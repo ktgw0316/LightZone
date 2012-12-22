@@ -1,0 +1,58 @@
+<project name="linux-help" default="build">
+
+    <property environment="ENV"/>
+
+    <target name="copy">
+        <mkdir dir="build"/>
+        <copy todir="build">
+            <fileset dir="../../lightcrafts/help" includes="**"/>
+            <fileset file="LightZone.hs"/>
+            <fileset file="LightZoneTOC.xml"/>
+            <fileset file="Map.jhm"/>
+            <fileset file="Platform.css"/>
+        </copy>
+        <copy todir="build/images">
+            <fileset dir="images" includes="**"/>
+        </copy>
+    </target>
+
+    <target name="tidy">
+        <exec executable="../../tidyall.sh" dir="build/English" vmlauncher="false" failonerror="true"/>
+    </target>
+
+    <target name="index">
+        <exec executable="jhindexer" dir="build" vmlauncher="false" failonerror="true">
+            <arg value="."/>
+        </exec>
+    </target>
+
+    <target name="jar">
+        <jar jarfile="lightzonehelp.jar">
+            <fileset dir="build" includes="**" excludes="English/**,neutral/**,JavaHelpSearch/**"/>
+            <fileset dir="build/English" includes="**"/>
+            <fileset dir="build/neutral" includes="**"/>
+        </jar>
+    </target>
+
+    <target name="build">
+        <antcall target="clean"/>
+        <antcall target="copy"/>
+        <antcall target="tidy"/>
+        <antcall target="index"/>
+        <antcall target="jar"/>
+        <copy todir="../products" file="lightzonehelp.jar"/>
+    </target>
+
+    <target name="run">
+        <fail unless="ENV.JH_HOME" message="Please define JH_HOME"/>
+        <java jar="${ENV.JH_HOME}/demos/bin/hsviewer.jar" fork="true">
+            <arg line="-helpset ./lightzonehelp.jar"/>
+        </java>
+    </target>
+
+    <target name="clean">
+        <delete file="lightzonehelp.jar"/>
+        <delete dir="build"/>
+    </target>
+
+</project>

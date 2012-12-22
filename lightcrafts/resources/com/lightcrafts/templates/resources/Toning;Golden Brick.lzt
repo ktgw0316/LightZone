@@ -1,0 +1,21 @@
+<Template version="7">
+  <Scale Factor="0.6462046"/>
+  <Image path=""/>
+  <Controls>
+    <GenericOperation Active="true" Collapsed="false" Locked="false" Mode="Normal" Name="Toning Shadows" Opacity="38" OperationType="Color Balance V2" regionsInverted="false">
+      <Slider Midpoint="0.03"/>
+      <Checkbox/>
+      <Choice/>
+      <Color b="107" g="120" r="128"/>
+    </GenericOperation>
+    <GenericOperation Active="true" Collapsed="false" Locked="false" Mode="Normal" Name="Toning Highlights" Opacity="55" OperationType="Color Balance V2" regionsInverted="false">
+      <Slider Midpoint="0.46"/>
+      <Checkbox/>
+      <Choice/>
+      <Color b="63" g="119" r="128"/>
+    </GenericOperation>
+    <Region/>
+    <Region/>
+    <Crop Angle="0.0"/>
+  </Controls>
+</Template>

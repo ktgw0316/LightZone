@@ -1,0 +1,19 @@
+<Template version="8">
+  <Scale Factor="0.38592008"/>
+  <Image path=""/>
+  <Controls>
+    <GenericOperation Active="true" Collapsed="false" Locked="false" Mode="Normal" Name="Clarity" Opacity="52" OperationType="Tone Mapper V5" layerControlsIndex="1" regionsInverted="false">
+      <ColorSelection HueBlue="0.5019608" HueEnabled="true" HueGreen="0.5019608" HueRadius="-1.0" HueRed="0.5019608" Inverted="false" LuminosityEnabled="true" LuminosityLower="0.365" LuminosityLowerFeather="0.189" LuminosityUpper="0.765" LuminosityUpperFeather="0.229"/>
+      <Slider Depth="64.0" Detail="6.5" Fuzz="0.1" Highlights="0.1" Shadows="2.0"/>
+      <Checkbox/>
+      <Choice/>
+    </GenericOperation>
+    <Region/>
+    <Crop>
+      <UpperLeft X="0.0" Y="0.0"/>
+      <UpperRight X="4304.0" Y="0.0"/>
+      <LowerLeft X="0.0" Y="2860.0"/>
+      <LowerRight X="4304.0" Y="2860.0"/>
+    </Crop>
+  </Controls>
+</Template>

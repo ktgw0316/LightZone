@@ -1,0 +1,248 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <title>LightZone: Blending Modes</title>
+    <meta name="description"
+      content="Description of the various blending modes."/>
+    <link rel="stylesheet" type="text/css" href="Help.css" media="all"/>
+    <link rel="stylesheet" type="text/css" href="Platform.css" media="all"/>
+    <!--[if lt IE 7]>
+    <script defer type="text/javascript" src="IE_PNG.js"></script>
+    <link rel="stylesheet" type="text/css" href="IE.css" media="all"/>
+    <![endif]-->
+  </head>
+
+  <body>
+    <div id="banner">
+      <div id="banner_left">
+        <a href="index.html">LightZone Help</a>
+      </div>
+      <div id="banner_right">
+        <a href="index/index.html">Index</a>
+      </div>
+    </div>
+
+    <!-- LC_Index: blending modes > description -->
+    <!-- LC_Index: tool > blending modes for -->
+    <a name="Blending_Modes"></a>
+    <img src="images/app_icon-32.png" width="32" height="32"
+      class="title_icon"/>
+    <h1>Blending modes</h1>
+
+    <p>
+      Most tools can have a <em>blending mode</em> specified for them.
+      A blending mode controls how the effects of tools in the
+      <a href="Tool_Stack.html">tool stack</a> blend together
+      to form the final photo.
+
+      In order to understand blending modes,
+      there are a few terms to know:
+      <dl>
+
+        <dt>Base color</dt>
+        <dd>
+          This is the color of a pixel
+          before a tool's effect
+          has been applied to the photo.
+        </dd>
+
+        <dt>Blend color</dt>
+        <dd>
+          This is the color of a pixel
+          after a tool's effect
+          has been applied to the photo.
+        </dd>
+
+        <dt>Result color</dt>
+        <dd>
+          This is the color of a pixel
+          after its base and blend colors
+          have been blended together
+          using a blending mode.
+        </dd>
+
+      </dl>
+
+      This is illustrated in the figure below.
+      First, as shown by the green arrows,
+      the base colors of a photo
+      have a tool's effect applied to them
+      producing the blend colors.
+
+      Second, as shown by the red arrows,
+      the base and blend colors
+      are blended together
+      using a blending mode
+      producing the result colors.
+    </p>
+    <p>
+      <div class="figure">
+        <img src="images/Blend_Modes_Illustration-en.png"
+          width="416" height="139"/>
+      </div>
+    </p>
+
+    <p>
+      There are many blending modes to choose from.
+      While descriptions for each are below,
+      it's best to experiment.
+    </p>
+
+    <dl>
+
+      <dt><a name="Blend_Normal"></a>Normal</dt>
+      <dd>
+        This blending mode has no effect;
+        therefore, the blend and result colors are the same.
+      </dd>
+
+      <dt><a name="Blend_Average"></a>Average</dt>
+      <dd>
+        This is the same as the Normal blending mode but at 50% opacity.
+      </dd>
+
+      <dt><a name="Blend_Color_Burn"></a>Color Burn</dt>
+      <dd>
+        Darkens the base color to reflect the blend color
+        by increasing contrast.
+        (Opposite of Color Dodge.
+        See also: Soft Burn.)
+      </dd>
+
+      <dt><a name="Blend_Color_Dodge"></a>Color Dodge</dt>
+      <dd>
+        Brightens the base color to reflect the blend color
+        by decreasing contrast.
+        (Opposite of Color Burn.)
+      </dd>
+
+      <dt><a name="Blend_Darken"></a>Darken</dt>
+      <dd>
+        The result color is either the base or blend color,
+        whichever is darker.
+        (Opposite of Lighten.)
+      </dd>
+
+      <dt><a name="Blend_Difference"></a>Difference</dt>
+      <dd>
+        Subtracts either the blend color from the base color
+        or the base color from the blend color
+        depending on whichever is brighter.
+        (See also: Exclusion.)
+      </dd>
+
+      <dt><a name="Blend_Exclusion"></a>Exclusion</dt>
+      <dd>
+        Creates an effect similar to,
+        but lower in contrast than,
+        the Difference blending mode.
+        (See also: Negation.)
+      </dd>
+
+      <dt><a name="Blend_Hard_Light"></a>Hard Light</dt>
+      <dd>
+        This blending mode multiplies or screens the colors,
+        depending on the blend color.
+
+        If the blend color is lighter than 50% gray,
+        the color is lightened (screened);
+
+        if the blend color is darker than 50% gray,
+        the color is darkened (multiplied).
+
+        This is useful for adding highlights or shadows to an image.
+      </dd>
+
+      <dt><a name="Blend_Lighten"></a>Lighten</dt>
+      <dd>
+        The result color is either the base or blend color,
+        whichever is lighter.
+        (Opposite of Darken.)
+      </dd>
+
+      <dt><a name="Blend_Midtones"></a>Midtones</dt>
+      <dd>
+        This blending mode is the same as the Normal blending mode
+        except that the effect is applied only to midtones. 
+      </dd>
+
+      <dt><a name="Blend_Mid_Hilights"></a>Mid+Hilights</dt>
+      <dd>
+        This blending mode is the same as the Normal blending mode
+        except that the effect is applied only to midtones and highlights. 
+      </dd>
+
+      <dt><a name="Blend_Multiply"></a>Multiply</dt>
+      <dd>
+        This blending mode multiplies the base and blend colors.
+        The result color is always darker.
+        The effect is similar to projecting multiple photographic slides
+        onto the same screen.
+        (See also: Screen.)
+      </dd>
+
+      <dt><a name="Blend_Negation"></a>Negation</dt>
+      <dd>
+        This blending mode is similar to the Exclusion blending mode
+        except that it shows brighter and more vibrant colors.
+      </dd>
+
+      <dt><a name="Blend_Overlay"></a>Overlay</dt>
+      <dd>
+        Multiplies or screens the colors
+        depending on the base color.
+        Patterns or colors overlay existing pixels
+        while preserving the highlights and shadows of the base color.
+        The base color is not replaced, but is mixed with the blend color
+        to reflect the relative lightness or darkness of the original color.
+      </dd>
+
+      <dt><a name="Blend_Screen"></a>Screen</dt>
+      <dd>
+        This blending mode is similar to the Multiply blending mode
+        except that it multiplies the inverse of the blend and base colors.
+        The result color is always lighter.
+        The effect is similar to projecting multiple photographic slides
+        onto the same screen.
+      </dd>
+
+      <dt><a name="Blend_Shadows"></a>Shadows</dt>
+      <dd>
+        This blending mode causes only the shadows to be affected.
+      </dd>
+
+      <dt><a name="Blend_Soft_Burn"></a>Soft Burn</dt>
+      <dd>
+        This blending mode is similar to the Color Burn blending mode
+        except that the effect results in less saturation and contrast.
+      </dd>
+
+      <dt><a name="Blend_Soft_Dodge"></a>Soft Dodge</dt>
+      <dd>
+        This blending mode is a combination of both the Color Dodge
+        and inverse Color Burn modes,
+        but much smoother than either.
+        The base colors are darkened slightly
+        with very bright blend colors dodged in.
+      </dd>
+
+      <dt><a name="Blend_Soft_Light"></a>Soft Light</dt>
+      <dd>
+        This blending mode darkens or lightens the colors
+        depending on the blend color.
+        The effect is similar to shining a diffused spotlight on the image.
+        If the blend color is lighter,
+        the image is lightened as if it were dodged;
+        if the blend color is darker,
+        the image is darkened as if it were burned in.
+      </dd>
+
+    </dl>
+
+  </body>
+</html>
+<!-- vim:set et sw=2 ts=2: -->

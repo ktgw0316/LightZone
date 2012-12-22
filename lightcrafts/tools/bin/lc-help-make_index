@@ -1,0 +1,222 @@
+#! /usr/bin/perl
+
+use File::Basename;
+use File::Find;
+use Getopt::Std;
+
+$ME = basename( $0 );
+
+##
+# Command-line options:
+#   a arg = application name
+#   C arg = chdir( $arg )
+#   h arg = Words for "LightZone Help"
+#   i arg = Word for "index"
+#   2 arg = 2-letter lang code
+##
+getopts( 'a:C:h:i:2:' );
+chdir( $opt_C ) if $opt_C;
+$app_name       = $opt_a || 'LightZone';
+$help_title     = $opt_h || "$app_name Help";
+$index_word     = $opt_i || 'Index';
+$lang_code      = $opt_2 || 'en';
+
+usage() if $#ARGV != 0;
+
+find( \&wanted, $ARGV[0] );
+my $midpoint = find_midpoint();
+html_header();
+my $main_entries = 0;
+for my $main_entry ( sort lc_sort keys %index ) {
+    html_middle() if ++$main_entries == $midpoint;
+
+    my $link = $index{ $main_entry }{ MAIN_LINK };
+
+    print "            <dt>";
+    if ( $link ) {
+        print "<a href=\"$link\">$main_entry</a>";
+    } else {
+        print "$main_entry";
+    }
+    print "</dt>\n";
+
+    unless ( $link ) {
+        for my $sub_entry ( sort lc_sort keys %{ $index{ $main_entry } } ) {
+            my $link = $index{ $main_entry }{ $sub_entry };
+            print "            <dd><a href=\"$link\">$sub_entry</a></dd>\n";
+        }
+    }
+}
+html_footer();
+
+########## Subroutines ########################################################
+
+##
+# Find the midpoint of the index entries so we can generate a 2-column index.
+# We find the midpoint making sure not to split a main entry.
+##
+sub find_midpoint {
+
+    ##
+    # Count the number of lines in the index for all main and sub entries and
+    # take half of that.
+    ##
+    my $lines = 0;
+    for my $main_entry ( keys %index ) {
+        ++$lines;
+        my $link = $index{ $main_entry }{ MAIN_LINK };
+        $lines += keys %{ $index{ $main_entry } } unless $link;
+    }
+    my $half = int( $lines / 2 + 0.5 );
+
+    ##
+    # Now go through the index again to see how many main and all of its
+    # subentires can be packed into the left column until we just go over the
+    # halfway point.
+    ##
+    $lines = 0;
+    my $midpoint = 0;
+    for my $main_entry ( sort lc_sort keys %index ) {
+        my $link = $index{ $main_entry }{ MAIN_LINK };
+        $lines += keys %{ $index{ $main_entry } } unless $link;
+        return $midpoint if ++$lines > $half;
+        ++$midpoint;
+    }
+
+    die "$ME: should never have gotten here!\n";
+}
+
+##
+# Print the HTML page header.
+##
+sub html_header {
+    print <<END;
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="$lang_code" xml:lang="$lang_code">
+
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <title>$app_name: $index_word</title>
+    <meta name="ROBOTS" content="NOINDEX"/>
+    <link rel="stylesheet" type="text/css" href="../Help.css" media="all"/>
+    <style type="text/css">
+      <!--
+      dt {
+        border-top: 1px solid #DFDFDF;
+        font-weight: normal;
+        margin-top: 5pt;
+      }
+      dd {
+        margin-left: 2em;
+      }
+      -->
+    </style>
+    <!--[if lt IE 7]>
+    <script defer type="text/javascript" src="../IE_PNG.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+    <div id="banner">
+      <div id="banner_left">
+        <a href="../index.html">$help_title</a>
+      </div>
+    </div>
+
+    <a name="Index"></a>
+    <img src="../images/app_icon-32.png" width="32" height="32"
+      class="title_icon"/>
+    <h1>$index_word</h1>
+
+    <table cellpadding="0" cellspacing="20">
+      <tr valign="top">
+        <td>
+          <dl>
+END
+}
+
+##
+# Print the HTML that ends the left column and begins the right column.
+##
+sub html_middle {
+    print <<END
+          </dl>
+        </td>
+        <td>
+          <dl>
+END
+}
+
+##
+# Print the HTML page footer.
+##
+sub html_footer {
+    print <<END
+          </dl>
+        </td>
+      </tr>
+    </table>
+
+  </body>
+</html>
+<!-- vim:set et sw=2 ts=2: -->
+END
+}
+
+##
+# Perform a string comparison ignoring case and ignoring whitespace (used as
+# argument to "sort").
+##
+sub lc_sort ($$) {
+    my ( $a, $b ) = @_;
+    $a =~ s/ //g;
+    $b =~ s/ //g;
+    lc($a) cmp lc($b);
+}
+
+##
+# Trim leading and trailing whitespace from a string.
+##
+sub trim {
+    my $s = shift;
+    $s =~ s/^\s+//;
+    $s =~ s/\s+$//;
+    return $s;
+}
+
+##
+# Print usage message and die.
+##
+sub usage {
+    die "usage: $ME [-a app_name] [-C dir] [-h help_title] [-i index_word] [-2 lang_code] help_dir\n";
+}
+
+##
+# Scan through an HTML file looking for LC_Index comments and build index
+# entries.
+##
+sub wanted {
+    return unless /\.html$/;
+    if ( !open( FILE, $_ ) ) {
+        warn "$ME: could not open $_\n";
+        return;
+    }
+    my $link = $File::Find::name;
+    $link =~ s/LightZone.*_Help/\.\./;
+    while ( <FILE> ) {
+        next unless /LC_Index:\s*(.*)\s*-->/;
+        my @terms = split( /\s*>\s*/, $1 );
+        my $main_entry = trim( shift( @terms ) );
+        my $sub_entry  = trim( shift( @terms ) );
+        if ( $sub_entry ) {
+            $index{ $main_entry }{ $sub_entry } = $link;
+        } else {
+            $index{ $main_entry }{ MAIN_LINK } = $link;
+        }
+    }
+    close( $_ );
+}
+
+# vim:set et sw=4 ts=4:

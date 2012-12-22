@@ -1,0 +1,13 @@
+<Template version="7">
+  <Scale Denominator="1" Numerator="1"/>
+  <Image path=""/>
+  <Controls>
+    <GenericOperation Active="true" Collapsed="false" Locked="false" Mode="Normal" Name="Crisp" Opacity="100" OperationType="Tone Mapper V4" regionsInverted="false">
+      <Slider Depth="32.08" Detail="1.32" Fuzz="0.2" Highlights="1.58" Shadows="1.0"/>
+      <Checkbox/>
+      <Choice/>
+    </GenericOperation>
+    <Region/>
+    <Crop Angle="0.0"/>
+  </Controls>
+</Template>

@@ -1,0 +1,163 @@
+<project name="linux" default="jar">
+
+  <tstamp/>
+
+  <!--===== Properties =====================================================-->
+
+  <property name="common-dir" value="../lightcrafts"/>
+
+  <!-- The default maxmemory for the run* targets. -->
+  <property name="maxmemory" value="256m"/>
+
+  <exec executable="cat" vmlauncher="false" failonerror="true"
+        outputproperty="app-version">
+    <arg value="${common-dir}/version.txt"/>
+  </exec>
+
+  <!--===== Application build ==============================================-->
+
+  <target name="common">
+    <ant dir="${common-dir}" target="jar"/>
+    <exec executable="make" dir="products" failonerror="true"
+          vmlauncher="false"/>
+  </target>
+
+  <target name="javac" depends="common">
+    <mkdir dir="build"/>
+    <javac destdir="build" source="1.5" debug="true">
+      <src path="src"/>
+      <classpath>
+        <fileset dir="${common-dir}/products">
+          <include name="*.jar"/>
+        </fileset>
+        <fileset dir="lib">
+          <include name="*.jar"/>
+        </fileset>
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="jni">
+    <exec executable="make" dir="jnisrc" failonerror="true" vmlauncher="false"/>
+  </target>
+
+  <target name="locales">
+    <copy todir="build">
+      <fileset dir="locale" excludes=".svn"/>
+    </copy>
+  </target>
+
+  <target name="help">
+    <ant dir="help" target="build"/>
+  </target>
+
+  <target name="build" depends="javac, jni, locales, help"/>
+
+  <!--===== Make the jar files =============================================-->
+
+  <target name="jar" depends="build">
+    <delete file="products/lightcrafts-linux.jar"/>
+    <jar jarfile="products/lightcrafts-linux.jar">
+      <fileset dir="build"/>
+      <manifest>
+        <attribute name="Built-By" value="${user.name}"/>
+        <attribute name="Implementation-Vendor" value="Light Crafts, Inc."/>
+        <attribute name="Implementation-Version"
+                   value="${app-version} ${TODAY}"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <!--===== Run the application ============================================-->
+
+  <target name="run">
+    <java classname="com.lightcrafts.platform.linux.LinuxLauncher"
+          dir="products" failonerror="true" fork="true"
+          maxmemory="${maxmemory}">
+      <classpath>
+        <fileset dir="products">
+          <include name="*.jar"/>
+        </fileset>
+      </classpath>
+      <env key="LD_LIBRARY_PATH" value="."/>
+      <sysproperty key="java.library.path" value="."/>
+      <sysproperty key="com.lightcrafts.licensetype" value="ESD"/>
+      <sysproperty key="lightcrafts.debug" value="1"/>
+    </java>
+  </target>
+
+  <!--===== Generate an Archive ============================================-->
+
+  <target name="archive" depends="jar">
+    <exec executable="install4jc" failonerror="true">
+      <!-- The "-D LZ_VERSION=..." has to be given to install4j as two seperate
+           arguments, hence the use of line= rather than value= since the
+           latter, even if there's a space in it, will be given as a single
+           argument containing a space and not as two seperate arguments. -->
+      <arg line="-D LZ_VERSION=${app-version}"/>
+      <arg file="lightzone.install4j"/>
+    </exec>
+  </target>
+
+  <target name="labelled-archive" depends="archive">
+    <exec executable="${common-dir}/tools/bin/lc-svn-revision"
+          outputproperty="svn-revision" vmlauncher="false" failonerror="true"/>
+
+    <!-- CruiseControl puts its build label in the "label" property -->
+    <mkdir dir="archive"/>
+    <move file="LightZone.tar.gz"
+          tofile="archive/LightZone-rev.${svn-revision}.tar.gz"/>
+  </target>
+
+  <!--===== Sign All Jars ==================================================-->
+
+  <target name="sign" depends="jar">
+    <signjar jar="products/lightcrafts.jar" lazy="true" alias="anton" storepass="xxxxxx"/>
+    <signjar jar="products/lightcrafts-linux.jar" lazy="true" alias="anton" storepass="xxxxxx"/>
+    <signjar jar="products/linux-so.jar" lazy="true" alias="anton" storepass="xxxxxx"/>
+    <signjar jar="products/lcjai.jar" lazy="true" alias="anton" storepass="xxxxxx"/>
+    <signjar jar="products/mlibwrapper_jai.jar" lazy="true" alias="anton" storepass="xxxxxx"/>
+  </target>
+
+  <!--===== Assemble the WebStart Site =====================================-->
+
+  <target name="webstart">
+    <delete dir="webstart"/>
+    <mkdir dir="webstart"/>
+
+    <!-- bundle native libraries into a jar and sign it -->
+    <delete file="products/linux-so.jar"/>
+    <jar jarfile="products/linux-so.jar">
+      <fileset dir="products" includes="*.so"/>
+      <manifest>
+        <attribute name="Built-By" value="${user.name}"/>
+        <attribute name="Implementation-Vendor" value="Light Crafts, Inc."/>
+        <attribute name="Implementation-Version"
+                   value="${app-version} ${TODAY}"/>
+      </manifest>
+    </jar>
+    <antcall target="sign"/>
+
+    <copy todir="webstart">
+      <fileset dir="web"/>  <!-- the static webstart content -->
+      <fileset dir="products" includes="*.jar"/>
+    </copy>
+  </target>
+
+  <!--===== Clean up =======================================================-->
+
+  <target name="distclean">
+    <ant dir="${common-dir}" target="distclean"/>
+    <ant dir="help" target="clean"/>
+    <delete dir="archive"/>
+    <delete dir="build"/>
+    <delete dir="webstart"/>
+    <delete file="LightZone.tar.gz"/>
+    <exec executable="make" dir="products">
+      <arg value="distclean"/>
+    </exec>
+  </target>
+  <target name="clean" depends="distclean"/>
+
+</project>
+<!-- vim:set et sw=2 ts=2: -->

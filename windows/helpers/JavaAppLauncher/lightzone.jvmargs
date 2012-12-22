@@ -1,0 +1,21 @@
+##
+# This file contains the arguments to the JVM as you would give them to the
+# 'java' command-line executable except one argument is given per line.
+# Additionally, -classpath can not be used; instead, use -Djava.class.path.
+#
+# Comments (like this) and blank lines are ignored.
+##
+
+# JVM options.
+-Xrs
+-XX:+UseParallelGC
+-Djava.class.path=lightcrafts-windows.jar;lightcrafts.jar;lcjai.jar;mlibwrapper_jai.jar;substance-lite.jar
+-Duser.dir=.
+-Dcom.lightcrafts.licensetype=@LICENSETYPE@
+
+# Main class.
+com.lightcrafts.platform.windows.WindowsLauncher
+
+# Main class arguments, if any.
+
+# The end.

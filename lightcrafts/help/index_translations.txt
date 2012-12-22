@@ -1,0 +1,18 @@
+##
+# The fields are:
+#
+#	1. Language name (in English)
+#	2. ISO language code
+#	3. Windows language code
+#	4. Windows region
+#	5. Help title (localized)
+#	6. Word for "index" (localized)
+#
+# Accented characters must use HTML character entity references.
+##
+
+English	:en :0x409 :United States	:LightZone Help		:Index
+French	:fr :0x40c :France		:Aide de LightZone	:Index
+German	:de :0x407 :Germany		:LightZone Hilfe	:Index
+Italian	:it :0x410 :Italy		:Aiuto di LightZone	:Indice
+Spanish	:es :0x40a :Traditional Sort	:Ayuda de LightZone	:&Iacute;ndice

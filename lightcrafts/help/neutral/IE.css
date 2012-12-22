@@ -1,0 +1,8 @@
+#banner {
+  /*
+  ** Fixed positioning is broken in IE < 7, so revert to absolute.
+  */
+  position: absolute;
+}
+
+/* vim:set et sw=2 ts=2: */

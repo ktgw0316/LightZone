@@ -1,0 +1,17 @@
+<Template version="6">
+  <Scale Factor="0.5123239"/>
+  <Image path=""/>
+  <Controls>
+    <ZoneOperation Locked="true" Active="true" Collapsed="true" Mode="Normal" Name="RAW Tone Mappers" Opacity="100" regionsInverted="false" scale="0">
+      <Points Size="16">
+        <Point X="5" Y="0.2264957264957265"/>
+        <Point X="8" Y="0.5085470085470085"/>
+        <Point X="12" Y="0.8504273504273504"/>
+        <Point X="14" Y="0.9444444444444444"/>
+        <Point X="15" Y="0.9786324786324786"/>
+      </Points>
+    </ZoneOperation>
+    <Region/>
+    <Crop Angle="0.0"/>
+  </Controls>
+</Template>

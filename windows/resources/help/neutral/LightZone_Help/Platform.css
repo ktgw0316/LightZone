@@ -1,0 +1,13 @@
+.Linux_only {
+  display: none;
+}
+
+.Mac_only {
+  display: none;
+}
+
+.Not_Windows {
+  display: none;
+}
+
+/* vim:set et sw=2 ts=2: */

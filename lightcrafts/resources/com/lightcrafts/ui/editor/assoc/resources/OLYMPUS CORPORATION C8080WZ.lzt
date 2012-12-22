@@ -1,0 +1,15 @@
+<Template version="6">
+  <Scale Factor="0.13521242"/>
+  <Image path="C:\Documents and Settings\lightcrafts\Desktop\ORF Test Images\Olympus C-8080WZ.ORF" relativePath="..\ORF Test Images\Olympus C-8080WZ.ORF"/>
+  <Controls>
+    <ZoneOperation Locked="true" Active="true" Collapsed="true" Mode="Normal" Name="RAW ZoneMapper" Opacity="100" regionsInverted="false" scale="0">
+      <Points Size="16">
+        <Point X="4" Y="0.18376068376068377"/>
+        <Point X="7" Y="0.3888888888888889"/>
+        <Point X="10" Y="0.6623931623931624"/>
+      </Points>
+    </ZoneOperation>
+    <Region/>
+    <Crop Angle="0.0"/>
+  </Controls>
+</Template>

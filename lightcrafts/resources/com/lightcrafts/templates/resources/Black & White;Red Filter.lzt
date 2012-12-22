@@ -1,0 +1,14 @@
+<Template version="7">
+  <Scale Factor="0.18246336"/>
+  <Image path=""/>
+  <Controls>
+    <GenericOperation Active="true" Collapsed="false" Locked="false" Mode="Normal" Name="BW Red Filter" Opacity="100" OperationType="Channel Mixer V4" regionsInverted="false">
+      <Slider Strength="1.0"/>
+      <Checkbox/>
+      <Choice/>
+      <Color b="2" g="0" r="255"/>
+    </GenericOperation>
+    <Region/>
+    <Crop Angle="0.0"/>
+  </Controls>
+</Template>

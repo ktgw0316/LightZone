@@ -1,0 +1,19 @@
+<Template version="8">
+  <Scale Denominator="1" Numerator="1"/>
+  <Image path=""/>
+  <Controls>
+    <GenericOperation Active="true" Collapsed="false" Locked="false" Mode="Normal" Name="Midtone Sharpening" Opacity="100" OperationType="UnSharp Mask V3" layerControlsIndex="1" regionsInverted="false">
+      <ColorSelection HueBlue="0.5019608" HueEnabled="true" HueGreen="0.5019608" HueRadius="-1.0" HueRed="0.5019608" Inverted="false" LuminosityEnabled="true" LuminosityLower="0.447" LuminosityLowerFeather="0.176" LuminosityUpper="0.8" LuminosityUpperFeather="0.194"/>
+      <Slider Amount="185.0" Radius="2.3" Threshold="20.0"/>
+      <Checkbox/>
+      <Choice/>
+    </GenericOperation>
+    <Region/>
+    <Crop>
+      <UpperLeft X="0.0" Y="0.0"/>
+      <UpperRight X="4378.0" Y="0.0"/>
+      <LowerLeft X="0.0" Y="2912.0"/>
+      <LowerRight X="4378.0" Y="2912.0"/>
+    </Crop>
+  </Controls>
+</Template>

@@ -1,0 +1,21 @@
+<Template version="7">
+  <Scale Factor="0.6462046"/>
+  <Image path=""/>
+  <Controls>
+    <GenericOperation Active="true" Collapsed="false" Locked="false" Mode="Normal" Name="Palladium Shadows" Opacity="23" OperationType="Color Balance V2" regionsInverted="false">
+      <Slider Midpoint="0.04"/>
+      <Checkbox/>
+      <Choice/>
+      <Color b="108" g="121" r="128"/>
+    </GenericOperation>
+    <GenericOperation Active="true" Collapsed="false" Locked="false" Mode="Normal" Name="Palladium Highlights" Opacity="85" OperationType="Color Balance V2" regionsInverted="false">
+      <Slider Midpoint="0.5"/>
+      <Checkbox/>
+      <Choice/>
+      <Color b="109" g="128" r="126"/>
+    </GenericOperation>
+    <Region/>
+    <Region/>
+    <Crop Angle="0.0"/>
+  </Controls>
+</Template>

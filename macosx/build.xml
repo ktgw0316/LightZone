@@ -1,0 +1,327 @@
+<project name="macosx" default="build">
+
+  <tstamp/>
+
+  <!--===== Properties =====================================================-->
+
+  <property name="common-dir" value="../lightcrafts"/>
+  <property file="${common-dir}/resources/com/lightcrafts/utils/resources/Version.properties"/>
+
+  <property name="app-dir" value="release"/>
+  <property name="macosx-jar" value="products/lightcrafts-apple.jar"/>
+
+  <!-- The default maxmemory for the run target. -->
+  <property name="maxmemory" value="256m"/>
+
+  <!-- The default JVM version for the run target. -->
+  <property name="jvm-version" value="1.5"/>
+
+  <exec executable="cat" vmlauncher="false" failonerror="true"
+        outputproperty="app-version">
+    <arg value="${common-dir}/version.txt"/>
+  </exec>
+
+  <condition property="UNIVERSAL" value="1" else="0">
+    <isset property="UNIVERSAL"/>
+  </condition>
+  <condition property="USE_ICC" value="1" else="0">
+    <isset property="USE_ICC"/>
+  </condition>
+
+  <!--===== Application build ==============================================-->
+
+  <target name="common">
+    <ant dir="${common-dir}" target="jar"/>
+    <exec executable="make" dir="products" failonerror="true"
+          vmlauncher="false"/>
+  </target>
+
+  <target name="javac" depends="common">
+    <mkdir dir="build"/>
+    <javac destdir="build" source="1.5" target="1.5" debug="true">
+      <src path="src"/>
+      <classpath>
+        <pathelement location="/System/Library/Java/"/>
+        <fileset dir="${common-dir}/products">
+          <include name="*.jar"/>
+        </fileset>
+        <fileset dir="lib">
+          <include name="*.jar"/>
+        </fileset>
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="locale">
+    <copy todir="build">
+      <fileset dir="locale" excludes=".svn"/>
+    </copy>
+  </target>
+
+  <target name="jni">
+    <exec executable="make" dir="jnisrc" failonerror="true" vmlauncher="false">
+      <arg value="UNIVERSAL=${UNIVERSAL}"/>
+    </exec>
+  </target>
+
+  <target name="helpers">
+    <exec executable="make" dir="helpers" failonerror="true" vmlauncher="false">
+      <arg value="UNIVERSAL=${UNIVERSAL}"/>
+    </exec>
+  </target>
+
+  <target name="build" depends="javac, locale, jni"/>
+
+  <!--===== Make a jar file ================================================-->
+
+  <target name="jar" depends="build">
+    <delete file="${macosx-jar}"/>
+    <jar jarfile="${macosx-jar}">
+      <fileset dir="build"/>
+      <manifest>
+        <attribute name="Built-By" value="${user.name}"/>
+        <attribute name="Implementation-Vendor" value="${company-name}"/>
+        <attribute name="Implementation-Version"
+                   value="${app-version} ${TODAY}"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <target name="check-for-jar">
+    <condition property="jar-exists">
+      <available file="${macosx-jar}"/>
+    </condition>
+  </target>
+
+  <target name="jar-if-necessary" depends="check-for-jar" unless="jar-exists">
+    <antcall target="jar"/>
+  </target>
+
+  <!--===== Run the application ============================================-->
+
+  <target name="run" depends="jar-if-necessary">
+    <java classname="com.lightcrafts.platform.macosx.MacOSXLauncher"
+          dir="products" failonerror="true" fork="true"
+          maxmemory="${maxmemory}">
+      <!--
+      <jvmarg value="-XrunShark"/>
+      -->
+      <classpath>
+        <pathelement location="/System/Library/Java/"/>
+        <fileset dir="products">
+          <include name="*.jar"/>
+        </fileset>
+      </classpath>
+      <env key="JAVA_JVM_VERSION" value="${jvm-version}"/>
+      <sysproperty key="com.lightcrafts.zorn" value="true"/>
+      <sysproperty key="IDE" value="true"/>
+      <sysproperty key="java.library.path" value="."/>
+      <sysproperty key="lightcrafts.debug" value="1"/>
+      <sysproperty key="apple.awt.graphics.EnableDeferredUpdates" value="false"/>
+    </java>
+  </target>
+
+  <!--===== Crash Reporter bundle build ====================================-->
+
+  <target name="crash-reporter" depends="helpers">
+    <exec executable="make" dir="helpers/CrashReporter" failonerror="true"
+          vmlauncher="false">
+      <arg value="UNIVERSAL=${UNIVERSAL}"/>
+      <arg value="bundle"/>
+    </exec>
+  </target>
+
+  <!--===== Make Mac OS X application bundles ==============================-->
+
+  <property name="bundle-contents" value="${app-dir}/${app-name}.app/Contents"/>
+  <property name="bundle-resources" value="${bundle-contents}/Resources"/>
+
+  <target name="delete-bundle">
+    <delete dir="${app-dir}" quiet="true"/>
+  </target>
+
+  <target name="resources">
+    <copy todir="${bundle-contents}">
+      <fileset dir="resources" excludes=".svn"/>
+    </copy>
+  </target>
+
+  <target name="build-bundle"
+    depends="jar, crash-reporter, delete-bundle, resources">
+
+    <exec executable="${common-dir}/tools/bin/lc-svn-revision"
+          outputproperty="svn-revision" vmlauncher="false" failonerror="true"/>
+    <copy file="resources/Info.plist" todir="${bundle-contents}"
+          overwrite="true">
+      <filterset>
+        <filter token="APPNAME" value="${app-name}"/>
+        <filter token="BUILD" value="${svn-revision}"/>
+        <filter token="BUNDLEID" value="com.lightcrafts.${app-name}"/>
+        <filter token="LICENSETYPE" value="${licensetype}"/>
+        <filter token="VERSION" value="${app-version}"/>
+      </filterset>
+    </copy>
+    <copy file="resources/lc_version.plist"
+          todir="${bundle-contents}" overwrite="true">
+      <filterset>
+        <filter token="APPNAME" value="${app-name}"/>
+        <filter token="VERSION" value="${app-version}"/>
+        <filter token="BUILD" value="${svn-revision}"/>
+      </filterset>
+    </copy>
+
+    <!-- The JavaAppLauncher is copied to LightZone so "LightZone" appears in
+         the output of the "ps" command. -->
+    <copy file="helpers/JavaAppLauncher/JavaAppLauncher"
+          tofile="${bundle-contents}/MacOS/${app-name}"/>
+    <chmod file="${bundle-contents}/MacOS/${app-name}" perm="775"/>
+    <copy todir="${bundle-contents}/Resources">
+      <fileset dir="helpers/JavaAppLauncher/Resources" excludes=".svn"/>
+    </copy>
+
+    <copy todir="${bundle-resources}/Java">
+      <fileset dir="products" excludes=".svn">
+        <include name="dcraw"/>
+        <include name="LightZone-forkd"/>
+        <include name="EWSMacCompress.tar.gz"/>
+        <include name="**/*.dylib"/>
+        <include name="**/*.jar"/>
+        <include name="**/*.jnilib"/>
+      </fileset>
+    </copy>
+    <chmod file="${bundle-resources}/Java/dcraw" perm="775"/>
+    <chmod file="${bundle-resources}/Java/LightZone-forkd" perm="775"/>
+
+    <copy file="helpers/eSellerateActivator/eSellerateActivate"
+          todir="${bundle-resources}/Java"/>
+    <chmod file="${bundle-resources}/Java/eSellerateActivate" perm="775"/>
+
+    <exec executable="make" dir="help" failonerror="true" vmlauncher="false">
+      <arg value="APP_NAME=${app-name}"/>
+    </exec>
+
+    <copy todir="${bundle-resources}/CrashReporter.app">
+      <fileset dir="helpers/CrashReporter/CrashReporter.app"/>
+    </copy>
+    <chmod file="${bundle-resources}/CrashReporter.app/Contents/MacOS/CrashReporter"
+           perm="775"/>
+  </target>
+
+  <target name="bundle-esd">
+    <antcall target="build-bundle">
+      <param name="licensetype" value="ESD"/>
+    </antcall>
+  </target>
+
+  <target name="bundle-tb">
+    <antcall target="build-bundle">
+      <param name="licensetype" value="TB"/>
+    </antcall>
+  </target>
+
+  <!--===== Make a dmg file ================================================-->
+
+  <target name="dmg-esd" depends="bundle-esd">
+    <exec executable="make" dir="dmg" failonerror="true" vmlauncher="false">
+      <arg value="APP_NAME=${app-name}"/>
+      <arg value="USE_ICC=${USE_ICC}"/>
+      <arg value="UNIVERSAL=${UNIVERSAL}"/>
+      <arg value="user"/>
+    </exec>
+  </target>
+
+  <target name="dmg-tb" depends="bundle-tb">
+    <exec executable="make" dir="dmg" failonerror="true" vmlauncher="false">
+      <arg value="APP_NAME=${app-name}"/>
+      <arg value="USE_ICC=${USE_ICC}"/>
+      <arg value="UNIVERSAL=${UNIVERSAL}"/>
+      <arg value="user"/>
+    </exec>
+  </target>
+
+  <!--===== CruiseControl ==================================================-->
+
+  <property name="cc-dir" value="dmg/cruisecontrol"/>
+
+  <target name="cc-build">
+    <antcall target="cc-clean"/>
+    <exec executable="${common-dir}/tools/bin/lc-svn-branch"
+          outputproperty="svn-branch" vmlauncher="false" failonerror="true"/>
+    <exec executable="${common-dir}/tools/bin/lc-svn-revision"
+          outputproperty="svn-revision" vmlauncher="false" failonerror="true"/>
+
+    <mkdir dir="dmg/cruisecontrol"/>
+
+    <antcall target="dmg-esd"/>
+    <move file="dmg/${app-name}.dmg"
+          tofile="${cc-dir}/${app-name}-${svn-branch}-r${svn-revision}-ESD.dmg"/>
+
+    <antcall target="dmg-tb"/>
+    <move file="dmg/${app-name}.dmg"
+          tofile="${cc-dir}/${app-name}-${svn-branch}-r${svn-revision}-TB.dmg"/>
+  </target>
+
+  <target name="cc-clean">
+    <delete dir="${cc-dir}"/>
+  </target>
+
+  <!--===== Make a zip file ================================================-->
+
+  <target name="zip" depends="bundle-esd">
+    <delete file="${app-dir}/${app-name}.zip"/>
+    <zip destfile="${app-dir}/${app-name}.zip">
+      <zipfileset dir="${app-dir}"
+        excludes="${app-name}.app/Contents/MacOS/${app-name}"/>
+      <zipfileset dir="${app-dir}"
+        includes="${app-name}.app/Contents/MacOS/${app-name}"
+        filemode="755"/>
+    </zip>
+  </target>
+
+  <!--===== Javadoc ========================================================-->
+
+  <target name="javadoc">
+    <mkdir dir="doc"/>
+    <javadoc destdir="doc">
+      <fileset dir="src"/>
+    </javadoc>
+  </target>
+
+  <!--===== Clean up =======================================================-->
+
+  <target name="clean-up">
+    <ant dir="${common-dir}" target="${clean-method}"/>
+    <delete dir="build"/>
+    <delete dir="${app-dir}"/>
+    <exec executable="make" dir="dmg">
+      <arg value="${clean-method}"/>
+    </exec>
+    <exec executable="make" dir="helpers">
+      <arg value="UNIVERSAL=1"/>
+      <arg value="${clean-method}"/>
+    </exec>
+    <exec executable="make" dir="jnisrc">
+      <arg value="UNIVERSAL=1"/>
+      <arg value="${clean-method}"/>
+    </exec>
+    <exec executable="make" dir="products">
+      <arg value="${clean-method}"/>
+    </exec>
+    <antcall target="cc-clean"/>
+  </target>
+
+  <target name="distclean">
+    <antcall target="clean-up">
+      <param name="clean-method" value="distclean"/>
+    </antcall>
+  </target>
+  <target name="clean" depends="distclean"/>
+
+  <target name="mostlyclean">
+    <antcall target="clean-up">
+      <param name="clean-method" value="mostlyclean"/>
+    </antcall>
+  </target>
+
+</project>
+<!-- vim:set et sw=2 ts=2: -->

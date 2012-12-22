@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist SYSTEM "file://localhost/System/Library/DTDs/PropertyList.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleAllowMixedLocalizations</key>
+    <string>false</string>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>US</string>
+    <key>CFBundleExecutable</key>
+    <string>@APPNAME@</string>
+    <key>CFBundleGetInfoString</key>
+    <string>@APPNAME@ @VERSION@ (@BUILD@), Copyright 2005-2007 Light Crafts, Inc. All Rights Reserved.</string>
+    <key>CFBundleHelpBookFolder</key>
+    <string>LightZone_Help</string>
+    <key>CFBundleHelpBookName</key>
+    <string>@APPNAME@ Help</string>
+    <key>CFBundleIdentifier</key>
+    <string>@BUNDLEID@</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>@APPNAME@</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleSignature</key>
+    <string>LCLZ</string>
+    <key>CFBundleVersion</key>
+    <string>@VERSION@</string>
+    <key>NSPrincipalClass</key>
+    <string>NSApplication</string>
+    <key>NSMainNibFile</key>
+    <string>MainMenu</string>
+    <key>CFBundleDocumentTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>ARW</string>
+                <string>CR2</string>
+                <string>CRW</string>
+                <string>DCR</string>
+                <string>dng</string>
+                <string>jpe</string>
+                <string>jpeg</string>
+                <string>jpg</string>
+                <string>KDC</string>
+                <string>lzn</string>
+                <string>lzt</string>
+                <string>MOS</string>
+                <string>MRW</string>
+                <string>NEF</string>
+                <string>ORF</string>
+                <string>PEF</string>
+                <string>RAF</string>
+                <string>RAW</string>
+                <string>RW2</string>
+                <string>SR2</string>
+                <string>tif</string>
+                <string>tiff</string>
+            </array>
+            <key>CFBundleTypeMIMETypes</key>
+            <array>
+                <string>image/jpeg</string>
+                <string>image/tiff</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>JPEG Image</string>
+            <key>CFBundleTypeName</key>
+            <string>TIFF Image</string>
+            <key>CFBundleTypeOSTypes</key>
+            <array>
+                <string>JPEG</string>
+                <string>TIFF</string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>LightZoneFile.icns</string>
+            <key>CFBundleTypeName</key>
+            <string>@APPNAME@ Transform Format</string>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+        </dict>
+    </array>
+    <key>CFBundleIconFile</key>
+    <string>LightZone.icns</string>
+
+    <!-- Java stuff -->
+
+    <key>Java</key>
+    <dict>
+        <key>MainClass</key>
+        <string>com.lightcrafts.platform.macosx.MacOSXLauncher</string>
+        <key>JVMVersion</key>
+        <string>1.5*</string>
+        <key>ClassPath</key>
+        <array>
+            <string>lightcrafts-apple.jar</string>
+            <string>lightcrafts.jar</string>
+            <string>quaqua.jar</string>
+            <string>lcjai.jar</string>
+            <string>substance-lite.jar</string>
+            <string>/System/Library/Java</string>
+        </array>
+        <key>VMOptions</key>
+        <array>
+            <string>-Xrs</string>
+        </array>
+        <key>Properties</key>
+        <dict>
+            <key>apple.awt.graphics.UseQuartz</key>
+            <string>true</string>
+            <key>com.lightcrafts.licensetype</key>
+            <string>@LICENSETYPE@</string>
+        </dict>
+        <key>WorkingDirectory</key>
+        <string>$APP_PACKAGE/$JAVAROOT</string>
+    </dict>
+
+</dict>
+</plist>
+<!-- vim:set et sw=4 ts=4: -->

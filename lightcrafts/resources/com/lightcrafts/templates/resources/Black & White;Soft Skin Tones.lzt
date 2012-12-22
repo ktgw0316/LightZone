@@ -1,0 +1,14 @@
+<Template version="7">
+  <Scale Denominator="1" Numerator="1"/>
+  <Image path=""/>
+  <Controls>
+    <GenericOperation Active="true" Collapsed="false" Locked="false" Mode="Normal" Name="Soft Skin Tones BW" Opacity="100" OperationType="Channel Mixer V4" regionsInverted="false">
+      <Slider Strength="2.1"/>
+      <Checkbox/>
+      <Choice/>
+      <Color b="0" g="144" r="255"/>
+    </GenericOperation>
+    <Region/>
+    <Crop Angle="0.0"/>
+  </Controls>
+</Template>

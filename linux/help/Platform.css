@@ -1,0 +1,278 @@
+.Mac_only {
+  display: none;
+}
+
+.Not_Linux {
+  display: none;
+}
+
+.Windows_only {
+  display: none;
+}
+
+/********** Elements *********************************************************/
+
+a {
+  color: blue;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+body {
+  background-color: white;
+  color: black;
+  font-family: "Lucida Grande", Arial, sans-serif;
+  font-size: 12pt;
+  margin: 12pt;
+}
+
+dt {
+  font-weight: bold;
+  margin-top: 9pt;
+}
+
+dd {
+  margin-left: 1em;
+}
+
+h1 {
+  font-size: 24pt;
+  font-weight: 500;
+  letter-spacing: -1pt;
+  margin-bottom: 0;
+  margin-left: 40px;
+  padding-top: 12px;
+  padding-bottom: 0;
+  width: 88%;
+}
+
+h2 {
+  font-size: 16pt;
+  margin-top: 16px;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+h2 + * {
+  margin-top: 0;
+}
+
+h3 {
+  font-size: 12pt;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+h3 + * {
+  margin-top: 0;
+}
+
+h4 {
+  font-size: 10pt;
+  font-weight: 300;
+}
+
+ol {
+  margin-left: 2em;
+  padding-left: 1em;
+}
+
+ul {
+  list-style-image: url("images/orange_bullet.gif");
+  margin-left: 1em;
+  padding-left: 1em;
+}
+
+/********** IDs **************************************************************/
+
+#banner {
+  background-color: #F2F2F2;
+  border-bottom: 1px solid #BFBFBF;
+  float: left;
+  font-size: 10pt;
+  height: 11pt;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1;
+}
+
+#banner_left {
+  left: 10px;
+  position: absolute;
+  top: 0;
+}
+
+#banner_right {
+  float: right;
+  padding-right: 10px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: auto;
+}
+
+#cover_center {
+  float: left;
+  margin-top: 2px;
+  padding: 0;
+  width: 20px;
+}
+
+#cover_frame {
+  text-align: left;
+  margin-top: 12px;
+  margin-right: auto;
+  margin-left: auto;
+  width: 510px;
+}
+
+#cover_left {
+  float: left;
+  margin-top: 38px;
+  text-align: center;
+  width: 240px;
+}
+
+#cover_right {
+  border-left: 1px solid #808080;
+  float: left;
+  height: 280px;
+  margin-top: 18px;
+  padding-left: 30px;
+  width: 210px;
+}
+
+#next {
+  left: 88%;
+  position: absolute;
+  top: 35px;
+}
+
+/********** Classes **********************************************************/
+
+.chapter_box {
+  border: dotted 1px #CCC;
+  border-collapse: collapse;
+}
+
+.chapter_box_header {
+  background-color: #E6EDFF;
+  font-weight: bold;
+}
+
+.chapter_box_figure {
+  padding-right: 10px;
+  padding-top: 10px;
+}
+
+.figure {
+  font-weight: bold;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+h1.cover {
+  font-size: 20pt;
+  margin-left: 0;
+  width: 100%;
+}
+
+h2.cover {
+  font-size: 14pt;
+}
+
+.inline_right {
+  float: right;
+  padding-bottom: 10px;
+  padding-left: 10px;
+}
+
+.legal {
+  color: #999;
+  font-size: 8pt;
+}
+
+.simple_table {
+  border-collapse: collapse;
+}
+
+.simple_table td {
+  border: solid 1px #BFBFBF;
+  padding: 3px;
+  text-align: left;
+}
+
+.simple_table th {
+  background-color: #E6EDFF;
+  border: solid 1px #BFBFBF;
+  font-weight: bold;
+  padding: 3px;
+  text-align: left;
+}
+
+.task_box {
+  background-color: #E6EDFF;
+  border: solid 1px #BFBFBF;
+  clear: both;
+  list-style-position: outside;
+  list-style-type: decimal;
+  margin: 12px 0;
+  padding: 2px 12px;
+  /*
+  ** In IE 7, floats (meaning: elements having a "float" CSS property) are
+  ** sometimes not rendered correctly.
+  **
+  ** One way to fix this is to give "layout" to the element containing the
+  ** floats.  From http://www.satzansatz.de/cssd/onhavinglayout.html:
+  **
+  **    "Layout" is an IE/Win proprietary concept that determines how elements
+  **    draw and bound their content, interact with and relate to other
+  **    elements, and react on and transmit application/user events.
+  **
+  ** One way to give "layout" to an element is with the a "zoom" IE/Windows
+  ** proprietary CSS property with a value of 1 which is a no-op except that it
+  ** bestows "layout"-ness.  Since the property is IE/Windows proprietary and
+  ** CSS engines ignore unknown properties, "zoom" has no effect in non-IE
+  ** browsers.
+  **
+  ** (If you want to see the rendering bug, comment out the "zoom" below and
+  ** look at Regions-Adjusting.html, for example.)
+  */
+  zoom: 1;
+}
+
+.task_box h2 {
+  font-size: 9pt;
+  font-weight: bold;
+  margin-bottom: -4px;
+  margin-top: 8px;
+}
+
+.task_box ol {
+  line-height: 12pt;
+  list-style-position: outside;
+  margin-bottom: 12px;
+  margin-left: -18px;
+  margin-top: 12px;
+  padding-left: 40px;
+}
+
+.task_box ol li {
+  margin-bottom: 6px;
+  margin-top: 6px;
+  margin-left: 100px;
+}
+
+.title_icon {
+  float: left;
+  padding-top: 12px;
+  width: 32px;
+}
+
+/* vim:set et sw=2 ts=2: */

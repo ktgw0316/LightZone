@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<install4j version="3.2.5">
+  <directoryPresets config="./scripts" />
+  <application name="LightZone" distributionSourceDir="" applicationId="3263-1164-2624-0045" mediaDir="." mediaFilePattern="%SHORT_NAME%" compression="6" lzmaCompression="false" keepModificationTimes="false" shortName="LightZone" publisher="Light Crafts, Inc." publisherWeb="http://www.lightcrafts.com/" version="%LZ_VERSION%" allPathsRelative="true" backupOnSave="false" autoSave="false" macSignature="????" javaMinVersion="1.6" javaMaxVersion="" allowBetaVM="false">
+    <searchSequence>
+      <registry />
+      <envVar name="JAVA_HOME" />
+      <envVar name="JDK_HOME" />
+    </searchSequence>
+    <variables>
+      <variable name="LZ_VERSION" value="" />
+    </variables>
+  </application>
+  <files>
+    <mountPoints>
+      <mountPoint name="" id="1" location="" mode="755" />
+    </mountPoints>
+    <entries>
+      <dirEntry mountPoint="1" file="products" overwrite="4" shared="false" mode="755" dontUninstall="false" excludeSuffixes="" dirMode="755">
+        <exclude>
+          <entry location="libLCCDL.so" launcher="false" />
+          <entry location="GNUmakefile" launcher="false" />
+          <entry location=".svn" launcher="false" />
+        </exclude>
+      </dirEntry>
+      <dirEntry mountPoint="1" file="icons" overwrite="4" shared="false" mode="644" dontUninstall="false" excludeSuffixes="" dirMode="755">
+        <exclude>
+          <entry location=".svn" launcher="false" />
+        </exclude>
+      </dirEntry>
+    </entries>
+    <components />
+  </files>
+  <launchers>
+    <launcher name="LightZone" id="2" external="false" excludeFromMenu="false" menuName="" icnsFile="" pngIcon16File="icons/LightZone_16.png" pngIcon32File="icons/LightZone_32.png" macServiceDependencies="" allowUserChangeServiceStartType="true">
+      <executable name="LightZone" type="1" iconSet="true" iconFile="" executableDir="" redirectStderr="true" stderrFile="LightZone.log" redirectStdout="true" stdoutFile="LightZone.log" failOnStderrOutput="false" executableMode="1" changeWorkingDirectory="false" workingDirectory="." singleInstance="true" serviceStartType="2" serviceDependencies="" serviceDescription="" jreLocation="">
+        <versionInfo include="false" fileVersion="" companyName="" fileDescription="" legalCopyright="" productVersion="" internalName="" />
+      </executable>
+      <splashScreen show="false" autoOff="true" alwaysOnTop="true" width="-1" height="-1" bitmapFile="">
+        <text>
+          <statusLine x="20" y="20" text="" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
+          <versionLine x="20" y="40" text="" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
+        </text>
+      </splashScreen>
+      <java mainClass="com.lightcrafts.platform.linux.LinuxLauncher" vmParameters="-Dcom.lightcrafts.licensetype=ESD" arguments="" allowVMPassthroughParameters="true" minVersion="" maxVersion="" preferredVM="client" allowBetaVM="false" jdkOnly="false">
+        <searchSequence>
+          <registry />
+          <envVar name="JAVA_HOME" />
+          <envVar name="JDK_HOME" />
+        </searchSequence>
+        <classPath>
+          <scanDirectory location="." failOnError="false" />
+        </classPath>
+        <nativeLibraryDirectories>
+          <directory name="." />
+        </nativeLibraryDirectories>
+      </java>
+      <includedFiles />
+    </launcher>
+  </launchers>
+  <installerGui installerType="1" runUninstallerOnUpdate="false" addOnAppId="" suggestPreviousLocations="true" allowUnattendedInstall="false" useCustomHeaderImage="true" customHeaderImage="icons/LightZone_55.png" customSize="false" customWidth="500" customHeight="390">
+    <customCode preAction="false" preActionClass="" postAction="false" postActionClass="" preUninstallAction="false" preUninstallActionClass="" postUninstallAction="false" postUninstallActionClass="" initHandler="false" initHandlerClass="" directoryValidator="false" directoryValidatorClass="" installationHandler="false" installationHandlerClass="" />
+    <standardScreens>
+      <screen id="welcome" enabled="true" useCustomBanner="true" bannerImageFile="icons/LightZone_164_314.png" background="255,255,255" />
+      <screen id="license" enabled="false" file="" />
+      <screen id="location" enabled="true" showSpace="true" suggestAppDir="true" />
+      <screen id="components" enabled="true" allSelected="true" firstMandatory="true">
+        <selectedComponents />
+        <mandatoryComponents />
+      </screen>
+      <screen id="programGroup" enabled="true" />
+      <screen id="fileAssociations" enabled="true">
+        <associations>
+          <association extension="lzn" description="LightZone document" winIconFile="icons/LightZoneFile.ico" launcherId="2" selected="true" windows="true" macos="true" macIconFile="" />
+          <association extension="jpg" description="JPEG image" winIconFile="icons/LightZoneFile.ico" launcherId="2" selected="false" windows="true" macos="true" macIconFile="" />
+          <association extension="png" description="PNG image" winIconFile="icons/LightZoneFile.ico" launcherId="2" selected="false" windows="true" macos="true" macIconFile="" />
+          <association extension="dng" description="DNG image" winIconFile="icons/LightZoneFile.ico" launcherId="2" selected="false" windows="true" macos="true" macIconFile="" />
+          <association extension="tif" description="TIFF image" winIconFile="icons/LightZoneFile.ico" launcherId="2" selected="false" windows="true" macos="true" macIconFile="" />
+          <association extension="tiff" description="TIFF image" winIconFile="icons/LightZoneFile.ico" launcherId="2" selected="false" windows="true" macos="true" macIconFile="" />
+          <association extension="crw" description="Canon RAW image" winIconFile="icons/LightZoneFile.ico" launcherId="2" selected="false" windows="true" macos="true" macIconFile="" />
+          <association extension="cr2" description="Canon RAW image" winIconFile="icons/LightZoneFile.ico" launcherId="2" selected="false" windows="true" macos="true" macIconFile="" />
+          <association extension="mrw" description="Minolta RAW image" winIconFile="icons/LightZoneFile.ico" launcherId="2" selected="false" windows="true" macos="true" macIconFile="" />
+          <association extension="nef" description="Nikon RAW image" winIconFile="icons/LightZoneFile.ico" launcherId="2" selected="false" windows="true" macos="true" macIconFile="" />
+        </associations>
+      </screen>
+      <screen id="services" enabled="true" allSelected="true">
+        <selectedServiceLaunchers />
+      </screen>
+      <screen id="additionalTasks" enabled="true" customTasksPlacement="1">
+        <customTasks />
+      </screen>
+      <screen id="preInfo" enabled="false" file="" />
+      <screen id="install" enabled="true" />
+      <screen id="postInfo" enabled="false" file="" />
+      <screen id="finished" enabled="true" useCustomBanner="true" bannerImageFile="icons/LightZone_164_314.png" background="255,255,255" />
+    </standardScreens>
+    <customScreens />
+  </installerGui>
+  <mediaSets>
+    <unixArchive name="tgz" id="9" mediaFileName="LightZone" installDir="LightZone" allLaunchers="true" includedJRE="linux-x86-1.6.0_03-lightzone.tar.gz" manualJREEntry="false" customScriptMode="2" customScriptFile="scripts/findmaxmem.sh">
+      <selectedLaunchers />
+      <messageSet language="English" />
+      <exclude />
+      <variables />
+      <customScriptLines />
+    </unixArchive>
+  </mediaSets>
+  <buildIds buildAll="true">
+    <mediaSet refId="9" />
+    <mediaSet refId="12" />
+  </buildIds>
+</install4j>
+

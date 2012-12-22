@@ -1,0 +1,19 @@
+<Template version="8">
+  <Scale Denominator="1" Numerator="1"/>
+  <Image path=""/>
+  <Controls>
+    <GenericOperation Active="true" Collapsed="false" Locked="false" Mode="Normal" Name="MT Green Sharpen" Opacity="100" OperationType="UnSharp Mask V3" layerControlsIndex="1" regionsInverted="false">
+      <ColorSelection HueBlue="0.08235294" HueEnabled="true" HueGreen="0.26666668" HueRadius="0.71" HueRed="0.12941177" Inverted="false" LuminosityEnabled="true" LuminosityLower="0.453" LuminosityLowerFeather="0.271" LuminosityUpper="0.859" LuminosityUpperFeather="0.135"/>
+      <Slider Amount="185.0" Radius="2.3" Threshold="20.0"/>
+      <Checkbox/>
+      <Choice/>
+    </GenericOperation>
+    <Region/>
+    <Crop>
+      <UpperLeft X="0.0" Y="0.0"/>
+      <UpperRight X="5002.0" Y="0.0"/>
+      <LowerLeft X="0.0" Y="3328.0"/>
+      <LowerRight X="5002.0" Y="3328.0"/>
+    </Crop>
+  </Controls>
+</Template>

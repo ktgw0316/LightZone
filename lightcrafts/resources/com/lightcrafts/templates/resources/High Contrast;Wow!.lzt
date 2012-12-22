@@ -1,0 +1,13 @@
+<Template version="7">
+  <Scale Factor="0.380008"/>
+  <Image path=""/>
+  <Controls>
+    <GenericOperation Active="true" Collapsed="false" Locked="false" Mode="Soft Light" Name="Wow!" Opacity="70" OperationType="UnSharp Mask V3" regionsInverted="false">
+      <Slider Amount="100.0" Radius="500.0" Threshold="20.0"/>
+      <Checkbox/>
+      <Choice/>
+    </GenericOperation>
+    <Region/>
+    <Crop Angle="0.0"/>
+  </Controls>
+</Template>

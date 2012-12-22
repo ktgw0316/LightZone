@@ -1,0 +1,16 @@
+<Template version="6">
+  <Scale Factor="0.33486766"/>
+  <Image path=""/>
+  <Controls>
+    <ZoneOperation Locked="true" Active="true" Collapsed="true" Mode="Normal" Name="ZoneMapper 1" Opacity="100" regionsInverted="false" scale="0">
+      <Points Size="16">
+        <Point X="4" Y="0.09829059829059829"/>
+        <Point X="7" Y="0.34615384615384615"/>
+        <Point X="14" Y="0.9230769230769231"/>
+        <Point X="15" Y="0.9658119658119658"/>
+      </Points>
+    </ZoneOperation>
+    <Region/>
+    <Crop Angle="0.0"/>
+  </Controls>
+</Template>

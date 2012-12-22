@@ -1,0 +1,479 @@
+#! /bin/bash
+
+ME=$(basename $0)
+
+function assertIsSet {
+    if [[ ! ${!1} ]]
+    then
+        echo "$ME: \"$1\" must be set" >&2
+        exit 1
+    fi
+}
+
+assertIsSet ICC_HOME
+assertIsSet INTEL_COMMON
+assertIsSet MSSDK_HOME
+
+ICC_HOME_W32=$(cygpath -w "$ICC_HOME")
+INTEL_COMMON_W32=$(cygpath -w "$INTEL_COMMON")
+MSSDK_HOME_W32=$(cygpath -w "$MSSDK_HOME")
+
+ICC_BIN="$ICC_HOME_W32\\Bin"
+ICC=icl
+
+##
+# The Intel compiler requires these variables to be set.
+##
+export INTEL_LICENSE_FILE="$INTEL_COMMON\\Licenses"
+export INTEL_SHARED="$INTEL_COMMON\\Shared Files"
+
+##
+# The default set of include directories.
+##
+export INCLUDE="\
+$MSSDK_HOME_W32\\Include;\
+$MSSDK_HOME_W32\\Include\\gl;\
+$ICC_HOME_W32\\Include"
+
+##
+# The default set of library directories.
+##
+export LIB="\
+$MSSDK_HOME_W32\\Lib;\
+$ICC_HOME_W32\\Lib"
+
+##
+# The name of the default executable produced by the compiler.
+##
+CC_DEFAULT_EXE=a.exe
+
+##
+# Default icl options:
+#
+#   /nologo     Disables printing of compiler version info.
+#   /Qvc9       Specifies "Microsoft Visual Studio 2008" compatibility.
+#   /Qwd10161   Disables "unrecognized source type ..." warning.
+##
+ICC_OPTS="/nologo /Qvc9 /Qwd10161"
+
+##
+# Annoyingly, icl has two different equivalents for the gcc -o option depending
+# on whether the target is either an object file or an executable (or DLL).  We
+# default to the one for executables (/Fe) and override this with the one for
+# object files (/Fo) only if we get a -c option since -c is used only when
+# producing objects and never executables (or DLLs).
+##
+ICC_o_OPT=/Fe
+
+##
+# cygpath has what is arguably a bug in that it converts relative paths
+# containing ., .., or any level of ../.. into absolute paths.  This can cause
+# problems when relative paths (e.g., ../include) are converted on the command
+# line but the current directory is changed before the command is executed: the
+# converted path points to the wrong place.
+#
+# Therefore, we have our own function that converts only absolute paths using
+# cygpath and simply used "sed" to change / to \ for relative paths.
+##
+function lc_cygpathw {
+    case "$*" in
+    /*) cygpath -w "$*" ;;
+    *) echo "$*" | sed 's!/!\\!g' ;;
+    esac
+}
+
+##
+# We need to keep track of all library paths specified by the -L option so we
+# can search through them later for libraries.
+##
+function add_cc_L_dir {
+    CC_L_DIRS[NLIB++]="$*"
+    W32PATH=$(lc_cygpathw "$*")
+    if [ -z "$ICC_LIB" ]
+    then ICC_LIB=$W32PATH
+    else ICC_LIB="$ICC_LIB;$W32PATH"
+    fi
+}
+add_cc_L_dir "$MSSDK_HOME_W32\\Lib"
+
+##
+# Search for a given library in the paths specified by CC_L_DIRS.
+##
+function find_lib {
+    for libdir in "${CC_L_DIRS[@]}"
+    do
+        if [ -f "$libdir\\$1-implib.a" ]; then echo $1-implib.a; return; fi
+        if [ -f "$libdir\\$1.dll"      ]; then echo $1.dll     ; return; fi
+        if [ -f "$libdir\\lib$1.dll"   ]; then echo lib$1.dll  ; return; fi
+        if [ -f "$libdir\\$1.a"        ]; then echo $1.a       ; return; fi
+        if [ -f "$libdir\\lib$1.a"     ]; then echo lib$1.a    ; return; fi
+        if [ -f "$libdir\\$1.lib"      ]; then echo $1.lib     ; return; fi
+        if [ -f "$libdir\\lib$1.lib"   ]; then echo lib$1.lib  ; return; fi
+    done
+    echo "$ME: warning: could not find library $1" >&2
+}
+
+###############################################################################
+#
+#   Translate Unix gcc options to icl options.
+#
+#   We can't use the shell's getopt because it only parses options up to the
+#   first non-option and a cc command line can have options after non-options,
+#   e.g.:
+#
+#       cc -L/libs hello.c -lfoo
+#
+###############################################################################
+
+for ARG in "$@"
+do
+    ##
+    # An argument (like a path) that contains a \ followed by a space, e.g.:
+    #
+    #   /some\ path
+    #
+    # appears to bash as 2 arguments: we need to put them back together into a
+    # quoted single argument without the \, e.g.:
+    #
+    #   "/some path"
+    #
+    # Note that there can be multiple \'s in an argument, e.g.:
+    #
+    #   /very\ long\ path
+    #
+    # so we have to loop until there are no more \'s.
+    ##
+    ARG_NO_BS=${ARG%\\}                 # ARG, no backslash
+    if [ "$ARG_NO_BS" != "$ARG" ]
+    then
+        if [ -z "$A" ]
+        then A=$ARG_NO_BS               # first time
+        else A="$A $ARG_NO_BS"          # multiple \'s
+        fi
+        continue
+    fi
+    if [ -z "$A" ]
+    then A=$ARG                         # no \'s at all
+    else A="$A $ARG"                    # final part of all \'s
+    fi
+
+    if [ "$AA" = "" ]
+    then
+        case $A in
+
+        ########## Options for this script itself start with '+'.
+
+        +n|+dryrun)
+            DRY_RUN=1
+            ;;
+
+        ########## No-argument gcc options that are the same for icl.
+
+        -c|-E|-P|-Wall)
+            ICC_OPTS="$ICC_OPTS /${A#-}"
+            if [ "$A" = -c ]
+            then
+                CC_c_OPT=1
+                ICC_o_OPT=/Fo
+            fi
+            ;;
+
+        ########## gcc argument options that are the same for icl.
+
+        -D*|-O*|-U*)
+            OPT=${A:1:1}
+            if [ "$A" != "-$OPT" ]
+            then ICC_OPTS="$ICC_OPTS /${A#-}"
+            else AA=/$OPT
+            fi
+            ;;
+
+        -I*)
+            if [ "$A" != -I ]
+            then
+                W32PATH=$(lc_cygpathw "${A#-?}")
+                ICC_OPTS="$ICC_OPTS /I\"$W32PATH\""
+            else
+                AA=/I
+            fi
+            ;;
+
+        -L*)
+            if [ "$A" != -L ]
+            then add_cc_L_dir "${A#-?}"
+            else AA=/L
+            fi
+            ;;
+
+        ########## gcc options that are different for icl.
+
+        -fexceptions)
+            ICC_OPTS="$ICC_OPTS /GX /EHs"
+            ;;
+
+        -g)
+            ICC_OPTS="$ICC_OPTS /Zi"
+            ;;
+
+        -l*)
+            if [ "$A" != -l ]
+            then
+                TEMP=$(find_lib "${A#-?}")
+                ICC_LINK="$ICC_LINK $TEMP"
+            else
+                AA=/link
+            fi
+            ;;
+
+        -msse)
+            ICC_OPTS="$ICC_OPTS /arch:SSE"
+            ;;
+
+        -msse2)
+            ICC_OPTS="$ICC_OPTS /arch:SSE2"
+            ;;
+
+        -o*)
+            if [ "$A" != -o ]
+            then
+                OPT_o_ARG=${A#-?}
+                W32PATH=$(lc_cygpathw "$OPT_o_ARG")
+                ICC_OPTS="$ICC_OPTS $ICC_o_OPT$W32PATH"
+            else
+                AA=$ICC_o_OPT
+            fi
+            ;;
+
+        -shared)
+            ICC_OPTS="$ICC_OPTS /LD"
+            ;;
+
+        -Wl,--add-stdcall-alias)
+            ICC_OPTS="$ICC_OPTS /Gz"
+            ;;
+
+        ########## icl options.
+
+        -fp-model)
+            AA=/fp
+            ;;
+
+        -ipo|-vec-report*)
+            ICC_OPTS="$ICC_OPTS /Q${A#-}"
+            ;;
+
+
+        -ipo-jobs*)
+            ICC_OPTS="$ICC_OPTS /Qipo-jobs:${A:9:1}"
+            ;;
+
+        -Kc++)
+            ICC_OPTS="$ICC_OPTS /TP"
+            ;;
+
+        ########## gcc options that don't exist for icl.
+
+        -fomit-frame-pointer)
+            # Ignore
+            ;;
+
+        -march=*)
+            # Ignore
+            ;;
+
+        -mfpmath=*)
+            # Ignore
+            ;;
+
+        -mno-cygwin)
+            # Ignore
+            ;;
+
+        -mno-sse)
+            # Ignore
+            ;;
+
+        -mwindows)
+            # Ignore
+            ;;
+
+        -Wl,--enable-auto-import)
+            # Ignore
+            ;;
+
+        -Wl,--export-all-symbols)
+            # Ignore
+            ;;
+
+        -Wl,--out-implib*)
+            # Ignore
+            ;;
+
+        -Wmissing-prototypes)
+            # Ignore
+            ;;
+
+        -Wno-pointer-sign)
+            # Ignore
+            ;;
+
+        ########## Unknown option.
+
+        -*) echo "$ME: unknown option: $A"
+            exit 1
+            ;;
+
+        ########## Pass Windows /-style options through as-is.
+
+        /*)
+            ICC_OPTS="$ICC_OPTS $A"
+            ;;
+
+        ########## Assume anything else is an argument to pass through.
+
+        *)  W32PATH=$(lc_cygpathw "$A")
+            ICC_ARGS="$ICC_ARGS \"$W32PATH\""
+            ;;
+
+        esac
+    else
+        ##
+        # Get the argument for the recent option.
+        ##
+        case $AA in
+        /D|/O)
+            ICC_OPTS="$ICC_OPTS $AA$A"
+            ;;
+        /Fe|/Fo)
+            OPT_o_ARG=$A
+            W32PATH=$(lc_cygpathw "$OPT_o_ARG")
+            ICC_OPTS="$ICC_OPTS $AA$W32PATH"
+            ;;
+        /fp)
+            ICC_OPTS="$ICC_OPTS $AA:$A"
+            ;;
+        /I)
+            W32PATH=$(lc_cygpathw "$A")
+            ICC_OPTS="$ICC_OPTS $AA\"$W32PATH\""
+            ;;
+        /L)
+            add_cc_L_dir "$A"
+            ;;
+        /link)
+            TEMP=$(find_lib "$A")
+            ICC_LINK="$ICC_LINK $TEMP"
+            ;;
+        esac
+        unset AA
+    fi
+
+    unset A
+done
+
+if [ -n "$AA" ]
+then
+    echo "$ME: $AA requires an argument" >&2
+    exit 1
+fi
+
+[ -n "$ICC_LIB" ] && echo "--> LIB=$ICC_LIB" >&2
+echo "--> $ICC $ICC_OPTS $ICC_ARGS $ICC_LINK" >&2
+
+[ -n "$DRY_RUN" ] && exit 0
+
+###############################################################################
+#
+#   Call the Intel C++ compiler.
+#
+###############################################################################
+
+##
+# Create a batch file to set up the environment for the Windows Intel C++
+# compiler, then call it.
+##
+trap "x=$?; rm -f /tmp/*_$$_* 2>/dev/null; exit $x" EXIT HUP INT TERM
+CMD_FILE=/tmp/icl_$$_.cmd
+cat > $CMD_FILE <<ENDHERE
+@echo off
+SETLOCAL
+@CALL "$ICC_BIN\iclvars.bat"
+SET LIB=%LIB%;$ICC_LIB
+$ICC $ICC_OPTS $ICC_ARGS $ICC_LINK
+ENDHERE
+
+cmd /C $(lc_cygpathw "$CMD_FILE")
+ICC_STATUS=$?
+
+###############################################################################
+#
+#   Do post-processing of generated object/executable files.
+#
+###############################################################################
+
+if [ -n "$CC_c_OPT" -a -n "$OPT_o_ARG" ]
+then
+    ##
+    # Intel's C++ compiler generates object files with the execute bit set:
+    # unset it just to be tidy.
+    ##
+    chmod -x $OPT_o_ARG
+elif [ -z "$CC_c_OPT" -a -z "$OPT_o_ARG" ]
+then
+    ##
+    # This is the case where one or more source files are being compiled
+    # directly into an executable.
+    #
+    # Intel's C++ compiler generates a default executable (no /Fe option)
+    # having the same basename as the first source file, e.g.:
+    #
+    #   cl hello.c world.c
+    #
+    # results in hello.exe being created: rename it to a.exe to be Unix-like.
+    ##
+    rm -f $CC_DEFAULT_EXE
+    EXE_FILES=$(echo *.exe)
+    if [ "$EXE_FILES" != '*.exe' ]
+    then
+        for exe in $EXE_FILES
+        do
+            mv $exe $CC_DEFAULT_EXE
+            break
+        done
+    fi
+    ##
+    # Intel's C++ compiler also leaves the intermediate .obj files around:
+    # delete them.
+    ##
+    rm -f *.obj
+else
+    ##
+    # Intel's C++ compiler defaults to generating object files with a .obj
+    # extension (no /Fo option): rename them to have a Unix-like .o extension.
+    ##
+    OBJ_FILES=$(echo *.obj)
+    if [ "$OBJ_FILES" != '*.obj' ]
+    then
+        for obj_file in $OBJ_FILES
+        do
+            O_FILE=${obj_file%%.obj}.o
+            mv $obj_file $O_FILE
+            chmod -x $O_FILE
+        done
+    fi
+fi
+
+##
+# Remove "junk" files created by the Windows Intel C++ compiler.
+##
+if [ -n "$OPT_o_ARG" ]
+then BASE_NAME=${OPT_o_ARG%.*}
+else BASE_NAME=${CC_DEFAULT_EXE%.*}
+fi
+rm -f $BASE_NAME.exp $BASE_NAME.ilk $BASE_NAME.lib $BASE_NAME.pdb *.pdb
+
+##
+# Finally, exit with the Intel C++ compiler's original exit status.
+##
+exit $ICC_STATUS
+
+# vim:set et sw=4 ts=4:

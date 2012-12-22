@@ -1,0 +1,34 @@
+#! /bin/bash
+
+CD_LICENSE_FILE="$HOME/Library/Preferences/com.lightcrafts.license.plist"
+ESD_SN_FILE="$HOME/Library/Application Support/LightZone/License/ESLF"
+ESD_LICENSE_DIR="/Library/Application Support/MindVision"
+
+########## You shouldn't have to change anything below this line. #############
+
+ME=$(basename $0)
+
+usage() {
+    echo "usage: $ME [-c] [-e]" >&2
+    exit 1
+}
+
+while getopts ce opt
+do
+    case $opt in
+    c)  CD=true ;;
+    e)  ESD=true ;;
+    ?)  usage ;;
+    esac
+done
+shift $(expr $OPTIND - 1)
+
+[ -z "$CD" -a -z "$ESD" ] && {
+    echo "$ME: at least one of -c or -e is required" >&2
+    exit 1
+}
+
+[ -n "$CD"  ] && rm -f "$CD_LICENSE_FILE"
+[ -n "$ESD" ] && rm -f "$ESD_SN_FILE" "$ESD_LICENSE_DIR"/*
+
+# vim:set et sw=4 ts=4:

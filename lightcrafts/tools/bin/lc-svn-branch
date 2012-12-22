@@ -1,0 +1,12 @@
+#! /usr/bin/perl
+##
+# Gets which branch (or trunk) we're on.
+#
+# Paul J. Lucas [paul@lightcrafts.com]
+##
+
+open( INFO, 'svn info|' ) or die "$ARGV[0]: can't run svn\n";
+map { print "$1$2\n" if m!^URL.*?lightzone/(trunk)|branches/([^/]*)!; } <INFO>;
+close( INFO );
+
+# vim:set et sw=4 ts=4:

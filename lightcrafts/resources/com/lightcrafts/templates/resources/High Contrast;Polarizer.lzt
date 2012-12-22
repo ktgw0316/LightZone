@@ -1,0 +1,13 @@
+<Template version="7">
+  <Scale Denominator="1" Numerator="1"/>
+  <Image path=""/>
+  <Controls>
+    <GenericOperation Active="true" Collapsed="false" Locked="false" Mode="Normal" Name="Polarizer" Opacity="100" OperationType="Tone Mapper V4" regionsInverted="false">
+      <Slider Depth="32.0" Detail="2.12" Fuzz="0.2" Highlights="0.63" Shadows="1.0"/>
+      <Checkbox/>
+      <Choice/>
+    </GenericOperation>
+    <Region/>
+    <Crop Angle="0.0"/>
+  </Controls>
+</Template>

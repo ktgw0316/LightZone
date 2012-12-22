@@ -1,0 +1,24 @@
+<Template version="7">
+  <Scale Factor="0.14930686"/>
+  <Image path=""/>
+  <Controls>
+    <GenericOperation Active="true" Collapsed="false" Locked="false" Mode="Normal" Name="BW Red Filter" Opacity="100" OperationType="Channel Mixer V4" regionsInverted="false">
+      <Slider Strength="1.0"/>
+      <Checkbox/>
+      <Choice/>
+      <Color b="2" g="0" r="255"/>
+    </GenericOperation>
+    <ZoneOperation Active="true" Collapsed="false" Locked="false" Mode="Normal" Name="High Key Look" Opacity="100" regionsInverted="false" scale="1">
+      <Points Size="16">
+        <Point X="2" Y="0.017094017094017096"/>
+        <Point X="6" Y="0.5042735042735043"/>
+        <Point X="10" Y="0.8247863247863247"/>
+        <Point X="12" Y="0.9017094017094017"/>
+        <Point X="14" Y="0.9572649572649573"/>
+      </Points>
+    </ZoneOperation>
+    <Region/>
+    <Region/>
+    <Crop Angle="0.0"/>
+  </Controls>
+</Template>

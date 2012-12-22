@@ -1,0 +1,67 @@
+#! /bin/bash
+set -e
+
+ME="$0"
+FILE1="$1"
+FILE2="$2"
+
+if [ -d "$FILE1" ]
+then
+    ##
+    # We're doing a directory symlink: recurse for every file in the directory.
+    ##
+
+    OLD_PWD="$PWD"
+    cd "$FILE1"
+    FILES=$(echo *)
+    cd "$OLD_PWD"
+
+    for i in $FILES
+    do
+        [ ! -e "$FILE2" ] && mkdir "$FILE2"
+        LC_RECURSE=1 "$ME" "$FILE1/$i" "$FILE2/$i"
+    done
+else
+    ##
+    # We're doing a file symlink.
+    ##
+
+    if [ -d "$FILE2" ]
+    then
+        ##
+        # We have a case like:
+        #
+        #   lc-cmp foo dir
+        #
+        # i.e., a file and a directory where the file of the second argument is
+        # implicit.  Make the second argument explicit:
+        #
+        #   lc-cmp foo dir/foo
+        ##
+        FILE1_BASE=$(basename "$FILE1")
+        FILE2="$FILE2/$FILE1_BASE"
+    fi
+
+    if [ -z "$LC_RECURSE" ]
+    then
+        FILE2_DIR=$(dirname "$FILE2")
+        if [ "$FILE2_DIR" != . -a "${FILE1:0:3}" = ../ ]
+        then
+            ##
+            # We have a case like:
+            #
+            #   lc-cmp ../foo dir/foo
+            #
+            # but ../foo is relative to dir/ so we have to "cd dir" first.
+            ##
+            cd "$FILE2_DIR"
+            FILE2=$(basename "$FILE2")
+        fi
+    fi
+
+    if ! cmp -s "$FILE1" "$FILE2"
+    then cp -r --preserve=mode "$FILE1" "$FILE2"
+    fi
+fi
+
+# vim:set et sw=4 ts=4:

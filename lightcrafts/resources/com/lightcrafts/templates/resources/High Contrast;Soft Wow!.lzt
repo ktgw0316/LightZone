@@ -1,0 +1,19 @@
+<Template version="7">
+  <Scale Denominator="1" Numerator="1"/>
+  <Image path=""/>
+  <Controls>
+    <GenericOperation Active="true" Collapsed="false" Locked="false" Mode="Normal" Name="Soft Wow!" Opacity="100" OperationType="Tone Mapper V4" regionsInverted="false">
+      <Slider Depth="32.0" Detail="1.32" Fuzz="0.2" Highlights="0.63" Shadows="2.0"/>
+      <Checkbox/>
+      <Choice/>
+    </GenericOperation>
+    <GenericOperation Active="true" Collapsed="false" Locked="false" Mode="Soft Light" Name="Soft Wow!" Opacity="70" OperationType="UnSharp Mask V3" regionsInverted="false">
+      <Slider Amount="100.0" Radius="500.0" Threshold="20.0"/>
+      <Checkbox/>
+      <Choice/>
+    </GenericOperation>
+    <Region/>
+    <Region/>
+    <Crop Angle="0.0"/>
+  </Controls>
+</Template>

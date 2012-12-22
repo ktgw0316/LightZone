@@ -1,0 +1,1040 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <meta http-equiv="Content-Script-Type" content="text/javascript"/>
+    <title>LightZone: Engineering Release Notes</title>
+    <style type="text/css">
+      <!--
+        a {
+          color: blue;
+          text-decoration: none;
+        }
+        a:hover {
+          text-decoration: underline;
+        }
+        body {
+          background-color: white;
+          color: black;
+          font-family: "Lucida Grande", Arial, sans-serif;
+          font-size: 9pt;
+        }
+        dt {
+          font-weight: bold;
+          margin-top: 9pt;
+        }
+        dd {
+          margin-left: 1em;
+        }
+        h2 {
+          border-top: 1px solid #DFDFDF;
+        }
+        h3 {
+          margin-bottom: 0;
+          padding-bottom: 0;
+        }
+        h3 + * {
+          margin-top: 0;
+        }
+        ul {
+          margin-left: 1em;
+          padding-left: 1em;
+        }
+        li p {
+          margin-top: 0;
+        }
+        .change_note {
+          color: #888;
+          margin-left: 1em;
+          margin-right: 1em;
+        }
+        .footer {
+          border-top: 1px solid #DFDFDF;
+        }
+      -->
+    </style>
+  </head>
+
+  <body>
+    <h1>LightZone Engineering Release Notes</h1>
+
+    <p>
+      <b>Note:</b>
+      This is text file for engineers only.
+      Please feel free to be verbose.
+    </p>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 3.1, rXXXX, 3-Sep-2007</h2>
+
+    <h3>New Features</h3>
+    <ul>
+      <li>
+        You can now restrict every tools' effect to a
+        range of color or luminosity.
+      </li>
+      <li>
+        The Raw Adjustments tool
+        now automatically removes &quot;hot pixels&quot;
+        from your raw photos.
+      </li>
+      <li>
+        Crop and Rotate have been improved.
+      </li>
+    </ul>
+
+    <h3>Camera Support</h3>
+    <ul>
+      <li>
+        Raw files from the following cameras are now supported:
+        Olympus E-400, E-410, E-510; Ricoh Caplio GX100.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 3.0.6, rXXXX, 28-June-2007</h2>
+
+    <h3>Fixes (all platforms)</h3>
+    <ul>
+      <li>
+        Upgrading from pre-3.0 versions of LightZone Basic
+        to 3.0.x LightZone Basic now works properly.
+      </li>
+      <li>
+        A DNG image created from a Fuji raw image
+        was not handled correctly.
+        This has been fixed.
+      </li>
+    </ul>
+
+    <h3>Fixes (Windows only)</h3>
+    <ul>
+      <li>
+        The font used in menus was too big.
+        This has been fixed.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 3.0.5, r8780, 27-June-2007</h2>
+
+    <h3>New Features</h3>
+    <ul>
+      <li>
+        LightZone Basic is now available again.
+      </li>
+    </ul>
+
+    <h3>Fixes</h3>
+    <ul>
+      <li>
+        Some Sony raw photo were opened with the wrong dimensions.
+        This has been fixed.
+      </li>
+      <li>
+        In some cases, you would get a Save dialog
+        even though the Auto Save preference was enabled.
+      </li>
+    </ul>
+
+    <h3>Camera Support</h3>
+    <ul>
+      <li>
+        Kodak P712, Nikon D40X, Olympus SP-550UZ, and Samsing GX10
+        raw files are now supported.
+      </li>
+    </ul>
+
+    <h3>Other changes</h3>
+    <ul>
+      <li>
+        If a photo is read-only,
+        the ability to edit metadata is now disabled.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 3.0.2, r8648, 8-June-2007</h2>
+
+    <h3>Fixes</h3>
+    <ul>
+      <li>
+        Fixed oversaturated colors in the sharpening tool.
+      </li>
+       <li>
+        Fixed related issue in noise reduction.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 3.0.1, r8637, 7-June-2007</h2>
+
+    <h3>New Features</h3>
+    <ul>
+      <li>
+        Adjusting the Exposure slider of the Raw Adjustments tool
+        so that the value is negative performs highlight recovery.
+      </li>
+    </ul>
+
+    <h3>Fixes</h3>
+    <ul>
+      <li>
+        Removed artifacts that were sometimes introduced
+        when using the Relight tool.
+      </li>
+      <li>
+        The Black &amp; White and Color Balance tools
+        have had minor corrections.
+      </li>
+      <li>
+        In some cases, vibrant colors were overly saturated.
+        This has been fixed.
+      </li>
+      <li>
+        Editing of metadata works much better.
+      </li>
+      <li>
+        Fixed generation of IPTC and XMP metadata for JPEG files
+        that previously resulted in an incompatibility with Photoshop CS3.
+      </li>
+      <li>
+        Fixed obtaining the artist information from CR2 files.
+      </li>
+      <li>
+        A photo's rating is now properly stored when generating new TIFF files.
+      </li>
+      <li>
+        Fixed obtaining the exposure-time/shutter-speed information from
+        Canon raw files.
+      </li>
+      <li>
+        Fixed reading of artist, copyright, caption, and rating metadata
+        from DNG files.
+      </li>
+      <li>
+        Styles now appear in the Import Styles dialog.
+      </li>
+      <li>
+        The capture date/time from CRW files
+        is now included when converting to JPEG.
+      </li>
+      <li>
+        Now writing IPTC metadata in a more standards-conformant way
+        using the Dublin Core XML schema.
+      </li>
+    </ul>
+
+    <h3>Camera Support</h3>
+    <ul>
+      <li>
+        Fuji Finepix S5 Pro raw files are now supported.
+      </li>
+    </ul>
+
+    <h3>Other changes</h3>
+    <ul>
+      <li>
+        LightZone now shows both the &quot;Edit Size&quot;
+        and the &quot;Version Size&quot; for an edited photo and its original.
+      </li>
+      <li>
+        LightZone now goes to the &quot;Discover LightZone&quot; help page
+        instead of the cover when first launched.
+      </li>
+      <li>
+        You can now sort by file type in the browser.
+      </li>
+      <li>
+        The Browser menu now includes Select Recent and Unselect All
+        menu items.
+      </li>
+      <li>
+        You can now use the Delete/Backspace key
+        to delete a region while editing a region.
+      </li>
+      <li>
+        When converting to JPEG, lens metadata is now preserved.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 3.0, r8440, 21-May-2007</h2>
+
+    <h3>User Interface</h3>
+    <ul>
+      <li>
+        LightZone now has distinct browse and edit modes.
+      </li>
+      <li>
+        There is now context-sensitive help throughout LightZone.
+      </li>
+    </ul>
+
+    <h3>Photo Browser</h3>
+    <ul>
+      <li>
+        Related photos can now be stacked.
+      </li>
+      <li>
+        You can now move photos via drag &amp; drop to folders in the
+        Folder Navigator.
+      </li>
+      <li>
+        You can now select only the most recent versions
+        of your photos in a given folder.
+      </li>
+      <li>
+        You can now edit IPTC metadata.
+      </li>
+    </ul>
+
+    <h3>Photo Editor</h3>
+    <ul>
+      <li>
+        LightZone now comes bundled with many ready-made Styles.
+      </li>
+      <li>
+        The Relight tool (an improved ToneMapper tool)
+        has new Depth and Fuzz sliders.
+      </li>
+      <li>
+        There is now a History tab
+        that shows you all the edits you have make to your photo
+        since opening it for the current editing session.
+      </li>
+      <li>
+        The Raw Adjustments tool has a new As Shot button.
+      </li>
+      <li>
+        LightZone no longer uses LZN files and now always saves your work
+        as either JPEG or TIFF files
+        for maximum interoperability with other applications.
+      </li>
+    </ul>
+
+    <h3>Camera Support</h3>
+    <ul>
+      <li>
+        Canon EOS 1D Mark III raw files are now supported.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 2.4, rXXXX, XX-Apr-2007</h2>
+
+    <h3>New features</h3>
+    <ul>
+      <li>
+        The Black &amp; White tool has a new Strength slider.
+      </li>
+      <li>
+        The Hue/Saturation tool has a new Vibrance slider;
+        the Luminosity slider has been removed.
+      </li>
+      <li>
+        The Noise Reduction tool has been simplified.
+      </li>
+      <li>
+        There is a new Raw Adjustments tool.
+      </li>
+      <li>
+        The ToneMapper tool has new Shadows and Highlights sliders
+        that replace the Radius and Gamma sliders.
+      </li>
+    </ul>
+
+    <h3>New requirements (Windows only)</h3>
+    <ul>
+      <li>
+        LightZone now requires a computer
+        that has a CPU with SSE2 instruction support.
+      </li>
+    </ul>
+
+    <h3>Fixes (all platforms)</h3>
+    <ul>
+      <li>
+        An integration issue with the French and German versions of Lightroom
+        has been fixed.
+      </li>
+      <li>
+        An integration issue with other applications
+        and photos that have no color profiles has been fixed.
+      </li>
+      <li>
+        Users can no longer get an arbitrarily long trial license period
+        by setting the computer's clock to a date in the future.
+      </li>
+      <li>
+        The color temperature of photos from Canon cameras is now displayed.
+      </li>
+      <li>
+        The rating is now included in the metadata of exported TIFF images.
+      </li>
+      <li>
+        IPTC metadata as XMP is now also included in exported TIFF images.
+      </li>
+      <li>
+        IPTC metadata dates are now exported correctly.
+      </li>
+    </ul>
+
+    <h3>Fixes (Mac OS X only)</h3>
+    <ul>
+      <li>
+        LightZone no longer switches back to the other application
+        when opening another photo.
+      </li>
+    </ul>
+
+    <h3>Other changes (Windows only)</h3>
+    <ul>
+      <li>
+        Improved appearance of Save and Export dialogs.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 2.3.2, r7735, 26-Mar-2007</h2>
+
+    <h3>Fixes (all platforms)</h3>
+    <ul>
+      <li>
+        The trial license dialog now displays the expiration date better.
+      </li>
+    </ul>
+
+    <h3>Fixes (Windows only)</h3>
+    <ul>
+      <li>
+        Under Windows Vista,
+        users' home folders (as well as some other folders)
+        incorrectly showed a long, alphanumeric string (a GUID)
+        rather than the folders' name in the Folder Navigator.
+        This has been fixed.
+      </li>
+      <li>
+        LightZone and its installer are now digitally signed.
+        This eliminates the &quot;Unknown publisher&quot; warning.
+      </li>
+      <li>
+        The eSellerate engine is now installed by the installer
+        rather than during the first run of LightZone.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 2.3.1, r7718, 21-Mar-2007</h2>
+
+    <h3>Fixes (Mac OS X only)</h3>
+    <ul>
+      <li>
+        When opening a photo directly from another application other than
+        Aperture, Lightroom, or iPhoto (e.g., drag-and-drop from the Finder),
+        you'd incorrectly get a dialog asking you to choose &quot;Unknown&quot;
+        followed by an AppleScript error.
+        This has been fixed.
+      </li>
+      <li>
+        When doing a &quot;Save As...&quot; for a file that already has
+        <code>_lzn</code> in the name,
+        LightZone would incorrectly insert <code>_lzn</code> again.
+        This has been fixed.
+      </li>
+      <li>
+        Selecting an item from a pop-up menu by click/drag/release didn't work.
+        (Selecting by click/release/move/click/release worked, however.)
+        This has been fixed.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 2.3, r7705, 19-Mar-2007</h2>
+
+    <h3>New features</h3>
+    <ul>
+      <li>
+        There is now seamless integration with Apple's Aperture, iPhoto,
+        and Adobe's Lightroom
+        via the new Direct Save preference.
+      </li>
+      <li>
+        There is a new Red-Eye Reduction tool.
+      </li>
+      <li>
+        The new Black &amp; White tool replaces the Channel Mixer tool.
+      </li>
+      <li>
+        The Sampler now includes Lab color information.
+      </li>
+    </ul>
+
+    <h3>Fixes</h3>
+    <ul>
+      <li>
+        The Check for Update preference wasn't being honored.
+        This has been fixed.
+      </li>
+      <li>
+        They keyboard shortcuts that rate and rotate photos in the browser
+        are now enabled only when you click in the browser.
+        This fixes an interaction problem when typing into text fields.
+      </li>
+    </ul>
+
+    <h3>Other changes (all platforms)</h3>
+    <ul>
+      <li>
+        The &quot;TIFF Writeback&quot; preference has been
+        replaced by the new Direct Save preference.
+      </li>
+      <li>
+        Disabled buttons now look more disabled.
+      </li>
+      <li>
+        A gear icon is now being used for the tool pop-up menu.
+      </li>
+      <li>
+        When trial licenses expire,
+        images are now watermarked.
+      </li>
+      <li>
+        The browser now remembers the selected photos
+        after a sort-order change.
+      </li>
+    </ul>
+
+    <h3>Other changes (Mac OS X only)</h3>
+    <ul>
+      <li>
+        When saving, <code>_lzn</code> is now inserted as a filename
+        suffix to help prevent accidental overwriting of original
+        JPEG and TIFF files.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 2.2.2, r7443, 9-Mar-2007</h2>
+
+    <h3>Fixes</h3>
+    <ul>
+      <li>
+        Fixed the opening of the LightZone Help window for non-English
+        locales.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 2.2.1, r7434, 6-Mar-2007</h2>
+
+    <h3>Fixes</h3>
+    <ul>
+      <li>
+        Fixed a bug that prevented saving or exporting images to
+        disks other than the system/boot disk.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 2.2, r7421, 5-Mar-2007</h2>
+
+    <h3>New requirements (Mac OS X only)</h3>
+    <ul>
+      <li>
+        Java 1.5 Release 5 is now required.
+        If you have not already updated to it,
+        get it by selecting Software Update from the Apple menu.
+      </li>
+    </ul>
+
+    <h3>New features</h3>
+    <ul>
+      <li>
+        You can now rate your photos.
+      </li>
+      <li>
+        Raw conversion has been improved.
+      </li>
+      <li>
+        <p>
+          Orientation changes (and ratings) are now stored in sidecar XMP files
+          for interoperability with other applications.
+        </p>
+        <p class="change_note">
+          In previous versions of LightZone, orientation information
+          was stored in a LightZone database.
+          To preserve the orientation of photos you've already rotated,
+          the first time your browse a folder with LightZone 2.2,
+          it will create a new sidecar XMP file for every photo in that folder
+          that's been rotated using LightZone's browser.
+
+          If the folder is read-only, no XMP files can be created
+          so orientation information will be lost
+          for photos in that folder.
+        </p>
+      </li>
+      <li>
+        Printer settings are now saved with your work
+        so you can easily reproduce prints.
+      </li>
+      <li>
+        The user interface has a darker and all-gray appearance
+        to reduce color distractions.
+      </li>
+    </ul>
+
+    <h3>Camera support</h3>
+    <ul>
+      <li>
+        Nikon D40 raw files are now supported.
+      </li>
+    </ul>
+
+    <h3>Fixes</h3>
+    <ul>
+      <li>
+        All known printing problems have been fixed.
+      </li>
+      <li>
+        Fixed a problem where rotating a photo
+        would also rotate all saved versions derived from that photo.
+      </li>
+      <li>
+        Fixed a compatibility problem between
+        sidecar TIFF files created by LightZone
+        and opening them in other applications.
+      </li>
+      <li>
+        Fixed a crash with some display color profiles.
+      </li>
+      <li>
+        Fixed artifacts with the noise reduction and Tone Mapper tools.
+      </li>
+    </ul>
+
+    <h3>Other changes</h3>
+    <ul>
+      <li>
+        Performance on computers having Intel (or compatible) processors
+        has been improved.
+      </li>
+      <li>
+        The way preview images are generated has changed.
+        The first time you click on a thumbnail,
+        it may take several seconds for the preview to appear.
+      </li>
+      <li>
+        XMP metadata embedded inside JPEG files is now read.
+      </li>
+      <li>
+        The browser menu previously available only via right/control click
+        has been given its own menu in the menu bar.
+      </li>
+      <li>
+        You can now edit a photo simply by clicking on its preview image.
+      </li>
+      <li>
+        The behavior of the &quot;eye&quot; button
+        that shows the before and after versions of your photo has changed:
+        you now need to click and hold the button to see the before version.
+      </li>
+      <li>
+        Support for PNG images has been removed.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 2.1.2</h2>
+
+    <h3>Fixes</h3>
+    <ul>
+      <li>
+        Fixed several issues for batch processing.
+      </li>
+      <li>
+        The photo sort order is now remembered between launches of LightZone.
+      </li>
+    </ul>
+
+    <h3>Other changes</h3>
+    <ul>
+      <li>
+        Improved performance for reading, processing, and zooming in/out
+        of large photos.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 2.1.1</h2>
+
+    <h3>Fixes (all platforms)</h3>
+    <ul>
+      <li>
+        Very small files having a <code>.tif</code> or <code>.tiff</code>
+        extension that aren't actually TIFF images
+        will no longer cause crashes.
+      </li>
+      <li>
+        Problems encountered during batch processing now have better recovery.
+      </li>
+    </ul>
+
+    <h3>Fixes (Windows only)</h3>
+    <ul>
+      <li>
+        More problems renaming or deleting files from the browser
+        have been fixed.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 2.1</h2>
+
+    <h3>New features (all platforms)</h3>
+    <ul>
+      <li>
+        LightZone can now operate as LightZone Basic
+        (formerly LightZone RT).
+      </li>
+      <li>
+        You can now specify a resolution when exporting images.
+      </li>
+      <li>
+        When saving a template,
+        you can now select which editing tools from the tool stack are saved.
+      </li>
+    </ul>
+
+    <h3>New features (Mac OS X only)</h3>
+    <ul>
+      <li>
+        There is now a Show in Finder menu item
+        that shows the selected photo in the Finder.
+      </li>
+    </ul>
+
+    <h3>New features (Windows only)</h3>
+    <ul>
+      <li>
+        There is now a Show in Explorer menu item
+        that shows the selected photo in Windows Explorer.
+      </li>
+    </ul>
+
+<!--
+    <h3>New features (Windows Vista only)</h3>
+    <ul>
+      <li>
+        &quot;Saved Search&quot; folders introduced in Windows Vista
+        are now browseable.
+      </li>
+    </ul>
+-->
+
+    <h3>Camera support</h3>
+    <ul>
+      <li>
+        Leica Digilux 3, Panasonic DMC-L1, and Pentax K10D raw files
+        are now supported.
+      </li>
+    </ul>
+
+    <h3>Fixes</h3>
+    <ul>
+      <li>
+        JPEG images having CMYK color profiles are now both read and exported
+        correctly.
+      </li>
+    </ul>
+
+    <h3>Other changes</h3>
+    <ul>
+      <li>
+        The Multipage checkbox has been removed from the Save dialog box
+        when saving (not exporting) as TIFF.
+        Multipage TIFF images are now created only when integrating
+        with either Aperture or Lightroom.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 2.0.6</h2>
+
+    <h3>New features</h3>
+    <ul>
+      <li>
+        The Crop Tool now allows user-specified, constrained aspect ratios.
+      </li>
+    </ul>
+
+    <h3>Fixes (all platforms)</h3>
+    <ul>
+      <li>
+        Fixed a crash when navigating some folders.
+      </li>
+      <li>
+        Fixed the White Balance tool for photos taken under fluorescent light.
+      </li>
+      <li>
+        In some cases, better preview images are now generated.
+      </li>
+      <li>
+        Fixed a bug where the browser would sometimes not show a thumbnail
+        for a photo if it was the only photo in its folder.
+      </li>
+      <li>
+        Saving your work as a multipage TIFF image now correctly
+        includes the tool stack as part of the metadata.
+      </li>
+      <li>
+        Fix a bug where deleting a selected region
+        using either the backspace or delete keys
+        would also delete all regions linked to the selected region.
+      </li>
+      <li>
+        LightZone can now correctly open and export to JPEG images
+        having color profiles that are greater than 64K in size.
+      </li>
+      <li>
+        Fixed incorrect values shown for photometric interpretation metadata
+        for TIFF and DNG images.
+      </li>
+      <li>
+        IPTC metadata is now correctly exported to JPEG images.
+      </li>
+    </ul>
+
+    <h3>Fixes (Mac OS X only)</h3>
+    <ul>
+      <li>
+        Bundles (e.g., applications, Aperture's library, etc.)
+        no longer show up in the folder navigator.
+      </li>
+      <li>
+        If you have many color profiles installed on your computer,
+        displaying either the save or export dialog boxes was slow.
+        This has been fixed.
+      </li>
+    </ul>
+
+    <h3>Other changes</h3>
+    <ul>
+      <li>
+        The interface for the Noise Reduction tool has been simplified.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 2.0.5</h2>
+
+    <h3>Fixes</h3>
+    <ul>
+      <li>
+        Fixed a problem where thumbnail images in the browser
+        were sometimes shown at an incorrectly low resolution.
+      </li>
+      <li>
+        Improved performance in the histogram.
+      </li>
+      <li>
+        Improved display of histogram.
+      </li>
+      <li>
+        For tools that used an eyedropper cursor
+        (such as the Color Balance tool),
+        fixed a crash if you clicked the mouse outside of the photo area.
+      </li>
+      <li>
+        Fixed a bug where if you typed the Enter key rather than clicking OK
+        in the Save Template dialog, your template name would not be used.
+      </li>
+      <li>
+        Fixed a bug where you would get two copies of default raw adjustment
+        tools when pasting tools onto a raw file using the browser.
+      </li>
+    </ul>
+
+    <h3>Other changes</h3>
+    <ul>
+      <li>
+        Improvements in performance and overall stability.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 2.0.4</h2>
+
+    <h3>Fixes</h3>
+    <ul>
+      <li>
+        Fixed a performance issue in the browser.
+      </li>
+      <li>
+        Fixed problems with interaction with other applications
+        like Aperture and Lightroom:
+        if LightZone was set as the external editor in such applications,
+        LightZone would sometimes open a received photo in a new window,
+        and sometimes would not show a received photo in the Editor Layout.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 2.0.3</h2>
+
+    <h3>Camera support</h3>
+    <ul>
+      <li>
+        Fuji S9000 raw images are now supported.
+      </li>
+    </ul>
+
+    <h3>Fixes (all platforms)</h3>
+    <ul>
+      <li>
+        Improved performance in the browser.
+      </li>
+      <li>
+        Scrolling the browser with a mouse wheel
+        now scrolls one row at a time as opposed to three at a time.
+      </li>
+      <li>
+        The help for the Color Balance tool
+        and for Copying &amp; Pasting tools
+        was completed.
+      </li>
+      <li>
+        Files containing Unicode characters are handled better.
+      </li>
+      <li>
+        Fixed crash for View &gt; Zoom to Fit
+        when the LightZone window was very small.
+      </li>
+    </ul>
+
+    <h3>Fixes (Windows only)</h3>
+    <ul>
+      <li>
+        Windows XP x64 SP 2 is now supported.
+      </li>
+      <li>
+        Fixed a crash when using either the ToneMapper or Noise Reduction
+        tools on computers having a Pentium&nbsp;3 processor.
+      </li>
+      <li>
+        You can now actually delete photos from the browser.
+      </li>
+      <li>
+        Multiple instances of LightZone are now handled correctly again.
+      </li>
+    </ul>
+
+    <h3>Other changes (Windows only)</h3>
+    <ul>
+      <li>
+        The location of the LightZone.log file
+        has been moved to your &quot;My&nbsp;Documents&quot; folder
+        for easier access
+        when submitting requests to Light&nbsp;Crafts' customer support.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 2.0.2</h2>
+
+    <h3>Fixes (all platorms)</h3>
+    <ul>
+      <li>
+        Overall performance has improved for caching image data.
+      </li>
+      <li>
+        Fixed a crash for some rare cases of TIFF file.
+      </li>
+    </ul>
+
+    <h3>Fixes (Mac OS X only)</h3>
+    <ul>
+      <li>
+        Fixed incorrectly requiring a minimum version of Tiger of 10.4.4
+        (10.4.3 is the correct minimum version).
+      </li>
+    </ul>
+
+    <h3>Fixes (Windows only)</h3>
+    <ul>
+      <li>
+        Now able to run on computers having at least SSE support
+        instead of requiring SSE2.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 2.0.1</h2>
+
+    <h3>Fixes</h3>
+    <ul>
+      <li>
+        Fixed &quot;mesh-like&quot; artifacts for Olympus raw files.
+      </li>
+      <li>
+        Fixed previews for some raw image files from remaining low-resolution.
+      </li>
+      <li>
+        Fixed not being able to open photos or folders
+        whose names contain accented characters.
+      </li>
+      <li>
+        Fixed batch processing that would sometimes overwrite files
+        even when the &quot;Create new files&quot; option was selected.
+      </li>
+      <li>
+        Fixed the wrong ISO value for some Canon PowerShot cameras.
+      </li>
+      <li>
+        Fixed an incorrect link for Blend Modes in the help.
+      </li>
+    </ul>
+
+    <h3>Other changes</h3>
+    <ul>
+      <li>
+        A Reset button was added to the Preferences dialog.
+        Clicking the Reset button will reset LightZone
+        to have its original factory settings.
+        This can sometimes resolve some problems you may experience.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <div class="footer">
+      <a href="http://www.lightcrafts.com/">www.lightcrafts.com</a>
+    </div>
+  </body>
+</html>
+<!-- vim:set et sw=2 ts=2: -->

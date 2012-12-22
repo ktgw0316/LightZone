@@ -1,0 +1,570 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <meta http-equiv="Content-Script-Type" content="text/javascript"/>
+    <title>LightZone: Release Notes</title>
+    <script type="text/javascript">
+      <!--
+        var agent = navigator.userAgent.toLowerCase();
+        var isMac     = ( agent.indexOf( 'mac' ) >= 0 );
+        var isWindows = ( agent.indexOf( 'win' ) >= 0 ||
+                          agent.indexOf( '16bit' ) >= 0 );
+        var isLinux   = ( agent.indexOf( 'linux' ) >= 0 );
+
+        if ( isMac || isWindows || isLinux ) {
+            document.write( '<style type="text/css"> <!--\n' );
+            if ( isMac ) {
+                document.write( '.Linux_only { display: none; }\n' );
+                document.write( '.Not_Mac { display: none; }\n' );
+                document.write( '.Windows_only { display: none; }\n' );
+            } else if ( isWindows ) {
+                document.write( '.Linux_only { display: none; }\n' );
+                document.write( '.Mac_only { display: none; }\n' );
+                document.write( '.Not_Windows { display: none; }\n' );
+            } else if ( isLinux ) {
+                document.write( '.Mac_only { display: none; }\n' );
+                document.write( '.Not_Linux { display: none; }\n' );
+                document.write( '.Windows_only { display: none; }\n' );
+            }
+            document.write( ' --> </style>\n' );
+        }
+      // -->
+    </script>
+    <style type="text/css">
+      <!--
+        a {
+          color: blue;
+          text-decoration: none;
+        }
+        a:hover {
+          text-decoration: underline;
+        }
+        body {
+          background-color: white;
+          color: black;
+          font-family: "Lucida Grande", Arial, sans-serif;
+          font-size: 9pt;
+        }
+        h2 {
+          border-top: 1px solid #DFDFDF;
+        }
+        h3 {
+          margin-bottom: 0;
+          padding-bottom: 0;
+        }
+        h3 + * {
+          margin-top: 0;
+        }
+        ul {
+          margin-left: 1em;
+          padding-left: 1em;
+        }
+        li p {
+          margin-top: 0;
+        }
+        .change_note {
+          color: #888;
+          margin-left: 1em;
+          margin-right: 1em;
+        }
+        .footer {
+          border-top: 1px solid #DFDFDF;
+        }
+      -->
+    </style>
+  </head>
+
+  <body>
+    <h1>LightZone Release Notes</h1>
+
+    <p>
+      <b>Note:</b>
+      The complete documentation for LightZone
+      is integrated into the application.
+      To access it, from within LightZone,
+      select Help &gt; LightZone&nbsp;Help.
+
+      <span class="Mac_only">
+        Mac&nbsp;OS&nbsp;X users can alternatively click
+        <a href="help:openbook=LightZone%20Help">here</a>.
+      </span>
+    </p>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 3.8.2</h2>
+
+    <h3>Fixes (Mac OS X only)</h3>
+    <ul>
+      <li>
+        Fixes for Snow Leopard.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 3.8</h2>
+
+    <h3>Camera Support</h3>
+    <ul>
+      <li>
+        Raw files from the following cameras are now supported:
+        Olympus&nbsp;E-P1
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 3.7.1</h2>
+
+    <h3>Fixes (Mac OS X only)</h3>
+    <ul>
+      <li>
+        Updated eSellerate software for Safari 4.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 3.7</h2>
+
+    <h3>Camera Support</h3>
+    <ul>
+      <li>
+        Raw files from the following cameras are now supported:
+        Canon&nbsp;EOS&nbsp;5D&nbsp;Mark&nbsp;II,
+        Canon&nbsp;EOS&nbsp;50D,
+        Canon&nbsp;Powershot&nbsp;G10,
+        Nikon&nbsp;D3X,
+        Nikon&nbsp;D90,
+        Nikon&nbsp;D700,
+        Olympus&nbsp;E-30,
+        Olympus&nbsp;E-620,
+        Panasonic&nbsp;DMC-LX3,
+        Panasonic&nbsp;DMC-FZ28,
+        Panasonic&nbsp;DMC-G1,
+        Pentax&nbsp;K2000,
+        Sony&nbsp;A300,
+        Sony&nbsp;A900
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 3.6.1</h2>
+
+    <h3>Fixes</h3>
+    <ul>
+      <li>
+        Fixed shrinking issue in batch processing
+        when output size was specified.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 3.6</h2>
+
+    <h3>Camera Support</h3>
+    <ul>
+      <li>
+        Raw files from the following cameras are now supported:
+        Canon&nbsp;EOS&nbsp;450D,
+        Canon&nbsp;EOS&nbsp;1000D,
+        Fuji&nbsp;Finepix&nbsp;S100FS,
+        Nikon&nbsp;D60,
+        Nikon&nbsp;D700,
+        Olympus&nbsp;E-420,
+        Olympus&nbsp;E-520,
+        Pentax&nbsp;K20D,
+        Pentax&nbsp;K200D,
+        Samsung&nbsp;GX20
+        Sony&nbsp;A200,
+        Sony&nbsp;A350.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 3.5</h2>
+
+    <h3>New Features</h3>
+    <ul>
+      <li>
+        There's a new Help menu item that takes you to the
+        <a href="http://www.lightcrafts.com/learning/">Learning Center</a>.
+      </li>
+    </ul>
+
+    <h3>Camera Support</h3>
+    <ul>
+      <li>
+        Raw files from the following cameras are now supported:
+        Canon EOS 1Ds Mark III,
+        Panasonic DMC-L10.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 3.4</h2>
+
+    <h3>New Features</h3>
+    <ul>
+      <li>
+        Preview Styles by placing mouse over style.
+      </li>
+      <li>
+        User interface enhancements.
+      </li>
+      <li>
+        Improved stability in handling corrupt/incompatible image files.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 3.3 (Linux only)</h2>
+
+    <h3>New Features</h3>
+    <ul>
+      <li>
+        LightZone Linux is now supported.
+      </li>
+    </ul>
+
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 3.2</h2>
+
+    <h3>New Features (Mac OS X only)</h3>
+    <ul>
+      <li>
+        Mac OS X 1.5 Leopard is now supported.
+      </li>
+    </ul>
+
+    <h3>Camera Support</h3>
+    <ul>
+      <li>
+        Raw files from the following cameras are now supported:
+        Canon Powershot G9,
+        Leica V-Lux 1,
+        Nikon D3, Nikon D300,
+        Olympus E-3,
+        Panasonic DMC-FZ18,
+        Sony Alpha DSLR-A700.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 3.1.1</h2>
+
+    <h3>Fixes (Mac OS X only)</h3>
+    <ul>
+      <li>
+        Updated eSellerate software for Mac OS X 10.5 Leopard.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 3.1</h2>
+
+    <h3>New Features</h3>
+    <ul>
+      <li>
+        You can now restrict every tools' effect to a
+        range of color or luminosity.
+      </li>
+      <li>
+        The Raw Adjustments tool
+        now automatically removes &quot;hot pixels&quot;
+        from your raw photos.
+      </li>
+      <li>
+        Crop and Rotate have been improved.
+      </li>
+    </ul>
+
+    <h3>Camera Support</h3>
+    <ul>
+      <li>
+        Raw files from the following cameras are now supported:
+        Olympus E-400, E-410, E-510; Ricoh Caplio GX100.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 3.0.6</h2>
+
+    <h3>Fixes (all platforms)</h3>
+    <ul>
+      <li>
+        Upgrading from pre-3.0 versions of LightZone Basic
+        to 3.0.x LightZone Basic now works properly.
+      </li>
+      <li>
+        A DNG image created from a Fuji raw image
+        was not handled correctly.
+        This has been fixed.
+      </li>
+    </ul>
+
+    <h3>Fixes (Windows only)</h3>
+    <ul>
+      <li>
+        The font used in menus was too big.
+        This has been fixed.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 3.0.5</h2>
+
+    <h3>New Features</h3>
+    <ul>
+      <li>
+        LightZone Basic is now available again.
+      </li>
+    </ul>
+
+    <h3>Fixes</h3>
+    <ul>
+      <li>
+        Some Sony raw photo were opened with the wrong dimensions.
+        This has been fixed.
+      </li>
+      <li>
+        In some cases, you would get a Save dialog
+        even though the Auto Save preference was enabled.
+      </li>
+    </ul>
+
+    <h3>Camera Support</h3>
+    <ul>
+      <li>
+        Kodak P712, Nikon D40X, Olympus SP-550UZ, and Samsing GX10
+        raw files are now supported.
+      </li>
+    </ul>
+
+    <h3>Other Changes</h3>
+    <ul>
+      <li>
+        If a photo is read-only,
+        the ability to edit metadata is now disabled.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 3.0.2</h2>
+
+    <h3>Fixes</h3>
+    <ul>
+      <li>
+        Fixed oversaturated colors in the sharpening tool.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 3.0.1</h2>
+
+    <h3>New Features</h3>
+    <ul>
+      <li>
+        Adjusting the Exposure slider of the Raw Adjustments tool
+        so that the value is negative performs highlight recovery.
+      </li>
+    </ul>
+
+    <h3>Fixes</h3>
+    <ul>
+      <li>
+        Improved functioning of Relight tool.
+      </li>
+      <li>
+        The Black &amp; White and Color Balance tools
+        have had minor corrections.
+      </li>
+      <li>
+        In some cases, vibrant colors were overly saturated.
+        This has been fixed.
+      </li>
+      <li>
+        Editing of metadata works much better.
+      </li>
+      <li>
+        Fixed generation of IPTC and XMP metadata for JPEG files
+        that previously resulted in an incompatibility with Photoshop CS3.
+      </li>
+      <li>
+        Fixed obtaining the artist information from CR2 files.
+      </li>
+      <li>
+        A photo's rating is now properly stored when generating new TIFF files.
+      </li>
+      <li>
+        Fixed obtaining the exposure-time/shutter-speed information from
+        Canon raw files.
+      </li>
+      <li>
+        Fixed reading of artist, copyright, caption, and rating metadata
+        from DNG files.
+      </li>
+      <li>
+        Styles now appear in the Import Styles dialog.
+      </li>
+      <li>
+        The capture date/time from CRW files
+        is now included when converting to JPEG.
+      </li>
+      <li>
+        Now writing IPTC metadata in a more standards-conformant way
+        using the Dublin Core XML schema.
+      </li>
+    </ul>
+
+    <h3>Camera Support</h3>
+    <ul>
+      <li>
+        Fuji Finepix S5 Pro raw files are now supported.
+      </li>
+    </ul>
+
+    <h3>Other Changes</h3>
+    <ul>
+      <li>
+        LightZone has always edited the full size image. LightZone now 
+        displays the dimensions of the full edit size and the version size
+        separately.
+      </li>
+      <li>
+        LightZone now goes to the &quot;Discover LightZone&quot; help page
+        instead of the cover when first launched.
+      </li>
+      <li>
+        You can now sort by file type in the browser.
+      </li>
+      <li>
+        The Browser menu now includes Select Recent and Unselect All
+        menu items.
+      </li>
+      <li>
+        You can now use the Delete/Backspace key
+        to delete a region while editing a region.
+      </li>
+      <li>
+        When converting to JPEG, lens metadata is now preserved.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <h2>Changes for 3.0</h2>
+
+    <h3>Intelligent Tools</h3>
+    <ul>
+      <li>
+        The new Relight tool replaces the already &quot;magical&quot;
+        ToneMapper:
+        new controls allow for greater precision in relighting virtually any 
+        scene.
+      </li>
+      <li>
+        The new History pane, gives users full and direct access to 
+        intermediate editing steps,
+        all the way from first opening the photograph.
+      </li>
+      <li>
+        Added support for RAW images from the latest dSLR cameras
+        such as the Canon 1D Mark III.
+      </li>
+    </ul>
+
+    <h3>Improved Learnability</h3>
+    <ul>
+      <li>
+        Styles automatically produce tools and guide new users through the 
+        interface process.
+      </li>
+      <li>
+        New context-sensitive help and tool tips to assist users
+        pre-flight and in-flight.
+      </li>
+      <li>
+        Revamped user interface with distinct Browse and Edit modes, new skins 
+        to optimize clarity of the photograph, logical button groupings.
+      </li>
+    </ul>
+
+    <h3>Improved Interoperability</h3>
+    <ul>
+      <li>
+        New default save mode: edit stack now embedded in JPEG.
+        Provides seamless 
+        interoperability with any best-of-breed application.
+      </li>
+      <li>
+        New Send and Convert capability provides advanced pre-processing 
+        capabilities to other applications in the photographic ecosystem.
+      </li>
+      <li>
+        New drag and drop capabilities in Browse mode for folders,
+        file-system or directly to other applications in the dock (on Mac).
+      </li>
+    </ul>
+
+    <h3>New Integrated Batch Processing</h3>
+    <ul>
+      <li>
+        New ift Style in Browse mode and apply to multiple images at once.
+      </li>
+      <li>
+        New Send and Convert capabilities
+        convert your images for sending by e-mail, 
+        posting on a web gallery or simply convert in another file format.
+      </li>
+      <li>
+        New drag &amp; drop capabilities in Browse mode to folders,
+        file-system or directly to other applications in the dock (on Mac).
+      </li>
+    </ul>
+
+    <h3>New Asset Management Capabilities</h3>
+    <ul>
+      <li>
+        New Stack and Unstack hides and shows the intermediate edit versions
+        of every photograph.
+      </li>
+      <li>
+        New Smart Select button automatically selects the latest version of the
+        photograph, so they can be post processed in batch within a single click
+      </li>
+      <li>
+        New Metadata Editor allows for editing of Title, Copyright, Creator
+        and other fields,
+        a new preference for Copyright will automatically populate when
+        specified.
+      </li>
+    </ul>
+
+    <!-- ================================================================== -->
+
+    <div class="footer">
+      <a href="http://www.lightcrafts.com/">www.lightcrafts.com</a>
+    </div>
+  </body>
+</html>
+<!-- vim:set et sw=2 ts=2: -->

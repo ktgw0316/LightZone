@@ -1,0 +1,228 @@
+<project name="windows" default="jar">
+
+  <tstamp/>
+
+  <!--===== Properties =====================================================-->
+
+  <property name="common-dir" value="../lightcrafts"/>
+  <property file="${common-dir}/resources/com/lightcrafts/utils/resources/Version.properties"/>
+
+  <property name="installer-name" value="${app-name}-Installer.exe"/>
+  <property name="licensetype" value="ESD"/>
+  <property name="windows-jar" value="products/lightcrafts-windows.jar"/>
+
+  <!-- The default maxmemory for the run* targets. -->
+  <property name="maxmemory" value="256m"/>
+
+  <exec executable="cat" vmlauncher="false" failonerror="true"
+        outputproperty="app-version">
+    <arg value="${common-dir}/version.txt"/>
+  </exec>
+
+  <condition property="USE_ICC" value="1" else="0">
+    <isset property="USE_ICC"/>
+  </condition>
+
+  <!--===== Application build ==============================================-->
+
+  <target name="common">
+    <ant dir="${common-dir}" target="jar"/>
+    <exec executable="make" dir="products" failonerror="true"
+          vmlauncher="false"/>
+  </target>
+
+  <target name="javac" depends="common">
+    <mkdir dir="build"/>
+    <javac destdir="build" source="1.5" debug="true">
+      <src path="src"/>
+      <classpath>
+        <fileset dir="${common-dir}/products">
+          <include name="*.jar"/>
+        </fileset>
+        <fileset dir="lib">
+          <include name="*.jar"/>
+        </fileset>
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="jni">
+    <exec executable="make" dir="jnisrc" failonerror="true" vmlauncher="false"/>
+  </target>
+
+  <target name="helpers">
+    <exec executable="make" dir="helpers" failonerror="true" vmlauncher="false">
+      <arg value="APP_NAME=${app-name}"/>
+    </exec>
+  </target>
+
+  <target name="build" depends="javac, jni"/>
+
+  <!--===== Make a jar file ================================================-->
+
+  <target name="jar" depends="build">
+    <delete file="${windows-jar}"/>
+    <jar jarfile="${windows-jar}">
+      <fileset dir="build"/>
+      <manifest>
+        <attribute name="Built-By" value="${user.name}"/>
+        <attribute name="Implementation-Vendor" value="${company-name}"/>
+        <attribute name="Implementation-Version"
+                   value="${app-version} ${TODAY}"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <target name="check-for-jar">
+    <condition property="jar-exists">
+      <available file="${windows-jar}"/>
+    </condition>
+  </target>
+  
+  <target name="jar-if-necessary" depends="check-for-jar" unless="jar-exists">
+    <ant target="jar"/>
+  </target>
+
+  <!--===== Run the application ============================================-->
+
+  <target name="run" depends="jar-if-necessary">
+    <java classname="com.lightcrafts.platform.windows.WindowsLauncher"
+          dir="products" failonerror="true" fork="true"
+          maxmemory="${maxmemory}">
+      <!--
+      <jvmarg value="-Xincgc"/>
+      -->
+      <classpath>
+        <fileset dir="products">
+          <include name="*.jar"/>
+        </fileset>
+      </classpath>
+      <sysproperty key="java.library.path" value="."/>
+      <sysproperty key="com.lightcrafts.zorn" value="true"/>
+      <sysproperty key="lightcrafts.debug" value="1"/>
+      <sysproperty key="IDE" value="1"/>
+    </java>
+  </target>
+
+  <!--===== Make a Windows installer =======================================-->
+
+  <target name="build-installer-only">
+
+    <copy file="helpers/JavaAppLauncher/${app-name}.exe"
+          tofile="products/${app-name}.exe" overwrite="true"/>
+    <chmod file="products/${app-name}.exe" perm="775"/>
+
+    <exec executable="make" dir="resources/sign" failonerror="true"
+          vmlauncher="false">
+      <arg value="EXE_TO_SIGN=../../products/${app-name}.exe"/>
+    </exec>
+
+    <copy file="helpers/JavaAppLauncher/lightzone.jvmargs" todir="products"
+          overwrite="true">
+      <filterset>
+        <filter token="LICENSETYPE" value="${licensetype}"/>
+      </filterset>
+    </copy>
+
+    <copy file="helpers/eSellerateInstaller/eSellerateInstaller.exe"
+          tofile="products/eSellerateInstaller.exe" overwrite="true"/>
+    <chmod file="products/eSellerateInstaller.exe" perm="775"/>
+
+    <exec executable="make" dir="resources/help" failonerror="true"
+          vmlauncher="false">
+      <arg value="APP_NAME=${app-name}"/>
+    </exec>
+
+    <exec executable="install4jc.exe" failonerror="true">
+      <!-- The "-D LC_VERSION=..." has to be given to install4j as two seperate
+           arguments, hence the use of line= rather than value= since the
+           latter, even if there's a space in it, will be given as a single
+           argument containing a space and not as two seperate arguments. -->
+      <arg line="-D LC_VERSION=${app-version}"/>
+      <arg file="lightzone.install4j"/>
+    </exec>
+
+    <exec executable="make" dir="resources/sign" failonerror="true"
+          vmlauncher="false">
+      <arg value="EXE_TO_SIGN=../../${installer-name}"/>
+    </exec>
+
+  </target>
+  <target name="build-installer" depends="jar, helpers, build-installer-only"/>
+
+  <target name="installer-esd">
+    <antcall target="build-installer">
+      <param name="licensetype" value="ESD"/>
+    </antcall>
+  </target>
+
+  <target name="installer-tb">
+    <antcall target="build-installer">
+      <param name="licensetype" value="TB"/>
+    </antcall>
+  </target>
+
+  <!--===== CruiseControl ==================================================-->
+
+  <property name="cc-dir" value="cruisecontrol"/>
+
+  <target name="cc-build">
+    <antcall target="cc-clean"/>
+    <exec executable="perl"
+          outputproperty="svn-branch" failonerror="true" vmlauncher="false">
+      <arg path="${common-dir}/tools/bin/lc-svn-branch"/>
+    </exec>
+    <exec executable="bash"
+          outputproperty="svn-revision" failonerror="true" vmlauncher="false">
+      <arg path="${common-dir}/tools/bin/lc-svn-revision"/>
+    </exec>
+
+    <mkdir dir="cruisecontrol"/>
+
+    <antcall target="installer-esd"/>
+    <move file="${installer-name}"
+          tofile="${cc-dir}/${app-name}-${svn-branch}-r${svn-revision}-ESD.exe"/>
+
+    <antcall target="installer-tb"/>
+    <move file="${installer-name}"
+          tofile="${cc-dir}/${app-name}-${svn-branch}-r${svn-revision}-TB.exe"/>
+  </target>
+
+  <target name="cc-clean">
+    <delete dir="${cc-dir}"/>
+  </target>
+
+  <!--===== Clean up =======================================================-->
+
+  <target name="clean-up">
+    <ant dir="${common-dir}" target="${clean-method}"/>
+    <delete dir="build"/>
+    <delete file="${installer-name}"/>
+    <exec executable="make" dir="helpers">
+      <arg value="${clean-method}"/>
+    </exec>
+    <exec executable="make" dir="jnisrc">
+      <arg value="${clean-method}"/>
+    </exec>
+    <exec executable="make" dir="products">
+      <arg value="${clean-method}"/>
+    </exec>
+    <delete file="products/lightzone.jvmargs"/>
+    <antcall target="cc-clean"/>
+  </target>
+
+  <target name="distclean">
+    <antcall target="clean-up">
+      <param name="clean-method" value="distclean"/>
+    </antcall>
+  </target>
+  <target name="clean" depends="distclean"/>
+
+  <target name="mostlyclean">
+    <antcall target="clean-up">
+      <param name="clean-method" value="mostlyclean"/>
+    </antcall>
+  </target>
+
+</project>
+<!-- vim:set et sw=2 ts=2: -->

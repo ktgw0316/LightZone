@@ -1,0 +1,23 @@
+#! /bin/bash
+
+ME=$(basename $0)
+OS=$(uname)
+
+PRODUCT="LightZone"
+
+case "$OS" in
+CYGWIN*)
+    echo "$ME: not supported for Windows" >&2;
+    ;;
+Darwin)
+    rm -rf "$HOME/Library/Application Support/eSellerate"
+    rm -rf "$HOME/Library/Application Support/$PRODUCT/License"
+    rm -rf "/Library/Application Support/MindVision"
+    rm -rf "/Library/Frameworks/EWSMac.framework"
+    ;;
+*)
+    echo "$ME: \"$OS\": unknown OS" >&2
+    ;;
+esac
+
+# vim:set et sw=4 ts=4:

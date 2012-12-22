@@ -1,0 +1,51 @@
+#!/usr/bin/perl
+
+##
+# symlinktree
+# Recursively symlink files from one dir to another.
+# Usage: symlink.pl SOURCEDIR DESTDIR
+##
+
+use Cwd qw/abs_path/;
+use File::Basename;
+use File::Find;
+use File::Path;
+use strict;
+
+##
+# Make sure script was called correctly
+##
+my $me = basename( $0 );
+my $usage = "Usage: $me SOURCEDIR DESTDIR\n";
+my $source_dir = shift or die $usage;
+my $dest_dir = shift or die $usage;
+
+##
+# Recursively find everything in $source_dir
+##
+my @files = ();
+find( \&found, $source_dir );
+
+foreach my $source_file ( @files ) {
+    my $dest_file = $source_file;
+    $dest_file =~ s@^$source_dir@$dest_dir@;
+    my $temp_dir = dirname( $dest_file );
+    unless ( -d $temp_dir ) {
+        die $! unless mkpath($temp_dir);
+    }
+    unless ( -e $dest_file ) {
+        die $! unless symlink( abs_path( $source_file ), $dest_file );
+    }
+}
+
+exit;
+
+sub found {
+    ##
+    # Process each file found, do not symlink directories
+    ##
+    push( @files, $File::Find::name ) unless -d $_;
+}
+
+1;
+# vim:set et sw=4 ts=4:

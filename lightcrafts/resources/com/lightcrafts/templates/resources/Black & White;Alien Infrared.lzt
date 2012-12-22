@@ -1,0 +1,14 @@
+<Template version="7">
+  <Scale Factor="0.62960505"/>
+  <Image path=""/>
+  <Controls>
+    <GenericOperation Active="true" Collapsed="false" Locked="false" Mode="Normal" Name="Alien Infrared" Opacity="100" OperationType="Channel Mixer V4" regionsInverted="false">
+      <Slider Strength="7.0"/>
+      <Checkbox/>
+      <Choice/>
+      <Color b="2" g="0" r="255"/>
+    </GenericOperation>
+    <Region/>
+    <Crop Angle="0.0"/>
+  </Controls>
+</Template>

@@ -1,0 +1,19 @@
+<Template version="8">
+  <Scale Factor="0.21962366"/>
+  <Image path=""/>
+  <Controls>
+    <GenericOperation Active="true" Collapsed="false" Locked="false" Mode="Normal" Name="Soften Skin II" Opacity="100" OperationType="Gaussian Blur" layerControlsIndex="1" regionsInverted="false">
+      <ColorSelection HueBlue="0.17254902" HueEnabled="true" HueGreen="0.26666668" HueRadius="0.4" HueRed="0.4862745" Inverted="false" LuminosityEnabled="true" LuminosityLower="0.7023497" LuminosityLowerFeather="0.1" LuminosityUpper="0.90234977" LuminosityUpperFeather="0.039166033"/>
+      <Slider Radius="5.0"/>
+      <Checkbox/>
+      <Choice/>
+    </GenericOperation>
+    <Region/>
+    <Crop>
+      <UpperLeft X="0.0" Y="0.0"/>
+      <UpperRight X="3720.0" Y="0.0"/>
+      <LowerLeft X="0.0" Y="2800.0"/>
+      <LowerRight X="3720.0" Y="2800.0"/>
+    </Crop>
+  </Controls>
+</Template>

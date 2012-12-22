@@ -1,0 +1,211 @@
+<project name="lightcrafts" default="build">
+
+  <tstamp/>
+
+  <!--===== Properties =====================================================-->
+
+  <property file="resources/com/lightcrafts/utils/resources/Version.properties"/>
+
+  <property name="common-jar" value="products/lightcrafts.jar"/>
+
+  <property name="lcjai-jar" value="products/lcjai.jar"/>
+
+	<exec executable="cat" vmlauncher="false" failonerror="true"
+	      outputproperty="app-version">
+		<arg value="version.txt"/>
+	</exec>
+
+  <condition property="UNIVERSAL" value="1" else="0">
+    <isset property="UNIVERSAL"/>
+  </condition>
+  <condition property="USE_ICC" value="1" else="0">
+    <isset property="USE_ICC"/>
+  </condition>
+
+	<!--===== Application build ==============================================-->
+
+  <condition property="jai-classpath"
+             value="../windows/lib/mlibwrapper_jai.jar">
+    <not>
+      <os family="mac"/>
+    </not>
+  </condition>
+
+  <target name="javac">
+    <exec executable="make" dir="products" failonerror="true"
+          vmlauncher="false"/>
+
+    <mkdir dir="extbuild"/>
+    <javac srcdir="extsrc" destdir="extbuild" source="1.5" target="1.5"
+           debug="true" classpath="${jai-classpath}"/>
+
+    <mkdir dir="build"/>
+    <javac destdir="build" source="1.5" target="1.5" debug="true">
+      <src path="src"/>
+      <classpath>
+        <pathelement path="extbuild"/>
+        <fileset dir="lib">
+          <include name="*.jar"/>
+        </fileset>
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="coprocesses">
+    <exec executable="make" dir="coprocesses" failonerror="true"
+          vmlauncher="false">
+      <arg value="USE_ICC=${USE_ICC}"/>
+      <arg value="UNIVERSAL=${UNIVERSAL}"/>
+    </exec>
+  </target>
+
+  <target name="revision">
+    <mkdir dir="build/com/lightcrafts/utils/resources"/>
+    <exec executable="svn">
+      <arg value="info"/>
+      <redirector output="build/com/lightcrafts/utils/resources/Revision"
+                  logError="true"/>
+    </exec>
+    <copy file="version.txt"
+          tofile="build/com/lightcrafts/utils/resources/Version"/>
+  </target>
+
+  <target name="resources" depends="revision">
+    <copy todir="build">
+      <fileset dir="resources" excludes=".svn"/>
+      <fileset dir="locale" excludes=".svn"/>
+    </copy>
+  </target>
+
+  <target name="jni">
+    <exec executable="make" dir="jnisrc" failonerror="true" vmlauncher="false">
+      <arg value="USE_ICC=${USE_ICC}"/>
+      <arg value="UNIVERSAL=${UNIVERSAL}"/>
+    </exec>
+  </target>
+
+  <target name="build" depends="javac, coprocesses, resources, jni"/>
+
+	<!--===== Make a jar file ================================================-->
+
+  <target name="jar" depends="build">
+    <delete file="${common-jar}"/>
+    <jar jarfile="${common-jar}">
+      <fileset dir="build"/>
+      <manifest>
+        <attribute name="Built-By" value="${user.name}"/>
+        <attribute name="Main-Class" value="com.lightcrafts.app.Application"/>
+        <attribute name="Implementation-Title" value="${app-name}"/>
+        <attribute name="Implementation-Vendor" value="Light Crafts, Inc."/>
+        <attribute name="Implementation-Version"
+                   value="${app-version} ${TODAY}"/>
+      </manifest>
+    </jar>
+
+    <delete file="${lcjai-jar}"/>
+    <jar jarfile="${lcjai-jar}">
+      <fileset dir="extbuild"/>
+      <manifest>
+        <attribute name="Built-By" value="${user.name}"/>
+        <attribute name="Implementation-Title" value="${app-name}"/>
+        <attribute name="Implementation-Vendor" value="Light Crafts, Inc."/>
+        <attribute name="Implementation-Version"
+                   value="${app-version} ${TODAY}"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <target name="check-for-jar">
+    <condition property="jar-exists">
+      <available file="${common-jar}"/>
+    </condition>
+  </target>
+
+  <target name="jar-if-necessary" depends="check-for-jar" unless="jar-exists">
+    <antcall target="jar"/>
+  </target>
+
+	<!--===== Make test ======================================================-->
+
+  <target name="test" depends="build">
+    <ant dir="test" target="build"/>
+    <ant dir="test" target="docs-test"/>
+  </target>
+
+	<!--===== Run the application ============================================-->
+
+  <target name="run" depends="jar-if-necessary">
+    <java classname="com.lightcrafts.app.Application" dir="products"
+          failonerror="true" fork="true" maxmemory="768m">
+      <classpath>
+        <fileset dir="products">
+          <include name="*.jar"/>
+        </fileset>
+      </classpath>
+      <sysproperty key="java.library.path" value="."/>
+      <sysproperty key="lightcrafts.debug" value="1"/>
+    </java>
+  </target>
+
+  <!-- Same as the "run" target, but with the test classes in the classpath: -->
+  <target name="run-test" depends="jar-if-necessary">
+    <java classname="com.lightcrafts.app.Application" dir="products"
+          failonerror="true" fork="true" maxmemory="768m">
+      <classpath>
+        <fileset dir="products">
+          <include name="*.jar"/>
+        </fileset>
+        <pathelement path="test/build"/>
+      </classpath>
+      <assertions>
+        <enable/>
+      </assertions>
+      <sysproperty key="java.library.path" value="."/>
+      <sysproperty key="lightcrafts.debug" value="1"/>
+      <sysproperty key="com.sun.management.jmxremote" value=""/>
+      <jvmarg value="-Xdebug"/>
+      <jvmarg value="-Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n"/>
+    </java>
+  </target>
+
+	<!--===== Javadoc ========================================================-->
+
+  <target name="javadoc">
+    <mkdir dir="doc"/>
+    <javadoc destdir="doc">
+      <fileset dir="src"/>
+    </javadoc>
+  </target>
+
+  <!--===== Clean up =======================================================-->
+
+  <target name="clean-up">
+    <delete dir="build"/>
+    <delete dir="extbuild"/>
+    <exec executable="make" dir="jnisrc">
+      <arg value="${clean-method}"/>
+    </exec>
+    <exec executable="make" dir="coprocesses">
+      <arg value="${clean-method}"/>
+    </exec>
+    <exec executable="make" dir="products">
+      <arg value="${clean-method}"/>
+    </exec>
+    <ant dir="test" target="${clean-method}"/>
+  </target>
+
+  <target name="distclean">
+    <antcall target="clean-up">
+      <param name="clean-method" value="distclean"/>
+    </antcall>
+  </target>
+  <target name="clean" depends="distclean"/>
+
+  <target name="mostlyclean">
+    <antcall target="clean-up">
+      <param name="clean-method" value="mostlyclean"/>
+    </antcall>
+  </target>
+
+</project>
+<!-- vim:set et sw=2 ts=2: -->

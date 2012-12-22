@@ -1,0 +1,19 @@
+<Template version="7">
+  <Scale Factor="0.1941392"/>
+  <Image path=""/>
+  <Controls>
+    <GenericOperation Active="true" Collapsed="false" Locked="false" Mode="Soft Light" Name="Wow!" Opacity="70" OperationType="UnSharp Mask V3" regionsInverted="false">
+      <Slider Amount="100.0" Radius="500.0" Threshold="20.0"/>
+      <Checkbox/>
+      <Choice/>
+    </GenericOperation>
+    <GenericOperation Active="true" Collapsed="false" Locked="false" Mode="Normal" Name="Wow! Relight" Opacity="100" OperationType="Tone Mapper V4" regionsInverted="false">
+      <Slider Depth="16.0" Detail="0.92" Fuzz="0.2" Highlights="1.0" Shadows="1.0"/>
+      <Checkbox/>
+      <Choice/>
+    </GenericOperation>
+    <Region/>
+    <Region/>
+    <Crop Angle="0.0"/>
+  </Controls>
+</Template>

@@ -1,0 +1,19 @@
+<Template version="7">
+  <Scale Denominator="1" Numerator="1"/>
+  <Image path=""/>
+  <Controls>
+    <GenericOperation Active="true" Collapsed="false" Locked="false" Mode="Darken" Name="SLR Sharpen Darks" Opacity="100" OperationType="UnSharp Mask V3" regionsInverted="false">
+      <Slider Amount="45.0" Radius="2.3" Threshold="20.0"/>
+      <Checkbox/>
+      <Choice/>
+    </GenericOperation>
+    <GenericOperation Active="true" Collapsed="false" Locked="false" Mode="Normal" Name="SLR Sharpen Light" Opacity="100" OperationType="UnSharp Mask V3" regionsInverted="false">
+      <Slider Amount="100.0" Radius="1.0" Threshold="20.0"/>
+      <Checkbox/>
+      <Choice/>
+    </GenericOperation>
+    <Region/>
+    <Region/>
+    <Crop Angle="0.0"/>
+  </Controls>
+</Template>

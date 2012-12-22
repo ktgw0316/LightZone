@@ -1,0 +1,21 @@
+<Template version="8">
+  <Scale Factor="0.19984567"/>
+  <Image path=""/>
+  <Controls>
+    <GenericOperation Active="true" Collapsed="false" Locked="false" Mode="Normal" Name="Relight 1" Opacity="100" OperationType="Tone Mapper V5" layerControlsIndex="0" regionsInverted="false">
+      <ColorSelection HueBlue="0.5" HueEnabled="true" HueGreen="0.5" HueRadius="-1.0" HueRed="0.5" Inverted="false" LuminosityEnabled="true" LuminosityLower="0.0" LuminosityLowerFeather="0.0" LuminosityUpper="1.0" LuminosityUpperFeather="0.0"/>
+      <Slider Depth="64.0" Detail="1.5" Fuzz="0.1" Highlights="0.2" Shadows="3.0"/>
+      <Checkbox/>
+      <Choice/>
+    </GenericOperation>
+    <GenericOperation Active="true" Collapsed="false" Locked="false" Mode="Soft Light" Name="Skin Glow III" Opacity="60" OperationType="Gaussian Blur" layerControlsIndex="1" regionsInverted="false">
+      <ColorSelection HueBlue="0.34117648" HueEnabled="true" HueGreen="0.43137255" HueRadius="0.16" HueRed="0.53333336" Inverted="false" LuminosityEnabled="false" LuminosityLower="0.769" LuminosityLowerFeather="0.1" LuminosityUpper="0.969" LuminosityUpperFeather="0.031"/>
+      <Slider Radius="151.7"/>
+      <Checkbox/>
+      <Choice/>
+    </GenericOperation>
+    <Region/>
+    <Region/>
+    <Crop Angle="0.0"/>
+  </Controls>
+</Template>

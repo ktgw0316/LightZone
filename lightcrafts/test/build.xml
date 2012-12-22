@@ -1,0 +1,156 @@
+<project name="test" default="build">
+
+  <property environment="ENV"/>
+
+  <property name="home" value="${ENV.HOME}"/>
+  <property name="pwd" value="${ENV.PWD}"/>
+  <property name="test-dir" value="${ENV.LZ_TESTDIR}"/>
+
+  <path id="classpath">
+    <pathelement location="lib/junit.jar"/>
+    <pathelement location="../build"/>
+    <pathelement location="../extbuild"/>
+  </path>
+
+  <condition property="ld-path" value="../bin">
+		<os family="unix"/> <!-- "unix" includes "Mac OS X" -->
+  </condition>
+
+  <condition property="ld-path" value="..\bin;..\lib\jclib4jai\windows\i386;..\lib\mediaLib\windows\i386">
+		<os family="windows"/>
+  </condition>
+
+  <target name="javac">
+    <mkdir dir="build"/>
+    <javac destdir="build" debug="true">
+      <src path="src"/>
+      <classpath refid="classpath"/>
+    </javac>
+  </target>
+
+  <target name="javadoc">
+    <mkdir dir="doc"/>
+    <javadoc destdir="doc">
+      <fileset dir="src"/>
+    </javadoc>
+  </target>
+
+  <target name="resources">
+    <copy todir="build">
+      <fileset dir="resources"/>
+    </copy>
+  </target>
+
+<!--  <target name="build" depends="javac,resources"/> -->
+  <target name="build" depends="javac"/>
+
+  <target name="distclean">
+    <delete dir="build"/>
+    <delete dir="doc"/>
+  </target>
+  <target name="clean" depends="distclean"/>
+  <target name="mostlyclean" depends="distclean"/>
+
+  <target name="docs-test">
+    <java classname="com.lightcrafts.app.test.DocumentTest" fork="true">
+      <classpath>
+        <path refid="classpath"/>
+        <pathelement path="build"/>
+      </classpath>
+      <sysproperty key="java.library.path" value="${ld-path}"/>
+      <jvmarg value="-Xmx512m"/>
+      <arg line="docs"/>
+    </java>
+  </target>
+
+  <target name="metadata-explorer">
+    <java classname="com.lightcrafts.ui.metadata.test.MetadataExplorer" fork="true">
+      <classpath>
+        <path refid="classpath"/>
+        <pathelement path="build"/>
+      </classpath>
+      <sysproperty key="java.library.path" value="${ld-path}"/>
+      <jvmarg value="-Xmx512m"/>
+      <arg line="/home/anton/test"/>
+    </java>
+  </target>
+
+  <target name="metadata-test">
+    <property name="dir" value="${test-dir}"/>
+    <junit dir="${dir}" showoutput="true" printsummary="withOutAndErr" fork="true">
+      <formatter type="plain"/>
+      <test name="com.lightcrafts.image.metadata.BulkMetadataTester" outfile="metadata-test"/>
+      <classpath>
+        <path refid="classpath"/>
+        <pathelement path="build"/>
+      </classpath>
+      <sysproperty key="java.library.path" value="${pwd}/${ld-path}"/>
+      <jvmarg value="-Xmx512m"/>
+    </junit>
+  </target>
+  <target name="bmt" depends="metadata-test"/>
+
+  <target name="image-test">
+    <property name="dir" value="${test-dir}"/>
+    <junit dir="${dir}" showoutput="true" printsummary="withOutAndErr" fork="true">
+      <formatter type="plain"/>
+      <test name="com.lightcrafts.image.metadata.BulkImageTester" outfile="image-test"/>
+      <classpath>
+        <path refid="classpath"/>
+        <pathelement path="build"/>
+      </classpath>
+      <sysproperty key="java.library.path" value="${pwd}/${ld-path}"/>
+      <jvmarg value="-Xmx512m"/>
+    </junit>
+  </target>
+  <target name="bit" depends="image-test"/>
+
+  <target name="region-test">
+    <java classname="com.lightcrafts.ui.region.test.RegionOverlayTest" fork="true">
+      <classpath>
+        <path refid="classpath"/>
+        <pathelement path="build"/>
+      </classpath>
+      <sysproperty key="java.library.path" value="${ld-path}"/>
+      <jvmarg value="-Xmx512m"/>
+<!--      <jvmarg value="-Dsun.java2d.trace=timestamp,log,count"/> -->
+      <arg line="/home/anton/photos"/>
+    </java>
+  </target>
+
+  <target name="crop-test">
+    <java classname="com.lightcrafts.ui.crop.test.CropTest" fork="true">
+      <classpath>
+        <path refid="classpath"/>
+        <pathelement path="build"/>
+      </classpath>
+      <sysproperty key="java.library.path" value="${ld-path}"/>
+      <jvmarg value="-Xmx512m"/>
+    </java>
+  </target>
+
+  <target name="memory-meter-test">
+    <java classname="com.lightcrafts.ui.test.MemoryMeterTest" fork="true">
+      <classpath>
+        <path refid="classpath"/>
+        <pathelement path="build"/>
+      </classpath>
+      <sysproperty key="java.library.path" value="${ld-path}"/>
+      <jvmarg value="-Xmx512m"/>
+    </java>
+  </target>
+
+  <target name="engine-test">
+    <java classname="com.lightcrafts.model.test.EngineTest" fork="true">
+      <classpath>
+        <path refid="classpath"/>
+        <pathelement path="build"/>
+      </classpath>
+      <sysproperty key="java.library.path" value="${ld-path}"/>
+      <jvmarg value="-Xmx512m"/>
+      <arg line="/home/anton/test/iris.jpg"/>
+    </java>
+  </target>
+
+</project>
+<!-- vim:set sw=2 ts=2: -->
