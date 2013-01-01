@@ -336,27 +336,6 @@ public final class CheckForUpdate {
      * @return Returns <code>true</code> only if an update is available.
      */
     private static boolean checkIfUpdateIsAvailable() throws IOException {
-        final int currentRevision = Version.getRevisionNumber();
-        if ( !m_testing && currentRevision <= 0 ) {
-            //
-            // This handles the case for development versions when the revision
-            // resource hasn't been populated.
-            //
-            return false;
-        }
-        final URLConnection conn = CHECK_URL.openConnection();
-        conn.setUseCaches( false );
-        final InputStream is = conn.getInputStream();
-        try {
-            final Document versionDoc = XMLUtil.readDocumentFrom( is );
-            if ( !parseVersionsDocument( versionDoc ) )
-                return false;
-            if ( m_updateRevision > currentRevision )
-                return true;
-        }
-        finally {
-            is.close();
-        }
         return false;
     }
 
