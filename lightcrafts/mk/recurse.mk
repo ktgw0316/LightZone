@@ -20,7 +20,18 @@ endif
 # overly verbose.
 
 .PHONY: all
-all %:
+all:
+	@for dir in $(SUBDIRS); \
+	do \
+	    if [ -f $$dir/*akefile ]; \
+	    then \
+		echo "-----> Entering $$dir"; \
+	        $(MAKE) --no-print-directory -C $$dir $@ || exit 1; \
+		echo "-----> Leaving $$dir"; \
+	    fi; \
+	done
+
+%:
 	@for dir in $(SUBDIRS); \
 	do \
 	    if [ -f $$dir/*akefile ]; \
