@@ -168,7 +168,7 @@
 
   <target name="cc-build">
     <antcall target="cc-clean"/>
-    <exec executable="perl"
+    <exec executable="bash"
           outputproperty="svn-branch" failonerror="true" vmlauncher="false">
       <arg path="${common-dir}/tools/bin/lc-svn-branch"/>
     </exec>
