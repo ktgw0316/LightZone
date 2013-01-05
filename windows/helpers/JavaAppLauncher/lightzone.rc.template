@@ -5,6 +5,14 @@
 #include "local_strings.h"
 
 LZ_Icon ICON DISCARDABLE LightZone.ico
+/*
+Ignoring for now. Windres has problem with calculation of right version hash.
+There is already patch for that so it should work with new Cygwin version.
+For now it will be left commented out.
+
+http://cygwin.com/ml/cygwin/2012-11/msg00165.html
+http://sourceware-org.1504.n7.nabble.com/patch-windres-Fix-binary-import-of-version-info-resource-td214399.html
+
 
 VS_VERSION_INFO VERSIONINFO
     FILEVERSION     @MAJOR@,@MINOR@,@PATCH@,@REVISION@
@@ -39,7 +47,7 @@ VS_VERSION_INFO VERSIONINFO
              // 0x0410,1200             // Italian
         }
     }
-
+*/
 #pragma code_page(1252)
 
 LANGUAGE    LANG_ENGLISH, SUBLANG_DEFAULT

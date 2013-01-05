@@ -244,7 +244,7 @@ endif	# UNIVERSAL
 ##
 ifeq ($(PLATFORM),Windows)
 %.res : %.rc
-	$(RC) $(RC_FLAGS) temp.RES $<
+	windres $< -o temp.RES
 	windres -O coff temp.RES $@
 	$(RM) temp.RES
 endif
