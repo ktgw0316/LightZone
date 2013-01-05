@@ -112,10 +112,11 @@
           tofile="products/${app-name}.exe" overwrite="true"/>
     <chmod file="products/${app-name}.exe" perm="775"/>
 
-    <exec executable="make" dir="resources/sign" failonerror="true"
-          vmlauncher="false">
-      <arg value="EXE_TO_SIGN=../../products/${app-name}.exe"/>
-    </exec>
+    <!-- for now skipping signing -->
+    <!--<exec executable="make" dir="resources/sign" failonerror="true"-->
+          <!--vmlauncher="false">-->
+      <!--<arg value="EXE_TO_SIGN=../../products/${app-name}.exe"/>-->
+    <!--</exec>-->
 
     <copy file="helpers/JavaAppLauncher/lightzone.jvmargs" todir="products"
           overwrite="true">
