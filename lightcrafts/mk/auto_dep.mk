@@ -47,7 +47,7 @@ MAKEDEPEND:=		$(AUTO_DEP_CC) $(AUTO_DEP_FLAGS)
 
 # Must not use := here!
 define MAKE_DEP
-  $(MAKEDEPEND) $1 | sed "s!^\([^ :]*\):!\1 $2 : !" > $2; [ -s $2 ] || $(RM) $2
+  $(MAKEDEPEND) $1 | sed "s!^\([^ :]*\):!\1 $2 : !" | sed 's/\(\w\):/\/cygdrive\/\L\1/g' > $2; [ -s $2 ]  || $(RM) $2
 endef
 
 .%.d : %.c
