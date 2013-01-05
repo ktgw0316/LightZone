@@ -183,9 +183,6 @@ ifeq ($(PLATFORM),Windows)
   ifndef MSSDK_HOME
     $(error "MSSDK_HOME" must be set)
   endif
-  ifndef MSVS_HOME
-    $(error "MSVS_HOME" must be set)
-  endif
 
   NUM_PROCESSORS:=	$(shell grep '^processor' /proc/cpuinfo | wc -l)
   ifeq ($(NUM_PROCESSORS),0)
@@ -193,7 +190,6 @@ ifeq ($(PLATFORM),Windows)
   endif
 
   MSSDK_HOME_W32:=	$(shell cygpath -w $(MSSDK_HOME))
-  MSVS_HOME_W32:=	$(shell cygpath -w $(MSVS_HOME))
 
   RC:=			"$(MSSDK_HOME)/Bin/RC.Exe"
   RC_INCLUDES:=		-i "$(shell cygpath -w /usr/include/w32api)"
