@@ -214,7 +214,7 @@ public final class Version {
     // The revision number from "svn info" looks like "Revision: 1000":
     // The revision number from "git status" looks like "commit 268da1ba96c935681e412f1cbb1146666daafd78":
     private static Pattern RevisionPattern = Pattern.compile(
-        ".*^commit\\s*([0-9]+).*", Pattern.DOTALL | Pattern.MULTILINE
+        ".*^commit\\s*([0-9a-fA-F]+).*", Pattern.DOTALL | Pattern.MULTILINE
     );
 
     // The URL pattern from "svn info" looks like "URL: svn+ssh://skippy...":
