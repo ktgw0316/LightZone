@@ -49,7 +49,7 @@ Few points for Cygwin beginners
 If you haven't changed anything, your default shell is Bash. Open `~/.bashrc` with an editor (nano or vim) and enter
 following (replace things in square brackets with Cygwin-style paths):
 
-    export PATH=[ant]/bin:$PATH:[jdk]/bin:[git]/bin:[WinSDK]/bin
+    export PATH=[ant]/bin:$PATH:[jdk]/bin:[git]/bin:[WinSDK]/bin:[Install4J]/bin
     export JAVA_HOME=[jdk]
     export MSSDK_HOME=[WinSDK]
     export C_INCLUDE_PATH=/usr/include
