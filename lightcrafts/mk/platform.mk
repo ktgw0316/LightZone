@@ -167,7 +167,11 @@ else
   #
   # See Sun bug ID: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5102720
   ##
-  P4_CPU_FLAGS:=	-march=pentium4
+  ifeq ($(PROCESSOR),x86_64)
+    P4_CPU_FLAGS:=	-march=athlon64
+  else
+    P4_CPU_FLAGS:=	-march=pentium4
+  endif
 
   SSE_FLAGS_OFF:=	$(P4_CPU_FLAGS) -mno-sse
   SSE_FLAGS_ON:=	$(P4_CPU_FLAGS) -msse2
@@ -236,7 +240,12 @@ endif
 # Linux
 ##
 ifeq ($(PLATFORM),Linux)
-  PLATFORM_CFLAGS+=	-march=pentium3 -mtune=pentium4 $(SSE_FLAGS_ON) -fpermissive
+  ifeq ($(PROCESSOR),x86_64)
+    PLATFORM_CFLAGS+=	-march=athlon64 -mtune=generic $(SSE_FLAGS_ON) -fpermissive -fPIC
+  else
+    PLATFORM_CFLAGS+=	-march=pentium3 -mtune=pentium4 $(SSE_FLAGS_ON) -fpermissive
+  endif
+
   ifdef HIGH_PERFORMANCE
     PLATFORM_CFLAGS+=	-O3
   else
