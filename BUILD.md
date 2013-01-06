@@ -46,24 +46,25 @@ Few points for Cygwin beginners
 - home directory is abbreviated with ~
 
 
-If you haven't changed anything, your default shell is Bash. Open ~/.bashrc with an editor (nano or vim) and enter
+If you haven't changed anything, your default shell is Bash. Open `~/.bashrc` with an editor (nano or vim) and enter
 following (replace things in square brackets with Cygwin-style paths):
-   export PATH=[ant]/bin:$PATH:[jdk]/bin:[git]/bin:[WinSDK]/bin
-   export JAVA_HOME=[jdk]
-   export MSSDK_HOME=[WinSDK]
-   export C_INCLUDE_PATH=/usr/include
+
+    export PATH=[ant]/bin:$PATH:[jdk]/bin:[git]/bin:[WinSDK]/bin
+    export JAVA_HOME=[jdk]
+    export MSSDK_HOME=[WinSDK]
+    export C_INCLUDE_PATH=/usr/include
 
 If you close and open your shell again it will automatically set these variables.
 
 Checkout your project with Git. If you have problems with line endings in build (the \r stuff), do following :
 
-    `git rm --cached -r .
-     git reset --hard`
+    git rm --cached -r .
+    git reset --hard
 
 To start the build:
 
-    `cd windows
-     ant build-installer`
+    cd windows
+    ant build-installer
 
 Updates already made to the code, checked in on Windows-build branch in github:
 -   .gitignore file added to ignore the built files
