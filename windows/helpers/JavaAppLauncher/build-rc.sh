@@ -9,8 +9,12 @@ COMMON_DIR=../../../lightcrafts
 VERSION=$(< $COMMON_DIR/version.txt)
 MAJOR=$(echo $VERSION | cut -f1 -d.)
 MINOR=$(echo $VERSION | cut -f2 -d.)
-PATCH=$(echo $VERSION | cut -f3 -d.); [ -z "$PATCH" ] && PATCH=0
-REVISION=$($COMMON_DIR/tools/bin/lc-svn-revision)
+#PATCH=$(echo $VERSION | cut -f3 -d.); [ -z "$PATCH" ] && PATCH=0
+# FIXME - this is a quick fix
+PATCH=0
+#REVISION=$($COMMON_DIR/tools/bin/lc-svn-revision)
+# FIXME - this is a quick fix
+REVISION=0
 YEAR="2005-$(date "+%Y")"
 
 sed -e "s/@APP_NAME@/${APP_NAME:-LightZone}/g" \
