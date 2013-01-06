@@ -170,11 +170,11 @@ public class LightZoneSkin extends SubstanceAbstractSkin {
         FontUIResource smallFont;
         FontUIResource messageFont;
 
-        String fontFamily = "Verdana";
+        String fontFamily = Font.SANS_SERIF;
 
         public LightZoneFontSet() {
             controlFont = new FontUIResource(fontFamily, Font.BOLD, 11);
-            menuFont = new FontUIResource("Arial", Font.PLAIN, 11);
+            menuFont = new FontUIResource(fontFamily, Font.PLAIN, 11);
             titleFont = new FontUIResource(fontFamily, Font.BOLD, 9);
             windowTitleFont = new FontUIResource(fontFamily, Font.BOLD, 14);
             smallFont = new FontUIResource(fontFamily, Font.PLAIN, 11);
