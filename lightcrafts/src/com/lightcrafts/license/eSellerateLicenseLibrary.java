@@ -613,7 +613,7 @@ final class eSellerateLicenseLibrary implements ESDLicenseLibrary {
         bb.order( ByteOrder.nativeOrder() );
         bb.put( (byte)'T' );
         bb.putInt( (int)startTime );
-        bb.putShort( (short)Version.getRevisionNumber() );
+        bb.putShort( (short)9999 );
         return buf;
     }
 

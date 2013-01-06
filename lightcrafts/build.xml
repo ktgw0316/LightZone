@@ -61,8 +61,8 @@
 
   <target name="revision">
     <mkdir dir="build/com/lightcrafts/utils/resources"/>
-    <exec executable="svn">
-      <arg value="info"/>
+    <exec executable="git">
+      <arg value="show"/>
       <redirector output="build/com/lightcrafts/utils/resources/Revision"
                   logError="true"/>
     </exec>

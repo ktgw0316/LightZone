@@ -30,6 +30,7 @@ all:
 		echo "-----> Leaving $$dir"; \
 	    fi; \
 	done
+
 %:
 	@for dir in $(SUBDIRS); \
 	do \

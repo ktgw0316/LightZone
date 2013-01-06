@@ -68,16 +68,18 @@ public final class Version {
      * Gets the Subversion revision number that was current at the time this
      * class was compiled.
      */
-    public static int getRevisionNumber() {
+    public static String getRevisionNumber() {
         if ( SVNInfo == null )
-            return -1;
+            return "";
         try {
-            final String text =
+            String text =
                 RevisionPattern.matcher( SVNInfo ).replaceAll( "$1" );
-            return Integer.parseInt( text );
+			if (text != null)
+				text = text.substring(0,7);
+            return text;
         }
         catch ( NumberFormatException e ) {
-            return -1;
+            return "";
         }
     }
 
@@ -193,12 +195,12 @@ public final class Version {
         ResourceBundle.getBundle( "com.lightcrafts.utils.resources.Version" );
 
     private static DateFormat ChangeDateFormat =
-        new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+        new SimpleDateFormat("MMM dd HH:mm:ss yyyy Z");
 
-    // The date pattern from "svn info" looks like
-    // "Last Changed Date: 2005-09-26 13:06:44 -0700 (Mon, 26 Sep 2005)":
+    // The date pattern from "git status" looks like
+    // "Date:   Sat Dec 22 10:55:47 2012 -0800":
     private static Pattern ChangeDatePattern = Pattern.compile(
-        ".*^Last Changed Date:\\s*([^(]+).*",
+        ".*^Date:\\s*... ([^(]+).*",
         Pattern.DOTALL | Pattern.MULTILINE
     );
 
@@ -210,8 +212,9 @@ public final class Version {
     private static String Version;  // Contents of "version.txt"
 
     // The revision number from "svn info" looks like "Revision: 1000":
+    // The revision number from "git status" looks like "commit 268da1ba96c935681e412f1cbb1146666daafd78":
     private static Pattern RevisionPattern = Pattern.compile(
-        ".*^Revision:\\s*([0-9]+).*", Pattern.DOTALL | Pattern.MULTILINE
+        ".*^commit\\s*([0-9a-fA-F]+).*", Pattern.DOTALL | Pattern.MULTILINE
     );
 
     // The URL pattern from "svn info" looks like "URL: svn+ssh://skippy...":
