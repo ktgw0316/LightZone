@@ -181,7 +181,7 @@ all: $(JAVAH_HEADERS) mk_target
 
 $(JAVAH_HEADERS):
 	-$(MKDIR) javah
-	javah -classpath "$(COMMON_DIR)/build$(CLASSPATH_SEP)$(PLATFORM_DIR)/build" \
+	javah -classpath "$(COMMON_DIR)/build$(CLASSPATH_SEP)$(COMMON_DIR)/extbuild$(CLASSPATH_SEP)$(PLATFORM_DIR)/build" \
 	      -d javah $(basename $(subst _,.,$(@F)))
 
 .PHONY: mk_target
