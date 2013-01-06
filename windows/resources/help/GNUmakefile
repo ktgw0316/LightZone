@@ -11,7 +11,11 @@ LANGUAGES:=	English
 ##
 
 .PHONY: all
-all %:
+all:
+	@for lang in $(LANGUAGES); \
+	do $(MAKE) -f lang.mk --no-print-directory LANG=$$lang $@; \
+	done
+%:
 	@for lang in $(LANGUAGES); \
 	do $(MAKE) -f lang.mk --no-print-directory LANG=$$lang $@; \
 	done
