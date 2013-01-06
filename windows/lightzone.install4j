@@ -548,7 +548,7 @@
     </uninstallerStartup>
   </installerGui>
   <mediaSets>
-    <win32 name="LightZoneWithJava" id="3" mediaFileName="${compiler:sys.shortName}-Installer" installDir="${compiler:sys.shortName} 3" overridePrincipalLanguage="false" requires64bit="false" runPostProcessor="true" postProcessor="cmd /C resources\sign\install4j_shim.cmd $EXECUTABLE" includedJRE="windows-x86-1.6.0_02" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="" runAsAdmin="true">
+    <win32 name="LightZoneWithJava" id="3" mediaFileName="${compiler:sys.shortName}-Installer" installDir="${compiler:sys.shortName} 3" overridePrincipalLanguage="false" requires64bit="false" runPostProcessor="true" postProcessor="cmd /C resources\sign\install4j_shim.cmd $EXECUTABLE" includedJRE="windows-x86-1.6.0_38" manualJREEntry="false" bundleType="1" jreURL="" jreFtpURL="" jreShared="false" customInstallBaseDir="" createUninstallIcon="true" contentFilesType="1" downloadURL="" runAsAdmin="true">
       <excludedLaunchers />
       <excludedComponents />
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
