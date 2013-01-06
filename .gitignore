@@ -3,6 +3,8 @@
 *.a
 *.la
 *.lo
+*.so
+*.jar
 *.exe
 *.dll
 lightcrafts/build
@@ -30,6 +32,7 @@ lightcrafts/jnisrc/jpeg/libjpeg/jpeg-6b/jconfig.h
 lightcrafts/jnisrc/tiff/libtiff/tiff-3.8.2/config.log
 lightcrafts/jnisrc/tiff/libtiff/tiff-3.8.2/config.status
 lightcrafts/jnisrc/tiff/libtiff/tiff-3.8.2/libtiff/.libs/
+lightcrafts/jnisrc/tiff/libtiff/tiff-3.8.2/libtiff/mkg3states
 lightcrafts/jnisrc/tiff/libtiff/tiff-3.8.2/libtiff/stamp-h1
 lightcrafts/jnisrc/tiff/libtiff/tiff-3.8.2/libtiff/stamp-h2
 lightcrafts/jnisrc/tiff/libtiff/tiff-3.8.2/libtiff/tif_config.h
@@ -40,3 +43,8 @@ windows/helpers/eSellerateInstaller/eWebLibrary.h
 windows/helpers/eSellerateInstaller/eWebClient.lib
 windows/helpers/JavaAppLauncher/LightZone.ico
 windows/helpers/JavaAppLauncher/jar_md5_include
+linux/build/
+linux/help/build/
+linux/jnisrc/libLinux/javah/
+linux/products/LightZone-forkd
+linux/products/dcraw
