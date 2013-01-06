@@ -143,10 +143,11 @@
       <arg file="lightzone.install4j"/>
     </exec>
 
-    <exec executable="make" dir="resources/sign" failonerror="true"
-          vmlauncher="false">
-      <arg value="EXE_TO_SIGN=../../${installer-name}"/>
-    </exec>
+    <!-- TODO enable signing -->
+    <!--<exec executable="make" dir="resources/sign" failonerror="true"-->
+          <!--vmlauncher="false">-->
+      <!--<arg value="EXE_TO_SIGN=../../${installer-name}"/>-->
+    <!--</exec>-->
 
   </target>
   <target name="build-installer" depends="jar, helpers, build-installer-only"/>
