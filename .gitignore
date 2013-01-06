@@ -5,6 +5,8 @@
 *.lo
 *.exe
 *.dll
+*.iml
+.idea/**
 lightcrafts/build
 windows/build
 lightcrafts/extbuild
