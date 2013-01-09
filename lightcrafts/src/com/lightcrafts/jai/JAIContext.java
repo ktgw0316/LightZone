@@ -28,8 +28,6 @@ import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.prefs.Preferences;
 
-import sun.awt.color.CMM;
-
 /**
  * Created by IntelliJ IDEA.
  * User: fabio
@@ -160,7 +158,7 @@ public class JAIContext {
 
     static void zlum(ICC_ColorSpace cs) {
         float[] zero;
-        synchronized (CMM.class) {
+        synchronized (ColorSpace.class) {
             zero = cs.fromCIEXYZ(new float[] {0, 0, 0});
         }
         System.out.println("zero: "  + zero[0] + " : " + zero[1] + " : " + zero[2]);

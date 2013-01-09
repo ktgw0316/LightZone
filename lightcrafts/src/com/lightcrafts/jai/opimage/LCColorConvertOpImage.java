@@ -31,8 +31,6 @@ import com.lightcrafts.mediax.jai.PointOpImage;
 import com.lightcrafts.mediax.jai.RasterFactory;
 import java.lang.ref.SoftReference;
 
-import sun.awt.color.CMM;
-
 /**
  * An <code>OpImage</code> implementing the "LCColorConvert" operation as
  * described in <code>com.lightcrafts.mediax.jai.operator.ColorConvertDescriptor</code>.
@@ -416,7 +414,7 @@ final class LCColorConvertOpImage extends PointOpImage {
             }
 
             // Perform the color conversion on the (possible child) Rasters.
-            synchronized (CMM.class) {
+            synchronized (ColorSpace.class) {
                 colorConvertOp.filter(s, d);
             }
         } else {
@@ -449,7 +447,7 @@ final class LCColorConvertOpImage extends PointOpImage {
                     }
 
                     // Convert src to dst via CIEXYZ.
-                    synchronized (CMM.class) {
+                    synchronized (ColorSpace.class) {
                         xyzPixel = srcColorSpace.toCIEXYZ(srcPixel);
                         dstPixel = dstColorSpace.fromCIEXYZ(xyzPixel);
                     }
