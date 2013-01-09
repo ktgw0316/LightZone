@@ -37,11 +37,14 @@
 
     <mkdir dir="extbuild"/>
     <javac srcdir="extsrc" destdir="extbuild" source="1.5" target="1.5"
-           debug="true" classpath="${jai-classpath}"/>
+           debug="true" classpath="${jai-classpath}">
+           <compilerarg value="-XDignore.symbol.file"/>
+    </javac>
 
     <mkdir dir="build"/>
     <javac destdir="build" source="1.5" target="1.5" debug="true">
       <src path="src"/>
+      <compilerarg value="-XDignore.symbol.file"/>
       <classpath>
         <pathelement path="extbuild"/>
         <fileset dir="lib">
