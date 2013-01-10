@@ -3,7 +3,9 @@
 ## Ubuntu 12.04.1 LTS (Precise Pangolin)
 ### Install required packages
 Building the LightZone source requires (at least) following packages:
+- __openjdk-7-jdk__
 - __ant__
+- __ivy__
 - __gcc__
 - __make__
 - __libx11-dev__ for X11/xlib.h
@@ -14,23 +16,25 @@ Building the LightZone source requires (at least) following packages:
 
 To install these packages:
 
-    sudo aptitude install ant gcc make libx11-dev tidy javahelp2 git subversion 
+    sudo aptitude install openjdk-7-jdk ant ivy gcc make libx11-dev tidy javahelp2 git subversion 
 
-__Oracle Java 6 JRE__ is also required. (LightZone cannot build with Oracle Java 7 nor any version of openjdk.)
-Easiest way to install this is:
+Before start the build, you have to set JAVA_HOME environment variable:
+
+    export JAVA_HOME=/usr/lib/jvm/java-7-openjdk
+
+#### If you prefer Oracle Java to OpenJDK
+You can use __Oracle Java JRE version 6, 7, or 8__ instead of openjdk-7-jdk.
+Easiest way to setup one of these is, for example:
 
     sudo add-apt-repository ppa:webupd8team/java
     sudo aptitude update
-    sudo aptitude install oracle-java6-installer
+    sudo aptitude install oracle-java7-installer
+    export JAVA_HOME=/usr/lib/jvm/java-7-oracle
 
 ### Build
-Before start the build, you have to set JAVA_HOME environment variable:
-
-    export JAVA_HOME=/usr/lib/jvm/java-6-oracle
-
 To start the build:
 
-    ant -f linux/build.xml
+    ant -lib /usr/share/java/ivy.jar -f linux/build.xml
 
 ### Test Run
 To check if it works fine before installing:
@@ -48,13 +52,13 @@ http://www.ej-technologies.com/download/install4j/files
 
 If you have already installed Install4J, this will create linux/LightZone.tar.gz:
 
-    ant -f linux/build.xml archive
+    ant -lib /usr/share/java/ivy.jar -f linux/build.xml archive
 
 To install LightZone, just extract the archive on a directory where you want to place it.
 For example:
 
     mv linux/LightZone.tar.gz ~
-    cd ~
+    cd
     tar zxf LightZone.tar.gz
     ./LightZone/LightZone &
 
