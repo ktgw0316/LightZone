@@ -12,7 +12,7 @@ import com.lightcrafts.jai.JAIContext;
 
 import static com.lightcrafts.app.Locale.LOCALE;
 
-import com.lightcrafts.mediax.jai.PlanarImage;
+import javax.media.jai.PlanarImage;
 import java.awt.*;
 import java.awt.image.RenderedImage;
 import java.io.File;

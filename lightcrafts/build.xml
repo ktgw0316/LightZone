@@ -1,4 +1,4 @@
-<project name="lightcrafts" default="build">
+<project name="lightcrafts" default="build" xmlns:ivy="antlib:org.apache.ivy.ant">
 
   <tstamp/>
 
@@ -31,20 +31,22 @@
     </not>
   </condition>
 
-  <target name="javac">
+  <target name="resolve">
+    <ivy:retrieve/>
+  </target>
+
+  <target name="javac" depends="resolve">
     <exec executable="make" dir="products" failonerror="true"
           vmlauncher="false"/>
 
     <mkdir dir="extbuild"/>
     <javac srcdir="extsrc" destdir="extbuild" source="1.5" target="1.5"
            debug="true" classpath="${jai-classpath}">
-           <compilerarg value="-XDignore.symbol.file"/>
     </javac>
 
     <mkdir dir="build"/>
     <javac destdir="build" source="1.5" target="1.5" debug="true">
       <src path="src"/>
-      <compilerarg value="-XDignore.symbol.file"/>
       <classpath>
         <pathelement path="extbuild"/>
         <fileset dir="lib">

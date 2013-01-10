@@ -12,11 +12,11 @@ import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.opimage.HighlightRecoveryOpImage;
 import com.lightcrafts.jai.opimage.FastBilateralFilterOpImage;
 
-import com.lightcrafts.mediax.jai.PlanarImage;
-import com.lightcrafts.mediax.jai.JAI;
-import com.lightcrafts.mediax.jai.BorderExtender;
-import com.lightcrafts.mediax.jai.RenderedOp;
-import com.lightcrafts.mediax.jai.operator.MedianFilterDescriptor;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.JAI;
+import javax.media.jai.BorderExtender;
+import javax.media.jai.RenderedOp;
+import javax.media.jai.operator.MedianFilterDescriptor;
 import com.lightcrafts.utils.ColorScience;
 import com.lightcrafts.utils.DCRaw;
 import com.lightcrafts.image.types.AuxiliaryImageInfo;

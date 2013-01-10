@@ -9,9 +9,9 @@ package com.lightcrafts.jai.opimage;
  * Time: 2:23:56 PM
  */
 
-import com.lightcrafts.mediax.jai.PointOpImage;
-import com.lightcrafts.mediax.jai.ImageLayout;
-import com.lightcrafts.media.jai.util.ImageUtil;
+import javax.media.jai.PointOpImage;
+import javax.media.jai.ImageLayout;
+import com.sun.media.jai.util.ImageUtil;
 import com.lightcrafts.utils.HSB;
 
 import java.awt.image.RenderedImage;

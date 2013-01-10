@@ -18,13 +18,13 @@ import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.image.renderable.RenderableImage;
-import com.lightcrafts.mediax.jai.JAI;
-import com.lightcrafts.mediax.jai.OperationDescriptorImpl;
-import com.lightcrafts.mediax.jai.ParameterBlockJAI;
-import com.lightcrafts.mediax.jai.RenderableOp;
-import com.lightcrafts.mediax.jai.RenderedOp;
-import com.lightcrafts.mediax.jai.registry.RenderableRegistryMode;
-import com.lightcrafts.mediax.jai.registry.RenderedRegistryMode;
+import javax.media.jai.JAI;
+import javax.media.jai.OperationDescriptorImpl;
+import javax.media.jai.ParameterBlockJAI;
+import javax.media.jai.RenderableOp;
+import javax.media.jai.RenderedOp;
+import javax.media.jai.registry.RenderableRegistryMode;
+import javax.media.jai.registry.RenderedRegistryMode;
 
 /**
  * An <code>OperationDescriptor</code> describing the "BandCombine" operation.
@@ -68,7 +68,7 @@ import com.lightcrafts.mediax.jai.registry.RenderedRegistryMode;
  * <tr><th>Name</th>        <th>Value</th></tr>
  * <tr><td>GlobalName</td>  <td>BandCombine</td></tr>
  * <tr><td>LocalName</td>   <td>BandCombine</td></tr>
- * <tr><td>Vendor</td>      <td>com.lightcrafts.media.jai</td></tr>
+ * <tr><td>Vendor</td>      <td>com.sun.media.jai</td></tr>
  * <tr><td>Description</td> <td>Performs arbitrary interband linear combination
  *                              using a specified matrix.</td></tr>
  * <tr><td>DocURL</td>      <td>http://java.sun.com/products/java-media/jai/forDevelopers/jai-apidocs/javax/media/jai/operator/BandCombineDescriptor.html</td></tr>
@@ -84,7 +84,7 @@ import com.lightcrafts.mediax.jai.registry.RenderedRegistryMode;
  *                     <td>NO_PARAMETER_DEFAULT</td>
  * </table></p>
  *
- * @see com.lightcrafts.mediax.jai.OperationDescriptor
+ * @see javax.media.jai.OperationDescriptor
  */
 public class LCBandCombineDescriptor extends OperationDescriptorImpl {
 

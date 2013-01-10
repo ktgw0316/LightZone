@@ -14,7 +14,7 @@ import sun.awt.image.ByteInterleavedRaster;
 
 import com.lightcrafts.image.metadata.*;
 import com.lightcrafts.image.types.JPEGImageType;
-import com.lightcrafts.mediax.jai.PlanarImage;
+import javax.media.jai.PlanarImage;
 import com.lightcrafts.utils.ProgressIndicator;
 import com.lightcrafts.utils.bytebuffer.ByteBufferUtil;
 import com.lightcrafts.utils.thread.ProgressThread;

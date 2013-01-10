@@ -7,7 +7,7 @@ import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
 import com.lightcrafts.jai.utils.Transform;
 
-import com.lightcrafts.mediax.jai.PlanarImage;
+import javax.media.jai.PlanarImage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

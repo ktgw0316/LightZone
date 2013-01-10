@@ -2,9 +2,9 @@
 
 package com.lightcrafts.ui.crop;
 
-import com.lightcrafts.mediax.jai.Interpolation;
-import com.lightcrafts.mediax.jai.RenderedOp;
-import com.lightcrafts.mediax.jai.operator.RotateDescriptor;
+import javax.media.jai.Interpolation;
+import javax.media.jai.RenderedOp;
+import javax.media.jai.operator.RotateDescriptor;
 import com.lightcrafts.model.CropBounds;
 import com.lightcrafts.platform.Platform;
 

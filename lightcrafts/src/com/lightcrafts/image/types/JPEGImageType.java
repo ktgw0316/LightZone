@@ -12,7 +12,7 @@ import java.nio.ByteBuffer;
 import java.nio.BufferUnderflowException;
 import java.nio.channels.FileChannel;
 import java.util.List;
-import com.lightcrafts.mediax.jai.*;
+import javax.media.jai.*;
 
 import org.w3c.dom.Document;
 

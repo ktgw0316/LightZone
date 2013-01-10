@@ -8,9 +8,9 @@ import java.awt.color.ICC_Profile;
 import java.awt.color.ICC_ColorSpace;
 import java.awt.image.*;
 import java.awt.geom.AffineTransform;
-import com.lightcrafts.mediax.jai.PlanarImage;
-import com.lightcrafts.mediax.jai.ImageLayout;
-import com.lightcrafts.mediax.jai.TileCache;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.TileCache;
 import javax.swing.*;
 
 import com.lightcrafts.image.ColorProfileException;
