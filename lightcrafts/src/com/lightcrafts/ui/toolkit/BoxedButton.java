@@ -7,7 +7,7 @@ import com.lightcrafts.ui.layout.ToggleTitleBorder;
 import javax.swing.*;
 
 /**
- * Copyright © 2007 Light Crafts, Inc.
+ * Copyright (C) 2007 Light Crafts, Inc.
  * User: fabio
  * Date: May 18, 2007
  * Time: 4:20:44 PM

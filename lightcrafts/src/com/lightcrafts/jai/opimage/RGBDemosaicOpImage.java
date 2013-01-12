@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Arrays;
 
 /**
- * Copyright © 2007 Light Crafts, Inc.
+ * Copyright (C) 2007 Light Crafts, Inc.
  * User: fabio
  * Date: Jun 28, 2007
  * Time: 11:18:24 AM
