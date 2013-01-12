@@ -13,9 +13,6 @@
   <!-- The default maxmemory for the run target. -->
   <property name="maxmemory" value="256m"/>
 
-  <!-- The default JVM version for the run target. -->
-  <property name="jvm-version" value="1.5"/>
-
   <exec executable="cat" vmlauncher="false" failonerror="true"
         outputproperty="app-version">
     <arg value="${common-dir}/version.txt"/>
@@ -38,7 +35,7 @@
 
   <target name="javac" depends="common">
     <mkdir dir="build"/>
-    <javac destdir="build" source="1.5" target="1.5" debug="true">
+    <javac destdir="build" debug="true">
       <src path="src"/>
       <classpath>
         <pathelement location="/System/Library/Java/"/>

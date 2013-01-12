@@ -33,7 +33,7 @@
 
   <target name="javac" depends="common">
     <mkdir dir="build"/>
-    <javac destdir="build" source="1.5" debug="true">
+    <javac destdir="build">
       <src path="src"/>
       <classpath>
         <fileset dir="${common-dir}/products">

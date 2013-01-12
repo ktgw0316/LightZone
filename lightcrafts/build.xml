@@ -40,12 +40,12 @@
           vmlauncher="false"/>
 
     <mkdir dir="extbuild"/>
-    <javac srcdir="extsrc" destdir="extbuild" source="1.5" target="1.5"
+    <javac srcdir="extsrc" destdir="extbuild"
            debug="true" classpath="${jai-classpath}">
     </javac>
 
     <mkdir dir="build"/>
-    <javac destdir="build" source="1.5" target="1.5" debug="true">
+    <javac destdir="build" debug="true">
       <src path="src"/>
       <classpath>
         <pathelement path="extbuild"/>
