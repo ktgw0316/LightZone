@@ -112,11 +112,10 @@
           tofile="products/${app-name}.exe" overwrite="true"/>
     <chmod file="products/${app-name}.exe" perm="775"/>
 
-    <!-- for now skipping signing -->
-    <!--<exec executable="make" dir="resources/sign" failonerror="true"-->
-          <!--vmlauncher="false">-->
-      <!--<arg value="EXE_TO_SIGN=../../products/${app-name}.exe"/>-->
-    <!--</exec>-->
+    <exec executable="make" dir="resources/sign" failonerror="true"
+          vmlauncher="false">
+      <arg value="EXE_TO_SIGN=../../products/${app-name}.exe"/>
+    </exec>
 
     <copy file="helpers/JavaAppLauncher/lightzone.jvmargs" todir="products"
           overwrite="true">
@@ -143,11 +142,10 @@
       <arg file="lightzone.install4j"/>
     </exec>
 
-    <!-- TODO enable signing -->
-    <!--<exec executable="make" dir="resources/sign" failonerror="true"-->
-          <!--vmlauncher="false">-->
-      <!--<arg value="EXE_TO_SIGN=../../${installer-name}"/>-->
-    <!--</exec>-->
+    <exec executable="make" dir="resources/sign" failonerror="true"
+          vmlauncher="false">
+      <arg value="EXE_TO_SIGN=../../${installer-name}"/>
+    </exec>
 
   </target>
   <target name="build-installer" depends="jar, helpers, build-installer-only"/>

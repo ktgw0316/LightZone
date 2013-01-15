@@ -42,3 +42,4 @@ windows/helpers/eSellerateInstaller/eWebLibrary.h
 windows/helpers/eSellerateInstaller/eWebClient.lib
 windows/helpers/JavaAppLauncher/LightZone.ico
 windows/helpers/JavaAppLauncher/jar_md5_include
+windows/helpers/JavaAppLauncher/lightzone.res
