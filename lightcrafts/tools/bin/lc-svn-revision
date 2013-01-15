@@ -7,6 +7,6 @@
 # Paul J. Lucas [paul@lightcrafts.com]
 ##
 
-git show | grep "^commit" | sed 's/^commit \(........................................\)/\1/'
+git show | grep "^commit" | sed 's/^commit \(.......\).*/\1/'
 
 # vim:set et sw=4 ts=4:

@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.ResourceBundle;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /** A container and accessor for static version data, either configured in
@@ -70,14 +69,18 @@ public final class Version {
      * class was compiled.
      */
     public static String getRevisionNumber() {
-        if (SVNInfo == null)
+        if ( SVNInfo == null )
             return "";
-        Matcher matcher = RevisionPattern.matcher(SVNInfo);
-        String text = "";
-        if (matcher.find()) {
-            text = matcher.group();
+        try {
+            String text =
+                RevisionPattern.matcher( SVNInfo ).replaceAll( "$1" );
+			if (text != null)
+				text = text.substring(0,7);
+            return text;
         }
-        return text;
+        catch ( NumberFormatException e ) {
+            return "";
+        }
     }
 
     public static Date getChangeDate() {
@@ -211,11 +214,7 @@ public final class Version {
     // The revision number from "svn info" looks like "Revision: 1000":
     // The revision number from "git status" looks like "commit 268da1ba96c935681e412f1cbb1146666daafd78":
     private static Pattern RevisionPattern = Pattern.compile(
-        ".*^commit\\s*([0-9]|[a-z]){40}", Pattern.DOTALL | Pattern.MULTILINE
-    );
-
-    private static Pattern RevisionHashMatcher = Pattern.compile(
-            "([0-9]|[a-z]){40}", Pattern.DOTALL | Pattern.MULTILINE
+        ".*^commit\\s*([0-9]+).*", Pattern.DOTALL | Pattern.MULTILINE
     );
 
     // The URL pattern from "svn info" looks like "URL: svn+ssh://skippy...":

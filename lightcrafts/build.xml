@@ -61,16 +61,11 @@
 
   <target name="revision">
     <mkdir dir="build/com/lightcrafts/utils/resources"/>
-    <exec executable="bash" vmlauncher="false" failonerror="true">
-      <arg value="tools/bin/lc-svn-revision" />
+    <exec executable="git">
+      <arg value="show"/>
       <redirector output="build/com/lightcrafts/utils/resources/Revision"
                   logError="true"/>
     </exec>
-    <!--<exec executable="git">-->
-      <!--<arg value="show"/>-->
-      <!--<redirector output="build/com/lightcrafts/utils/resources/Revision"-->
-                  <!--logError="true"/>-->
-    <!--</exec>-->
     <copy file="version.txt"
           tofile="build/com/lightcrafts/utils/resources/Version"/>
   </target>
