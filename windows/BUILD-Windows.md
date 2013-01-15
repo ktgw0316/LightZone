@@ -33,8 +33,6 @@ Download and install (or unpack) following:
     http://en.wikipedia.org/wiki/Microsoft_Windows_SDK#Versions
     Place at end of PATH
 -   __HTML Help Workshop__
-    On 64-bit system it must be copied to _Program Files_, or lang.mk line 18 modified.
-    This issue will be addressed later.
 -   __Install4J__ (free trial for 90 days, then we'll need to try to get open-source licenses)
     After installation, run Install4J, click on Project -> Download JREs, and go through wizard dialog.
 -   Java IDE - Eclipse, Netbeans or IntelliJ IDEA Community Edition

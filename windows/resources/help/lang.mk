@@ -15,7 +15,14 @@ INDEX_WORD:=		$(strip $(shell echo $(LANG_LINE) | cut -f6 -d:))
 
 TARGET_HELP_DIR:=	/tmp/$(HELP)
 
+# check for 64 bit version of windows
+# to determine path to HTML Help Workshop
+UNAME:= $(shell uname | grep 64)
+ifeq ($(strip $(UNAME)),)
 HTML_HELP_COMPILER:=	/cygdrive/c/Program\ Files/HTML\ Help\ Workshop/hhc
+else
+HTML_HELP_COMPILER:=	/cygdrive/c/Program\ Files\ \(x86\)/HTML\ Help\ Workshop/hhc
+endif
 HTML_HELP_PROJECT:=	$(APP_NAME).hhp
 HTML_HELP_TOC:=		TOC.hhc
 HTML_HELP_FILE:=	../../products/$(APP_NAME)-$(ISO_LANG_CODE).chm
