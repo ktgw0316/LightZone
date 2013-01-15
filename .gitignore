@@ -9,6 +9,10 @@
 .idea/**
 lightcrafts/build
 windows/build
+windows/error.log
+windows/md5sums
+windows/output.txt
+windows/updates.xml
 lightcrafts/extbuild
 lightcrafts/products
 windows/products
@@ -34,5 +38,7 @@ lightcrafts/jnisrc/tiff/libtiff/tiff-3.8.2/libtiff/tif_config.h
 lightcrafts/jnisrc/tiff/libtiff/tiff-3.8.2/libtiff/tiffconf.h
 lightcrafts/jnisrc/tiff/libtiff/tiff-3.8.2/libtool
 lightcrafts/jnisrc/tiff/zlib/zlib-1.2.3/zconf.h
+windows/helpers/eSellerateInstaller/eWebLibrary.h
+windows/helpers/eSellerateInstaller/eWebClient.lib
 windows/helpers/JavaAppLauncher/LightZone.ico
 windows/helpers/JavaAppLauncher/jar_md5_include

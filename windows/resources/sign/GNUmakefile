@@ -1,7 +1,7 @@
 DESCRIPTION:=		LightZone
-DESCRIPTION_URL:=	http://www.lightcrafts.com/
+DESCRIPTION_URL:=	http://lightzoneproject.org/
 
-CERT_BASENAME:=		lightcrafts
+CERT_BASENAME:=		LightZone
 CERT_PASSWORD:=		photoshopsucks
 
 TIMESTAMP_URL:=		http://timestamp.comodoca.com/authenticode
