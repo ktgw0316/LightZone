@@ -112,11 +112,15 @@
   <!--===== Sign All Jars ==================================================-->
 
   <target name="sign" depends="jar">
-    <signjar jar="products/lightcrafts.jar" lazy="true" alias="anton" storepass="xxxxxx"/>
-    <signjar jar="products/lightcrafts-linux.jar" lazy="true" alias="anton" storepass="xxxxxx"/>
-    <signjar jar="products/linux-so.jar" lazy="true" alias="anton" storepass="xxxxxx"/>
-    <signjar jar="products/lcjai.jar" lazy="true" alias="anton" storepass="xxxxxx"/>
-    <signjar jar="products/mlibwrapper_jai.jar" lazy="true" alias="anton" storepass="xxxxxx"/>
+    <property name="storetype" value="pkcs12" />
+    <property name="keystore" value="../windows/resources/sign/LightZone.pfx" />
+    <property name="alias" value="pvktmp:2fe2cbb9-7371-497c-8650-f850e878b5ea" />
+    <property name="storepass" value="photoshopsucks" />
+    <signjar jar="products/lightcrafts.jar" storetype="${storetype}" keystore="${keystore}" alias="${alias}" storepass="${storepass}"/>
+    <signjar jar="products/lightcrafts-linux.jar" storetype="${storetype}" keystore="${keystore}" alias="${alias}" storepass="${storepass}"/>
+    <signjar jar="products/linux-so.jar" storetype="${storetype}" keystore="${keystore}" alias="${alias}" storepass="${storepass}"/>
+    <signjar jar="products/lcjai.jar" storetype="${storetype}" keystore="${keystore}" alias="${alias}" storepass="${storepass}"/>
+    <signjar jar="products/mlibwrapper_jai.jar" storetype="${storetype}" keystore="${keystore}" alias="${alias}" storepass="${storepass}"/>
   </target>
 
   <!--===== Assemble the WebStart Site =====================================-->
