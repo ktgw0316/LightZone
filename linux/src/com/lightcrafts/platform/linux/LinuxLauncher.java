@@ -35,7 +35,7 @@ public final class LinuxLauncher {
 //            }
             UIManager.setLookAndFeel(Platform.getPlatform().getLookAndFeel());
 
-            int revision = Version.getRevisionNumber();
+            String revision = Version.getRevisionNumber();
             String name = Version.getVersionName();
             String versionText = "Version " + name + " (" + revision + ")";
 

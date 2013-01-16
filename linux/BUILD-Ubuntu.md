@@ -5,6 +5,7 @@
 Building the LightZone source requires (at least) following packages:
 - __ant__
 - __gcc__
+- __g++__
 - __make__
 - __libx11-dev__ for X11/xlib.h
 - __tidy__
@@ -14,14 +15,14 @@ Building the LightZone source requires (at least) following packages:
 
 To install these packages:
 
-    sudo aptitude install ant gcc make libx11-dev tidy javahelp2 git subversion 
+    sudo apt-get install ant gcc g++ make libx11-dev tidy javahelp2 git subversion 
 
 __Oracle Java 6 JRE__ is also required. (LightZone cannot build with Oracle Java 7 nor any version of openjdk.)
 Easiest way to install this is:
 
     sudo add-apt-repository ppa:webupd8team/java
-    sudo aptitude update
-    sudo aptitude install oracle-java6-installer
+    sudo apt-get update
+    sudo apt-get install oracle-java6-installer
 
 ### Build
 Before start the build, you have to set JAVA_HOME environment variable:
