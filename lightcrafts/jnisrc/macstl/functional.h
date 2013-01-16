@@ -37,7 +37,7 @@
 
 #include <cmath>
 #include <functional>
-#include <limits>
+#include <limits.h>
 
 #include "impl/meta.h"
 
