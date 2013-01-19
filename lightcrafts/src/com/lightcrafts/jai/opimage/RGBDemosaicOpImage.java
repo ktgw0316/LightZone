@@ -2,7 +2,7 @@
 
 package com.lightcrafts.jai.opimage;
 
-import com.lightcrafts.mediax.jai.*;
+import javax.media.jai.*;
 import com.lightcrafts.utils.DCRaw;
 import com.lightcrafts.jai.utils.Functions;
 
@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Arrays;
 
 /**
- * Copyright © 2007 Light Crafts, Inc.
+ * Copyright (C) 2007 Light Crafts, Inc.
  * User: fabio
  * Date: Jun 28, 2007
  * Time: 11:18:24 AM

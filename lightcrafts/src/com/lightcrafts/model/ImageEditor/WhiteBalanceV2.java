@@ -12,10 +12,10 @@ import com.lightcrafts.utils.ColorScience;
 import com.lightcrafts.utils.splines;
 import com.lightcrafts.utils.DCRaw;
 
-import com.lightcrafts.mediax.jai.JAI;
-import com.lightcrafts.mediax.jai.LookupTableJAI;
-import com.lightcrafts.mediax.jai.PlanarImage;
-import com.lightcrafts.mediax.jai.RenderedOp;
+import javax.media.jai.JAI;
+import javax.media.jai.LookupTableJAI;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.RenderedOp;
 import com.lightcrafts.image.types.RawImageInfo;
 import com.lightcrafts.image.types.AuxiliaryImageInfo;
 

@@ -13,10 +13,10 @@ import java.awt.image.renderable.ParameterBlock;
 import java.awt.print.PageFormat;
 import java.io.File;
 import java.io.IOException;
-import com.lightcrafts.mediax.jai.BorderExtender;
-import com.lightcrafts.mediax.jai.Interpolation;
-import com.lightcrafts.mediax.jai.JAI;
-import com.lightcrafts.mediax.jai.RenderedOp;
+import javax.media.jai.BorderExtender;
+import javax.media.jai.Interpolation;
+import javax.media.jai.JAI;
+import javax.media.jai.RenderedOp;
 
 // Show a scaled image inside a rectangle representing paper bounds for
 // printing.

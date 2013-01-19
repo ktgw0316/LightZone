@@ -4,9 +4,9 @@ package com.lightcrafts.ui.browser.view;
 
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.ui.LightZoneSkin;
-import com.lightcrafts.mediax.jai.JAI;
-import com.lightcrafts.mediax.jai.BorderExtender;
-import com.lightcrafts.mediax.jai.Interpolation;
+import javax.media.jai.JAI;
+import javax.media.jai.BorderExtender;
+import javax.media.jai.Interpolation;
 import com.lightcrafts.jai.utils.Functions;
 
 import javax.swing.*;

@@ -18,9 +18,9 @@ import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.lang.ref.WeakReference;
 import java.math.BigInteger;
-import com.lightcrafts.mediax.jai.CachedTile;
-import com.lightcrafts.mediax.jai.PlanarImage;
-import com.lightcrafts.mediax.jai.remote.SerializableRenderedImage;
+import javax.media.jai.CachedTile;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.remote.SerializableRenderedImage;
 
 /**
  * Information associated with a cached tile.

@@ -8,7 +8,7 @@ import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.utils.Segment;
 import com.lightcrafts.utils.ColorScience;
 
-import com.lightcrafts.mediax.jai.*;
+import javax.media.jai.*;
 import com.lightcrafts.ui.LightZoneSkin;
 
 import java.awt.*;

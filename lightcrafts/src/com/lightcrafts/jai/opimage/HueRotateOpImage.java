@@ -3,8 +3,8 @@
 package com.lightcrafts.jai.opimage;
 
 
-import com.lightcrafts.mediax.jai.PointOpImage;
-import com.lightcrafts.mediax.jai.ImageLayout;
+import javax.media.jai.PointOpImage;
+import javax.media.jai.ImageLayout;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.utils.HSB;
 

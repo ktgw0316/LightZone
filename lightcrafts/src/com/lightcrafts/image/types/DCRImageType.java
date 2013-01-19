@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 
-import com.lightcrafts.mediax.jai.JAI;
-import com.lightcrafts.mediax.jai.operator.TransposeType;
+import javax.media.jai.JAI;
+import javax.media.jai.operator.TransposeType;
 
 import com.lightcrafts.image.BadImageFileException;
 import com.lightcrafts.image.ImageInfo;

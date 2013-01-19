@@ -2,9 +2,9 @@
 
 package com.lightcrafts.model.ImageEditor;
 
-import com.lightcrafts.mediax.jai.TileComputationListener;
-import com.lightcrafts.mediax.jai.TileRequest;
-import com.lightcrafts.mediax.jai.PlanarImage;
+import javax.media.jai.TileComputationListener;
+import javax.media.jai.TileRequest;
+import javax.media.jai.PlanarImage;
 import java.awt.image.Raster;
 import java.awt.*;
 import java.util.*;

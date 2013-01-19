@@ -9,7 +9,7 @@ import com.lightcrafts.image.UnknownImageTypeException;
 import com.lightcrafts.image.export.ImageExportOptions;
 import com.lightcrafts.image.metadata.ImageMetadata;
 import com.lightcrafts.image.metadata.ImageOrientation;
-import com.lightcrafts.mediax.jai.util.ImagingException;
+import javax.media.jai.util.ImagingException;
 import com.lightcrafts.model.Engine;
 import com.lightcrafts.model.EngineFactory;
 import com.lightcrafts.model.Scale;

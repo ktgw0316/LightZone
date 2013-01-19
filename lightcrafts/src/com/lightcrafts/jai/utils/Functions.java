@@ -2,7 +2,7 @@
 
 package com.lightcrafts.jai.utils;
 
-import com.lightcrafts.mediax.jai.*;
+import javax.media.jai.*;
 import java.awt.image.*;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.*;
@@ -19,8 +19,7 @@ import com.lightcrafts.utils.ColorProfileInfo;
 import com.lightcrafts.model.ImageEditor.Rendering;
 import com.lightcrafts.model.ImageEditor.ImageProcessor;
 import com.lightcrafts.model.Operation;
-import com.lightcrafts.media.jai.util.ImageUtil;
-import sun.awt.color.CMM;
+import com.sun.media.jai.util.ImageUtil;
 
 /**
  * Created by IntelliJ IDEA.
@@ -131,14 +130,14 @@ public class Functions {
     }
 
     public static float[] fromLinearToCS(ColorSpace target, float color[]) {
-        synchronized (CMM.class) {
+        synchronized (ColorSpace.class) {
             return target.fromCIEXYZ(JAIContext.linearColorSpace.toCIEXYZ(color));
         }
     }
 
     public static int[] fromLinearToCS(ColorSpace target, int color[]) {
         float[] converted;
-        synchronized (CMM.class) {
+        synchronized (ColorSpace.class) {
             converted = target.fromCIEXYZ(JAIContext.linearColorSpace.toCIEXYZ(
                     new float[]{color[0] / 255.0f, color[1] / 255.0f, color[2] / 255.0f})
             );

@@ -2,14 +2,14 @@
 
 package com.lightcrafts.ui.toolkit;
 
-import com.lightcrafts.mediax.jai.BorderExtender;
-import com.lightcrafts.mediax.jai.Interpolation;
-import com.lightcrafts.mediax.jai.JAI;
-import com.lightcrafts.mediax.jai.RenderedOp;
-import com.lightcrafts.mediax.jai.operator.AffineDescriptor;
-import com.lightcrafts.mediax.jai.operator.BandMergeDescriptor;
-import com.lightcrafts.mediax.jai.operator.BandSelectDescriptor;
-import com.lightcrafts.mediax.jai.operator.InvertDescriptor;
+import javax.media.jai.BorderExtender;
+import javax.media.jai.Interpolation;
+import javax.media.jai.JAI;
+import javax.media.jai.RenderedOp;
+import javax.media.jai.operator.AffineDescriptor;
+import javax.media.jai.operator.BandMergeDescriptor;
+import javax.media.jai.operator.BandSelectDescriptor;
+import javax.media.jai.operator.InvertDescriptor;
 import com.lightcrafts.ui.LightZoneSkin;
 
 import javax.imageio.ImageIO;

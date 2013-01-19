@@ -9,7 +9,6 @@
   <path id="classpath">
     <pathelement location="lib/junit.jar"/>
     <pathelement location="../build"/>
-    <pathelement location="../extbuild"/>
   </path>
 
   <condition property="ld-path" value="../bin">

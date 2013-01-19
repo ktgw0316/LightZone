@@ -5,7 +5,7 @@ package com.lightcrafts.model.ImageEditor;
 import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.*;
 
-import com.lightcrafts.mediax.jai.*;
+import javax.media.jai.*;
 import com.lightcrafts.ui.editor.EditorMode;
 
 public class SpotOperationImpl extends BlendedOperation implements SpotOperation {

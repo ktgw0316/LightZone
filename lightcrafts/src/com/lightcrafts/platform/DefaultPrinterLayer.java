@@ -9,8 +9,8 @@ import com.lightcrafts.utils.ProgressIndicator;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.JAIContext;
 
-import com.lightcrafts.mediax.jai.*;
-import com.lightcrafts.mediax.jai.operator.TransposeDescriptor;
+import javax.media.jai.*;
+import javax.media.jai.operator.TransposeDescriptor;
 import java.awt.print.*;
 import java.awt.image.Raster;
 import java.awt.image.BufferedImage;

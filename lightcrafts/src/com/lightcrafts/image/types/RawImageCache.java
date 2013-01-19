@@ -7,7 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
-import com.lightcrafts.mediax.jai.PlanarImage;
+import javax.media.jai.PlanarImage;
 
 import com.lightcrafts.utils.filecache.FileCache;
 import com.lightcrafts.utils.filecache.FileCacheFactory;

@@ -20,7 +20,7 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.Timer;
 
-import com.lightcrafts.mediax.jai.*;
+import javax.media.jai.*;
 import com.lightcrafts.ui.LightZoneSkin;
 
 public class ImageEditorDisplay extends JPanel {

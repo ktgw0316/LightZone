@@ -15,7 +15,7 @@ import com.lightcrafts.image.export.ImageExportOptions;
 import com.lightcrafts.image.export.ImageFileExportOptions;
 import com.lightcrafts.image.metadata.ImageMetadata;
 import com.lightcrafts.image.types.*;
-import com.lightcrafts.mediax.jai.PlanarImage;
+import javax.media.jai.PlanarImage;
 import com.lightcrafts.model.Engine;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.PrintSettings;
@@ -1748,8 +1748,8 @@ public class Application {
 
             // preload jai_core.jar, jai_codec.jar, jai_imageio.jar:
             Startup.startupMessage(LOCALE.get("StartupClassesMessage"));
-            Class.forName("com.lightcrafts.mediax.jai.JAI");
-            Class.forName("com.lightcrafts.media.jai.codec.ImageCodec");
+            Class.forName("javax.media.jai.JAI");
+            Class.forName("com.sun.media.jai.codec.ImageCodec");
         }
         catch (ClassNotFoundException e) {
             showError(

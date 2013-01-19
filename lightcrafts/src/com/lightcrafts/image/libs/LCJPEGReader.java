@@ -7,8 +7,8 @@ import java.awt.image.*;
 import java.awt.color.ColorSpace;
 import java.io.*;
 import java.nio.ByteBuffer;
-import com.lightcrafts.mediax.jai.PlanarImage;
-import com.lightcrafts.mediax.jai.ImageLayout;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.ImageLayout;
 
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.opimage.CachedImage;

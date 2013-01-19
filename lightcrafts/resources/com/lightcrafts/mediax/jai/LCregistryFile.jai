@@ -58,117 +58,117 @@
 #
 # Image operation descriptors :
 #
-descriptor	com.lightcrafts.mediax.jai.operator.AbsoluteDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.AddCollectionDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.AddConstDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.AddConstToCollectionDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.AddDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.AffineDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.AndConstDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.AndDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.AWTImageDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.BandCombineDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.BandMergeDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.BandSelectDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.BinarizeDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.BMPDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.BorderDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.BoxFilterDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.ClampDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.ColorConvertDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.ColorQuantizerDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.ConstantDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.CompositeDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.ConjugateDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.ConvolveDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.CropDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.DCTDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.DFTDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.DilateDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.DivideDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.DivideComplexDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.DivideByConstDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.DivideIntoConstDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.ErodeDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.ErrorDiffusionDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.EncodeDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.ExpDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.ExtremaDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.FileLoadDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.FileStoreDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.FilteredSubsampleDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.FormatDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.FPXDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.GIFDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.GradientMagnitudeDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.HistogramDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.IDCTDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.IDFTDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.IIPDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.IIPResolutionDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.ImageFunctionDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.InvertDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.JPEGDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.LogDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.LookupDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.MagnitudeDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.MagnitudeSquaredDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.MaxDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.MaxFilterDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.MatchCDFDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.MeanDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.MedianFilterDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.MinDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.MinFilterDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.MosaicDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.MultiplyConstDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.MultiplyComplexDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.MultiplyDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.NotDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.NullDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.OrConstDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.OrDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.OrderedDitherDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.OverlayDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.PatternDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.PeriodicShiftDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.PhaseDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.PiecewiseDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.PNGDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.PNMDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.PolarToComplexDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.RenderableDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.RescaleDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.RotateDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.ScaleDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.ShearDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.StreamDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.SubsampleAverageDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.SubsampleBinaryToGrayDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.SubtractDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.SubtractConstDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.SubtractFromConstDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.TIFFDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.ThresholdDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.TranslateDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.TransposeDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.UnsharpMaskDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.URLDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.WarpDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.XorConstDescriptor
-descriptor	com.lightcrafts.mediax.jai.operator.XorDescriptor
+descriptor	javax.media.jai.operator.AbsoluteDescriptor
+descriptor	javax.media.jai.operator.AddCollectionDescriptor
+descriptor	javax.media.jai.operator.AddConstDescriptor
+descriptor	javax.media.jai.operator.AddConstToCollectionDescriptor
+descriptor	javax.media.jai.operator.AddDescriptor
+descriptor	javax.media.jai.operator.AffineDescriptor
+descriptor	javax.media.jai.operator.AndConstDescriptor
+descriptor	javax.media.jai.operator.AndDescriptor
+descriptor	javax.media.jai.operator.AWTImageDescriptor
+descriptor	javax.media.jai.operator.BandCombineDescriptor
+descriptor	javax.media.jai.operator.BandMergeDescriptor
+descriptor	javax.media.jai.operator.BandSelectDescriptor
+descriptor	javax.media.jai.operator.BinarizeDescriptor
+descriptor	javax.media.jai.operator.BMPDescriptor
+descriptor	javax.media.jai.operator.BorderDescriptor
+descriptor	javax.media.jai.operator.BoxFilterDescriptor
+descriptor	javax.media.jai.operator.ClampDescriptor
+descriptor	javax.media.jai.operator.ColorConvertDescriptor
+descriptor	javax.media.jai.operator.ColorQuantizerDescriptor
+descriptor	javax.media.jai.operator.ConstantDescriptor
+descriptor	javax.media.jai.operator.CompositeDescriptor
+descriptor	javax.media.jai.operator.ConjugateDescriptor
+descriptor	javax.media.jai.operator.ConvolveDescriptor
+descriptor	javax.media.jai.operator.CropDescriptor
+descriptor	javax.media.jai.operator.DCTDescriptor
+descriptor	javax.media.jai.operator.DFTDescriptor
+descriptor	javax.media.jai.operator.DilateDescriptor
+descriptor	javax.media.jai.operator.DivideDescriptor
+descriptor	javax.media.jai.operator.DivideComplexDescriptor
+descriptor	javax.media.jai.operator.DivideByConstDescriptor
+descriptor	javax.media.jai.operator.DivideIntoConstDescriptor
+descriptor	javax.media.jai.operator.ErodeDescriptor
+descriptor	javax.media.jai.operator.ErrorDiffusionDescriptor
+descriptor	javax.media.jai.operator.EncodeDescriptor
+descriptor	javax.media.jai.operator.ExpDescriptor
+descriptor	javax.media.jai.operator.ExtremaDescriptor
+descriptor	javax.media.jai.operator.FileLoadDescriptor
+descriptor	javax.media.jai.operator.FileStoreDescriptor
+descriptor	javax.media.jai.operator.FilteredSubsampleDescriptor
+descriptor	javax.media.jai.operator.FormatDescriptor
+descriptor	javax.media.jai.operator.FPXDescriptor
+descriptor	javax.media.jai.operator.GIFDescriptor
+descriptor	javax.media.jai.operator.GradientMagnitudeDescriptor
+descriptor	javax.media.jai.operator.HistogramDescriptor
+descriptor	javax.media.jai.operator.IDCTDescriptor
+descriptor	javax.media.jai.operator.IDFTDescriptor
+descriptor	javax.media.jai.operator.IIPDescriptor
+descriptor	javax.media.jai.operator.IIPResolutionDescriptor
+descriptor	javax.media.jai.operator.ImageFunctionDescriptor
+descriptor	javax.media.jai.operator.InvertDescriptor
+descriptor	javax.media.jai.operator.JPEGDescriptor
+descriptor	javax.media.jai.operator.LogDescriptor
+descriptor	javax.media.jai.operator.LookupDescriptor
+descriptor	javax.media.jai.operator.MagnitudeDescriptor
+descriptor	javax.media.jai.operator.MagnitudeSquaredDescriptor
+descriptor	javax.media.jai.operator.MaxDescriptor
+descriptor	javax.media.jai.operator.MaxFilterDescriptor
+descriptor	javax.media.jai.operator.MatchCDFDescriptor
+descriptor	javax.media.jai.operator.MeanDescriptor
+descriptor	javax.media.jai.operator.MedianFilterDescriptor
+descriptor	javax.media.jai.operator.MinDescriptor
+descriptor	javax.media.jai.operator.MinFilterDescriptor
+descriptor	javax.media.jai.operator.MosaicDescriptor
+descriptor	javax.media.jai.operator.MultiplyConstDescriptor
+descriptor	javax.media.jai.operator.MultiplyComplexDescriptor
+descriptor	javax.media.jai.operator.MultiplyDescriptor
+descriptor	javax.media.jai.operator.NotDescriptor
+descriptor	javax.media.jai.operator.NullDescriptor
+descriptor	javax.media.jai.operator.OrConstDescriptor
+descriptor	javax.media.jai.operator.OrDescriptor
+descriptor	javax.media.jai.operator.OrderedDitherDescriptor
+descriptor	javax.media.jai.operator.OverlayDescriptor
+descriptor	javax.media.jai.operator.PatternDescriptor
+descriptor	javax.media.jai.operator.PeriodicShiftDescriptor
+descriptor	javax.media.jai.operator.PhaseDescriptor
+descriptor	javax.media.jai.operator.PiecewiseDescriptor
+descriptor	javax.media.jai.operator.PNGDescriptor
+descriptor	javax.media.jai.operator.PNMDescriptor
+descriptor	javax.media.jai.operator.PolarToComplexDescriptor
+descriptor	javax.media.jai.operator.RenderableDescriptor
+descriptor	javax.media.jai.operator.RescaleDescriptor
+descriptor	javax.media.jai.operator.RotateDescriptor
+descriptor	javax.media.jai.operator.ScaleDescriptor
+descriptor	javax.media.jai.operator.ShearDescriptor
+descriptor	javax.media.jai.operator.StreamDescriptor
+descriptor	javax.media.jai.operator.SubsampleAverageDescriptor
+descriptor	javax.media.jai.operator.SubsampleBinaryToGrayDescriptor
+descriptor	javax.media.jai.operator.SubtractDescriptor
+descriptor	javax.media.jai.operator.SubtractConstDescriptor
+descriptor	javax.media.jai.operator.SubtractFromConstDescriptor
+descriptor	javax.media.jai.operator.TIFFDescriptor
+descriptor	javax.media.jai.operator.ThresholdDescriptor
+descriptor	javax.media.jai.operator.TranslateDescriptor
+descriptor	javax.media.jai.operator.TransposeDescriptor
+descriptor	javax.media.jai.operator.UnsharpMaskDescriptor
+descriptor	javax.media.jai.operator.URLDescriptor
+descriptor	javax.media.jai.operator.WarpDescriptor
+descriptor	javax.media.jai.operator.XorConstDescriptor
+descriptor	javax.media.jai.operator.XorDescriptor
 
 #
 # tile codec descriptor
 #
-descriptor	com.lightcrafts.mediax.jai.tilecodec.GZIPTileCodecDescriptor
-descriptor	com.lightcrafts.mediax.jai.tilecodec.JPEGTileCodecDescriptor
-descriptor	com.lightcrafts.mediax.jai.tilecodec.RawTileCodecDescriptor
+descriptor	javax.media.jai.tilecodec.GZIPTileCodecDescriptor
+descriptor	javax.media.jai.tilecodec.JPEGTileCodecDescriptor
+descriptor	javax.media.jai.tilecodec.RawTileCodecDescriptor
 
 #
 # remote descriptor
 #
-descriptor    com.lightcrafts.mediax.jai.remote.JAIRMIDescriptor
+descriptor    javax.media.jai.remote.JAIRMIDescriptor
 
 #
 # "rendered" factory objects
@@ -279,7 +279,7 @@ rendered    com.lightcrafts.media.jai.opimage.MultiplyConstCRIF		com.lightcrafts
 rendered    com.lightcrafts.media.jai.mlib.MlibMultiplyConstRIF		com.lightcrafts.media.jai	multiplyconst		mlibmultiplyconstrif
 rendered    com.lightcrafts.media.jai.opimage.NotCRIF			com.lightcrafts.media.jai	not			sunnotrif
 rendered    com.lightcrafts.media.jai.mlib.MlibNotRIF			com.lightcrafts.media.jai	not			mlibnotrif
-rendered    com.lightcrafts.mediax.jai.NullCRIF			   	com.lightcrafts.mediax.jai		null			sunullrif
+rendered    javax.media.jai.NullCRIF			   	javax.media.jai		null			sunullrif
 rendered    com.lightcrafts.media.jai.opimage.OrConstCRIF		com.lightcrafts.media.jai	orconst			sunorconstrif
 rendered    com.lightcrafts.media.jai.mlib.MlibOrConstRIF		com.lightcrafts.media.jai	orconst			mliborconstrif
 rendered    com.lightcrafts.media.jai.opimage.OrCRIF			com.lightcrafts.media.jai	or			sunorrif
@@ -373,7 +373,7 @@ renderable	com.lightcrafts.media.jai.opimage.MultiplyCRIF		multiply
 renderable	com.lightcrafts.media.jai.opimage.MultiplyComplexCRIF	multiplycomplex
 renderable	com.lightcrafts.media.jai.opimage.MultiplyConstCRIF	multiplyconst
 renderable	com.lightcrafts.media.jai.opimage.NotCRIF		not
-renderable	com.lightcrafts.mediax.jai.NullCRIF			null
+renderable	javax.media.jai.NullCRIF			null
 renderable	com.lightcrafts.media.jai.opimage.OrConstCRIF		orconst
 renderable	com.lightcrafts.media.jai.opimage.OrCRIF		or
 renderable	com.lightcrafts.media.jai.opimage.OverlayCRIF		overlay

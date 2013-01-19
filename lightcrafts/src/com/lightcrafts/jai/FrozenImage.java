@@ -2,8 +2,8 @@
 
 package com.lightcrafts.jai;
 
-import com.lightcrafts.mediax.jai.PlanarImage;
-import com.lightcrafts.mediax.jai.ImageLayout;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.ImageLayout;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.awt.image.ComponentColorModel;

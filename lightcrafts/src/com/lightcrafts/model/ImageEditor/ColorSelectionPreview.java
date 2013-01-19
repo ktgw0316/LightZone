@@ -6,7 +6,7 @@ import com.lightcrafts.model.*;
 import com.lightcrafts.jai.utils.*;
 import com.lightcrafts.jai.JAIContext;
 
-import com.lightcrafts.mediax.jai.*;
+import javax.media.jai.*;
 import com.lightcrafts.ui.LightZoneSkin;
 
 import java.awt.*;

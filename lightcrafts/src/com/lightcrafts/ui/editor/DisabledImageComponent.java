@@ -4,9 +4,9 @@ package com.lightcrafts.ui.editor;
 
 import static com.lightcrafts.ui.editor.Locale.LOCALE;
 import com.lightcrafts.ui.LightZoneSkin;
-import com.lightcrafts.mediax.jai.JAI;
-import com.lightcrafts.mediax.jai.BorderExtender;
-import com.lightcrafts.mediax.jai.Interpolation;
+import javax.media.jai.JAI;
+import javax.media.jai.BorderExtender;
+import javax.media.jai.Interpolation;
 
 import javax.swing.*;
 import java.awt.image.RenderedImage;

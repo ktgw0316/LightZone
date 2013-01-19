@@ -16,13 +16,13 @@ package com.lightcrafts.jai.operator;
 import java.awt.RenderingHints;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.RenderableImage;
-import com.lightcrafts.mediax.jai.JAI;
-import com.lightcrafts.mediax.jai.OperationDescriptorImpl;
-import com.lightcrafts.mediax.jai.ParameterBlockJAI;
-import com.lightcrafts.mediax.jai.RenderableOp;
-import com.lightcrafts.mediax.jai.RenderedOp;
-import com.lightcrafts.mediax.jai.registry.RenderableRegistryMode;
-import com.lightcrafts.mediax.jai.registry.RenderedRegistryMode;
+import javax.media.jai.JAI;
+import javax.media.jai.OperationDescriptorImpl;
+import javax.media.jai.ParameterBlockJAI;
+import javax.media.jai.RenderableOp;
+import javax.media.jai.RenderedOp;
+import javax.media.jai.registry.RenderableRegistryMode;
+import javax.media.jai.registry.RenderedRegistryMode;
 
 /**
  * An <code>OperationDescriptor</code> describing the "Add" operation.
@@ -64,7 +64,7 @@ import com.lightcrafts.mediax.jai.registry.RenderedRegistryMode;
  * <tr><th>Name</th>        <th>Value</th></tr>
  * <tr><td>GlobalName</td>  <td>Add</td></tr>
  * <tr><td>LocalName</td>   <td>Add</td></tr>
- * <tr><td>Vendor</td>      <td>com.lightcrafts.media.jai</td></tr>
+ * <tr><td>Vendor</td>      <td>com.sun.media.jai</td></tr>
  * <tr><td>Description</td> <td>Adds two images.</td></tr>
  * <tr><td>DocURL</td>      <td>http://java.sun.com/products/java-media/jai/forDevelopers/jai-apidocs/javax/media/jai/operator/AddDescriptor.html</td></tr>
  * <tr><td>Version</td>     <td>1.0</td></tr>
@@ -72,7 +72,7 @@ import com.lightcrafts.mediax.jai.registry.RenderedRegistryMode;
  *
  * <p> No parameters are needed for this operation.
  *
- * @see com.lightcrafts.mediax.jai.OperationDescriptor */
+ * @see javax.media.jai.OperationDescriptor */
 public class UnSharpMaskDescriptor extends OperationDescriptorImpl {
 
     /**

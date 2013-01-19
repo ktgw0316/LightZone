@@ -8,8 +8,8 @@ import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.utils.ColorScience;
 
-import com.lightcrafts.mediax.jai.JAI;
-import com.lightcrafts.mediax.jai.PlanarImage;
+import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
 
 import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;

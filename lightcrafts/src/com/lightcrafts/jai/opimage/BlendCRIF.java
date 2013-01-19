@@ -2,11 +2,11 @@
 
 package com.lightcrafts.jai.opimage;
 
-import com.lightcrafts.media.jai.opimage.RIFUtil;
+import com.sun.media.jai.opimage.RIFUtil;
 
-import com.lightcrafts.mediax.jai.ImageLayout;
-import com.lightcrafts.mediax.jai.CRIFImpl;
-import com.lightcrafts.mediax.jai.ROI;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.CRIFImpl;
+import javax.media.jai.ROI;
 import com.lightcrafts.model.ColorSelection;
 
 import java.awt.image.RenderedImage;

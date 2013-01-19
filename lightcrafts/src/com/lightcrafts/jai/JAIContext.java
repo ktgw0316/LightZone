@@ -10,11 +10,11 @@ import com.lightcrafts.jai.utils.LCTileScheduler;
 import com.lightcrafts.utils.ColorScience;
 import com.lightcrafts.utils.ColorProfileInfo;
 import com.lightcrafts.platform.Platform;
-import com.lightcrafts.media.jai.util.SunTileCache;
+import com.sun.media.jai.util.SunTileCache;
 
-import com.lightcrafts.mediax.jai.*;
-import com.lightcrafts.mediax.jai.registry.CRIFRegistry;
-import com.lightcrafts.mediax.jai.registry.RIFRegistry;
+import javax.media.jai.*;
+import javax.media.jai.registry.CRIFRegistry;
+import javax.media.jai.registry.RIFRegistry;
 import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.color.ICC_ColorSpace;
@@ -27,8 +27,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.prefs.Preferences;
-
-import sun.awt.color.CMM;
 
 /**
  * Created by IntelliJ IDEA.
@@ -160,7 +158,7 @@ public class JAIContext {
 
     static void zlum(ICC_ColorSpace cs) {
         float[] zero;
-        synchronized (CMM.class) {
+        synchronized (ColorSpace.class) {
             zero = cs.fromCIEXYZ(new float[] {0, 0, 0});
         }
         System.out.println("zero: "  + zero[0] + " : " + zero[1] + " : " + zero[2]);

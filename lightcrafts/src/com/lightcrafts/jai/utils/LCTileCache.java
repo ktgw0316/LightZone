@@ -13,8 +13,8 @@
  */
 package com.lightcrafts.jai.utils;
 
-import com.lightcrafts.media.jai.util.CacheDiagnostics;
-import com.lightcrafts.media.jai.util.ImageUtil;
+import com.sun.media.jai.util.CacheDiagnostics;
+import com.sun.media.jai.util.ImageUtil;
 import com.lightcrafts.utils.cache.*;
 import com.lightcrafts.utils.MemoryLimits;
 import com.lightcrafts.utils.LCArrays;
@@ -30,13 +30,13 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.lang.ref.Reference;
 import java.nio.ByteBuffer;
-import com.lightcrafts.mediax.jai.EnumeratedParameter;
-import com.lightcrafts.mediax.jai.TileCache;
-import com.lightcrafts.mediax.jai.util.ImagingListener;
+import javax.media.jai.EnumeratedParameter;
+import javax.media.jai.TileCache;
+import javax.media.jai.util.ImagingListener;
 
 /**
  * This is Sun Microsystems' reference implementation of the
- * <code>com.lightcrafts.mediax.jai.TileCache</code> interface.  It provides a
+ * <code>javax.media.jai.TileCache</code> interface.  It provides a
  * central location for images to cache computed tiles, and is used as
  * the default tile cache mechanism when no other tile cache objects
  * are specified.
@@ -49,7 +49,7 @@ import com.lightcrafts.mediax.jai.util.ImagingListener;
  * greatly depends on the type of images involved.  In fact, the tile
  * capacity is rather meaningless.
  *
- * @see com.lightcrafts.mediax.jai.TileCache
+ * @see javax.media.jai.TileCache
  *
  */
 

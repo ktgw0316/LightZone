@@ -9,8 +9,8 @@ import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.ui.browser.model.ImageTask;
-import com.lightcrafts.mediax.jai.RenderedOp;
-import com.lightcrafts.mediax.jai.operator.AffineDescriptor;
+import javax.media.jai.RenderedOp;
+import javax.media.jai.operator.AffineDescriptor;
 import com.lightcrafts.utils.filecache.FileCacheFactory;
 import com.lightcrafts.utils.filecache.FileCache;
 

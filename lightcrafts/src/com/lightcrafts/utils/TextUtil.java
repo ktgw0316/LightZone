@@ -2,8 +2,7 @@
 
 package com.lightcrafts.utils;
 
-import jdk1_6.java.text.Normalizer;
-
+import java.text.Normalizer;
 import java.util.Date;
 import java.text.DateFormat;
 

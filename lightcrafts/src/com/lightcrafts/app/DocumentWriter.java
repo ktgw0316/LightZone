@@ -11,7 +11,7 @@ import com.lightcrafts.image.export.ImageExportOptions;
 import com.lightcrafts.image.types.LZNImageType;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.opimage.CachedImage;
-import com.lightcrafts.mediax.jai.PlanarImage;
+import javax.media.jai.PlanarImage;
 import com.lightcrafts.model.Engine;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.platform.ProgressDialog;

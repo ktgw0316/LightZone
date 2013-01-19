@@ -1,4 +1,4 @@
-<project name="lightcrafts" default="build">
+<project name="lightcrafts" default="build" xmlns:ivy="antlib:org.apache.ivy.ant">
 
   <tstamp/>
 
@@ -7,8 +7,6 @@
   <property file="resources/com/lightcrafts/utils/resources/Version.properties"/>
 
   <property name="common-jar" value="products/lightcrafts.jar"/>
-
-  <property name="lcjai-jar" value="products/lcjai.jar"/>
 
 	<exec executable="cat" vmlauncher="false" failonerror="true"
 	      outputproperty="app-version">
@@ -31,19 +29,18 @@
     </not>
   </condition>
 
-  <target name="javac">
+  <target name="resolve">
+    <ivy:retrieve/>
+  </target>
+
+  <target name="javac" depends="resolve">
     <exec executable="make" dir="products" failonerror="true"
           vmlauncher="false"/>
-
-    <mkdir dir="extbuild"/>
-    <javac srcdir="extsrc" destdir="extbuild" source="1.5" target="1.5"
-           debug="true" includeantruntime="false" classpath="${jai-classpath}"/>
-
     <mkdir dir="build"/>
-    <javac destdir="build" includeantruntime="false" source="1.5" target="1.5" debug="true">
+
+    <javac destdir="build" source="1.5" target="1.5" includeantruntime="false" debug="true">
       <src path="src"/>
       <classpath>
-        <pathelement path="extbuild"/>
         <fileset dir="lib">
           <include name="*.jar"/>
         </fileset>
@@ -95,18 +92,6 @@
       <manifest>
         <attribute name="Built-By" value="${user.name}"/>
         <attribute name="Main-Class" value="com.lightcrafts.app.Application"/>
-        <attribute name="Implementation-Title" value="${app-name}"/>
-        <attribute name="Implementation-Vendor" value="Light Crafts, Inc."/>
-        <attribute name="Implementation-Version"
-                   value="${app-version} ${TODAY}"/>
-      </manifest>
-    </jar>
-
-    <delete file="${lcjai-jar}"/>
-    <jar jarfile="${lcjai-jar}">
-      <fileset dir="extbuild"/>
-      <manifest>
-        <attribute name="Built-By" value="${user.name}"/>
         <attribute name="Implementation-Title" value="${app-name}"/>
         <attribute name="Implementation-Vendor" value="Light Crafts, Inc."/>
         <attribute name="Implementation-Version"
@@ -181,7 +166,6 @@
 
   <target name="clean-up">
     <delete dir="build"/>
-    <delete dir="extbuild"/>
     <exec executable="make" dir="jnisrc">
       <arg value="${clean-method}"/>
     </exec>

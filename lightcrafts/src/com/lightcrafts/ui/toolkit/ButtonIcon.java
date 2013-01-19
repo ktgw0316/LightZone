@@ -7,8 +7,8 @@ import com.lightcrafts.platform.Platform;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import com.lightcrafts.mediax.jai.*;
-import com.lightcrafts.mediax.jai.operator.CompositeDescriptor;
+import javax.media.jai.*;
+import javax.media.jai.operator.CompositeDescriptor;
 import java.awt.image.*;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.*;

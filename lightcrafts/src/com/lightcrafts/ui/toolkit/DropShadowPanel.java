@@ -80,7 +80,7 @@ public class DropShadowPanel extends JPanel implements PropertyChangeListener {
      * <p>Creates a new checkboard panel with a flow layout. The drop shadow has
      * the following default properties:
      * <ul>
-     *   <li><i>angle</i>: 45°</li>
+     *   <li><i>angle</i>: 45&deg;</li>
      *   <li><i>distance</i>: 2 pixels</li>
      *   <li><i>size</i>: 5 pixels (see
      *   {@link org.jdesktop.swingx.util.ShadowFactory}</li>
@@ -103,7 +103,7 @@ public class DropShadowPanel extends JPanel implements PropertyChangeListener {
      * <p>Creates a new checkboard panel the specified layout. The drop shadow
      * has the following default properties:
      * <ul>
-     *   <li><i>angle</i>: 45°</li>
+     *   <li><i>angle</i>: 45&deg;</li>
      *   <li><i>distance</i>: 2 pixels</li>
      *   <li><i>size</i>: 5 pixels (see
      *   {@link org.jdesktop.swingx.util.ShadowFactory}</li>
@@ -126,7 +126,7 @@ public class DropShadowPanel extends JPanel implements PropertyChangeListener {
      * <p>Creates a new checkboard panel the specified layout and shadow factory.
      * The drop shadow has the following default properties:
      * <ul>
-     *   <li><i>angle</i>: 45°</li>
+     *   <li><i>angle</i>: 45&deg;</li>
      *   <li><i>distance</i>: 2 pixels</li>
      * </ul>
      * This configuration provides good looking results for use with Swing

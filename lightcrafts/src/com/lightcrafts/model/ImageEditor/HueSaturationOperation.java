@@ -10,7 +10,7 @@ import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.opimage.IntVibranceOpImage;
 import com.lightcrafts.jai.opimage.HueRotateOpImage;
 
-import com.lightcrafts.mediax.jai.*;
+import javax.media.jai.*;
 import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
 

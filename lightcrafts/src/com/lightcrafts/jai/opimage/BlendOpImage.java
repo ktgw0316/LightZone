@@ -2,11 +2,11 @@
 
 package com.lightcrafts.jai.opimage;
 
-import com.lightcrafts.media.jai.util.ImageUtil;
-import com.lightcrafts.media.jai.util.JDKWorkarounds;
+import com.sun.media.jai.util.ImageUtil;
+import com.sun.media.jai.util.JDKWorkarounds;
 import com.lightcrafts.jai.LCROIShape;
 
-import com.lightcrafts.mediax.jai.*;
+import javax.media.jai.*;
 import com.lightcrafts.model.ColorSelection;
 
 import java.awt.image.*;

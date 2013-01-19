@@ -10,7 +10,7 @@ import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.ui.toolkit.ShadowFactory;
 
-import com.lightcrafts.mediax.jai.IHSColorSpace;
+import javax.media.jai.IHSColorSpace;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.font.TextLayout;
