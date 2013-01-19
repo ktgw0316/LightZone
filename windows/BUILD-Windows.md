@@ -12,6 +12,7 @@ There's a .gitattributes file to specify that those files need to have LF line e
 
 Download and install (or unpack) following:
 -   __Apache Ant__
+-   __Apache Ivy__ - copy ivy-<version>.jar to ANT_HOME/lib
 -   __Cygwin__
     In Cygwin install following:
     -    __gcc__ version 3 (not 4)
