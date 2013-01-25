@@ -21,7 +21,7 @@
     </target>
 
     <target name="index">
-        <exec executable="jhindexer" dir="build" vmlauncher="false" failonerror="true">
+        <exec executable="../jhindexer.sh" dir="build" vmlauncher="false" failonerror="true">
             <arg value="."/>
         </exec>
     </target>
