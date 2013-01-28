@@ -1,7 +1,6 @@
 # Development guide
 
-## Ubuntu 12.04.1 LTS (Precise Pangolin)
-### Install required packages
+## Install required packages
 Building the LightZone source requires (at least) following packages:
 - __openjdk-7-jdk__
 - __ant__
@@ -13,7 +12,8 @@ Building the LightZone source requires (at least) following packages:
 - __javahelp2__ for jhindexer
 - __git__
 
-To install these packages:
+### Ubuntu 12.04.1 LTS (Precise Pangolin)
+Install required packages:
 
     sudo apt-get install openjdk-7-jdk ant gcc g++ make libx11-dev tidy javahelp2 git
 
@@ -33,17 +33,27 @@ Set your JAVA_HOME variable to point to installed JDK, e.g.
 
     export JAVA_HOME=/usr/lib/jvm/java-7-oracle
 
-### Build
+### OpenSUSE 12.2
+Install required packages:
+    sudo zypper install gcc gcc-c++ make libX11-devel tidy javahelp2 git
+
+Manually download Apache Ant, unpack it somewhere (e.g. to your home directory) and append it to the path:
+    export PATH=/home/yourusername/apache-ant-1.8.4/bin/:$PATH
+
+Set your JAVA_HOME variable to point to installed JDK, e.g.
+    export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-1.7.0
+
+## Build
 To start the build:
 
     ant -f linux/build.xml
 
-### Test Run
+## Test Run
 To check if it works fine before installing:
 
     ant -f linux/build.xml run
 
-### Create a tarball and install
+## Create a tarball and install
 To create a tarball (.tar.gz) of LightZone, you need Install4J.
 Download and install its debian package from
 http://www.ej-technologies.com/download/install4j/files
