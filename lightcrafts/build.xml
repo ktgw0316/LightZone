@@ -29,8 +29,28 @@
     </not>
   </condition>
 
-  <target name="resolve">
+  <target name="resolve" depends="init-ivy">
     <ivy:retrieve/>
+  </target>
+
+  <property name="ivy.version" value="2.3.0-rc2"/>
+  <property name="ivy.jar.dir" value="${basedir}/lib"/>
+  <property name="ivy.jar.file"
+            value="${ivy.jar.dir}/ivy-${ivy.version}.jar"/>
+
+  <target name="download-ivy" unless="offline">
+    <mkdir dir="${ivy.jar.dir}"/>
+    <get src="http://repo2.maven.org/maven2/org/apache/ivy/ivy/${ivy.version}/ivy-${ivy.version}.jar" 
+         dest="${ivy.jar.file}" usetimestamp="true"/>
+  </target>
+
+  <target name="init-ivy" depends="download-ivy" unless="ivy.initialized">
+    <path id="ivy.lib.path">
+      <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
+    </path>
+    <taskdef resource="org/apache/ivy/ant/antlib.xml"
+             uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+    <property name="ivy.initialized" value="true"/>
   </target>
 
   <target name="javac" depends="resolve">

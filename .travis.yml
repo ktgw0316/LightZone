@@ -1,5 +1,5 @@
 language: java
-script: ant -lib /usr/share/java/ivy.jar -f linux/build.xml
+script: ant -f linux/build.xml
 jdk:
   - oraclejdk7
   - openjdk7
