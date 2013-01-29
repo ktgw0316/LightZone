@@ -8,7 +8,6 @@ import com.lightcrafts.templates.TemplateKey;
 import com.lightcrafts.ui.browser.view.AbstractImageBrowser;
 import com.lightcrafts.ui.toolkit.IconFactory;
 import com.lightcrafts.ui.editor.EditorMode;
-import com.lightcrafts.prefs.ApplicationMode;
 
 import javax.swing.*;
 import java.awt.*;
@@ -38,32 +37,18 @@ class StylesButton extends BrowserButton {
         setToolTipText(ToolTip);
 
         // Show the popup on mouse-pressed, not on action-performed.
-        if (! ApplicationMode.isBasicMode()) {
-            addMouseListener(
-                new MouseAdapter() {
-                    public void mousePressed(MouseEvent event) {
-                        ComboFrame frame = getComboFrame();
-                        AbstractImageBrowser browser = frame.getBrowser();
-                        ArrayList<File> files = browser.getSelectedFiles();
-                        if (! files.isEmpty()) {
-                            showPopup(files);
-                        }
+        addMouseListener(
+            new MouseAdapter() {
+                public void mousePressed(MouseEvent event) {
+                    ComboFrame frame = getComboFrame();
+                    AbstractImageBrowser browser = frame.getBrowser();
+                    ArrayList<File> files = browser.getSelectedFiles();
+                    if (! files.isEmpty()) {
+                        showPopup(files);
                     }
                 }
-            );
-        }
-        else {
-            ApplicationMode.maybeSetToolTip(this);
-        }
-    }
-
-    void updateEnabled() {
-        if (ApplicationMode.isBasicMode()) {
-            setEnabled(false);
-        }
-        else {
-            super.updateEnabled();
-        }
+            }
+        );
     }
 
     private void showPopup(final ArrayList<File> files) {

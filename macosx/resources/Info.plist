@@ -108,8 +108,6 @@
         <dict>
             <key>apple.awt.graphics.UseQuartz</key>
             <string>true</string>
-            <key>com.lightcrafts.licensetype</key>
-            <string>@LICENSETYPE@</string>
         </dict>
         <key>WorkingDirectory</key>
         <string>$APP_PACKAGE/$JAVAROOT</string>

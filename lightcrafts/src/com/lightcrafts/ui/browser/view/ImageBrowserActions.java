@@ -8,7 +8,6 @@ import com.lightcrafts.ui.browser.model.ImageDatum;
 import com.lightcrafts.ui.browser.model.ImageDatumType;
 import static com.lightcrafts.ui.browser.view.Locale.LOCALE;
 import com.lightcrafts.utils.file.FileUtil;
-import com.lightcrafts.prefs.ApplicationMode;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -54,8 +53,6 @@ public class ImageBrowserActions {
     ImageBrowserActions(AbstractImageBrowser b) {
         this.browser = b;
 
-        boolean isBasic = ApplicationMode.isBasicMode();
-
         editAction = new LeadSelectionAction("EditMenuItem", browser, true) {
             public void actionPerformed(ActionEvent event) {
                 ImageDatum lead = getLeadDatum();
@@ -63,7 +60,7 @@ public class ImageBrowserActions {
             }
         };
         copyAction = new LeadSelectionAction(
-            "CopyMenuItem", browser, ! isBasic
+            "CopyMenuItem", browser, true
         ) {
             public void actionPerformed(ActionEvent event) {
                 ImageDatum datum = getLeadDatum();
@@ -80,7 +77,7 @@ public class ImageBrowserActions {
             }
         };
         pasteAction = new SelectionAction(
-            LOCALE.get("PasteMenuItem"), browser, null, true, ! isBasic
+            LOCALE.get("PasteMenuItem"), browser, null, true, true
         ) {
             public void actionPerformed(ActionEvent event) {
                 List<ImageDatum> selection = getSelection();
@@ -129,7 +126,7 @@ public class ImageBrowserActions {
         rightAction = RotateActions.createRotateRightAction(browser, true);
 
         renameAction = new LeadSelectionAction(
-            "RenameMenuItem", browser, ! isBasic
+            "RenameMenuItem", browser, true
         ) {
             public void actionPerformed(ActionEvent event) {
                 ImageDatum datum = browser.getLeadSelectedDatum();
@@ -145,7 +142,7 @@ public class ImageBrowserActions {
                 browser.selectLatest();
             }
         };
-        selectLatestAction.setEnabled(! ApplicationMode.isBasicMode());
+        selectLatestAction.setEnabled(true);
 
         selectAllAction = new AbstractAction(
             LOCALE.get("SelectAllActionName")
@@ -154,7 +151,7 @@ public class ImageBrowserActions {
                 browser.selectAll();
             }
         };
-        selectAllAction.setEnabled(! ApplicationMode.isBasicMode());
+        selectAllAction.setEnabled(true);
 
         // This accelerator key setup should be localized and maybe unified
         // with the centralized menu configuration in MenuFactory.
@@ -190,7 +187,7 @@ public class ImageBrowserActions {
         // The trash action does get a key binding, defined in
         // AbstractImageBrowser instead of here.
         trashAction = new SelectionAction(
-            LOCALE.get("TrashMenuItem"), browser, null, true, ! isBasic
+            LOCALE.get("TrashMenuItem"), browser, null, true, true
         ) {
             public void actionPerformed(ActionEvent event) {
                 List<ImageDatum> datums = browser.getSelectedDatums();

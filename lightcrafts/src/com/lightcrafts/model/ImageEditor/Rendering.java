@@ -7,10 +7,8 @@ import com.lightcrafts.model.Operation;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.opimage.CachedImage;
-import com.lightcrafts.jai.opimage.UnlicensedOpImage;
 
 import javax.media.jai.*;
-import com.lightcrafts.license.LicenseChecker;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
@@ -33,8 +31,6 @@ public class Rendering implements Cloneable {
     private ImagePyramid pyramid;
 
     public boolean cheapScale = false;
-
-    private boolean licenseExpired = LicenseChecker.hasExpiredTrialLicense();
 
     public Rendering clone() /* throws CloneNotSupportedException */ {
         try {
@@ -254,7 +250,7 @@ public class Rendering implements Cloneable {
         } else
             System.out.println("Rendering.renderPipeline: null pipeline?");
 
-        return licenseExpired ? new UnlicensedOpImage(processedImage, null) : processedImage;
+        return processedImage;
     }
 
     public void prefetch(Rectangle area) {

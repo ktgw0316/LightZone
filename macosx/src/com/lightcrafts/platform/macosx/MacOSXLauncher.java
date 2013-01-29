@@ -2,22 +2,21 @@
 
 package com.lightcrafts.platform.macosx;
 
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-
 import com.lightcrafts.app.Application;
 import com.lightcrafts.app.CheckForUpdate;
 import com.lightcrafts.app.ExceptionDialog;
 import com.lightcrafts.app.other.MacApplication;
 import com.lightcrafts.app.other.OtherApplication;
-import com.lightcrafts.license.LicenseChecker;
 import com.lightcrafts.platform.AlertDialog;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.splash.SplashImage;
 import com.lightcrafts.splash.SplashWindow;
 import com.lightcrafts.utils.ForkDaemon;
 import com.lightcrafts.utils.Version;
+
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 
 import static com.lightcrafts.platform.macosx.Locale.LOCALE;
 
@@ -51,7 +50,7 @@ public final class MacOSXLauncher {
 
         try {
             checkJavaVersion();
-            final String licenseText = LicenseChecker.checkLicense();
+            final String licenseText = "Open Source";
 
             final SplashImage image = new SplashImage(
                 SplashImage.getDefaultSplashText(licenseText)

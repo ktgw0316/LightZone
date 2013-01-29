@@ -5,7 +5,6 @@ package com.lightcrafts.app.menu;
 import com.lightcrafts.app.ComboFrame;
 import com.lightcrafts.app.Application;
 import com.lightcrafts.ui.browser.view.AbstractImageBrowser;
-import com.lightcrafts.prefs.ApplicationMode;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -27,12 +26,4 @@ class SendMenuItem extends BrowserMenuItem {
         }
     }
 
-    void update() {
-        if (! ApplicationMode.isBasicMode()) {
-            super.update();
-        }
-        else {
-            setEnabled(false);
-        }
-    }
 }

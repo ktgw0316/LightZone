@@ -34,7 +34,6 @@ public class PreferencesPanel extends JPanel {
         addItem(this, items, new SaveDirectoryItem(help));
         addItem(this, items, new AutoSaveItem(help));
         addItem(this, items, new OtherAppIntegrationItem(help));
-        addItem(this, items, new AppModeItem(help));
         addItem(this, items, new ShowToolTitlesItem(help));
         addItem(this, items, new ClearPrefsItem(help));
 //        addItem(this, items, new VideoLearningCenterItem(help));

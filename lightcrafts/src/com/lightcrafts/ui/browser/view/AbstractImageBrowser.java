@@ -3,7 +3,6 @@
 package com.lightcrafts.ui.browser.view;
 
 import com.lightcrafts.platform.Platform;
-import com.lightcrafts.prefs.ApplicationMode;
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.ui.browser.model.*;
 import static com.lightcrafts.ui.browser.view.Locale.LOCALE;
@@ -93,9 +92,7 @@ public abstract class AbstractImageBrowser
 
         this.count = getAllImageData().size();
 
-        selection = ApplicationMode.isBasicMode() ?
-            new SingleImageBrowserSelectionModel(this) :
-            new ImageBrowserSelectionModel(this);
+        selection = new ImageBrowserSelectionModel(this);
 
         previews = new LinkedList<ImageDatum>();
 
@@ -729,7 +726,7 @@ public abstract class AbstractImageBrowser
                 }
             }
         );
-        renameItem.setEnabled(! ApplicationMode.isBasicMode());
+        renameItem.setEnabled(true);
         menu.add(renameItem);
 
         JMenuItem deleteAllItem = new JMenuItem(actions.getTrashAction());
@@ -745,7 +742,7 @@ public abstract class AbstractImageBrowser
                 }
             }
         );
-        if (! type.hasLznData() || ApplicationMode.isBasicMode()) {
+        if (! type.hasLznData() ) {
             copyTemplate.setEnabled(false);
         }
         menu.add(copyTemplate);
@@ -761,8 +758,7 @@ public abstract class AbstractImageBrowser
         JMenu templateItem = new JMenu(LOCALE.get("ApplyMenuItem"));
         if (
             (templates != null) &&
-            (! files.isEmpty()) &&
-            (! ApplicationMode.isBasicMode())
+            (! files.isEmpty())
         ) {
             List actions = templates.getTemplateActions();
             if (! actions.isEmpty()) {
@@ -1085,36 +1081,35 @@ public abstract class AbstractImageBrowser
             KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
             WHEN_FOCUSED
         );
-        if (! ApplicationMode.isBasicMode()) {
-            Action deleteSelected = new AbstractAction() {
-                public void actionPerformed(ActionEvent event) {
-                    ArrayList<File> files = getSelectedFiles();
-                    if (! files.isEmpty()) {
-                        FileActions.deleteFiles(
-                            files.toArray(new File[0]),
-                            AbstractImageBrowser.this
-                        );
-                    }
+
+        Action deleteSelected = new AbstractAction() {
+            public void actionPerformed(ActionEvent event) {
+                ArrayList<File> files = getSelectedFiles();
+                if (! files.isEmpty()) {
+                    FileActions.deleteFiles(
+                        files.toArray(new File[0]),
+                        AbstractImageBrowser.this
+                    );
                 }
-            };
-            registerKeyboardAction(
-                deleteSelected,
-                KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0),
-                WHEN_FOCUSED
-            );
-            registerKeyboardAction(
-                deleteSelected,
-                KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0),
-                WHEN_FOCUSED
-            );
-            // All the rating actions
-            List<SelectionAction> ratings =
-                RatingActions.createAllActions(this, true);
-            for (SelectionAction action : ratings) {
-                registerKeyboardAction(
-                    action, action.getKeyStroke(), WHEN_FOCUSED
-                );
             }
+        };
+        registerKeyboardAction(
+            deleteSelected,
+            KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0),
+            WHEN_FOCUSED
+        );
+        registerKeyboardAction(
+            deleteSelected,
+            KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0),
+            WHEN_FOCUSED
+        );
+        // All the rating actions
+        List<SelectionAction> ratings =
+            RatingActions.createAllActions(this, true);
+        for (SelectionAction action : ratings) {
+            registerKeyboardAction(
+                action, action.getKeyStroke(), WHEN_FOCUSED
+            );
         }
         // The left and right rotate actions
         List<SelectionAction> rotations =

@@ -7,7 +7,6 @@ import static com.lightcrafts.ui.metadata2.Locale.LOCALE;
 import com.lightcrafts.ui.toolkit.IconFactory;
 import com.lightcrafts.ui.toolkit.CoolButton;
 import com.lightcrafts.ui.LightZoneSkin;
-import com.lightcrafts.prefs.ApplicationMode;
 
 import javax.swing.*;
 import java.awt.*;
@@ -92,8 +91,7 @@ class DefaultButtons extends JPanel {
                     }
                 );
                 add(button);
-                button.setEnabled(! ApplicationMode.isBasicMode());
-                ApplicationMode.maybeSetToolTip(button);
+                button.setEnabled(true);
             }
         }
     }
@@ -108,7 +106,7 @@ class DefaultButtons extends JPanel {
                 Dimension buttonSize = button.getPreferredSize();
                 button.setSize(buttonSize);
                 button.setEnabled(
-                    (! ApplicationMode.isBasicMode()) && entry.hasDefaultValue()
+                    entry.hasDefaultValue()
                 );
                 int y = row * rowHeight + rowHeight / 2 - buttonSize.height / 2;
                 button.setLocation(0, y);

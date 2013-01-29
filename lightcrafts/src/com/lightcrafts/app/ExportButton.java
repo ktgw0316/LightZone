@@ -6,7 +6,6 @@ import static com.lightcrafts.app.Locale.LOCALE;
 import com.lightcrafts.ui.browser.view.AbstractImageBrowser;
 import com.lightcrafts.ui.toolkit.IconFactory;
 import com.lightcrafts.ui.editor.EditorMode;
-import com.lightcrafts.prefs.ApplicationMode;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -39,15 +38,6 @@ class ExportButton extends BrowserButton {
                 }
             }
         );
-        ApplicationMode.maybeSetToolTip(this);
     }
 
-    void updateEnabled() {
-        if (ApplicationMode.isBasicMode()) {
-            setEnabled(false);
-        }
-        else {
-            super.updateEnabled();
-        }
-    }
 }

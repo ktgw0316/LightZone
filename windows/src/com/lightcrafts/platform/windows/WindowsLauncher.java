@@ -2,22 +2,18 @@
 
 package com.lightcrafts.platform.windows;
 
-import java.awt.*;
-import java.io.File;
-
+import com.lightcrafts.app.Application;
 import com.lightcrafts.app.CheckForUpdate;
 import com.lightcrafts.app.ExceptionDialog;
-import com.lightcrafts.app.Application;
 import com.lightcrafts.app.other.OtherApplication;
 import com.lightcrafts.app.other.WindowsApplication;
-import com.lightcrafts.license.LicenseChecker;
 import com.lightcrafts.splash.SplashImage;
 import com.lightcrafts.splash.SplashWindow;
 import com.lightcrafts.utils.Version;
 
 import javax.swing.*;
-
-import sun.swing.SwingUtilities2;
+import java.awt.*;
+import java.io.File;
 
 /**
  * Launch LightZone for Windows.
@@ -62,7 +58,7 @@ public final class WindowsLauncher {
                 "net.java.plaf.windows.WindowsLookAndFeel"
             ); */
 
-            final String licenseText = LicenseChecker.checkLicense();
+            final String licenseText = "Open Source";
 
             CheckForUpdate.start();
             {

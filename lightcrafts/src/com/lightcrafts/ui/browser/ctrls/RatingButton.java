@@ -7,7 +7,6 @@ import static com.lightcrafts.ui.browser.ctrls.Locale.LOCALE;
 import com.lightcrafts.ui.browser.view.AbstractImageBrowser;
 import com.lightcrafts.ui.browser.view.ImageBrowserActions;
 import com.lightcrafts.ui.toolkit.CoolButton;
-import com.lightcrafts.prefs.ApplicationMode;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,8 +34,6 @@ public class RatingButton extends CoolButton {
         setIcon(starIcon);
         setToolTipText(ToolTip);
 
-        ApplicationMode.maybeSetToolTip(this);
-
         popup = new JPopupMenu();
         
         ImageBrowserActions actions = browser.getActions();
@@ -57,17 +54,14 @@ public class RatingButton extends CoolButton {
         popup.add(item);
         
         // Show the popup on mouse-pressed, not on action-performed.
-        // (But not in Basic mode.)
-        if (! ApplicationMode.isBasicMode()) {
-            addMouseListener(
-                new MouseAdapter() {
-                    public void mousePressed(MouseEvent event) {
-                        Dimension size = RatingButton.this.getSize();
-                        popup.show(RatingButton.this, 0, size.height);
-                    }
+        addMouseListener(
+            new MouseAdapter() {
+                public void mousePressed(MouseEvent event) {
+                    Dimension size = RatingButton.this.getSize();
+                    popup.show(RatingButton.this, 0, size.height);
                 }
-            );
-        }
+            }
+        );
         // Enable and disable this button with one of the actions, which
         // follow the browser selection.
         clearAction.addPropertyChangeListener(

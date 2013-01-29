@@ -6,7 +6,6 @@ import static com.lightcrafts.ui.browser.ctrls.Locale.LOCALE;
 import com.lightcrafts.ui.browser.view.AbstractImageBrowser;
 import com.lightcrafts.ui.browser.view.ImageBrowserActions;
 import com.lightcrafts.ui.toolkit.CoolButton;
-import com.lightcrafts.prefs.ApplicationMode;
 
 import javax.swing.*;
 
@@ -29,7 +28,5 @@ public class SelectLatestButton extends CoolButton {
         // setText(name);
         setToolTipText(ToolTip);
         setIcon(icon);
-
-        ApplicationMode.maybeSetToolTip(this);
     }
 }

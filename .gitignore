@@ -40,13 +40,10 @@ linux/products/LightZone-forkd
 linux/products/dcraw
 windows/build
 windows/error.log
-windows/helpers/eSellerateInstaller/eWebClient.lib
-windows/helpers/eSellerateInstaller/eWebLibrary.h
 windows/helpers/JavaAppLauncher/jar_md5_include
 windows/helpers/JavaAppLauncher/LightZone.ico
 windows/helpers/JavaAppLauncher/lightzone.res
 windows/jnisrc/*/javah
-windows/jnisrc/libESD/eSellerate.cpp
 windows/md5sums
 windows/output.txt
 windows/products

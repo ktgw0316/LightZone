@@ -4,15 +4,13 @@ package com.lightcrafts.platform.linux;
 
 import com.lightcrafts.app.Application;
 import com.lightcrafts.app.ExceptionDialog;
+import com.lightcrafts.platform.Platform;
 import com.lightcrafts.splash.SplashImage;
 import com.lightcrafts.splash.SplashWindow;
 import com.lightcrafts.utils.ForkDaemon;
 import com.lightcrafts.utils.Version;
-import com.lightcrafts.license.LicenseChecker;
-import com.lightcrafts.platform.Platform;
 
 import javax.swing.*;
-import java.util.Date;
 
 public final class LinuxLauncher {
 
@@ -42,7 +40,7 @@ public final class LinuxLauncher {
             String splashText = versionText;
 
             // Here is how you make a licensed version:
-            splashText = LicenseChecker.checkLicense();
+            splashText = "Open Source";
             SplashImage splash = new SplashImage(splashText);
             SplashWindow.splash(splash);
             Application.setStartupProgress(splash.getStartupProgress());

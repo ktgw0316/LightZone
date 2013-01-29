@@ -5,7 +5,6 @@ package com.lightcrafts.ui.metadata2;
 import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.image.metadata.ImageMetadata;
 import com.lightcrafts.image.types.ImageType;
-import com.lightcrafts.prefs.ApplicationMode;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -54,9 +53,6 @@ class MetadataTableModel extends AbstractTableModel {
     }
 
     public boolean isCellEditable(int row, int col) {
-        if (ApplicationMode.isBasicMode()) {
-            return false;
-        }
         MetadataEntry entry = section.get(row);
         return ((col == 1) && entry.isEditable(info));
     }

@@ -2,7 +2,6 @@
 
 package com.lightcrafts.prefs;
 
-import com.lightcrafts.license.DummyLicenseLibrary;
 import static com.lightcrafts.prefs.Locale.LOCALE;
 import com.lightcrafts.ui.toolkit.TextAreaFactory;
 
@@ -91,14 +90,10 @@ class ClearPrefsItem extends PreferencesItem {
             boolean success = true;
             try {
                 // On Linux, the license state resides in preferences.
-                Object licenseState = DummyLicenseLibrary.getLicenseState();
                 Preferences root = Preferences.userRoot();
                 Preferences node = root.node("/com/lightcrafts");
                 node.removeNode();
                 node.flush();
-                if (licenseState != null) {
-                    DummyLicenseLibrary.setLicenseState(licenseState);
-                }
             }
             catch (BackingStoreException e) {
                 System.err.println(

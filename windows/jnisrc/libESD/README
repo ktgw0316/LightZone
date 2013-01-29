@@ -1,5 +1,0 @@
-The file eWebClient.dll from eSellerate is renamed here as
-eWebClient-runtime.dll otherwise g++ tries to link against it
-rather than eWebClient.lib.
-
-When copied to the target directory (products), it's renamed back.

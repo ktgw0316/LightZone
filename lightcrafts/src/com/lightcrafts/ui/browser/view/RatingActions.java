@@ -2,7 +2,6 @@
 
 package com.lightcrafts.ui.browser.view;
 
-import com.lightcrafts.prefs.ApplicationMode;
 import com.lightcrafts.ui.browser.model.ImageDatum;
 import static com.lightcrafts.ui.browser.view.Locale.LOCALE;
 
@@ -55,7 +54,7 @@ class RatingActions {
             browser,
             KeyStroke.getKeyStroke('0', 0),
             dynamic,
-            ! ApplicationMode.isBasicMode()
+            true
         ) {
             public void actionPerformed(ActionEvent e) {
                 clearRating(browser);
@@ -123,7 +122,7 @@ class RatingActions {
             browser,
             KeyStroke.getKeyStroke('0' + rating, 0),
             dynamic,
-            ! ApplicationMode.isBasicMode()            
+            true
         ) {
             public void actionPerformed(ActionEvent e) {
                 setRating(browser, rating);

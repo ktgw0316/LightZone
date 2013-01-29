@@ -50,7 +50,7 @@
           <versionLine x="20" y="40" text="" font="Arial" fontSize="8" fontColor="0,0,0" fontWeight="500" />
         </text>
       </splashScreen>
-      <java mainClass="com.lightcrafts.platform.linux.LinuxLauncher" vmParameters="-Dcom.lightcrafts.licensetype=ESD" arguments="" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
+      <java mainClass="com.lightcrafts.platform.linux.LinuxLauncher" vmParameters="" arguments="" allowVMPassthroughParameters="true" preferredVM="client" bundleRuntime="true">
         <classPath>
           <scanDirectory location="." failOnError="false" />
         </classPath>

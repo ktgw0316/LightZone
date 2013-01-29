@@ -119,14 +119,7 @@
 
     <copy file="helpers/JavaAppLauncher/lightzone.jvmargs" todir="products"
           overwrite="true">
-      <filterset>
-        <filter token="LICENSETYPE" value="${licensetype}"/>
-      </filterset>
     </copy>
-
-    <copy file="helpers/eSellerateInstaller/eSellerateInstaller.exe"
-          tofile="products/eSellerateInstaller.exe" overwrite="true"/>
-    <chmod file="products/eSellerateInstaller.exe" perm="775"/>
 
     <exec executable="make" dir="resources/help" failonerror="true"
           vmlauncher="false">

@@ -6,7 +6,6 @@ import static com.lightcrafts.ui.browser.ctrls.Locale.LOCALE;
 import com.lightcrafts.ui.browser.view.AbstractImageBrowser;
 import com.lightcrafts.ui.browser.view.ImageBrowserActions;
 import com.lightcrafts.ui.toolkit.CoolButton;
-import com.lightcrafts.prefs.ApplicationMode;
 
 import javax.swing.*;
 
@@ -24,7 +23,5 @@ public class TrashButton extends CoolButton {
         setIcon(ButtonFactory.getIconByName("trash"));
         setText(null);
         setToolTipText(ToolTip);
-
-        ApplicationMode.maybeSetToolTip(this);
     }
 }

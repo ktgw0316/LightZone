@@ -11,7 +11,6 @@
 -XX:+UseParallelGC
 -Djava.class.path=lightcrafts-windows.jar;lightcrafts.jar;lcjai.jar;mlibwrapper_jai.jar;substance-lite.jar
 -Duser.dir=.
--Dcom.lightcrafts.licensetype=@LICENSETYPE@
 
 # Main class.
 com.lightcrafts.platform.windows.WindowsLauncher

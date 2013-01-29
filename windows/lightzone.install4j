@@ -162,23 +162,6 @@
             </serializedBean>
             <condition />
           </action>
-          <action name="" id="237" beanClass="com.install4j.runtime.beans.actions.misc.RunExecutableAction" rollbackBarrier="false" multiExec="false" failureStrategy="2" errorMessage="Could not install eSellerate engine.">
-            <serializedBean>
-              <java class="java.beans.XMLDecoder">
-                <object class="com.install4j.runtime.beans.actions.misc.RunExecutableAction">
-                  <void property="executable">
-                    <object class="java.io.File">
-                      <string>eSellerateInstaller.exe</string>
-                    </object>
-                  </void>
-                  <void property="wait">
-                    <boolean>true</boolean>
-                  </void>
-                </object>
-              </java>
-            </serializedBean>
-            <condition />
-          </action>
           <action name="" id="165" beanClass="com.install4j.runtime.beans.actions.desktop.CreateProgramGroupAction" rollbackBarrier="false" multiExec="false" failureStrategy="3" errorMessage="">
             <serializedBean>
               <java class="java.beans.XMLDecoder">

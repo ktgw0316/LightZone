@@ -2,29 +2,25 @@
 
 package com.lightcrafts.app;
 
-import java.io.File;
-import java.io.InputStream;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.prefs.Preferences;
-import java.util.prefs.BackingStoreException;
-
+import com.lightcrafts.platform.AlertDialog;
+import com.lightcrafts.platform.Platform;
+import com.lightcrafts.platform.ProgressDialog;
+import com.lightcrafts.utils.ProgressIndicator;
+import com.lightcrafts.utils.Version;
+import com.lightcrafts.utils.WebBrowser;
+import com.lightcrafts.utils.thread.ProgressThread;
+import com.lightcrafts.utils.xml.ElementFilter;
+import com.lightcrafts.utils.xml.XMLUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import com.lightcrafts.license.LicenseChecker;
-import com.lightcrafts.platform.AlertDialog;
-import com.lightcrafts.platform.Platform;
-import com.lightcrafts.platform.ProgressDialog;
-import com.lightcrafts.utils.thread.ProgressThread;
-import com.lightcrafts.utils.xml.ElementFilter;
-import com.lightcrafts.utils.xml.XMLUtil;
-import com.lightcrafts.utils.ProgressIndicator;
-import com.lightcrafts.utils.Version;
-import com.lightcrafts.utils.WebBrowser;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 import static com.lightcrafts.app.Locale.LOCALE;
 
@@ -288,8 +284,9 @@ public final class CheckForUpdate {
 
             final String product =
                 element.getAttribute( "product" ).toLowerCase();
-            final boolean productMatches = isAny( product ) ||
-                product.equals( LicenseChecker.isBasic() ? "basic" : "full" );
+//            final boolean productMatches = isAny( product ) ||
+//                product.equals( LicenseChecker.isBasic() ? "basic" : "full" );
+            final boolean productMatches = true;
             if ( !productMatches )
                 return false;
 
@@ -677,7 +674,6 @@ public final class CheckForUpdate {
     ////////// main() /////////////////////////////////////////////////////////
 
     public static void main( String[] args ) throws IOException {
-        final String licenseText = LicenseChecker.checkLicense();
         m_testing = true;
         //checkNowAndWait();
 

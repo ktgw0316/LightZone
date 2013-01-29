@@ -81,7 +81,6 @@
       </classpath>
       <env key="LD_LIBRARY_PATH" value="."/>
       <sysproperty key="java.library.path" value="."/>
-      <sysproperty key="com.lightcrafts.licensetype" value="ESD"/>
       <sysproperty key="lightcrafts.debug" value="1"/>
     </java>
   </target>

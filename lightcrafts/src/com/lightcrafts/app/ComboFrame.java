@@ -37,7 +37,6 @@ import com.lightcrafts.ui.toolkit.UICompliance;
 import com.lightcrafts.utils.Version;
 import com.lightcrafts.utils.filecache.FileCacheFactory;
 import com.lightcrafts.utils.thread.ProgressThread;
-import com.lightcrafts.prefs.ApplicationMode;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -361,12 +360,7 @@ public class ComboFrame
 
         initImages(folder, useCache);
 
-        if (ApplicationMode.isBasicMode()) {
-            browser = BrowserFactory.createExpanded(images);
-        }
-        else {
-            browser = BrowserFactory.createRecent(images);
-        }
+        browser = BrowserFactory.createRecent(images);
         setBrowser();   // Puts browser as the viewport in browserScroll
 
         initBrowserSelection(folder);
@@ -873,9 +867,6 @@ public class ComboFrame
         }
         buffer.append(Version.getApplicationName());
 
-        if (ApplicationMode.isBasicMode()) {
-            buffer.append(" Basic");
-        }
         setTitle(buffer.toString());
 
         WindowMenu.updateAll();
@@ -906,9 +897,6 @@ public class ComboFrame
         }
         sb.append(Version.getApplicationName());
 
-        if (ApplicationMode.isBasicMode()) {
-            sb.append(" Basic");
-        }
         setTitle(sb.toString());
 
         WindowMenu.updateAll();

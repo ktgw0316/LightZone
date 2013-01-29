@@ -6,7 +6,6 @@ import com.lightcrafts.ui.browser.view.AbstractImageBrowser;
 import com.lightcrafts.ui.browser.view.ImageBrowserActions;
 import static com.lightcrafts.ui.browser.ctrls.Locale.LOCALE;
 import com.lightcrafts.ui.toolkit.CoolButton;
-import com.lightcrafts.prefs.ApplicationMode;
 
 import javax.swing.*;
 
@@ -37,8 +36,5 @@ public class CopyPasteButtons extends Box {
 
         add(copy);
         add(paste);
-
-        ApplicationMode.maybeSetToolTip(copy);
-        ApplicationMode.maybeSetToolTip(paste);
     }
 }

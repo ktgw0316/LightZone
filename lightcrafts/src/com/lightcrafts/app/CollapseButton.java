@@ -6,7 +6,6 @@ import static com.lightcrafts.app.Locale.LOCALE;
 import com.lightcrafts.ui.browser.view.BrowserFactory;
 import com.lightcrafts.ui.toolkit.CoolToggleButton;
 import com.lightcrafts.ui.toolkit.IconFactory;
-import com.lightcrafts.prefs.ApplicationMode;
 
 import javax.swing.*;
 import java.awt.event.ItemEvent;
@@ -53,9 +52,6 @@ public class CollapseButton extends CoolToggleButton {
                 }
             }
         );
-        boolean isBasic = ApplicationMode.isBasicMode();
-        setEnabled(! isBasic);
-
-        ApplicationMode.maybeSetToolTip(this);
+        setEnabled(true);
     }
 }
