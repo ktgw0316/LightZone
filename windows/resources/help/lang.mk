@@ -31,7 +31,7 @@ INDEX_PAGE_COMPILER:=	$(COMMON_DIR)/tools/bin/lc-help-make_index
 INDEX_PAGE_DIR:=	$(TARGET_HELP_DIR)/index
 INDEX_PAGE:=		$(INDEX_PAGE_DIR)/index.html
 
-COPY= 			cd "$1" && tar -c -f - --exclude .svn * | \
+COPY= 			cd "$1" && tar -c -f - --exclude .git * | \
 			( cd $(TARGET_HELP_DIR) && tar xfB - )
 
 MKDIR:=			mkdir -p

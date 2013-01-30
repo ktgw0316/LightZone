@@ -28,12 +28,12 @@
         <exclude>
           <entry location="libLCCDL.so" fileType="regular" />
           <entry location="GNUmakefile" fileType="regular" />
-          <entry location=".svn" fileType="regular" />
+          <entry location=".git" fileType="regular" />
         </exclude>
       </dirEntry>
       <dirEntry mountPoint="1" file="icons" overwriteMode="4" shared="false" fileMode="644" uninstallMode="0" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" entryMode="direct" subDirectory="" excludeSuffixes="" dirMode="755" overrideDirMode="true">
         <exclude>
-          <entry location=".svn" fileType="regular" />
+          <entry location=".git" fileType="regular" />
         </exclude>
       </dirEntry>
     </entries>

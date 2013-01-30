@@ -80,9 +80,14 @@
   <target name="revision">
     <mkdir dir="build/com/lightcrafts/utils/resources"/>
     <exec executable="git">
-      <arg value="show"/>
+      <arg line="log -1"/>
       <redirector output="build/com/lightcrafts/utils/resources/Revision"
                   logError="true"/>
+    </exec>
+    <exec executable="git">
+      <arg line="config --list"/>
+      <redirector output="build/com/lightcrafts/utils/resources/Revision"
+                  logError="true" append="true"/>
     </exec>
     <copy file="version.txt"
           tofile="build/com/lightcrafts/utils/resources/Version"/>
@@ -90,8 +95,8 @@
 
   <target name="resources" depends="revision">
     <copy todir="build">
-      <fileset dir="resources" excludes=".svn"/>
-      <fileset dir="locale" excludes=".svn"/>
+      <fileset dir="resources" excludes=".git"/>
+      <fileset dir="locale" excludes=".git"/>
     </copy>
   </target>
 

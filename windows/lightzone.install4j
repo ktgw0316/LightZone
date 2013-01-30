@@ -23,13 +23,13 @@
     <entries>
       <dirEntry mountPoint="1" file="products" overwrite="1" shared="false" mode="644" uninstallMode="2" excludeSuffixes="" dirMode="755">
         <exclude>
-          <entry location=".svn" launcher="false" />
+          <entry location=".git" launcher="false" />
           <entry location="GNUmakefile" launcher="false" />
         </exclude>
       </dirEntry>
       <dirEntry mountPoint="1" file="../lightcrafts/misc/userdoc" overwrite="1" shared="false" mode="644" uninstallMode="2" excludeSuffixes="" dirMode="755">
         <exclude>
-          <entry location=".svn" launcher="false" />
+          <entry location=".git" launcher="false" />
         </exclude>
       </dirEntry>
     </entries>

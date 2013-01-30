@@ -162,23 +162,23 @@
   <target name="cc-build">
     <antcall target="cc-clean"/>
     <exec executable="bash"
-          outputproperty="svn-branch" failonerror="true" vmlauncher="false">
-      <arg path="${common-dir}/tools/bin/lc-svn-branch"/>
+          outputproperty="git-branch" failonerror="true" vmlauncher="false">
+      <arg path="${common-dir}/tools/bin/lc-git-branch"/>
     </exec>
     <exec executable="bash"
-          outputproperty="svn-revision" failonerror="true" vmlauncher="false">
-      <arg path="${common-dir}/tools/bin/lc-svn-revision"/>
+          outputproperty="git-revision" failonerror="true" vmlauncher="false">
+      <arg path="${common-dir}/tools/bin/lc-git-revision"/>
     </exec>
 
     <mkdir dir="cruisecontrol"/>
 
     <antcall target="installer-esd"/>
     <move file="${installer-name}"
-          tofile="${cc-dir}/${app-name}-${svn-branch}-r${svn-revision}-ESD.exe"/>
+          tofile="${cc-dir}/${app-name}-${git-branch}-r${git-revision}-ESD.exe"/>
 
     <antcall target="installer-tb"/>
     <move file="${installer-name}"
-          tofile="${cc-dir}/${app-name}-${svn-branch}-r${svn-revision}-TB.exe"/>
+          tofile="${cc-dir}/${app-name}-${git-branch}-r${git-revision}-TB.exe"/>
   </target>
 
   <target name="cc-clean">

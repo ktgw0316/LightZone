@@ -43,7 +43,7 @@
 
   <target name="locales">
     <copy todir="build">
-      <fileset dir="locale" excludes=".svn"/>
+      <fileset dir="locale" excludes=".git"/>
     </copy>
   </target>
 
@@ -99,13 +99,13 @@
   </target>
 
   <target name="labelled-archive" depends="archive">
-    <exec executable="${common-dir}/tools/bin/lc-svn-revision"
-          outputproperty="svn-revision" vmlauncher="false" failonerror="true"/>
+    <exec executable="${common-dir}/tools/bin/lc-git-revision"
+          outputproperty="git-revision" vmlauncher="false" failonerror="true"/>
 
     <!-- CruiseControl puts its build label in the "label" property -->
     <mkdir dir="archive"/>
     <move file="LightZone.tar.gz"
-          tofile="archive/LightZone-rev.${svn-revision}.tar.gz"/>
+          tofile="archive/LightZone-rev.${git-revision}.tar.gz"/>
   </target>
 
   <!--===== Sign All Jars ==================================================-->
