@@ -30,13 +30,14 @@
   </condition>
 
   <target name="resolve" depends="init-ivy">
+    <ivy:resolve file="${basedir}/ivy.xml"/>
     <ivy:retrieve/>
   </target>
 
-  <property name="ivy.version" value="2.3.0-rc2"/>
+  <property name="ivy.version" value="2.3.0"/>
   <property name="ivy.jar.dir" value="${basedir}/lib"/>
   <property name="ivy.jar.file"
-            value="${ivy.jar.dir}/ivy-${ivy.version}.jar"/>
+            value="${ivy.jar.dir}/ivy.jar"/>
 
   <target name="download-ivy" unless="offline">
     <mkdir dir="${ivy.jar.dir}"/>

@@ -12,7 +12,10 @@ ifndef JAVA_HOME
   $(error "JAVA_HOME" must be set)
 endif
 
-PROCESSOR:=		$(shell uname -p)
+PROCESSOR:=		$(shell uname -m)
+ifeq ($(PROCESSOR),amd64)
+  PROCESSOR:=		x86_64
+endif
 TOOLS_BIN:=		$(abspath $(ROOT)/lightcrafts/tools/bin)
 
 # Default to a normal (Unix) classpath seperator.
