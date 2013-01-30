@@ -16,7 +16,7 @@ files=`find . -name "*.properties" | sort`
 
 # Stamp the flat form with its revision number:
 echo -n "# "
-svn info | grep Revision
+git log -1 | grep '^commit '
 
 for file in $files; do
     echo "$separatorPre $file $separatorPost"
