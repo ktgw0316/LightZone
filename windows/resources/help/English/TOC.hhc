@@ -17,10 +17,6 @@
 		<param name="Local" value="LightZone_Help\Discover.html">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="LightZone editions">
-		<param name="Local" value="LightZone_Help\LightZone_Editions.html">
-		</OBJECT>
-	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="New features">
 		<param name="Local" value="LightZone_Help\New_Features.html">
 		</OBJECT>
