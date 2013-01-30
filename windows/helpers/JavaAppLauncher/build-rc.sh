@@ -10,7 +10,7 @@ VERSION=$(< $COMMON_DIR/version.txt)
 MAJOR=$(echo $VERSION | cut -f1 -d.)
 MINOR=$(echo $VERSION | cut -f2 -d.)
 PATCH=$(echo $VERSION | cut -f3 -d.); [ -z "$PATCH" ] && PATCH=0
-REVISION=$($COMMON_DIR/tools/bin/lc-svn-revision)
+REVISION=$($COMMON_DIR/tools/bin/lc-git-revision)
 YEAR="2005-$(date "+%Y")"
 
 sed -e "s/@APP_NAME@/${APP_NAME:-LightZone}/g" \

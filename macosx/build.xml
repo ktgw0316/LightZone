@@ -51,7 +51,7 @@
 
   <target name="locale">
     <copy todir="build">
-      <fileset dir="locale" excludes=".svn"/>
+      <fileset dir="locale" excludes=".git"/>
     </copy>
   </target>
 
@@ -139,20 +139,20 @@
 
   <target name="resources">
     <copy todir="${bundle-contents}">
-      <fileset dir="resources" excludes=".svn"/>
+      <fileset dir="resources" excludes=".git"/>
     </copy>
   </target>
 
   <target name="build-bundle"
     depends="jar, crash-reporter, delete-bundle, resources">
 
-    <exec executable="${common-dir}/tools/bin/lc-svn-revision"
-          outputproperty="svn-revision" vmlauncher="false" failonerror="true"/>
+    <exec executable="${common-dir}/tools/bin/lc-git-revision"
+          outputproperty="git-revision" vmlauncher="false" failonerror="true"/>
     <copy file="resources/Info.plist" todir="${bundle-contents}"
           overwrite="true">
       <filterset>
         <filter token="APPNAME" value="${app-name}"/>
-        <filter token="BUILD" value="${svn-revision}"/>
+        <filter token="BUILD" value="${git-revision}"/>
         <filter token="BUNDLEID" value="com.lightcrafts.${app-name}"/>
         <filter token="LICENSETYPE" value="${licensetype}"/>
         <filter token="VERSION" value="${app-version}"/>
@@ -163,7 +163,7 @@
       <filterset>
         <filter token="APPNAME" value="${app-name}"/>
         <filter token="VERSION" value="${app-version}"/>
-        <filter token="BUILD" value="${svn-revision}"/>
+        <filter token="BUILD" value="${git-revision}"/>
       </filterset>
     </copy>
 
@@ -173,11 +173,11 @@
           tofile="${bundle-contents}/MacOS/${app-name}"/>
     <chmod file="${bundle-contents}/MacOS/${app-name}" perm="775"/>
     <copy todir="${bundle-contents}/Resources">
-      <fileset dir="helpers/JavaAppLauncher/Resources" excludes=".svn"/>
+      <fileset dir="helpers/JavaAppLauncher/Resources" excludes=".git"/>
     </copy>
 
     <copy todir="${bundle-resources}/Java">
-      <fileset dir="products" excludes=".svn">
+      <fileset dir="products" excludes=".git">
         <include name="dcraw"/>
         <include name="LightZone-forkd"/>
         <include name="EWSMacCompress.tar.gz"/>
@@ -242,20 +242,20 @@
 
   <target name="cc-build">
     <antcall target="cc-clean"/>
-    <exec executable="${common-dir}/tools/bin/lc-svn-branch"
-          outputproperty="svn-branch" vmlauncher="false" failonerror="true"/>
-    <exec executable="${common-dir}/tools/bin/lc-svn-revision"
-          outputproperty="svn-revision" vmlauncher="false" failonerror="true"/>
+    <exec executable="${common-dir}/tools/bin/lc-git-branch"
+          outputproperty="git-branch" vmlauncher="false" failonerror="true"/>
+    <exec executable="${common-dir}/tools/bin/lc-git-revision"
+          outputproperty="git-revision" vmlauncher="false" failonerror="true"/>
 
     <mkdir dir="dmg/cruisecontrol"/>
 
     <antcall target="dmg-esd"/>
     <move file="dmg/${app-name}.dmg"
-          tofile="${cc-dir}/${app-name}-${svn-branch}-r${svn-revision}-ESD.dmg"/>
+          tofile="${cc-dir}/${app-name}-${git-branch}-r${git-revision}-ESD.dmg"/>
 
     <antcall target="dmg-tb"/>
     <move file="dmg/${app-name}.dmg"
-          tofile="${cc-dir}/${app-name}-${svn-branch}-r${svn-revision}-TB.dmg"/>
+          tofile="${cc-dir}/${app-name}-${git-branch}-r${git-revision}-TB.dmg"/>
   </target>
 
   <target name="cc-clean">
