@@ -93,7 +93,7 @@ ifeq ($(PLATFORM),MacOSX)
       LDFLAGS+=		$(JNI_PPC_LDFLAGS)
       LINK+=		$(JNI_PPC_LINK)
     endif
-    ifeq ($(PROCESSOR),i386)
+    ifeq ($(PROCESSOR),x86_64)
       CFLAGS+=		$(JNI_X86_CFLAGS)
       DEFINES+=		$(JNI_X86_DEFINES)
       LDFLAGS+=		$(JNI_X86_LDFLAGS)
@@ -154,7 +154,13 @@ LOCAL_RANLIBS:=	$(foreach lib,$(LOCAL_LIBS),$(lib:.a=-ranlib.a))
 
 BUILT_LIBS:=	$(wildcard */lib/*.a)
 
+ifeq ($(PLATFORM),MacOSX)
+# don't go directly to target dir; creates an invalid ../../ link in the jni library file itself
+# we'll copy after CC instead
+TARGET:=	$(JNILIB_PREFIX)$(TARGET_BASE)$(JNILIB_EXT)
+else
 TARGET:=	$(TARGET_DIR)/$(JNILIB_PREFIX)$(TARGET_BASE)$(JNILIB_EXT)
+endif
 
 ##
 # These are always defined even when UNIVERSAL is not set so a "make disclean"
@@ -202,6 +208,9 @@ ifeq ($(UNIVERSAL),1)
 $(TARGET): $(TARGET_PPC) $(TARGET_X86)
 	-$(MKDIR) $(TARGET_DIR)
 	$(LIPO) -create $(TARGET_PPC) $(TARGET_X86) -output $@
+ifeq ($(PLATFORM),MacOSX)
+	cp -p $@ $(TARGET_DIR)
+endif
 
 ifndef JNI_MANUAL_TARGET
 $(TARGET_PPC): $(OBJECTS_PPC) $(LOCAL_RANLIBS) $(BUILT_LIBS)
@@ -217,6 +226,9 @@ ifndef JNI_MANUAL_TARGET
 $(TARGET): $(OBJECTS) $(RC_OBJECTS) $(LOCAL_RANLIBS) $(BUILT_LIBS)
 	-$(MKDIR) $(TARGET_DIR)
 	$(CC_LINK) $(CFLAGS) $(LDFLAGS) $(RC_OBJECTS) -o $@ *.o $(LINK)
+ifeq ($(PLATFORM),MacOSX)
+	cp -p $@ $(TARGET_DIR)
+endif
 endif
 
 endif	# UNIVERSAL
