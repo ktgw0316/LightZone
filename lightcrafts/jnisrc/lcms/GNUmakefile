@@ -32,11 +32,17 @@ ifeq ($(UNIVERSAL),1)
 $(TARGET_PPC) $(TARGET_X86): $(LCMS_SOURCE) $(LCMS_INCLUDES)
 	-$(MKDIR) $(TARGET_DIR)
 	$(CC_LINK) $(CFLAGS) $(INCLUDES) $(LCMS_LDFLAGS) -o $@ $(LCMS_SOURCE)
+ifeq ($(PLATFORM),MacOSX)
+	  cp -p $@ $(TARGET_DIR)
+endif
 	$(RM) $@.dSYM
 else
 $(TARGET): $(LCMS_SOURCE) $(LCMS_INCLUDES)
 	-$(MKDIR) $(TARGET_DIR)
 	$(CC_LINK) $(CFLAGS) $(INCLUDES) $(LCMS_LDFLAGS) -o $@ $(LCMS_SOURCE)
+ifeq ($(PLATFORM),MacOSX)
+	  cp -p $@ $(TARGET_DIR)
+endif
 	$(RM) $@.dSYM
 endif
 

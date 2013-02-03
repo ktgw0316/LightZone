@@ -25,11 +25,17 @@ ifeq ($(UNIVERSAL),1)
 $(TARGET_PPC) $(TARGET_X86): $(SEGM_SOURCE) $(SEGM_INCLUDES)
 	-$(MKDIR) $(TARGET_DIR)
 	$(CC_LINK) $(CFLAGS) $(INCLUDES) $(SEGM_LDFLAGS) -o $@ $(SEGM_SOURCE)
+ifeq ($(PLATFORM),MacOSX)
+	  cp -p $@ $(TARGET_DIR)
+endif
 	$(RM) $@.dSYM
 else
 $(TARGET): $(SEGM_SOURCE) $(SEGM_INCLUDES)
 	-$(MKDIR) $(TARGET_DIR)
 	$(CC_LINK) $(CFLAGS) $(INCLUDES) $(SEGM_LDFLAGS) -o $@ $(SEGM_SOURCE)
+ifeq ($(PLATFORM),MacOSX)
+	  cp -p $@ $(TARGET_DIR)
+endif
 	$(RM) $@.dSYM
 endif
 
