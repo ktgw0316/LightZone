@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<shortcuts>
+
+    <programGroup defaultName="LightZone" location="applications"/>
+    <shortcut
+            name="LightZone Editor"
+            target="$INSTALL_PATH/LightZone.exe"
+            commandLine=""
+            workingDirectory="$INSTALL_PATH"
+            description="Start LightZone photo editor"
+            iconFile="$INSTALL_PATH/LightZone.ico"
+            iconIndex="0"
+            initialState="maximized"
+            programGroup="yes"
+            desktop="yes"
+            applications="yes"
+            startMenu="yes"
+            startup="no">
+
+    </shortcut>
+</shortcuts>

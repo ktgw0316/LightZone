@@ -104,88 +104,7 @@
     </java>
   </target>
 
-  <!--===== Make a Windows installer =======================================-->
-
-  <target name="build-installer-only">
-
-    <copy file="helpers/JavaAppLauncher/${app-name}.exe"
-          tofile="products/${app-name}.exe" overwrite="true"/>
-    <chmod file="products/${app-name}.exe" perm="775"/>
-
-    <exec executable="make" dir="resources/sign" failonerror="true"
-          vmlauncher="false">
-      <arg value="EXE_TO_SIGN=../../products/${app-name}.exe"/>
-    </exec>
-
-    <copy file="helpers/JavaAppLauncher/lightzone.jvmargs" todir="products"
-          overwrite="true">
-    </copy>
-
-    <exec executable="make" dir="resources/help" failonerror="true"
-          vmlauncher="false">
-      <arg value="APP_NAME=${app-name}"/>
-    </exec>
-
-    <exec executable="install4jc.exe" failonerror="true">
-      <!-- The "-D LC_VERSION=..." has to be given to install4j as two seperate
-           arguments, hence the use of line= rather than value= since the
-           latter, even if there's a space in it, will be given as a single
-           argument containing a space and not as two seperate arguments. -->
-      <arg line="-D LC_VERSION=${app-version}"/>
-      <arg file="lightzone.install4j"/>
-    </exec>
-
-    <exec executable="make" dir="resources/sign" failonerror="true"
-          vmlauncher="false">
-      <arg value="EXE_TO_SIGN=../../${installer-name}"/>
-    </exec>
-
-  </target>
-  <target name="build-installer" depends="jar, helpers, build-installer-only"/>
-
-  <target name="installer-esd">
-    <antcall target="build-installer">
-      <param name="licensetype" value="ESD"/>
-    </antcall>
-  </target>
-
-  <target name="installer-tb">
-    <antcall target="build-installer">
-      <param name="licensetype" value="TB"/>
-    </antcall>
-  </target>
-
-  <!--===== CruiseControl ==================================================-->
-
-  <property name="cc-dir" value="cruisecontrol"/>
-
-  <target name="cc-build">
-    <antcall target="cc-clean"/>
-    <exec executable="bash"
-          outputproperty="git-branch" failonerror="true" vmlauncher="false">
-      <arg path="${common-dir}/tools/bin/lc-git-branch"/>
-    </exec>
-    <exec executable="bash"
-          outputproperty="git-revision" failonerror="true" vmlauncher="false">
-      <arg path="${common-dir}/tools/bin/lc-git-revision"/>
-    </exec>
-
-    <mkdir dir="cruisecontrol"/>
-
-    <antcall target="installer-esd"/>
-    <move file="${installer-name}"
-          tofile="${cc-dir}/${app-name}-${git-branch}-r${git-revision}-ESD.exe"/>
-
-    <antcall target="installer-tb"/>
-    <move file="${installer-name}"
-          tofile="${cc-dir}/${app-name}-${git-branch}-r${git-revision}-TB.exe"/>
-  </target>
-
-  <target name="cc-clean">
-    <delete dir="${cc-dir}"/>
-  </target>
-
-  <!--===== Clean up =======================================================-->
+    <!--===== Clean up =======================================================-->
 
   <target name="clean-up">
     <ant dir="${common-dir}" target="${clean-method}"/>
@@ -201,7 +120,6 @@
       <arg value="${clean-method}"/>
     </exec>
     <delete file="products/lightzone.jvmargs"/>
-    <antcall target="cc-clean"/>
   </target>
 
   <target name="distclean">
@@ -216,6 +134,58 @@
       <param name="clean-method" value="mostlyclean"/>
     </antcall>
   </target>
+
+
+    <!-- ======== IZPack stuff ======== -->
+
+    <!--
+      Look for IZPack. If IZPACK_HOME is defined, ise it.
+      If not, try default installation path.
+    -->
+    <property environment="env"/>
+    <condition property="izPackHome" value="${env.IZPACK_HOME}" else="c:/Program Files (x86)/IzPack">
+        <isset property="env.IZPACK_HOME" />
+    </condition>
+
+    <path id="build.classpath">
+        <fileset dir="${izPackHome}">
+            <include name="lib/*.jar" />
+        </fileset>
+    </path>
+
+    <taskdef name="izpack" classpathref="build.classpath" classname="com.izforge.izpack.ant.IzPackTask" />
+
+    <target name="izpack-installer" depends="jar, helpers">
+
+    <copy file="helpers/JavaAppLauncher/${app-name}.exe"
+              tofile="products/${app-name}.exe" overwrite="true"/>
+        <chmod file="products/${app-name}.exe" perm="775"/>
+        <copy file="helpers/JavaAppLauncher/${app-name}.ico"
+              tofile="products/${app-name}.ico" overwrite="true"/>
+
+        <exec executable="make" dir="resources/sign" failonerror="true"
+              vmlauncher="false">
+            <arg value="EXE_TO_SIGN=../../products/${app-name}.exe"/>
+        </exec>
+
+        <copy file="helpers/JavaAppLauncher/lightzone.jvmargs" todir="products"
+              overwrite="true">
+        </copy>
+
+        <exec executable="make" dir="resources/help" failonerror="true"
+              vmlauncher="false">
+            <arg value="APP_NAME=${app-name}"/>
+        </exec>
+
+        <izpack input="windows/installer/lightzone.izpack.xml"
+                output="LightZone-install.jar"
+                installerType="standard"
+                basedir="${basedir}/products"
+                izPackDir="c:\Program Files (x86)\IzPack"
+                inheritAll="true"
+                />
+
+    </target>
 
 </project>
 <!-- vim:set et sw=2 ts=2: -->

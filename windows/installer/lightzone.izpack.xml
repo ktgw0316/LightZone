@@ -1,0 +1,59 @@
+<installation version="1.0"
+              xmlns:izpack="http://izpack.org/schema/installation"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://izpack.org/schema/installation http://izpack.org/schema/5.0/izpack-installation-5.0.xsd">
+
+    <info>
+        <appname>LightZone</appname>
+        <appversion>@{app-version}</appversion>
+<!--        <javaversion>1.6</javaversion>
+        <authors>
+            <author name="Anton Kast" email="anton@lightzone.org" />
+        </authors>-->
+    </info>
+
+    <guiprefs width="500" height="400" resizable="no">
+
+        <!--<splash>images/peas_load.gif</splash>-->
+        <!--<laf name="looks">-->
+            <!--<os family="windows" />-->
+            <!--<os family="unix" />-->
+            <!--<param name="variant" value="windows" />-->
+        <!--</laf>-->
+        <!--<laf name="substance">
+            <os family="mac" />
+            <param name="variant" value="mist-aqua" />
+        </laf>-->
+        <modifier key="useHeadingPanel" value="yes" />
+    </guiprefs>
+
+    <locale>
+        <langpack iso3="eng"/>
+    </locale>
+
+    <panels>
+        <panel classname="HelloPanel" />
+        <panel classname="LicencePanel" />
+        <panel classname="TargetPanel" />
+        <panel classname="PacksPanel" />
+        <panel classname="InstallPanel" />
+        <panel classname="ShortcutPanel" />
+        <!--<panel classname="FinishPanel" />-->
+    </panels>
+
+    <packs>
+        <pack name="Core program files" required="yes">
+            <description>The core files needed for the application</description>
+            <!--<file src="products" targetdir="$INSTALL_PATH" />-->
+            <fileset dir="." includes="*" targetdir="$INSTALL_PATH" />
+        </pack>
+    </packs>
+
+    <resources>
+        <res src="../installer/shortcutSpec.xml" id="shortcutSpec.xml"/>
+        <res src="../../COPYING" id="LicencePanel.licence" />
+    </resources>
+
+        <native type="izpack" name="ShellLink.dll"/>
+        <native type="izpack" name="ShellLink_x64.dll"/>
+</installation>
