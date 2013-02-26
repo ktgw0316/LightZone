@@ -8,7 +8,7 @@ import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.JAIContext;
 
-import javax.media.jai.*;
+import com.lightcrafts.mediax.jai.*;
 import com.lightcrafts.utils.ColorScience;
 
 import java.awt.image.renderable.ParameterBlock;

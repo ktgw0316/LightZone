@@ -7,7 +7,7 @@ import java.io.*;
 import java.lang.ref.WeakReference;
 import java.util.LinkedList;
 import java.util.ResourceBundle;
-import javax.media.jai.PlanarImage;
+import com.lightcrafts.mediax.jai.PlanarImage;
 
 import org.w3c.dom.Document;
 

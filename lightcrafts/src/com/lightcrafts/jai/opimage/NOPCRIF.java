@@ -2,9 +2,9 @@
 
 package com.lightcrafts.jai.opimage;
 
-import com.sun.media.jai.opimage.RIFUtil;
+import com.lightcrafts.media.jai.opimage.RIFUtil;
 
-import javax.media.jai.*;
+import com.lightcrafts.mediax.jai.*;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.*;

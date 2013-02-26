@@ -8,7 +8,7 @@ import com.lightcrafts.model.Operation;
 import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.jai.utils.Functions;
 
-import javax.media.jai.PlanarImage;
+import com.lightcrafts.mediax.jai.PlanarImage;
 import java.text.DecimalFormat;
 
 /**

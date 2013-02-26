@@ -7,8 +7,8 @@ import com.lightcrafts.utils.LCMS;
 import com.lightcrafts.utils.LCMS_LabColorSpace;
 import com.lightcrafts.utils.LCMS_ColorSpace;
 
-import javax.media.jai.PointOpImage;
-import javax.media.jai.ImageLayout;
+import com.lightcrafts.mediax.jai.PointOpImage;
+import com.lightcrafts.mediax.jai.ImageLayout;
 import java.awt.image.*;
 import java.awt.*;
 import java.awt.color.ICC_ColorSpace;

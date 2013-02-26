@@ -2,7 +2,7 @@
 
 package com.lightcrafts.jai.utils;
 
-import javax.media.jai.ImageFunction;
+import com.lightcrafts.mediax.jai.ImageFunction;
 
 /**
  * Created by IntelliJ IDEA.

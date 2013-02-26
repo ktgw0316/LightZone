@@ -29,7 +29,7 @@ import java.awt.color.ColorSpace;
 
 import contrib.com.jgoodies.looks.common.FontSet;
 import contrib.com.jgoodies.looks.common.FontPolicy;
-import javax.media.jai.IHSColorSpace;
+import com.lightcrafts.mediax.jai.IHSColorSpace;
 
 public class LightZoneSkin extends SubstanceAbstractSkin {
     public static String NAME = "LightZone";

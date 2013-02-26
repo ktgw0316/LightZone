@@ -10,11 +10,11 @@ import com.lightcrafts.jai.utils.LCTileScheduler;
 import com.lightcrafts.utils.ColorScience;
 import com.lightcrafts.utils.ColorProfileInfo;
 import com.lightcrafts.platform.Platform;
-import com.sun.media.jai.util.SunTileCache;
+import com.lightcrafts.media.jai.util.SunTileCache;
 
-import javax.media.jai.*;
-import javax.media.jai.registry.CRIFRegistry;
-import javax.media.jai.registry.RIFRegistry;
+import com.lightcrafts.mediax.jai.*;
+import com.lightcrafts.mediax.jai.registry.CRIFRegistry;
+import com.lightcrafts.mediax.jai.registry.RIFRegistry;
 import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.color.ICC_ColorSpace;

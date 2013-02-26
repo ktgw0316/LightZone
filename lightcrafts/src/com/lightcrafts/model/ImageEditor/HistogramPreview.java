@@ -7,7 +7,7 @@ import com.lightcrafts.model.Region;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.JAIContext;
 
-import javax.media.jai.*;
+import com.lightcrafts.mediax.jai.*;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
