@@ -2,9 +2,9 @@
 
 package com.lightcrafts.jai.operator;
 
-import javax.media.jai.*;
-import javax.media.jai.registry.RenderedRegistryMode;
-import javax.media.jai.registry.RenderableRegistryMode;
+import com.lightcrafts.mediax.jai.*;
+import com.lightcrafts.mediax.jai.registry.RenderedRegistryMode;
+import com.lightcrafts.mediax.jai.registry.RenderableRegistryMode;
 import com.lightcrafts.model.ColorSelection;
 
 import java.awt.image.RenderedImage;
@@ -53,11 +53,11 @@ public class BlendDescriptor extends OperationDescriptorImpl {
      *
      * <p>Creates a <code>ParameterBlockJAI</code> from all
      * supplied arguments except <code>hints</code> and invokes
-     * {@link javax.media.jai.JAI#create(String,java.awt.image.renderable.ParameterBlock,java.awt.RenderingHints)}.
+     * {@link com.lightcrafts.mediax.jai.JAI#create(String,java.awt.image.renderable.ParameterBlock,java.awt.RenderingHints)}.
      *
-     * @see javax.media.jai.JAI
-     * @see javax.media.jai.ParameterBlockJAI
-     * @see javax.media.jai.RenderedOp
+     * @see com.lightcrafts.mediax.jai.JAI
+     * @see com.lightcrafts.mediax.jai.ParameterBlockJAI
+     * @see com.lightcrafts.mediax.jai.RenderedOp
      *
      * @param source0 <code>RenderedImage</code> source 0.
      * @param source1 <code>RenderedImage</code> source 1.
@@ -113,7 +113,7 @@ public class BlendDescriptor extends OperationDescriptorImpl {
      *
      * @see JAI
      * @see ParameterBlockJAI
-     * @see javax.media.jai.RenderableOp
+     * @see com.lightcrafts.mediax.jai.RenderableOp
      *
      * @param source0 <code>RenderableImage</code> source 0.
      * @param source1 <code>RenderableImage</code> source 1.

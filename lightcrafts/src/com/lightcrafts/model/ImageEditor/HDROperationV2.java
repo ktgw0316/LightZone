@@ -2,7 +2,7 @@
 
 package com.lightcrafts.model.ImageEditor;
 
-import javax.media.jai.*;
+import com.lightcrafts.mediax.jai.*;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
 import com.lightcrafts.jai.opimage.FastBilateralFilterOpImage;

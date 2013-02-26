@@ -2,7 +2,7 @@
 
 package com.lightcrafts.jai.utils;
 
-import javax.media.jai.*;
+import com.lightcrafts.mediax.jai.*;
 import java.awt.image.*;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.*;
@@ -19,7 +19,7 @@ import com.lightcrafts.utils.ColorProfileInfo;
 import com.lightcrafts.model.ImageEditor.Rendering;
 import com.lightcrafts.model.ImageEditor.ImageProcessor;
 import com.lightcrafts.model.Operation;
-import com.sun.media.jai.util.ImageUtil;
+import com.lightcrafts.media.jai.util.ImageUtil;
 
 /**
  * Created by IntelliJ IDEA.

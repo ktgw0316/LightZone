@@ -30,10 +30,10 @@ import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Observable;
-import com.sun.media.jai.util.DataBufferUtils;
+import com.lightcrafts.media.jai.util.DataBufferUtils;
 
-import javax.media.jai.TileFactory;
-import javax.media.jai.TileRecycler;
+import com.lightcrafts.mediax.jai.TileFactory;
+import com.lightcrafts.mediax.jai.TileRecycler;
 
 /**
  * A simple implementation of <code>TileFactory</code> wherein the tiles

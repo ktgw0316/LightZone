@@ -8,7 +8,7 @@ import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.opimage.CachedImage;
 
-import javax.media.jai.*;
+import com.lightcrafts.mediax.jai.*;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;

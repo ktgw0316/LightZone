@@ -24,7 +24,7 @@ import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.opimage.CachedImage;
 import com.lightcrafts.jai.opimage.RGBDemosaicOpImage;
-import javax.media.jai.*;
+import com.lightcrafts.mediax.jai.*;
 import com.lightcrafts.utils.thread.ProgressThread;
 import com.lightcrafts.utils.*;
 import com.lightcrafts.utils.filecache.FileCache;

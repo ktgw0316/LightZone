@@ -19,9 +19,9 @@ import java.awt.color.ICC_Profile;
 import java.awt.image.ColorModel;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.RenderableImage;
-import javax.media.jai.*;
-import javax.media.jai.registry.RenderableRegistryMode;
-import javax.media.jai.registry.RenderedRegistryMode;
+import com.lightcrafts.mediax.jai.*;
+import com.lightcrafts.mediax.jai.registry.RenderableRegistryMode;
+import com.lightcrafts.mediax.jai.registry.RenderedRegistryMode;
 
 /**
  * An <code>OperationDescriptor</code> describing the "ColorConvert" operation.
@@ -74,12 +74,12 @@ import javax.media.jai.registry.RenderedRegistryMode;
  *                        <td>NO_PARAMETER_DEFAULT</td>
  * </table></p>
  *
- * @see javax.media.jai.OperationDescriptor
+ * @see com.lightcrafts.mediax.jai.OperationDescriptor
  * @see java.awt.color.ColorSpace
  * @see java.awt.color.ICC_ColorSpace
  * @see java.awt.image.ColorModel
- * @see javax.media.jai.ColorSpaceJAI
- * @see javax.media.jai.IHSColorSpace
+ * @see com.lightcrafts.mediax.jai.ColorSpaceJAI
+ * @see com.lightcrafts.mediax.jai.IHSColorSpace
  */
 public class LCColorConvertDescriptor extends OperationDescriptorImpl {
 
@@ -144,11 +144,11 @@ public class LCColorConvertDescriptor extends OperationDescriptorImpl {
      *
      * <p>Creates a <code>ParameterBlockJAI</code> from all
      * supplied arguments except <code>hints</code> and invokes
-     * {@link javax.media.jai.JAI#create(String,java.awt.image.renderable.ParameterBlock,java.awt.RenderingHints)}.
+     * {@link com.lightcrafts.mediax.jai.JAI#create(String,java.awt.image.renderable.ParameterBlock,java.awt.RenderingHints)}.
      *
-     * @see javax.media.jai.JAI
-     * @see javax.media.jai.ParameterBlockJAI
-     * @see javax.media.jai.RenderedOp
+     * @see com.lightcrafts.mediax.jai.JAI
+     * @see com.lightcrafts.mediax.jai.ParameterBlockJAI
+     * @see com.lightcrafts.mediax.jai.RenderedOp
      *
      * @param source0 <code>RenderedImage</code> source 0.
      * @param colorModel The destination color space.
@@ -183,7 +183,7 @@ public class LCColorConvertDescriptor extends OperationDescriptorImpl {
      *
      * @see JAI
      * @see ParameterBlockJAI
-     * @see javax.media.jai.RenderableOp
+     * @see com.lightcrafts.mediax.jai.RenderableOp
      *
      * @param source0 <code>RenderableImage</code> source 0.
      * @param colorModel The destination color space.
