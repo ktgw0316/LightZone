@@ -370,6 +370,7 @@ typedef enum {
 #define	TIFFTAG_XMLPACKET		700	/* %XML packet
 						   [Adobe XMP Specification,
 						   January 2004 */
+#define TIFFTAG_MS_RATING		18246	/* Microsoft rating */
 #define TIFFTAG_OPIIMAGEID		32781	/* %OPI ImageID
 						   [Adobe TIFF technote] */
 /* tags 32952-32956 are private tags registered to Island Graphics */
@@ -528,6 +529,7 @@ typedef enum {
 						   into ICC profile space */
 #define TIFFTAG_CURRENTICCPROFILE	50833	/* & */
 #define TIFFTAG_CURRENTPREPROFILEMATRIX	50834	/* & */
+#define TIFFTAG_LIGHTCRAFTS_LIGHTZONE	50919
 /* tag 65535 is an undefined tag used by Eastman Kodak */
 #define TIFFTAG_DCSHUESHIFTVALUES       65535   /* hue shift correction data */
 
