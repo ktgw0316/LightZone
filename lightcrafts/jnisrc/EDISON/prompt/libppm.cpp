@@ -85,7 +85,7 @@ int readPPMImage(char *filename, unsigned char **image, int& height, int& width,
   //Read header information.
   //********************************************************
   
-  char buf[70];
+/*  char buf[70];
   if(!fgets(buf, 70, fp)) return PPM_FILE_ERROR;
   if(strncmp(buf, "P6", 2)) return PPM_UNKNOWN_FORMAT;  
   do {
@@ -94,7 +94,34 @@ int readPPMImage(char *filename, unsigned char **image, int& height, int& width,
   sscanf(buf, "%d %d", &width, &height);  
   if(!fgets(buf, 70, fp)) return PPM_FILE_ERROR;
   sscanf(buf , "%d", &depth);
+  */
   
+  //!-Start modification by Sushil Mittal for handling different kinds of formats of .ppm file, 05/05/2009
+  char buf[70];
+  if(!fscanf(fp, "%s", buf)) return PPM_FILE_ERROR;
+  if(strncmp(buf, "P6", 2)) return PPM_UNKNOWN_FORMAT;  
+  fscanf(fp,"s",buf);
+  printf("%s\n",buf);
+  if(buf[0] == '#')
+  {
+	  
+	  while(buf[0] == '#')
+	  {
+		  if(!fscanf(fp, "%s", buf)) return PPM_FILE_ERROR;
+	  }
+  }
+  else
+  {
+	  if(!fscanf(fp, "%s", buf)) return PPM_FILE_ERROR;
+  }
+  sscanf(buf,"%d",&width);
+  if(!fscanf(fp, "%s", buf)) return PPM_FILE_ERROR;  
+  sscanf(buf,"%d",&height);
+  if(!fscanf(fp, "%s", buf)) return PPM_FILE_ERROR;
+  sscanf(buf,"%d",&depth);
+  fgets(buf,70,fp);
+  
+//!-End modification by Sushil Mittal for handling different kinds of formats of .ppm file, 05/05/2009
   //********************************************************
   //Read raw data information.
   //********************************************************

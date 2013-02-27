@@ -69,4 +69,3 @@ private:
 extern inline unsigned char gBgImPt(BgImage*, int, int);
 
 #endif
-

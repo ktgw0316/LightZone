@@ -35,6 +35,12 @@ and they are is available at:
 Implemented by Chris M. Christoudias, Bogdan Georgescu
 ********************************************************/
 
+////////////////////////////////////////////////////////////////////////
+// Command Line Version:
+//   This version of mean shift system is written for the command
+//   line version of EDISON.
+////////////////////////////////////////////////////////////////////////
+
 //include the msSystem class prototype
 #include	"msSys.h"
 
@@ -43,6 +49,22 @@ Implemented by Chris M. Christoudias, Bogdan Georgescu
 #include	<stdio.h>
 #include	<stdarg.h>
 #include	<stdlib.h>
+
+//define bgLog
+extern bool CmCDisplayProgress;
+void bgLog(const char *PromptStr, ...)
+{
+	//obtain argument list using ANSI standard...
+	va_list	argList;
+	va_start(argList, PromptStr);
+
+	//print the output string to stderr using
+	if(CmCDisplayProgress) vfprintf(stdout, PromptStr, argList);
+	va_end(argList);
+
+	//done.
+	return;
+}
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
@@ -157,8 +179,6 @@ double msSystem::ElapsedTime( void )
 /*        has been output to the user.                 */
 /*******************************************************/
 
-extern void bgLogVar(const char *, va_list);
-
 void msSystem::Prompt(const char *PromptStr, ...)
 {
 
@@ -167,8 +187,7 @@ void msSystem::Prompt(const char *PromptStr, ...)
 	va_start(argList, PromptStr);
 
 	//print the output string to stderr using
-	//vfprintf
-	bgLogVar(PromptStr, argList);
+	if(CmCDisplayProgress) vfprintf(stdout, PromptStr, argList);
 	va_end(argList);
 
 	//done.
@@ -201,30 +220,9 @@ void msSystem::Prompt(const char *PromptStr, ...)
 //      or program one must re-implement this method.
 ///////////////////////////////////////////////////////////////////
 
-//is set by the GUI when the user presses the Cancel button
-//on the wxWindows progress modal window; this flag indicates
-//to the mean shift library that it is to halt execution.
-//This parameter is used and checked in the method
-//BgMdiSegmentChild::OnSegment.
-extern bool stop_flag;
-
-//is updated in the msSystem::Progress method and indicates to
-//the wxWindows progress modal window the percent complete, such
-//that it may update its progress bar accordingly; This parameter
-//is used and checked in the method BgMdiSegmentChild::OnSegment.
-extern int	percentDone;
-
 ErrorLevel msSystem::Progress(float percentComplete)
 {
-	percentDone	= (int)(percentComplete*100);
-
-	//check stop flag and return appropriate system state
-	ErrorLevel		myState = EL_OKAY;
-	if(stop_flag)	myState	= EL_HALT;
-
-	//done.
-	return myState;
-
+	return EL_OKAY;
 }
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/

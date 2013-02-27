@@ -29,4 +29,3 @@ int readPGMImage(char *filename, unsigned char **image, int& height, int& width,
 int readPNMImage(char *filename, unsigned char **image, int& height, int& width, int& depth, bool& color);
 
 #endif
-

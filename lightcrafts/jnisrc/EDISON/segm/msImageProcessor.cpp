@@ -103,8 +103,8 @@ msImageProcessor::msImageProcessor( void )
 	//created...
 	class_state.OUTPUT_DEFINED	= false;
 
-
-   LUV_treshold = 1.0;
+//Changed by Sushil from 1.0 to 0.1, 11/11/2008
+   LUV_treshold = 0.1;
 }
 
 /*******************************************************/
@@ -174,7 +174,9 @@ void msImageProcessor::DefineImage(byte *data_, imageType type, int height_, int
 	else
 	{
 		for(i = 0; i < height_*width_; i++)
-			RGBtoLUV(&data_[dim*i], &luv[dim*i]);
+		{
+				RGBtoLUV(&data_[dim*i], &luv[dim*i]);
+		}
 	}
 
 	//define input defined on a lattice using mean shift base class
@@ -213,7 +215,9 @@ void msImageProcessor::DefineBgImage(byte* data_, imageType type, int height_, i
 
 	//perform texton classification
 	int		i;
+
 	float	*luv	= new float [height_*width_*dim];
+	
 	if(dim == 1)
 	{
 		for(i = 0; i < height_*width_; i++)
@@ -223,10 +227,12 @@ void msImageProcessor::DefineBgImage(byte* data_, imageType type, int height_, i
 	{
 		for(i = 0; i < height_*width_; i++)
 			RGBtoLUV(&data_[dim*i], &luv[dim*i]);
+		
 	}
 
 	//define input defined on a lattice using mean shift base class
 	DefineLInput(luv, height_, width_, dim);
+
 
 	//Define a default kernel if it has not been already
 	//defined by user
@@ -399,15 +405,18 @@ void msImageProcessor::Filter(int sigmaS, float sigmaR, SpeedUpLevel speedUpLeve
 	//no speedup...
 	case NO_SPEEDUP:	
       //NonOptimizedFilter((float)(sigmaS), sigmaR);	break;
-      NewNonOptimizedFilter((float)(sigmaS), sigmaR);	break;
+      NewNonOptimizedFilter((float)(sigmaS), sigmaR);	
+	  break;
 	//medium speedup
 	case MED_SPEEDUP:	
       //OptimizedFilter1((float)(sigmaS), sigmaR);		break;
-      NewOptimizedFilter1((float)(sigmaS), sigmaR);		break;
+      NewOptimizedFilter1((float)(sigmaS), sigmaR);		
+	  break;
 	//high speedup
 	case HIGH_SPEEDUP: 
       //OptimizedFilter2((float)(sigmaS), sigmaR);		break;
-      NewOptimizedFilter2((float)(sigmaS), sigmaR);		break;
+      NewOptimizedFilter2((float)(sigmaS), sigmaR);		
+	  break;
    // new speedup
 	}
 
@@ -4666,4 +4675,3 @@ void msImageProcessor::SetSpeedThreshold(float speedUpThreshold)
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ END OF CLASS DEFINITION @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
-

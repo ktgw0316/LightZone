@@ -64,4 +64,3 @@ class CmCParser
 };
 
 #endif
-
