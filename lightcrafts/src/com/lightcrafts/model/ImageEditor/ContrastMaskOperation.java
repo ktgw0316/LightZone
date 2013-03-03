@@ -10,7 +10,7 @@ import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
 import com.lightcrafts.utils.ColorScience;
 
-import javax.media.jai.*;
+import com.lightcrafts.mediax.jai.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.DataBuffer;

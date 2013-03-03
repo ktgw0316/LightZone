@@ -2,8 +2,8 @@
 
 package com.lightcrafts.jai.opimage;
 
-import javax.media.jai.PointOpImage;
-import javax.media.jai.ImageLayout;
+import com.lightcrafts.mediax.jai.PointOpImage;
+import com.lightcrafts.mediax.jai.ImageLayout;
 import com.lightcrafts.model.ColorSelection;
 import com.lightcrafts.utils.ColorScience;
 

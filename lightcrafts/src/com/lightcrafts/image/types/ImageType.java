@@ -10,7 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-import javax.media.jai.PlanarImage;
+import com.lightcrafts.mediax.jai.PlanarImage;
 
 import org.w3c.dom.Document;
 
