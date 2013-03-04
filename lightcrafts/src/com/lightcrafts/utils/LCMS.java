@@ -307,7 +307,7 @@ public class LCMS {
 
     // NOTE: LCMS doesn't seem to be properly reentrant, make all native calls synchronized
 
-    protected synchronized native static long cmsCreateLabProfile();
+    protected synchronized native static long cmsCreateLab2Profile();
 
     protected synchronized native static long cmsOpenProfileFromMem(byte data[], int size);
 
@@ -470,7 +470,7 @@ public class LCMS {
 
         public LABProfile() {
             if (labProfileHandle == -1) {
-                labProfileHandle = cmsCreateLabProfile();
+                labProfileHandle = cmsCreateLab2Profile();
                 cmsProfile = handle = new RCHandle(labProfileHandle);
             } else {
                 cmsProfile = handle;

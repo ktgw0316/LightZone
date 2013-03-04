@@ -13,7 +13,7 @@
 #endif
 
 #include "LC_JNIUtils.h"
-#include "lcms.h"
+#include "lcms2.h"
 
 #define DCRaw_METHOD(method) \
 name4(Java_,com_lightcrafts_utils_LCMS,_,method)
@@ -46,15 +46,16 @@ JNIEXPORT jlong JNICALL Java_com_lightcrafts_utils_LCMS_cmsCreateRGBProfile
         {Primaries[6], Primaries[7], Primaries[8]}
       };
 
-      LPGAMMATABLE gammaTable[3];
+      cmsToneCurve* gammaTable[3];
+      const int context = 1337;
 
-      gammaTable[0] = gammaTable[1] = gammaTable[2] = cmsBuildGamma(gamma == 1 ? 2 : 256, gamma);
+      gammaTable[0] = gammaTable[1] = gammaTable[2] = cmsBuildGamma(gamma == 1 ? &context : 0, gamma);
 
       result = cmsCreateRGBProfile(&w, &p, gammaTable);
       
       // _cmsSaveProfile( result, "/Stuff/matrixRGB.icc" );
       
-      // cmsFreeGamma(gammaTable[0]);
+      // cmsFreeToneCurve(gammaTable[0]);
       
       (*env)->ReleasePrimitiveArrayCritical(env, jWhitePoint, WhitePoint, 0);
       (*env)->ReleasePrimitiveArrayCritical(env, jPrimaries, Primaries, 0);
@@ -62,10 +63,10 @@ JNIEXPORT jlong JNICALL Java_com_lightcrafts_utils_LCMS_cmsCreateRGBProfile
       return (jlong) result;
 }
 
-JNIEXPORT jlong JNICALL Java_com_lightcrafts_utils_LCMS_cmsCreateLabProfile
+JNIEXPORT jlong JNICALL Java_com_lightcrafts_utils_LCMS_cmsCreateLab2Profile
   (JNIEnv *env, jclass clazz)
 {
-    return (jlong) cmsCreateLabProfile(NULL);
+    return (jlong) cmsCreateLab2Profile(NULL);
 }
 
 JNIEXPORT jboolean JNICALL Java_com_lightcrafts_utils_LCMS_cmsCloseProfile
