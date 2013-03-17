@@ -11,8 +11,8 @@ COMMON_DIR:=		$(ROOT)/lightcrafts
 include			$(COMMON_DIR)/mk/platform.mk
 include			$(COMMON_DIR)/mk/sources.mk
 
-LIB_SRC:=		$(wildcard jpeg-*)
-LIB:=			libjpeg.a
+LIB_SRC:=		$(wildcard libjpeg-*)
+LIB:=			.libs/libjpeg.a
 
 ARCHS:=			$(PROCESSOR) $(OTHER_PROCESSOR)
 ARCH_SRCS:=		$(foreach arch,$(ARCHS),arch-$(arch)/$(LIB_SRC))
@@ -75,7 +75,8 @@ ifeq ($(UNIVERSAL),1)
 
   arch-$(OTHER_PROCESSOR)/$(LIB_SRC)/Makefile: CONFIG_OPTIONS+= $(CONFIG_CROSS)
 else
-  CFLAGS+=		$(PLATFORM_CFLAGS)
+  CFLAGS+=		-fPIC
+  # CFLAGS+=		$(PLATFORM_CFLAGS)
 endif
 
 $(ARCH_MAKEFILES):
@@ -93,7 +94,7 @@ $(TARGET_LIB):
 endif
 
 $(ARCH_LIBS): FORCE
-	$(MAKE) -C $(@D) -j $(NUM_PROCESSORS) $(@F)
+	$(MAKE) -C $(ARCH_SRCS) -j $(NUM_PROCESSORS)
 
 ##### Symlink the include files.
 
