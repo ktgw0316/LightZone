@@ -2,15 +2,16 @@
 
 ## Install required packages
 Building the LightZone source requires (at least) following packages:
-- __openjdk-7-jdk__
 - __ant__
-- __gcc__
 - __g++__
-- __make__
-- __libx11-dev__ for X11/xlib.h
-- __tidy__
-- __javahelp2__ for jhindexer
+- __gcc__
 - __git__
+- __javahelp2__ for jhindexer
+- __libx11-dev__ for X11/xlib.h
+- __make__
+- __nasm__
+- __openjdk-7-jdk__
+- __tidy__
 
 ### Ubuntu 12.04.1 LTS (Precise Pangolin)
 Install required packages:
