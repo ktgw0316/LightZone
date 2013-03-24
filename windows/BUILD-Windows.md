@@ -81,7 +81,4 @@ Updates already made to the code, checked in on Windows-build branch in github:
     be used to compile it. There is a bug in windres that makes it fail on compiling version info. A patch has been
     submitted to binutils already, so in next version (higher than 2.22.51-2) it should work again. Here also versioning
     with Git needs to be considered.
--   LightZone.exe signing has been disabled for now as it is not critical to build functionality.
-    It can be resolved later.
--   HTML Help on 64-bit Windows must be manually copied to C:/Program Files
 -   bundled JRE version in Install4J is updated manually now
