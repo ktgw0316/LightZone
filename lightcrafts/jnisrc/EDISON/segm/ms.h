@@ -924,4 +924,3 @@ class MeanShift {
 };
 
 #endif
-

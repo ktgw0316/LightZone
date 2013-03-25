@@ -49,4 +49,3 @@ enum ErrorLevel		{EL_OKAY, EL_ERROR, EL_HALT};
 enum ErrorType		{NONFATAL, FATAL};
 
 #endif
-

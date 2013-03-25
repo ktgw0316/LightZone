@@ -167,4 +167,3 @@ protected:
    float* permGx_;
    float* permGy_; 
 };
-

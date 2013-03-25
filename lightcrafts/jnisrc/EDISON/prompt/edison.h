@@ -86,4 +86,3 @@ class EDISON
 };
 
 #endif
-

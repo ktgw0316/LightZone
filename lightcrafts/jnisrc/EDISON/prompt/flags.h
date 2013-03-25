@@ -27,4 +27,3 @@ extern bool CmCRankMapDefined;
 extern bool CmCConfMapDefined;
 
 #endif
-

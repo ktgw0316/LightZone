@@ -38,4 +38,3 @@ public:
    void SetPoints(int*, int);
    void SetGradient(float*,float*,float*,int);
 };
-
