@@ -79,6 +79,10 @@ else
   # CFLAGS+=		$(PLATFORM_CFLAGS)
 endif
 
+ifeq ($(PLATFORM),Windows))
+  CFLAGS+= -mno-cygwin
+endif
+
 $(ARCH_MAKEFILES):
 	cd $(@D) && \
 	CC="$(CC)" CFLAGS="$(CFLAGS)" ./configure $(CONFIG_OPTIONS)
