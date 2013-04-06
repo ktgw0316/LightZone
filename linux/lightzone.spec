@@ -43,7 +43,7 @@ cat > %{name} << 'EOF'
 echo Starting %{name} version %{version} ...
 echo with options : ${@}
 
-(cd "%_datadir/%name" && LD_LIBRARY_PATH="%_datadir/%name" exec java -Xmx256m -Djava.library.path="%_datadir/%name" -Dcom.lightcrafts.licensetype=ESD -Dlightcrafts.debug=1 -classpath "%_datadir/%name/*" com.lightcrafts.platform.linux.LinuxLauncher ${@} )
+(cd "%_datadir/%name" && LD_LIBRARY_PATH="%_datadir/%name" exec java -Xmx256m -Djava.library.path="%_datadir/%name" -Dlightcrafts.debug=1 -classpath "%_datadir/%name/*" com.lightcrafts.platform.linux.LinuxLauncher ${@} )
 EOF
 install -d -m 755 %{buildroot}%{_bindir}
 install -m 755 %{name} %{buildroot}%{_bindir}/
