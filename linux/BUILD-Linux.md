@@ -3,6 +3,7 @@
 ## Install required packages
 Building the LightZone source requires (at least) following packages:
 - __ant__
+- __fakeroot__ for linux package creation
 - __g++__
 - __gcc__
 - __git__

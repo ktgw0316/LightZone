@@ -107,6 +107,24 @@
     <move file="LightZone.tar.gz"
           tofile="archive/LightZone-rev.${git-revision}.tar.gz"/>
   </target>
+  
+  <target name="package-ubuntu-i386" depends="sign" >
+    <property name="pkgdir" value="install/ubuntu" />
+    <property name="destdir" value="${pkgdir}/opt/lightzone" />
+    <mkdir dir="${destdir}" />
+    <copy todir="${destdir}">
+      <fileset dir="products">
+	<include name="*.so" />
+	<include name="*.jar" />
+      </fileset>
+    </copy>
+    <exec executable="fakeroot">
+      <arg value="dpkg" />
+      <arg value="--build" />
+      <arg value="${basedir}/${pkgdir}" />
+      <arg value="./" />
+    </exec>
+  </target>
 
   <!--===== Sign All Jars ==================================================-->
 
