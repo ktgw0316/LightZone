@@ -15,6 +15,7 @@ Download and install (or unpack) following:
 -   __Apache Ivy__ - copy ivy-<version>.jar to ANT_HOME/lib
 -   __Cygwin__
     In Cygwin install following:
+    -    __automake__ version 1.9
     -    __gcc__ version 3 (not 4)
     -    __make__
     -    __nasm__
