@@ -1,2 +1,4 @@
 #!/bin/sh
 chmod +x /usr/bin/lightzone
+chmod +x /opt/lightzone/LightZone-forkd
+chmod +x /opt/lightzone/dcraw

@@ -2,7 +2,7 @@ Package: lightzone
 Version: 3.9.0
 Section: graphics
 Priority: optional 
-Architecture: i386
-Depends: oracle-java7-installer
+Architecture: all
+Depends: openjdk-7-jre
 Maintainer: pavel.benak@example.com 
 Description: LightZone is professional-level digital darkroom software for Windows, Mac OS X, and Linux. Rather than using layers as many other photo editors do, LightZone lets the user build up a stack of tools which can be rearranged, turned off and on, and removed from the stack. It's a non-destructive editor, where any of the tools can be re-adjusted or modified later — even in a different editing session. A tool stack can be copied to a batch of photos at one time. LightZone operates in a 16-bit linear color space with the wide gamut of ProPhoto RGB.

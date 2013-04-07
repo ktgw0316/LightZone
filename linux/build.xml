@@ -116,6 +116,8 @@
       <fileset dir="products">
 	<include name="*.so" />
 	<include name="*.jar" />
+        <include name="LightZone-forkd" />
+        <include name="dcraw" />
       </fileset>
     </copy>
     <exec executable="fakeroot">
