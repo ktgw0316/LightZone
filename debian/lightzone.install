@@ -1,0 +1,2 @@
+linux/icons/*.png usr/share/lightzone/images/
+debian/lightzone.desktop usr/share/applications

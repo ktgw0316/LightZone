@@ -26,13 +26,17 @@ install: build
 	dh_testroot
 	dh_prep
 	dh_installdirs
+	install -m 755 $(CURDIR)/linux/products/lightzone $(CURDIR)/debian/lightzone/usr/bin/lightzone
+	install -m 755 $(CURDIR)/linux/products/LightZone-forkd $(CURDIR)/debian/lightzone/opt/lightzone/LightZone-forkd
+	install -m 755 $(CURDIR)/linux/products/dcraw $(CURDIR)/debian/lightzone/opt/lightzone/dcraw
+	install -m 644 $(CURDIR)/linux/products/*.jar $(CURDIR)/debian/lightzone/opt/lightzone/
+	install -m 644 $(CURDIR)/linux/products/*.so $(CURDIR)/debian/lightzone/opt/lightzone/
 
 binary-arch: build install
 
 binary-indep: build install
 	dh_testdir
 	dh_testroot
-	dh_installchangelogs -k release/changes.txt
 	dh_installdocs
 	dh_installexamples
 	dh_install
@@ -47,5 +51,5 @@ binary-indep: build install
 	dh_builddeb
 
 binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install configure get-orig-source
+.PHONY: build clean binary-indep binary-arch binary install configure
 

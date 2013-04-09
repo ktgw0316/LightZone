@@ -1,11 +1,10 @@
 Source: lightzone
 Section: graphics
 Priority: optional
-Architecture: i386
-Depends: openjdk-7-jre
 Maintainer: pavel.benak@example.com 
-Build-Depends: ant, fakeroot, g++, gcc, git, javahelp2, libx11-dev, make,
- nasm, openjdk-7-jdk, tidy
+Build-Depends: ant, g++, gcc (>= 4.1), git, javahelp2, libx11-dev, make,
+ autoconf (>= 2.56), automake (>= 1.7), libtool (>= 1.4), nasm (>= 2.07),
+ openjdk-7-jdk, tidy
 Homepage: http://lightzoneproject.org/
 Standards-Version: 3.9.0
 
