@@ -1,0 +1,8 @@
+linux/products/*.{jar,so} opt/lightzone/
+linux/products/LightZone-forkd opt/lightzone/
+linux/products/dcraw opt/lightzone/
+linux/products/lightzone usr/bin/
+linux/icons/*.png usr/share/lightzone/images/
+linux/products/i386/*.so usr/lib/jvm/java-7-openjdk/jre/lib/i386/
+linux/products/amd64/*.so usr/lib/jvm/java-7-openjdk/jre/lib/amd64/
+linux/install/ubuntu/DEBIAN/lightzone.desktop usr/share/applications
