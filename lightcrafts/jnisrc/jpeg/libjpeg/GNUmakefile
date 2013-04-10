@@ -85,6 +85,7 @@ endif
 
 $(ARCH_MAKEFILES):
 	cd $(@D) && \
+	autoreconf -fiv && \
 	CC="$(CC)" CFLAGS="$(CFLAGS)" ./configure $(CONFIG_OPTIONS)
 
 ##### Make the libraries.
