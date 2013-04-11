@@ -79,7 +79,7 @@ else
   # CFLAGS+=		$(PLATFORM_CFLAGS)
 endif
 
-ifeq ($(PLATFORM),Windows))
+ifeq ($(PLATFORM),Windows)
   CFLAGS+= -mno-cygwin
 endif
 
