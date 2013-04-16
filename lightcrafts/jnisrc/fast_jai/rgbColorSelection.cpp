@@ -6,7 +6,7 @@ typedef unsigned short ushort;
 #include <stdlib.h>
 #include <math.h>
 
-static inline float fast_log2 (float val)
+static inline float orig_fast_log2 (float val)
 {
     int * const  exp_ptr = reinterpret_cast <int *> (&val);
     int          x = *exp_ptr;
@@ -17,6 +17,19 @@ static inline float fast_log2 (float val)
     
     return (val + log_2);
 }
+
+typedef union { float f; int i; } floatint_union;
+
+static inline float fast_log2 (float val)
+{
+    floatint_union * vval =  (floatint_union*)&val ;
+    const int    log_2 = ((vval->i >> 23) & 255) - 128;
+    vval->i &= ~(255 << 23);
+    vval->i += 127 << 23;
+    
+    return (vval->f + log_2);
+}
+
 
 static inline float inv_sqrt(float x) 
 { 
@@ -66,6 +79,9 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_RGBColorSelectionMaskOpI
     float luminosityUpper           = colorSelection[6];
     float luminosityUpperFeather    = colorSelection[7];
     
+	const float rmin = (3 * radius) / 16;
+	const float rmax = (5 * radius) / 16;
+
     for (int row = 0; row < height; row++) {
         for (int col = 0; col < width; col++) {
             float L = srcData[3 * col + row * srcLineStride + srcROffset];
@@ -75,8 +91,6 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_RGBColorSelectionMaskOpI
             float brightnessMask, colorMask;
             
             if (radius >= 0) {
-                const float rmin = 3 * radius / 16;
-                const float rmax = 5 * radius / 16;
                 
                 float da = sa - a;
                 float db = sb - b;
@@ -93,9 +107,9 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_RGBColorSelectionMaskOpI
             
             if (luminosityLower > 0 || luminosityUpper < 1) {
 #if defined(__ppc__)
-	        float luminosity = log2f(L / 0x100 + 1)/8;
+	            float luminosity = log2f(L / 0x100 + 1)/8;
 #else
-                float luminosity = fast_log2(L / 0x100 + 1)/8;
+                float luminosity = fast_log2(L / 256.0F + 1.0F)/8;
 #endif
                 if (luminosity > 1)
                     luminosity = 1;
