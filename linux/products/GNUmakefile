@@ -6,8 +6,15 @@ include			$(COMMON_DIR)/mk/platform.mk
 COMMON_PRODUCTS:=	$(filter-out GNUmakefile,$(wildcard $(COMMON_DIR)/products/*))
 DEST_COMMON_PRODUCTS:=	$(notdir $(COMMON_PRODUCTS))
 
-LINUX_LIBS:=		$(wildcard ../lib/*)
+LINUX_LIBS:=		$(wildcard ../lib/*.jar)
 DEST_LINUX_LIBS:=	$(notdir $(LINUX_LIBS))
+
+DEST_LIBMLIB_JAI:=	libmlib_jai.so
+
+PROCESSOR:=		$(shell uname -m)
+ifeq ($(PROCESSOR),x86_64)
+  PROCESSOR:=		amd64
+endif
 
 ##
 # Build rules
@@ -15,13 +22,16 @@ DEST_LINUX_LIBS:=	$(notdir $(LINUX_LIBS))
 
 .PHONY: all
 
-all: $(DEST_COMMON_PRODUCTS) $(DEST_LINUX_LIBS)
+all: $(DEST_COMMON_PRODUCTS) $(DEST_LINUX_LIBS) $(DEST_LIBMLIB_JAI)
 
 $(DEST_COMMON_PRODUCTS):
 	$(call SYMLINK,$(COMMON_DIR)/products/$@,$@)
 
 $(DEST_LINUX_LIBS):
 	$(call SYMLINK,../lib/$@,$@)
+
+$(DEST_LIBMLIB_JAI):
+	$(call SYMLINK,../lib/${PROCESSOR}/$@,$@)
 
 ##
 # Utility rules
