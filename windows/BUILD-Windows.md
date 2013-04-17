@@ -17,6 +17,7 @@ Download and install (or unpack) following:
     In Cygwin install following:
     -    __automake__ version 1.9
     -    __gcc__ version 3 (not 4)
+    -    __libtool__
     -    __make__
     -    __nasm__
     -    __vim__ or __nano__ — These are editors for console, might come handy. If you are not familiar with vim, install
