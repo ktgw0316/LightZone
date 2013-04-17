@@ -97,11 +97,6 @@ public final class BilateralFilterOpImage extends AreaOpImage {
         }
     }
 
-    // The native bilateral filter implementation bilateralFilterChroma()
-    // crashes intermittently on Linux, so use bilateralFilterLuma()
-    // instead.
-    private static boolean IsLinux = Platform.getType() == Platform.Linux;
-
     protected void ushortLoop(RasterAccessor src, RasterAccessor dst) {
         int swidth = src.getWidth();
         int sheight = src.getHeight();
@@ -124,7 +119,7 @@ public final class BilateralFilterOpImage extends AreaOpImage {
                                src.getPixelStride(), dst.getPixelStride(),
                                srcBandOffsets[0], dstBandOffsets[0],
                                srcScanlineStride, dstScanlineStride);
-        else if (luminosity || IsLinux)
+        else if (luminosity)
             bilateralFilterLuma(srcData, dstData,
                                wr, ws, scale_r, kernel,
                                swidth, sheight,
