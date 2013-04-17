@@ -57,4 +57,9 @@ windows/md5sums
 windows/output.txt
 windows/products
 windows/updates.xml
-
+debian/*.debhelper
+debian/*.substvars
+debian/*.log
+debian/DEBIAN
+debian/lightzone
+debian/files
