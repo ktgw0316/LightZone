@@ -82,6 +82,7 @@
       <env key="LD_LIBRARY_PATH" value="."/>
       <sysproperty key="java.library.path" value="."/>
       <sysproperty key="lightcrafts.debug" value="1"/>
+      <sysproperty key="file.encoding" value="utf-8" />
     </java>
   </target>
 
