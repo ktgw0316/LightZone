@@ -58,9 +58,9 @@ SavedSearch::~SavedSearch() {
  * Begin a saved search.
  */
 JNIEXPORT jlong JNICALL WindowsSavedSearch_METHOD(beginSearch)
-    ( JNIEnv *env, jclass, jstring jPath )
+    ( JNIEnv *env, jclass, jbyteArray jPathUtf8 )
 {
-    jstring_to_c const cPath( env, jPath );
+    jbyteArray_to_c const cPath( env, jPathUtf8 );
 
     SavedSearch*    cSavedSearch = NULL;
     bool            error = false;

@@ -5,9 +5,10 @@ package com.lightcrafts.image.libs;
 import java.awt.*;
 import java.awt.color.ICC_Profile;
 import java.awt.image.*;
-import java.io.IOException;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -52,7 +53,7 @@ public final class LCTIFFWriter extends LCTIFFCommon {
      * @param height The height of the image in pixels.
      */
     public LCTIFFWriter( String fileName, int width, int height )
-        throws LCImageLibException
+        throws LCImageLibException, UnsupportedEncodingException
     {
         this( fileName, null, width, height );
     }
@@ -70,7 +71,7 @@ public final class LCTIFFWriter extends LCTIFFCommon {
      */
     public LCTIFFWriter( String fileName, int width, int height,
                          int resolution, int resolutionUnit )
-        throws LCImageLibException
+        throws LCImageLibException, UnsupportedEncodingException
     {
         this( fileName, null, width, height, resolution, resolutionUnit );
     }
@@ -86,7 +87,7 @@ public final class LCTIFFWriter extends LCTIFFCommon {
      */
     public LCTIFFWriter( String fileName, String appendFileName, int width,
                          int height )
-        throws LCImageLibException
+        throws LCImageLibException, UnsupportedEncodingException
     {
         this(
             fileName, appendFileName, width, height,
@@ -109,7 +110,7 @@ public final class LCTIFFWriter extends LCTIFFCommon {
      */
     public LCTIFFWriter( String fileName, String appendFileName, int width,
                          int height, int resolution, int resolutionUnit )
-        throws LCImageLibException
+        throws LCImageLibException, UnsupportedEncodingException
     {
         m_fileName = fileName;
         m_appendFileName = appendFileName;
@@ -132,12 +133,13 @@ public final class LCTIFFWriter extends LCTIFFCommon {
      * @param thread The thread that's doing the putting.
      */
     public void putImageTiled( RenderedImage image, ProgressThread thread )
-        throws IOException, LCImageLibException
+        throws IOException, LCImageLibException, UnsupportedEncodingException
     {
         try {
             writeImageTiled( image, thread );
-            if ( m_appendFileName != null )
+            if ( m_appendFileName != null ) {
                 append( m_appendFileName );
+            }
             dispose();
             if ( m_hasExifMetadata )
                 fixEXIFMetadata( m_fileName );
@@ -154,12 +156,13 @@ public final class LCTIFFWriter extends LCTIFFCommon {
      * @param thread The thread that's doing the putting.
      */
     public void putImageStriped( RenderedImage image, ProgressThread thread )
-        throws IOException, LCImageLibException
+        throws IOException, LCImageLibException, UnsupportedEncodingException
     {
         try {
             writeImageStriped( image, thread );
-            if ( m_appendFileName != null )
+            if ( m_appendFileName != null ) {
                 append( m_appendFileName );
+            }
             dispose();
             if ( m_hasExifMetadata )
                 fixEXIFMetadata( m_fileName );
@@ -350,7 +353,14 @@ public final class LCTIFFWriter extends LCTIFFCommon {
      * @see #setFloatField(int,float)
      * @see #setIntField(int,int)
      */
-    public native boolean setStringField( int tagID, String value )
+    public boolean setStringField( int tagID, String value )
+        throws LCImageLibException, UnsupportedEncodingException
+    {
+        byte[] valueUtf8 = ( value + '\000' ).getBytes( "UTF-8" );
+        return setStringField( tagID, valueUtf8 );
+    }
+
+    public native boolean setStringField( int tagID, byte[] valueUtf8 )
         throws LCImageLibException;
 
     ////////// private ////////////////////////////////////////////////////////
@@ -361,7 +371,14 @@ public final class LCTIFFWriter extends LCTIFFCommon {
      * @param fileName The name of the TIFF file to append.
      * @return Returns <code>true</code> only if the append succeeded.
      */
-    private native boolean append( String fileName );
+    private boolean append( String fileName )
+        throws IOException, UnsupportedEncodingException
+    {
+        byte[] fileNameUtf8 = ( fileName + '\000' ).getBytes( "UTF-8" );
+        return append( fileNameUtf8 );
+    }
+
+    private native boolean append( byte[] fileNameUtf8 );
 
     /**
      * Computes which tile a given point is in.
@@ -467,7 +484,14 @@ public final class LCTIFFWriter extends LCTIFFCommon {
      *
      * @param fileName The name of the TIFF file to open.
      */
-    private native void openForWriting( String fileName )
+    private void openForWriting( String fileName )
+        throws LCImageLibException, UnsupportedEncodingException
+    {
+        byte[] fileNameUtf8 = ( fileName + '\000' ).getBytes( "UTF-8" );
+        openForWriting( fileNameUtf8 );
+    }
+
+    private native void openForWriting( byte[] fileNameUtf8 )
         throws LCImageLibException;
 
     /**

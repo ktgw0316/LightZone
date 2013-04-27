@@ -8,6 +8,8 @@ import java.awt.color.ICC_Profile;
 import java.awt.color.ICC_ColorSpace;
 import java.awt.image.*;
 import java.awt.geom.AffineTransform;
+import java.io.*;
+import java.util.Arrays;
 import com.lightcrafts.mediax.jai.PlanarImage;
 import com.lightcrafts.mediax.jai.ImageLayout;
 import com.lightcrafts.mediax.jai.TileCache;
@@ -39,7 +41,9 @@ public final class LCTIFFReader extends LCTIFFCommon {
      *
      * @param fileName The name of the TIFF file to open.
      */
-    public LCTIFFReader( String fileName ) throws LCImageLibException {
+    public LCTIFFReader( String fileName )
+        throws LCImageLibException, UnsupportedEncodingException
+    {
         this( fileName, false );
     }
 
@@ -51,7 +55,7 @@ public final class LCTIFFReader extends LCTIFFCommon {
      * present).
      */
     public LCTIFFReader( String fileName, boolean read2nd )
-        throws LCImageLibException
+        throws LCImageLibException, UnsupportedEncodingException
     {
         m_read2nd = read2nd;
         openForReading( fileName );
@@ -228,7 +232,14 @@ public final class LCTIFFReader extends LCTIFFCommon {
      *
      * @param fileName The name of the TIFF file to open.
      */
-    private native void openForReading( String fileName )
+    private void openForReading( String fileName )
+        throws LCImageLibException, UnsupportedEncodingException
+    {
+        byte[] fileNameUtf8 = ( fileName + '\000' ).getBytes( "UTF-8" );
+        openForReading( fileNameUtf8 );
+    }
+
+    private native void openForReading( byte[] fileNameUtf8 )
         throws LCImageLibException;
 
     private class TIFF_Format {
@@ -321,7 +332,9 @@ public final class LCTIFFReader extends LCTIFFCommon {
         final LCTIFFReader.TIFF_Format tf;
         final LCTIFFReader reader;
 
-        public TIFFImage(String path) throws LCImageLibException {
+        public TIFFImage(String path)
+            throws LCImageLibException, UnsupportedEncodingException
+        {
             reader = new LCTIFFReader(path);
             tf = reader.getFormat();
             final ImageLayout layout = new ImageLayout(0, 0, tf.imageWidth, tf.imageHeight,

@@ -34,9 +34,9 @@ using namespace LightCrafts;
  * Get the last access time of a file.
  */
 JNIEXPORT jlong JNICALL FileUtil_METHOD(getLastAccessTime)
-    ( JNIEnv *env, jclass, jstring jFileName )
+    ( JNIEnv *env, jclass, jbyteArray jFileName )
 {
-    jstring_to_c const cFileName( env, jFileName );
+    jbyteArray_to_c const cFileName( env, jFileName );
     struct stat s;
     if ( ::stat( cFileName, &s ) == -1 ) {
         LC_throwIOException( env, cFileName );

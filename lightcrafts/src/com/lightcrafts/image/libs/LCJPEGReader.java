@@ -7,6 +7,7 @@ import java.awt.image.*;
 import java.awt.color.ColorSpace;
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import com.lightcrafts.mediax.jai.PlanarImage;
 import com.lightcrafts.mediax.jai.ImageLayout;
 
@@ -43,7 +44,7 @@ public final class LCJPEGReader {
      * @param fileName The name of the JPEG file to read.
      */
     public LCJPEGReader( String fileName )
-        throws FileNotFoundException, LCImageLibException
+        throws FileNotFoundException, LCImageLibException, UnsupportedEncodingException
     {
         this( fileName, 0, 0, null );
     }
@@ -61,7 +62,7 @@ public final class LCJPEGReader {
      */
     public LCJPEGReader( String fileName, int maxWidth, int maxHeight,
                          JPEGImageInfo jpegInfo )
-        throws FileNotFoundException, LCImageLibException
+        throws FileNotFoundException, LCImageLibException, UnsupportedEncodingException
     {
         openForReading( fileName, maxWidth, maxHeight );
         if ( jpegInfo != null ) {
@@ -282,7 +283,14 @@ public final class LCJPEGReader {
      * @param maxHeight The maximum height of the image to get, rescaling if
      * necessary.  A value of 0 means don't scale.
      */
-    private native void openForReading( String fileName, int maxWidth,
+    private void openForReading( String fileName, int maxWidth, int maxHeight )
+        throws FileNotFoundException, LCImageLibException, UnsupportedEncodingException
+    {
+        byte[] fileNameUtf8 = ( fileName + '\000' ).getBytes( "UTF-8" );
+        openForReading( fileNameUtf8, maxWidth, maxHeight );
+    }
+
+    private native void openForReading( byte[] fileNameUtf8, int maxWidth,
                                         int maxHeight )
         throws FileNotFoundException, LCImageLibException;
 

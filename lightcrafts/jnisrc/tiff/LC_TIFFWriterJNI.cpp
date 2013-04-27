@@ -51,14 +51,14 @@ bool isLightZoneLayeredTIFF( TIFF *tiff ) {
  * Append the TIFF image in the given file.
  */
 JNIEXPORT jboolean JNICALL LCTIFFWriter_METHOD(append)
-    ( JNIEnv *env, jobject jLCTIFFWriter, jstring jFileName )
+    ( JNIEnv *env, jobject jLCTIFFWriter, jbyteArray jFileNameUtf8 )
 {
     TIFF *const destTIFF = getNativePtr( env, jLCTIFFWriter );
     TIFFSetField( destTIFF, TIFFTAG_PAGENUMBER, 0, 2 );
     int result = TIFFWriteDirectory( destTIFF );
     if ( !result )
         return JNI_FALSE;
-    jstring_to_c const cFileName( env, jFileName );
+    jbyteArray_to_c const cFileName( env, jFileNameUtf8 );
     TIFF *const srcTIFF = LC_TIFFOpen( cFileName, "r" );
     if ( !srcTIFF )
         return JNI_FALSE;
@@ -84,9 +84,9 @@ JNIEXPORT jint JNICALL LCTIFFWriter_METHOD(computeTile)
  * Open a TIFF image file for writing.
  */
 JNIEXPORT void JNICALL LCTIFFWriter_METHOD(openForWriting)
-    ( JNIEnv *env, jobject jLCTIFFWriter, jstring jFileName )
+    ( JNIEnv *env, jobject jLCTIFFWriter, jbyteArray jFileNameUtf8 )
 {
-    jstring_to_c const cFileName( env, jFileName );
+    jbyteArray_to_c const cFileName( env, jFileNameUtf8 );
     LC_setNativePtr( env, jLCTIFFWriter, LC_TIFFOpen( cFileName, "w" ) );
 }
 
@@ -217,7 +217,7 @@ JNIEXPORT jboolean JNICALL LCTIFFWriter_METHOD(setIntField2)
  * Set the given string metadata field.
  */
 JNIEXPORT jboolean JNICALL LCTIFFWriter_METHOD(setStringField)
-    ( JNIEnv *env, jobject jLCTIFFWriter, jint tagID, jstring jValue )
+    ( JNIEnv *env, jobject jLCTIFFWriter, jint tagID, jbyteArray jValueUtf8 )
 {
     TIFF *const tiff = getNativePtr( env, jLCTIFFWriter );
     switch ( tagID ) {
@@ -234,7 +234,7 @@ JNIEXPORT jboolean JNICALL LCTIFFWriter_METHOD(setStringField)
         case TIFFTAG_PAGENAME:
         case TIFFTAG_SOFTWARE:
         case TIFFTAG_TARGETPRINTER: {
-            jstring_to_c const cValue( env, jValue );
+            jbyteArray_to_c const cValue( env, jValueUtf8 );
             return TIFFSetField(
                 tiff, tagID, static_cast<char const*>( cValue )
             );
