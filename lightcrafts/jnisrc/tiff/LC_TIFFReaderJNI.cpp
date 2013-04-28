@@ -221,9 +221,9 @@ JNIEXPORT jboolean JNICALL LCTIFFReader_METHOD(nextDirectory)
  * Open a TIFF image file for reading.
  */
 JNIEXPORT void JNICALL LCTIFFReader_METHOD(openForReading)
-    ( JNIEnv *env, jobject jLCTIFFReader, jstring jFileName )
+    ( JNIEnv *env, jobject jLCTIFFReader, jbyteArray jFileNameUtf8 )
 {
-    jstring_to_c const cFileName( env, jFileName );
+    jbyteArray_to_c const cFileName( env, jFileNameUtf8 );
     LC_setNativePtr( env, jLCTIFFReader, LC_TIFFOpen( cFileName, "r" ) );
 }
 

@@ -106,7 +106,7 @@ JNIEXPORT void JNICALL LCJPEGWriter_METHOD(dispose)
  * Open a JPEG image file.
  */
 JNIEXPORT void JNICALL LCJPEGWriter_METHOD(openForWriting)
-    ( JNIEnv *env, jobject jLCJPEGWriter, jstring jFileName, jint width,
+    ( JNIEnv *env, jobject jLCJPEGWriter, jbyteArray jFileNameUtf8, jint width,
       jint height, jint colorsPerPixel, jint colorSpace, jint quality )
 {
 #ifdef DEBUG
@@ -130,7 +130,7 @@ JNIEXPORT void JNICALL LCJPEGWriter_METHOD(openForWriting)
     //
     // Open the JPEG file.
     //
-    jstring_to_c const cFileName( env, jFileName );
+    jbyteArray_to_c const cFileName( env, jFileNameUtf8 );
     if ( !(writer->m_file = LC_fopen( cFileName, "wb" )) ) {
         LC_throwIOException( env, cFileName );
         return;
