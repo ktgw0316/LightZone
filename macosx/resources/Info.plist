@@ -108,8 +108,6 @@
         <dict>
             <key>apple.awt.graphics.UseQuartz</key>
             <string>true</string>
-            <key>file.encoding</key>
-            <string>utf-8</string>
         </dict>
         <key>WorkingDirectory</key>
         <string>$APP_PACKAGE/$JAVAROOT</string>
