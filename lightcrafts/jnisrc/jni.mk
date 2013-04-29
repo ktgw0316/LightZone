@@ -130,6 +130,16 @@ ifeq ($(PLATFORM),Linux)
   JNI_EXTRA_DISTCLEAN+=	$(JNI_LINUX_DISTCLEAN)
 endif
 
+ifeq ($(PLATFORM),FreeBSD)
+  CFLAGS+= 		$(JNI_FREEBSD_CFLAGS)
+  DEFINES+=		$(JNI_FREEBSD_DEFINES)
+  INCLUDES+= 		$(JNI_FREEBSD_INCLUDES)
+  LDFLAGS+=		-shared $(JNI_FREEBSD_LDFLAGS)
+  LINK+=		$(JNI_FREEBSD_LINK)
+  JNI_EXTRA_CLEAN+=	$(JNI_FREEBSD_CLEAN)
+  JNI_EXTRA_DISTCLEAN+=	$(JNI_FREEBSD_DISTCLEAN)
+endif
+
 ########## You shouldn't have to change anything below this line. #############
 
 ifdef DEBUG

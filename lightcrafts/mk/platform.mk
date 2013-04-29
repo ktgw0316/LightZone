@@ -277,6 +277,31 @@ ifeq ($(PLATFORM),Linux)
 endif
 
 ##
+# FreeBSD
+##
+ifeq ($(PLATFORM),FreeBSD)
+  ifeq ($(PROCESSOR),x86_64)
+    PLATFORM_CFLAGS+=	-march=athlon64 -mtune=generic $(SSE_FLAGS_ON) -fpermissive -fPIC
+  else
+    PLATFORM_CFLAGS+=	-march=pentium3 -mtune=pentium4 $(SSE_FLAGS_ON) -fpermissive
+  endif
+
+  ifdef HIGH_PERFORMANCE
+    PLATFORM_CFLAGS+=	-O3
+  else
+    PLATFORM_CFLAGS+=	-Os
+  endif
+  JAVA_INCLUDES:=	-I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/freebsd
+  JAVA_LDFLAGS:=	-L$(JAVA_HOME)/lib
+  JNILIB_PREFIX:=	lib
+  JNILIB_EXT:=		.so
+  DYLIB_PREFIX:=	$(JNILIB_PREFIX)
+  DYLIB_EXT:=		$(JNILIB_EXT)
+
+  NUM_PROCESSORS:=	$(shell dmesg | grep '^cpu' | wc -l)
+endif
+
+##
 # Miscellaneous stuff.
 ##
 

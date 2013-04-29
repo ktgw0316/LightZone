@@ -8,6 +8,7 @@ TARGET_BASE:=		Linux
 #DEBUG:=			true
 
 JNI_LINUX_LINK:= 	-lLCJNI -lX11
+JNI_FREEBSD_INCLUDES:= 	-I/usr/local/include/
 
 JAVAH_CLASSES:=	com.lightcrafts.platform.linux.LinuxKeyUtil
 

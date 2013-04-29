@@ -12,25 +12,43 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.*;
 
 class TestSSE2 {
     
+    static String osname = System.getProperty("os.name");
+
     static boolean hasSSE2() {
-        String line = getCpuInfoLine("flags\t\t:");
-        return line.contains("sse2");
+        if (osname.indexOf("Linux") >= 0) {
+            String line = getCpuInfoLine("flags\t\t:");
+            return line.contains("sse2");
+        } else {
+            String line = getCpuInfoLine("  Features=");
+            return line.contains("SSE2");
+        }
     }
 
     private static String getCpuInfoLine(String key) {
         try {
-            BufferedReader reader = new BufferedReader(
-                new InputStreamReader(
-                    new FileInputStream("/proc/cpuinfo")
-                )
-            );
-            String line = null;
+            BufferedReader reader;
+            String line;
+            if (osname.indexOf("Linux") >= 0) {
+                reader = new BufferedReader(
+                    new InputStreamReader(
+                        new FileInputStream("/proc/cpuinfo")
+                    )
+                );
+            } else {
+                Process process = Runtime.getRuntime().exec("dmesg");
+                InputStream in = process.getInputStream();
+                reader = new BufferedReader(
+                    new InputStreamReader(in)
+                );
+            }
             do {
                 line = reader.readLine();
                 if (line != null) {
@@ -47,8 +65,14 @@ class TestSSE2 {
     }
 
     static void showDialog() {
-        String model = getCpuInfoLine("model name\t: ");
-        model = model.replaceFirst("model name\t: ", "");
+        String model = "";
+        if (osname.indexOf("Linux") >= 0) {
+            model = getCpuInfoLine("model name\t: ");
+            model = model.replaceFirst("model name\t: ", "");
+        } else {
+            model = getCpuInfoLine("CPU: ");
+            model = model.replaceFirst("CPU: ", "");
+        }
 
         String messageA = LOCALE.get("CantRunSSE2Title");
         String messageB = LOCALE.get("CantRunSSE2");

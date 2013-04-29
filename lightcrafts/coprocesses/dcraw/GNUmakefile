@@ -11,6 +11,7 @@ EXEC_LINUX_DEFINES:=	-Dfgetc=getc_unlocked
 EXEC_MACOSX_DEFINES:=	$(EXEC_LINUX_DEFINES)
 EXEC_WINDOWS_DEFINES:=	-DDJGPP
 EXEC_LINUX_LINK:=	-lm
+EXEC_FREEBSD_LINK:=	-lm
 
 ROOT:=		../../..
 include		$(ROOT)/lightcrafts/mk/executable.mk
