@@ -115,6 +115,7 @@
       <sysproperty key="java.library.path" value="."/>
       <sysproperty key="lightcrafts.debug" value="1"/>
       <sysproperty key="apple.awt.graphics.EnableDeferredUpdates" value="false"/>
+      <sysproperty key="file.encoding" value="utf-8" />
     </java>
   </target>
 
