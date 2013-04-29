@@ -193,7 +193,7 @@ public class TIFFImageType extends ImageType implements TrueImageTypeProvider {
      * {@inheritDoc}
      */
     public PlanarImage getImage( ImageInfo imageInfo, ProgressThread thread )
-        throws BadImageFileException, UserCanceledException
+        throws BadImageFileException, UserCanceledException, UnsupportedEncodingException
     {
         return getImage( imageInfo, thread, false );
     }
@@ -210,7 +210,7 @@ public class TIFFImageType extends ImageType implements TrueImageTypeProvider {
     public static PlanarImage getImage( ImageInfo imageInfo,
                                         ProgressThread thread,
                                         boolean read2nd )
-        throws BadImageFileException, UserCanceledException
+        throws BadImageFileException, UserCanceledException, UnsupportedEncodingException
     {
         try {
             final String fileName = imageInfo.getFile().getAbsolutePath();

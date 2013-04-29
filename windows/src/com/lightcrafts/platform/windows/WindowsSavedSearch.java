@@ -186,7 +186,14 @@ public final class WindowsSavedSearch extends SmartFolder {
      * as opaque from Java and passed back to {@link #getNextResult(long)} and
      * {@link #endSearch(long)}.
      */
-    private static native long beginSearch( String savedSearchPathname );
+    private static long beginSearch( String savedSearchPathname )
+        throws UnsupportedEncodingException
+    {
+        byte[] savedSearchPathnameUtf8 = ( savedSearchPathname+ '\000' ).getBytes( "UTF-8" );
+        beginSearch( savedSearchPathnameUtf8 );
+    }
+
+    private static native long beginSearch( byte[] savedSearchPathnameUtf8 );
 
     /**
      * End the saved search.  This must be called to dispose of native

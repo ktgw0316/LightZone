@@ -426,6 +426,52 @@ namespace LightCrafts {
         char const *m_cString;
     };
 
+    /**
+     * Convert a jbyteArray to a C string.
+     */
+    class jbyteArray_to_c {
+    public:
+        jbyteArray_to_c( JNIEnv *env , jbyteArray jba ) :
+            m_env( env ), m_jbyteArray( jba ),
+            m_cString( (char*)env->GetByteArrayElements( jba, NULL ) )
+        {
+        }
+
+        void release() {
+            if ( m_cString ) {
+                m_env->ReleaseByteArrayElements( m_jbyteArray, m_cString, NULL );
+                m_cString = 0;
+            }
+        }
+
+        ~jbyteArray_to_c() {
+            release();
+        }
+
+        operator char const*() const {
+            return m_cString;
+        }
+
+        char operator[]( int i ) const {
+            return m_cString[i];
+        }
+
+        char operator*() const {
+            return operator[]( 0 );
+        }
+
+        friend char const* operator+( jbyteArray_to_c const &s, int i ) {
+            return s.m_cString + i;
+        }
+        friend char const* operator+( int i, jbyteArray_to_c const &s ) {
+            return s + i;
+        }
+    private:
+        JNIEnv *const m_env;
+        jbyteArray const m_jbyteArray;
+        char const *m_cString;
+    };
+
 } // namespace
 
 #endif  /* __cplusplus */
