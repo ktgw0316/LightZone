@@ -12,6 +12,15 @@ DEST_LINUX_LIBS:=	$(notdir $(LINUX_LIBS))
 DEST_LIBMLIB_JAI:=	libmlib_jai.so
 
 PROCESSOR:=		$(shell uname -m)
+ifeq ($(PROCESSOR),i486)
+  PROCESSOR:=		i386
+endif
+ifeq ($(PROCESSOR),i586)
+  PROCESSOR:=		i386
+endif
+ifeq ($(PROCESSOR),i686)
+  PROCESSOR:=		i386
+endif
 ifeq ($(PROCESSOR),x86_64)
   PROCESSOR:=		amd64
 endif
