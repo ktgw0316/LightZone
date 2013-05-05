@@ -3,6 +3,7 @@
 package com.lightcrafts.platform.windows;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 import com.lightcrafts.utils.file.SmartFolder;
@@ -159,7 +160,13 @@ public final class WindowsSavedSearch extends SmartFolder {
      * directory, or if an I/O error occurs.
      */
     private String[] savedSearch( String savedSearchPathname ) {
-        final long nativePtr = beginSearch( savedSearchPathname );
+        final long nativePtr;
+        try {
+            nativePtr = beginSearch( savedSearchPathname );
+        }
+        catch (UnsupportedEncodingException e) {
+            return null;
+        }
         if ( nativePtr == 0 )
             return null;
         try {
@@ -186,7 +193,14 @@ public final class WindowsSavedSearch extends SmartFolder {
      * as opaque from Java and passed back to {@link #getNextResult(long)} and
      * {@link #endSearch(long)}.
      */
-    private static native long beginSearch( String savedSearchPathname );
+    private static long beginSearch( String savedSearchPathname )
+        throws UnsupportedEncodingException
+    {
+        byte[] savedSearchPathnameUtf8 = ( savedSearchPathname+ '\000' ).getBytes( "UTF-8" );
+        return beginSearch( savedSearchPathnameUtf8 );
+    }
+
+    private static native long beginSearch( byte[] savedSearchPathnameUtf8 );
 
     /**
      * End the saved search.  This must be called to dispose of native

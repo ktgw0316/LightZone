@@ -101,7 +101,6 @@
       <sysproperty key="com.lightcrafts.zorn" value="true"/>
       <sysproperty key="lightcrafts.debug" value="1"/>
       <sysproperty key="IDE" value="1"/>
-      <sysproperty key="file.encoding" value="utf-8" />
     </java>
   </target>
 

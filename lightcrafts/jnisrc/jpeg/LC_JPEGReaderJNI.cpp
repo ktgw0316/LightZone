@@ -102,7 +102,7 @@ JNIEXPORT void JNICALL LCJPEGReader_METHOD(dispose)
  * Open a JPEG image file.
  */
 JNIEXPORT void JNICALL LCJPEGReader_METHOD(openForReading)
-    ( JNIEnv *env, jobject jLCJPEGReader, jstring jFileName, jint maxWidth,
+    ( JNIEnv *env, jobject jLCJPEGReader, jbyteArray jFileNameUtf8, jint maxWidth,
       jint maxHeight )
 {
 #ifdef DEBUG
@@ -121,7 +121,7 @@ JNIEXPORT void JNICALL LCJPEGReader_METHOD(openForReading)
     //
     // Open the JPEG file.
     //
-    jstring_to_c const cFileName( env, jFileName );
+    jbyteArray_to_c const cFileName( env, jFileNameUtf8 );
     if ( !(reader->m_file = LC_fopen( cFileName, "rb" )) ) {
         LC_throwFileNotFoundException( env, cFileName );
         return;

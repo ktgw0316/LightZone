@@ -5,8 +5,9 @@ package com.lightcrafts.image.libs;
 import java.awt.*;
 import java.awt.color.ICC_Profile;
 import java.awt.image.*;
-import java.io.IOException;
+import java.io.*;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 import org.w3c.dom.Document;
 
@@ -58,7 +59,7 @@ public final class LCJPEGWriter {
     public LCJPEGWriter( String fileName, int width, int height,
                          int colorsPerPixel, int colorSpace, int quality,
                          int resolution, int resolutionUnit )
-        throws IOException, LCImageLibException
+        throws IOException, LCImageLibException, UnsupportedEncodingException
     {
         m_exportWidth = width;
         m_exportHeight = height;
@@ -318,7 +319,18 @@ public final class LCJPEGWriter {
      * {@link LCJPEGConstants#CS_YCCK}.
      * @param quality Image quality: 0-100.
      */
-    private native void openForWriting( String fileName, int width, int height,
+    private void openForWriting( String fileName, int width, int height,
+                                        int colorsPerPixel, int colorSpace,
+                                        int quality )
+        throws IOException, LCImageLibException, UnsupportedEncodingException
+    {
+        byte[] fileNameUtf8 = ( fileName + '\000' ).getBytes( "UTF-8" );
+        openForWriting(
+            fileNameUtf8, width, height, colorsPerPixel, colorSpace, quality
+        );
+    }
+
+    private native void openForWriting( byte[] fileNameUtf8, int width, int height,
                                         int colorsPerPixel, int colorSpace,
                                         int quality )
         throws IOException, LCImageLibException;

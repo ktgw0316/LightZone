@@ -4,6 +4,7 @@ package com.lightcrafts.utils.file;
 
 import java.io.*;
 import java.util.Collection;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.NoSuchElementException;
@@ -544,7 +545,14 @@ public final class FileUtil {
      * @throws IOException if the file doesn't exist or the access time could
      * not be obtained.
      */
-    private static native long getLastAccessTime( String fileName )
+    private static long getLastAccessTime( String fileName )
+        throws IOException, UnsupportedEncodingException
+    {
+        byte[] fileNameUtf8 = ( fileName + '\000' ).getBytes( "UTF-8" );
+        return getLastAccessTime( fileNameUtf8 );
+    }
+
+    private static native long getLastAccessTime( byte[] fileNameUtf8 )
         throws IOException;
 
     /**
