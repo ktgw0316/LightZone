@@ -43,7 +43,14 @@ cat > %{name} << 'EOF'
 echo Starting %{name} version %{version} ...
 echo with options : ${@}
 
-(cd "%_datadir/%name" && LD_LIBRARY_PATH="%_datadir/%name" exec java -Xmx256m -Djava.library.path="%_datadir/%name" -classpath "%_datadir/%name/*" com.lightcrafts.platform.linux.LinuxLauncher ${@} )
+totalmem=`cat /proc/meminfo | grep MemTotal | sed -r 's/.* ([0-9]+) .*/\1/'`
+if [ $totalmem -ge 1024000 ]; then
+        maxmem=$(( $totalmem / 2 ))
+else
+        maxmem=512000
+fi
+
+(cd "%_datadir/%name" && LD_LIBRARY_PATH="%_datadir/%name" exec java -Xmx${maxmem}k -Djava.library.path="%_datadir/%name" -classpath "%_datadir/%name/*" com.lightcrafts.platform.linux.LinuxLauncher ${@} )
 EOF
 install -d -m 755 %{buildroot}%{_bindir}
 install -m 755 %{name} %{buildroot}%{_bindir}/
