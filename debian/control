@@ -6,7 +6,7 @@ Build-Depends: ant, g++, gcc (>= 4.1), git, javahelp2, libx11-dev, make,
  autoconf (>= 2.56), automake (>= 1.7), libtool (>= 1.4), nasm (>= 2.07),
  openjdk-7-jdk, tidy
 Homepage: http://lightzoneproject.org/
-Standards-Version: 3.9.0
+Standards-Version: 3.9.1
 
 Package: lightzone
 Architecture: i386 amd64
