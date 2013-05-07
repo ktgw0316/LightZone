@@ -24,7 +24,8 @@
 
   <target name="javac" depends="common">
     <mkdir dir="build"/>
-    <javac destdir="build" includeantruntime="false" source="1.5" debug="true">
+    <javac destdir="build" includeantruntime="false"
+           source="1.6" target="1.6" debug="true">
       <src path="src"/>
       <classpath>
         <fileset dir="${common-dir}/products">

@@ -37,10 +37,12 @@
 
     <mkdir dir="extbuild"/>
     <javac srcdir="extsrc" destdir="extbuild" includeantruntime="false"
+           source="1.6" target="1.6"
            debug="true" classpath="${jai-classpath}"/>
 
     <mkdir dir="build"/>
-    <javac destdir="build" includeantruntime="false" debug="true">
+    <javac destdir="build" includeantruntime="false" debug="true"
+           source="1.6" target="1.6">
       <src path="src"/>
       <classpath>
         <pathelement path="extbuild"/>
