@@ -20,7 +20,7 @@ Building the LightZone source requires (at least) following packages:
 ### Ubuntu 12.04.1 LTS (Precise Pangolin)
 Install required packages:
 
-    sudo apt-get install ant autoconf automake debhelper devscripts g++ gcc git javahelp2 libtool libx11-dev make nasm openjdk-7-jdk tidy
+    sudo apt-get install ant autoconf automake debhelper devscripts g++ gcc git javahelp2 libtool libx11-dev make nasm openjdk-6-jdk tidy
 
 Before start the build, you have to set JAVA_HOME environment variable:
 
