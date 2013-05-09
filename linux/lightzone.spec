@@ -29,11 +29,12 @@ LightZone is professional-level digital darkroom software for Windows, Mac OS X,
 %ant -f linux/build.xml jar
 
 %install
-install -dm 0755 "%buildroot/%_datadir/%name"
-cp -rpH lightcrafts/products/dcraw "%buildroot/%_datadir/%name"
-cp -rpH lightcrafts/products/LightZone-forkd "%buildroot/%_datadir/%name"
-cp -rpH linux/products/*.so "%buildroot/%_datadir/%name"
-cp -rpH linux/products/*.jar "%buildroot/%_datadir/%name"
+%define instdir /opt/%{name}
+install -dm 0755 "%buildroot/%{instdir}"
+cp -rpH lightcrafts/products/dcraw "%buildroot/%{instdir}"
+cp -rpH lightcrafts/products/LightZone-forkd "%buildroot/%{instdir}"
+cp -rpH linux/products/*.so "%buildroot/%{instdir}"
+cp -rpH linux/products/*.jar "%buildroot/%{instdir}"
 
 #startscript
 cat > %{name} << 'EOF'
@@ -51,7 +52,7 @@ else
         maxmem=512000
 fi
 
-(cd "%_datadir/%name" && LD_LIBRARY_PATH="%_datadir/%name" exec java -Xmx${maxmem}k -Djava.library.path="%_datadir/%name" -classpath "%_datadir/%name/*" com.lightcrafts.platform.linux.LinuxLauncher ${@} )
+(cd "%{instdir}" && LD_LIBRARY_PATH="%{instdir}" exec java -Xmx${maxmem}k -Djava.library.path="%{instdir}" -classpath "%{instdir}/*" com.lightcrafts.platform.linux.LinuxLauncher ${@} )
 EOF
 install -d -m 755 %{buildroot}%{_bindir}
 install -m 755 %{name} %{buildroot}%{_bindir}/
@@ -63,7 +64,7 @@ install -m 755 %{name} %{buildroot}%{_bindir}/
 %files
 %defattr(-,root,root)
 %doc COPYING README.md linux/BUILD-Linux.md
-%_datadir/%name
+%{instdir}
 %_bindir/%name
 
 %changelog
