@@ -10,7 +10,7 @@
 
   <property name="lcjai-jar" value="products/lcjai.jar"/>
 
-	<exec executable="cat" vmlauncher="false" failonerror="true"
+	<exec executable="cat" vmlauncher="true" failonerror="true"
 	      outputproperty="app-version">
 		<arg value="version.txt"/>
 	</exec>
@@ -33,7 +33,7 @@
 
   <target name="javac">
     <exec executable="make" dir="products" failonerror="true"
-          vmlauncher="false"/>
+          vmlauncher="true"/>
 
     <mkdir dir="extbuild"/>
     <javac srcdir="extsrc" destdir="extbuild" includeantruntime="false"
@@ -53,7 +53,7 @@
 
   <target name="coprocesses">
     <exec executable="make" dir="coprocesses" failonerror="true"
-          vmlauncher="false">
+          vmlauncher="true">
       <arg value="USE_ICC=${USE_ICC}"/>
       <arg value="UNIVERSAL=${UNIVERSAL}"/>
     </exec>
@@ -83,7 +83,7 @@
   </target>
 
   <target name="jni">
-    <exec executable="make" dir="jnisrc" failonerror="true" vmlauncher="false">
+    <exec executable="make" dir="jnisrc" failonerror="true" vmlauncher="true">
       <arg value="USE_ICC=${USE_ICC}"/>
       <arg value="UNIVERSAL=${UNIVERSAL}"/>
     </exec>
