@@ -25,7 +25,7 @@
 	<!--===== Application build ==============================================-->
 
   <condition property="jai-classpath"
-             value="../windows/lib/mlibwrapper_jai.jar">
+             value="../linux/lib/mlibwrapper_jai.jar">
     <not>
       <os family="mac"/>
     </not>
