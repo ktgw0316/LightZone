@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 
-JAVA_HOME=/usr/lib/jvm/java-7-openjdk
+JAVA_HOME=/usr/lib/jvm/default-java
 ANT_OPTIONS=-f linux/build.xml
 
 configure: configure-stamp
