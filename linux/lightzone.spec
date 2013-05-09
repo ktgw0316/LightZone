@@ -13,7 +13,8 @@ Source:		LightZone.tar.gz
 #Patch:
 BuildRequires:	java-1_7_0-openjdk-devel, ant, autoconf, automake, nasm, gcc, gcc-c++, libtool, make, libX11-devel, tidy, git, javahelp2
 Requires:	java >= 1.7.0
-Provides:	lightzone
+Obsoletes:	lightzone < %{version}
+Provides:	lightzone = %{version}
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Packager:	Andreas Rother
 #Prefix:	/opt
