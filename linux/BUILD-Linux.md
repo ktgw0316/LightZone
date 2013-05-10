@@ -14,44 +14,43 @@ Building the LightZone source requires (at least) following packages:
 - __libx11-dev__ for X11/xlib.h
 - __make__
 - __nasm__ 2.07 or later
-- __openjdk-7-jdk__
+- __openjdk-6-jdk__ or later
 - __tidy__
 
-### Ubuntu 12.04.1 LTS (Precise Pangolin)
+### Debian and Ubuntu
+_For Debian (>= squeeze, i386/amd64) and Ubuntu (>= 10.04 lucid). See also [Packaging on Debian or Ubuntu](#packaging_deb) below._
+
 Install required packages:
 
-    sudo apt-get install ant autoconf automake debhelper devscripts g++ gcc git javahelp2 libtool libx11-dev make nasm openjdk-6-jdk tidy
+    sudo apt-get install ant autoconf automake build-essential debhelper devscripts git javahelp2 libtool libx11-dev nasm default-jdk default-jre-headless tidy
 
-Before start the build, you have to set JAVA_HOME environment variable:
+_(Note: gcc, g++, libc6-dev and make shall be installed with the build-essential.)_
 
-    export JAVA_HOME=/usr/lib/jvm/java-7-openjdk
+Before start the build, you have to set JAVA_HOME environment variable, e.g.
 
-#### If you prefer Oracle Java to OpenJDK
-You can use __Oracle Java JRE version 6, 7, or 8__ instead of openjdk-7-jdk.
-Easiest way to setup one of these is, for example:
+    export JAVA_HOME=/usr/lib/jvm/default-java
 
-    sudo add-apt-repository ppa:webupd8team/java
-    sudo apt-get update
-    sudo apt-get install oracle-java7-installer
+### OpenSUSE (>= 12.2)
+Install required packages:
+
+    sudo zypper install ant autoconf automake nasm gcc gcc-c++ libtool make tidy git javahelp2 libX11-devel
 
 Set your JAVA_HOME variable to point to installed JDK, e.g.
 
-    export JAVA_HOME=/usr/lib/jvm/java-7-oracle
-
-### OpenSUSE 12.2
-Install required packages:
-    sudo zypper install gcc gcc-c++ make libX11-devel tidy javahelp2 git
-
-Manually download Apache Ant, unpack it somewhere (e.g. to your home directory) and append it to the path:
-    export PATH=/home/yourusername/apache-ant-1.8.4/bin/:$PATH
-
-Set your JAVA_HOME variable to point to installed JDK, e.g.
     export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-1.7.0
 
 ## Build
 To start the build:
 
     ant -f linux/build.xml
+
+_Note: If the build failed with a message_
+
+    "/usr/share/ant/bin/antRun": java.io.IOException: error=2, No such file or directory
+
+_manually download Apache Ant, unpack it somewhere (e.g. to your home directory) and append it to the path:_
+
+    export PATH=/home/yourusername/apache-ant-1.8.4/bin/:$PATH
 
 ## Test Run
 To check if it works fine before installing:
@@ -78,4 +77,26 @@ For example:
     cd
     tar zxf LightZone.tar.gz
     ./LightZone/LightZone &
+
+## Miscellaneous
+### If you prefer Oracle Java to OpenJDK
+You can use __Oracle Java JRE version 6, 7, or 8__ instead of openjdk-7-jdk.
+
+Easiest way to setup one of these on Ubuntu is, for example:
+
+    sudo add-apt-repository ppa:webupd8team/java
+    sudo apt-get update
+    sudo apt-get install oracle-java7-installer
+
+Set your JAVA_HOME variable to point to installed JDK, e.g.
+
+    export JAVA_HOME=/usr/lib/jvm/java-7-oracle
+
+### <a name="packaging_deb"/>Packaging on Debian or Ubuntu
+    debuild -uc -us
+
+will create lightzone-*.deb package in parent directory,
+To install the package:
+
+    sudo dpkg -i ../lightzone-*.deb
 
