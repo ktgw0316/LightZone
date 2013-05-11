@@ -75,7 +75,10 @@ public final class Version {
             String text =
                 RevisionPattern.matcher( GITInfo ).replaceAll( "$1" );
 			if (text != null)
-				text = text.substring(0,7);
+                if (7 < text.length()) {
+                    text = text.substring(0,7);
+                } else
+                    text = text.substring(0);
             return text;
         }
         catch ( NumberFormatException e ) {
