@@ -70,7 +70,7 @@ public class Functions {
         RenderingHints extenderHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
                                                   BorderExtender.createInstance(BorderExtender.BORDER_COPY));
 
-        Interpolation interp = Interpolation.getInstance(Interpolation.INTERP_BILINEAR);
+        // Interpolation interp = Interpolation.getInstance(Interpolation.INTERP_BILINEAR);
 
         RenderedImage scaleDown;
         if (rescale != 1) {
@@ -91,7 +91,7 @@ public class Functions {
             pb.addSource(blur);
             pb.add(AffineTransform.getScaleInstance(image.getWidth() / (double) blur.getWidth(),
                                                     image.getHeight() / (double) blur.getHeight()));
-            pb.add(interp);
+            // pb.add(interp);
             RenderingHints sourceLayoutHints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT,
                                                                   new ImageLayout(0, 0,
                                                                                   JAIContext.TILE_WIDTH,
