@@ -52,7 +52,7 @@ else
         maxmem=512000
 fi
 
-(cd "%{instdir}" && LD_LIBRARY_PATH="%{instdir}" exec java -Xmx${maxmem}k -Djava.library.path="%{instdir}" -classpath "%{instdir}/*" com.lightcrafts.platform.linux.LinuxLauncher ${@} )
+(cd "%{instdir}" && LD_LIBRARY_PATH="%{instdir}" exec java -Xmx${maxmem}k -Djava.library.path="%{instdir}" -Dfile.encoding=UTF8 -classpath "%{instdir}/*" com.lightcrafts.platform.linux.LinuxLauncher ${@} )
 EOF
 install -d -m 755 %{buildroot}%{_bindir}
 install -m 755 %{name} %{buildroot}%{_bindir}/
