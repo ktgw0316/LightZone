@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=LightZone
+GenericName=Digital Darkroom Software
+Comment=Post-processing software for digital photos
+Exec=/usr/bin/lightzone
+Icon=LightZone
+Type=Application
+Terminal=false
+StartupNotify=false
+Categories=Graphics;2DGraphics;
