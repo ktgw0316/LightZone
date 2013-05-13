@@ -94,19 +94,4 @@ install -m 755 %{name} %{buildroot}%{_bindir}/
 %_bindir/%name
 
 %changelog
-* Mon Mar 18 2013 Andreas Rother <andreas@rother.org>
-- updated source from https://github.com/Aries85/LightZone/
-- minor changes in lightzone startscript
-* Sun Feb 10 2013 Andreas Rother <andreas@rother.org>
-- changed license to GPLv2+ due to dcraw.c
-- added changes from Pavel Benak:
-+ added -H option to cp to follow symbolic links. This allows simpler 
-  copying from product directory. There were four JARs missing.
-+ script now runs LightZone from /usr/share/lightzone directory, because 
-  the native launcher invokes command "./LightZone-forkd". This may be 
-  working if moved to bin, might be worth trying.
-+ added LD_LIBRARY_PATH to fix problems with native libraries loading
-+ removed ant dependency, in OpenSUSE it seems to have weird build results
 
-* Sat Feb 09 2013 Andreas Rother <andreas@rother.org>
-- initial version with Lightzone 3.9.1 and OpenJDK 1.7.0
