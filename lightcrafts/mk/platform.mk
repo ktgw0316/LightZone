@@ -67,7 +67,7 @@ ifeq ($(PLATFORM),MacOSX)
   else
     PLATFORM_CFLAGS+=	-m32
   endif
-  SDKROOT:=		/Developer/SDKs/MacOSX10.5.sdk
+  SDKROOT:=		$(shell xcodebuild -version -sdk | sed -n '/^Path\:/p' | sed 's/^Path\: //' | sort | tail -1)
   ifndef EXECUTABLE
     PLATFORM_CFLAGS+=	-fPIC
   endif
@@ -168,10 +168,9 @@ ifeq ($(PLATFORM),MacOSX)
   ##
   # Note that JAVA_INCLUDES is treated as relative to SDKROOT.
   ##
-  JAVA_VERSION:=	1.5
-  JAVA_HOME=		/System/Library/Frameworks/JavaVM.framework/Versions/$(JAVA_VERSION)/Home
-  JAVA_INCLUDES=	-I$(JAVA_HOME)/include
-  JAVA_LDFLAGS=		-L$(JAVA_HOME)/lib
+  JAVA_HOME=		/Library/Java/Home
+  JAVA_INCLUDES=	-I/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers
+  JAVA_LDFLAGS=		-L/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Libraries
   JNILIB_PREFIX:=	lib
   JNILIB_EXT:=		.jnilib
   DYLIB_PREFIX:=	$(JNILIB_PREFIX)
