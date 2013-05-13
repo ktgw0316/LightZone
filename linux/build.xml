@@ -9,7 +9,7 @@
   <!-- The default maxmemory for the run* targets. -->
   <property name="maxmemory" value="256m"/>
 
-  <exec executable="cat" vmlauncher="false" failonerror="true"
+  <exec executable="cat" vmlauncher="true" failonerror="true"
         outputproperty="app-version">
     <arg value="${common-dir}/version.txt"/>
   </exec>
@@ -19,12 +19,13 @@
   <target name="common">
     <ant dir="${common-dir}" target="jar"/>
     <exec executable="make" dir="products" failonerror="true"
-          vmlauncher="false"/>
+          vmlauncher="true"/>
   </target>
 
   <target name="javac" depends="common">
     <mkdir dir="build"/>
-    <javac destdir="build" includeantruntime="false" source="1.5" debug="true">
+    <javac destdir="build" includeantruntime="false"
+           source="1.6" target="1.6" debug="true">
       <src path="src"/>
       <classpath>
         <fileset dir="${common-dir}/products">
@@ -38,7 +39,7 @@
   </target>
 
   <target name="jni">
-    <exec executable="make" dir="jnisrc" failonerror="true" vmlauncher="false"/>
+    <exec executable="make" dir="jnisrc" failonerror="true" vmlauncher="true"/>
   </target>
 
   <target name="locales">
@@ -100,7 +101,7 @@
 
   <target name="labelled-archive" depends="archive">
     <exec executable="${common-dir}/tools/bin/lc-git-revision"
-          outputproperty="git-revision" vmlauncher="false" failonerror="true"/>
+          outputproperty="git-revision" vmlauncher="true" failonerror="true"/>
 
     <!-- CruiseControl puts its build label in the "label" property -->
     <mkdir dir="archive"/>

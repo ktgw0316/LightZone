@@ -1,3 +1,16 @@
+lightzone (3.9.1-0obs20130511) raring; urgency=low
+
+  * Upstream sync.
+
+ -- Masahiro Kitagawa <arctica0316@gmail.com>  Sat, 11 May 2013 16:43:21 +0900
+
+lightzone (3.9.1-0ppa6) raring; urgency=low
+
+  * Updated version: 3.9.1
+  * Added debian/patch/mlibwrapper.dpatch
+
+ -- Masahiro Kitagawa <arctica0316@gmail.com>  Tue, 30 Apr 2013 17:43:02 +0900
+
 lightzone (3.9.0) unstable; urgency=low
 
   * Initial release.
