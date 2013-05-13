@@ -13,9 +13,22 @@ ifndef JAVA_HOME
 endif
 
 PROCESSOR:=		$(shell uname -m)
+ifeq ($(PROCESSOR),i486)
+  PROCESSOR:=		i386
+endif
+ifeq ($(PROCESSOR),i586)
+  PROCESSOR:=		i386
+endif
+ifeq ($(PROCESSOR),i686)
+  PROCESSOR:=		i386
+endif
 ifeq ($(PROCESSOR),amd64)
   PROCESSOR:=		x86_64
 endif
+ifeq ($(PROCESSOR),"Power Macintosh")
+  PROCESSOR:=		powerpc
+endif
+
 TOOLS_BIN:=		$(abspath $(ROOT)/lightcrafts/tools/bin)
 
 # Default to a normal (Unix) classpath seperator.
@@ -49,17 +62,16 @@ RM:=			rm -fr
 ifeq ($(PLATFORM),MacOSX)
   CC:=			gcc-4.0
   CXX:=			g++-4.0
-  PLATFORM_CFLAGS+=	-m64
+  ifeq ($(PROCESSOR),x86_64)
+    PLATFORM_CFLAGS+=	-m64
+  else
+    PLATFORM_CFLAGS+=	-m32
+  endif
   SDKROOT:=		/Developer/SDKs/MacOSX10.5.sdk
   ifndef EXECUTABLE
     PLATFORM_CFLAGS+=	-fPIC
   endif
   ALTIVEC_CFLAGS:=	-DLC_USE_ALTIVEC
-
-  # force 64-bit for modern JVMs in OSX 10.6+
-  ifeq ($(PROCESSOR),i386)
-    PROCESSOR:=	x86_64
-  endif
 
   ifdef USE_ICC_HERE
     ICC_ROOT:=		/opt/intel/Compiler/11.1/067
@@ -83,7 +95,11 @@ ifeq ($(PLATFORM),MacOSX)
   # performance CFLAGS go in the FAST_CFLAGS_* variables below.
   ##
   MACOSX_CFLAGS_PPC:=	-mcpu=G4 -mtune=G5
-  MACOSX_CFLAGS_X86:=	-march=athlon64
+  ifeq ($(PROCESSOR),x86_64)
+    MACOSX_CFLAGS_X86:=	-march=athlon64
+  else
+    MACOSX_CFLAGS_X86:=	-march=pentium4
+  endif
 
   ifdef HIGH_PERFORMANCE
     ##
@@ -98,7 +114,7 @@ ifeq ($(PLATFORM),MacOSX)
 	AR_X86:=	$(XIAR)
         CXX_X86:=	$(ICC)
       else
-        ifeq ($(PROCESSOR),x86_64)
+        ifneq ($(PROCESSOR),powerpc)
 	  AR:=		$(XIAR)
           CC:=		$(ICC)
           CXX:=		$(ICC)
@@ -118,12 +134,11 @@ ifeq ($(PLATFORM),MacOSX)
 
   ifeq ($(UNIVERSAL),1)
     PLATFORM_CFLAGS_PPC:= $(PLATFORM_CFLAGS) -arch ppc7400 $(MACOSX_CFLAGS_PPC)
-    PLATFORM_CFLAGS_X86:= $(PLATFORM_CFLAGS) -arch x86_64 $(MACOSX_CFLAGS_X86)
+    PLATFORM_CFLAGS_X86:= $(PLATFORM_CFLAGS) -arch i386 $(MACOSX_CFLAGS_X86)
 
     ifeq ($(PROCESSOR),powerpc)
-      OTHER_PROCESSOR:=	x86_64
-    endif
-    ifeq ($(PROCESSOR),x86_64)
+      OTHER_PROCESSOR:=	i386
+    else
       OTHER_PROCESSOR:=	powerpc
     endif
     DARWIN_RELEASE:=	$(shell uname -r)
@@ -140,8 +155,7 @@ ifeq ($(PLATFORM),MacOSX)
     ifeq ($(PROCESSOR),powerpc)
       PLATFORM_CFLAGS+=	$(MACOSX_CFLAGS_PPC)
       PLATFORM_CFLAGS_PPC:= $(PLATFORM_CFLAGS)
-    endif
-    ifeq ($(PROCESSOR),x86_64)
+    else
       PLATFORM_CFLAGS+=	$(MACOSX_CFLAGS_X86)
       PLATFORM_CFLAGS_X86:= $(PLATFORM_CFLAGS)
     endif
