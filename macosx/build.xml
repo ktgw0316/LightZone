@@ -189,10 +189,6 @@
     <chmod file="${bundle-resources}/Java/dcraw" perm="775"/>
     <chmod file="${bundle-resources}/Java/LightZone-forkd" perm="775"/>
 
-    <copy file="helpers/eSellerateActivator/eSellerateActivate"
-          todir="${bundle-resources}/Java"/>
-    <chmod file="${bundle-resources}/Java/eSellerateActivate" perm="775"/>
-
     <exec executable="make" dir="help" failonerror="true" vmlauncher="false">
       <arg value="APP_NAME=${app-name}"/>
     </exec>
@@ -204,30 +200,9 @@
            perm="775"/>
   </target>
 
-  <target name="bundle-esd">
-    <antcall target="build-bundle">
-      <param name="licensetype" value="ESD"/>
-    </antcall>
-  </target>
-
-  <target name="bundle-tb">
-    <antcall target="build-bundle">
-      <param name="licensetype" value="TB"/>
-    </antcall>
-  </target>
-
   <!--===== Make a dmg file ================================================-->
 
-  <target name="dmg-esd" depends="bundle-esd">
-    <exec executable="make" dir="dmg" failonerror="true" vmlauncher="false">
-      <arg value="APP_NAME=${app-name}"/>
-      <arg value="USE_ICC=${USE_ICC}"/>
-      <arg value="UNIVERSAL=${UNIVERSAL}"/>
-      <arg value="user"/>
-    </exec>
-  </target>
-
-  <target name="dmg-tb" depends="bundle-tb">
+  <target name="dmg" depends="build-bundle">
     <exec executable="make" dir="dmg" failonerror="true" vmlauncher="false">
       <arg value="APP_NAME=${app-name}"/>
       <arg value="USE_ICC=${USE_ICC}"/>
@@ -249,13 +224,9 @@
 
     <mkdir dir="dmg/cruisecontrol"/>
 
-    <antcall target="dmg-esd"/>
+    <antcall target="dmg"/>
     <move file="dmg/${app-name}.dmg"
-          tofile="${cc-dir}/${app-name}-${git-branch}-r${git-revision}-ESD.dmg"/>
-
-    <antcall target="dmg-tb"/>
-    <move file="dmg/${app-name}.dmg"
-          tofile="${cc-dir}/${app-name}-${git-branch}-r${git-revision}-TB.dmg"/>
+          tofile="${cc-dir}/${app-name}-${git-branch}-r${git-revision}.dmg"/>
   </target>
 
   <target name="cc-clean">
@@ -264,7 +235,7 @@
 
   <!--===== Make a zip file ================================================-->
 
-  <target name="zip" depends="bundle-esd">
+  <target name="zip" depends="build-bundle">
     <delete file="${app-dir}/${app-name}.zip"/>
     <zip destfile="${app-dir}/${app-name}.zip">
       <zipfileset dir="${app-dir}"
