@@ -10,7 +10,7 @@ import java.util.*;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.*;
 
-import ch.randelshofer.quaqua.panther.filechooser.PantherFileSystemView;
+import ch.randelshofer.quaqua.panther.filechooser.OSXPantherFileSystemView;
 import ch.randelshofer.quaqua.QuaquaLookAndFeel;
 
 import com.lightcrafts.platform.*;
@@ -83,7 +83,7 @@ public final class MacOSXPlatform extends Platform {
     }
 
     public FileSystemView getFileSystemView() {
-        return PantherFileSystemView.getQuaquaFileSystemView();
+        return OSXPantherFileSystemView.getQuaquaFileSystemView();
     }
 
     public File getLightZoneDocumentsDirectory() {
