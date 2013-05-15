@@ -67,7 +67,7 @@ ifeq ($(PLATFORM),MacOSX)
   else
     PLATFORM_CFLAGS+=	-m32
   endif
-  SDKROOT:=		$(shell xcodebuild -version -sdk | sed -n '/^Path\:/p' | sed 's/^Path\: //' | sort | tail -1)
+  SDKROOT:=		$(shell xcodebuild -version -sdk macosx${MACOSX_DEPLOYMENT_TARGET}| sed -n '/^Path\:/p' | sed 's/^Path\: //')
   ifndef EXECUTABLE
     PLATFORM_CFLAGS+=	-fPIC
   endif
