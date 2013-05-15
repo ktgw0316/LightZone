@@ -60,8 +60,6 @@ RM:=			rm -fr
 # Mac OS X
 ##
 ifeq ($(PLATFORM),MacOSX)
-  CC:=			gcc-4.0
-  CXX:=			g++-4.0
   ifeq ($(PROCESSOR),x86_64)
     PLATFORM_CFLAGS+=	-m64
   else
