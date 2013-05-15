@@ -124,7 +124,7 @@ ifeq ($(PLATFORM),MacOSX)
       FAST_CFLAGS_X86:=	-O3 \
 			-fno-trapping-math \
 			-fomit-frame-pointer \
-			-msse2 -mfpmath=sse,387
+			-msse2 -mfpmath=sse
     endif
     MACOSX_CFLAGS_PPC+=	$(FAST_CFLAGS_PPC)
     MACOSX_CFLAGS_X86+=	$(FAST_CFLAGS_X86)
@@ -256,13 +256,16 @@ endif
 ##
 ifeq ($(PLATFORM),Linux)
   ifeq ($(PROCESSOR),x86_64)
-    PLATFORM_CFLAGS+=	-march=athlon64 -mtune=generic $(SSE_FLAGS_ON) -fpermissive -fPIC
+    PLATFORM_CFLAGS+=	-march=athlon64 -mtune=generic $(SSE_FLAGS_ON) -fPIC
   else
-    PLATFORM_CFLAGS+=	-march=pentium3 -mtune=pentium4 $(SSE_FLAGS_ON) -fpermissive
+    PLATFORM_CFLAGS+=	-march=pentium3 -mtune=pentium4 $(SSE_FLAGS_ON) -fPIC
   endif
 
   ifdef HIGH_PERFORMANCE
-    PLATFORM_CFLAGS+=	-O3
+    PLATFORM_CFLAGS+=	-O3 \
+			-fno-trapping-math \
+			-fomit-frame-pointer \
+			-msse2 -mfpmath=sse
   else
     PLATFORM_CFLAGS+=	-Os
   endif
