@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 
-JAVA_HOME=/usr/lib/jvm/java-7-openjdk
+JAVA_HOME=/usr/lib/jvm/default-java
 ANT_OPTIONS=-f linux/build.xml
 
 configure: configure-stamp
@@ -9,17 +9,11 @@ configure-stamp:
 	touch configure-stamp
 
 build: build-stamp
+build-arch: build-stamp
 build-stamp: configure-stamp
 	dh_testdir
 	JAVA_HOME=$(JAVA_HOME) ant $(ANT_OPTIONS) jar
 	touch $@
-
-clean:
-	dh_testdir
-	dh_testroot
-	rm -f build-stamp configure-stamp
-	-JAVA_HOME=$(JAVA_HOME) ant $(ANT_OPTIONS) clean
-	dh_clean 
 
 install: build
 	dh_testdir
@@ -33,15 +27,13 @@ install: build
 	install -m 644 $(CURDIR)/linux/products/*.so $(CURDIR)/debian/lightzone/opt/lightzone/
 
 binary-arch: build install
-
-binary-indep: build install
 	dh_testdir
 	dh_testroot
-	dh_installdocs
-	dh_installexamples
+#	dh_installdocs
+#	dh_installexamples
 	dh_install
 	dh_installmenu
-	dh_installman
+#	dh_installman
 	dh_link
 	dh_compress
 	dh_fixperms
@@ -50,6 +42,6 @@ binary-indep: build install
 	dh_md5sums
 	dh_builddeb
 
-binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install configure
+binary: binary-arch
+.PHONY: build-arch build clean binary-arch binary install configure
 

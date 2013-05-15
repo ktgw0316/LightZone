@@ -12,4 +12,4 @@ else
         maxmem=512000
 fi
 
-(cd "/opt/lightzone" && LD_LIBRARY_PATH="/opt/lightzone" exec java -Xmx${maxmem}k -Djava.library.path="/opt/lightzone" -Dfile.encoding=utf-8 -classpath "/opt/lightzone/*" com.lightcrafts.platform.linux.LinuxLauncher ${@} )
+(cd "/opt/lightzone" && LD_LIBRARY_PATH="/opt/lightzone" exec java -Xmx${maxmem}k -Djava.library.path="/opt/lightzone" -Dfile.encoding=UTF8 -classpath "/opt/lightzone/*" com.lightcrafts.platform.linux.LinuxLauncher ${@} )

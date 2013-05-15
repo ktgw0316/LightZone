@@ -25,9 +25,6 @@ public class ExceptionDialog extends JOptionPane {
     private final static String ContinueMessage = LOCALE.get("CrashContinueMessage");
     private final static String ExitMessage = LOCALE.get("CrashExitMessage");
 
-    private final static String SendMessage = LOCALE.get("CrashSendMessage");
-    private final static String SendHelp = LOCALE.get("CrashSendHelp");
-
     private static boolean isDisplayed; // Prevent more than one dialog at once
 
     private JTextArea message;
@@ -39,8 +36,6 @@ public class ExceptionDialog extends JOptionPane {
     private JRadioButton saveButton;
     private JRadioButton contButton;
     private JRadioButton exitButton;
-
-    private JCheckBox sendBox;
 
     public ExceptionDialog() {
 
@@ -76,18 +71,11 @@ public class ExceptionDialog extends JOptionPane {
         group.add(contButton);
         group.add(exitButton);
 
-        sendBox = new JCheckBox(SendMessage);
-        sendBox.setSelected(true);
-
-        JTextArea sendHelp = TextAreaFactory.createTextArea(SendHelp, 30);
-        sendHelp.setBackground((new JPanel()).getBackground());
-
         Box buttonBox = Box.createHorizontalBox();
         Box buttonSubBox = Box.createVerticalBox();
         buttonSubBox.add(saveButton);
         buttonSubBox.add(contButton);
         buttonSubBox.add(exitButton);
-        buttonSubBox.add(sendBox);
         buttonBox.add(buttonSubBox);
         buttonBox.add(Box.createHorizontalGlue());
 
@@ -96,7 +84,6 @@ public class ExceptionDialog extends JOptionPane {
         box.add(Box.createVerticalStrut(12));
         box.add(buttonBox);
         box.add(Box.createVerticalStrut(12));
-        box.add(sendHelp);
         box.add(Box.createVerticalStrut(12));
 
         setMessage(box);
@@ -171,18 +158,6 @@ public class ExceptionDialog extends JOptionPane {
         isDisplayed = false;
         detailsButton.removeActionListener(detailsAction);
 
-        if (sendBox.isSelected()) {
-            Object monitor = new Object();
-            ErrorLogger.logError(t, monitor);
-            try {
-                // Give the ErrorLogger a few seconds to do its job:
-                synchronized (monitor) {
-                    monitor.wait(5000);
-                }
-            } catch (InterruptedException e) {
-                // No meaning, do nothing
-            }
-        }
         if (saveButton.isSelected()) {
             // Ignore errors during the saveAll and quit:
             try {

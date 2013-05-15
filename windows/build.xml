@@ -33,7 +33,7 @@
 
   <target name="javac" depends="common">
     <mkdir dir="build"/>
-    <javac destdir="build">
+    <javac destdir="build" source="1.6" target="1.6" debug="true">
       <src path="src"/>
       <classpath>
         <fileset dir="${common-dir}/products">
@@ -101,7 +101,7 @@
       <sysproperty key="com.lightcrafts.zorn" value="true"/>
       <sysproperty key="lightcrafts.debug" value="1"/>
       <sysproperty key="IDE" value="1"/>
-      <sysproperty key="file.encoding" value="UTF-8"/>
+      <sysproperty key="file.encoding" value="UTF8"/>
     </java>
   </target>
 
