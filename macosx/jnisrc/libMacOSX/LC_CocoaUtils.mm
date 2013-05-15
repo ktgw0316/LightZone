@@ -41,19 +41,21 @@ NSWindow* LC_getNSWindowFromAWTComponent( JNIEnv *env, jobject awtComponent ) {
     if ( lock & JAWT_LOCK_ERROR )
         goto error_1;
 
-    JAWT_DrawingSurfaceInfo *const dsi = ds->GetDrawingSurfaceInfo( ds );
-    if ( !dsi )
-        goto error_2;
+    {
+        JAWT_DrawingSurfaceInfo *const dsi = ds->GetDrawingSurfaceInfo( ds );
+        if ( !dsi )
+            goto error_2;
 
-    { // local scope
-        JAWT_MacOSXDrawingSurfaceInfo const *const dsiMac =
-            static_cast<JAWT_MacOSXDrawingSurfaceInfo const*>(
-                dsi->platformInfo
-            );
-        nsWindow = [dsiMac->cocoaViewRef window];
+        { // local scope
+            JAWT_MacOSXDrawingSurfaceInfo const *const dsiMac =
+                static_cast<JAWT_MacOSXDrawingSurfaceInfo const*>(
+                        dsi->platformInfo
+                        );
+            nsWindow = [dsiMac->cocoaViewRef window];
+        }
+
+        ds->FreeDrawingSurfaceInfo( dsi );
     }
-
-    ds->FreeDrawingSurfaceInfo( dsi );
 error_2:
     ds->Unlock( ds );
 error_1:
