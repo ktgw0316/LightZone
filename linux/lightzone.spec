@@ -74,12 +74,12 @@ install -dm 0755 "%buildroot/%icondir/32x32/apps"
 install -dm 0755 "%buildroot/%icondir/16x16/apps"
 
 cp -rpH linux/products/lightzone.desktop "%buildroot/usr/share/applications/"
-cp -rpH linux/products/LightZone_256x256.png "%buildroot/%icondir/256x256/apps/LightZone.png"
-cp -rpH linux/products/LightZone_128x128.png "%buildroot/%icondir/128x128/apps/LightZone.png"
-cp -rpH linux/products/LightZone_64x64.png "%buildroot/%icondir/64x64/apps/LightZone.png"
-cp -rpH linux/products/LightZone_48x48.png "%buildroot/%icondir/48x48/apps/LightZone.png"
-cp -rpH linux/products/LightZone_32x32.png "%buildroot/%icondir/32x32/apps/LightZone.png"
-cp -rpH linux/products/LightZone_16x16.png "%buildroot/%icondir/16x16/apps/LightZone.png"
+cp -rpH linux/icons/LightZone_256x256.png "%buildroot/%icondir/256x256/apps/LightZone.png"
+cp -rpH linux/icons/LightZone_128x128.png "%buildroot/%icondir/128x128/apps/LightZone.png"
+cp -rpH linux/icons/LightZone_64x64.png "%buildroot/%icondir/64x64/apps/LightZone.png"
+cp -rpH linux/icons/LightZone_48x48.png "%buildroot/%icondir/48x48/apps/LightZone.png"
+cp -rpH linux/icons/LightZone_32x32.png "%buildroot/%icondir/32x32/apps/LightZone.png"
+cp -rpH linux/icons/LightZone_16x16.png "%buildroot/%icondir/16x16/apps/LightZone.png"
 
 install -d -m 755 %{buildroot}%{_bindir}
 install -m 755 linux/products/%{name} %{buildroot}%{_bindir}/
