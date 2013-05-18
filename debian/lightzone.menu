@@ -1,5 +1,0 @@
-?package(lightzone):needs="X11" section="Applications/Graphics"\
-  title="LightZone" command="/usr/bin/lightzone"\
-  genericname="Digital Darkroom Software"\
-  comment="Post-processing software for digital photos"\
-  icon="LightZone"
