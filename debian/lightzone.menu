@@ -1,3 +1,5 @@
-?package(omegat):needs="X11" section="Applications/Graphics"\
+?package(lightzone):needs="X11" section="Applications/Graphics"\
   title="LightZone" command="/usr/bin/lightzone"\
-  icon="/usr/share/lightzone/images/LightZone_32.xpm"
+  genericname="Digital Darkroom Software"\
+  comment="Post-processing software for digital photos"\
+  icon="LightZone"

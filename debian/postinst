@@ -2,3 +2,7 @@
 chmod +x /usr/bin/lightzone
 chmod +x /opt/lightzone/LightZone-forkd
 chmod +x /opt/lightzone/dcraw
+
+if [ -x "`which update-menus 2>/dev/null`" ]; then
+	update-menus
+fi
