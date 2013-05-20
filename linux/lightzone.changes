@@ -1,17 +1,37 @@
 -------------------------------------------------------------------
-Sat May 11 2013 - arctica0316@gmail.com
+Mon May 20 2013 - KITAGAW Masahiro <arctica0316@gmail.com>
+
+- Fixed rpmlint warnings
+
+-------------------------------------------------------------------
+Sat May 11 2013 - KITAGAW Masahiro <arctica0316@gmail.com>
 
 - Changes for openSuse Build Service cross platform build
 - Divided changelog section from .spec into .changes
 
 -------------------------------------------------------------------
-Mon Mar 18 2013 - andreas@rother.org
+Wed May 08 2013 - Andreas Rother <andreas@rother.org>
+
+- added menu entry and icons
+
+-------------------------------------------------------------------
+Sun May 05 2013 - Andreas Rother <andreas@rother.org>
+
+- changes prefix to /opt/lightzone
+
+-------------------------------------------------------------------
+Sat May 04 2013 - Andreas Rother <andreas@rother.org>
+
+- changes in lightzone startscript
+
+-------------------------------------------------------------------
+Mon Mar 18 2013 - Andreas Rother <andreas@rother.org>
 
 - updated source from https://github.com/Aries85/LightZone/
 - minor changes in lightzone startscript
 
 -------------------------------------------------------------------
-Sun Feb 10 2013 - andreas@rother.org
+Sun Feb 10 2013 - Andreas Rother <andreas@rother.org>
 
 - changed license to GPLv2+ due to dcraw.c
 - added changes from Pavel Benak:
@@ -24,7 +44,7 @@ Sun Feb 10 2013 - andreas@rother.org
   + removed ant dependency, in OpenSUSE it seems to have weird build results
 
 -------------------------------------------------------------------
-Sat Feb 09 2013 - andreas@rother.org
+Sat Feb 09 2013 - Andreas Rother <andreas@rother.org>
 
 - initial version with Lightzone 3.9.1 and OpenJDK 1.7.0
 
