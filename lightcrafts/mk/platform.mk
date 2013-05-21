@@ -65,7 +65,8 @@ ifeq ($(PLATFORM),MacOSX)
   else
     PLATFORM_CFLAGS+=	-m32
   endif
-  SDKROOT:=		$(shell xcodebuild -version -sdk macosx${MACOSX_DEPLOYMENT_TARGET}| sed -n '/^Path\:/p' | sed 's/^Path\: //')
+  MACOSX_DEPLOYMENT_TARGET:= 	$(shell sw_vers -productVersion | cut -d. -f-2)
+  SDKROOT:=		$(shell xcodebuild -version -sdk macosx${MACOSX_DEPLOYMENT_TARGET} | sed -n '/^Path:/p' | sed 's/^Path: //')
   ifndef EXECUTABLE
     PLATFORM_CFLAGS+=	-fPIC
   endif
@@ -160,8 +161,6 @@ ifeq ($(PLATFORM),MacOSX)
   endif
 
   LIPO:=		lipo
-
-  export MACOSX_DEPLOYMENT_TARGET:= 	10.4
 
   ##
   # Note that JAVA_INCLUDES is treated as relative to SDKROOT.
