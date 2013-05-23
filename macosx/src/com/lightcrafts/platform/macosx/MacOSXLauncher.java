@@ -39,7 +39,7 @@ public final class MacOSXLauncher {
      * @param args The command line arguments.
      */
     public static void main( final String[] args ) {
-        java.util.Locale.setDefault( java.util.Locale.ENGLISH );
+        // java.util.Locale.setDefault( java.util.Locale.ENGLISH );
         // System.setProperty("apple.awt.graphics.UseQuartz", "false");
 
         System.out.println(
