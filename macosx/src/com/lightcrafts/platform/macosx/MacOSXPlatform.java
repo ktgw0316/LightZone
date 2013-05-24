@@ -102,7 +102,7 @@ public final class MacOSXPlatform extends Platform {
             QuaquaLookAndFeel quaqua = new QuaquaLookAndFeel();
 
             UIDefaults quaquaDefaults = quaqua.getDefaults();
-            Set quaquaKeys = new HashSet(quaquaDefaults.keySet());
+            Set quaquaKeys = quaquaDefaults.keySet();
 
             String[] fromQuaqua = new String[] {
                     "FileChooser",
@@ -115,7 +115,7 @@ public final class MacOSXPlatform extends Platform {
 
             for (Object key : quaquaKeys) {
                 for (String qk : fromQuaqua)
-                    if (((String) key).startsWith(qk)) {
+                    if (key instanceof String && ((String) key).startsWith(qk)) {
                         Object value = quaquaDefaults.get(key);
                         UIManager.put(key, value);
                         break;
