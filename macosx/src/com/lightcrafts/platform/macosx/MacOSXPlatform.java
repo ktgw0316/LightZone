@@ -102,7 +102,7 @@ public final class MacOSXPlatform extends Platform {
             QuaquaLookAndFeel quaqua = new QuaquaLookAndFeel();
 
             UIDefaults quaquaDefaults = quaqua.getDefaults();
-            Set quaquaKeys = quaquaDefaults.keySet();
+            Object[] quaquaKeys = quaquaDefaults.keySet().toArray();
 
             String[] fromQuaqua = new String[] {
                     "FileChooser",
