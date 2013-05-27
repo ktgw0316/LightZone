@@ -92,7 +92,8 @@ JNIEXPORT jstring JNICALL MacOSXFileUtil_METHOD(resolveAlias)
         goto error;
 
     Boolean isAlias, isFolder;
-    OSErr err = FSResolveAliasFileWithMountFlags(
+    OSErr err;
+        err = FSResolveAliasFileWithMountFlags(
         &fsRef, true /* resolveAliasChains */, &isFolder, &isAlias,
         kResolveAliasFileNoUI
     );

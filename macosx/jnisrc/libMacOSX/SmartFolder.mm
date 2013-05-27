@@ -53,24 +53,26 @@ JNIEXPORT jobjectArray JNICALL MacOSXSmartFolder_METHOD(smartQuery)
     if ( !queryRan )
         goto done;
 
-    CFIndex const resultCount = MDQueryGetResultCount( queryRef );
-    jclass const jString_class = LC_findClassOrDie( env, "java/lang/String" );
-    results = env->NewObjectArray( resultCount, jString_class, NULL );
-    if ( !results )
-        goto done;
+    {
+        CFIndex const resultCount = MDQueryGetResultCount( queryRef );
+        jclass const jString_class = LC_findClassOrDie( env, "java/lang/String" );
+        results = env->NewObjectArray( resultCount, jString_class, NULL );
+        if ( !results )
+            goto done;
 
-    int resultIndex;
-    resultIndex = 0;
-    for ( CFIndex i = 0; i < resultCount; ++i ) {
-        MDItemRef itemRef = (MDItemRef)MDQueryGetResultAtIndex( queryRef, i );
-        CFStringRef pathRef =
-            (CFStringRef)MDItemCopyAttribute( itemRef, kMDItemPath );
-        if ( pathRef ) {
-            auto_jstring jPath( env,
-                LC_NSStringTojstring( env, (NSString*)pathRef )
-            );
-            env->SetObjectArrayElement( results, resultIndex++, jPath );
-            CFRelease( pathRef );
+        int resultIndex;
+        resultIndex = 0;
+        for ( CFIndex i = 0; i < resultCount; ++i ) {
+            MDItemRef itemRef = (MDItemRef)MDQueryGetResultAtIndex( queryRef, i );
+            CFStringRef pathRef =
+                (CFStringRef)MDItemCopyAttribute( itemRef, kMDItemPath );
+            if ( pathRef ) {
+                auto_jstring jPath( env,
+                        LC_NSStringTojstring( env, (NSString*)pathRef )
+                        );
+                env->SetObjectArrayElement( results, resultIndex++, jPath );
+                CFRelease( pathRef );
+            }
         }
     }
 
