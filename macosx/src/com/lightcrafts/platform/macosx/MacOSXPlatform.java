@@ -10,7 +10,7 @@ import java.util.*;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.*;
 
-import ch.randelshofer.quaqua.panther.filechooser.PantherFileSystemView;
+import ch.randelshofer.quaqua.filechooser.QuaquaFileSystemView;
 import ch.randelshofer.quaqua.QuaquaLookAndFeel;
 
 import com.lightcrafts.platform.*;
@@ -83,7 +83,7 @@ public final class MacOSXPlatform extends Platform {
     }
 
     public FileSystemView getFileSystemView() {
-        return PantherFileSystemView.getQuaquaFileSystemView();
+        return QuaquaFileSystemView.getQuaquaFileSystemView();
     }
 
     public File getLightZoneDocumentsDirectory() {
@@ -102,7 +102,7 @@ public final class MacOSXPlatform extends Platform {
             QuaquaLookAndFeel quaqua = new QuaquaLookAndFeel();
 
             UIDefaults quaquaDefaults = quaqua.getDefaults();
-            Set quaquaKeys = new TreeSet(quaquaDefaults.keySet());
+            Object[] quaquaKeys = quaquaDefaults.keySet().toArray();
 
             String[] fromQuaqua = new String[] {
                     "FileChooser",
@@ -115,7 +115,7 @@ public final class MacOSXPlatform extends Platform {
 
             for (Object key : quaquaKeys) {
                 for (String qk : fromQuaqua)
-                    if (((String) key).startsWith(qk)) {
+                    if (key instanceof String && ((String) key).startsWith(qk)) {
                         Object value = quaquaDefaults.get(key);
                         UIManager.put(key, value);
                         break;
