@@ -381,10 +381,10 @@ public class Rendering implements Cloneable {
                 while(scale <= 1/(double) MIP_SCALE_RATIO) {
                     scale *= MIP_SCALE_RATIO;
                     level++;
-                    transform = new AffineTransform(transform);
-                    transform.concatenate(AffineTransform.getScaleInstance(MIP_SCALE_RATIO, MIP_SCALE_RATIO));
                 }
                 image = (PlanarImage) pyramid.getImage(level);
+                transform.concatenate(AffineTransform.getScaleInstance(sourceImage.getWidth() / (double)image.getWidth(),
+                                                                       sourceImage.getHeight() / (double)image.getHeight()));
             }
 
             if (!transform.isIdentity()) {
