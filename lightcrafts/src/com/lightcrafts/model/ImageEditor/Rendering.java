@@ -406,8 +406,8 @@ public class Rendering implements Cloneable {
             Rectangle bounds = new Rectangle(xformedSourceImage.getMinX(), xformedSourceImage.getMinY(),
                                              xformedSourceImage.getWidth(), xformedSourceImage.getHeight());
             Rectangle finalBounds = bounds.intersection(new Rectangle(0, 0,
-                                                                      (int) actualCropBounds.getWidth(),
-                                                                      (int) actualCropBounds.getHeight()));
+                                                                      (int) Math.round(actualCropBounds.getWidth()),
+                                                                      (int) Math.round(actualCropBounds.getHeight())));
             if (finalBounds.width > 0 && finalBounds.height > 0)
                 xformedSourceImage = Functions.crop(xformedSourceImage,
                                                     finalBounds.x, finalBounds.y,
