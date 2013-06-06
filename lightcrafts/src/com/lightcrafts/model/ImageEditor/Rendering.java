@@ -374,7 +374,7 @@ public class Rendering implements Cloneable {
 
             double dx = one.getX() - zero.getX();
             double dy = one.getY() - zero.getY();
-            double scale = Math.sqrt(dx*dx + dy*dy)/Math.sqrt(2.0);
+            double scale = Math.sqrt((dx*dx + dy*dy) / 2.0);
 
             if (!cheapScale && scale <= 0.5) {
                 int level = 0;
