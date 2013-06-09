@@ -1,3 +1,9 @@
+lightzone (4.0.0-0obs20130609) raring; urgency=low
+
+  * Upstream sync.
+
+ -- Pavel Benak <pavel.benak@gmail.com>  Sun, 9 Jun 2013 16:32:21 +0100
+
 lightzone (3.9.1-0obs20130511) raring; urgency=low
 
   * Upstream sync.
