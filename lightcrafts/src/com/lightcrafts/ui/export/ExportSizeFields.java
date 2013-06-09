@@ -43,7 +43,10 @@ class ExportSizeFields {
         xText = createTextField(x);
         yText = createTextField(y);
 
-        ratio = x / (double) y;
+	int width = fileOptions.originalWidth.getValue();
+	int height = fileOptions.originalHeight.getValue();
+
+        ratio = width / (double) height;
 
         // Push valid text updates into the export options:
         new ExportUpdater(widthOption, xText);

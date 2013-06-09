@@ -374,17 +374,17 @@ public class Rendering implements Cloneable {
 
             double dx = one.getX() - zero.getX();
             double dy = one.getY() - zero.getY();
-            double scale = Math.sqrt(dx*dx + dy*dy)/Math.sqrt(2.0);
+            double scale = Math.sqrt((dx*dx + dy*dy) / 2.0);
 
             if (!cheapScale && scale <= 0.5) {
                 int level = 0;
                 while(scale <= 1/(double) MIP_SCALE_RATIO) {
                     scale *= MIP_SCALE_RATIO;
                     level++;
-                    transform = new AffineTransform(transform);
-                    transform.concatenate(AffineTransform.getScaleInstance(MIP_SCALE_RATIO, MIP_SCALE_RATIO));
                 }
                 image = (PlanarImage) pyramid.getImage(level);
+                transform.concatenate(AffineTransform.getScaleInstance(sourceImage.getWidth() / (double)image.getWidth(),
+                                                                       sourceImage.getHeight() / (double)image.getHeight()));
             }
 
             if (!transform.isIdentity()) {
@@ -406,8 +406,8 @@ public class Rendering implements Cloneable {
             Rectangle bounds = new Rectangle(xformedSourceImage.getMinX(), xformedSourceImage.getMinY(),
                                              xformedSourceImage.getWidth(), xformedSourceImage.getHeight());
             Rectangle finalBounds = bounds.intersection(new Rectangle(0, 0,
-                                                                      (int) actualCropBounds.getWidth(),
-                                                                      (int) actualCropBounds.getHeight()));
+                                                                      (int) Math.round(actualCropBounds.getWidth()),
+                                                                      (int) Math.round(actualCropBounds.getHeight())));
             if (finalBounds.width > 0 && finalBounds.height > 0)
                 xformedSourceImage = Functions.crop(xformedSourceImage,
                                                     finalBounds.x, finalBounds.y,
