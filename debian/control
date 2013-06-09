@@ -1,7 +1,7 @@
 Source: lightzone
 Section: graphics
 Priority: optional
-Maintainer: pavel.benak@example.com 
+Maintainer: Pavel Benak <pavel.benak@gmail.com>
 Build-Depends: debhelper, devscripts, build-essential, ant, git-core, javahelp2, libx11-dev, autoconf (>= 2.56), automake (>= 1.7), libtool (>= 1.4), nasm (>= 2.07), default-jdk (>= 1.6), default-jre-headless (>= 1.6), tidy, liblzma-dev
 Homepage: http://lightzoneproject.org/
 Standards-Version: 4.0.0
