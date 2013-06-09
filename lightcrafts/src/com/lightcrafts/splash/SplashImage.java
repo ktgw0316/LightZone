@@ -61,8 +61,8 @@ public final class SplashImage extends BufferedImage {
     private String[] m_staticText;      // There is also dynamic text.
 
     private static final Color m_textColor = new Color( 204, 204, 204 );
-    private static final Font m_textFont = new Font( "SansSerif", Font.PLAIN, 9 );
-    private static final Point m_textLoc = new Point( 25, 300 );
+    private static final Font m_textFont = new Font( "SansSerif", Font.PLAIN, 10 );
+    private static final Point m_textLoc = new Point( 57, 107 );
 
     static synchronized BufferedImage backgroundImage() {
         if (m_splashImage == null) {
@@ -92,7 +92,7 @@ public final class SplashImage extends BufferedImage {
 
         int y = m_textLoc.y;
         final FontMetrics metrics = g.getFontMetrics( m_textFont );
-        final int dy = metrics.getHeight() + 5;
+        final int dy = 0 - metrics.getHeight() - 5;
         for ( int i = 0; i < m_staticText.length; ++i ) {
             g.drawString( m_staticText[i], m_textLoc.x, y );
             y += dy;
