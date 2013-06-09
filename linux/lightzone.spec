@@ -3,7 +3,7 @@
 #
 
 Name:           lightzone
-Version:	3.9.1
+Version:	4.0.0
 Release:	14beta
 License:	GPL-2.0+
 Summary:	Open-source digital darkroom software
