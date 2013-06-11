@@ -13,7 +13,7 @@ else
 fi
 
 # workaround for loading problem with liblzma.so
-lzmalibrary=`find /usr/lib -name "liblzma.so*" | head -1`
+lzmalibrary=`find /lib /usr/lib -name "liblzma.so*" | head -1`
 if [ -z "$lzmalibrary" ]; then
    echo "liblzma was not found on the system; exiting"
    exit 1
