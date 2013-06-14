@@ -383,6 +383,7 @@ public class Rendering implements Cloneable {
                     level++;
                 }
                 image = (PlanarImage) pyramid.getImage(level);
+                transform = new AffineTransform(transform);
                 transform.concatenate(AffineTransform.getScaleInstance(sourceImage.getWidth() / (double)image.getWidth(),
                                                                        sourceImage.getHeight() / (double)image.getHeight()));
             }
