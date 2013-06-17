@@ -5,7 +5,7 @@
 Name:           lightzone
 Version:	4.0.0
 Release:	1
-License:	GPL-2.0+
+License:	BSD-3-Clause
 Summary:	Open-source professional-level digital darkroom software
 Url:		http://lightzoneproject.org/
 Group:		Productivity/Graphics/Convertors 

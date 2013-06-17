@@ -1,10 +1,15 @@
 -------------------------------------------------------------------
-Mon May 20 2013 - KITAGAW Masahiro <arctica0316@gmail.com>
+Mon Jun 17 2013 - KITAGAWA Masahiro <arctica0316@gmail.com>
+
+- Changed license to BSD 3-clause Licence
+
+-------------------------------------------------------------------
+Mon May 20 2013 - KITAGAWA Masahiro <arctica0316@gmail.com>
 
 - Fixed rpmlint warnings
 
 -------------------------------------------------------------------
-Sat May 11 2013 - KITAGAW Masahiro <arctica0316@gmail.com>
+Sat May 11 2013 - KITAGAWA Masahiro <arctica0316@gmail.com>
 
 - Changes for openSuse Build Service cross platform build
 - Divided changelog section from .spec into .changes
