@@ -5,9 +5,14 @@
 echo Starting LightZone version 4.0.0 ...
 echo with options : ${@}
 
+arch=`getconf LONG_BIT`
 totalmem=`cat /proc/meminfo | grep MemTotal | sed -r 's/.* ([0-9]+) .*/\1/'`
 if [ $totalmem -ge 1024000 ]; then
         maxmem=$(( $totalmem / 2 ))
+        # on 32-bit architectures there is ~2GB limit for maximum Java heap size
+        if [ $arch = "32" -a $totalmem -ge 4096000 ]; then
+                maxmem=2048000
+        fi
 else
         maxmem=512000
 fi
@@ -18,7 +23,12 @@ if [ -d "$archpath" ]; then
   lzmalibrary=`find $archpath -name "liblzma.so*" | head -1`
 fi
 if [ -z "$lzmalibrary" ]; then
-  lzmalibrary=`find /lib /usr/lib -name "liblzma.so*" | head -1`
+  if [ $arch = "32" ]; then
+    lib="/lib /usr/lib"
+  else
+    lib="/lib64 /usr/lib64"
+  fi
+  lzmalibrary=`find $lib -name "liblzma.so*" | head -1`
   if [ -z "$lzmalibrary" ]; then
     echo "liblzma was not found on the system; exiting"
     exit 1
