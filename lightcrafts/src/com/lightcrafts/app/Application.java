@@ -2174,7 +2174,9 @@ public class Application {
             EventQueue.invokeLater(
                 new Runnable() {
                     public void run() {
-                        setLookAndFeel();
+                        if (Platform.getType() != Platform.MacOSX) {
+                            setLookAndFeel();
+                        }
                         if (Platform.getType() == Platform.MacOSX) {
                             openMacPlaceholderFrame();
                         }
