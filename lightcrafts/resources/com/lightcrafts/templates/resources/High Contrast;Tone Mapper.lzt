@@ -1,0 +1,13 @@
+<Template version="7">
+  <Scale Factor="0.23936696"/>
+  <Image path=""/>
+  <Controls>
+    <GenericOperation Active="true" Collapsed="false" Locked="false" Mode="Soft Light" Name="Tone Mapper" Opacity="75" OperationType="Tone Mapper" regionsInverted="false">
+      <Slider Detail="0.8" Gamma="2.2" Radius="250.0"/>
+      <Checkbox/>
+      <Choice/>
+    </GenericOperation>
+    <Region/>
+    <Crop Angle="0.0"/>
+  </Controls>
+</Template>
