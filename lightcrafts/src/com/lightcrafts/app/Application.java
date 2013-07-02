@@ -27,6 +27,7 @@ import com.lightcrafts.splash.SplashWindow;
 import com.lightcrafts.splash.StartupProgress;
 import com.lightcrafts.templates.TemplateDatabase;
 import com.lightcrafts.templates.TemplateKey;
+import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.ui.editor.*;
 import com.lightcrafts.ui.editor.assoc.DocumentDatabase;
 import com.lightcrafts.ui.editor.assoc.DocumentInterpreter;
@@ -2174,9 +2175,7 @@ public class Application {
             EventQueue.invokeLater(
                 new Runnable() {
                     public void run() {
-                        if (Platform.getType() != Platform.MacOSX) {
-                            setLookAndFeel();
-                        }
+                        setLookAndFeel(new LightZoneSkin().getLightZoneLookAndFeel());
                         if (Platform.getType() == Platform.MacOSX) {
                             openMacPlaceholderFrame();
                         }
