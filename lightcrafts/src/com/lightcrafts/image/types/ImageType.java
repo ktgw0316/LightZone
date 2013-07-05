@@ -341,6 +341,7 @@ public abstract class ImageType {
             CR2ImageType.INSTANCE,
             DCRImageType.INSTANCE,
             DNGImageType.INSTANCE,
+            ERFImageType.INSTANCE,
             FFFImageType.INSTANCE,
             JPEGImageType.INSTANCE,
             KDCImageType.INSTANCE,
