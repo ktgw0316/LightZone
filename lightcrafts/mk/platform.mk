@@ -60,11 +60,6 @@ RM:=			rm -fr
 # Mac OS X
 ##
 ifeq ($(PLATFORM),MacOSX)
-  ifeq ($(PROCESSOR),x86_64)
-    PLATFORM_CFLAGS+=	-m64
-  else
-    PLATFORM_CFLAGS+=	-m32
-  endif
   MACOSX_DEPLOYMENT_TARGET:= 	$(shell sw_vers -productVersion | cut -d. -f-2)
   SDKROOT:=		$(shell xcodebuild -version -sdk macosx${MACOSX_DEPLOYMENT_TARGET} | sed -n '/^Path:/p' | sed 's/^Path: //')
   ifndef EXECUTABLE
@@ -94,11 +89,7 @@ ifeq ($(PLATFORM),MacOSX)
   # performance CFLAGS go in the FAST_CFLAGS_* variables below.
   ##
   MACOSX_CFLAGS_PPC:=	-mcpu=G4 -mtune=G5
-  ifeq ($(PROCESSOR),x86_64)
-    MACOSX_CFLAGS_X86:=	-march=athlon64
-  else
-    MACOSX_CFLAGS_X86:=	-march=pentium4
-  endif
+  MACOSX_CFLAGS_X86:=	-march=core2 -mtune=generic
 
   ifdef HIGH_PERFORMANCE
     ##
@@ -143,13 +134,6 @@ ifeq ($(PLATFORM),MacOSX)
     DARWIN_RELEASE:=	$(shell uname -r)
     CONFIG_HOST:=	$(PROCESSOR)-apple-darwin$(DARWIN_RELEASE)
     CONFIG_TARGET:=	$(OTHER_PROCESSOR)-apple-darwin$(DARWIN_RELEASE)
-
-    ##
-    # Ensure we're compiling using gcc/g++ 4.0 in order to build universal
-    # binaries.
-    ##
-    CC:=		gcc-4.0
-    CXX:=		g++-4.0
   else
     ifeq ($(PROCESSOR),powerpc)
       PLATFORM_CFLAGS+=	$(MACOSX_CFLAGS_PPC)
@@ -255,7 +239,7 @@ ifeq ($(PLATFORM),Linux)
   ifeq ($(PROCESSOR),x86_64)
     PLATFORM_CFLAGS+=	-march=athlon64 -mtune=generic $(SSE_FLAGS_ON) -fPIC
   else
-    PLATFORM_CFLAGS+=	-march=pentium3 -mtune=pentium4 $(SSE_FLAGS_ON) -fPIC
+    PLATFORM_CFLAGS+=	-march=pentium4 -mtune=generic $(SSE_FLAGS_ON) -fPIC
   endif
 
   ifdef HIGH_PERFORMANCE
