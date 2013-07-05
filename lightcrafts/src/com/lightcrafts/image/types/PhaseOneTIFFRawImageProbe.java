@@ -30,7 +30,13 @@ final class PhaseOneTIFFRawImageProbe implements TrueImageTypeProvider {
         final LCByteBuffer buf = imageInfo.getByteBuffer();
         try {
             buf.position( 12 );
-            if ( buf.getEquals( "Raw", "ASCII" ) ) {
+            boolean isRaw = buf.getEquals("Raw", "ASCII");
+            if (! isRaw)
+            {
+                buf.position( 13 );
+                isRaw = buf.getEquals("waR", "ASCII");
+            }
+            if (isRaw) {
                 final ImageMetadata metadata = imageInfo.getCurrentMetadata();
                 MetadataUtil.removePreviewMetadataFrom( metadata );
                 MetadataUtil.removeWidthHeightFrom( metadata );
