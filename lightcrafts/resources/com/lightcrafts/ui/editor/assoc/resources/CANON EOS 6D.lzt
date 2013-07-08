@@ -1,0 +1,16 @@
+<Template version="6">
+  <Scale Factor="0.18337587"/>
+  <Image path=""/>
+  <Controls>
+    <ZoneOperation Locked="true" Active="true" Collapsed="true" Mode="Normal" Name="RAW Tone Curve" Opacity="100" regionsInverted="false" scale="0">
+      <Points Size="16">
+        <Point X="5" Y="0.41593"/>
+        <Point X="8" Y="0.64602"/>
+        <Point X="13" Y="0.93805"/>
+        <Point X="14" Y="0.98511"/>
+      </Points>
+    </ZoneOperation>
+    <Region/>
+    <Crop Angle="0.0"/>
+  </Controls>
+</Template>
