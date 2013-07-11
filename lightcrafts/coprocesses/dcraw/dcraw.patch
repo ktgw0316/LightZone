@@ -1,0 +1,88 @@
+--- dcraw.c.orig	2013-07-11 22:13:26.982508471 +0900
++++ dcraw.c	2013-07-11 22:17:52.842425150 +0900
+@@ -140,7 +140,10 @@
+ int no_auto_bright=0;
+ unsigned greybox[4] = { 0, 0, UINT_MAX, UINT_MAX };
+ float cam_mul[4], pre_mul[4], cmatrix[3][4], rgb_cam[3][4];
+-const double xyz_rgb[3][3] = {			/* XYZ from RGB */
++#ifndef LIGHTZONE
++const
++#endif
++double xyz_rgb[3][3] = {			/* XYZ from RGB */
+   { 0.412453, 0.357580, 0.180423 },
+   { 0.212671, 0.715160, 0.072169 },
+   { 0.019334, 0.119193, 0.950227 } };
+@@ -9019,6 +9022,9 @@
+ #ifndef NO_LCMS
+   const char *cam_profile=0, *out_profile=0;
+ #endif
++#ifdef LIGHTZONE
++  char *ofbase = 0;
++#endif
+ 
+ #ifndef LOCALTIME
+   putenv ((char *) "TZ=UTC");
+@@ -9113,6 +9119,9 @@
+       case 'p':  cam_profile = argv[arg++];
+ #endif
+ 	break;
++#ifdef LIGHTZONE
++      case 'F':  ofbase     = argv[arg++];  break;
++#endif
+       case 'P':  bpfile     = argv[arg++];  break;
+       case 'K':  dark_frame = argv[arg++];  break;
+       case 'z':  timestamp_only    = 1;  break;
+@@ -9141,6 +9150,19 @@
+ 	return 1;
+     }
+   }
++#ifdef LIGHTZONE
++  if (!half_size && !thumbnail_only) {
++    float rimm[3][3] = {
++      { 0.7977, 0.2880, 0.0000 },
++      { 0.1352, 0.7119, 0.0000 },
++      { 0.0313, 0.0001, 0.8249 } };
++    int i, j;
++
++    for (i=0; i < 3; ++i)
++      for (j=0; j < 3; ++j)
++        xyz_rgb[i][j] = rimm[j][i];
++  }
++#endif
+   if (use_camera_matrix < 0)
+       use_camera_matrix = use_camera_wb;
+   if (arg == argc) {
+@@ -9238,6 +9260,10 @@
+       printf (_("Aperture: f/%0.1f\n"), aperture);
+       printf (_("Focal length: %0.1f mm\n"), focal_len);
+       printf (_("Embedded ICC profile: %s\n"), profile_length ? _("yes"):_("no"));
++#ifdef LIGHTZONE
++      if (is_raw > 1 && !strncmp(make,"FUJIFILM",8) && !fuji_width)
++        printf (_("Number of raw images: 1\nTrue "));
++#endif
+       printf (_("Number of raw images: %d\n"), is_raw);
+       if (pixel_aspect != 1)
+ 	printf (_("Pixel Aspect Ratio: %0.6f\n"), pixel_aspect);
+@@ -9280,6 +9306,10 @@
+ 	  for (i=0; i < 16; i++)
+ 	    putchar (cdesc[fcol(i >> 1,i & 1)]);
+ 	}
++#ifdef LIGHTZONE	
++	printf(_("\nCamera RGB Profile:"));
++	for (i=0; i<3; ++i) FORCC printf(" %f", rgb_cam[i][c]);
++#endif
+ 	printf (_("\nDaylight multipliers:"));
+ 	FORCC printf (" %f", pre_mul[c]);
+ 	if (cam_mul[0] > 0) {
+@@ -9390,6 +9420,11 @@
+     if (write_to_stdout)
+       strcpy (ofname,_("standard output"));
+     else {
++#ifdef LIGHTZONE
++      if (ofbase)
++        strcpy (ofname, ofbase);
++      else
++#endif
+       strcpy (ofname, ifname);
+       if ((cp = strrchr (ofname, '.'))) *cp = 0;
+       if (multi_out)
