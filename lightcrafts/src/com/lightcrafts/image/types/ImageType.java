@@ -355,6 +355,7 @@ public abstract class ImageType {
             RAFImageType.INSTANCE,
             RW2ImageType.INSTANCE,
             SR2ImageType.INSTANCE,
+            SRWImageType.INSTANCE,
             TIFFImageType.INSTANCE,
             // X3FImageType.INSTANCE,
 
