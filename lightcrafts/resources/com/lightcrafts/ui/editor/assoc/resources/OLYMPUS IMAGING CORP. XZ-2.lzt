@@ -1,0 +1,24 @@
+<Template version="8">
+  <Scale Factor="0.28998655"/>
+  <Image path=""/>
+  <Controls>
+    <ZoneOperation Active="true" Collapsed="true" Locked="true" Mode="Normal" Name="RAW Tone Curve" Opacity="100" layerControlsIndex="0" regionsInverted="false" scale="0">
+      <ColorSelection HueBlue="0.5" HueEnabled="true" HueGreen="0.5" HueRadius="-1.0" HueRed="0.5" Inverted="false" LuminosityEnabled="true" LuminosityLower="0.0" LuminosityLowerFeather="0.0" LuminosityUpper="1.0" LuminosityUpperFeather="0.0"/>
+      <Points Size="16">
+        <Point X="7" Y="0.4778761061946903"/>
+        <Point X="8" Y="0.5796460176991151"/>
+        <Point X="10" Y="0.6858407079646017"/>
+        <Point X="13" Y="0.8893805309734514"/>
+        <Point X="14" Y="0.9513274336283186"/>
+        <Point X="15" Y="0.995575221238938"/>
+      </Points>
+    </ZoneOperation>
+    <Region/>
+    <Crop>
+      <UpperLeft X="0.0" Y="0.0"/>
+      <UpperRight X="3974.0" Y="0.0"/>
+      <LowerLeft X="0.0" Y="2976.0"/>
+      <LowerRight X="3974.0" Y="2976.0"/>
+    </Crop>
+  </Controls>
+</Template>
