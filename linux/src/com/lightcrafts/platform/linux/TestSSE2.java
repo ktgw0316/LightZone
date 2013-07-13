@@ -19,8 +19,13 @@ import java.awt.event.MouseEvent;
 class TestSSE2 {
     
     static boolean hasSSE2() {
-        String line = getCpuInfoLine("flags\t\t:");
-        return line.contains("sse2");
+        if (System.getProperty("os.name").equals("SunOS")) {
+            return true;
+        }
+        else {
+            String line = getCpuInfoLine("flags\t\t:");
+            return line.contains("sse2");
+        }
     }
 
     private static String getCpuInfoLine(String key) {
@@ -47,8 +52,11 @@ class TestSSE2 {
     }
 
     static void showDialog() {
-        String model = getCpuInfoLine("model name\t: ");
-        model = model.replaceFirst("model name\t: ", "");
+        String model = "";
+        if (! System.getProperty("os.name").equals("SunOS")) {
+            model = getCpuInfoLine("model name\t: ");
+            model = model.replaceFirst("model name\t: ", "");
+        }
 
         String messageA = LOCALE.get("CantRunSSE2Title");
         String messageB = LOCALE.get("CantRunSSE2");

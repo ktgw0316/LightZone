@@ -8,7 +8,7 @@
 
 // standard
 #include <jni.h>
-#define _POSIX_C_SOURCE                 /* makes stat have the right fields */
+#define _POSIX_C_SOURCE 199506L         /* makes stat have the right fields */
 #include <sys/stat.h>                   /* for stat(2) */
 
 #ifdef DEBUG

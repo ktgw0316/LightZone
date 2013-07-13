@@ -261,6 +261,34 @@ ifeq ($(PLATFORM),Linux)
 endif
 
 ##
+# SunOS
+##
+ifeq ($(PLATFORM),SunOS)
+  ifeq ($(PROCESSOR),x86_64)
+    PLATFORM_CFLAGS+=	-march=athlon64 -mtune=generic $(SSE_FLAGS_ON) -fPIC
+  else
+    PLATFORM_CFLAGS+=	-march=pentium4 -mtune=generic $(SSE_FLAGS_ON) -fPIC
+  endif
+
+  ifdef HIGH_PERFORMANCE
+    PLATFORM_CFLAGS+=	-O3 \
+			-fno-trapping-math \
+			-fomit-frame-pointer \
+			-msse2 -mfpmath=sse
+  else
+    PLATFORM_CFLAGS+=	-Os
+  endif
+  JAVA_INCLUDES:=	-I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/solaris
+  JAVA_LDFLAGS:=	-L$(JAVA_HOME)/lib
+  JNILIB_PREFIX:=	lib
+  JNILIB_EXT:=		.so
+  DYLIB_PREFIX:=	$(JNILIB_PREFIX)
+  DYLIB_EXT:=		$(JNILIB_EXT)
+
+  NUM_PROCESSORS:=	$(shell psrinfo -p)
+endif
+
+##
 # Miscellaneous stuff.
 ##
 

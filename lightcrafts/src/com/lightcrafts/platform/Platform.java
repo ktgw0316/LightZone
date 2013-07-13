@@ -56,6 +56,8 @@ public class Platform {
             final String osName = System.getProperty( "os.name" ).toLowerCase();
             if ( osName.startsWith( "linux" ) )
                 return Linux;
+            if ( osName.startsWith( "sunos" ) )
+                return Linux;
             if ( osName.equals( "mac os x" ) )
                 return MacOSX;
             if ( osName.startsWith( "windows" ) )

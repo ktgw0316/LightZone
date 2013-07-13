@@ -11,6 +11,7 @@ PLATFORM:=		$(shell uname)
 ##
 ifeq ($(PLATFORM),Darwin)
   PLATFORM:=		MacOSX
+  PLATFORM_DIR:=		$(ROOT)/macosx
 endif
 
 ##
@@ -18,6 +19,7 @@ endif
 ##
 ifeq ($(findstring CYGWIN,$(PLATFORM)),CYGWIN)
   PLATFORM:=		Windows
+  PLATFORM_DIR:=		$(ROOT)/windows
 endif
 
 ##
@@ -25,6 +27,15 @@ endif
 ##
 ifeq ($(PLATFORM),Linux)
   # PLATFORM is OK as-is
+  PLATFORM_DIR:=		$(ROOT)/linux
+endif
+
+##
+# OpenIndiana
+##
+ifeq ($(PLATFORM),SunOS)
+  # PLATFORM is OK as-is
+  PLATFORM_DIR:=		$(ROOT)/linux
 endif
 
 ##
@@ -33,7 +44,5 @@ endif
 
 # Flag to indicate that this file has been included
 PLATFORM0:=		1
-
-PLATFORM_DIR:=		$(ROOT)/$(shell echo $(PLATFORM) | tr '[A-Z]' '[a-z]')
 
 # vim:set noet sw=8 ts=8:

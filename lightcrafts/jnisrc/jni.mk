@@ -130,6 +130,16 @@ ifeq ($(PLATFORM),Linux)
   JNI_EXTRA_DISTCLEAN+=	$(JNI_LINUX_DISTCLEAN)
 endif
 
+ifeq ($(PLATFORM),SunOS)
+  CFLAGS+= 		$(JNI_LINUX_CFLAGS)
+  DEFINES+=		$(JNI_LINUX_DEFINES)
+  INCLUDES+= 		$(JNI_LINUX_INCLUDES)
+  LDFLAGS+=		-shared $(JNI_LINUX_LDFLAGS)
+  LINK+=		$(JNI_LINUX_LINK)
+  JNI_EXTRA_CLEAN+=	$(JNI_LINUX_CLEAN)
+  JNI_EXTRA_DISTCLEAN+=	$(JNI_LINUX_DISTCLEAN)
+endif
+
 ########## You shouldn't have to change anything below this line. #############
 
 ifdef DEBUG

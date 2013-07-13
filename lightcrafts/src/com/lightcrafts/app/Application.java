@@ -2172,7 +2172,7 @@ public class Application {
                             UIManager.put("MenuBarUI", menuBarUI);
                         }
                         else {
-                            setLookAndFeel();
+                            setLookAndFeel(new LightZoneSkin().getLightZoneLookAndFeel());
                         }
                         openEmpty();
                         Platform.getPlatform().readyToOpenFiles();
