@@ -18,6 +18,9 @@ class SendMenuItem extends BrowserMenuItem {
 
     public void actionPerformed(ActionEvent event) {
         ComboFrame frame = getComboFrame();
+        if (frame == null) {
+            return;
+        }
         AbstractImageBrowser browser = frame.getBrowser();
         List<File> list = browser.getSelectedFiles();
         if (! list.isEmpty()) {
