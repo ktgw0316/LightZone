@@ -913,16 +913,16 @@ public final class LCTileCache extends Observable
             Preferences prefs = Preferences.userRoot().node("/com/lightcrafts/app");
             long maxMemory = (long) prefs.getInt("MaxMemory", defaultMemorySize) * 1024 * 1024;
             long maxHeap = Runtime.getRuntime().maxMemory();
-            long extraCaheSize = (maxMemory - maxHeap)/(1024 * 1024);
+            long extraCacheSize = maxMemory - maxHeap;
 
-            System.out.println("Allocating " + extraCaheSize + "MB for the image cache.");
+            System.out.println("Allocating " + (extraCacheSize / (1024 * 1024)) + "MB for the image cache.");
 
             return new Cache(
                 new TileCacheCacheObjectBroker(),
-                extraCaheSize < 128 * 1024 * 1024 ?
+                extraCacheSize < 128 * 1024 * 1024 ?
                     new WriteThroughCacheObjectMap() :
                     new LRUCacheObjectMap(
-                        new NativeByteBufferAllocator( CHUNK_SIZE ), extraCaheSize
+                        new NativeByteBufferAllocator( CHUNK_SIZE ), extraCacheSize
                     ),
                 new DirectFileCacheStore( tmpFile ),
                 new CoalescingFreeBlockManager()
