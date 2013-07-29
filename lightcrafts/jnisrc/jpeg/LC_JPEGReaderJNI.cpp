@@ -178,7 +178,7 @@ JNIEXPORT jint JNICALL LCJPEGReader_METHOD(readScanLines)
     auto_vec<JSAMPROW> row( new JSAMPROW[ numLines ] );
 #endif
     for ( int i = 0; i < numLines; ++i )
-        row[i] = cBuf + offset + i * rowSize;
+        row[i] = (JSAMPLE*)cBuf + offset + i * rowSize;
 
     try {
         int totalLinesRead = 0;
