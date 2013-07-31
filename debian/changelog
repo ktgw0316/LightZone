@@ -1,3 +1,9 @@
+lightzone (4.0.0-0obs20130731) raring; urgency=low
+
+  * Replaced "uname -p" with "uname -m" in /usr/bin/lightzone
+
+ -- Masahiro Kitagawa <arctica0316@gmail.com>  Wed, 31 Jul 2013 21:02:43 +0900
+
 lightzone (4.0.0-0obs20130729) raring; urgency=low
 
   * Added debian/rules: clean

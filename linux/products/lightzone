@@ -18,7 +18,7 @@ else
 fi
 
 # workaround for loading problem with liblzma.so
-archpath=/lib/`uname -p`-linux-gnu
+archpath=/lib/`uname -m`-linux-gnu
 if [ -d "$archpath" ]; then
   lzmalibrary=`find $archpath -name "liblzma.so*" | head -1`
 fi
