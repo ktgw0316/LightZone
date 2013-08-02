@@ -1,3 +1,9 @@
+lightzone (4.0.0-0obs20130803) raring; urgency=low
+
+  * Simpler way to find liblzma.so in /usr/bin/lightzone 
+
+ -- Masahiro Kitagawa <arctica0316@gmail.com>  Sat, 03 Aug 2013 13:37:22 +0900
+
 lightzone (4.0.0-0obs20130731) raring; urgency=low
 
   * Replaced "uname -p" with "uname -m" in /usr/bin/lightzone
