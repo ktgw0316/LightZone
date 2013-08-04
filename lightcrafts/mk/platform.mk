@@ -35,8 +35,11 @@ TOOLS_BIN:=		$(abspath $(ROOT)/lightcrafts/tools/bin)
 CLASSPATH_SEP:=		:
 
 # The default C and C++ compilers.
-CC:=			gcc
-CXX:=			g++
+#CC:=			gcc
+#CXX:=			g++
+
+CC:=			i686-pc-mingw32-gcc
+CXX:=			i686-pc-mingw32-g++
 
 # Unset USE_ICC_HERE if the overall USE_ICC flags != 1.
 ifneq ($(USE_ICC),1)
@@ -178,7 +181,8 @@ else
   SSE_FLAGS_ON:=	$(P4_CPU_FLAGS) -msse2
   SSE_FLAGS:=		$(SSE_FLAGS_OFF)
 
-  %_sse.o  : SSE_FLAGS:= $(SSE_FLAGS_ON)
+  %_sse.o:
+    SSE_FLAGS:= $(SSE_FLAGS_ON)
 endif
 
 ##
@@ -200,7 +204,7 @@ ifeq ($(PLATFORM),Windows)
   RC_INCLUDES:=		-i "$(shell cygpath -w /usr/include/w32api)"
   RC_FLAGS=		$(RC_INCLUDES) -n -fo
 
-  PLATFORM_CFLAGS+=	-mno-cygwin $(SSE_FLAGS)
+  PLATFORM_CFLAGS+=	$(SSE_FLAGS) "-D__int64=long long"
   ifdef HIGH_PERFORMANCE
     ifdef USE_ICC_HERE
       ICC:=		$(TOOLS_BIN)/lc-icc-w32
@@ -211,7 +215,7 @@ ifeq ($(PLATFORM),Windows)
     else
       PLATFORM_CFLAGS+=	-O3 \
 			-fno-trapping-math \
-			-fomit-frame-pointer
+			-fomit-frame-pointer 
     endif
   else
     PLATFORM_CFLAGS+=	-Os

@@ -15,7 +15,7 @@ JARS:=		$(COMMON_DIR)/products/lightcrafts.jar \
 # Uncomment to compile in debug mode.
 #DEBUG:=		true
 
-CFLAGS:=	-Os -mno-cygwin
+CFLAGS:=	-O3
 DEFINES:=	-D_WIN32_IE=0x0500 -D_WIN32_WINNT=0x0500 -DUNICODE
 INCLUDES:=	-I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32" \
 		-I$(COMMON_DIR)/jnisrc/jniutils

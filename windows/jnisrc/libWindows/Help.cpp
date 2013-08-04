@@ -2,7 +2,7 @@
 
 // standard
 #include <windows.h>
-
+#include <string>
 // local
 #include "LC_JNIUtils.h"
 #include "LC_WinUtils.h"
