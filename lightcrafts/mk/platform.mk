@@ -156,7 +156,13 @@ ifeq ($(PLATFORM),MacOSX)
   JNILIB_EXT:=		.jnilib
   DYLIB_PREFIX:=	$(JNILIB_PREFIX)
   DYLIB_EXT:=		.dylib
+
+ifeq ($(PLATFORM),Windows)
+  NUM_PROCESSORS:=	$(NUMBER_OF_PROCESSORS)
+else
   NUM_PROCESSORS:=	$(shell /usr/sbin/sysctl -n hw.ncpu)
+endif
+
 else
   ##
   # JNI on non-Mac platforms doesn't do proper stack alignment when SSE
@@ -185,22 +191,33 @@ endif
 # Windows
 ##
 ifeq ($(PLATFORM),Windows)
+  ## Check required system environment variables
+  ifndef NUMBER_OF_PROCESSORS
+    $(error "NUMBER_OF_PROCESSORS" must be set)
+  endif
+  ## Check user supplied variables
   ifndef MSSDK_HOME
     $(error "MSSDK_HOME" must be set)
   endif
-
-  NUM_PROCESSORS:=	$(shell grep '^processor' /proc/cpuinfo | wc -l)
-  ifeq ($(NUM_PROCESSORS),0)
-    NUM_PROCESSORS:=	1
+  ifndef MINGW_HOME
+    $(error "MINGW_HOME" must be set)
   endif
 
-  MSSDK_HOME_W32:=	$(shell cygpath -w $(MSSDK_HOME))
+#  NUM_PROCESSORS:=	$(shell grep '^processor' /proc/cpuinfo | wc -l)
+#  ifeq ($(NUM_PROCESSORS),0)
+#    NUM_PROCESSORS:=	1
+#  endif
+
+  #MSSDK_HOME_W32:=	$(shell cygpath -w $(MSSDK_HOME))
+  MSSDK_HOME_W32:=	$(MSSDK_HOME)
 
   RC:=			"$(MSSDK_HOME)/Bin/RC.Exe"
-  RC_INCLUDES:=		-i "$(shell cygpath -w /usr/include/w32api)"
+  #RC_INCLUDES:=		-i "$(shell cygpath -w /usr/include/w32api)"
+  RC_INCLUDES:=		$(MINGW_HOME)/include
   RC_FLAGS=		$(RC_INCLUDES) -n -fo
 
-  PLATFORM_CFLAGS+=	-mno-cygwin $(SSE_FLAGS)
+  #PLATFORM_CFLAGS+=	-mno-cygwin $(SSE_FLAGS)
+  PLATFORM_CFLAGS+=	$(SSE_FLAGS)
   ifdef HIGH_PERFORMANCE
     ifdef USE_ICC_HERE
       ICC:=		$(TOOLS_BIN)/lc-icc-w32

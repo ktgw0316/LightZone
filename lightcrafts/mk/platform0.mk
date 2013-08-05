@@ -19,6 +19,9 @@ endif
 ifeq ($(findstring CYGWIN,$(PLATFORM)),CYGWIN)
   PLATFORM:=		Windows
 endif
+ifeq ($(findstring MINGW,$(PLATFORM)),MINGW)
+  PLATFORM:=		Windows
+endif
 
 ##
 # Linux
