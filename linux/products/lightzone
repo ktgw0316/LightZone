@@ -19,6 +19,11 @@ fi
 
 # workaround for loading problem with liblzma.so
 arch=`uname -m`
+if [ ${arch} = "i486" -o ${arch} = "i586" -o ${arch} = "i686" ]; then
+  arch="i386"
+elif [ ${arch} = "amd64" ]; then
+  arch="x86_64"
+fi
 lzmalibrary=`find /lib/${arch}-*-gnu*/ /usr/lib/${arch}-*-gnu*/ \
                   /lib64/ /usr/lib64/ /lib/ /usr/lib/ \
                   -maxdepth 1 -name "liblzma.so*" 2> /dev/null | head -1`
