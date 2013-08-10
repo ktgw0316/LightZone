@@ -20,8 +20,10 @@ public class BoxedButton {
     public BoxedButton(String title, AbstractButton... buttons) {
         this.buttons = buttons;
         box = Box.createHorizontalBox();
+        box.add(Box.createHorizontalStrut(14));
         for (AbstractButton b : buttons)
             box.add(b);
+        box.add(Box.createHorizontalStrut(14));
         ToggleTitleBorder.setBorder(box, title);
     }
 }
