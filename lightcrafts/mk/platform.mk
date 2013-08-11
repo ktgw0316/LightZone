@@ -35,11 +35,14 @@ TOOLS_BIN:=		$(abspath $(ROOT)/lightcrafts/tools/bin)
 CLASSPATH_SEP:=		:
 
 # The default C and C++ compilers.
-#CC:=			gcc
-#CXX:=			g++
+ifeq ($(PLATFORM),Windows)
+  CC:=			i686-pc-mingw32-gcc
+  CXX:=			i686-pc-mingw32-g++
+else
+  CC:=			gcc
+  CXX:=			g++
+endif
 
-CC:=			i686-pc-mingw32-gcc
-CXX:=			i686-pc-mingw32-g++
 
 # Unset USE_ICC_HERE if the overall USE_ICC flags != 1.
 ifneq ($(USE_ICC),1)
