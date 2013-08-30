@@ -833,14 +833,20 @@ public final class LCTileCache extends Observable
 
         public Object decodeFromByteBuffer( ByteBuffer buf, Object obj ) {
             if ( obj instanceof byte[] )
-                //buf.get( (byte[])obj );
-                LCArrays.copy( buf.array(), 0, (byte[])obj, 0, buf.capacity() );
+                if ( buf.hasArray() ) 
+                    LCArrays.copy( buf.array(), 0, (byte[])obj, 0, buf.capacity() );
+                else
+                    buf.get( (byte[])obj );
             else if ( obj instanceof short[] )
-                //buf.asShortBuffer().get( (short[])obj );
-                LCArrays.copy( buf.array(), 0, (short[])obj, 0, buf.capacity() );
+                if ( buf.hasArray() ) 
+                    LCArrays.copy( buf.array(), 0, (short[])obj, 0, buf.capacity() );
+                else
+                    buf.asShortBuffer().get( (short[])obj );
             else if ( obj instanceof int[] )
-                //buf.asIntBuffer().get( (int[])obj );
-                LCArrays.copy( buf.array(), 0, (int[])obj, 0, buf.capacity() );
+                if ( buf.hasArray() ) 
+                    LCArrays.copy( buf.array(), 0, (int[])obj, 0, buf.capacity() );
+                else
+                    buf.asIntBuffer().get( (int[])obj );
             else
                 throw new IllegalArgumentException(
                     "can't decode " + obj.getClass()
@@ -850,14 +856,20 @@ public final class LCTileCache extends Observable
 
         public void encodeToByteBuffer( ByteBuffer buf, Object obj ) {
             if ( obj instanceof byte[] )
-                //buf.put( (byte[])obj );
-                LCArrays.copy( (byte[])obj, 0, buf.array(), 0, buf.capacity() );
+                if ( buf.hasArray() ) 
+                    LCArrays.copy( (byte[])obj, 0, buf.array(), 0, buf.capacity() );
+                else
+                    buf.put( (byte[])obj );
             else if ( obj instanceof short[] )
-                //buf.asShortBuffer().put( (short[])obj );
-                LCArrays.copy( (short[])obj, 0, buf.array(), 0, buf.capacity() );
+                if ( buf.hasArray() ) 
+                    LCArrays.copy( (short[])obj, 0, buf.array(), 0, buf.capacity() );
+                else
+                    buf.asShortBuffer().put( (short[])obj );
             else if ( obj instanceof int[] )
-                //buf.asIntBuffer().put( (int[])obj );
-                LCArrays.copy( (int[])obj, 0, buf.array(), 0, buf.capacity() );
+                if ( buf.hasArray() ) 
+                    LCArrays.copy( (int[])obj, 0, buf.array(), 0, buf.capacity() );
+                else
+                    buf.asIntBuffer().put( (int[])obj );
             else
                 throw new IllegalArgumentException(
                     "can't encode " + obj.getClass()
