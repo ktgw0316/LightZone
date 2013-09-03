@@ -35,14 +35,8 @@ TOOLS_BIN:=		$(abspath $(ROOT)/lightcrafts/tools/bin)
 CLASSPATH_SEP:=		:
 
 # The default C and C++ compilers.
-ifeq ($(PLATFORM),Windows)
-  CC:=			i686-pc-mingw32-gcc
-  CXX:=			i686-pc-mingw32-g++
-else
-  CC:=			gcc
-  CXX:=			g++
-endif
-
+CC:=			gcc
+CXX:=			g++
 
 # Unset USE_ICC_HERE if the overall USE_ICC flags != 1.
 ifneq ($(USE_ICC),1)
@@ -202,6 +196,14 @@ ifeq ($(PLATFORM),Windows)
   endif
 
   MSSDK_HOME_W32:=	$(shell cygpath -w $(MSSDK_HOME))
+
+  ifeq ($(PROCESSOR),x86_64)
+    CC:=		x86_64-w64-mingw32-gcc
+    CXX:=		x86_64-w64-mingw32-g++
+  else
+    CC:=		i686-pc-mingw32-gcc
+    CXX:=		i686-pc-mingw32-g++
+  endif
 
   RC:=			"$(MSSDK_HOME)/Bin/RC.Exe"
   RC_INCLUDES:=		-i "$(shell cygpath -w /usr/include/w32api)"
