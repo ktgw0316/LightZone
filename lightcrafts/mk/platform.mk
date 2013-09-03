@@ -195,17 +195,19 @@ ifeq ($(PLATFORM),Windows)
     NUM_PROCESSORS:=	1
   endif
 
-  MSSDK_HOME_W32:=	$(shell cygpath -w $(MSSDK_HOME))
+  MSSDK_HOME_W32:=	$(shell cygpath -w "$(MSSDK_HOME)")
 
   ifeq ($(PROCESSOR),x86_64)
+    ARCH:=		x64
     CC:=		x86_64-w64-mingw32-gcc
     CXX:=		x86_64-w64-mingw32-g++
   else
+    ARCH:=		x86
     CC:=		i686-pc-mingw32-gcc
     CXX:=		i686-pc-mingw32-g++
   endif
 
-  RC:=			"$(MSSDK_HOME)/Bin/RC.Exe"
+  RC:=			"$(MSSDK_HOME)/Bin/$(ARCH)/RC.Exe"
   RC_INCLUDES:=		-i "$(shell cygpath -w /usr/include/w32api)"
   RC_FLAGS=		$(RC_INCLUDES) -n -fo
 
