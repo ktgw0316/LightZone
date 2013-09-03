@@ -169,7 +169,7 @@ static void checkCPUType() {
     // Before we can check for anything about the CPU, we first need to check
     // for cpuid instruction support.
     //
-    long a, c;
+    short a, c;
     asm volatile (
         /* Copy EFLAGS into eax and ecx. */
         "pushf\n\t"
@@ -580,7 +580,7 @@ static void redirectOutput() {
     // same log file, we have to convert logHandle to a FILE* then replace
     // stdout and stderr with it.
     //
-    int const logFD = _open_osfhandle( reinterpret_cast<long>( logHandle ), 0 );
+    int const logFD = _open_osfhandle( reinterpret_cast<long long>( logHandle ), 0 );
     FILE *const logFile = ::_fdopen( logFD, "w" );
     ::setvbuf( logFile, NULL, _IONBF, 0 );
     ::fclose( stdout ); *stdout = *logFile;
