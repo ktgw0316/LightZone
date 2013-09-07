@@ -211,7 +211,7 @@ ifeq ($(PLATFORM),Windows)
   RC_INCLUDES:=		-i "$(shell cygpath -w /usr/include/w32api)"
   RC_FLAGS=		$(RC_INCLUDES) -n -fo
 
-  PLATFORM_CFLAGS+=	$(SSE_FLAGS) "-D__int64=long long"
+  PLATFORM_CFLAGS+=	$(SSE_FLAGS) # "-D__int64=long long"
   ifdef HIGH_PERFORMANCE
     ifdef USE_ICC_HERE
       ICC:=		$(TOOLS_BIN)/lc-icc-w32
