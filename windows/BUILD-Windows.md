@@ -15,6 +15,7 @@ Download and install (or unpack) following:
 -   __Cygwin__
     In Cygwin install following:
     -    __automake__
+    -    __binutils__
     -    __git__
     -    __libtool__
     -    __make__
