@@ -203,8 +203,8 @@ ifeq ($(PLATFORM),Windows)
     CXX:=		x86_64-w64-mingw32-g++
   else
     ARCH:=		x86
-    CC:=		i686-pc-mingw32-gcc
-    CXX:=		i686-pc-mingw32-g++
+    CC:=		i686-w64-mingw32-gcc
+    CXX:=		i686-w64-mingw32-g++
   endif
 
   RC:=			"$(MSSDK_HOME)/Bin/$(ARCH)/RC.Exe"
