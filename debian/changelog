@@ -1,3 +1,9 @@
+lightzone (4.0.0-0obs20130910) raring; urgency=low
+
+  * Upstream sync
+
+ -- Masahiro Kitagawa <arctica0316@gmail.com>  Wed, 11 Sep 2013 01:18:04 +0900
+
 lightzone (4.0.0-0obs20130807) raring; urgency=low
 
   * Fixed /usr/bin/lightzone for uname -m is i486, i586, i686 or amd64
