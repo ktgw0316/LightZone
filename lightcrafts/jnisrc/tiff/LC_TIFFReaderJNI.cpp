@@ -240,7 +240,7 @@ JNIEXPORT jint JNICALL LCTIFFReader_METHOD(readStripByte)
         return 0;
     }
     return TIFFReadEncodedStrip(
-        getNativePtr( env, jLCTIFFReader ), stripIndex, cBuf + offset, stripSize
+        getNativePtr( env, jLCTIFFReader ), stripIndex, (jbyte*)cBuf + offset, stripSize
     );
 }
 
@@ -257,7 +257,7 @@ JNIEXPORT jint JNICALL LCTIFFReader_METHOD(readStripShort)
         return 0;
     }
     return TIFFReadEncodedStrip(
-        getNativePtr( env, jLCTIFFReader ), stripIndex, cBuf + offset, stripSize
+        getNativePtr( env, jLCTIFFReader ), stripIndex, (jshort*)cBuf + offset, stripSize
     );
 }
 
@@ -274,7 +274,7 @@ JNIEXPORT jint JNICALL LCTIFFReader_METHOD(readTileByte)
         return 0;
     }
     return TIFFReadEncodedTile(
-        getNativePtr( env, jLCTIFFReader ), tileIndex, cBuf + offset, tileSize
+        getNativePtr( env, jLCTIFFReader ), tileIndex, (jbyte*)cBuf + offset, tileSize
     );
 }
 
@@ -291,7 +291,7 @@ JNIEXPORT jint JNICALL LCTIFFReader_METHOD(readTileShort)
         return 0;
     }
     return TIFFReadEncodedTile(
-        getNativePtr( env, jLCTIFFReader ), tileIndex, cBuf + offset, tileSize
+        getNativePtr( env, jLCTIFFReader ), tileIndex, (jshort*)cBuf + offset, tileSize
     );
 }
 

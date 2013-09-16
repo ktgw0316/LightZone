@@ -1,3 +1,34 @@
+lightzone (4.0.0-0obs20130910) raring; urgency=low
+
+  * Upstream sync
+
+ -- Masahiro Kitagawa <arctica0316@gmail.com>  Wed, 11 Sep 2013 01:18:04 +0900
+
+lightzone (4.0.0-0obs20130807) raring; urgency=low
+
+  * Fixed /usr/bin/lightzone for uname -m is i486, i586, i686 or amd64
+
+ -- Masahiro Kitagawa <arctica0316@gmail.com>  Wed, 07 Aug 2013 22:07:19 +0900
+
+lightzone (4.0.0-0obs20130803) raring; urgency=low
+
+  * Simpler way to find liblzma.so in /usr/bin/lightzone 
+
+ -- Masahiro Kitagawa <arctica0316@gmail.com>  Sat, 03 Aug 2013 13:37:22 +0900
+
+lightzone (4.0.0-0obs20130731) raring; urgency=low
+
+  * Replaced "uname -p" with "uname -m" in /usr/bin/lightzone
+
+ -- Masahiro Kitagawa <arctica0316@gmail.com>  Wed, 31 Jul 2013 21:02:43 +0900
+
+lightzone (4.0.0-0obs20130729) raring; urgency=low
+
+  * Added debian/rules: clean
+  * Fixed errors in OBS packages for Fedora.
+
+ -- Masahiro Kitagawa <arctica0316@gmail.com>  Mon, 29 Jul 2013 20:09:09 +0900
+
 lightzone (4.0.0-0obs20130609) raring; urgency=low
 
   * Upstream sync.
