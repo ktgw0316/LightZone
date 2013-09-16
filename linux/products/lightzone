@@ -18,21 +18,18 @@ else
 fi
 
 # workaround for loading problem with liblzma.so
-archpath=/lib/`uname -p`-linux-gnu
-if [ -d "$archpath" ]; then
-  lzmalibrary=`find $archpath -name "liblzma.so*" | head -1`
+arch=`uname -m`
+if [ ${arch} = "i486" -o ${arch} = "i586" -o ${arch} = "i686" ]; then
+  arch="i386"
+elif [ ${arch} = "amd64" ]; then
+  arch="x86_64"
 fi
+lzmalibrary=`find /lib/${arch}-*-gnu*/ /usr/lib/${arch}-*-gnu*/ \
+                  /lib64/ /usr/lib64/ /lib/ /usr/lib/ \
+                  -maxdepth 1 -name "liblzma.so*" 2> /dev/null | head -1`
 if [ -z "$lzmalibrary" ]; then
-  if [ $arch = "32" ]; then
-    lib="/lib /usr/lib"
-  else
-    lib="/lib64 /usr/lib64"
-  fi
-  lzmalibrary=`find $lib -name "liblzma.so*" | head -1`
-  if [ -z "$lzmalibrary" ]; then
-    echo "liblzma was not found on the system; exiting"
-    exit 1
-  fi
+  echo "liblzma was not found on the system; exiting"
+  exit 1
 fi
 
 (cd "/opt/lightzone" && LD_PRELOAD="$lzmalibrary" LD_LIBRARY_PATH="/opt/lightzone" exec java -Xmx${maxmem}k -Djava.library.path="/opt/lightzone" -Dfile.encoding=UTF8 -classpath "/opt/lightzone/*" com.lightcrafts.platform.linux.LinuxLauncher ${@} )
