@@ -14,7 +14,7 @@ public class ExportNameUtility {
     // "(name)-(number).(extension)".
 
     private final static Pattern FileNamePattern =
-        Pattern.compile("(?:-([0-9]*))?(?:\\.([^.]*))?$");
+        Pattern.compile("(?:_lzn-([0-9]*))?(?:\\.([^.]*))?$");
 
     // A Pattern to isolate a File's extension string.
 
