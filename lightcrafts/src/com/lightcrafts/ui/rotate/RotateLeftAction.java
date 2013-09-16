@@ -15,7 +15,7 @@ final class RotateLeftAction extends AbstractAction {
     private RotorControl control;
 
     RotateLeftAction( RotorControl control ) {
-        super("Rotate Left");
+        super(LOCALE.get("RotateLeftActionName"));
         putValue(Action.SHORT_DESCRIPTION, LOCALE.get("RotateLeftToolTip"));
         this.control = control;
     }

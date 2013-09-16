@@ -45,11 +45,11 @@ public class ExportControls extends JPanel {
     public static final int defaultSaveSize = 1024;
 
     static {
-        Sizes.put("Fit within 1024 x 1024", 1024);
-        Sizes.put("Fit within 1536 x 1536", 1536);
-        Sizes.put("Fit within 2048 x 2048", 2048);
-        Sizes.put("Fit within 2560 x 2560", 2560);
-        Sizes.put("Don't limit", 0);
+        Sizes.put(LOCALE.get("FitWithin1024"), 1024);
+        Sizes.put(LOCALE.get("FitWithin1536"), 1536);
+        Sizes.put(LOCALE.get("FitWithin2048"), 2048);
+        Sizes.put(LOCALE.get("FitWithin2560"), 2560);
+        Sizes.put(LOCALE.get("DontLimit"), 0);
     }
 
     private ImageFileExportOptions options;

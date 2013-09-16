@@ -5,6 +5,8 @@ package com.lightcrafts.app;
 import com.lightcrafts.ui.layout.ToggleTitleBorder;
 import com.lightcrafts.ui.toolkit.BoxedButton;
 
+import static com.lightcrafts.app.Locale.LOCALE;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -97,20 +99,20 @@ class LayoutHeader extends Box {
 
         buttonList = new LinkedList<BoxedButton>();
 
-        buttonList.add(browse = new BoxedButton("Done", new DoneButton(frame)));
-        buttonList.add(printDoc = new BoxedButton("Print", new PrintDocButton(frame)));
-        buttonList.add(exportDoc = new BoxedButton("Export", new ExportDocButton(frame)));
-        buttonList.add(save = new BoxedButton("Save", new SaveButton(frame)));
-        buttonList.add(revert = new BoxedButton("Revert", new RevertButton(frame)));
-        buttonList.add(undoRedo = new BoxedButton("Undo Redo", new UndoButton(frame), new RedoButton(frame)));
+        buttonList.add(browse = new BoxedButton(LOCALE.get("DoneLabel"), new DoneButton(frame)));
+        buttonList.add(printDoc = new BoxedButton(LOCALE.get("PrintLabel"), new PrintDocButton(frame)));
+        buttonList.add(exportDoc = new BoxedButton(LOCALE.get("ExportLabel"), new ExportDocButton(frame)));
+        buttonList.add(save = new BoxedButton(LOCALE.get("SaveLabel"), new SaveButton(frame)));
+        buttonList.add(revert = new BoxedButton(LOCALE.get("RevertLabel"), new RevertButton(frame)));
+        buttonList.add(undoRedo = new BoxedButton(LOCALE.get("UndoRedoLabel"), new UndoButton(frame), new RedoButton(frame)));
 
-        buttonList.add(edit = new BoxedButton("Edit", new EditButton(frame)));
-        buttonList.add(send = new BoxedButton("Send", new SendButton(frame)));
-        buttonList.add(print = new BoxedButton("Print", new PrintButton(frame)));
-        buttonList.add(export = new BoxedButton("Convert", new ExportButton(frame)));
-        buttonList.add(styles = new BoxedButton("Styles", new StylesButton(frame)));
+        buttonList.add(edit = new BoxedButton(LOCALE.get("EditLabel"), new EditButton(frame)));
+        buttonList.add(send = new BoxedButton(LOCALE.get("SendLabel"), new SendButton(frame)));
+        buttonList.add(print = new BoxedButton(LOCALE.get("PrintLabel"), new PrintButton(frame)));
+        buttonList.add(export = new BoxedButton(LOCALE.get("ConvertLabel"), new ExportButton(frame)));
+        buttonList.add(styles = new BoxedButton(LOCALE.get("StylesLabel"), new StylesButton(frame)));
 
-        buttonList.add(open = new BoxedButton("Open", new OpenButton(frame)));
+        buttonList.add(open = new BoxedButton(LOCALE.get("OpenLabel"), new OpenButton(frame)));
     }
 
     void setBrowseSelected() {
