@@ -156,6 +156,8 @@ void startJava( JavaParamBlock *jpb ) {
     //
     HINSTANCE libHandle = ::LoadLibrary( TEXT("jre\\bin\\client\\jvm.dll") );
     if ( !libHandle )
+        libHandle = ::LoadLibrary( TEXT("jre\\bin\\server\\jvm.dll") );
+    if ( !libHandle )
         LC_die( TEXT("Could not load JVM library.") );
     jpb->CreateJavaVM_func = (JavaParamBlock::CreateJavaVM_t)
         ::GetProcAddress( libHandle, "JNI_CreateJavaVM" );
