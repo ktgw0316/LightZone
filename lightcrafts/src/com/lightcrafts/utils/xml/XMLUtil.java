@@ -430,7 +430,13 @@ public final class XMLUtil {
 
     static {
         try {
-            m_builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
+            // Workaround for NPE calling javax.xml.parsers.DocumentBuilder.parse()
+            // see http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6181020
+            f.setFeature(
+                "http://apache.org/xml/features/dom/defer-node-expansion", false
+            );
+            m_builder = f.newDocumentBuilder();
         }
         catch ( Exception e ) {
             throw new IllegalStateException( e );

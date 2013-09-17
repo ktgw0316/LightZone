@@ -105,8 +105,13 @@ final class FileMenu
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         final ComboFrame frame = getComboFrame();
-                        final Editor editor = frame.getEditor();
-                        editor.setMode( EditorMode.ARROW );
+                        if (frame != null) {
+                            final Editor editor = frame.getEditor();
+                            editor.setMode( EditorMode.ARROW );
+                        }
+                        else {
+                            Application.openEmpty();
+                        }
                         Application.open(frame, file);
                     }
                 }
@@ -147,8 +152,13 @@ final class FileMenu
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         final ComboFrame frame = getComboFrame();
-                        final Editor editor = frame.getEditor();
-                        editor.setMode( EditorMode.ARROW );
+                        if (frame != null) {
+                            final Editor editor = frame.getEditor();
+                            editor.setMode( EditorMode.ARROW );
+                        }
+                        else {
+                            Application.openEmpty();
+                        }
                         Application.openRecentFolder(frame, folder);
                     }
                 }
