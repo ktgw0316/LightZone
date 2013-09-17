@@ -1427,6 +1427,16 @@ public class Application {
         }
     }
 
+    // Make the ever-present invisible window on the Mac, with a menu.
+    private static void openMacPlaceholderFrame() {
+        JMenuBar menus = new ComboFrameMenuBar();
+        JFrame frame = new JFrame();
+        frame.setJMenuBar(menus);
+        frame.setBounds(-1000000, -1000000, 0, 0);
+        frame.setUndecorated(true);
+        frame.setVisible(true);
+    }
+
     private static final int SAVE_YES    = 0;
     private static final int SAVE_CANCEL = 1;
 
@@ -2170,6 +2180,8 @@ public class Application {
                             Object menuBarUI = UIManager.get("MenuBarUI");
                             setLookAndFeel(new LightZoneSkin().getLightZoneLookAndFeel());
                             UIManager.put("MenuBarUI", menuBarUI);
+
+                            openMacPlaceholderFrame();
                         }
                         else {
                             setLookAndFeel();
