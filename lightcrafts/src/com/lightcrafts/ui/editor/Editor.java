@@ -48,6 +48,7 @@ import java.util.List;
 public class Editor {
 
     private Engine engine;
+    private ScaleModel scale;
 
     // Modes are managed here:
     private RegionManager regions;
@@ -162,18 +163,21 @@ public class Editor {
     class PanningMouseWheelListener implements MouseWheelListener {
         public void mouseWheelMoved(MouseWheelEvent e) {
             if (imageScroll.isWheelScrollingEnabled() && e.getScrollAmount() != 0) {
-                JScrollBar toScroll = e.getScrollType() < 2
-                                      ? imageScroll.getVerticalScrollBar()
-                                      : imageScroll.getHorizontalScrollBar();
                 int direction = e.getWheelRotation() < 0 ? -1 : 1;
-                if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
-                    scrollByUnits(toScroll, direction, e.getScrollAmount());
-                } else if (e.getScrollType() ==
-                           MouseWheelEvent.WHEEL_BLOCK_SCROLL) {
-                    scrollByBlock(toScroll, direction);
+                if (e.isControlDown()) {
+                    scale.scaleUpDown(-direction);
                 } else {
-                    direction = e.getWheelRotation() < 0 ? 1 : -1;
-                    scrollByUnits(toScroll, direction, Math.abs(e.getWheelRotation()));
+                    JScrollBar toScroll = (e.getScrollType() < 2 && ! e.isShiftDown())
+                                          ? imageScroll.getVerticalScrollBar()
+                                          : imageScroll.getHorizontalScrollBar();
+                    if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
+                        scrollByUnits(toScroll, direction, e.getScrollAmount());
+                    } else if (e.getScrollType() ==
+                               MouseWheelEvent.WHEEL_BLOCK_SCROLL) {
+                        scrollByBlock(toScroll, direction);
+                    } else {
+                        scrollByUnits(toScroll, -direction, Math.abs(e.getWheelRotation()));
+                    }
                 }
             }
         }
@@ -188,6 +192,7 @@ public class Editor {
         Document doc                // for zoom-to-fit
     ) {
         this.engine = engine;
+        this.scale = scale;
         this.regions = regions;
         this.crop = crop;
 

@@ -89,6 +89,11 @@ public class ScaleModel {
         }
     }
 
+    public boolean scaleUpDown(int direction) {
+        Scale scale = direction < 0 ? getNextScaleDown() : getNextScaleUp();
+        return setScale(scale);
+    }
+
     public boolean scaleUp() {
         Scale scale = getNextScaleUp();
         return setScale(scale);
