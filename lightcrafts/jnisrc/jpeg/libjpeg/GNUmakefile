@@ -79,10 +79,6 @@ else
   # CFLAGS+=		$(PLATFORM_CFLAGS)
 endif
 
-ifeq ($(PLATFORM),Windows)
-  CFLAGS+= -mno-cygwin
-endif
-
 $(ARCH_MAKEFILES):
 	cd $(@D) && \
 	autoreconf -fiv && \

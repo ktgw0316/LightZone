@@ -40,7 +40,7 @@ public final class WindowsDirectoryMonitor extends DirectoryMonitor {
         synchronized ( m_dirMap ) {
             if ( !m_dirMap.containsKey( directory ) ) {
                 try {
-                    final int value;
+                    final long value;
                     if ( WindowsFileUtil.isGUID( directory ) )
                         value = newHashCode( directory );
                     else
@@ -65,7 +65,7 @@ public final class WindowsDirectoryMonitor extends DirectoryMonitor {
     public void dispose() {
         super.dispose();
         synchronized ( m_dirMap ) {
-            for ( Map.Entry<File,Integer> entry : m_dirMap.entrySet() )
+            for ( Map.Entry<File,Long> entry : m_dirMap.entrySet() )
                 if ( !WindowsFileUtil.isGUID( entry.getKey() ) )
                     try {
                         disposeHandle( entry.getValue() );
@@ -84,7 +84,7 @@ public final class WindowsDirectoryMonitor extends DirectoryMonitor {
      * monitored and thus removed.
      */
     public boolean removeDirectory( File directory ) {
-        final Integer value;
+        final Long value;
         synchronized ( m_dirMap ) {
             value = m_dirMap.remove( directory );
         }
@@ -128,10 +128,10 @@ public final class WindowsDirectoryMonitor extends DirectoryMonitor {
             // since the last time we checked.
             //
             synchronized ( m_dirMap ) {
-                final Integer value = m_dirMap.get( dir );
+                final Long value = m_dirMap.get( dir );
                 if ( value != null )
                     if ( WindowsFileUtil.isGUID( dir ) ) {
-                        final int newHashCode = newHashCode( dir );
+                        final long newHashCode = newHashCode( dir );
                         if ( newHashCode != value ) {
                             m_dirMap.put( dir, newHashCode );
                             return true;
@@ -168,7 +168,7 @@ public final class WindowsDirectoryMonitor extends DirectoryMonitor {
      * @param handle The handle to the native Windows change notification
      * object to dispose of.
      */
-    private static native void disposeHandle( int handle ) throws IOException;
+    private static native void disposeHandle( long handle ) throws IOException;
 
     /**
      * Checks whether the directory referred to by the given native Windows
@@ -178,7 +178,7 @@ public final class WindowsDirectoryMonitor extends DirectoryMonitor {
      * object of a directory being monitored.
      * @return Returns <code>true</code> only if the directory has changed.
      */
-    private static native boolean hasChanged( int handle ) throws IOException;
+    private static native boolean hasChanged( long handle ) throws IOException;
 
     /**
      * Creates a new native Windows <code>HANDLE</code> that refers to a
@@ -187,12 +187,12 @@ public final class WindowsDirectoryMonitor extends DirectoryMonitor {
      *
      * @param dir The full path of the directory to monitor.
      * @return Returns a native Windows <code>HANDLE</code> object (casted to
-     * an <code>int</code>) that refers to a Windows change notification object
+     * an <code>long</code>) that refers to a Windows change notification object
      * that is used to monitor the directory.  The value should only be passed
      * to native methods and should be considered opaque and not touched from
      * Java.
      */
-    private static native int newHandle( String dir ) throws IOException;
+    private static native long newHandle( String dir ) throws IOException;
 
     /**
      * Computes a hash code for the given directory.
@@ -200,7 +200,7 @@ public final class WindowsDirectoryMonitor extends DirectoryMonitor {
      * @param dir The directory to compute the hash code for.
      * @return Returns said hash code.
      */
-    private static int newHashCode( File dir ) {
+    private static long newHashCode( File dir ) {
         if ( dir instanceof ShellFolder ) {
             //
             // This is a hack to work around the problem of scanning the
@@ -212,7 +212,7 @@ public final class WindowsDirectoryMonitor extends DirectoryMonitor {
         }
         final File[] contents =
             FileUtil.listFiles( dir, DirectoryOnlyFilter.INSTANCE, false );
-        int hashCode = 0;
+        long hashCode = 0;
         if ( contents != null )
             for ( File file : contents )
                 hashCode ^= file.hashCode();
@@ -222,13 +222,13 @@ public final class WindowsDirectoryMonitor extends DirectoryMonitor {
     /**
      * The collection of directories to monitor.  The key is the full path to a
      * directory and the value is a native Windows <code>HANDLE</code> object
-     * (casted to an <code>int</code>) that refers to a Windows change
+     * (casted to an <code>long</code>) that refers to a Windows change
      * notification object that is used to monitor the directory.
      * <p>
      * The value should only be gotten from and passed to native methods and
      * should be considered opaque and not touched from Java.
      */
-    private final Map<File,Integer> m_dirMap = new HashMap<File,Integer>();
+    private final Map<File,Long> m_dirMap = new HashMap<File,Long>();
 
     static {
         System.loadLibrary( "Windows" );

@@ -91,7 +91,7 @@ CONFIG_OPTIONS+= \
 
 $(ARCH_MAKEFILES):
 	cd $(@D) && \
-	AR="$(AR)" CC="$(CC)" CFLAGS="$(CFLAGS)" ./configure $(CONFIG_OPTIONS)
+	AR="$(AR)" CC="$(CC)" CFLAGS='$(CFLAGS)' ./configure $(CONFIG_OPTIONS)
 
 ##### Make the libraries.
 

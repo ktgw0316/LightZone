@@ -2,7 +2,7 @@
 
 // standard
 #include <windows.h>
-
+#include <string>
 // local
 #include "LC_JNIUtils.h"
 #include "LC_WinUtils.h"
@@ -10,6 +10,20 @@
 #include "javah/com_lightcrafts_platform_windows_WindowsHelp.h"
 #endif
 #include "htmlhelp.h"
+
+#ifndef _MSC_VER
+// HTML Help libs from recent MS SDKs are compiled with /GS, so link in the following.
+#ifdef _WIN64
+#define HH_GS_CALL __cdecl
+#else
+#define HH_GS_CALL __fastcall
+#endif
+extern "C" {
+	void HH_GS_CALL __GSHandlerCheck() { }
+	void HH_GS_CALL __security_check_cookie(uintptr_t) { }
+}
+#undef HH_GS_CALL
+#endif
 
 using namespace std;
 using namespace LightCrafts;

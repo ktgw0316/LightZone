@@ -40,7 +40,7 @@ ifeq ($(findstring MacOSX10.2.8,$(AUTO_DEP_FLAGS)),MacOSX10.2.8)
   ##
   AUTO_DEP_CC:=		gcc-3.3
 else
-  AUTO_DEP_CC:=		gcc
+  AUTO_DEP_CC:=		$(CC)
 endif
 
 MAKEDEPEND:=		$(AUTO_DEP_CC) $(AUTO_DEP_FLAGS)

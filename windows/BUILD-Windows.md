@@ -12,26 +12,20 @@ There's a .gitattributes file to specify that those files need to have LF line e
 
 Download and install (or unpack) following:
 -   __Apache Ant__
--   __Apache Ivy__ - copy ivy-<version>.jar to ANT_HOME/lib
 -   __Cygwin__
     In Cygwin install following:
-    -    __automake__ version 1.9
-    -    __gcc__ version 3 (not 4)
+    -    __automake__
+    -    __binutils__
+    -    __git__
     -    __libtool__
     -    __make__
+    -    __mingw64-i686-gcc-core__ (32-bit) or __mingw64-x86_64-gcc-core__ (64-bit)
+    -    __mingw64-i686-gcc-g++__ (32-bit) or __mingw64-x86_64-gcc-g++__ (64-bit)
+    -    __mingw64-i686-xz__ (32-bit) or __mingw64-x86_64-xz__ (64-bit)
     -    __nasm__
     -    __vim__ or __nano__ — These are editors for console, might come handy. If you are not familiar with vim, install
          nano instead, it is more user friendly.
-    -    __git__
-    You cannot use MinGW. Also do not mix binaries or header files from Cygwin and MinGW. It is possible to do that,
-    but it is another complication.
--   __Oracle JDK SE 6__ (Java Development Kit)
-    Do not use version 7 for now, it does not work.
--   __PortableGit__
-    In case your IDE does depends on external Git client, install this and do not put it to the PATH. It would conflict
-    with Git from Cygwin.
--   __Microsoft .NET__
-    This one is probably not necessary. The version depends on version of Windows SDK (next point).
+-   __Oracle JDK SE 7__ (Java Development Kit)
 -   __Microsoft Windows SDK__
     Pick the right version based on your Windows version. Information and download links are available at
     http://en.wikipedia.org/wiki/Microsoft_Windows_SDK#Versions
@@ -39,6 +33,11 @@ Download and install (or unpack) following:
 -   __HTML Help Workshop__
 -   __Install4J__ (free trial for 90 days, then we'll need to try to get open-source licenses)
     After installation, run Install4J, click on Project -> Download JREs, and go through wizard dialog.
+
+Optionally, install following:
+-   __PortableGit__
+    In case your IDE does depends on external Git client, install this and do not put it to the PATH. It would conflict
+    with Git from Cygwin.
 -   Java IDE - Eclipse, Netbeans or IntelliJ IDEA Community Edition
 
 Few points for Cygwin beginners
@@ -47,16 +46,23 @@ Few points for Cygwin beginners
 - computer drives under it are available under /cygdrive directory, e.g /cygdrive/c/
 - home directory is abbreviated with ~
 
-
 If you haven't changed anything, your default shell is Bash. Open `~/.bashrc` with an editor (nano or vim) and enter
-following (replace things in square brackets with Cygwin-style paths):
+following environmental variables. (Modify the paths to match your environment.):
 
-    export PATH=[ant]/bin:$PATH:[jdk]/bin:[git]/bin:[WinSDK]/bin:[Install4J]/bin
-    export JAVA_HOME=[jdk]
-    export MSSDK_HOME=[WinSDK]
-    export C_INCLUDE_PATH=/usr/include
+    export JAVA_HOME="/cygdrive/c/Program Files/Java/jdk1.7.0_25";
+    export ANT_HOME="/cygdrive/c/Program Files/apache-ant-1.9.1"
+    export MSSDK_HOME="/cygdrive/c/Program Files (x86)/Windows Kits/8.0";
+    export INSTALL4J_HOME="/cygdrive/c/Program Files/install4j5";
+    export PATH=$PATH:${JAVA_HOME}/bin:${ANT_HOME}/bin:${MSSDK_HOME}/bin/x86:${INSTALL4J_HOME}/bin;
 
 If you close and open your shell again it will automatically set these variables.
+
+Do NOT set C_INCLUDE_PATH=/usr/include for mingw compilers.
+
+Before starting your first build, you have to copy HtmlHelp.lib to mingw library path:
+
+    cp ${MSSDK_HOME}/Lib/win8/um/x86/Htmlhelp.Lib /usr/i686-w64-mingw32/sys-root/mingw/lib/libhtmlhelp.a
+    cp ${MSSDK_HOME}/Lib/win8/um/x64/Htmlhelp.Lib /usr/x86_64-w64-mingw32/sys-root/mingw/lib/libhtmlhelp.a
 
 Checkout your project with Git. If you have problems with line endings in build (the \r stuff), do following :
 
