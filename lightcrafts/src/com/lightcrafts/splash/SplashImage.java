@@ -61,7 +61,7 @@ public final class SplashImage extends BufferedImage {
     private String[] m_staticText;      // There is also dynamic text.
 
     private static final Color m_textColor = new Color( 204, 204, 204 );
-    private static final Font m_textFont = new Font( "SansSerif", Font.PLAIN, 10 );
+    private static final Font m_textFont = new Font( "SansSerif", Font.PLAIN, 12 );
     private static final Point m_textLoc = new Point( 57, 107 );
 
     static synchronized BufferedImage backgroundImage() {

@@ -51,7 +51,7 @@ public class FolderBrowserPane
 
         final Font treeFont = tree.getFont();
         tree.setFont(
-            treeFont.deriveFont( (float)(treeFont.getSize() - 2) )
+            treeFont.deriveFont( (float)(treeFont.getSize() - 1) )
         );
         tree.setExpandsSelectedPaths( true );
 
