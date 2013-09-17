@@ -16,6 +16,12 @@ public final class LinuxLauncher {
 
     public static void main(String[] args) {
         try {
+            System.setProperty("awt.useSystemAAFontSettings", "on");
+
+            final boolean lafCond = sun.swing.SwingUtilities2.isLocalDisplay();
+            Object aaTextInfo = sun.swing.SwingUtilities2.AATextInfo.getAATextInfo(lafCond);
+            UIManager.getDefaults().put(sun.swing.SwingUtilities2.AA_TEXT_PROPERTY_KEY, aaTextInfo);
+
             System.out.println(
                 "This is " +
                 Version.getApplicationName() + ' ' +

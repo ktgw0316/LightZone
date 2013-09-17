@@ -38,11 +38,9 @@ public final class WindowsLauncher {
     public static void main( String[] args ) {
         System.setProperty("awt.useSystemAAFontSettings", "on");
 
-        if (System.getProperty("java.version").startsWith("1.6")) {
-            final boolean lafCond = sun.swing.SwingUtilities2.isLocalDisplay();
-            Object aaTextInfo = sun.swing.SwingUtilities2.AATextInfo.getAATextInfo(lafCond);
-            UIManager.getDefaults().put(sun.swing.SwingUtilities2.AA_TEXT_PROPERTY_KEY, aaTextInfo);
-        }
+        final boolean lafCond = sun.swing.SwingUtilities2.isLocalDisplay();
+        Object aaTextInfo = sun.swing.SwingUtilities2.AATextInfo.getAATextInfo(lafCond);
+        UIManager.getDefaults().put(sun.swing.SwingUtilities2.AA_TEXT_PROPERTY_KEY, aaTextInfo);
 
         System.out.println(
             "This is " + Version.getApplicationName() + ' '

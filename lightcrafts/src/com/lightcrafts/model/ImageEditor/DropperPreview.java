@@ -89,7 +89,7 @@ class DropperPreview extends Preview {
         g.fillRect(minx, miny, width, height);
         g.setColor(Color.black);
 
-        Font font = new Font("Monospaced", Font.PLAIN, 12);
+        Font font = new Font("Monospaced", Font.PLAIN, 13);
         g.setFont(font);
 
         TextLayout layout = new TextLayout("ABC", font, g.getFontRenderContext());
