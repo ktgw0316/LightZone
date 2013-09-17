@@ -178,7 +178,8 @@ else
   SSE_FLAGS_ON:=	$(P4_CPU_FLAGS) -msse2
   SSE_FLAGS:=		$(SSE_FLAGS_OFF)
 
-  %_sse.o  : SSE_FLAGS:= $(SSE_FLAGS_ON)
+  %_sse.o:
+    SSE_FLAGS:= $(SSE_FLAGS_ON)
 endif
 
 ##
@@ -194,13 +195,23 @@ ifeq ($(PLATFORM),Windows)
     NUM_PROCESSORS:=	1
   endif
 
-  MSSDK_HOME_W32:=	$(shell cygpath -w $(MSSDK_HOME))
+  MSSDK_HOME_W32:=	$(shell cygpath -w "$(MSSDK_HOME)")
 
-  RC:=			"$(MSSDK_HOME)/Bin/RC.Exe"
+  ifeq ($(PROCESSOR),x86_64)
+    ARCH:=		x64
+    CC:=		x86_64-w64-mingw32-gcc
+    CXX:=		x86_64-w64-mingw32-g++
+  else
+    ARCH:=		x86
+    CC:=		i686-w64-mingw32-gcc
+    CXX:=		i686-w64-mingw32-g++
+  endif
+
+  RC:=			"$(MSSDK_HOME)/Bin/$(ARCH)/RC.Exe"
   RC_INCLUDES:=		-i "$(shell cygpath -w /usr/include/w32api)"
   RC_FLAGS=		$(RC_INCLUDES) -n -fo
 
-  PLATFORM_CFLAGS+=	-mno-cygwin $(SSE_FLAGS)
+  PLATFORM_CFLAGS+=	$(SSE_FLAGS) # "-D__int64=long long"
   ifdef HIGH_PERFORMANCE
     ifdef USE_ICC_HERE
       ICC:=		$(TOOLS_BIN)/lc-icc-w32
@@ -211,7 +222,7 @@ ifeq ($(PLATFORM),Windows)
     else
       PLATFORM_CFLAGS+=	-O3 \
 			-fno-trapping-math \
-			-fomit-frame-pointer
+			-fomit-frame-pointer 
     endif
   else
     PLATFORM_CFLAGS+=	-Os

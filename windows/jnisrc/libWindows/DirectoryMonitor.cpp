@@ -28,7 +28,7 @@ using namespace LightCrafts;
  * Dispose of the change notification object.
  */
 JNIEXPORT void JNICALL WindowsDirectoryMonitor_METHOD(disposeHandle)
-    ( JNIEnv *env, jclass, jint jHandle )
+    ( JNIEnv *env, jclass, jlong jHandle )
 {
     HANDLE handle = reinterpret_cast<HANDLE>( jHandle );
 #ifdef DEBUG
@@ -45,7 +45,7 @@ JNIEXPORT void JNICALL WindowsDirectoryMonitor_METHOD(disposeHandle)
  * handle has changed.
  */
 JNIEXPORT jboolean JNICALL WindowsDirectoryMonitor_METHOD(hasChanged)
-    ( JNIEnv *env, jclass, jint jHandle )
+    ( JNIEnv *env, jclass, jlong jHandle )
 {
     HANDLE handle = reinterpret_cast<HANDLE>( jHandle );
     switch ( ::WaitForSingleObject( handle, 0 /* just check, don't wait */ ) ) {
@@ -78,7 +78,7 @@ JNIEXPORT jboolean JNICALL WindowsDirectoryMonitor_METHOD(hasChanged)
  * Creates a new HANDLE that refers to a change notification object that is
  * used to monitor the given directory.
  */
-JNIEXPORT jint JNICALL WindowsDirectoryMonitor_METHOD(newHandle)
+JNIEXPORT jlong JNICALL WindowsDirectoryMonitor_METHOD(newHandle)
     ( JNIEnv *env, jclass, jstring jDirectory )
 {
     jstring_to_w const wDirectory( env, jDirectory );
@@ -92,6 +92,6 @@ JNIEXPORT jint JNICALL WindowsDirectoryMonitor_METHOD(newHandle)
         );
         return 0;
     }
-    return reinterpret_cast<jint>( handle );
+    return reinterpret_cast<jlong>( handle );
 }
 /* vim:set et sw=4 ts=4: */

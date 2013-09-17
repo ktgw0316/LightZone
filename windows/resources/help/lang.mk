@@ -17,7 +17,7 @@ TARGET_HELP_DIR:=	/tmp/$(HELP)
 
 # check for 64 bit version of windows
 # to determine path to HTML Help Workshop
-UNAME:= $(shell uname | grep 64)
+UNAME:= $(shell uname -ms | grep 64)
 ifeq ($(strip $(UNAME)),)
 HTML_HELP_COMPILER:=	/cygdrive/c/Program\ Files/HTML\ Help\ Workshop/hhc
 else
