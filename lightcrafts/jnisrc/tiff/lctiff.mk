@@ -23,7 +23,7 @@ JNI_EXTRA_LDFLAGS:=	-L../jpeg/libjpeg/lib -Lzlib/lib -Llibtiff/lib
 ifeq ($(PLATFORM),Windows)
   JNI_EXTRA_LINK:=	-Wl,-Bdynamic -lLCJNI -Wl,-Bstatic -ltiff -llzma -lz -lstdc++ 
 else
-  JNI_EXTRA_LINK:=	-lLCJNI -ltiff -lz -llzma -lstdc++ 
+  JNI_EXTRA_LINK:=	-lLCJNI -ltiff -lz -lstdc++ 
 endif
 
 JAVAH_CLASSES:=		com.lightcrafts.image.libs.LCTIFFCommon \
