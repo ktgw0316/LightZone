@@ -1,3 +1,9 @@
+lightzone (4.0.0-0obs20130919) raring; urgency=low
+
+  * dcraw 9.19
+
+ -- Masahiro Kitagawa <arctica0316@gmail.com>  Thu, 19 Sep 2013 00:32:55 +0900
+
 lightzone (4.0.0-0obs20130910) raring; urgency=low
 
   * Upstream sync
