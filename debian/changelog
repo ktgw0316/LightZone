@@ -1,3 +1,9 @@
+lightzone (4.0.0-0obs20130920) raring; urgency=low
+
+  * Fixed MissingResourceException in Spanish locale
+
+ -- Masahiro Kitagawa <arctica0316@gmail.com>  Fri, 20 Sep 2013 21:45:46 +0900
+
 lightzone (4.0.0-0obs20130919) raring; urgency=low
 
   * dcraw 9.19
