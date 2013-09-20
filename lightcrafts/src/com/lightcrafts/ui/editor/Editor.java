@@ -5,6 +5,7 @@ package com.lightcrafts.ui.editor;
 import com.lightcrafts.model.Engine;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.Preview;
+import com.lightcrafts.platform.Platform;
 import com.lightcrafts.ui.ActivityMeter;
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.ui.crop.CropMode;
@@ -164,7 +165,7 @@ public class Editor {
         public void mouseWheelMoved(MouseWheelEvent e) {
             if (imageScroll.isWheelScrollingEnabled() && e.getScrollAmount() != 0) {
                 int direction = e.getWheelRotation() < 0 ? -1 : 1;
-                if (e.isControlDown()) {
+                if (((! isMac()) && e.isControlDown()) || (isMac() && e.isMetaDown())) {
                     scale.scaleUpDown(-direction);
                 } else {
                     JScrollBar toScroll = (e.getScrollType() < 2 && ! e.isShiftDown())
@@ -620,5 +621,9 @@ public class Editor {
         regions.restore(opControls, node);
 
         crop.restore(node);
+    }
+
+    private static boolean isMac() {
+        return Platform.getType() == Platform.MacOSX;
     }
 }
