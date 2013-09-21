@@ -142,6 +142,9 @@ class MenuFactory {
 
     private static String getName(String key) {
         String s = getPlatformString(key + NameSuffix);
+        if ((! useMacMnemonics) && Platform.getType() == Platform.MacOSX) {
+            s = s.replaceAll("\\([A-Z0-9]\\)$", "");
+        }
         return s;
     }
 
