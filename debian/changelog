@@ -1,3 +1,9 @@
+lightzone (4.1.0~beta1-0obs1) unstable; urgency=low
+
+  * Upstream sync to v4.1.0beta1
+
+ -- Masahiro Kitagawa <arctica0316@gmail.com>  Sun, 29 Sep 2013 21:40:07 +0900
+
 lightzone (4.0.0-0obs20130920) raring; urgency=low
 
   * Fixed MissingResourceException in Spanish locale
