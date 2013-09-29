@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Sun Sep 29 2013 - KITAGAWA Masahiro <arctica0316@gmail.com>
+
+- Upstream sync to 4.1.0beta1
+- Versioning for pre-release packages. c.f.
+  https://en.opensuse.org/openSUSE:Package_naming_guidelines#Pre-Release_packages
+
+-------------------------------------------------------------------
 Sat Sep 21 2013 - KITAGAWA Masahiro <arctica0316@gmail.com>
 
 - Upstream sync
