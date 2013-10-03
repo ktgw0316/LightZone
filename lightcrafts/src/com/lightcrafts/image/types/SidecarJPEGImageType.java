@@ -59,7 +59,7 @@ public final class SidecarJPEGImageType extends JPEGImageType
         throws BadImageFileException, IOException, UnknownImageTypeException
     {
         final ByteBuffer buf = getFirstSegment( imageInfo, JPEG_APP4_MARKER );
-        if ( buf != null ) {
+        if ( buf != null && !( buf.hasArray() ) ) {
             final InputStream is = new ByteArrayInputStream( buf.array() );
             return XMLUtil.readDocumentFrom( is );
         }

@@ -588,7 +588,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
         final ByteBuffer xmpSegBuf = getFirstSegment(
             imageInfo, JPEG_APP1_MARKER, new XMPJPEGSegmentFilter()
         );
-        if ( xmpSegBuf == null )
+        if ( xmpSegBuf == null || !( xmpSegBuf.hasArray() ) )
             return null;
         final byte[] xmpBytes = xmpSegBuf.array();
         final ByteArrayInputStream bis = new ByteArrayInputStream(
