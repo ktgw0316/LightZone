@@ -925,7 +925,7 @@ public final class LCTileCache extends Observable
             Preferences prefs = Preferences.userRoot().node("/com/lightcrafts/app");
             long maxMemory = (long) prefs.getInt("MaxMemory", defaultMemorySize) * 1024 * 1024;
             long maxHeap = Runtime.getRuntime().maxMemory();
-            long extraCacheSize = maxMemory - maxHeap;
+            long extraCacheSize = Math.max( maxMemory - maxHeap, 0 );
 
             System.out.println("Allocating " + (extraCacheSize / (1024 * 1024)) + "MB for the image cache.");
 
