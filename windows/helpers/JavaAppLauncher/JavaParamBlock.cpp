@@ -37,7 +37,7 @@ int const   JavaMinMemoryInMB = 256;
  * Limit the JVM heap size because we now use non-heap memory for things like
  * tile caches.
  */
-int const   JavaMaxMemoryInMB = 768;
+int const   JavaMaxMemoryInMB = 1536;
 
 /**
  * Copy a C string to a newly allocated C buffer.
