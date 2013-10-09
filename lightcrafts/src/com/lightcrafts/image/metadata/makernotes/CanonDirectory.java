@@ -100,11 +100,15 @@ public final class CanonDirectory extends MakerNotesDirectory implements
      * {@inheritDoc}
      */
     public int getISO() {
-        boolean isAPEX = false;
-        ImageMetaValue value = getValue( CANON_CS_ISO );
+        ImageMetaValue value = getValue( CANON_SI_ISO );
+        boolean isAPEX = true;
         if ( value == null ) {
-            value = getValue( CANON_SI_ISO );
-            isAPEX = true;
+            //
+            // CANON_CS_ISO can be "Auto" that is not a number,
+            // therefore it shouldn't be a default choice. 
+            //
+            value = getValue( CANON_CS_ISO );
+            isAPEX = false;
         }
         if ( value == null )
             return 0;
