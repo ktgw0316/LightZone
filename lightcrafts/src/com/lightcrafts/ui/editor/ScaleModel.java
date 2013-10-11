@@ -56,7 +56,7 @@ public class ScaleModel {
     }
 
     public boolean setScale(Scale scale) {
-        if ((scale.compareTo(MinScale) < 0) || scale.compareTo(MaxScale) > 0) {
+        if (scale == null || (scale.compareTo(MinScale) < 0) || scale.compareTo(MaxScale) > 0) {
             return false;
         }
         int i = getIndexOf(scale);
