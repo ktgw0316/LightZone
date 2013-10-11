@@ -32,7 +32,11 @@ public class ElementPrefixFilter extends NodeTypeFilter {
         if ( !super.accept( node ) )
             return false;
         final Element element = (Element)node;
-        return m_prefix.equals( element.getPrefix() );
+        //
+        // Use getTagName() since getPrefix() always returns null.
+        //
+        // return m_prefix.equals( element.getPrefix() );
+        return m_prefix.equals( element.getTagName().replaceAll( ":.*", "" ) );
     }
 
     /**

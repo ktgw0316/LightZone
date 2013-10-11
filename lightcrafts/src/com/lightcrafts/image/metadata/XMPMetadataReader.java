@@ -113,7 +113,11 @@ public final class XMPMetadataReader {
                                ImageMetadataDirectory dir ) {
         for ( Node node : elements ) {
             final Element dirElement = (Element)node;
-            final String tagName = dirElement.getLocalName();
+            //
+            // Use getTagName() since getLocalName() always returns null.
+            //
+            // final String tagName = dirElement.getLocalName();
+            final String tagName = dirElement.getTagName().replaceAll( ".*:", "" );
             final ImageMetaTagInfo tagInfo = dir.getTagInfoFor( tagName );
             if ( tagInfo == null )
                 continue;
