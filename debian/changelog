@@ -1,3 +1,12 @@
+lightzone (4.1.0-0.2.beta2-0obs1) unstable; urgency=low
+
+  * Upstream sync to v4.1.0 beta2
+  * Changed version numbering rule for cross distribution build on Open Build
+    Service. Description for the rule is:
+    https://fedoraproject.org/wiki/Packaging:NamingGuidelines#Pre-Release_packages
+
+ -- Masahiro Kitagawa <arctica0316@gmail.com>  Thu, 17 Oct 2013 23:39:13 +0900
+
 lightzone (4.1.0~beta1-0obs1) unstable; urgency=low
 
   * Upstream sync to v4.1.0beta1

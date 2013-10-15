@@ -2,7 +2,7 @@
 #
 # LightZone startscript
 #
-echo Starting LightZone version 4.0.0 ...
+echo Starting LightZone version 4.1.0 beta2 ...
 echo with options : ${@}
 
 arch=`getconf LONG_BIT`

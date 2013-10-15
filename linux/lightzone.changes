@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Oct 17 2013 - KITAGAWA Masahiro <arctica0316@gmail.com>
+
+- Upstream sync to 4.1.0 beta2
+- Versioning for pre-release packages changed. c.f.
+  https://fedoraproject.org/wiki/Packaging:NamingGuidelines#Pre-Release_packages
+
+-------------------------------------------------------------------
 Sun Sep 29 2013 - KITAGAWA Masahiro <arctica0316@gmail.com>
 
 - Upstream sync to 4.1.0beta1
