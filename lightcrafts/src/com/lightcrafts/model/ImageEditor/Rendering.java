@@ -394,8 +394,8 @@ public class Rendering implements Cloneable {
                 ParameterBlock params = new ParameterBlock();
                 params.addSource(image);
                 params.add(transform);
-                params.add(Interpolation.getInstance(cheapScale ? Interpolation.INTERP_BILINEAR : Interpolation.INTERP_BICUBIC));
-                // params.add(Interpolation.getInstance(Interpolation.INTERP_BILINEAR));
+                // Note: never use INTERP_BICUBIC here, it causes color artifacts on over-exposed area in RAW files in pure Java mode JAI.
+                params.add(Interpolation.getInstance(cheapScale ? Interpolation.INTERP_NEAREST : Interpolation.INTERP_BILINEAR));
                 xformedSourceImage = JAI.create("Affine", params, extenderHints);
             } else
                 xformedSourceImage = image;
