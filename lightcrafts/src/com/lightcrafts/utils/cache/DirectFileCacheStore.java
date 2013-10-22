@@ -68,8 +68,10 @@ public final class DirectFileCacheStore implements CacheStore {
         throws IOException
     {
         m_file.seek( pos );
-        m_file.read( buf.array(), 0, buf.limit() );
-        // m_file.getChannel().read( buf );
+        if ( buf.hasArray() )
+            m_file.read( buf.array(), 0, buf.limit() );
+        else
+            m_file.getChannel().read( buf );
         buf.position( 0 );
     }
 
@@ -81,8 +83,10 @@ public final class DirectFileCacheStore implements CacheStore {
     {
         buf.position( 0 );
         m_file.seek( pos );
-        m_file.write( buf.array(), 0, buf.limit() );
-        // m_file.getChannel().write( buf );
+        if ( buf.hasArray() )
+            m_file.write( buf.array(), 0, buf.limit() );
+        else
+            m_file.getChannel().write( buf );
     }
 
     ////////// private ////////////////////////////////////////////////////////

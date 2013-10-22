@@ -284,9 +284,11 @@ public final class XMLUtil {
     public static Document readDocumentFrom( String s ) throws IOException {
         s = TextUtil.trimNulls( s );
         @SuppressWarnings( { "IOResourceOpenedButNotSafelyClosed" } )
-        final InputStream is = new ByteArrayInputStream( s.getBytes() );
+        final InputStream is = new ByteArrayInputStream( s.getBytes( "UTF-8" ) );
         try {
-            return m_builder.parse( is );
+            synchronized (m_builder) {
+                return m_builder.parse( is );
+            }
         }
         catch ( SAXException e ) {
             final IOException ioe = new IOException( "Couldn't read XML" );
@@ -430,13 +432,7 @@ public final class XMLUtil {
 
     static {
         try {
-            DocumentBuilderFactory f = DocumentBuilderFactory.newInstance();
-            // Workaround for NPE calling javax.xml.parsers.DocumentBuilder.parse()
-            // see http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6181020
-            f.setFeature(
-                "http://apache.org/xml/features/dom/defer-node-expansion", false
-            );
-            m_builder = f.newDocumentBuilder();
+            m_builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         }
         catch ( Exception e ) {
             throw new IllegalStateException( e );

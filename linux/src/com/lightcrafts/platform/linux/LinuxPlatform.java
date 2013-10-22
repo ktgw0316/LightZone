@@ -150,6 +150,7 @@ public class LinuxPlatform extends Platform {
                 }
                 line = buffer.readLine();
             }
+            buffer.close();
         }
         catch (IOException  e) {
             System.err.println("Can't read /proc/meminfo: " + e.getMessage());

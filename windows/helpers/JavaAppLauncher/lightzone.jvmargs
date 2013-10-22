@@ -10,7 +10,6 @@
 -Xrs
 -XX:+UseParallelGC
 -Djava.class.path=lightcrafts-windows.jar;lightcrafts.jar;lcjai.jar;mlibwrapper_jai.jar;substance-lite.jar
--Duser.dir=.
 -Dfile.encoding=UTF8
 
 # Main class.

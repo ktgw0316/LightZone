@@ -3,7 +3,6 @@
 package com.lightcrafts.platform.linux;
 
 import static com.lightcrafts.platform.linux.Locale.LOCALE;
-import com.lightcrafts.platform.Platform;
 import com.lightcrafts.ui.toolkit.TextAreaFactory;
 import com.lightcrafts.utils.WebBrowser;
 
@@ -39,6 +38,7 @@ class TestSSE2 {
                     }
                 }
             } while (line != null);
+            reader.close();
         }
         catch (IOException e) {
             e.printStackTrace();

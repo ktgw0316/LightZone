@@ -39,7 +39,7 @@ int const   JavaMinMemoryInMB = 256;
  * Limit the JVM heap size because we now use non-heap memory for things like
  * tile caches.
  */
-int const   JavaMaxMemoryInMB = 1536;
+int const   JavaMaxMemoryInMB = 2560;
 
 extern cpu_type_t lc_cpuType;
 
