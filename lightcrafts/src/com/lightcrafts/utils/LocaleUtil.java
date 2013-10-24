@@ -4,6 +4,7 @@ package com.lightcrafts.utils;
 
 import java.util.ResourceBundle;
 import java.util.MissingResourceException;
+import java.util.regex.Matcher;
 
 import com.lightcrafts.platform.Platform;
 
@@ -67,7 +68,7 @@ public final class LocaleUtil {
     public String get( String key, String... subs ) {
         String s = get( key );
         for ( int i = 0; i < subs.length; ++i  )
-            s = s.replaceFirst( "\\$" + (i+1), subs[i] );
+            s = s.replaceFirst( "\\$" + (i+1), Matcher.quoteReplacement( subs[i] ) );
         return s;
     }
 
