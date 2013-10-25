@@ -216,8 +216,8 @@ If this appears during build, you may need to go to the antRun directory under /
 
 		sudo chmod +x *
 
-# class file has wrong version 50.0, should be 49.0
-If this appears, then some of the project was built with java 1.6, some with java 1.5.
+# class file has wrong version 51.0, should be 50.0
+If this appears, then some of the project was built with java 1.7, some with java 1.6.
 
 - Find which one is the default JVM version for your machine, and set that (see "Eclipse initial setup" above).
 - Then, run the "clean" external tool and rebuild the project.
