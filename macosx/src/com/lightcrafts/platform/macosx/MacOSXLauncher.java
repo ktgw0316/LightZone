@@ -87,7 +87,7 @@ public final class MacOSXLauncher {
     private static final int REQUIRED_MIN_MAJOR    = 1;
     private static final int REQUIRED_MIN_MINOR    = 6;
     private static final int REQUIRED_MIN_POINT    = 0;
-    private static final int REQUIRED_MIN_REVISION = 65;
+    private static final int REQUIRED_MIN_REVISION = 0; // accept any rev.
 
     /**
      * Check that the currently running JVM meets our minimum required version.
