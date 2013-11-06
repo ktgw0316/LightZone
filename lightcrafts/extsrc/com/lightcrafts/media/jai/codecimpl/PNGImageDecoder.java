@@ -1241,13 +1241,13 @@ class PNGImage extends SimpleRenderedImage {
     }
 
     private void parse_zTXt_chunk(PNGChunk chunk) {
-        String key = new String();
-        String value = new String();
+        StringBuffer key = new StringBuffer();
+        StringBuffer value = new StringBuffer();
         byte b;
 
         int textIndex = 0;
         while ((b = chunk.getByte(textIndex++)) != 0) {
-            key += (char)b;
+            key.append((char)b);
         }
         int method = chunk.getByte(textIndex++);
 
@@ -1258,13 +1258,14 @@ class PNGImage extends SimpleRenderedImage {
                 new ByteArrayInputStream(data, textIndex, length);
             InputStream iis = new InflaterInputStream(cis);
 
-            int c;
-            while ((c = iis.read()) != -1) {
-                value += (char)c;
+            byte[] buf = new byte[4096];
+            int r;
+            while ((r = iis.read(buf)) > 0) {
+                value.append(new String(buf, 0, r));
             }
 
-            ztextKeys.add(key);
-            ztextStrings.add(value);
+            ztextKeys.add(key.toString());
+            ztextStrings.add(value.toString());
         } catch (Exception e) {
             ImagingListenerProxy.errorOccurred(JaiI18N.getString("PNGImageDecoder21"),
                                    e, this, false);
