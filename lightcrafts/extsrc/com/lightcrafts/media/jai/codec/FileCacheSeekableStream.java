@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Method;
 import java.util.HashSet;
-import java.util.Iterator;
 
 /**
  * A subclass of <code>SeekableStream</code> that may be used to wrap
@@ -308,11 +307,10 @@ class TempFileCleanupThread extends Thread {
      */
     public void run() {
         if(tempFiles != null && tempFiles.size() > 0) {
-            Iterator fileIter = tempFiles.iterator();
-            while(fileIter.hasNext()) {
+            File[] filesToDelete = (File[])tempFiles.toArray(new File[tempFiles.size()]);
+            for (int i = 0; i < filesToDelete.length; i++) {
                 try {
-                    File file = (File)fileIter.next();
-                    file.delete();
+                    filesToDelete[i].delete();
                 } catch(Exception e) {
                     // Ignore
                 }
