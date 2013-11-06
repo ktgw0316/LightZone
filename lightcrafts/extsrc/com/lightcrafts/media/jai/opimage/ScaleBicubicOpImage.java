@@ -705,8 +705,8 @@ final class ScaleBicubicOpImage extends ScaleOpImage {
 		    s = (int)((sum + round) >> precisionBits);
 			
 		    // clamp the value to ushort range
-		    if (s > 65536) {
-			s = 65536;
+		    if (s > 65535) {
+			s = 65535;
 		    } else if (s < 0) {
 			s = 0;
 		    }
