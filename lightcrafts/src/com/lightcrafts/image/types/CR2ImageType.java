@@ -51,7 +51,7 @@ public final class CR2ImageType extends RawImageType {
         // values below are actually stored in the TIFF directory.
         //
         final ImageMetadataDirectory dir =
-            imageInfo.getMetadata().getDirectoryFor( TIFFDirectory.class );
+            imageInfo.getMetadata().getDirectoryFor( EXIFDirectory.class );
         if ( dir != null ) {
             final RenderedImage image = JPEGImageType.getImageFromBuffer(
                 imageInfo.getByteBuffer(),

@@ -400,14 +400,14 @@ public class Application {
             XmlDocument xml = null;
 
             // First look for default settings in the user-defined templates:
-            TemplateKey template = TemplateDatabase.getDefaultTemplate(meta);
-            if (template != null) {
-                try {
+            try {
+                TemplateKey template = TemplateDatabase.getDefaultTemplate(meta);
+                if (template != null) {
                     xml = TemplateDatabase.getTemplateDocument(template);
                 }
-                catch (TemplateDatabase.TemplateException e) {
-                    // Let xml remain null, try the factory defaults.
-                }
+            }
+            catch (TemplateDatabase.TemplateException e) {
+                // Let xml remain null, try the factory defaults.
             }
             // Then look for factory default settings:
             if (xml == null) {
@@ -493,14 +493,14 @@ public class Application {
             XmlDocument xml = null;
 
             // First look for default settings in the user-defined templates:
-            TemplateKey template = TemplateDatabase.getDefaultTemplate(meta);
-            if (template != null) {
-                try {
+            try {
+                TemplateKey template = TemplateDatabase.getDefaultTemplate(meta);
+                if (template != null) {
                     xml = TemplateDatabase.getTemplateDocument(template);
                 }
-                catch (TemplateDatabase.TemplateException e) {
-                    // Let xml remain null, try the factory defaults.
-                }
+            }
+            catch (TemplateDatabase.TemplateException e) {
+                // Let xml remain null, try the factory defaults.
             }
             // Then look for factory default settings:
             if (xml == null) {
