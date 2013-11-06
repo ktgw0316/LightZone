@@ -704,8 +704,8 @@ final class ScaleGeneralOpImage extends ScaleOpImage {
 		    s = interp.interpolate(samples, xfrac, yfrac);
 			
 		    // clamp the value to ushort range
-		    if (s > 65536) {
-			s = 65536;
+		    if (s > 65535) {
+			s = 65535;
 		    } else if (s < 0) {
 			s = 0;
 		    }
