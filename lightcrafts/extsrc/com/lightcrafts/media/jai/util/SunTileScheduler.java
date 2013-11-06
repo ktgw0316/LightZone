@@ -898,11 +898,19 @@ public final class SunTileScheduler implements TileScheduler {
                     // Attempt to compute the tile.
                     tile = owner.computeTile(tileX, tileY);
                 } catch (OutOfMemoryError e) {
-                    // Empty the cache and call System.gc()
+                    // Free some space in cache
                     TileCache tileCache = owner.getTileCache();
                     if(tileCache != null) {
-                        tileCache.flush();
-                        System.gc(); //slow
+                        tileCache.removeTiles(owner);
+                    }
+                    try {
+                        // Re-attempt to compute the tile.
+                        tile = owner.computeTile(tileX, tileY);
+                    } catch (OutOfMemoryError e1) {
+                        // Empty the cache
+                        if(tileCache != null) {
+                            tileCache.flush();
+                        }
                     }
 
                     // Re-attempt to compute the tile.
