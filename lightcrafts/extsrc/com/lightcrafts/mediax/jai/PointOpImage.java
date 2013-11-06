@@ -724,7 +724,7 @@ public abstract class PointOpImage extends OpImage {
      * @param tileY The Y index of the tile.
      */
     public Raster computeTile(int tileX, int tileY) {
-        if (!cobbleSources) {
+        if (cobbleSources) {
             return super.computeTile(tileX, tileY);
         }
 
