@@ -11,6 +11,7 @@ import com.lightcrafts.image.UnknownImageTypeException;
 import com.lightcrafts.image.metadata.*;
 
 import static com.lightcrafts.image.metadata.makernotes.CanonTags.*;
+import static com.lightcrafts.image.metadata.TIFFTags.*;
 
 /**
  * A <code>CR2ImageType</code> is-a {@link RawImageType} for CR2 (Canon Raw
@@ -75,7 +76,26 @@ public final class CR2ImageType extends RawImageType {
     public RenderedImage getThumbnailImage( ImageInfo imageInfo )
         throws BadImageFileException, IOException, UnknownImageTypeException
     {
-        return getPreviewImage( imageInfo, 640, 480 );
+        if (!USE_EMBEDDED_PREVIEW)
+            return getPreviewImage( imageInfo, 640, 480 );
+
+        final ImageMetadataDirectory dir =
+            imageInfo.getMetadata().getDirectoryFor( TIFFDirectory.class );
+        if ( dir == null ) {
+            //
+            // This should never be null, but just in case ...
+            //
+            return null;
+        }
+        //
+        // Get a small jpeg image from IFD #1
+        //
+        return JPEGImageType.getImageFromBuffer(
+            imageInfo.getByteBuffer(),
+            dir.getValue( TIFF_JPEG_INTERCHANGE_FORMAT ), 0,
+            dir.getValue( TIFF_JPEG_INTERCHANGE_FORMAT_LENGTH ),
+            160, 120
+        );
     }
 
     /**
