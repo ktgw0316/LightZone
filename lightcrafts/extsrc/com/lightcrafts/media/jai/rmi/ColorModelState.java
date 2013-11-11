@@ -13,7 +13,7 @@ package com.lightcrafts.media.jai.rmi;
 
 import java.awt.RenderingHints;
 import java.awt.color.ColorSpace;
-import java.awt.color.ICC_ColorSpace;
+// import java.awt.color.ICC_ColorSpace;
 import java.awt.image.ColorModel;
 import java.awt.image.ComponentColorModel;
 import java.awt.image.DirectColorModel;
@@ -45,7 +45,7 @@ public class ColorModelState extends SerializableStateImpl {
     private static final int COLORSPACE_PREDEFINED = 1;
 
     /** Flag indicating that the ColorSpace is an ICC_ColorSpace. */
-    private static final int COLORSPACE_ICC = 2;
+    // private static final int COLORSPACE_ICC = 2;
 
     /** Flag indicating that the ColorModel is null. */
     private static final int COLORMODEL_NULL = 0;
@@ -63,7 +63,7 @@ public class ColorModelState extends SerializableStateImpl {
     private static final int COLORMODEL_DIRECT = 4;
 
     /** The ColorModel. */
-    private transient ColorModel colorModel = null;
+    // private transient ColorModel colorModel = null;
 
     /**
      * Returns an array of length one containing the pre-defined
@@ -79,13 +79,13 @@ public class ColorModelState extends SerializableStateImpl {
 
         // Return the pre-defined index if the parameter is one of these.
         for(int i = 0; i < colorSpaces.length; i++) {
-	    try {
-		if(cs.equals(ColorSpace.getInstance(colorSpaces[i]))) {
-		    return new int[] {colorSpaces[i]};
-		}
-	    } catch (Throwable e) {
-		// profile not found ; resilent.
-	    }
+            try {
+                if(cs.equals(ColorSpace.getInstance(colorSpaces[i]))) {
+                    return new int[] {colorSpaces[i]};
+                }
+            } catch (Throwable e) {
+                // profile not found ; resilent.
+            }
         }
 
         // Try to find a similar ColorSpace.
@@ -112,26 +112,26 @@ public class ColorModelState extends SerializableStateImpl {
                                                ObjectOutputStream out)
         throws IOException {
             int[] colorSpaceType = getPredefinedColorSpace(cs);
-	    boolean isICCColorSpace = (cs instanceof ICC_ColorSpace);
+            // boolean isICCColorSpace = (cs instanceof ICC_ColorSpace);
 
-	    if (colorSpaceType == null) {
-		out.writeInt(COLORSPACE_OTHERS);
+            if (colorSpaceType == null) {
+                out.writeInt(COLORSPACE_OTHERS);
 
-		Object object = cs;
-		boolean flag = false;
-		try {
-		    Class cls = cs.getClass();
-		    Method getInstance = cls.getMethod("getInstance", 
-							null);
-		    if (Modifier.isPublic(cls.getModifiers())) {
-			flag = true;
-			object = cls.getName();
-		    }
-		} catch (Exception e) {
-		} finally {
-		    out.writeBoolean(flag);
-		    out.writeObject(object);
-		}
+                Object object = cs;
+                boolean flag = false;
+                try {
+                    Class<? extends ColorSpace> cls = cs.getClass();
+                    // Method getInstance = cls.getMethod("getInstance", 
+                    //                                    (Class<?>[]) null);
+                    if (Modifier.isPublic(cls.getModifiers())) {
+                        flag = true;
+                        object = cls.getName();
+                    }
+                } catch (Exception e) {
+                } finally {
+                    out.writeBoolean(flag);
+                    out.writeObject(object);
+                }
             } else {
                 out.writeInt(COLORSPACE_PREDEFINED);
                 out.writeInt(colorSpaceType[0]);
@@ -147,19 +147,19 @@ public class ColorModelState extends SerializableStateImpl {
         throws IOException, ClassNotFoundException {
             ColorSpace cs = null;
             int colorSpaceType = in.readInt();
-	    if (colorSpaceType == COLORSPACE_OTHERS) {
-		if (in.readBoolean()) {
-		    String name = (String)in.readObject();
-		    try {
-			Class cls = Class.forName(name);
-			Method getInstance = cls.getMethod("getInstance",
-							    null);
-			cs = (ColorSpace)getInstance.invoke(null, null);
+            if (colorSpaceType == COLORSPACE_OTHERS) {
+                if (in.readBoolean()) {
+                    String name = (String)in.readObject();
+                    try {
+                        Class<?> cls = Class.forName(name);
+                        Method getInstance = cls.getMethod("getInstance",
+                                                            (Class<?>[]) null);
+                        cs = (ColorSpace)getInstance.invoke(null, (Object[]) null);
 
-		    } catch (Exception e) { e.printStackTrace(); }
-		} else { 
-		    cs = (ColorSpace)in.readObject();
-		}
+                    } catch (Exception e) { e.printStackTrace(); }
+                } else { 
+                    cs = (ColorSpace)in.readObject();
+                }
             } else if(colorSpaceType == COLORSPACE_PREDEFINED) {
                 cs = ColorSpace.getInstance(in.readInt());
             } 
@@ -185,7 +185,7 @@ public class ColorModelState extends SerializableStateImpl {
       * @param o The <code>SampleModel</code> to be serialized.
       * @param h The <code>RenderingHints</code> (ignored).
       */
-    public ColorModelState(Class c, Object o, RenderingHints h) {
+    public ColorModelState(Class<?> c, Object o, RenderingHints h) {
         super(c, o, h);
     }
 

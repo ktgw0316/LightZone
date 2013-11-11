@@ -88,8 +88,8 @@ public class ImagingException extends RuntimeException {
 	while(rootCause != atop && rootCause != null) {
 	    try {
 		atop = rootCause;
-		Method getCause = rootCause.getClass().getMethod("getCause", null);
-		rootCause = (Throwable)getCause.invoke(rootCause, null);
+		Method getCause = rootCause.getClass().getMethod("getCause", (Class<?>[]) null);
+		rootCause = (Throwable)getCause.invoke(rootCause, (Object[]) null);
 	    } catch (Exception e) {
 		// do nothing.  This happens (1) getCause method is not defined.
 		// (2) Reflection error.  So rootCause will be the same as

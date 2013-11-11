@@ -25,21 +25,21 @@ public class ImagingListenerProxy {
 	Object listener = null;
 
         try {
-            Class jaiClass = Class.forName("com.lightcrafts.mediax.jai.JAI");
+            Class<?> jaiClass = Class.forName("com.lightcrafts.mediax.jai.JAI");
             if (jaiClass == null)
                 return defaultImpl(message, thrown, where, isRetryable);
 
             Method jaiInstance =
-                jaiClass.getMethod("getDefaultInstance", null);
+                jaiClass.getMethod("getDefaultInstance", (Class<?>[]) null);
             Method getListener =
-		jaiClass.getMethod("getImagingListener", null);
+		jaiClass.getMethod("getImagingListener", (Class<?>[]) null);
 
-            Object jai = jaiInstance.invoke(null, null);
+            Object jai = jaiInstance.invoke(null, (Object[]) null);
             if (jai == null)
                 return defaultImpl(message, thrown, where, isRetryable);
 
-            listener = getListener.invoke(jai, null);
-            Class listenerClass = listener.getClass();
+            listener = getListener.invoke(jai, (Object[]) null);
+            Class<? extends Object> listenerClass = listener.getClass();
 
             errorOccurred =
                 listenerClass.getMethod("errorOccurred",
@@ -79,7 +79,7 @@ public class ImagingListenerProxy {
         System.err.println("Error: " + message);
         System.err.println("Occurs in: " +
                            ((where instanceof Class) ?
-                           ((Class)where).getName() :
+                           ((Class<?>)where).getName() :
                            where.getClass().getName()));
         thrown.printStackTrace(System.err);
         return false;

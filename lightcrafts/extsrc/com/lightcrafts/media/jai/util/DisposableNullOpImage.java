@@ -40,21 +40,21 @@ public class DisposableNullOpImage extends NullOpImage {
     }
 
     public synchronized void dispose() {
-        PlanarImage src = getSource(0);
+        PlanarImage src = getSourceImage(0);
         if(src instanceof RenderedImageAdapter) {
             // Use relection to invoke dispose();
             RenderedImage trueSrc =
                 ((RenderedImageAdapter)src).getWrappedImage();
             Method disposeMethod = null;
             try {
-                Class cls = trueSrc.getClass();
-                disposeMethod = cls.getMethod("dispose", null);
+                Class<? extends RenderedImage> cls = trueSrc.getClass();
+                disposeMethod = cls.getMethod("dispose", (Class<?>[]) null);
                 if(!disposeMethod.isAccessible()) {
                     AccessibleObject.setAccessible(new AccessibleObject[] {
                         disposeMethod
                     }, true);
                 }
-                disposeMethod.invoke(trueSrc, null);
+                disposeMethod.invoke(trueSrc, (Object[]) null);
             } catch(Exception e) {
                 // Ignore it.
             }

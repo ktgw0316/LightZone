@@ -60,14 +60,14 @@ class StreamImage extends RenderedImageAdapter {
         RenderedImage trueSrc = getWrappedImage();
         Method disposeMethod = null;
         try {
-            Class cls = trueSrc.getClass();
-            disposeMethod = cls.getMethod("dispose", null);
+            Class<? extends RenderedImage> cls = trueSrc.getClass();
+            disposeMethod = cls.getMethod("dispose", (Class<?>[]) null);
             if(!disposeMethod.isAccessible()) {
                 AccessibleObject.setAccessible(new AccessibleObject[] {
                     disposeMethod
                 }, true);
             }
-            disposeMethod.invoke(trueSrc, null);
+            disposeMethod.invoke(trueSrc, (Object[]) null);
         } catch(Exception e) {
             // Ignore it.
         }
@@ -104,16 +104,16 @@ public class FileLoadRIF implements RenderedImageFactory {
             // Create a SeekableStream from the file name (first parameter).
             String fileName = (String)args.getObjectParameter(0);
 
-	    SeekableStream src = null;
-	    try {
+            SeekableStream src = null;
+            try {
                 src = new FileSeekableStream(fileName);
             } catch (FileNotFoundException fnfe) {
-		// Try to get the file as an InputStream resource. This would
-		// happen when the application and image file are packaged in
-		// a JAR file
-		InputStream is = this.getClass().getClassLoader().getResourceAsStream(fileName);
-		if (is != null)
-		    src = SeekableStream.wrapInputStream(is, true);
+                // Try to get the file as an InputStream resource. This would
+                // happen when the application and image file are packaged in
+                // a JAR file
+                InputStream is = this.getClass().getClassLoader().getResourceAsStream(fileName);
+                if (is != null)
+                    src = SeekableStream.wrapInputStream(is, true);
             }
 
             ImageDecodeParam param = null;
@@ -141,7 +141,7 @@ public class FileLoadRIF implements RenderedImageFactory {
 
             // Create the image using the most preferred RIF for "stream".
             RenderedImage image =
-		RIFRegistry.create(registry, "stream", newArgs, hints);
+                RIFRegistry.create(registry, "stream", newArgs, hints);
 
             return image == null ? null : new StreamImage(image, src);
 
