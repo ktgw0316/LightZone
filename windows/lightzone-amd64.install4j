@@ -631,7 +631,7 @@
                         <array class="java.io.File" length="1">
                           <void index="0">
                             <object class="java.io.File">
-                              <string>${installer:sys.userHome}/Application Data/LightZone/Caches</string>
+                              <string>${installer:sys.appdataDir}/LightZone/Caches</string>
                             </object>
                           </void>
                         </array>
