@@ -16,7 +16,7 @@ JARS:=		$(COMMON_DIR)/products/lightcrafts.jar \
 # Uncomment to compile in debug mode.
 #DEBUG:=		true
 
-SDKROOT:=	/Developer/SDKs/MacOSX10.6.sdk
+SDKROOT:=	$(shell xcodebuild -version -sdk macosx${MACOSX_DEPLOYMENT_TARGET} | sed -n '/^Path:/p' | sed 's/^Path: //')
 ifeq ($(UNIVERSAL),1)
   ##
   # We need to build the PowerPC part with gcc/g++ 3.3 so the launcher will run
