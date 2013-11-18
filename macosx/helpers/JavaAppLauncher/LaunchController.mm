@@ -77,7 +77,7 @@ static OSType getSigFromPSN( ProcessSerialNumber const *psn ) {
     ProcessInfoRec info;
     info.processInfoLength = sizeof( info );
     info.processName = NULL;
-    info.processAppSpec = NULL;
+    // info.processAppSpec = NULL;
     if ( ::GetProcessInformation( psn, &info ) == noErr )
         return info.processSignature;
     return 0;
