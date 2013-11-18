@@ -62,7 +62,7 @@ JNIEXPORT jboolean JNICALL MacOSXFileUtil_METHOD(moveToTrash)
     ( JNIEnv *env, jclass, jstring jDirectory, jobjectArray jFiles )
 {
     auto_obj<NSAutoreleasePool> pool;
-    int tag;
+    NSInteger tag;
     BOOL const result =
         [[NSWorkspace sharedWorkspace]
             performFileOperation:NSWorkspaceRecycleOperation
