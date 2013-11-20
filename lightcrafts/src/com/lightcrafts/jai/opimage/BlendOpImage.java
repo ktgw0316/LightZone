@@ -276,10 +276,12 @@ public class BlendOpImage extends PointOpImage {
 
         RasterAccessor cs = null;
         if (colorSelection != null) {
-            // Raster csRaster = colorSelection.getData(destRect);
             int tilex = sources[0].getMinX() / sources[0].getWidth();
             int tiley = sources[0].getMinY() / sources[0].getHeight();
             Raster csRaster = colorSelection.getTile(tilex, tiley);
+            if (csRaster == null) {
+                csRaster = colorSelection.getData(destRect);
+            }
             SampleModel csRasterSM = csRaster.getSampleModel();
             int csRasterFormatTagID = RasterAccessor.findCompatibleTag(null, csRasterSM);
             RasterFormatTag csRasterFormatTag = new RasterFormatTag(csRasterSM, csRasterFormatTagID);
