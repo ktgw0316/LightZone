@@ -130,7 +130,7 @@ JNIEXPORT void JNICALL MacOSXPrinter_METHOD(nativePrint)
         [view setImage:image];
         [view setImageScaling:NSScaleProportionally];
 
-        NSPrintInfo const *const info = getSharedPrintInfo();
+        NSPrintInfo *const info = getSharedPrintInfo();
 
         NSPoint p = NSMakePoint(
             jBoundsX, [info paperSize].height - jBoundsHeight - jBoundsY
