@@ -1,0 +1,12 @@
+language: objective-c
+script: ant -f macosx/build.xml dmg
+jdk:
+  - oraclejdk7
+  - openjdk7
+  - openjdk6
+before_install:
+  - cat /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/usr/include/unistd.h
+  - cat /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/usr/include/strings.h
+  - export JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Home
+  - brew update
+  - brew install --force libtool autoconf automake nasm
