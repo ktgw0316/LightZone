@@ -6,6 +6,10 @@
 
 AUTO_DEP_FLAGS:=	-MM -DAUTO_DEP $(DEFINES)
 
+ifeq ($(PLATFORM),MacOSX)
+  AUTO_DEP_FLAGS+=	-D_DARWIN_C_SOURCE -D__DARWIN_C_LEVEL=199506L
+endif
+
 ifeq ($(UNIVERSAL),1)
   ##
   # We need to use an architecture-specific INCLUDES, but since dependencies
