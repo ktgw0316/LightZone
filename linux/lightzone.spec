@@ -5,7 +5,7 @@
 Name:           lightzone
 # Do not use hyphens in Version tag. OBS doesn't handle it properly.
 # Use 4.1.0.beta2 for betas and 4.1.0.0 for final, since RPM sorts A-Z before 0-9.
-Version:	4.1.0.beta4
+Version:	4.1.0.beta5
 Release:	0
 License:	BSD-3-Clause
 Summary:	Open-source professional-level digital darkroom software
