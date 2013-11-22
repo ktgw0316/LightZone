@@ -77,12 +77,20 @@ ifeq ($(UNIVERSAL),1)
 else
   CFLAGS+=		-fPIC
   # CFLAGS+=		$(PLATFORM_CFLAGS)
+  ifeq ($(PLATFORM),MacOSX)
+    ifeq ($(HOSTTYPE),x86_64)
+      ifeq ($(arch),i386)
+        CFLAGS+=	-O3 -m32
+        LDFLAGS:=	-m32
+      endif
+    endif
+  endif
 endif
 
 $(ARCH_MAKEFILES):
 	cd $(@D) && \
 	autoreconf -fiv && \
-	CC="$(CC)" CFLAGS="$(CFLAGS)" ./configure $(CONFIG_OPTIONS)
+	CC="$(CC)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" ./configure $(CONFIG_OPTIONS)
 
 ##### Make the libraries.
 
