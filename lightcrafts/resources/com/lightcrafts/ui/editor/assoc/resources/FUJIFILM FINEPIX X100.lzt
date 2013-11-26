@@ -2,7 +2,7 @@
   <Scale Denominator="2" Numerator="1"/>
   <Image path=""/>
   <Controls>
-    <ZoneOperation Active="true" Collapsed="true" Locked="true" Mode="Normal" Name="Raw Tone Curve" Opacity="100" layerControlsIndex="0" regionsInverted="false" scale="0">
+    <ZoneOperation Active="true" Collapsed="true" Locked="true" Mode="Normal" Name="RAW Tone Curve" Opacity="100" layerControlsIndex="0" regionsInverted="false" scale="0">
       <ColorSelection HueBlue="0.5" HueEnabled="true" HueGreen="0.5" HueRadius="-1.0" HueRed="0.5" Inverted="false" LuminosityEnabled="true" LuminosityLower="0.0" LuminosityLowerFeather="0.0" LuminosityUpper="1.0" LuminosityUpperFeather="0.0"/>
       <Points Size="16">
         <Point X="5" Y="0.1592920353982301"/>
