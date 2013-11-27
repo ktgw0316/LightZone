@@ -63,9 +63,13 @@ endif
 
 ##### Create the sub-Makefiles via configure.
 
+MAKEFILE_X86:=		arch-i386/$(LIB_SRC)/Makefile
+
+$(MAKEFILE_X86): CFLAGS+=	-O3 -m32
+$(MAKEFILE_X86): LDFLAGS:=	-m32
+
 ifeq ($(UNIVERSAL),1)
   MAKEFILE_PPC:=		arch-powerpc/$(LIB_SRC)/Makefile
-  MAKEFILE_X86:=		arch-i386/$(LIB_SRC)/Makefile
 
   $(MAKEFILE_PPC): CC:=		$(CC_PPC)
   $(MAKEFILE_PPC): CFLAGS+=	$(PLATFORM_CFLAGS_PPC) # $(ALTIVEC_CFLAGS) off for now, there is a bug in the color
@@ -77,14 +81,6 @@ ifeq ($(UNIVERSAL),1)
 else
   CFLAGS+=		-fPIC
   # CFLAGS+=		$(PLATFORM_CFLAGS)
-  ifeq ($(PLATFORM),MacOSX)
-    ifeq ($(HOSTTYPE),x86_64)
-      ifeq ($(arch),i386)
-        CFLAGS+=	-O3 -m32
-        LDFLAGS:=	-m32
-      endif
-    endif
-  endif
 endif
 
 $(ARCH_MAKEFILES):
