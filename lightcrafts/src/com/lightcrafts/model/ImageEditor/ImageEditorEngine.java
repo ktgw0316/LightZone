@@ -771,23 +771,23 @@ public class ImageEditorEngine implements Engine {
                 exportOptions.getIntValueOf(BitsPerChannelOption.NAME) == 8
         );
 
-        // Never uprez output images.  See bug 1443.
+        // Uprez output images
 
-//        double scale = Math.min(exportWidth / (double) exportImage.getWidth(),
-//                                exportHeight / (double) exportImage.getHeight());
-//
-//        if (scale > 1) {
-//            AffineTransform xform = AffineTransform.getScaleInstance(scale, scale);
-//
-//            RenderingHints formatHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-//
-//            Interpolation interp = Interpolation.getInstance(Interpolation.INTERP_BICUBIC_2);
-//            ParameterBlock params = new ParameterBlock();
-//            params.addSource(exportImage);
-//            params.add(xform);
-//            params.add(interp);
-//            exportImage = JAI.create("Affine", params, formatHints);
-//        }
+        double scale = Math.min(exportWidth / (double) exportImage.getWidth(),
+                                exportHeight / (double) exportImage.getHeight());
+
+        if (scale > 1) {
+            AffineTransform xform = AffineTransform.getScaleInstance(scale, scale);
+
+            RenderingHints formatHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
+
+            Interpolation interp = Interpolation.getInstance(Interpolation.INTERP_BICUBIC_2);
+            ParameterBlock params = new ParameterBlock();
+            params.addSource(exportImage);
+            params.add(xform);
+            params.add(interp);
+            exportImage = JAI.create("Affine", params, formatHints);
+        }
 
         // Make sure that if uprezzing was requested and denied, the metadata
         // reflect the actual output image size
