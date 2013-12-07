@@ -113,6 +113,9 @@ class MenuFactory {
     final static ResourceBundle Resources = ResourceBundle.getBundle(
         "com/lightcrafts/app/menu/MenuFactory"
     );
+    final static ResourceBundle Resources_ALL = ResourceBundle.getBundle(
+        "com/lightcrafts/app/menu/MenuFactory_ALL"
+    );
 
     private static String PlatformSuffix = "";
 
@@ -177,7 +180,11 @@ class MenuFactory {
         try {
             return Resources.getString(key);
         } catch (MissingResourceException e) {
-            return null;
+            try {
+                return Resources_ALL.getString(key);
+            } catch (MissingResourceException e2) {
+                return null;
+            }
         }
     }
 
