@@ -12,7 +12,7 @@ separatorPre='# *** flattened from'
 separatorPost='***'
 
 # Properties files are discovered under the working directory:
-files=`find . -name "*.properties" | sort`
+files=`find . -name "*.properties" | grep -v "_" | sort`
 
 # Stamp the flat form with its revision number:
 echo -n "# "
