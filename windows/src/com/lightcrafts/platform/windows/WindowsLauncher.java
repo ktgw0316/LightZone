@@ -3,7 +3,7 @@
 package com.lightcrafts.platform.windows;
 
 import com.lightcrafts.app.Application;
-import com.lightcrafts.app.CheckForUpdate;
+// import com.lightcrafts.app.CheckForUpdate;
 import com.lightcrafts.app.ExceptionDialog;
 import com.lightcrafts.app.other.OtherApplication;
 import com.lightcrafts.app.other.WindowsApplication;
@@ -58,7 +58,7 @@ public final class WindowsLauncher {
 
             final String licenseText = "Open Source";
 
-            CheckForUpdate.start();
+            // CheckForUpdate.start();
             {
                 final SplashImage image = new SplashImage(
                     SplashImage.getDefaultSplashText( licenseText )
@@ -68,7 +68,7 @@ public final class WindowsLauncher {
                 Application.main( args );
                 SplashWindow.disposeSplash();
             }
-            CheckForUpdate.showAlertIfAvailable();
+            // CheckForUpdate.showAlertIfAvailable();
         }
         catch ( Throwable t ) {
             (new ExceptionDialog()).handle( t );

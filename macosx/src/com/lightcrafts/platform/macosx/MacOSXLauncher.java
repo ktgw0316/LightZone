@@ -3,7 +3,7 @@
 package com.lightcrafts.platform.macosx;
 
 import com.lightcrafts.app.Application;
-import com.lightcrafts.app.CheckForUpdate;
+// import com.lightcrafts.app.CheckForUpdate;
 import com.lightcrafts.app.ExceptionDialog;
 import com.lightcrafts.app.other.MacApplication;
 import com.lightcrafts.app.other.OtherApplication;
@@ -57,7 +57,7 @@ public final class MacOSXLauncher {
             );
             SplashWindow.splash(image);
             setColor();
-            CheckForUpdate.start();
+            // CheckForUpdate.start();
             {
                 Application.setStartupProgress(
                         image.getStartupProgress()
@@ -66,7 +66,7 @@ public final class MacOSXLauncher {
                 Application.main(args);
             }
             SplashWindow.disposeSplash();
-            CheckForUpdate.showAlertIfAvailable();
+            // CheckForUpdate.showAlertIfAvailable();
         }
         catch (Throwable t) {
             (new ExceptionDialog()).handle(t);
