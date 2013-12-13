@@ -37,6 +37,9 @@ public final class WindowsLauncher {
      */
     public static void main( String[] args ) {
         System.setProperty("awt.useSystemAAFontSettings", "on");
+        if (System.getProperty("os.arch").endsWith("64")) {
+            System.setProperty("com.sun.media.jai.disableMediaLib", "true");
+        }
 
         final boolean lafCond = sun.swing.SwingUtilities2.isLocalDisplay();
         Object aaTextInfo = sun.swing.SwingUtilities2.AATextInfo.getAATextInfo(lafCond);
