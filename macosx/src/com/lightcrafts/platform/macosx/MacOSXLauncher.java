@@ -41,7 +41,6 @@ public final class MacOSXLauncher {
     public static void main( final String[] args ) {
         // java.util.Locale.setDefault( java.util.Locale.ENGLISH );
         // System.setProperty("apple.awt.graphics.UseQuartz", "false");
-        System.setProperty("com.sun.media.jai.disableMediaLib", "true");
 
         System.out.println(
             "This is " + Version.getApplicationName() + ' '
