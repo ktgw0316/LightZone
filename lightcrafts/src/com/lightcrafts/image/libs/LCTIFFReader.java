@@ -454,13 +454,17 @@ public final class LCTIFFReader extends LCTIFFCommon {
             else
                 db = tf.planes == 1 ? new DataBufferUShort(tf.tileSize/2) : new DataBufferUShort(tf.tileSize/2, tf.planes);
         }
+
+        final int imageTileWidth = tf.tiled ? tf.tiffTileWidth : JAIContext.TILE_WIDTH;
+        final int imageTileHeight = tf.tiled ? tf.tiffTileHeight : JAIContext.TILE_HEIGHT;
+
         // Sample model for the output image, interleaved
-        final SampleModel tsm = imageCcm.createCompatibleSampleModel(JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT);
+        final SampleModel tsm = imageCcm.createCompatibleSampleModel(imageTileWidth, imageTileHeight);
 
         // Layout of the output image
         final ImageLayout layout = new ImageLayout(0, 0, tf.imageWidth, tf.imageHeight,
                                                    0, 0,
-                                                   JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT,
+                                                   imageTileWidth, imageTileHeight,
                                                    tsm, imageCcm);
 
         // The output image itself, directly allocated in the file cache
