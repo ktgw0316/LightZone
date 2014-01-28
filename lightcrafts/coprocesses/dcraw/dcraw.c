@@ -19,8 +19,8 @@
    *If you have not modified dcraw.c in any way, a link to my
    homepage qualifies as "full source code".
 
-   $Revision: 1.458 $
-   $Date: 2014/01/15 00:24:09 $
+   $Revision: 1.460 $
+   $Date: 2014/01/26 23:56:04 $
  */
 
 #define DCRAW_VERSION "9.20"
@@ -80,7 +80,7 @@ typedef unsigned long long UINT64;
 #include <jpeglib.h>		/* Decode compressed Kodak DC120 photos */
 #endif				/* and Adobe Lossy DNGs */
 #ifndef NO_LCMS
-#include <lcms.h>		/* Support color profiles */
+#include <lcms2.h>		/* Support color profiles */
 #endif
 #ifdef LOCALEDIR
 #include <libintl.h>
@@ -6975,6 +6975,8 @@ void CLASS adobe_coeff (const char *make, const char *model)
 	{ 7911,-2167,-813,-5327,13150,2408,-1288,2483,7968 } },
     { "Nikon D3200", 0, 0xfb9,
 	{ 7013,-1408,-635,-5268,12902,2640,-1470,2801,7379 } },
+    { "Nikon D3300", 147, 0,		/* DJC */
+	{ 6108,-2161,-13,-4091,9871,4220,-1222,2469,7907 } },
     { "Nikon D300", 0, 0,
 	{ 9030,-1992,-715,-8465,16302,2255,-2689,3217,8069 } },
     { "Nikon D3X", 0, 0,
@@ -7305,6 +7307,8 @@ void CLASS adobe_coeff (const char *make, const char *model)
 	{ 6763,-1919,-863,-3868,11515,2684,-1216,2387,5879 } },
     { "Panasonic DMC-GX7", 143, 0,
 	{ 7610,-2780,-576,-4614,12195,2733,-1375,2393,6490 } },
+    { "Panasonic DMC-TZ61", 143, 0,	/* DJC */
+	{ 6211,-2325,27,-3800,9449,4352,-943,2166,6293 } },
     { "Phase One H 20", 0, 0,		/* DJC */
 	{ 1313,1855,-109,-6715,15908,808,-327,1840,6020 } },
     { "Phase One H 25", 0, 0,
@@ -7397,6 +7401,8 @@ void CLASS adobe_coeff (const char *make, const char *model)
 	{ 5271,-712,-347,-6153,13653,2763,-1601,2366,7242 } },
     { "Sony ILCE-3000", 128, 0,
 	{ 5991,-1456,-455,-4764,12135,2980,-707,1425,6701 } },
+    { "Sony ILCE-5000", 128, 0,		/* DJC */
+	{ 4130,-1407,93,-4151,9566,4586,-1035,1976,7000 } },
     { "Sony NEX-5N", 128, 0,
 	{ 5991,-1456,-455,-4764,12135,2980,-707,1425,6701 } },
     { "Sony NEX-5R", 128, 0,

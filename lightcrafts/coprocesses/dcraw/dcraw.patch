@@ -1,5 +1,5 @@
---- dcraw.c.orig	2014-01-16 20:25:04.612448200 +0900
-+++ dcraw.c	2014-01-16 20:44:25.007184400 +0900
+--- dcraw.c.orig	2014-01-28 21:45:30.870068876 +0900
++++ dcraw.c	2014-01-28 21:48:58.149979521 +0900
 @@ -140,7 +140,10 @@
  int no_auto_bright=0;
  unsigned greybox[4] = { 0, 0, UINT_MAX, UINT_MAX };
@@ -12,7 +12,15 @@
    { 0.412453, 0.357580, 0.180423 },
    { 0.212671, 0.715160, 0.072169 },
    { 0.019334, 0.119193, 0.950227 } };
-@@ -9108,6 +9111,9 @@
+@@ -8684,6 +8687,7 @@
+   FILE *fp;
+   unsigned size;
+ 
++  cmsErrorAction (LCMS_ERROR_SHOW);
+   if (strcmp (input, "embed"))
+     hInProfile = cmsOpenProfileFromFile (input, "r");
+   else if (profile_length) {
+@@ -9113,6 +9117,9 @@
  #ifndef NO_LCMS
    const char *cam_profile=0, *out_profile=0;
  #endif
@@ -22,7 +30,7 @@
  
  #ifndef LOCALTIME
    putenv ((char *) "TZ=UTC");
-@@ -9202,6 +9208,9 @@
+@@ -9207,6 +9214,9 @@
        case 'p':  cam_profile = argv[arg++];
  #endif
  	break;
@@ -32,7 +40,7 @@
        case 'P':  bpfile     = argv[arg++];  break;
        case 'K':  dark_frame = argv[arg++];  break;
        case 'z':  timestamp_only    = 1;  break;
-@@ -9230,6 +9239,19 @@
+@@ -9235,6 +9245,19 @@
  	return 1;
      }
    }
@@ -52,7 +60,7 @@
    if (arg == argc) {
      fprintf (stderr,_("No files to process.\n"));
      return 1;
-@@ -9326,6 +9348,10 @@
+@@ -9331,6 +9354,10 @@
        printf (_("Aperture: f/%0.1f\n"), aperture);
        printf (_("Focal length: %0.1f mm\n"), focal_len);
        printf (_("Embedded ICC profile: %s\n"), profile_length ? _("yes"):_("no"));
@@ -63,7 +71,7 @@
        printf (_("Number of raw images: %d\n"), is_raw);
        if (pixel_aspect != 1)
  	printf (_("Pixel Aspect Ratio: %0.6f\n"), pixel_aspect);
-@@ -9368,6 +9394,10 @@
+@@ -9373,6 +9400,10 @@
  	  for (i=0; i < 16; i++)
  	    putchar (cdesc[fcol(i >> 1,i & 1)]);
  	}
@@ -74,7 +82,7 @@
  	printf (_("\nDaylight multipliers:"));
  	FORCC printf (" %f", pre_mul[c]);
  	if (cam_mul[0] > 0) {
-@@ -9480,6 +9510,11 @@
+@@ -9485,6 +9516,11 @@
      if (write_to_stdout)
        strcpy (ofname,_("standard output"));
      else {
