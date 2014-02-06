@@ -572,15 +572,16 @@ public class ImageEditorEngine implements Engine {
                 if (preview.isShowing()) {
                     if (preview instanceof PaintListener) {
                         float renderingScale = rendering.getScaleFactor();
+                        Rectangle previewVisibleRect = visibleRect;
                         if (renderingScale > 1)
-                            visibleRect = new Rectangle((int) (visibleRect.x/renderingScale),
+                            previewVisibleRect = new Rectangle((int) (visibleRect.x/renderingScale),
                                                         (int) (visibleRect.y/renderingScale),
                                                         (int) (visibleRect.width/renderingScale),
                                                         (int) (visibleRect.height/renderingScale));
 
                         ((PaintListener) preview).paintDone(preview instanceof ZoneFinder
                                                             ? previewImage
-                                                            : processedImage, visibleRect, synchronous, time);
+                                                            : processedImage, previewVisibleRect, synchronous, time);
                     }
                 }
             }
