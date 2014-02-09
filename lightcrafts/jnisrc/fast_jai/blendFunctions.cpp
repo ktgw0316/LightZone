@@ -12,6 +12,7 @@
 
 #include <math.h>
 #include <algorithm>
+#include <complex>
 
 typedef unsigned char byte;
 typedef unsigned short ushort;

@@ -8,6 +8,9 @@
 *.exe
 *.dll
 *.iml
+*.jnilib
+*.dylib
+*.nib
 .idea/**
 lightcrafts/build
 lightcrafts/extbuild
@@ -31,6 +34,7 @@ lightcrafts/jnisrc/jpeg/libjpeg/libjpeg-turbo-1.2.90/ltmain.sh
 lightcrafts/jnisrc/jpeg/libjpeg/libjpeg-turbo-1.2.90/missing
 lightcrafts/jnisrc/jpeg/libjpeg/libjpeg-turbo-1.2.90/*/Makefile
 lightcrafts/jnisrc/jpeg/libjpeg/libjpeg-turbo-1.2.90/*/Makefile.in
+lightcrafts/jnisrc/jpeg/libjpeg/arch-x86_64/
 lightcrafts/jnisrc/tiff/libtiff/tiff-4.0.3/config.log
 lightcrafts/jnisrc/tiff/libtiff/tiff-4.0.3/config.status
 lightcrafts/jnisrc/tiff/libtiff/tiff-4.0.3/libtiff/.libs/
@@ -40,6 +44,8 @@ lightcrafts/jnisrc/tiff/libtiff/tiff-4.0.3/libtiff/stamp-h2
 lightcrafts/jnisrc/tiff/libtiff/tiff-4.0.3/libtiff/tif_config.h
 lightcrafts/jnisrc/tiff/libtiff/tiff-4.0.3/libtiff/tiffconf.h
 lightcrafts/jnisrc/tiff/libtiff/tiff-4.0.3/libtool
+lightcrafts/jnisrc/tiff/libtiff/arch-x86_64/
+lightcrafts/jnisrc/tiff/zlib/arch-x86_64/
 lightcrafts/jnisrc/tiff/zlib/zlib-1.2.7/zconf.h
 lightcrafts/jnisrc/tiff/zlib/zlib-1.2.7/configure.log
 linux/build/
@@ -63,3 +69,7 @@ debian/*.log
 debian/DEBIAN
 debian/lightzone
 debian/files
+macosx/build/
+macosx/jnisrc/libMacOSX/javah/
+macosx/products/LightZone-forkd
+macosx/products/dcraw
