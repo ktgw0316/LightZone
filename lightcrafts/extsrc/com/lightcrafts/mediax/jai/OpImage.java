@@ -1124,10 +1124,18 @@ public abstract class OpImage extends PlanarImage {
                 try {
                     tile = scheduler.scheduleTile(this, tileX, tileY);
                 } catch (OutOfMemoryError e) {
-                    // Empty the cache and call System.gc()
+                    // Free some space in cache
                     if(cache != null) {
-                        cache.flush();
-                        System.gc(); //slow
+                        cache.removeTiles(this);
+                    }
+                    try {
+                        // Re-attempt to compute the tile.
+                        tile = scheduler.scheduleTile(this, tileX, tileY);
+                    } catch (OutOfMemoryError e1){
+                        // Empty the cache
+                        if(cache != null) {
+                            cache.flush();
+                        }
                     }
 
                     // Need to reissue the tile scheduling.
