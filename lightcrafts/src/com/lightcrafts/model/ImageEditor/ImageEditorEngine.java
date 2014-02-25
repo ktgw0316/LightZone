@@ -300,6 +300,7 @@ public class ImageEditorEngine implements Engine {
         operationsSet.put(AdvancedNoiseReductionOperation.typeV1, AdvancedNoiseReductionOperation.class);
         operationsSet.put(AdvancedNoiseReductionOperation.typeV2, AdvancedNoiseReductionOperation.class);
         operationsSet.put(AdvancedNoiseReductionOperation.typeV3, AdvancedNoiseReductionOperation.class);
+        operationsSet.put(AdvancedNoiseReductionOperationV4.type, AdvancedNoiseReductionOperationV4.class);
         operationsSet.put(HiPassFilterOperation.type, HiPassFilterOperation.class);
         operationsSet.put(HueSaturationOperation.typeV1, HueSaturationOperation.class);
         operationsSet.put(HueSaturationOperation.typeV2, HueSaturationOperation.class);
@@ -322,10 +323,11 @@ public class ImageEditorEngine implements Engine {
         operationsSet.put(ColorBalanceOperationV2.typeV3, ColorBalanceOperationV2.class);
         operationsSet.put(ColorBalanceOperation.type, ColorBalanceOperation.class);
         operationsSet.put(RedEyesOperation.type, RedEyesOperation.class);
-        operationsSet.put(RawAdjustmentsOperation.type, RawAdjustmentsOperation.class);
+        operationsSet.put(RawAdjustmentsOperation.typeV1, RawAdjustmentsOperation.class);
+        operationsSet.put(RawAdjustmentsOperation.typeV2, RawAdjustmentsOperation.class);
     }
 
-    public Collection getGenericOperationTypes() {
+    public Collection<OperationType> getGenericOperationTypes() {
         return operationsSet.keySet();
     }
 
@@ -395,7 +397,11 @@ public class ImageEditorEngine implements Engine {
     }
 
     public OperationType getRawAdjustmentsOperationType() {
-        return RawAdjustmentsOperation.type;
+        return RawAdjustmentsOperation.typeV2;
+    }
+
+    public OperationType getGenericRawAdjustmentsOperationType() {
+        return RawAdjustmentsOperation.typeV1;
     }
 
     public void removeOperation(int position) {
@@ -528,7 +534,7 @@ public class ImageEditorEngine implements Engine {
                                                                              this.proofProfile,
                                                                              null,
                                                                              this.proofIntent,
-                                                                             JAIContext.noCacheHint),
+                                                                             null),
                                                       null); // Cache this for the preview
 
             previewImage.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
@@ -686,7 +692,7 @@ public class ImageEditorEngine implements Engine {
                                LCMSColorConvertDescriptor.RELATIVE_COLORIMETRIC_BP);
     }
 
-    public LCMSColorConvertDescriptor.RenderingIntent getLCMSIntent(RenderingIntent intent) {
+    public static LCMSColorConvertDescriptor.RenderingIntent getLCMSIntent(RenderingIntent intent) {
         return renderingIntentMap.get(intent);
     }
 
