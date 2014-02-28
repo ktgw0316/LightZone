@@ -9354,10 +9354,6 @@ int CLASS main (int argc, const char **argv)
       printf (_("Aperture: f/%0.1f\n"), aperture);
       printf (_("Focal length: %0.1f mm\n"), focal_len);
       printf (_("Embedded ICC profile: %s\n"), profile_length ? _("yes"):_("no"));
-#ifdef LIGHTZONE
-      if (is_raw > 1 && !strncmp(make,"FUJIFILM",8) && !fuji_width)
-        printf (_("Number of raw images: 1\nTrue "));
-#endif
       printf (_("Number of raw images: %d\n"), is_raw);
       if (pixel_aspect != 1)
 	printf (_("Pixel Aspect Ratio: %0.6f\n"), pixel_aspect);
