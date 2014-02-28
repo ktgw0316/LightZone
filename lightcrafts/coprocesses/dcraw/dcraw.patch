@@ -1,5 +1,5 @@
---- dcraw.c.orig	2014-01-28 21:45:30.870068876 +0900
-+++ dcraw.c	2014-01-28 21:48:58.149979521 +0900
+--- dcraw.c.orig	2014-03-01 00:24:27.964770800 +0900
++++ dcraw.c	2014-03-01 00:19:48.880394200 +0900
 @@ -140,7 +140,10 @@
  int no_auto_bright=0;
  unsigned greybox[4] = { 0, 0, UINT_MAX, UINT_MAX };
@@ -60,18 +60,7 @@
    if (arg == argc) {
      fprintf (stderr,_("No files to process.\n"));
      return 1;
-@@ -9331,6 +9354,10 @@
-       printf (_("Aperture: f/%0.1f\n"), aperture);
-       printf (_("Focal length: %0.1f mm\n"), focal_len);
-       printf (_("Embedded ICC profile: %s\n"), profile_length ? _("yes"):_("no"));
-+#ifdef LIGHTZONE
-+      if (is_raw > 1 && !strncmp(make,"FUJIFILM",8) && !fuji_width)
-+        printf (_("Number of raw images: 1\nTrue "));
-+#endif
-       printf (_("Number of raw images: %d\n"), is_raw);
-       if (pixel_aspect != 1)
- 	printf (_("Pixel Aspect Ratio: %0.6f\n"), pixel_aspect);
-@@ -9373,6 +9400,10 @@
+@@ -9373,6 +9396,10 @@
  	  for (i=0; i < 16; i++)
  	    putchar (cdesc[fcol(i >> 1,i & 1)]);
  	}
@@ -82,7 +71,7 @@
  	printf (_("\nDaylight multipliers:"));
  	FORCC printf (" %f", pre_mul[c]);
  	if (cam_mul[0] > 0) {
-@@ -9485,6 +9516,11 @@
+@@ -9485,6 +9512,11 @@
      if (write_to_stdout)
        strcpy (ofname,_("standard output"));
      else {
