@@ -17,6 +17,8 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
@@ -309,11 +311,16 @@ public final class DCRaw implements
                         m_secondary_cam_mul[3] = Float.parseFloat(multipliers[3]);
                     }
                 } else {
-                    if (line.startsWith(search = FILENAME)) {
-                        String filename = line.substring(search.length());
-                    } else if (line.startsWith(search = TIMESTAMP)) {
+                    // if (line.startsWith(search = FILENAME)) {
+                    //     String filename = line.substring(search.length());
+                    // } else
+                    if (line.startsWith(search = TIMESTAMP)) {
                         String timestamp = line.substring(search.length());
-                        m_captureDateTime = new Date(timestamp).getTime();
+                        try {
+                            m_captureDateTime = new SimpleDateFormat().parse(timestamp).getTime();
+                        } catch (ParseException e) {
+                            m_captureDateTime = 0;
+                        }
                     } else if (line.startsWith(search = CAMERA)) {
                         String camera = line.substring(search.length());
                         m_make = camera.substring(0, camera.indexOf(' '));
@@ -339,11 +346,10 @@ public final class DCRaw implements
                         try {
                             m_focalLength = Float.valueOf(focalLenght.substring(0, focalLenght.indexOf(" mm")));
                         } catch (NumberFormatException e) { }
-                    } else if (line.startsWith(search = NUM_RAW_IMAGES)) {
-                        String numRawImages = line.substring(search.length());
-                        m_secondaryPixels = numRawImages.startsWith("2");
-                    } else if (line.startsWith(search = EMBEDDED_ICC_PROFILE)) {
-                        String embeddedICCProfile = line.substring(search.length());
+                    // } else if (line.startsWith(search = NUM_RAW_IMAGES)) {
+                    //     String numRawImages = line.substring(search.length());
+                    // } else if (line.startsWith(search = EMBEDDED_ICC_PROFILE)) {
+                    //     String embeddedICCProfile = line.substring(search.length());
                     } else if (line.startsWith(CANNOT_DECODE)) {
                         m_decodable = false;
                     } else if ((args = match(line, THUMB_SIZE)) != null) {
@@ -468,8 +474,8 @@ public final class DCRaw implements
                 String HEIGHT = "HEIGHT ";
                 String DEPTH = "DEPTH ";
                 String MAXVAL = "MAXVAL ";
-                String TUPLTYPE = "TUPLTYPE ";
-                String ENDHDR = "ENDHDR";
+                // String TUPLTYPE = "TUPLTYPE ";
+                // String ENDHDR = "ENDHDR";
                 String SWIDTH = readln(s);
                 width = Integer.parseInt(SWIDTH.substring(WIDTH.length()));
                 String SHEIGHT = readln(s);
@@ -480,8 +486,8 @@ public final class DCRaw implements
                 dataType = SMAXVAL.substring(MAXVAL.length()).equals("65535")
                            ? DataBuffer.TYPE_USHORT
                            : DataBuffer.TYPE_BYTE;
-                String STUPLTYPE = readln(s);
-                String SENDHDR = readln(s);
+                // String STUPLTYPE = readln(s);
+                // String SENDHDR = readln(s);
                 imageData = new ImageData(width, height, bands, dataType);
             } else
                 return null;
@@ -731,10 +737,6 @@ public final class DCRaw implements
         return m_filters;
     }
 
-    public boolean getSecondaryPixels() {
-        return m_secondaryPixels;
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -783,8 +785,6 @@ public final class DCRaw implements
     private int m_filters;
 
     private int m_rawColors;
-
-    private boolean m_secondaryPixels;
 
     private float m_cam_mul[] = new float[4];
     private float m_pre_mul[] = new float[4];
