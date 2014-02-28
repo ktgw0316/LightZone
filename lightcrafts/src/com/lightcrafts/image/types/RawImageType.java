@@ -11,8 +11,6 @@ import java.io.File;
 
 import Jama.Matrix;
 
-import sun.awt.image.ShortInterleavedRaster;
-
 import com.lightcrafts.image.BadImageFileException;
 import com.lightcrafts.image.ColorProfileException;
 import com.lightcrafts.image.ImageInfo;
@@ -152,77 +150,6 @@ public abstract class RawImageType extends ImageType {
         final BufferedImage dcrawImage = (BufferedImage) dcRaw.runDCRaw(DCRaw.dcrawMode.full, false);
 
         System.out.println("dcraw width: " + dcrawImage.getWidth() + ", height: " + dcrawImage.getHeight());
-
-        // Merge the secondary pixels of Fuji S3 and S5
-        if (this instanceof RAFImageType && dcRaw.getSecondaryPixels() &&
-            (dcRaw.getCameraMake(true).endsWith("S3PRO") || dcRaw.getCameraMake(true).endsWith("S5PRO")))
-        {
-            final int rawWidth = dcrawImage.getWidth();
-            final int rawHeight = dcrawImage.getHeight();
-
-            int rx, ry, bx, by;
-
-            System.out.println("Filters: 0x" + Long.toString(0xffffffffL & filters, 16));
-
-            switch (filters) {
-                case 0x16161616:
-                    rx=1; ry=1; bx=0; by=0;
-                    break;
-                case 0x61616161:
-                    rx=1; ry=0; bx=0; by=1;
-                    break;
-                case 0x49494949:
-                    rx=0; ry=1; bx=1; by=0;
-                    break;
-                case 0x94949494:
-                    rx=0; ry=0; bx=1; by=1;
-                    break;
-                case 0:
-                case -1:
-                    rx=0; ry=0; bx=0; by=0;
-                    break;
-                default:
-                    throw new UnknownImageTypeException("Unknown Bayer filter pattern.");
-            }
-
-            final ShortInterleavedRaster dcrawRaster = (ShortInterleavedRaster) dcrawImage.getRaster();
-
-            final BufferedImage dcrawImage2 = (BufferedImage) dcRaw.runDCRaw(DCRaw.dcrawMode.full, true);
-            final ShortInterleavedRaster dcrawRaster2 = (ShortInterleavedRaster) dcrawImage2.getRaster();
-
-            short data[] = dcrawRaster.getDataStorage();
-            short data2[] = dcrawRaster2.getDataStorage();
-
-            float[] cameraMultipliers = dcRaw.getCameraMultipliers();
-            float[] secondaryCameraMultipliers = dcRaw.getSecondaryCameraMultipliers();
-
-            float redRatio = secondaryCameraMultipliers[0] / cameraMultipliers[0];
-            float blueRatio = secondaryCameraMultipliers[2] / cameraMultipliers[2];
-
-            final int tl = (int) (0x6000/12.73f); // 3.5 stops
-            final int th = (int) (0x8000/12.73f);
-
-            for (int y = 0; y < rawHeight; y++) {
-                for (int x = 0; x < rawWidth; x++) {
-                    int d = (int) ((0xffff & data[y * rawWidth + x]) / 12.73f);
-                    if (x >= 0 && y > 0 && x < rawWidth - 1 && y < rawHeight - 1 && d > tl) {
-                        int d2 = 0xffff & data2[(y-1) * (rawWidth-1) + x];
-                        if ((x&1) == rx && (y&1) == ry)
-                            d2 = (int) (redRatio * d2);
-                        if ((x&1) == bx && (y&1) == by)
-                            d2 = (int) (blueRatio * d2);
-
-                        if (d < th) {
-                            float m = (th - d) / (float) (th - tl);
-                            d = (int) (m * d + (1 - m) * d2);
-                        } else
-                            d = d2;
-                    }
-
-                    data[y * rawWidth + x] = (short) (0xffff & d);
-                }
-            }
-        }
 
         long dcrawTime = System.currentTimeMillis();
 
