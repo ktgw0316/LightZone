@@ -90,7 +90,7 @@
         <key>MainClass</key>
         <string>com.lightcrafts.platform.macosx.MacOSXLauncher</string>
         <key>JVMVersion</key>
-        <string>1.5*</string>
+        <string>1.6*</string>
         <key>ClassPath</key>
         <array>
             <string>lightcrafts-apple.jar</string>

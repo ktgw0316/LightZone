@@ -32,7 +32,7 @@ class SortCombo extends JComboBox implements ItemListener {
         addItemListener(this);
         setToolTipText(LOCALE.get("SortToolTip"));
         setFocusable(false);
-        setFont(new Font("SansSerif", Font.PLAIN, 10));
+        setFont(new Font("SansSerif", Font.PLAIN, 12));
         setFixedSize();
         String compName = Prefs.get(ComparatorKey, null);
         for (ImageDatumComparator comparator : comparators) {

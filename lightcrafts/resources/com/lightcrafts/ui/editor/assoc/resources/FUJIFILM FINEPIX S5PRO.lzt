@@ -2,14 +2,6 @@
   <Scale Factor="0.6353135"/>
   <Image path=""/>
   <Controls>
-    <ZoneOperation Active="true" Collapsed="true" Locked="true" Mode="Normal" Name="RAW Exposure Bias" Opacity="100" regionsInverted="false" scale="0">
-      <Points Size="16">
-        <Point X="7" Y="0.8803418803418803"/>
-        <Point X="9" Y="0.9102564102564102"/>
-        <Point X="11" Y="0.9444444444444444"/>
-        <Point X="13" Y="0.9700854700854701"/>
-      </Points>
-    </ZoneOperation>
     <ZoneOperation Active="true" Collapsed="true" Locked="true" Mode="Normal" Name="RAW Tone Curve" Opacity="100" regionsInverted="false" scale="0">
       <Points Size="16">
         <Point X="3" Y="0.0641025641025641"/>
@@ -20,7 +12,6 @@
         <Point X="15" Y="0.9786324786324786"/>
       </Points>
     </ZoneOperation>
-    <Region/>
     <Region/>
     <Crop Angle="0.0"/>
   </Controls>

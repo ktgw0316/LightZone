@@ -63,9 +63,13 @@ endif
 
 ##### Create the sub-Makefiles via configure.
 
+MAKEFILE_X86:=		arch-i386/$(LIB_SRC)/Makefile
+
+$(MAKEFILE_X86): CFLAGS+=	-O3 -m32
+$(MAKEFILE_X86): LDFLAGS:=	-m32
+
 ifeq ($(UNIVERSAL),1)
   MAKEFILE_PPC:=		arch-powerpc/$(LIB_SRC)/Makefile
-  MAKEFILE_X86:=		arch-i386/$(LIB_SRC)/Makefile
 
   $(MAKEFILE_PPC): CC:=		$(CC_PPC)
   $(MAKEFILE_PPC): CFLAGS+=	$(PLATFORM_CFLAGS_PPC) # $(ALTIVEC_CFLAGS) off for now, there is a bug in the color
@@ -79,14 +83,10 @@ else
   # CFLAGS+=		$(PLATFORM_CFLAGS)
 endif
 
-ifeq ($(PLATFORM),Windows)
-  CFLAGS+= -mno-cygwin
-endif
-
 $(ARCH_MAKEFILES):
 	cd $(@D) && \
 	autoreconf -fiv && \
-	CC="$(CC)" CFLAGS="$(CFLAGS)" ./configure $(CONFIG_OPTIONS)
+	CC="$(CC)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" ./configure $(CONFIG_OPTIONS)
 
 ##### Make the libraries.
 

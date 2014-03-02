@@ -3,7 +3,7 @@
 package com.lightcrafts.platform.macosx;
 
 import com.lightcrafts.app.Application;
-import com.lightcrafts.app.CheckForUpdate;
+// import com.lightcrafts.app.CheckForUpdate;
 import com.lightcrafts.app.ExceptionDialog;
 import com.lightcrafts.app.other.MacApplication;
 import com.lightcrafts.app.other.OtherApplication;
@@ -57,7 +57,7 @@ public final class MacOSXLauncher {
             );
             SplashWindow.splash(image);
             setColor();
-            CheckForUpdate.start();
+            // CheckForUpdate.start();
             {
                 Application.setStartupProgress(
                         image.getStartupProgress()
@@ -66,7 +66,7 @@ public final class MacOSXLauncher {
                 Application.main(args);
             }
             SplashWindow.disposeSplash();
-            CheckForUpdate.showAlertIfAvailable();
+            // CheckForUpdate.showAlertIfAvailable();
         }
         catch (Throwable t) {
             (new ExceptionDialog()).handle(t);
@@ -85,9 +85,9 @@ public final class MacOSXLauncher {
     // Values correspond to M.m.p_r, e.g. "1.5.0_13".
     //
     private static final int REQUIRED_MIN_MAJOR    = 1;
-    private static final int REQUIRED_MIN_MINOR    = 5;
+    private static final int REQUIRED_MIN_MINOR    = 6;
     private static final int REQUIRED_MIN_POINT    = 0;
-    private static final int REQUIRED_MIN_REVISION = 13;
+    private static final int REQUIRED_MIN_REVISION = 0; // accept any rev.
 
     /**
      * Check that the currently running JVM meets our minimum required version.

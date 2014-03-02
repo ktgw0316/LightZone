@@ -1,10 +1,54 @@
 -------------------------------------------------------------------
-Mon May 20 2013 - KITAGAW Masahiro <arctica0316@gmail.com>
+Thu Jan 28 2014 - KITAGAWA Masahiro <arctica0316@gmail.com>
+
+- Upstream sync to 4.1.0 beta6
+
+-------------------------------------------------------------------
+Thu Nov 21 2013 - KITAGAWA Masahiro <arctica0316@gmail.com>
+
+- Upstream sync to 4.1.0 beta5
+
+-------------------------------------------------------------------
+Fri Nov 08 2013 - KITAGAWA Masahiro <arctica0316@gmail.com>
+
+- Upstream sync to 4.1.0 beta4
+
+-------------------------------------------------------------------
+Wed Oct 24 2013 - KITAGAWA Masahiro <arctica0316@gmail.com>
+
+- Reverted versioning for pre-release packages.
+
+-------------------------------------------------------------------
+Thu Oct 17 2013 - KITAGAWA Masahiro <arctica0316@gmail.com>
+
+- Upstream sync to 4.1.0 beta2
+- Versioning for pre-release packages changed. c.f.
+  https://fedoraproject.org/wiki/Packaging:NamingGuidelines#Pre-Release_packages
+
+-------------------------------------------------------------------
+Sun Sep 29 2013 - KITAGAWA Masahiro <arctica0316@gmail.com>
+
+- Upstream sync to 4.1.0beta1
+- Versioning for pre-release packages. c.f.
+  https://en.opensuse.org/openSUSE:Package_naming_guidelines#Pre-Release_packages
+
+-------------------------------------------------------------------
+Sat Sep 21 2013 - KITAGAWA Masahiro <arctica0316@gmail.com>
+
+- Upstream sync
+
+-------------------------------------------------------------------
+Mon Jun 17 2013 - KITAGAWA Masahiro <arctica0316@gmail.com>
+
+- Changed license to BSD 3-clause Licence
+
+-------------------------------------------------------------------
+Mon May 20 2013 - KITAGAWA Masahiro <arctica0316@gmail.com>
 
 - Fixed rpmlint warnings
 
 -------------------------------------------------------------------
-Sat May 11 2013 - KITAGAW Masahiro <arctica0316@gmail.com>
+Sat May 11 2013 - KITAGAWA Masahiro <arctica0316@gmail.com>
 
 - Changes for openSuse Build Service cross platform build
 - Divided changelog section from .spec into .changes

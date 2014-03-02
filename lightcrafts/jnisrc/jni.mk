@@ -108,7 +108,7 @@ ifeq ($(PLATFORM),Windows)
   CFLAGS+=		$(JNI_WINDOWS_CFLAGS)
   DEFINES+=		$(JNI_WINDOWS_DEFINES)
   INCLUDES+=		$(JNI_WINDOWS_INCLUDES)
-  LDFLAGS+=		-shared -Wl,--add-stdcall-alias $(JNI_WINDOWS_LDFLAGS)
+  LDFLAGS+=		-shared -Wl,--add-stdcall-alias -static-libgcc -static-libstdc++ $(JNI_WINDOWS_LDFLAGS)
   ifdef JNI_WINDOWS_IMPLIB
     TARGET_IMPLIB:=	$(TARGET_DIR)/$(TARGET_BASE)-implib.a
     ifeq ($(USE_ICC),1)

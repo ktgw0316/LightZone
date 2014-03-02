@@ -100,11 +100,15 @@ public final class CanonDirectory extends MakerNotesDirectory implements
      * {@inheritDoc}
      */
     public int getISO() {
-        boolean isAPEX = false;
-        ImageMetaValue value = getValue( CANON_CS_ISO );
+        ImageMetaValue value = getValue( CANON_SI_ISO );
+        boolean isAPEX = true;
         if ( value == null ) {
-            value = getValue( CANON_SI_ISO );
-            isAPEX = true;
+            //
+            // CANON_CS_ISO can be "Auto" that is not a number,
+            // therefore it shouldn't be a default choice. 
+            //
+            value = getValue( CANON_CS_ISO );
+            isAPEX = false;
         }
         if ( value == null )
             return 0;
@@ -245,6 +249,7 @@ public final class CanonDirectory extends MakerNotesDirectory implements
             case CANON_SHOT_INFO:
                 explodeSubfields( tagID, 1, value, false );
                 return;
+            case CANON_COLOR_DATA:
             case CANON_COLOR_INFO:
             case CANON_FILE_INFO:
             case CANON_PICTURE_INFO:
@@ -404,6 +409,7 @@ public final class CanonDirectory extends MakerNotesDirectory implements
 
     static {
         add( CANON_CAMERA_SETTINGS, "CameraSettings", META_UNDEFINED );
+        add( CANON_CD_VERSION, "CDVersion", META_SSHORT );
         add( CANON_CF_AF_ASSIST_LIGHT, "CFAssistLight", META_SSHORT );
         add( CANON_CF_AUTO_EXPOSURE_BRACKETING, "CFAutoExposureBracketing", META_SSHORT );
         add( CANON_CF_AUTO_EXPOSURE_LOCK_BUTTONS, "CFAutoExposureLockButtons", META_SSHORT );
@@ -469,6 +475,7 @@ public final class CanonDirectory extends MakerNotesDirectory implements
         add( CANON_LI_LENS_TYPE, "LILensType", META_USHORT );
         add( CANON_LI_LONG_FOCAL_LENGTH, "LILongFocalLength", META_USHORT );
         add( CANON_LI_SHORT_FOCAL_LENGTH, "LIShortFocalLength", META_USHORT );
+        add( CANON_MODEL_ID, "ModelID", META_ULONG );
         add( CANON_OWNER_NAME, "OwnerName", META_STRING );
         add( CANON_PI_AF_POINTS_USED, "PIAFPointsUsed", META_USHORT );
         add( CANON_PI_COLOR_TEMPERATURE, "PIColorTemperature", META_SSHORT );
@@ -485,7 +492,9 @@ public final class CanonDirectory extends MakerNotesDirectory implements
         add( CANON_PI_WB_SHIFT_GM, "PIWBShiftGM", META_SSHORT );
         add( CANON_PI_WHITE_BALANCE_BLUE, "PIWhiteBalanceBlue", META_SSHORT );
         add( CANON_PI_WHITE_BALANCE_RED, "PIWhiteBalanceRed", META_SSHORT );
+        add( CANON_PI2_AF_AREA_MODE, "PI2AfAreaMode", META_USHORT );
         add( CANON_PICTURE_INFO, "PictureInfo", META_UNDEFINED );
+        add( CANON_PICTURE_INFO2, "PictureInfo2", META_UNDEFINED );
         add( CANON_PII_FOCAL_PLANE_X_RESOLUTION, "PIIFocalPlaneXResolution", META_SRATIONAL );
         add( CANON_PII_FOCAL_PLANE_Y_RESOLUTION, "PIIFocalPlaneYResolution", META_SRATIONAL );
         add( CANON_PII_IMAGE_HEIGHT, "PIIImageHeight", META_ULONG );

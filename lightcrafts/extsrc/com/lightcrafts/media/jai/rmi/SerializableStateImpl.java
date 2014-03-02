@@ -39,7 +39,7 @@ import com.lightcrafts.mediax.jai.remote.SerializerFactory;
  * @since 1.1
  */
 public abstract class SerializableStateImpl implements SerializableState {
-    protected Class theClass;
+    protected Class<?> theClass;
     protected transient Object theObject;
 
     /**
@@ -64,7 +64,7 @@ public abstract class SerializableStateImpl implements SerializableState {
      * Constructor.  All subclasses MUST have exactly ONE constructor with
      * the SAME signature as this constructor.
      */
-    protected SerializableStateImpl(Class c, Object o, RenderingHints h) {
+    protected SerializableStateImpl(Class<?> c, Object o, RenderingHints h) {
         if (c == null || o == null) {
             throw new IllegalArgumentException(JaiI18N.getString("SerializableStateImpl1"));
         } else {
@@ -75,9 +75,9 @@ public abstract class SerializableStateImpl implements SerializableState {
                 boolean permitsSubclasses = false;
                 try {
                     Method m =
-                        this.getClass().getMethod("permitsSubclasses", null);
+                        this.getClass().getMethod("permitsSubclasses", (Class<?>[]) null);
                     permitsSubclasses 
-                        = ((Boolean)m.invoke(null, null)).booleanValue();
+                        = ((Boolean)m.invoke(null, (Object[]) null)).booleanValue();
                 } catch (Exception e){
                     throw new IllegalArgumentException(JaiI18N.getString("SerializableStateImpl5"));
                 }
@@ -94,7 +94,7 @@ public abstract class SerializableStateImpl implements SerializableState {
         theObject = o;
     }
 
-    public Class getObjectClass() {
+    public Class<?> getObjectClass() {
         return theClass;
     }
 

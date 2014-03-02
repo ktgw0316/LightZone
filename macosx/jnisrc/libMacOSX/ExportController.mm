@@ -161,7 +161,7 @@ using namespace std;
     (NSTabView*)tabView
     didSelectTabViewItem:(NSTabViewItem*)tabViewItem
 {
-    int const ident = (int)[tabViewItem identifier];
+    NSInteger const ident = (NSInteger)[tabViewItem identifier];
 }
 
 @end

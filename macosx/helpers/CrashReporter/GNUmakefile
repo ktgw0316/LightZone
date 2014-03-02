@@ -43,7 +43,7 @@ TARGET:=	CrashReporter
 ########## You shouldn't have to change anything below this line. #############
 
 export MACOSX_DEPLOYMENT_TARGET_ppc:=	10.3
-export MACOSX_DEPLOYMENT_TARGET_i386:=	10.4
+export MACOSX_DEPLOYMENT_TARGET_i386:=	10.5
 
 ifdef DEBUG
 DEFINES+=	-DDEBUG

@@ -1,0 +1,14 @@
+<Template version="6">
+  <Scale Factor="0.5024414"/>
+  <Image path=""/>
+  <Controls>
+    <GenericOperation Active="true" Collapsed="false" Locked="false" Mode="Midtones" Name="High-Pass Filter" Opacity="100" OperationType="Hi Pass Filter" layerControlsIndex="0" regionsInverted="false">
+      <Slider Gain="0.05" Radius="0.60"/>
+      <Checkbox/>
+      <Choice/>
+      <Color b="128" g="128" r="128"/>
+    </GenericOperation>
+    <Region/>
+    <Crop/>
+  </Controls>
+</Template>

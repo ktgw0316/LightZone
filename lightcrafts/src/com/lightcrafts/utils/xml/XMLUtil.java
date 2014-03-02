@@ -284,9 +284,11 @@ public final class XMLUtil {
     public static Document readDocumentFrom( String s ) throws IOException {
         s = TextUtil.trimNulls( s );
         @SuppressWarnings( { "IOResourceOpenedButNotSafelyClosed" } )
-        final InputStream is = new ByteArrayInputStream( s.getBytes() );
+        final InputStream is = new ByteArrayInputStream( s.getBytes( "UTF-8" ) );
         try {
-            return m_builder.parse( is );
+            synchronized (m_builder) {
+                return m_builder.parse( is );
+            }
         }
         catch ( SAXException e ) {
             final IOException ioe = new IOException( "Couldn't read XML" );

@@ -192,7 +192,7 @@ public class TemplateDatabase {
         }
     }
 
-    public static TemplateKey getDefaultTemplate(ImageMetadata meta) {
+    public static TemplateKey getDefaultTemplate(ImageMetadata meta) throws TemplateException {
         boolean isRaw = (meta.getImageType() instanceof RawImageType);
         if (isRaw) {
             String camera = meta.getCameraMake(true);
@@ -207,7 +207,7 @@ public class TemplateDatabase {
                 }
                 catch (TemplateException e) {
                     // Counts as a missing template.
-                    System.err.println("Template error: " + e.getMessage());
+                    throw new TemplateException("Template error: " + e.getMessage(), e);
                 }
                 if (xml == null) {
                     // Compatibility for users of the LightZone 2 beta:

@@ -25,8 +25,7 @@ public class MemoryLimits {
 
     public static int getMaximum() {
         int physicalMax = Platform.getPlatform().getPhysicalMemoryInMB();
-        int platformMax = Platform.getType().equals(Platform.Windows) ?
-            1536 : 2560;
+        int platformMax = (int)(Runtime.getRuntime().maxMemory() / 1048576);
         return Math.min(physicalMax, platformMax);
     }
 

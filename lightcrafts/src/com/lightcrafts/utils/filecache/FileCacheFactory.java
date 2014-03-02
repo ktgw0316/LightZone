@@ -68,10 +68,14 @@ public class FileCacheFactory {
      * global cache instead.
      */
     public static FileCache getLocalCache(File file) {
+        final String cacheDirName = "LightZone Previews";
         if (file.isFile()) {
             file = file.getParentFile();
         }
-        file = new File(file, "LightZone Previews");
+        else if (file.getName().equals(cacheDirName)) {
+            return null;
+        }
+        file = new File(file, cacheDirName);
         FileCache cache = LocalInstances.get(file);
         if (cache != null) {
             return cache;

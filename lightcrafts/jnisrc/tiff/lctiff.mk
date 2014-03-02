@@ -20,7 +20,11 @@ else
 endif
 
 JNI_EXTRA_LDFLAGS:=	-L../jpeg/libjpeg/lib -Lzlib/lib -Llibtiff/lib
-JNI_EXTRA_LINK:=	-ltiff -lz -lLCJNI -lstdc++
+ifeq ($(PLATFORM),Windows)
+  JNI_EXTRA_LINK:=	-Wl,-Bdynamic -lLCJNI -Wl,-Bstatic -ltiff -llzma -lz -lstdc++ 
+else
+  JNI_EXTRA_LINK:=	-lLCJNI -ltiff -lz -lstdc++ 
+endif
 
 JAVAH_CLASSES:=		com.lightcrafts.image.libs.LCTIFFCommon \
 			com.lightcrafts.image.libs.LCTIFFReader \

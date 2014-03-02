@@ -2,9 +2,10 @@
 Name=LightZone
 GenericName=Digital Darkroom Software
 Comment=Post-processing software for digital photos
-Exec=/usr/bin/lightzone
+Exec=/usr/bin/lightzone %U
 Icon=LightZone
 Type=Application
 Terminal=false
 StartupNotify=false
 Categories=Graphics;2DGraphics;
+MimeType=image/tiff;image/jpeg;image/x-canon-cr2;image/x-canon-crw;image/x-fuji-raf;image/x-kodak-dcr;image/x-kodak-k25;image/x-kodak-kdc;image/x-minolta-mrw;image/x-nikon-nef;image/x-olympus-orf;image/x-panasonic-raw;image/x-panasonic-raw2;image/x-pentax-pef;image/x-sigma-x3f;image/x-sony-arw;image/x-sony-sr2;image/x-sony-srf;

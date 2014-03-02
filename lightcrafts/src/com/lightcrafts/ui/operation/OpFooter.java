@@ -14,6 +14,7 @@ import org.jvnet.substance.utils.SubstanceCoreUtilities;
 import org.jvnet.substance.utils.SubstanceSizeUtils;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
@@ -117,6 +118,7 @@ class OpFooter extends Box implements PropertyChangeListener {
 
         tabPane = new JTabbedPane();
         tabPane.setFont(LightZoneSkin.fontSet.getSmallFont());
+        tabPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         tabPane.add(LOCALE.get( "ToolSettingsTabName" ), blendBox);
         tabPane.add(LOCALE.get( "ColorSelectionTabName"), colorControls);
 

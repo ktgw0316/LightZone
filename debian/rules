@@ -52,6 +52,10 @@ binary-arch: build install
 	dh_md5sums
 	dh_builddeb
 
+clean: 
+	JAVA_HOME=$(JAVA_HOME) ant $(ANT_OPTIONS) clean
+	-$(RM) configure-stamp build-stamp
+
 binary: binary-arch
 .PHONY: build-arch build clean binary-arch binary install configure
 

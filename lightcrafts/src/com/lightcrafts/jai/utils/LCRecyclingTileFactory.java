@@ -27,6 +27,7 @@ import java.awt.image.SampleModel;
 import java.awt.image.SinglePixelPackedSampleModel;
 import java.awt.image.WritableRaster;
 import java.lang.ref.SoftReference;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Observable;
@@ -279,6 +280,7 @@ public class LCRecyclingTileFactory extends Observable
 
         DataBuffer db = null;
 
+        int height = sampleModel.getHeight();
         int type = sampleModel.getTransferType();
         long numBanks = 0;
         long size = 0;
@@ -286,20 +288,22 @@ public class LCRecyclingTileFactory extends Observable
         if(sampleModel instanceof ComponentSampleModel) {
             ComponentSampleModel csm = (ComponentSampleModel)sampleModel;
             numBanks = getNumBanksCSM(csm);
-            size = getBufferSizeCSM(csm);
+            size = height == 1 ? csm.getScanlineStride()
+                               : getBufferSizeCSM(csm);
         } else if(sampleModel instanceof MultiPixelPackedSampleModel) {
             MultiPixelPackedSampleModel mppsm =
                 (MultiPixelPackedSampleModel)sampleModel;
             numBanks = 1;
             int dataTypeSize = DataBuffer.getDataTypeSize(type);
-            size = mppsm.getScanlineStride()*mppsm.getHeight() +
+            size = mppsm.getScanlineStride()*height +
                 (mppsm.getDataBitOffset() + dataTypeSize - 1)/dataTypeSize;
         } else if(sampleModel instanceof SinglePixelPackedSampleModel) {
             SinglePixelPackedSampleModel sppsm =
                 (SinglePixelPackedSampleModel)sampleModel;
             numBanks = 1;
-            size = sppsm.getScanlineStride()*(sppsm.getHeight() - 1) +
-                sppsm.getWidth();
+            size = height == 1 ? sppsm.getScanlineStride()
+                               : sppsm.getScanlineStride()*(height - 1) +
+                                       sppsm.getWidth();
         }
 
         if(size != 0) {
@@ -312,7 +316,7 @@ public class LCRecyclingTileFactory extends Observable
                         byte[][] bankData = (byte[][])array;
                         /*for(int i = 0; i < numBanks; i++) {
                             Arrays.fill(bankData[i], (byte)0);
-			}*/
+                        }*/
                         db = new DataBufferByte(bankData, (int)size);
                     }
                     break;
@@ -475,8 +479,29 @@ public class LCRecyclingTileFactory extends Observable
             }
         }
 
-        //if(DEBUG) System.out.println("getRecycledArray() returning "+array);
+        // array is null
+        switch(arrayType) {
+        case DataBuffer.TYPE_BYTE:
+            return Array.newInstance(byte.class,
+                                      new int[]{(int)numBanks, (int)arrayLength});
+        case DataBuffer.TYPE_USHORT:
+        case DataBuffer.TYPE_SHORT:
+            return Array.newInstance(short.class,
+                                      new int[]{(int)numBanks, (int)arrayLength});
+        case DataBuffer.TYPE_INT:
+            return Array.newInstance(int.class,
+                                      new int[]{(int)numBanks, (int)arrayLength});
+        case DataBuffer.TYPE_FLOAT:
+            return Array.newInstance(float.class,
+                                      new int[]{(int)numBanks, (int)arrayLength});
+        case DataBuffer.TYPE_DOUBLE:
+            return Array.newInstance(double.class,
+                                      new int[]{(int)numBanks, (int)arrayLength});
+        default:
+            //throw new IllegalArgumentException("Unsupported Data Type");
+            return null;
+        }
 
-        return null;
+        //if(DEBUG) System.out.println("getRecycledArray() returning "+array);
     }
 }

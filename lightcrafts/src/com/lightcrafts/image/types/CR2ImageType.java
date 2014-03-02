@@ -4,13 +4,15 @@ package com.lightcrafts.image.types;
 
 import java.awt.image.RenderedImage;
 import java.io.IOException;
+import java.nio.ByteOrder;
 
 import com.lightcrafts.image.BadImageFileException;
 import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.image.UnknownImageTypeException;
 import com.lightcrafts.image.metadata.*;
+import com.lightcrafts.utils.bytebuffer.LCByteBuffer;
 
-import static com.lightcrafts.image.metadata.makernotes.CanonTags.*;
+import static com.lightcrafts.image.metadata.TIFFTags.*;
 
 /**
  * A <code>CR2ImageType</code> is-a {@link RawImageType} for CR2 (Canon Raw
@@ -46,23 +48,23 @@ public final class CR2ImageType extends RawImageType {
                                           int maxHeight )
         throws BadImageFileException, IOException, UnknownImageTypeException
     {
+        final LCByteBuffer buf = imageInfo.getByteBuffer();
         //
-        // Note that this is a weird special case for CR2 files.  The tag
-        // values below are actually stored in the TIFF directory.
+        // The pointer to where the JPEG starts (tag 0x0111) is 98 bytes in.
+        // The length of the JPEG (tag 0x0117) is 24 bytes after that.
+        // Both are always in little-endian.
         //
-        final ImageMetadataDirectory dir =
-            imageInfo.getMetadata().getDirectoryFor( TIFFDirectory.class );
-        if ( dir != null ) {
-            final RenderedImage image = JPEGImageType.getImageFromBuffer(
-                imageInfo.getByteBuffer(),
-                dir.getValue( CANON_CR2_PREVIEW_IMAGE_START ), 0,
-                dir.getValue( CANON_CR2_PREVIEW_IMAGE_LENGTH ),
-                maxWidth, maxHeight
-            );
-            if ( image != null )
-                return image;
-        }
-        return super.getPreviewImage( imageInfo, maxWidth, maxHeight );
+        final ByteOrder origOrder = buf.order();
+        buf.order( ByteOrder.LITTLE_ENDIAN );
+        final int offset = (int) buf.getLong( 98 );
+        final int length = (int) buf.getLong( 122 );
+        buf.order( origOrder );
+
+        final RenderedImage image = JPEGImageType.getImageFromBuffer(
+            buf, offset, length, null, maxWidth, maxHeight
+        );
+        return ( image != null ) ?
+            image : super.getPreviewImage( imageInfo, maxWidth, maxHeight );
     }
 
     public boolean hasFastPreview() {
@@ -75,7 +77,26 @@ public final class CR2ImageType extends RawImageType {
     public RenderedImage getThumbnailImage( ImageInfo imageInfo )
         throws BadImageFileException, IOException, UnknownImageTypeException
     {
-        return getPreviewImage( imageInfo, 640, 480 );
+        if (!USE_EMBEDDED_PREVIEW)
+            return getPreviewImage( imageInfo, 640, 480 );
+
+        final ImageMetadataDirectory dir =
+            imageInfo.getMetadata().getDirectoryFor( TIFFDirectory.class );
+        if ( dir == null ) {
+            //
+            // This should never be null, but just in case ...
+            //
+            return null;
+        }
+        //
+        // Get a small jpeg image from IFD #1
+        //
+        return JPEGImageType.getImageFromBuffer(
+            imageInfo.getByteBuffer(),
+            dir.getValue( TIFF_JPEG_INTERCHANGE_FORMAT ), 0,
+            dir.getValue( TIFF_JPEG_INTERCHANGE_FORMAT_LENGTH ),
+            160, 120
+        );
     }
 
     /**

@@ -8,12 +8,15 @@
 *.exe
 *.dll
 *.iml
+*.jnilib
+*.dylib
+*.nib
 .idea/**
 lightcrafts/build
 lightcrafts/extbuild
 lightcrafts/products
 lightcrafts/jnisrc/*/javah
-lightcrafts/jnisrc/*/*/arch-unknown
+lightcrafts/jnisrc/*/*/arch-*
 lightcrafts/jnisrc/tiff/*/Makefile
 lightcrafts/jnisrc/tiff/*/*/Makefile
 lightcrafts/jnisrc/tiff/*/*/*/Makefile
@@ -63,3 +66,7 @@ debian/*.log
 debian/DEBIAN
 debian/lightzone
 debian/files
+macosx/build/
+macosx/jnisrc/libMacOSX/javah/
+macosx/products/LightZone-forkd
+macosx/products/dcraw

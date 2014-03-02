@@ -88,7 +88,7 @@ package com.lightcrafts.mediax.jai;
  */
 public final class InterpolationBicubic extends InterpolationTable {
 
-    private static final int PRECISION_BITS = 8;
+    private static final int PRECISION_BITS = 12;
 
     private static float[] dataHelper(int subsampleBits) {
 

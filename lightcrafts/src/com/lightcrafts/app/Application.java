@@ -27,6 +27,7 @@ import com.lightcrafts.splash.SplashWindow;
 import com.lightcrafts.splash.StartupProgress;
 import com.lightcrafts.templates.TemplateDatabase;
 import com.lightcrafts.templates.TemplateKey;
+import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.ui.editor.*;
 import com.lightcrafts.ui.editor.assoc.DocumentDatabase;
 import com.lightcrafts.ui.editor.assoc.DocumentInterpreter;
@@ -399,14 +400,14 @@ public class Application {
             XmlDocument xml = null;
 
             // First look for default settings in the user-defined templates:
-            TemplateKey template = TemplateDatabase.getDefaultTemplate(meta);
-            if (template != null) {
-                try {
+            try {
+                TemplateKey template = TemplateDatabase.getDefaultTemplate(meta);
+                if (template != null) {
                     xml = TemplateDatabase.getTemplateDocument(template);
                 }
-                catch (TemplateDatabase.TemplateException e) {
-                    // Let xml remain null, try the factory defaults.
-                }
+            }
+            catch (TemplateDatabase.TemplateException e) {
+                // Let xml remain null, try the factory defaults.
             }
             // Then look for factory default settings:
             if (xml == null) {
@@ -492,14 +493,14 @@ public class Application {
             XmlDocument xml = null;
 
             // First look for default settings in the user-defined templates:
-            TemplateKey template = TemplateDatabase.getDefaultTemplate(meta);
-            if (template != null) {
-                try {
+            try {
+                TemplateKey template = TemplateDatabase.getDefaultTemplate(meta);
+                if (template != null) {
                     xml = TemplateDatabase.getTemplateDocument(template);
                 }
-                catch (TemplateDatabase.TemplateException e) {
-                    // Let xml remain null, try the factory defaults.
-                }
+            }
+            catch (TemplateDatabase.TemplateException e) {
+                // Let xml remain null, try the factory defaults.
             }
             // Then look for factory default settings:
             if (xml == null) {
@@ -2174,9 +2175,16 @@ public class Application {
             EventQueue.invokeLater(
                 new Runnable() {
                     public void run() {
-                        setLookAndFeel();
                         if (Platform.getType() == Platform.MacOSX) {
+                            // Get a Mac menu bar before setting LaF, then restore.
+                            Object menuBarUI = UIManager.get("MenuBarUI");
+                            setLookAndFeel(new LightZoneSkin().getLightZoneLookAndFeel());
+                            UIManager.put("MenuBarUI", menuBarUI);
+
                             openMacPlaceholderFrame();
+                        }
+                        else {
+                            setLookAndFeel();
                         }
                         openEmpty();
                         Platform.getPlatform().readyToOpenFiles();

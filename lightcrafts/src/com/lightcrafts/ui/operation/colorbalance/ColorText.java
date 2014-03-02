@@ -53,7 +53,7 @@ class ColorText extends Box {
     }
 
     // TODO: this should be defined elsewhere
-    public final static Font ControlFont = new Font("SansSerif", Font.PLAIN, 10);
+    public final static Font ControlFont = new Font("SansSerif", Font.PLAIN, 13);
 
     private static JLabel createLabel(String text) {
         JLabel label = new JLabel(text);

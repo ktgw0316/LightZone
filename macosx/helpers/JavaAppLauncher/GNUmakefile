@@ -16,7 +16,9 @@ JARS:=		$(COMMON_DIR)/products/lightcrafts.jar \
 # Uncomment to compile in debug mode.
 #DEBUG:=		true
 
-SDKROOT:=	/Developer/SDKs/MacOSX10.6.sdk
+export MACOSX_DEPLOYMENT_TARGET:=	$(shell sw_vers -productVersion | cut -d. -f-2)
+
+SDKROOT:=	$(shell xcodebuild -version -sdk macosx${MACOSX_DEPLOYMENT_TARGET} | sed -n '/^Path:/p' | sed 's/^Path: //')
 ifeq ($(UNIVERSAL),1)
   ##
   # We need to build the PowerPC part with gcc/g++ 3.3 so the launcher will run
@@ -36,8 +38,6 @@ LDFLAGS=	$(PLATFORM_LDFLAGS) -framework JavaVM -framework Cocoa
 TARGET:=	JavaAppLauncher
 
 ########## You shouldn't have to change anything below this line. #############
-
-export MACOSX_DEPLOYMENT_TARGET:=	10.4
 
 ifdef DEBUG
   CFLAGS+=	-g

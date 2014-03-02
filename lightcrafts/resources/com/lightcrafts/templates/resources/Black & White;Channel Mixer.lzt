@@ -1,0 +1,13 @@
+<Template version="7">
+  <Scale Factor="0.23936696"/>
+  <Image path=""/>
+  <Controls>
+    <GenericOperation Active="true" Collapsed="false" Locked="false" Mode="Normal" Name="Channel Mixer" Opacity="100" OperationType="Channel Mixer" regionsInverted="false">
+      <Slider Blue="0.0722" Green="0.7152" Red="0.2126"/>
+      <Checkbox/>
+      <Choice/>
+    </GenericOperation>
+    <Region/>
+    <Crop Angle="0.0"/>
+  </Controls>
+</Template>

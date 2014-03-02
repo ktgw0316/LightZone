@@ -16,6 +16,12 @@ public final class LinuxLauncher {
 
     public static void main(String[] args) {
         try {
+            System.setProperty("awt.useSystemAAFontSettings", "on");
+
+            final boolean lafCond = sun.swing.SwingUtilities2.isLocalDisplay();
+            Object aaTextInfo = sun.swing.SwingUtilities2.AATextInfo.getAATextInfo(lafCond);
+            UIManager.getDefaults().put(sun.swing.SwingUtilities2.AA_TEXT_PROPERTY_KEY, aaTextInfo);
+
             System.out.println(
                 "This is " +
                 Version.getApplicationName() + ' ' +
@@ -26,22 +32,13 @@ public final class LinuxLauncher {
                 TestSSE2.showDialog();
                 System.exit(0);
             }
-            // Here is how you make a version that expires on a fixed date:
-//            boolean expired = ExpirationLogic.showExpirationDialog();
-//            if (expired) {
-//                System.exit(0);
-//            }
             UIManager.setLookAndFeel(Platform.getPlatform().getLookAndFeel());
 
-            String revision = Version.getRevisionNumber();
-            String name = Version.getVersionName();
-            String versionText = "Version " + name + " (" + revision + ")";
-
-            String splashText = versionText;
-
             // Here is how you make a licensed version:
-            splashText = "Open Source";
-            SplashImage splash = new SplashImage(splashText);
+            final String licenseText = "Open Source";
+            final SplashImage splash = new SplashImage(
+                SplashImage.getDefaultSplashText(licenseText)
+            );
             SplashWindow.splash(splash);
             Application.setStartupProgress(splash.getStartupProgress());
             ForkDaemon.start();

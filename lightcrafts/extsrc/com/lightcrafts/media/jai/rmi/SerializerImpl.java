@@ -36,9 +36,9 @@ import com.lightcrafts.media.jai.util.ImageUtil;
  * @since 1.1
  */
 public final class SerializerImpl implements Serializer {
-    private Class theClass;
+    private Class<?> theClass;
     private boolean areSubclassesPermitted;
-    private Constructor ctor;
+    private Constructor<?> ctor;
 
     /**
      * Registers all known <code>Serializer</code>s with the
@@ -59,7 +59,7 @@ public final class SerializerImpl implements Serializer {
         registerSerializers(ShapeState.class);
     }
 
-    private static void registerSerializers(Class ssi) {
+    private static void registerSerializers(Class<?> ssi) {
         if(ssi == null) {
             throw new IllegalArgumentException(JaiI18N.getString("Generic0"));
         }
@@ -72,8 +72,8 @@ public final class SerializerImpl implements Serializer {
             ImageUtil.getImagingListener((RenderingHints)null);
         Class[] classes = null;
         try {
-            Method m1 = ssi.getMethod("getSupportedClasses", null);
-            classes = (Class[])m1.invoke(null, null);
+            Method m1 = ssi.getMethod("getSupportedClasses", (Class<?>[]) null);
+            classes = (Class[])m1.invoke(null, (Object[]) null);
         } catch(java.lang.NoSuchMethodException e) {
             String message = JaiI18N.getString("SerializerImpl1");
             listener.errorOccurred(message,
@@ -93,8 +93,8 @@ public final class SerializerImpl implements Serializer {
 
         boolean supportsSubclasses = false;
         try {
-            Method m2 = ssi.getMethod("permitsSubclasses", null);
-            Boolean b = (Boolean)m2.invoke(null, null);
+            Method m2 = ssi.getMethod("permitsSubclasses", (Class<?>[]) null);
+            Boolean b = (Boolean)m2.invoke(null, (Object[]) null);
             supportsSubclasses = b.booleanValue();
         } catch(java.lang.NoSuchMethodException e) {
             String message = JaiI18N.getString("SerializerImpl4");
@@ -129,8 +129,8 @@ public final class SerializerImpl implements Serializer {
      * as this class should never be instantiated except from within
      * <code>registerSerializers(Class)</code>.
      */
-    protected SerializerImpl(Class ssi, // SerializableStateImpl subclass
-                             Class c,
+    protected SerializerImpl(Class<?> ssi, // SerializableStateImpl subclass
+                             Class<?> c,
                              boolean areSubclassesPermitted) {
         theClass = c;
         this.areSubclassesPermitted = areSubclassesPermitted;
@@ -177,7 +177,7 @@ public final class SerializerImpl implements Serializer {
         return (SerializableState)state;
     }
 
-    public Class getSupportedClass() {
+    public Class<?> getSupportedClass() {
         return theClass;
     }
 

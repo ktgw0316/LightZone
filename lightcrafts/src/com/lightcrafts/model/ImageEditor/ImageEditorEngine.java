@@ -300,6 +300,7 @@ public class ImageEditorEngine implements Engine {
         operationsSet.put(AdvancedNoiseReductionOperation.typeV1, AdvancedNoiseReductionOperation.class);
         operationsSet.put(AdvancedNoiseReductionOperation.typeV2, AdvancedNoiseReductionOperation.class);
         operationsSet.put(AdvancedNoiseReductionOperation.typeV3, AdvancedNoiseReductionOperation.class);
+        operationsSet.put(AdvancedNoiseReductionOperationV4.type, AdvancedNoiseReductionOperationV4.class);
         operationsSet.put(HiPassFilterOperation.type, HiPassFilterOperation.class);
         operationsSet.put(HueSaturationOperation.typeV1, HueSaturationOperation.class);
         operationsSet.put(HueSaturationOperation.typeV2, HueSaturationOperation.class);
@@ -322,10 +323,11 @@ public class ImageEditorEngine implements Engine {
         operationsSet.put(ColorBalanceOperationV2.typeV3, ColorBalanceOperationV2.class);
         operationsSet.put(ColorBalanceOperation.type, ColorBalanceOperation.class);
         operationsSet.put(RedEyesOperation.type, RedEyesOperation.class);
-        operationsSet.put(RawAdjustmentsOperation.type, RawAdjustmentsOperation.class);
+        operationsSet.put(RawAdjustmentsOperation.typeV1, RawAdjustmentsOperation.class);
+        operationsSet.put(RawAdjustmentsOperation.typeV2, RawAdjustmentsOperation.class);
     }
 
-    public Collection getGenericOperationTypes() {
+    public Collection<OperationType> getGenericOperationTypes() {
         return operationsSet.keySet();
     }
 
@@ -395,7 +397,11 @@ public class ImageEditorEngine implements Engine {
     }
 
     public OperationType getRawAdjustmentsOperationType() {
-        return RawAdjustmentsOperation.type;
+        return RawAdjustmentsOperation.typeV2;
+    }
+
+    public OperationType getGenericRawAdjustmentsOperationType() {
+        return RawAdjustmentsOperation.typeV1;
     }
 
     public void removeOperation(int position) {
@@ -528,7 +534,7 @@ public class ImageEditorEngine implements Engine {
                                                                              this.proofProfile,
                                                                              null,
                                                                              this.proofIntent,
-                                                                             JAIContext.noCacheHint),
+                                                                             null),
                                                       null); // Cache this for the preview
 
             previewImage.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
@@ -572,15 +578,16 @@ public class ImageEditorEngine implements Engine {
                 if (preview.isShowing()) {
                     if (preview instanceof PaintListener) {
                         float renderingScale = rendering.getScaleFactor();
+                        Rectangle previewVisibleRect = visibleRect;
                         if (renderingScale > 1)
-                            visibleRect = new Rectangle((int) (visibleRect.x/renderingScale),
+                            previewVisibleRect = new Rectangle((int) (visibleRect.x/renderingScale),
                                                         (int) (visibleRect.y/renderingScale),
                                                         (int) (visibleRect.width/renderingScale),
                                                         (int) (visibleRect.height/renderingScale));
 
                         ((PaintListener) preview).paintDone(preview instanceof ZoneFinder
                                                             ? previewImage
-                                                            : processedImage, visibleRect, synchronous, time);
+                                                            : processedImage, previewVisibleRect, synchronous, time);
                     }
                 }
             }
@@ -685,7 +692,7 @@ public class ImageEditorEngine implements Engine {
                                LCMSColorConvertDescriptor.RELATIVE_COLORIMETRIC_BP);
     }
 
-    public LCMSColorConvertDescriptor.RenderingIntent getLCMSIntent(RenderingIntent intent) {
+    public static LCMSColorConvertDescriptor.RenderingIntent getLCMSIntent(RenderingIntent intent) {
         return renderingIntentMap.get(intent);
     }
 
@@ -771,23 +778,23 @@ public class ImageEditorEngine implements Engine {
                 exportOptions.getIntValueOf(BitsPerChannelOption.NAME) == 8
         );
 
-        // Never uprez output images.  See bug 1443.
+        // Uprez output images
 
-//        double scale = Math.min(exportWidth / (double) exportImage.getWidth(),
-//                                exportHeight / (double) exportImage.getHeight());
-//
-//        if (scale > 1) {
-//            AffineTransform xform = AffineTransform.getScaleInstance(scale, scale);
-//
-//            RenderingHints formatHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-//
-//            Interpolation interp = Interpolation.getInstance(Interpolation.INTERP_BICUBIC_2);
-//            ParameterBlock params = new ParameterBlock();
-//            params.addSource(exportImage);
-//            params.add(xform);
-//            params.add(interp);
-//            exportImage = JAI.create("Affine", params, formatHints);
-//        }
+        double scale = Math.min(exportWidth / (double) exportImage.getWidth(),
+                                exportHeight / (double) exportImage.getHeight());
+
+        if (scale > 1) {
+            AffineTransform xform = AffineTransform.getScaleInstance(scale, scale);
+
+            RenderingHints formatHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
+
+            Interpolation interp = Interpolation.getInstance(Interpolation.INTERP_BICUBIC_2);
+            ParameterBlock params = new ParameterBlock();
+            params.addSource(exportImage);
+            params.add(xform);
+            params.add(interp);
+            exportImage = JAI.create("Affine", params, formatHints);
+        }
 
         // Make sure that if uprezzing was requested and denied, the metadata
         // reflect the actual output image size

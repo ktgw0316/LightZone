@@ -36,7 +36,7 @@ public class ImagingException extends RuntimeException {
 
     /** The default constructor. */
     public ImagingException() {
-	super();
+        super();
     }
 
     /**
@@ -45,7 +45,7 @@ public class ImagingException extends RuntimeException {
      * @param message The message to describe the situation.
      */
     public ImagingException(String message) {
-	super(message);
+        super(message);
     }
 
     /**
@@ -54,8 +54,8 @@ public class ImagingException extends RuntimeException {
      * @param cause The cause of this <code>ImagingException</code>.
      */
     public ImagingException(Throwable cause) {
-	super();
-	this.cause = cause;
+        super();
+        this.cause = cause;
     }
 
     /**
@@ -66,15 +66,15 @@ public class ImagingException extends RuntimeException {
      * @param cause The cause of this <code>ImagingException</code>
      */
     public ImagingException(String message, Throwable cause) {
-	super(message);
-	this.cause = cause;
+        super(message);
+        this.cause = cause;
     }
 
     /**
      * Returns the cause of this <code>ImagingException</code>.
      */
     public Throwable getCause() {
-	return cause;
+        return cause;
     }
 
     /**
@@ -82,30 +82,30 @@ public class ImagingException extends RuntimeException {
      * <code>ImagingException</code>.
      */
     public Throwable getRootCause() {
-	Throwable rootCause = cause;
-	Throwable atop = this;
+        Throwable rootCause = cause;
+        Throwable atop = this;
 
-	while(rootCause != atop && rootCause != null) {
-	    try {
-		atop = rootCause;
-		Method getCause = rootCause.getClass().getMethod("getCause", null);
-		rootCause = (Throwable)getCause.invoke(rootCause, null);
-	    } catch (Exception e) {
-		// do nothing.  This happens (1) getCause method is not defined.
-		// (2) Reflection error.  So rootCause will be the same as
-		// atop. Then stop the loop.
+        while(rootCause != atop && rootCause != null) {
+            try {
+                atop = rootCause;
+                Method getCause = rootCause.getClass().getMethod("getCause", (Class<?>[]) null);
+                rootCause = (Throwable)getCause.invoke(rootCause, (Object[]) null);
+            } catch (Exception e) {
+                // do nothing.  This happens (1) getCause method is not defined.
+                // (2) Reflection error.  So rootCause will be the same as
+                // atop. Then stop the loop.
                 if (rootCause instanceof InvocationTargetException)
                     rootCause = ((InvocationTargetException)rootCause).getTargetException();
                 else if (rootCause instanceof PrivilegedActionException)
                     rootCause = ((PrivilegedActionException)rootCause).getException();
-		else rootCause = atop;
-	    } finally {
-		if (rootCause == null)
-		    rootCause = atop;
-	    }
-	}
+                else rootCause = atop;
+            } finally {
+                if (rootCause == null)
+                    rootCause = atop;
+            }
+        }
 
-	return rootCause;
+        return rootCause;
     }
 
     /**
@@ -129,18 +129,18 @@ public class ImagingException extends RuntimeException {
     public void printStackTrace(PrintStream s) {
 
         synchronized (s) {
-	    super.printStackTrace(s);
-	    boolean is14 = false;
-	    try {
-		String version = System.getProperty("java.version");
-		is14 = version.indexOf("1.4") >=0 ;
-	    } catch(Exception e) {
-	    }
+            super.printStackTrace(s);
+            boolean is14 = false;
+            try {
+                String version = System.getProperty("java.version");
+                is14 = version.indexOf("1.4") >=0 ;
+            } catch(Exception e) {
+            }
 
-	    if (!is14 && cause != null) {
-		s.println("Caused by:");
-		cause.printStackTrace(s);
-	    }
+            if (!is14 && cause != null) {
+                s.println("Caused by:");
+                cause.printStackTrace(s);
+            }
 
         }
     }
@@ -171,11 +171,11 @@ public class ImagingException extends RuntimeException {
     }
 /*
     public static void main(String[] args) {
-	Exception ce = new ImagingException(new RuntimeException("test"));
-	Throwable cause = ce.getCause();
-	System.out.println("Cause: " + cause);
-	System.out.println("Root cause: " + ((ImagingException)ce).getRootCause());
-	ce.printStackTrace();
+        Exception ce = new ImagingException(new RuntimeException("test"));
+        Throwable cause = ce.getCause();
+        System.out.println("Cause: " + cause);
+        System.out.println("Root cause: " + ((ImagingException)ce).getRootCause());
+        ce.printStackTrace();
     }
 */
 }

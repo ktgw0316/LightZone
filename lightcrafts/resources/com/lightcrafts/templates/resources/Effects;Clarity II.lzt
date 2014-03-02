@@ -2,7 +2,7 @@
   <Scale Factor="0.38592008"/>
   <Image path=""/>
   <Controls>
-    <GenericOperation Active="true" Collapsed="false" Locked="false" Mode="Normal" Name="Clarity" Opacity="51" OperationType="Tone Mapper V5" layerControlsIndex="0" regionsInverted="false">
+    <GenericOperation Active="true" Collapsed="false" Locked="false" Mode="Normal" Name="Clarity II" Opacity="51" OperationType="Tone Mapper V5" layerControlsIndex="0" regionsInverted="false">
       <ColorSelection HueBlue="0.5019608" HueEnabled="true" HueGreen="0.5019608" HueRadius="-1.0" HueRed="0.5019608" Inverted="false" LuminosityEnabled="true" LuminosityLower="0.306" LuminosityLowerFeather="0.188" LuminosityUpper="0.765" LuminosityUpperFeather="0.228"/>
       <Slider Depth="64.0" Detail="6.5" Fuzz="0.1" Highlights="0.1" Shadows="4.0"/>
       <Checkbox/>

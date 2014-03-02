@@ -2,6 +2,7 @@
 
 // standard
 #include <cstring>
+#include <string>
 
 // windows
 #include <windows.h>
@@ -230,12 +231,13 @@ JNIEXPORT jstring JNICALL WindowsFileUtil_METHOD(resolveShortcutImpl)
     jstring_to_w const wPath( env, jPath );
     DWORD flags_high, flags_low;
 
+    HRESULT result = NULL;
     // Initialize the COM system.
     if ( FAILED( ::CoInitialize( NULL ) ) )
         goto error;
 
     // Get a pointer to the IShellLink interface.
-    HRESULT result = ::CoCreateInstance(
+    result = ::CoCreateInstance(
         CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink,
         (LPVOID*)&link
     );

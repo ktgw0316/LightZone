@@ -45,6 +45,26 @@ public interface CanonTags extends ImageMetaTags {
     int CANON_CR2_PREVIEW_IMAGE_LENGTH      = TIFFTags.TIFF_STRIP_BYTE_COUNTS;
 
     /**
+     * Model ID.
+     * <p>
+     * Type: Unsigned long.
+     */
+    int CANON_MODEL_ID                      = 0x0010;
+
+    /**
+     * Color data.
+     * This has sub-fields; see all the <code>CANON_CD_</code> tags.
+     */
+    int CANON_COLOR_DATA                    = 0x4001;
+
+    /**
+     * Color data: color data version
+     * <p>
+     * Type: Signed short.
+     */
+    int CANON_CD_VERSION                    = CANON_COLOR_DATA << 8;
+
+    /**
      * Color information.
      * This has sub-fields; see all the <code>CANON_CI_</code> tags.
      */
@@ -1041,6 +1061,19 @@ public interface CanonTags extends ImageMetaTags {
      * Type: Unsigned short.
      */
     int CANON_PI_IMAGE_WIDTH_AS_SHOT        = CANON_PICTURE_INFO << 8 | 0x04;
+
+    /**
+     * Picture information 2.
+     * This has sub-fields; see all the <code>CANON_PI2_</code> tags.
+     */
+    int CANON_PICTURE_INFO2                 = 0x0026;
+
+    /**
+     * Picture information 2: AF area mode.
+     * <p>
+     * Type: Unsigned short.
+     */
+    int CANON_PI2_AF_AREA_MODE              = CANON_PICTURE_INFO2 << 8 | 0x01;
 
     /**
      * Preview image info.

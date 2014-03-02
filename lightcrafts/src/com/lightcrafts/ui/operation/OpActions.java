@@ -33,10 +33,13 @@ public class OpActions {
     private final static ResourceBundle Resources = ResourceBundle.getBundle(
         "com/lightcrafts/ui/operation/OpActions"
     );
+    private final static ResourceBundle Resources_ALL = ResourceBundle.getBundle(
+        "com/lightcrafts/ui/operation/OpActions_ALL"
+    );
 
     static {
         OpKeys = new LinkedList<String>();
-        String names = Resources.getString("Operations");
+        String names = Resources_ALL.getString("Operations");
         StringTokenizer tokens = new StringTokenizer(names, ",");
         while (tokens.hasMoreTokens()) {
             String token = tokens.nextToken();
@@ -216,7 +219,7 @@ public class OpActions {
     private static BufferedImage getImage(String key) {
         String iconName;
         try {
-            iconName = Resources.getString(key + "_Icon");
+            iconName = Resources_ALL.getString(key + "_Icon");
         } catch (MissingResourceException e) {
             iconName = "generic";
         }

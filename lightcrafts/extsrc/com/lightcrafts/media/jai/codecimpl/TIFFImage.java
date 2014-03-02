@@ -985,8 +985,8 @@ public class TIFFImage extends SimpleRenderedImage {
                 // com.lightcrafts.mediax.jai.DataBufferFloat.
                 try {
                     Method getDataMethod =
-                        buffer.getClass().getMethod("getData", null);
-                    fdata = (float[])getDataMethod.invoke(buffer, null);
+                        buffer.getClass().getMethod("getData", (Class<?>[]) null);
+                    fdata = (float[])getDataMethod.invoke(buffer, (Object[]) null);
                 } catch(Exception e) {
                     String message = JaiI18N.getString("TIFFImage18");
                     ImagingListenerProxy.errorOccurred(message,
