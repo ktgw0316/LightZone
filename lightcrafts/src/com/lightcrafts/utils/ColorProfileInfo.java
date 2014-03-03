@@ -51,8 +51,14 @@ public final class ColorProfileInfo implements Comparable {
         //
         final TreeMap<String,String> sortedByPath =
             new TreeMap<String, String>();
-        for ( ColorProfileInfo cpi : profiles )
-            sortedByPath.put( cpi.getPath(), cpi.getName() );
+        for ( ColorProfileInfo cpi : profiles ) {
+            String ppath = cpi.getPath();
+            String pname = cpi.getName();
+            if ( pname.length() == 0 )
+                pname = new File(ppath).getName();
+
+            sortedByPath.put( ppath, pname );
+        }
 
         //
         // Then clump the profiles by path.
