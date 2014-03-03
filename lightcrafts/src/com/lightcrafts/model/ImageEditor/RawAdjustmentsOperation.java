@@ -7,17 +7,12 @@ import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.ColorDropperOperation;
 import com.lightcrafts.model.RawAdjustmentOperation;
 import com.lightcrafts.jai.utils.Transform;
-import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.opimage.BilateralFilterRGBOpImage;
 import com.lightcrafts.jai.opimage.HighlightRecoveryOpImage;
-import com.lightcrafts.jai.opimage.FastBilateralFilterOpImage;
 
 import com.lightcrafts.mediax.jai.PlanarImage;
-import com.lightcrafts.mediax.jai.JAI;
 import com.lightcrafts.mediax.jai.BorderExtender;
-import com.lightcrafts.mediax.jai.RenderedOp;
-import com.lightcrafts.mediax.jai.operator.MedianFilterDescriptor;
 import com.lightcrafts.utils.ColorScience;
 import com.lightcrafts.utils.DCRaw;
 import com.lightcrafts.image.types.AuxiliaryImageInfo;
@@ -25,13 +20,10 @@ import com.lightcrafts.image.types.RawImageInfo;
 
 import java.text.DecimalFormat;
 import java.awt.geom.Point2D;
-import java.awt.*;
-import java.awt.image.renderable.ParameterBlock;
 import java.awt.image.Raster;
 import java.util.*;
 
 import Jama.Matrix;
-import com.lightcrafts.image.metadata.ImageMetadata;
 import java.lang.String;
 
 public class RawAdjustmentsOperation extends BlendedOperation implements ColorDropperOperation, RawAdjustmentOperation {
@@ -371,7 +363,7 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
                 CA = CA.times(new Matrix(new double[][]{{1/max, 0, 0},{0, 1/max, 0},{0, 0, 1/max}}));
 
             // The matrix taking into account the camera color space and its basic white balance and exposure
-            float camMatrix[][] = CA.times(new Matrix(cameraRGB(temperature)).times(Math.pow(2, exposure))).getArrayFloat();
+            float camMatrix[][] = new Matrix(cameraRGB(temperature)).times(Math.pow(2, exposure)).getArrayFloat();
 
             front = new HighlightRecoveryOpImage(front, preMul, camMatrix, CA.getArrayFloat(), null);
 
