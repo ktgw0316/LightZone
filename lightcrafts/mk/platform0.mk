@@ -24,19 +24,30 @@ endif
 # Linux
 ##
 ifeq ($(PLATFORM),Linux)
-# PLATFORM is OK as-is
+  # PLATFORM is OK as-is
 endif
 
 ##
-# GNU/kFreeBSD, FreeBSD
+# GNU/kFreeBSD
 ##
 ifeq ($(PLATFORM),GNU/kFreeBSD)
   PLATFORM:=		Linux
 endif
 
+##
+# FreeBSD
+##
 ifeq ($(PLATFORM),FreeBSD)
-# PLATFORM is OK as-is
+  # PLATFORM is OK as-is
   PLATFORM_DIR:=	${ROOT}/linux
+endif
+
+##
+# OpenIndiana
+##
+ifeq ($(PLATFORM),SunOS)
+  # PLATFORM is OK as-is
+  PLATFORM_DIR:=		$(ROOT)/linux
 endif
 
 ##

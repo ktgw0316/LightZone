@@ -115,6 +115,14 @@ ifeq ($(PLATFORM),FreeBSD)
   LINK+=		$(EXEC_FREEBSD_LINK)
 endif
 
+ifeq ($(PLATFORM),SunOS)
+  CFLAGS+= 		$(EXEC_LINUX_CFLAGS)
+  DEFINES+=		$(EXEC_LINUX_DEFINES)
+  INCLUDES+= 		$(EXEC_LINUX_INCLUDES)
+  LDFLAGS+=		$(EXEC_LINUX_LDFLAGS)
+  LINK+=		$(EXEC_LINUX_LINK)
+endif
+
 TARGET_DIR:=	../../products
 
 ########## You shouldn't have to change anything below this line. #############

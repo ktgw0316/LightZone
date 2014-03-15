@@ -59,6 +59,8 @@ public class Platform {
                     || osName.startsWith( "openbsd" )
                     || osName.startsWith( "sunos" ) )
                 return Linux;
+            if ( osName.startsWith( "sunos" ) )
+                return Linux;
             if ( osName.equals( "mac os x" ) )
                 return MacOSX;
             if ( osName.startsWith( "windows" ) )

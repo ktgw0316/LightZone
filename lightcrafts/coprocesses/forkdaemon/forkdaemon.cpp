@@ -64,7 +64,7 @@ int main( int argc, char const *argv[] ) {
                     ::exit( Exit_Success );
                 if ( ::strcmp( line, CMDSTART ) == 0 ) {
                     // make sure we don't keep unwanted history...
-                    bzero(arguments, sizeof(arguments));
+                    memset(arguments, 0, sizeof(arguments));
                     execution_state = collecting;
                 }
                 continue;

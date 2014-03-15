@@ -25,6 +25,8 @@ class TestSSE2 {
         if (osname.indexOf("Linux") >= 0) {
             String line = getCpuInfoLine("flags\t\t:");
             return line.contains("sse2");
+        else if (osname.indexOf("SunOS") >= 0) {
+            return true;
         } else {
             String line = getCpuInfoLine("  Features=");
             return line.contains("SSE2");
@@ -41,6 +43,8 @@ class TestSSE2 {
                         new FileInputStream("/proc/cpuinfo")
                     )
                 );
+            } else if (osname.indexOf("SunOS") >= 0) {
+                // TODO: 
             } else {
                 Process process = Runtime.getRuntime().exec("dmesg");
                 InputStream in = process.getInputStream();
@@ -69,6 +73,8 @@ class TestSSE2 {
         if (osname.indexOf("Linux") >= 0) {
             model = getCpuInfoLine("model name\t: ");
             model = model.replaceFirst("model name\t: ", "");
+        else if (osname.indexOf("SunOS") >= 0) {
+            // TODO: 
         } else {
             model = getCpuInfoLine("CPU: ");
             model = model.replaceFirst("CPU: ", "");
