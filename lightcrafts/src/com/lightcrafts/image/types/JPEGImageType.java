@@ -263,8 +263,23 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
         final List<ByteBuffer> iccSegBufs = getAllSegments(
             imageInfo, JPEG_APP2_MARKER, new ICCProfileJPEGSegmentFilter()
         );
-        if ( iccSegBufs == null )
-            return getICCProfileFromEXIF( imageInfo );
+        if ( iccSegBufs == null ) {
+            final String path = imageInfo.getFile().getAbsolutePath();
+            try {
+                switch ( new LCJPEGReader(path).getColorsPerPixel() ) {
+                    case 1:
+                        return JAIContext.gray22Profile;
+                    case 3: // sRGB or uncalibrated
+                        return getICCProfileFromEXIF( imageInfo );
+                    case 4:
+                        return JAIContext.CMYKProfile;
+                    default:
+                        throw new BadColorProfileException( path );
+                }
+            } catch (LCImageLibException e) {
+                // ignore
+            }
+        }
         final byte[] iccProfileData;
         try {
             iccProfileData = assembleICCProfile( iccSegBufs );
