@@ -175,6 +175,9 @@
     <exec executable="${MAKE}" dir="products">
       <arg value="distclean"/>
     </exec>
+    <exec executable="${MAKE}" dir="jnisrc">
+      <arg value="distclean"/>
+    </exec>
   </target>
   <target name="clean" depends="distclean"/>
 
