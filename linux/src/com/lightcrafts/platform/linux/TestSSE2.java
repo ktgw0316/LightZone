@@ -16,69 +16,64 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class TestSSE2 {
     
     static String osname = System.getProperty("os.name");
 
     static boolean hasSSE2() {
+        String regex;
         if (osname.indexOf("Linux") >= 0) {
-            String line = getCpuInfoLine("flags\t\t:");
-            return line.contains("sse2");
-        else if (osname.indexOf("SunOS") >= 0) {
-            return true;
+            regex = "^flags\t\t:.*sse2";
+        } else if (osname.indexOf("SunOS") >= 0) {
+            regex = "^\t.*sse2";
         } else {
-            String line = getCpuInfoLine("  Features=");
-            return line.contains("SSE2");
+            regex = "^  Features=.*SSE2";
         }
+        return (getCpuInfoLine(regex) != null);
     }
 
-    private static String getCpuInfoLine(String key) {
+    private static String getCpuInfoLine(String regex) {
+        String line = null;
+        String[] cmd;
+        if (osname.indexOf("Linux") >= 0) {
+            cmd = new String[] {"cat", "/proc/cpuinfo"};
+        } else if (osname.indexOf("SunOS") >= 0) {
+            cmd = new String[] {"sh", "-c", "isainfo -nv ; psrinfo -pv"};
+        } else {
+            cmd = new String[] {"dmesg"};
+        }
+
         try {
-            BufferedReader reader;
-            String line;
-            if (osname.indexOf("Linux") >= 0) {
-                reader = new BufferedReader(
-                    new InputStreamReader(
-                        new FileInputStream("/proc/cpuinfo")
-                    )
-                );
-            } else if (osname.indexOf("SunOS") >= 0) {
-                // TODO: 
-            } else {
-                Process process = Runtime.getRuntime().exec("dmesg");
-                InputStream in = process.getInputStream();
-                reader = new BufferedReader(
-                    new InputStreamReader(in)
-                );
+            Process process = Runtime.getRuntime().exec(cmd);
+            InputStream in = process.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            while ((line = reader.readLine()) != null) {
+                if (Pattern.compile(regex).matcher(line).find())
+                    break;
             }
-            do {
-                line = reader.readLine();
-                if (line != null) {
-                    if (line.startsWith(key)) {
-                        return line;
-                    }
-                }
-            } while (line != null);
             reader.close();
         }
         catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        return line;
     }
 
     static void showDialog() {
-        String model = "";
+        String regex;
         if (osname.indexOf("Linux") >= 0) {
-            model = getCpuInfoLine("model name\t: ");
-            model = model.replaceFirst("model name\t: ", "");
-        else if (osname.indexOf("SunOS") >= 0) {
-            // TODO: 
+            regex = getCpuInfoLine("^model name\t: ");
+        } else if (osname.indexOf("SunOS") >= 0) {
+            regex = getCpuInfoLine("^\t");
         } else {
-            model = getCpuInfoLine("CPU: ");
-            model = model.replaceFirst("CPU: ", "");
+            regex = getCpuInfoLine("^CPU: ");
         }
+        String model = getCpuInfoLine(regex);
+        if (model != null)
+            model = model.replaceFirst(Matcher.quoteReplacement(regex), "");
 
         String messageA = LOCALE.get("CantRunSSE2Title");
         String messageB = LOCALE.get("CantRunSSE2");
