@@ -274,6 +274,8 @@ ifeq ($(PLATFORM),$(filter $(PLATFORM),Linux FreeBSD SunOS))
   else ifeq ($(PLATFORM),FreeBSD)
     JAVA_INCLUDES:=	-I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/freebsd
     NUM_PROCESSORS:=	$(shell dmesg | grep '^cpu' | wc -l)
+    PLATFORM_INCLUDES=	-I/usr/local/include
+    PLATFORM_LDFLAGS=	-L/usr/local/lib
   else ifeq ($(PLATFORM),SunOS)
     JAVA_INCLUDES:=	-I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/solaris
     NUM_PROCESSORS:=	$(shell psrinfo -p)
