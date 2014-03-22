@@ -6,6 +6,4 @@ jdk:
   - openjdk6
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -qq tidy javahelp2
-  - sudo apt-get install -qq zlib1g-dev libjpeg-dev libxmu-dev libglu1-mesa-dev freeglut3-dev libxi-dev liblzma-dev
-  - sudo apt-get install -qq autoconf automake libtool nasm
+  - sudo apt-get install -qq tidy javahelp2 zlib1g-dev libjpeg-dev libxmu-dev libglu1-mesa-dev freeglut3-dev libxi-dev liblzma-dev liblcms2-dev autoconf automake libtool nasm

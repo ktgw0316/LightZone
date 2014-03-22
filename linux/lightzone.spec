@@ -15,24 +15,24 @@ Source:		%{name}-%{version}.tar.bz2
 BuildRequires:	ant, autoconf, automake, nasm, gcc, gcc-c++, libtool, make, tidy, git, javahelp2
 
 %if 0%{?fedora}
-BuildRequires: java-1.7.0-openjdk-devel, libX11-devel, xz-libs
+BuildRequires: java-1.7.0-openjdk-devel
 %define debug_package %{nil}
 %endif
 %if 0%{?sles_version}
-BuildRequires: java-1_6_0-openjdk-devel, xorg-x11-libX11-devel, liblzma5, update-desktop-files
+BuildRequires: java-1_6_0-openjdk-devel, update-desktop-files
 %endif
 %if 0%{?suse_version} == 1210
-BuildRequires: java-1_6_0-openjdk-devel, xorg-x11-libX11-devel, liblzma5
+BuildRequires: java-1_6_0-openjdk-devel 
 %endif
 %if 0%{?suse_version} > 1210
-BuildRequires: java-1_7_0-openjdk-devel, libX11-devel, liblzma5
+BuildRequires: java-1_7_0-openjdk-devel
 %endif
 %if 0%{?centos_version}
-BuildRequires: java-1.6.0-openjdk-devel, libX11-devel, liblzma5
+BuildRequires: java-1.6.0-openjdk-devel
 %define debug_package %{nil}
 %endif
 %if 0%{?mdkversion}
-BuildRequires: java-1.6.0-openjdk-devel, libX11-devel, liblzma5
+BuildRequires: java-1.6.0-openjdk-devel
 %endif
 
 %if 0%{?fedora}

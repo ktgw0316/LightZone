@@ -12,18 +12,10 @@ TARGET_BASE:=		LCTIFF
 # Uncomment to compile in debug mode.
 #DEBUG:=		true
 
-ifeq ($(UNIVERSAL),1)
-  JNI_PPC_INCLUDES:=	-Ilibtiff/arch-powerpc/include
-  JNI_X86_INCLUDES:=	-Ilibtiff/arch-i386/include
-else
-  JNI_EXTRA_INCLUDES=	-Ilibtiff/arch-$(PROCESSOR)/include
-endif
-
-JNI_EXTRA_LDFLAGS:=	-L../jpeg/libjpeg/lib -Lzlib/lib -Llibtiff/lib
 ifeq ($(PLATFORM),Windows)
-  JNI_EXTRA_LINK:=	-Wl,-Bdynamic -lLCJNI -Wl,-Bstatic -ltiff -llzma -lz -lstdc++ 
+  JNI_EXTRA_LINK:=	-Wl,-Bdynamic -lLCJNI -Wl,-Bstatic -ltiff -lstdc++ 
 else
-  JNI_EXTRA_LINK:=	-lLCJNI -ltiff -lz -lstdc++ 
+  JNI_EXTRA_LINK:=	-lLCJNI -ltiff -lstdc++ 
 endif
 
 JAVAH_CLASSES:=		com.lightcrafts.image.libs.LCTIFFCommon \

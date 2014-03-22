@@ -12,7 +12,6 @@ TARGET_BASE:=		LCMS
 ##
 JNI_MANUAL_TARGET:=	1
 
-JNI_EXTRA_INCLUDES:=	-Ilcms/include
 ##
 # This is to prevent LCMS from using the MessageBox() function to report errors
 # under Windows and just use stderr instead.

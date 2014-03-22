@@ -1,6 +1,7 @@
 lightzone (4.1.0~beta6-0obs1) unstable; urgency=low
 
   * Upstream sync
+  * Reverted version numbering
 
  -- Masahiro Kitagawa <arctica0316@gmail.com>  Tue, 28 Jan 2014 22:23:03 +0900
 
@@ -55,6 +56,12 @@ lightzone (4.0.0-0obs20130910) raring; urgency=low
   * Upstream sync
 
  -- Masahiro Kitagawa <arctica0316@gmail.com>  Wed, 11 Sep 2013 01:18:04 +0900
+
+lightzone (4.0.0-0core20130807) raring; urgency=low
+
+  * Removed libjpeg-turbo, zlib and lcms2 source
+
+ -- Masahiro Kitagawa <arctica0316@gmail.com>  Wed, 07 Aug 2013 23:58:28 +0900
 
 lightzone (4.0.0-0obs20130807) raring; urgency=low
 
