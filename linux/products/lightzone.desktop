@@ -2,7 +2,7 @@
 Name=LightZone
 GenericName=Digital Darkroom Software
 Comment=Post-processing software for digital photos
-Exec=/usr/bin/lightzone %U
+Exec=lightzone %U
 Icon=LightZone
 Type=Application
 Terminal=false
