@@ -6,7 +6,20 @@ echo Starting LightZone version 4.1.0 beta6 ...
 echo with options : ${@}
 
 arch=`getconf LONG_BIT`
-totalmem=`cat /proc/meminfo | grep MemTotal | sed -r 's/.* ([0-9]+) .*/\1/'`
+PLATFORM=`uname`
+if [ "${PLATFORM}" = "Linux" ]; then
+  totalmem=`cat /proc/meminfo | grep 'MemTotal: ' | sed -r 's/.* ([0-9]+) .*/\1/'`
+  sharedir=/opt/lightzone
+elif [ "${PLATFORM}" = "SunOS" ]; then
+  totalmem=`prtconf | grep 'Memory size:' | sed -r 's/.* ([0-9]+) .*/\1/'`
+  totalmem=`expr $totalmem \* 1024`
+  sharedir=/opt/lightzone
+elif [ "${PLATFORM}" = "FreeBSD" ]; then
+  totalmem=`dmesg | grep 'real memory' | sed -r 's/.* ([0-9]+) .*/\1/'`
+  totalmem=`expr $totalmem / 1024`
+  sharedir=/usr/local/share/java/lightzone
+fi
+
 if [ $totalmem -ge 1024000 ]; then
         maxmem=$(( $totalmem / 2 ))
         # on 32-bit architectures there is ~2GB limit for maximum Java heap size
@@ -17,4 +30,4 @@ else
         maxmem=512000
 fi
 
-(cd "/opt/lightzone" && LD_PRELOAD="$lzmalibrary" LD_LIBRARY_PATH="/opt/lightzone" exec java -Xmx${maxmem}k -Djava.library.path="/opt/lightzone" -Dfile.encoding=UTF8 -classpath "/opt/lightzone/*" com.lightcrafts.platform.linux.LinuxLauncher ${@} )
+(cd $sharedir && LD_LIBRARY_PATH=$sharedir exec java -Xmx${maxmem}k -Djava.library.path=$sharedir -Dfile.encoding=UTF8 -classpath "$sharedir/*" com.lightcrafts.platform.linux.LinuxLauncher ${@} )

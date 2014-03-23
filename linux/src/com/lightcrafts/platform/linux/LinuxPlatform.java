@@ -164,10 +164,12 @@ public class LinuxPlatform extends Platform {
                 if (matcher.matches()) {
                     String text = matcher.replaceAll("$1");
                     int i = Integer.parseInt(text);
-                    if (osname.indexOf("SunOS") >= 0)
+                    if (osname.indexOf("Linux") >= 0)
+                        return i / 1024;
+                    else if (osname.indexOf("SunOS") >= 0)
                         return i;
                     else
-                        return i / 1024;
+                        return i / 1048576;
                 }
                 line = buffer.readLine();
             }

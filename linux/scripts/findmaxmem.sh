@@ -16,6 +16,7 @@ elif [ "${PLATFORM}" = "SunOS" ]; then
   totalmem=`expr $totalmem \* 1024`
 elif [ "${PLATFORM}" = "FreeBSD" ]; then
   totalmem=`dmesg | grep 'real memory' | sed -r 's/.* ([0-9]+) .*/\1/'`
+  totalmem=`expr $totalmem / 1024`
 fi
 echo $totalmem
 
