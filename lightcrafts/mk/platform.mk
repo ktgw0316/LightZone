@@ -189,29 +189,22 @@ ifeq ($(PLATFORM),Windows)
   ifndef MSSDK_HOME
     $(error "MSSDK_HOME" must be set)
   endif
+  MSSDK_HOME_W32:=	$(shell cygpath -w "$(MSSDK_HOME)")
 
   NUM_PROCESSORS:=	$(shell grep '^processor' /proc/cpuinfo | wc -l)
   ifeq ($(NUM_PROCESSORS),0)
     NUM_PROCESSORS:=	1
   endif
 
-  MSSDK_HOME_W32:=	$(shell cygpath -w "$(MSSDK_HOME)")
-
   ifeq ($(PROCESSOR),x86_64)
-    ARCH:=		x64
-    CC:=		x86_64-w64-mingw32-gcc
-    CXX:=		x86_64-w64-mingw32-g++
+    MINGW:=		x86_64-w64-mingw32
   else
-    ARCH:=		x86
-    CC:=		i686-w64-mingw32-gcc
-    CXX:=		i686-w64-mingw32-g++
+    MINGW:=		i686-w64-mingw32
   endif
+  CC:=			$(MINGW)-gcc
+  CXX:=			$(MINGW)-g++
+  PLATFORM_CFLAGS+=	$(SSE_FLAGS)
 
-  RC:=			"$(MSSDK_HOME)/Bin/$(ARCH)/RC.Exe"
-  RC_INCLUDES:=		-i "$(shell cygpath -w /usr/include/w32api)"
-  RC_FLAGS=		$(RC_INCLUDES) -n -fo
-
-  PLATFORM_CFLAGS+=	$(SSE_FLAGS) # "-D__int64=long long"
   ifdef HIGH_PERFORMANCE
     ifdef USE_ICC_HERE
       ICC:=		$(TOOLS_BIN)/lc-icc-w32
