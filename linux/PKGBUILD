@@ -1,22 +1,31 @@
 # Maintainer: KITAGAWA Masahiro <arctica0316@gmail.com>
 pkgname="lightzone"
-pkgver=4.0.0
+pkgver=4.1.0.beta6
 pkgrel=1
 pkgdesc="Open-source professional-level digital darkroom software"
 url="http://lightzoneproject.org/"
 license=('custom:BSD-3-Clause')
 arch=('i686' 'x86_64')
 
-depends=('jre7-openjdk' 'libjpeg-turbo' 'lcms2' 'zlib' 'libtiff')
-makedepends=('apache-ant' 'gcc' 'make' 'tidyhtml' 'git' 'javahelp2')
+depends=('jre7-openjdk' 'libjpeg-turbo' 'lcms2' 'libtiff')
+makedepends=('jdk7-openjdk' 'apache-ant' 'gcc' 'make' 'tidyhtml' 'git' 'javahelp2' 'libx11')
 
 source=("${pkgname}-${pkgver}.tar.bz2")
+md5sums=()
 
 build() {
-  ant -f "${srcdir}/linux/build.xml" jar
+  # Set $JAVA_HOME and $ANT_HOME
+  [ -f /etc/profile.d/openjdk7.sh ] && source /etc/profile.d/openjdk7.sh
+  [ -f /etc/profile.d/jdk.sh ] && source /etc/profile.d/jdk.sh
+  [ -f /etc/profile.d/apache-ant.sh ] && source /etc/profile.d/apache-ant.sh
+
+  cd "${srcdir}/${pkgname}-${pkgver}/"
+  ant -f linux/build.xml jar
 }
 
 package() {
+  cd "${srcdir}/${pkgname}-${pkgver}/"
+
   instdir="/opt/${pkgname}"
   install -dm 0755 "${pkgdir}/${instdir}"
   cp -rpH lightcrafts/products/dcraw "${pkgdir}/${instdir}"
