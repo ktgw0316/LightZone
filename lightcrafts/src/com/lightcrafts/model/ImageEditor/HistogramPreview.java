@@ -172,7 +172,7 @@ public class HistogramPreview extends Preview implements PaintListener {
 
     static {
         for (int i = 0; i < 0x10000; i++)
-            logTable[i] = (float) Math.log(i+1);
+            logTable[i] = (float) Math.log1p(i);
     }
 
     private synchronized void computeHistogram(Rectangle visibleRect, PlanarImage image) {

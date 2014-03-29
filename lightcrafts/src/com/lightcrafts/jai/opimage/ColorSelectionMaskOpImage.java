@@ -213,7 +213,7 @@ public class ColorSelectionMaskOpImage extends PointOpImage {
                 } else
                     colorMask = 0;
 
-                float luminosity = (float) (Math.log((wr * r + wg * g + wb * b)/0x100) / (8 * Math.log(2)));
+                float luminosity = (float) (Math.log1p((wr * r + wg * g + wb * b)/0x100) / (8 * Math.log(2)));
 
                 if (luminosity >= luminosityLower && luminosity <= luminosityUpper)
                     brightnessMask = 1;

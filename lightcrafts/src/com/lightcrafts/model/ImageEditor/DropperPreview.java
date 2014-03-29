@@ -112,11 +112,11 @@ class DropperPreview extends Preview {
 
             g.drawString("Luminosity: " + (int) lightness, minx + gap, miny + 2 + textHeight);
 
-            double zone = Math.log(lightness) / (8 * Math.log(2));
+            double zone = Math.log1p(lightness) / (8 * Math.log(2));
 
             DecimalFormat format = new DecimalFormat("0.0");
 
-            g.drawString("      Zone: " + format.format(10 * zone), minx + gap, miny + 2 + 2 * textHeight);
+            g.drawString("      Zone: " + format.format(16 * zone), minx + gap, miny + 2 + 2 * textHeight);
 
             float xyzColor[] = JAIContext.linearColorSpace.toCIEXYZ(new float[]{(float) (red / 255.),
                                                                                 (float) (green / 255.),

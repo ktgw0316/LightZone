@@ -104,11 +104,11 @@ class ZoneOperationImpl extends BlendedOperation implements ZoneOperation {
     }
 
     private static double fy(double y) {
-        return Math.log((255.0 * y + 1))/(8 * Math.log(2));
+        return Math.log1p(255.0 * y) / (8 * Math.log(2));
     }
 
     public double getControlPoint(int index) {
-        final double x = (Math.pow(2, (index) * 8.0 / 16.0) - 1) / 255.0f;
+        final double x = (Math.pow(2, index * 8.0 / 16.0) - 1) / 255.0f;
         final double y;
         
         if (controlPoints == null) {
