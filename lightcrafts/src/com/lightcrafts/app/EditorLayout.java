@@ -101,13 +101,18 @@ class EditorLayout extends AbstractLayout {
 
     List<FadingTabConfiguration> getRightFaderConfs() {
         String toolsLabel = LOCALE.get("ToolsTabLabel");
+        String infoLabel = LOCALE.get("InfoTabLabel");
         String toolsTip = LOCALE.get("ToolsTabToolTip");
+        String infoTip = LOCALE.get("InfoTabToolTip");
         List<FadingTabConfiguration> tabs =
             new LinkedList<FadingTabConfiguration>();
         tabs.add(
             new FadingTabConfiguration(
                 editor.getToolStack(), toolsLabel, toolsTip
             )
+        );
+        tabs.add(
+            new FadingTabConfiguration(info, infoLabel, infoTip)
         );
         return tabs;
     }
