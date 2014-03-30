@@ -43,12 +43,12 @@ WRKSRC=	${WRKDIR}/${GIT_ACCOUNT}-${GIT_PROJECT}-${GIT_COMMIT}/linux
 do-install:
 	${INSTALL_SCRIPT} ${WRKSRC}/products/${PORTNAME} ${PREFIX}/bin/
 	@${MKDIR} ${DATADIR}
-	@cd ${WRKSRC}/icons  && ${COPYTREE_SHARE} . ${DATADIR}
 	${INSTALL_PROGRAM} ${WRKSRC}/products/LightZone-forkd ${DATADIR}
 	${INSTALL_PROGRAM} ${WRKSRC}/products/dcraw ${DATADIR}
 	${INSTALL_DATA} ${WRKSRC}/products/*.jar ${DATADIR}
 	${INSTALL_LIB} ${WRKSRC}/products/*.so ${DATADIR}
-	${INSTALL_DATA} ${WRKSRC}/products/${PORTNAME}.desktop ${LOCALBASE}/share/applications
+	${INSTALL_DATA} ${WRKSRC}/products/${PORTNAME}.desktop ${PREFIX}/share/applications/
+	@cd ${WRKSRC} && ${COPYTREE_SHARE} icons ${PREFIX}/share/
 
 post-install:
 	${LN} -sf ${DATADIR}/libLCJNI.so ${LIBDIR}
