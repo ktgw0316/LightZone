@@ -113,6 +113,10 @@ public interface Engine {
      */
     OperationType getRawAdjustmentsOperationType();
 
+    // Account for Raw Adjustments versioning
+
+    OperationType getGenericRawAdjustmentsOperationType();
+
     /**
      * Remove the Operation at the given position in the pipeline, or do
      * nothing if the given position number is out of range.

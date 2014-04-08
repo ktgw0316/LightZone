@@ -863,11 +863,11 @@ public class OpStack extends DraggableStack
      * manually.
      */
     public boolean hasRawAdjustments() {
-        OperationType rawType = engine.getRawAdjustmentsOperationType();
+        OperationType rawType = engine.getGenericRawAdjustmentsOperationType();
         for (OpControl control : opControls) {
             Operation op = control.getOperation();
             OperationType type = op.getType();
-            if (type.equals(rawType)) {
+            if (type.getName().startsWith(rawType.getName())) {
                 return true;
             }
         }
