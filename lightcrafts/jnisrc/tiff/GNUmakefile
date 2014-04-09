@@ -8,6 +8,8 @@ include		$(COMMON_DIR)/mk/platform.mk
 
 .PHONY: all
 all:
+	autoconf -f -i -v
+	CC="$(CC)" CXX="$(CXX)" ./configure
 	$(MAKE) -f lctiff.mk
 
 ##
