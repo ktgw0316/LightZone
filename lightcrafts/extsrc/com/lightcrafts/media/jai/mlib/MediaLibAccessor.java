@@ -184,9 +184,9 @@ public class MediaLibAccessor {
         boolean disableMediaLib = false;
         try {
             disableMediaLib =
-                Boolean.getBoolean("com.lightcrafts.media.jai.disableMediaLib");
+                Boolean.getBoolean("com.sun.media.jai.disableMediaLib");
         } catch (java.security.AccessControlException e) {
-            // Because the property com.lightcrafts.media.jai.disableMediaLib isn't
+            // Because the property com.sun.media.jai.disableMediaLib isn't
             // defined as public, the users shouldn't know it.  In most of
             // the cases, it isn't defined, and thus no access permission
             // is granted to it in the policy file.  When JAI is utilized in
