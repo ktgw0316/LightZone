@@ -128,9 +128,10 @@ class BrowserLayout extends AbstractLayout {
     void updateEditor(
         TemplateControl templates,
         Editor editor,
-        DocUndoHistory history
+        DocUndoHistory history,
+        MetadataScroll info
     ) {
-        super.updateEditor(templates, editor, history);
+        super.updateEditor(templates, editor, history, info);
 
         // In this layout, we assume the TemplateControl never needs updating,
         // and the ImageMetadata is not used.

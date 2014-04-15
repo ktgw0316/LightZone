@@ -97,9 +97,10 @@ class ComboLayout extends AbstractLayout {
     void updateEditor(
         TemplateControl templates,
         Editor editor,
-        DocUndoHistory history
+        DocUndoHistory history,
+        MetadataScroll info
     ) {
-        super.updateEditor(templates, editor, history);
+        super.updateEditor(templates, editor, history, info);
 
         remove(editorToolBar);
         editorToolBar = editor.getToolBar();

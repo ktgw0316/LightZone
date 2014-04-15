@@ -176,11 +176,13 @@ public abstract class AbstractLayout extends JPanel {
     void updateEditor(
         TemplateControl templates,
         Editor editor,
-        DocUndoHistory history
+        DocUndoHistory history,
+        MetadataScroll info
     ) {
         this.templates = templates;
         this.editor = editor;
         this.history = history;
+        this.info = info;
     }
 
     /**

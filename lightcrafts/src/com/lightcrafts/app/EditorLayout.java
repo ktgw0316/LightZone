@@ -36,15 +36,16 @@ class EditorLayout extends AbstractLayout {
             LayoutType.Editor,
             templates, editor, history, folders, browser, info, header
         );
-        updateEditor(templates, editor, history);
+        updateEditor(templates, editor, history, info);
     }
 
     void updateEditor(
         TemplateControl templates,
         Editor editor,
-        DocUndoHistory history
+        DocUndoHistory history,
+        MetadataScroll info
     ) {
-        super.updateEditor(templates, editor, history);
+        super.updateEditor(templates, editor, history, info);
 
         initFaders();
 

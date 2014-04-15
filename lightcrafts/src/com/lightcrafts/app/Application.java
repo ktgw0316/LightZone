@@ -217,6 +217,9 @@ public class Application {
                             // Ensure the source is set before frame init:
                             doc.setSource(otherApp);
                             ComboFrame docFrame = show(doc, frame);
+
+                            ImageInfo imageInfo = ImageInfo.getInstanceFor(file);
+                            docFrame.setImage(imageInfo);
                             // Ensure layout is complete before zoom-to-fit:
                             docFrame.validate();
                             setInitialSize(doc);

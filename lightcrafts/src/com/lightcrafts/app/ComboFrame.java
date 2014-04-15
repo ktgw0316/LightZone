@@ -406,6 +406,10 @@ public class ComboFrame
         }
     }
 
+    public void setImage(ImageInfo imageInfo) {
+        info.setImage(imageInfo);
+    }
+
     // Implementing ImageBrowserListener.  Updates the metadata display,
     // shuts down any open Document, shows a preview if the shutdown was
     // successful, remembers the selection in preferences, and updates the
@@ -414,11 +418,11 @@ public class ComboFrame
         File file = event.getFile();
         if (file != null) {
             ImageInfo imageInfo = ImageInfo.getInstanceFor(file);
-            info.setImage(imageInfo);
+            setImage(imageInfo);
             BrowserSelectionMemory.setRememberedFile(file);
         }
         else {
-            info.setImage(null);
+            setImage(null);
         }
         // Attempt to put away any current editor:
         if (doc != null) {
@@ -657,7 +661,7 @@ public class ComboFrame
             JComponent toolbar = editor.getToolBar();
             toolbar.add(memory);
         }
-        layout.updateEditor(templates, editor, history);
+        layout.updateEditor(templates, editor, history, info);
 
         setContentPane(layout);
         header.update();
@@ -694,7 +698,7 @@ public class ComboFrame
             info,
             header
         );
-        layout.updateEditor(templates, editor, history);
+        layout.updateEditor(templates, editor, history, info);
 
         repaint();
         setContentPane(layout);
@@ -778,6 +782,10 @@ public class ComboFrame
                 isBrowserVisible = true;
             }
             isEditorVisible = false;
+
+            File file = browser.getLeadSelectedFile();
+            ImageInfo imageInfo = ImageInfo.getInstanceFor(file);
+            setImage(imageInfo);
 
             header.setBrowseSelected();
 
