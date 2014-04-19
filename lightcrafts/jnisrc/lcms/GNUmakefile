@@ -6,6 +6,7 @@ TARGET_BASE:=		LCMS
 # Uncomment to compile in debug mode.
 #DEBUG:=			true
 
+JNI_EXTRA_INCLUDES:=	-Ilcms/src
 ##
 # I didn't want to figure out how to tweak this EDISON stuff to have it conform
 # to the way JNI source is built, so I'll just define the TARGET rule manually.
