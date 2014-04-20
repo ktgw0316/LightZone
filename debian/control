@@ -2,12 +2,12 @@ Source: lightzone
 Section: graphics
 Priority: optional
 Maintainer: Masahiro Kitagawa <arctica0316@gmail.com>
-Build-Depends: debhelper, devscripts, build-essential, ant, autoconf, git-core, javahelp2, default-jdk (>= 1.6), default-jre-headless (>= 1.6), tidy, libjpeg-turbo8-dev | libturbojpeg1-dev | libjpeg8-dev, liblcms2-dev, libtiff4-dev | libtiff5-dev, libx11-dev
+Build-Depends: debhelper, devscripts, build-essential, ant, autoconf, git-core, javahelp2, default-jdk (>= 1.6), default-jre-headless (>= 1.6), tidy, libjpeg-turbo8-dev | libturbojpeg1-dev | libjpeg8-dev, libtiff4-dev | libtiff5-dev, libx11-dev
 Homepage: http://lightzoneproject.org/
 Standards-Version: 3.9.4.0
 
 Package: lightzone
 Architecture: i386 amd64
-Depends: openjdk-7-jre | openjdk-8-jre | oracle-java7-jre | oracle-java8-jre, libjpeg-turbo8 | libturbojpeg1 | libjpeg8, liblcms2-2, libtiff4 | libtiff5
+Depends: openjdk-7-jre | openjdk-8-jre | oracle-java7-jre | oracle-java8-jre, libjpeg-turbo8 | libturbojpeg1 | libjpeg8, libtiff4 | libtiff5
 Description: Open-source professional-level digital darkroom software
  LightZone is open-source professional-level digital darkroom software for Windows, Mac OS X, and Linux. Rather than using layers as many other photo editors do, LightZone lets the user build up a stack of tools which can be rearranged, turned off and on, and removed from the stack. It's a non-destructive editor, where any of the tools can be re-adjusted or modified later - even in a different editing session. A tool stack can be copied to a batch of photos at one time. LightZone operates in a 16-bit linear color space with the wide gamut of ProPhoto RGB.

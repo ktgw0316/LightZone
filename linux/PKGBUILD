@@ -7,8 +7,8 @@ url="http://lightzoneproject.org/"
 license=('custom:BSD-3-Clause')
 arch=('i686' 'x86_64')
 
-depends=('jre7-openjdk' 'libjpeg-turbo' 'lcms2' 'libtiff')
-makedepends=('jdk7-openjdk' 'apache-ant' 'gcc' 'make' 'tidyhtml' 'git' 'javahelp2' 'libx11')
+depends=('jre7-openjdk' 'libjpeg-turbo' 'libtiff')
+makedepends=('jdk7-openjdk' 'apache-ant' 'autoconf' 'gcc' 'make' 'tidyhtml' 'git' 'javahelp2' 'libx11')
 
 source=("${pkgname}-${pkgver}.tar.bz2")
 md5sums=()
