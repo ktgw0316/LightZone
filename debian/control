@@ -1,10 +1,10 @@
 Source: lightzone
 Section: graphics
 Priority: optional
-Maintainer: Pavel Benak <pavel.benak@gmail.com>
+Maintainer: Masahiro Kitagawa <arctica0316@gmail.com>
 Build-Depends: debhelper, devscripts, build-essential, ant, autoconf, git-core, javahelp2, default-jdk (>= 1.6), default-jre-headless (>= 1.6), tidy, libjpeg-dev | libturbojpeg1-dev | libjpeg8-dev, liblcms2-dev, libtiff4-dev | libtiff5-dev, libx11-dev
 Homepage: http://lightzoneproject.org/
-Standards-Version: 4.0.0
+Standards-Version: 3.9.4.0
 
 Package: lightzone
 Architecture: i386 amd64
