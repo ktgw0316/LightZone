@@ -1,4 +1,4 @@
-bin/lightzone
+%%LOCALBASE%%/bin/lightzone
 %%DATADIR%%/LightZone-forkd
 %%DATADIR%%/dcraw
 %%DATADIR%%/jh.jar
@@ -23,12 +23,11 @@ bin/lightzone
 %%DATADIR%%/mlibwrapper_jai.jar
 %%DATADIR%%/script-api.jar
 %%DATADIR%%/substance-lite.jar
-%%LIBDIR%%/libLCJNI.so
-share/applications/lightzone.desktop
-share/icons/hicolor/16x16/apps/lightzone.png
-share/icons/hicolor/32x32/apps/lightzone.png
-share/icons/hicolor/48x48/apps/lightzone.png
-share/icons/hicolor/64x64/apps/lightzone.png
-share/icons/hicolor/128x128/apps/lightzone.png
-share/icons/hicolor/256x256/apps/lightzone.png
+%%LOCALBASE%%/share/applications/lightzone.desktop
+%%LOCALBASE%%/share/icons/hicolor/16x16/apps/lightzone.png
+%%LOCALBASE%%/share/icons/hicolor/32x32/apps/lightzone.png
+%%LOCALBASE%%/share/icons/hicolor/48x48/apps/lightzone.png
+%%LOCALBASE%%/share/icons/hicolor/64x64/apps/lightzone.png
+%%LOCALBASE%%/share/icons/hicolor/128x128/apps/lightzone.png
+%%LOCALBASE%%/share/icons/hicolor/256x256/apps/lightzone.png
 @dirrm %%DATADIR%%
