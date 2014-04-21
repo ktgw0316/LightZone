@@ -10,7 +10,7 @@ include		$(COMMON_DIR)/mk/platform.mk
 all: configure
 	$(MAKE) -f lctiff.mk
 configure:
-	autoconf -f -i -v
+	autoconf
 	CC="$(CC)" CXX="$(CXX)" ./configure
 
 ##
