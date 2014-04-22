@@ -237,9 +237,9 @@ ifeq ($(PLATFORM),Windows)
 endif
 
 ##
-# Linux
+# Linux, FreeBSD or OpenIndiana
 ##
-ifeq ($(PLATFORM),Linux)
+ifeq ($(PLATFORM),$(filter $(PLATFORM),Linux FreeBSD SunOS))
   ifeq ($(PROCESSOR),x86_64)
     PLATFORM_CFLAGS+=	-march=athlon64 -mtune=generic $(SSE_FLAGS_ON) -fPIC
   else
@@ -254,14 +254,25 @@ ifeq ($(PLATFORM),Linux)
   else
     PLATFORM_CFLAGS+=	-Os
   endif
-  JAVA_INCLUDES:=	-I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux
+
   JAVA_LDFLAGS:=	-L$(JAVA_HOME)/lib
   JNILIB_PREFIX:=	lib
   JNILIB_EXT:=		.so
   DYLIB_PREFIX:=	$(JNILIB_PREFIX)
   DYLIB_EXT:=		$(JNILIB_EXT)
 
-  NUM_PROCESSORS:=	$(shell grep '^processor' /proc/cpuinfo | wc -l)
+  ifeq ($(PLATFORM),Linux)
+    JAVA_INCLUDES:=	-I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux
+    NUM_PROCESSORS:=	$(shell grep '^processor' /proc/cpuinfo | wc -l)
+  else ifeq ($(PLATFORM),FreeBSD)
+    JAVA_INCLUDES:=	-I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/freebsd
+    NUM_PROCESSORS:=	$(shell dmesg | grep '^cpu' | wc -l)
+    PLATFORM_INCLUDES=	-I/usr/local/include
+    PLATFORM_LDFLAGS=	-L/usr/local/lib
+  else ifeq ($(PLATFORM),SunOS)
+    JAVA_INCLUDES:=	-I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/solaris
+    NUM_PROCESSORS:=	$(shell psrinfo -p)
+  endif
 endif
 
 ##

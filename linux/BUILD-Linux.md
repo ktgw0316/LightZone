@@ -3,17 +3,12 @@
 ## Install required packages
 Building the LightZone source requires (at least) following packages:
 - __ant__
-- __autoconf__ 2.56 or later
-- __automake__ 1.7 or later
 - __fakeroot__ for linux package creation
 - __g++__
 - __gcc__
 - __git__
 - __javahelp2__ for jhindexer
-- __libtool__ 1.4 or later
-- __libx11-dev__ for X11/xlib.h
 - __make__
-- __nasm__ 2.07 or later
 - __openjdk-6-jdk__ or later
 - __tidy__
 

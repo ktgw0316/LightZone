@@ -20,21 +20,16 @@ install: build
 	dh_testroot
 	dh_prep
 	dh_installdirs
+	install -m 755 $(CURDIR)/linux/products/lightzone $(CURDIR)/debian/lightzone/usr/bin/
+	install -m 644 $(CURDIR)/linux/products/lightzone.desktop $(CURDIR)/debian/lightzone/usr/share/applications/
 	# not using install file here because
-	# 1 - icon files have to be renamed
+	# 1 - icon files have to be copied recursively
 	# 2 - some files are symlinks and they need to be followed. Install file just copies symlinks
-	install -m 644 $(CURDIR)/linux/products/lightzone.desktop $(CURDIR)/debian/lightzone/usr/share/applications/lightzone.desktop
-	install -m 644 $(CURDIR)/linux/icons/LightZone_256x256.png $(CURDIR)/debian/lightzone/usr/share/icons/hicolor/256x256/apps/LightZone.png
-	install -m 644 $(CURDIR)/linux/icons/LightZone_128x128.png $(CURDIR)/debian/lightzone/usr/share/icons/hicolor/128x128/apps/LightZone.png
-	install -m 644 $(CURDIR)/linux/icons/LightZone_64x64.png $(CURDIR)/debian/lightzone/usr/share/icons/hicolor/64x64/apps/LightZone.png
-	install -m 644 $(CURDIR)/linux/icons/LightZone_48x48.png $(CURDIR)/debian/lightzone/usr/share/icons/hicolor/48x48/apps/LightZone.png
-	install -m 644 $(CURDIR)/linux/icons/LightZone_32x32.png $(CURDIR)/debian/lightzone/usr/share/icons/hicolor/32x32/apps/LightZone.png
-	install -m 644 $(CURDIR)/linux/icons/LightZone_16x16.png $(CURDIR)/debian/lightzone/usr/share/icons/hicolor/16x16/apps/LightZone.png
-	cp -rpH $(CURDIR)/linux/products/lightzone $(CURDIR)/debian/lightzone/usr/bin
-	cp -rpH $(CURDIR)/linux/products/LightZone-forkd $(CURDIR)/debian/lightzone/opt/lightzone
-	cp -rpH $(CURDIR)/linux/products/dcraw $(CURDIR)/debian/lightzone/opt/lightzone/
-	cp -rpH $(CURDIR)/linux/products/*.jar $(CURDIR)/debian/lightzone/opt/lightzone/
-	cp -rpH $(CURDIR)/linux/products/*.so $(CURDIR)/debian/lightzone/opt/lightzone/
+	cp -pHR $(CURDIR)/linux/icons $(CURDIR)/debian/lightzone/usr/share/
+	cp -pH $(CURDIR)/linux/products/LightZone-forkd $(CURDIR)/debian/lightzone/opt/lightzone/
+	cp -pH $(CURDIR)/linux/products/dcraw $(CURDIR)/debian/lightzone/opt/lightzone/
+	cp -pH $(CURDIR)/linux/products/*.jar $(CURDIR)/debian/lightzone/opt/lightzone/
+	cp -pH $(CURDIR)/linux/products/*.so $(CURDIR)/debian/lightzone/opt/lightzone/
 
 binary-arch: build install
 	dh_testdir
@@ -52,7 +47,7 @@ binary-arch: build install
 	dh_md5sums
 	dh_builddeb
 
-clean: 
+clean:
 	JAVA_HOME=$(JAVA_HOME) ant $(ANT_OPTIONS) clean
 	-$(RM) configure-stamp build-stamp
 

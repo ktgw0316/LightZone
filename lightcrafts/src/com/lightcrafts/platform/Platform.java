@@ -54,7 +54,12 @@ public class Platform {
          */
         static Type getTypeForOS() {
             final String osName = System.getProperty( "os.name" ).toLowerCase();
-            if ( osName.startsWith( "linux" ) )
+            if ( osName.startsWith( "linux" )
+                    || osName.startsWith( "freebsd" )
+                    || osName.startsWith( "openbsd" )
+                    || osName.startsWith( "sunos" ) )
+                return Linux;
+            if ( osName.startsWith( "sunos" ) )
                 return Linux;
             if ( osName.equals( "mac os x" ) )
                 return MacOSX;

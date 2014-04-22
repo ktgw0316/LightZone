@@ -1,8 +1,0 @@
-To upgrade the version of the TIFF library:
-
-	svn remove <existing_version>
-	tar xf <new_version>.tar
-	svn add <new_version>
-
-There is no need to touch the GNUmakefile -- it will automatically build
-whatever library is here so long as the directory name starts with "tiff-".

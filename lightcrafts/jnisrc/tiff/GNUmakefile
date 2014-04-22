@@ -2,18 +2,16 @@ ROOT:=		../../..
 COMMON_DIR:=	$(ROOT)/lightcrafts
 include		$(COMMON_DIR)/mk/platform.mk
 
-DEP_LIBS:=	zlib libtiff
-
 ##
 # Build rules
 ##
 
-.PHONY: all $(DEP_LIBS)
-all: $(DEP_LIBS)
+.PHONY: all
+all: configure
 	$(MAKE) -f lctiff.mk
-
-$(DEP_LIBS):
-	$(MAKE) -C $@
+configure:
+	autoconf
+	CC="$(CC)" CXX="$(CXX)" ./configure
 
 ##
 # Utility rules
@@ -23,6 +21,5 @@ $(DEP_LIBS):
 
 clean distclean mostlyclean:
 	$(MAKE) -f lctiff.mk $@
-	for lib in $(DEP_LIBS); do $(MAKE) -C $$lib $@; done
 
 # vim:set noet sw=8 ts=8:

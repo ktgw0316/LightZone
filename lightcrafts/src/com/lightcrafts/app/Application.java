@@ -2187,7 +2187,7 @@ public class Application {
                             openMacPlaceholderFrame();
                         }
                         else {
-                            setLookAndFeel();
+                            setLookAndFeel(new LightZoneSkin().getLightZoneLookAndFeel());
                         }
                         openEmpty();
                         Platform.getPlatform().readyToOpenFiles();

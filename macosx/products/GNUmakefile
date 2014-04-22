@@ -27,6 +27,8 @@ $(DEST_COMMON_PRODUCTS):
 
 $(DEST_MACOSX_LIBS):
 	$(call SYMLINK,$(MACOSX_LIB_DIR)/$@,$@)
+	install_name_tool -change "/usr/local/lib/libjpeg.8.dylib" libjpeg.8.dylib libLCJPEG.jnilib
+	install_name_tool -change "/usr/local/lib/libtiff.5.dylib" libtiff.5.dylib libLCTIFF.jnilib
 
 $(DEST_MACOSX_NIBS):
 	$(call SYMLINK,$(MACOSX_NIB_DIR)/$@,$@)

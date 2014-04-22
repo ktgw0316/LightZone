@@ -23,6 +23,21 @@
   </condition>
 
 	<!--===== Application build ==============================================-->
+  
+  <condition property="MAKE" value="make">
+    <not>
+      <or>
+        <os name="freebsd"/>
+        <os name="SunOS"/>
+      </or>
+    </not>
+  </condition>
+  <condition property="MAKE" value="gmake">
+    <or>
+      <os name="freebsd"/>
+      <os name="SunOS"/>
+    </or>
+  </condition>
 
   <condition property="jai-classpath"
              value="../linux/lib/mlibwrapper_jai.jar">
@@ -32,7 +47,7 @@
   </condition>
 
   <target name="javac">
-    <exec executable="make" dir="products" failonerror="true"
+    <exec executable="${MAKE}" dir="products" failonerror="true"
           vmlauncher="true"/>
 
     <mkdir dir="extbuild"/>
@@ -54,7 +69,7 @@
   </target>
 
   <target name="coprocesses">
-    <exec executable="make" dir="coprocesses" failonerror="true"
+    <exec executable="${MAKE}" dir="coprocesses" failonerror="true"
           vmlauncher="true">
       <arg value="USE_ICC=${USE_ICC}"/>
       <arg value="UNIVERSAL=${UNIVERSAL}"/>
@@ -85,7 +100,7 @@
   </target>
 
   <target name="jni">
-    <exec executable="make" dir="jnisrc" failonerror="true" vmlauncher="true">
+    <exec executable="${MAKE}" dir="jnisrc" failonerror="true" vmlauncher="true">
       <arg value="USE_ICC=${USE_ICC}"/>
       <arg value="UNIVERSAL=${UNIVERSAL}"/>
     </exec>
@@ -189,13 +204,13 @@
   <target name="clean-up">
     <delete dir="build"/>
     <delete dir="extbuild"/>
-    <exec executable="make" dir="jnisrc">
+    <exec executable="${MAKE}" dir="jnisrc">
       <arg value="${clean-method}"/>
     </exec>
-    <exec executable="make" dir="coprocesses">
+    <exec executable="${MAKE}" dir="coprocesses">
       <arg value="${clean-method}"/>
     </exec>
-    <exec executable="make" dir="products">
+    <exec executable="${MAKE}" dir="products">
       <arg value="${clean-method}"/>
     </exec>
     <ant dir="test" target="${clean-method}"/>

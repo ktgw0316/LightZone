@@ -1,0 +1,59 @@
+# Maintainer: KITAGAWA Masahiro <arctica0316@gmail.com>
+pkgname="lightzone"
+pkgver=4.1.0.beta6
+pkgrel=1
+pkgdesc="Open-source professional-level digital darkroom software"
+url="http://lightzoneproject.org/"
+license=('custom:BSD-3-Clause')
+arch=('i686' 'x86_64')
+
+depends=('jre7-openjdk' 'libjpeg-turbo' 'libtiff')
+makedepends=('jdk7-openjdk' 'apache-ant' 'autoconf' 'gcc' 'make' 'tidyhtml' 'git' 'javahelp2' 'libx11')
+
+source=("${pkgname}-${pkgver}.tar.bz2")
+md5sums=()
+
+build() {
+  # Set $JAVA_HOME and $ANT_HOME
+  [ -f /etc/profile.d/openjdk7.sh ] && source /etc/profile.d/openjdk7.sh
+  [ -f /etc/profile.d/jdk.sh ] && source /etc/profile.d/jdk.sh
+  [ -f /etc/profile.d/apache-ant.sh ] && source /etc/profile.d/apache-ant.sh
+
+  cd "${srcdir}/${pkgname}-${pkgver}/"
+  ant -f linux/build.xml jar
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}/"
+
+  instdir="/opt/${pkgname}"
+  install -dm 0755 "${pkgdir}/${instdir}"
+  cp -rpH lightcrafts/products/dcraw "${pkgdir}/${instdir}"
+  cp -rpH lightcrafts/products/LightZone-forkd "${pkgdir}/${instdir}"
+  cp -rpH linux/products/*.so "${pkgdir}/${instdir}"
+  cp -rpH linux/products/*.jar "${pkgdir}/${instdir}"
+  cp -rpH linux/products/lightzone "${pkgdir}/${instdir}"
+  
+# create icons and shortcuts
+  _datadir=/usr/share
+  icondir="${_datadir}/icons/hicolor"
+  install -dm 0755 "${pkgdir}/${_datadir}/applications"
+  install -dm 0755 "${pkgdir}/${icondir}/256x256/apps"
+  install -dm 0755 "${pkgdir}/${icondir}/128x128/apps"
+  install -dm 0755 "${pkgdir}/${icondir}/64x64/apps"
+  install -dm 0755 "${pkgdir}/${icondir}/48x48/apps"
+  install -dm 0755 "${pkgdir}/${icondir}/32x32/apps"
+  install -dm 0755 "${pkgdir}/${icondir}/16x16/apps"
+
+  cp -rpH linux/products/lightzone.desktop "${pkgdir}/${_datadir}/applications/"
+  cp -rpH linux/icons/LightZone_256x256.png "${pkgdir}/${icondir}/256x256/apps/LightZone.png"
+  cp -rpH linux/icons/LightZone_128x128.png "${pkgdir}/${icondir}/128x128/apps/LightZone.png"
+  cp -rpH linux/icons/LightZone_64x64.png "${pkgdir}/${icondir}/64x64/apps/LightZone.png"
+  cp -rpH linux/icons/LightZone_48x48.png "${pkgdir}/${icondir}/48x48/apps/LightZone.png"
+  cp -rpH linux/icons/LightZone_32x32.png "${pkgdir}/${icondir}/32x32/apps/LightZone.png"
+  cp -rpH linux/icons/LightZone_16x16.png "${pkgdir}/${icondir}/16x16/apps/LightZone.png"
+
+  _bindir=/usr/bin
+  install -d -m 755 "${pkgdir}/${_bindir}"
+  install -m 755 "linux/products/${pkgname}" "${pkgdir}/${_bindir}"
+}

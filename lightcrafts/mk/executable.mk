@@ -99,7 +99,7 @@ ifeq ($(PLATFORM),Windows)
   LINK+=		$(EXEC_WINDOWS_LINK)
 endif
 
-ifeq ($(PLATFORM),Linux)
+ifeq ($(PLATFORM),$(filter $(PLATFORM),Linux FreeBSD SunOS))
   CFLAGS+= 		$(EXEC_LINUX_CFLAGS)
   DEFINES+=		$(EXEC_LINUX_DEFINES)
   INCLUDES+= 		$(EXEC_LINUX_INCLUDES)
