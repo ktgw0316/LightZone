@@ -17,6 +17,7 @@ ifeq ($(PLATFORM),Windows)
 else
   JNI_EXTRA_LINK:=	-lLCJNI -ltiff -lstdc++ 
 endif
+JNI_MACOSX_INCLUDES:=	-I/usr/local/include
 
 JNI_EXTRA_DISTCLEAN:=	autom4te.cache configure config.* tif_config.h
 

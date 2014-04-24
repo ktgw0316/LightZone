@@ -15,6 +15,8 @@ ifeq ($(PLATFORM),Windows)
 else
   JNI_EXTRA_LINK:=	-ljpeg -lLCJNI
 endif
+JNI_MACOSX_LDFLAGS:=	-L/usr/local/opt/jpeg-turbo/lib
+JNI_MACOSX_INCLUDES:=	-I/usr/local/opt/jpeg-turbo/include
 
 JAVAH_CLASSES:=		com.lightcrafts.image.libs.LCJPEGReader \
 			com.lightcrafts.image.libs.LCJPEGWriter
