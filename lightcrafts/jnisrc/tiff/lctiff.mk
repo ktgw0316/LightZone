@@ -13,8 +13,7 @@ TARGET_BASE:=		LCTIFF
 #DEBUG:=		true
 
 ifeq ($(PLATFORM),Windows)
-  JNI_EXTRA_LDFLAGS:=   -Larch-$(PROCESSOR) -L../jpeg/arch-$(PROCESSOR)
-  JNI_EXTRA_LINK:=	-Wl,-Bdynamic -lLCJNI -Wl,-Bstatic -ltiff -ljpeg -ljbig -llzma -lz -lstdc++ 
+  JNI_EXTRA_LINK:=	-Wl,-Bdynamic -lLCJNI -ltiff.dll -Wl,-Bstatic -lstdc++ 
 else
   JNI_EXTRA_LINK:=	-lLCJNI -ltiff -lstdc++ 
 endif

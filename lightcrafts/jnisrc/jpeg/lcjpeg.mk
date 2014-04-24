@@ -11,9 +11,10 @@ TARGET_BASE:=		LCJPEG
 
 JNI_EXTRA_CFLAGS:=	-fexceptions
 ifeq ($(PLATFORM),Windows)
-  JNI_EXTRA_LDFLAGS:=   -Larch-$(PROCESSOR)
+  JNI_EXTRA_LINK:=	-ljpeg.dll -lLCJNI
+else
+  JNI_EXTRA_LINK:=	-ljpeg -lLCJNI
 endif
-JNI_EXTRA_LINK:=	-ljpeg -lLCJNI
 
 JAVAH_CLASSES:=		com.lightcrafts.image.libs.LCJPEGReader \
 			com.lightcrafts.image.libs.LCJPEGWriter
