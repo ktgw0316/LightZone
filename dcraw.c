@@ -1,4 +1,8 @@
 /*
+ * OpenMP multithread version of dcraw
+ * based on UFRaw dcraw_indi.c by Udi Fuchs
+ */
+/*
    dcraw.c -- Dave Coffin's raw photo decoder
    Copyright 1997-2014 by Dave Coffin, dcoffin a cybercom o net
 
@@ -103,6 +107,15 @@ typedef unsigned long long UINT64;
 #endif
 #if !defined(ushort)
 #define ushort unsigned short
+#endif
+
+#ifdef _OPENMP
+#include <omp.h>
+#define uf_omp_get_thread_num() omp_get_thread_num()
+#define uf_omp_get_num_threads() omp_get_num_threads()
+#else
+#define uf_omp_get_thread_num() 0
+#define uf_omp_get_num_threads() 1
 #endif
 
 /*
@@ -3771,6 +3784,19 @@ void CLASS wavelet_denoise()
   merror (fimg, "wavelet_denoise()");
   temp = fimg + size*3;
   if ((nc = colors) == 3 && filters) nc++;
+#ifdef _OPENMP
+#if defined(__sun) && !defined(__GNUC__)	/* Fix UFRaw bug #3205673 - NKBJ */
+    #pragma omp parallel for				\
+    default(none)					\
+    shared(nc,image,scale,size,noise)				\
+    private(c,i,hpass,lev,lpass,row,col,thold,fimg,temp)
+#else
+    #pragma omp parallel for				\
+    default(none)					\
+    shared(nc,image,iheight,iwidth,scale,threshold,size)				\
+    private(c,i,hpass,lev,lpass,row,col,thold,fimg,temp)
+#endif
+#endif
   FORC(nc) {			/* denoise R,G1,B,G3 individually */
     for (i=0; i < size; i++)
       fimg[i] = 256 * sqrt(image[i][c] << scale);
@@ -4045,6 +4071,9 @@ void CLASS lin_interpolate()
 	  *ip++ = 256 / sum[c];
 	}
     }
+#ifdef _OPENMP
+    #pragma omp parallel for default(shared) private(row,col,pix,ip,sum,i)
+#endif
   for (row=1; row < height-1; row++)
     for (col=1; col < width-1; col++) {
       pix = image[row*width+col];
@@ -4139,7 +4168,18 @@ void CLASS vng_interpolate()
   merror (brow[4], "vng_interpolate()");
   for (row=0; row < 3; row++)
     brow[row] = brow[4] + row*width;
-  for (row=2; row < height-2; row++) {		/* Do VNG interpolation */
+#ifdef _OPENMP
+    #pragma omp parallel				\
+    default(none)					\
+    shared(image,code,prow,pcol,width,height,colors)			\
+    private(row,col,g,brow,pix,ip,gval,diff,gmin,gmax,thold,sum,color,num,c,t)
+#endif
+{
+  int slice = (height - 4) / uf_omp_get_num_threads();
+  int start_row = 2 + slice * uf_omp_get_thread_num();
+  int end_row = MIN(start_row + slice, height - 2);
+
+  for (row=start_row; row < end_row; row++) {		/* Do VNG interpolation */
     for (col=2; col < width-2; col++) {
       pix = image[row*width+col];
       ip = code[row % prow][col % pcol];
@@ -4191,6 +4231,7 @@ void CLASS vng_interpolate()
   memcpy (image[(row-2)*width+2], brow[0]+2, (width-4)*sizeof *image);
   memcpy (image[(row-1)*width+2], brow[1]+2, (width-4)*sizeof *image);
   free (brow[4]);
+} /* pragma omp parallel */
   free (code[0][0]);
 }
 
@@ -4206,7 +4247,17 @@ void CLASS ppg_interpolate()
   border_interpolate(3);
   if (verbose) fprintf (stderr,_("PPG interpolation...\n"));
 
+#ifdef _OPENMP
+    #pragma omp parallel				\
+    default(none)					\
+    shared(image,dir,diff,width,height,filters)				\
+    private(row,col,i,d,c,pix,guess)
+#endif
+{
 /*  Fill in the green layer with gradients and pattern recognition: */
+#ifdef _OPENMP
+        #pragma omp for
+#endif
   for (row=3; row < height-3; row++)
     for (col=3+(FC(row,3) & 1), c=FC(row,col); col < width-3; col+=2) {
       pix = image + row*width+col;
@@ -4223,6 +4274,9 @@ void CLASS ppg_interpolate()
       pix[0][1] = ULIM(guess[i] >> 2, pix[d][1], pix[-d][1]);
     }
 /*  Calculate red and blue for each green pixel:		*/
+#ifdef _OPENMP
+        #pragma omp for
+#endif
   for (row=1; row < height-1; row++)
     for (col=1+(FC(row,2) & 1), c=FC(row,col+1); col < width-1; col+=2) {
       pix = image + row*width+col;
@@ -4231,6 +4285,9 @@ void CLASS ppg_interpolate()
 			- pix[-d][1] - pix[d][1]) >> 1);
     }
 /*  Calculate blue for red pixels and vice versa:		*/
+#ifdef _OPENMP
+        #pragma omp for
+#endif
   for (row=1; row < height-1; row++)
     for (col=1+(FC(row,1) & 1), c=2-FC(row,col); col < width-1; col+=2) {
       pix = image + row*width+col;
@@ -4246,6 +4303,7 @@ void CLASS ppg_interpolate()
       else
 	pix[0][c] = CLIP((guess[0]+guess[1]) >> 2);
     }
+} /* pragma omp parallel */
 }
 
 void CLASS cielab (ushort rgb[3], short lab[3])
@@ -4522,6 +4580,12 @@ void CLASS ahd_interpolate()
 
   if (verbose) fprintf (stderr,_("AHD interpolation...\n"));
 
+#ifdef _OPENMP
+    #pragma omp parallel				\
+    default(shared)					\
+    private(top, left, row, col, pix, rix, lix, c, val, d, tc, tr, i, j, ldiff, abdiff, leps, abeps, hm, buffer, rgb, lab, homo)
+#endif
+{
   cielab (0,0);
   border_interpolate(5);
   buffer = (char *) malloc (26*TS*TS);
@@ -4530,6 +4594,9 @@ void CLASS ahd_interpolate()
   lab  = (short (*)[TS][TS][3])(buffer + 12*TS*TS);
   homo = (char  (*)[TS][TS])   (buffer + 24*TS*TS);
 
+#ifdef _OPENMP
+        #pragma omp for
+#endif
   for (top=2; top < height-5; top += TS-6)
     for (left=2; left < width-5; left += TS-6) {
 
@@ -4612,6 +4679,7 @@ void CLASS ahd_interpolate()
       }
     }
   free (buffer);
+} /* pragma omp parallel */
 }
 #undef TS
 
@@ -8687,7 +8755,6 @@ void CLASS apply_profile (const char *input, const char *output)
   FILE *fp;
   unsigned size;
 
-  cmsErrorAction (LCMS_ERROR_SHOW);
   if (strcmp (input, "embed"))
     hInProfile = cmsOpenProfileFromFile (input, "r");
   else if (profile_length) {
@@ -8853,6 +8920,9 @@ void CLASS fuji_rotate()
   img = (ushort (*)[4]) calloc (high, wide*sizeof *img);
   merror (img, "fuji_rotate()");
 
+#ifdef _OPENMP
+    #pragma omp parallel for default(shared) private(row,col,ur,uc,r,c,fr,fc,pix,i)
+#endif
   for (row=0; row < high; row++)
     for (col=0; col < wide; col++) {
       ur = r = fuji_width + (row-col)*step;

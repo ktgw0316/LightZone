@@ -6,6 +6,7 @@ TARGET_BASE:=		dcraw
 # Uncomment to compile in debug mode.
 #DEBUG:=		true
 
+EXEC_EXTRA_CFLAGS:=	-fopenmp -static
 EXEC_EXTRA_DEFINES:=	-DNODEPS -DLIGHTZONE
 EXEC_LINUX_DEFINES:=	-Dfgetc=getc_unlocked
 EXEC_MACOSX_DEFINES:=	$(EXEC_LINUX_DEFINES)
