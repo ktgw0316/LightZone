@@ -1,6 +1,31 @@
---- dcraw.c.orig	2014-03-01 00:24:27.964770800 +0900
-+++ dcraw.c	2014-03-01 00:19:48.880394200 +0900
-@@ -140,7 +140,10 @@
+--- dcraw.c.orig	2014-04-26 23:18:45.141602600 +0900
++++ dcraw.c	2014-04-26 23:30:17.844196500 +0900
+@@ -1,4 +1,8 @@
+ /*
++ * OpenMP multithread version of dcraw
++ * based on UFRaw dcraw_indi.c by Udi Fuchs
++ */
++/*
+    dcraw.c -- Dave Coffin's raw photo decoder
+    Copyright 1997-2014 by Dave Coffin, dcoffin a cybercom o net
+ 
+@@ -105,6 +109,15 @@
+ #define ushort unsigned short
+ #endif
+ 
++#ifdef _OPENMP
++#include <omp.h>
++#define uf_omp_get_thread_num() omp_get_thread_num()
++#define uf_omp_get_num_threads() omp_get_num_threads()
++#else
++#define uf_omp_get_thread_num() 0
++#define uf_omp_get_num_threads() 1
++#endif
++
+ /*
+    All global variables are defined here, and all functions that
+    access them are prefixed with "CLASS".  Note that a thread-safe
+@@ -140,7 +153,10 @@
  int no_auto_bright=0;
  unsigned greybox[4] = { 0, 0, UINT_MAX, UINT_MAX };
  float cam_mul[4], pre_mul[4], cmatrix[3][4], rgb_cam[3][4];
@@ -12,15 +37,152 @@
    { 0.412453, 0.357580, 0.180423 },
    { 0.212671, 0.715160, 0.072169 },
    { 0.019334, 0.119193, 0.950227 } };
-@@ -8684,6 +8687,7 @@
-   FILE *fp;
-   unsigned size;
+@@ -3768,6 +3784,19 @@
+   merror (fimg, "wavelet_denoise()");
+   temp = fimg + size*3;
+   if ((nc = colors) == 3 && filters) nc++;
++#ifdef _OPENMP
++#if defined(__sun) && !defined(__GNUC__)	/* Fix UFRaw bug #3205673 - NKBJ */
++    #pragma omp parallel for				\
++    default(none)					\
++    shared(nc,image,scale,size,noise)				\
++    private(c,i,hpass,lev,lpass,row,col,thold,fimg,temp)
++#else
++    #pragma omp parallel for				\
++    default(none)					\
++    shared(nc,image,iheight,iwidth,scale,threshold,size)				\
++    private(c,i,hpass,lev,lpass,row,col,thold,fimg,temp)
++#endif
++#endif
+   FORC(nc) {			/* denoise R,G1,B,G3 individually */
+     for (i=0; i < size; i++)
+       fimg[i] = 256 * sqrt(image[i][c] << scale);
+@@ -4042,6 +4071,9 @@
+ 	  *ip++ = 256 / sum[c];
+ 	}
+     }
++#ifdef _OPENMP
++    #pragma omp parallel for default(shared) private(row,col,pix,ip,sum,i)
++#endif
+   for (row=1; row < height-1; row++)
+     for (col=1; col < width-1; col++) {
+       pix = image[row*width+col];
+@@ -4136,7 +4168,18 @@
+   merror (brow[4], "vng_interpolate()");
+   for (row=0; row < 3; row++)
+     brow[row] = brow[4] + row*width;
+-  for (row=2; row < height-2; row++) {		/* Do VNG interpolation */
++#ifdef _OPENMP
++    #pragma omp parallel				\
++    default(none)					\
++    shared(image,code,prow,pcol,width,height,colors)			\
++    private(row,col,g,brow,pix,ip,gval,diff,gmin,gmax,thold,sum,color,num,c,t)
++#endif
++{
++  int slice = (height - 4) / uf_omp_get_num_threads();
++  int start_row = 2 + slice * uf_omp_get_thread_num();
++  int end_row = MIN(start_row + slice, height - 2);
++
++  for (row=start_row; row < end_row; row++) {		/* Do VNG interpolation */
+     for (col=2; col < width-2; col++) {
+       pix = image[row*width+col];
+       ip = code[row % prow][col % pcol];
+@@ -4188,6 +4231,7 @@
+   memcpy (image[(row-2)*width+2], brow[0]+2, (width-4)*sizeof *image);
+   memcpy (image[(row-1)*width+2], brow[1]+2, (width-4)*sizeof *image);
+   free (brow[4]);
++} /* pragma omp parallel */
+   free (code[0][0]);
+ }
  
-+  cmsErrorAction (LCMS_ERROR_SHOW);
-   if (strcmp (input, "embed"))
-     hInProfile = cmsOpenProfileFromFile (input, "r");
-   else if (profile_length) {
-@@ -9113,6 +9117,9 @@
+@@ -4203,7 +4247,17 @@
+   border_interpolate(3);
+   if (verbose) fprintf (stderr,_("PPG interpolation...\n"));
+ 
++#ifdef _OPENMP
++    #pragma omp parallel				\
++    default(none)					\
++    shared(image,dir,diff,width,height,filters)				\
++    private(row,col,i,d,c,pix,guess)
++#endif
++{
+ /*  Fill in the green layer with gradients and pattern recognition: */
++#ifdef _OPENMP
++        #pragma omp for
++#endif
+   for (row=3; row < height-3; row++)
+     for (col=3+(FC(row,3) & 1), c=FC(row,col); col < width-3; col+=2) {
+       pix = image + row*width+col;
+@@ -4220,6 +4274,9 @@
+       pix[0][1] = ULIM(guess[i] >> 2, pix[d][1], pix[-d][1]);
+     }
+ /*  Calculate red and blue for each green pixel:		*/
++#ifdef _OPENMP
++        #pragma omp for
++#endif
+   for (row=1; row < height-1; row++)
+     for (col=1+(FC(row,2) & 1), c=FC(row,col+1); col < width-1; col+=2) {
+       pix = image + row*width+col;
+@@ -4228,6 +4285,9 @@
+ 			- pix[-d][1] - pix[d][1]) >> 1);
+     }
+ /*  Calculate blue for red pixels and vice versa:		*/
++#ifdef _OPENMP
++        #pragma omp for
++#endif
+   for (row=1; row < height-1; row++)
+     for (col=1+(FC(row,1) & 1), c=2-FC(row,col); col < width-1; col+=2) {
+       pix = image + row*width+col;
+@@ -4243,6 +4303,7 @@
+       else
+ 	pix[0][c] = CLIP((guess[0]+guess[1]) >> 2);
+     }
++} /* pragma omp parallel */
+ }
+ 
+ void CLASS cielab (ushort rgb[3], short lab[3])
+@@ -4519,6 +4580,12 @@
+ 
+   if (verbose) fprintf (stderr,_("AHD interpolation...\n"));
+ 
++#ifdef _OPENMP
++    #pragma omp parallel				\
++    default(shared)					\
++    private(top, left, row, col, pix, rix, lix, c, val, d, tc, tr, i, j, ldiff, abdiff, leps, abeps, hm, buffer, rgb, lab, homo)
++#endif
++{
+   cielab (0,0);
+   border_interpolate(5);
+   buffer = (char *) malloc (26*TS*TS);
+@@ -4527,6 +4594,9 @@
+   lab  = (short (*)[TS][TS][3])(buffer + 12*TS*TS);
+   homo = (char  (*)[TS][TS])   (buffer + 24*TS*TS);
+ 
++#ifdef _OPENMP
++        #pragma omp for
++#endif
+   for (top=2; top < height-5; top += TS-6)
+     for (left=2; left < width-5; left += TS-6) {
+ 
+@@ -4609,6 +4679,7 @@
+       }
+     }
+   free (buffer);
++} /* pragma omp parallel */
+ }
+ #undef TS
+ 
+@@ -8849,6 +8920,9 @@
+   img = (ushort (*)[4]) calloc (high, wide*sizeof *img);
+   merror (img, "fuji_rotate()");
+ 
++#ifdef _OPENMP
++    #pragma omp parallel for default(shared) private(row,col,ur,uc,r,c,fr,fc,pix,i)
++#endif
+   for (row=0; row < high; row++)
+     for (col=0; col < wide; col++) {
+       ur = r = fuji_width + (row-col)*step;
+@@ -9113,6 +9187,9 @@
  #ifndef NO_LCMS
    const char *cam_profile=0, *out_profile=0;
  #endif
@@ -30,7 +192,7 @@
  
  #ifndef LOCALTIME
    putenv ((char *) "TZ=UTC");
-@@ -9207,6 +9214,9 @@
+@@ -9207,6 +9284,9 @@
        case 'p':  cam_profile = argv[arg++];
  #endif
  	break;
@@ -40,7 +202,7 @@
        case 'P':  bpfile     = argv[arg++];  break;
        case 'K':  dark_frame = argv[arg++];  break;
        case 'z':  timestamp_only    = 1;  break;
-@@ -9235,6 +9245,19 @@
+@@ -9235,6 +9315,19 @@
  	return 1;
      }
    }
@@ -60,7 +222,7 @@
    if (arg == argc) {
      fprintf (stderr,_("No files to process.\n"));
      return 1;
-@@ -9373,6 +9396,10 @@
+@@ -9373,6 +9466,10 @@
  	  for (i=0; i < 16; i++)
  	    putchar (cdesc[fcol(i >> 1,i & 1)]);
  	}
@@ -71,7 +233,7 @@
  	printf (_("\nDaylight multipliers:"));
  	FORCC printf (" %f", pre_mul[c]);
  	if (cam_mul[0] > 0) {
-@@ -9485,6 +9512,11 @@
+@@ -9485,6 +9582,11 @@
      if (write_to_stdout)
        strcpy (ofname,_("standard output"));
      else {
