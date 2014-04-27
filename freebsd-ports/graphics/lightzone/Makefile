@@ -24,9 +24,9 @@ BUILD_DEPENDS=	ant:${PORTSDIR}/devel/apache-ant \
 		tidy:${PORTSDIR}/www/tidy
 RUN_DEPENDS=	java:${PORTSDIR}/java/javavmwrapper
 
-GIT_ACCOUNT=	ktgw0316
+GIT_ACCOUNT=	Aries85
 GIT_PROJECT=	LightZone
-GIT_COMMIT=	022ef48
+GIT_COMMIT=	2a69427
 
 USES=		desktop-file-utils
 USE_GCC=	4.2+
