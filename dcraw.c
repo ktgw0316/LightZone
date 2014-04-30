@@ -4359,7 +4359,13 @@ void CLASS xtrans_interpolate (int passes)
    char (*homo)[TS][TS], *buffer;
 
   if (verbose)
-    fprintf (stderr,_("%d-pass X-Trans interpolation...\n"), passes);
+#if defined(_OPENMP)
+    fprintf (stderr,_("%d-pass X-Trans interpolation with %d max threads...\n"), 
+	     passes, omp_get_max_threads ());
+#else
+    fprintf (stderr,_("%d-pass X-Trans interpolation...\n"), 
+	     passes);
+#endif
 
   cielab (0,0);
   border_interpolate(6);
@@ -4512,7 +4518,9 @@ void CLASS xtrans_interpolate (int passes)
 	for (row=2; row < mrow-2; row++)
 	  for (col=2; col < mcol-2; col++)
 	    cielab (rgb[d][row][col], lab[row][col]);
-	for (f=dir[d & 3],row=3; row < mrow-3; row++)
+	f=dir[d & 3];
+#pragma omp parallel for private (row, col, lix, g) default (none) shared (mrow, mcol, lab, drv, f, d)
+	for (row=3; row < mrow-3; row++)
 	  for (col=3; col < mcol-3; col++) {
 	    lix = &lab[row][col];
 	    g = 2*lix[0][0] - lix[f][0] - lix[-f][0];
@@ -4524,6 +4532,7 @@ void CLASS xtrans_interpolate (int passes)
 
 /* Build homogeneity maps from the derivatives:			*/
       memset(homo, 0, ndir*TS*TS);
+#pragma omp parallel for private (row, col, tr, d, v, h) default (none) shared (mrow, mcol, ndir, drv, homo)
       for (row=4; row < mrow-4; row++)
 	for (col=4; col < mcol-4; col++) {
 	  for (tr=FLT_MAX, d=0; d < ndir; d++)
