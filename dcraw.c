@@ -4370,6 +4370,7 @@ void CLASS xtrans_interpolate (int passes)
   cielab (0,0);
   border_interpolate(6);
   ndir = 4 << (passes > 1);
+  //  ndir = 8; => no perf improvement!
   buffer = (char *) malloc (TS*TS*(ndir*11+6));
   merror (buffer, "xtrans_interpolate()");
   rgb  = (ushort(*)[TS][TS][3]) buffer;
@@ -4536,14 +4537,16 @@ void CLASS xtrans_interpolate (int passes)
       for (row=4; row < mrow-4; row++)
 	for (col=4; col < mcol-4; col++) {
 	  for (tr=FLT_MAX, d=0; d < ndir; d++)
-	    if (tr > drv[d][row][col])
-		tr = drv[d][row][col];
+	    //	    if (tr > drv[d][row][col])
+	    //	tr = drv[d][row][col]; => big win!
+	    tr = MIN(tr, (drv[d][row][col]));
 	  tr *= 8;
 	  for (d=0; d < ndir; d++)
 	    for (v=-1; v <= 1; v++)
 	      for (h=-1; h <= 1; h++)
-		if (drv[d][row+v][col+h] <= tr)
-		  homo[d][row][col]++;
+		//		if (drv[d][row+v][col+h] <= tr)
+		// homo[d][row][col]++; => big win!
+		homo[d][row][col] += (drv[d][row+v][col+h] <= tr);
 	}
 
 /* Average the most homogenous pixels for the final result:	*/
