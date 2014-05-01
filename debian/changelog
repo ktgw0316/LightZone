@@ -1,3 +1,11 @@
+lightzone (4.1.0~beta8-0obs2) unstable; urgency=low
+
+  * debian/control:
+    - Specified libtiff4 version. Ubuntu >= 12.10 should use libtiff5.
+    - Added libjpeg-turbo8-dev and libjpeg62-dev
+
+ -- Masahiro Kitagawa <arctica0316@gmail.com>  Thu, 01 May 2014 21:25:53 +0900
+
 lightzone (4.1.0~beta8-0obs1) unstable; urgency=low
 
   * Upstream sync
