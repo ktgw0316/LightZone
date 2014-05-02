@@ -4324,11 +4324,11 @@ void CLASS cielab (ushort rgb[3], short lab[3])
     return;
   }
   xyz[0] = xyz[1] = xyz[2] = 0.5;
-  FORCC {
-    xyz[0] += xyz_cam[0][c] * rgb[c];
-    xyz[1] += xyz_cam[1][c] * rgb[c];
-    xyz[2] += xyz_cam[2][c] * rgb[c];
+
+  FORC(3) {
+    xyz[c] += xyz_cam[c][0] * rgb [0] + xyz_cam[c][1] * rgb [1] + xyz_cam[c][2] * rgb [2] ;
   }
+
   xyz[0] = cbrt[CLIP((int) xyz[0])];
   xyz[1] = cbrt[CLIP((int) xyz[1])];
   xyz[2] = cbrt[CLIP((int) xyz[2])];
@@ -4340,23 +4340,41 @@ void CLASS cielab (ushort rgb[3], short lab[3])
 #define TS 512		/* Tile Size */
 #define fcol(row,col) xtrans[(row+top_margin+6)%6][(col+left_margin+6)%6]
 
+#if ! defined(_OPENMP)
+#define _FIXED_NDIR
+#define _STATIC_BUFFER
+#endif
+
 /*
    Frank Markesteijn's algorithm for Fuji X-Trans sensors
  */
 void CLASS xtrans_interpolate (int passes)
 {
   int c, d, f, g, h, i, v, ng, row, col, top, left, mrow, mcol;
-  int val, ndir, pass, hm[8], avg[4], color[3][8];
+  // int val, ndir, pass, hm[8], avg[4], color[3][8];
+  int val, pass, hm[8], avg[4], color[3][8];
+#if defined(_FIXED_NDIR)
+  const int ndir = 4 << 1;
+#else
+  int ndir = 4 << (passes > 1);
+#endif
+  
   static const short orth[12] = { 1,0,0,1,-1,0,0,-1,1,0,0,1 },
-	patt[2][16] = { { 0,1,0,-1,2,0,-1,0,1,1,1,-1,0,0,0,0 },
+    patt[2][16] = { { 0,1,0,-1,2,0,-1,0,1,1,1,-1,0,0,0,0 },
 			{ 0,1,0,-2,1,0,-2,0,1,1,-2,-2,1,-1,-1,1 } },
-	dir[4] = { 1,TS,TS+1,TS-1 };
+      dir[4] = { 1,TS,TS+1,TS-1 };
   short allhex[3][3][2][8], *hex;
   ushort min, max, sgrow, sgcol;
   ushort (*rgb)[TS][TS][3], (*rix)[3], (*pix)[4];
-   short (*lab)    [TS][3], (*lix)[3];
-   float (*drv)[TS][TS], diff[6], tr;
-   char (*homo)[TS][TS], *buffer;
+  short (*lab)    [TS][3], (*lix)[3];
+  float (*drv)[TS][TS], diff[6], tr;
+#if defined(_STATIC_BUFFER)
+  char (*homo)[TS][TS];
+  static char buffer [TS*TS*(8*11+6)] __attribute__((aligned(64)));
+#else 
+  char (*homo)[TS][TS], *buffer;
+#endif
+
 
   if (verbose)
 #if defined(_OPENMP)
@@ -4369,10 +4387,16 @@ void CLASS xtrans_interpolate (int passes)
 
   cielab (0,0);
   border_interpolate(6);
-  ndir = 4 << (passes > 1);
-  //  ndir = 8; => no perf improvement!
+
+  if ((4 << (passes > 1)) != ndir)
+    fprintf (stderr,_("4 << (passes > 1) = %d != ndir = %d\n"),
+	     (4 << (passes > 1)), ndir);
+
+#if ! defined(_STATIC_BUFFER)
   buffer = (char *) malloc (TS*TS*(ndir*11+6));
   merror (buffer, "xtrans_interpolate()");
+#endif
+
   rgb  = (ushort(*)[TS][TS][3]) buffer;
   lab  = (short (*)    [TS][3])(buffer + TS*TS*(ndir*6));
   drv  = (float (*)[TS][TS])   (buffer + TS*TS*(ndir*6+6));
@@ -4533,19 +4557,19 @@ void CLASS xtrans_interpolate (int passes)
 
 /* Build homogeneity maps from the derivatives:			*/
       memset(homo, 0, ndir*TS*TS);
-#pragma omp parallel for private (row, col, tr, d, v, h) default (none) shared (mrow, mcol, ndir, drv, homo)
+#if defined(_FIXED_NDIR)
+#pragma omp parallel for private (row, col, tr, d, v, h) default (none) shared (mrow, mcol, drv, homo)
+#else
+#pragma omp parallel for private (row, col, tr, d, v, h) default (none) shared (mrow, mcol, drv, homo, ndir)
+#endif
       for (row=4; row < mrow-4; row++)
 	for (col=4; col < mcol-4; col++) {
 	  for (tr=FLT_MAX, d=0; d < ndir; d++)
-	    //	    if (tr > drv[d][row][col])
-	    //	tr = drv[d][row][col]; => big win!
 	    tr = MIN(tr, (drv[d][row][col]));
 	  tr *= 8;
 	  for (d=0; d < ndir; d++)
 	    for (v=-1; v <= 1; v++)
 	      for (h=-1; h <= 1; h++)
-		//		if (drv[d][row+v][col+h] <= tr)
-		// homo[d][row][col]++; => big win!
 		homo[d][row][col] += (drv[d][row+v][col+h] <= tr);
 	}
 
@@ -4573,7 +4597,9 @@ void CLASS xtrans_interpolate (int passes)
 	  FORC3 image[(row+top)*width+col+left][c] = avg[c]/avg[3];
 	}
     }
+#if ! defined(_STATIC_BUFFER)
   free(buffer);
+#endif
 }
 #undef fcol
 
