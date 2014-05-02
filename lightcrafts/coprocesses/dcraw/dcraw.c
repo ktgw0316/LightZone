@@ -4306,6 +4306,38 @@ void CLASS ppg_interpolate()
 } /* pragma omp parallel */
 }
 
+void CLASS cielab3 (ushort rgb[3], short lab[3])
+{
+  int c, i, j, k;
+  float r, xyz[3];
+  static float cbrt[0x10000], xyz_cam[3][4];
+
+  if (!rgb) {
+    for (i=0; i < 0x10000; i++) {
+      r = i / 65535.0;
+      cbrt[i] = r > 0.008856 ? pow(r,1/3.0) : 7.787*r + 16/116.0;
+    }
+    for (i=0; i < 3; i++)
+      for (j=0; j < colors; j++)
+	for (xyz_cam[i][j] = k=0; k < 3; k++)
+	  xyz_cam[i][j] += xyz_rgb[i][k] * rgb_cam[k][j] / d65_white[i];
+    return;
+  }
+  xyz[0] = xyz[1] = xyz[2] = 0.5;
+
+    FORC(3) {
+      xyz[c] += xyz_cam[c][0] * rgb [0] + xyz_cam[c][1] * rgb [1] + xyz_cam[c][2] * rgb [2] ;
+    }
+
+  xyz[0] = cbrt[CLIP((int) xyz[0])];
+  xyz[1] = cbrt[CLIP((int) xyz[1])];
+  xyz[2] = cbrt[CLIP((int) xyz[2])];
+  lab[0] = 64 * (116 * xyz[1] - 16);
+  lab[1] = 64 * 500 * (xyz[0] - xyz[1]);
+  lab[2] = 64 * 200 * (xyz[1] - xyz[2]);
+}
+
+
 void CLASS cielab (ushort rgb[3], short lab[3])
 {
   int c, i, j, k;
@@ -4325,9 +4357,16 @@ void CLASS cielab (ushort rgb[3], short lab[3])
   }
   xyz[0] = xyz[1] = xyz[2] = 0.5;
 
-  FORC(3) {
-    xyz[c] += xyz_cam[c][0] * rgb [0] + xyz_cam[c][1] * rgb [1] + xyz_cam[c][2] * rgb [2] ;
-  }
+  if (colors == 3)
+    FORC(3) {
+      xyz[c] += xyz_cam[c][0] * rgb [0] + xyz_cam[c][1] * rgb [1] + xyz_cam[c][2] * rgb [2] ;
+    }
+  else
+    FORCC {
+      xyz[0] += xyz_cam[0][c] * rgb[c];
+      xyz[1] += xyz_cam[1][c] * rgb[c];
+      xyz[2] += xyz_cam[2][c] * rgb[c];
+    }
 
   xyz[0] = cbrt[CLIP((int) xyz[0])];
   xyz[1] = cbrt[CLIP((int) xyz[1])];
@@ -4385,7 +4424,7 @@ void CLASS xtrans_interpolate (int passes)
 	     passes);
 #endif
 
-  cielab (0,0);
+  cielab3 (0,0);
   border_interpolate(6);
 
   if ((4 << (passes > 1)) != ndir)
@@ -4542,7 +4581,7 @@ void CLASS xtrans_interpolate (int passes)
       for (d=0; d < ndir; d++) {
 	for (row=2; row < mrow-2; row++)
 	  for (col=2; col < mcol-2; col++)
-	    cielab (rgb[d][row][col], lab[row][col]);
+	    cielab3 (rgb[d][row][col], lab[row][col]); // use cielab3 because X-trans is 3 colors
 	f=dir[d & 3];
 #pragma omp parallel for private (row, col, lix, g) default (none) shared (mrow, mcol, lab, drv, f, d)
 	for (row=3; row < mrow-3; row++)
