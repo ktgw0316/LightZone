@@ -4380,9 +4380,22 @@ void CLASS cielab (ushort rgb[3], short lab[3])
 #define fcol(row,col) xtrans[(row+top_margin+6)%6][(col+left_margin+6)%6]
 
 #if ! defined(_OPENMP)
-#define _FIXED_NDIR
+// Makes a 10% difference in performances in sequential version, but none at all with OPENMP...
+// And _STATIC_BUFFER is delicate to manage
 #define _STATIC_BUFFER
+#define _FIXED_NDIR
 #endif
+
+/* Allow each tile to be calculate independently from the others
+   Explanation: the border pixels from each tiles start from the border pixel of other tiles
+   This goes from top to bottom:
+   - the first pixels of each tile depend on the last ones of the previous tile
+   - the last ones depend on the first ones of the next tile
+   In sequential mode, the first pixels use the calculated values from the previous tiles and fresh values from the next tile.
+   In OpenMP / parallel mode, the first pixels of the next files might have been already calculated.
+   The STRIC_IMAGE makes it possible to use indeed fresh values, always
+*/
+#define _STRICT_IMAGE
 
 /*
    Frank Markesteijn's algorithm for Fuji X-Trans sensors
@@ -4431,16 +4444,6 @@ void CLASS xtrans_interpolate (int passes)
     fprintf (stderr,_("4 << (passes > 1) = %d != ndir = %d\n"),
 	     (4 << (passes > 1)), ndir);
 
-#if ! defined(_STATIC_BUFFER)
-  buffer = (char *) malloc (TS*TS*(ndir*11+6));
-  merror (buffer, "xtrans_interpolate()");
-#endif
-
-  rgb  = (ushort(*)[TS][TS][3]) buffer;
-  lab  = (short (*)    [TS][3])(buffer + TS*TS*(ndir*6));
-  drv  = (float (*)[TS][TS])   (buffer + TS*TS*(ndir*6+6));
-  homo = (char  (*)[TS][TS])   (buffer + TS*TS*(ndir*10+6));
-
 /* Map a green hexagon around each non-green pixel and vice versa:	*/
   for (row=0; row < 3; row++)
     for (col=0; col < 3; col++)
@@ -4455,6 +4458,7 @@ void CLASS xtrans_interpolate (int passes)
 	  allhex[row][col][1][c^(g*2 & d)] = h + v*TS;
 	}
       }
+
 
 /* Set green1 and green3 to the minimum and maximum allowed values:	*/
   for (row=2; row < height-2; row++)
@@ -4475,20 +4479,67 @@ void CLASS xtrans_interpolate (int passes)
       }
     }
 
+  ushort (*working_image)[4];
+#if defined(_STRICT_IMAGE)
+  working_image = (ushort (*)[4]) calloc (iheight, iwidth*sizeof *image);
+  memcpy (working_image, image, iheight * iwidth * sizeof *image);
+  merror (working_image, "xtrans_interpolate working_image");
+#endif
+
+#ifdef _FIXED_NDIR
+#pragma omp parallel default (none)			\
+  shared (height, width, image, allhex, sgrow, sgcol, stderr, xtrans, \
+	  top_margin, left_margin, passes, verbose, working_image)			\
+  private (top, left, mrow, mcol, row, col, color, pix, hex, c, pass, rix, \
+	   val, h, f, d, g, tr, v, hm, max, avg, lix, diff, i, \
+	   buffer, rgb, lab, drv, homo)
+#else
+#pragma omp parallel default (none)			\
+  shared (height, width, image, allhex, ndir, sgrow, sgcol, stderr, xtrans, top_margin, left_margin, passes, verbose, working_image) \
+  private (top, left, mrow, mcol, row, col, color, pix, hex, c, pass, rix, \
+	   val, h, f, d, g, tr, v, hm, max, avg, lix, diff, i, \
+	   buffer, rgb, lab, drv, homo)
+#endif
+  {
+#if defined(_OPENMP)
+    if (verbose)
+      fprintf (stderr,_("> xtrans_interpolate thread #%d/%d/%d\n"), 
+	       omp_get_thread_num (), omp_get_num_threads (), omp_get_max_threads ());
+#endif
+
+#if ! defined(_STATIC_BUFFER)
+  buffer = (char *) malloc (TS*TS*(ndir*11+6));
+  merror (buffer, "xtrans_interpolate()");
+#endif
+
+  rgb  = (ushort(*)[TS][TS][3]) buffer;
+  lab  = (short (*)    [TS][3])(buffer + TS*TS*(ndir*6));
+  drv  = (float (*)[TS][TS])   (buffer + TS*TS*(ndir*6+6));
+  homo = (char  (*)[TS][TS])   (buffer + TS*TS*(ndir*10+6));
+
+#pragma omp for
   for (top=3; top < height-19; top += TS-16)
     for (left=3; left < width-19; left += TS-16) {
       mrow = MIN (top+TS, height-3);
       mcol = MIN (left+TS, width-3);
       for (row=top; row < mrow; row++)
 	for (col=left; col < mcol; col++)
-	  memcpy (rgb[0][row-top][col-left], image[row*width+col], 6);
+#if defined(_STRICT_IMAGE)
+	  memcpy (rgb[0][row-top][col-left], working_image[row*width+col], 6);
+#else
+          memcpy (rgb[0][row-top][col-left], image[row*width+col], 6);
+#endif
       FORC3 memcpy (rgb[c+1], rgb[0], sizeof *rgb);
 
 /* Interpolate green horizontally, vertically, and along both diagonals: */
       for (row=top; row < mrow; row++)
 	for (col=left; col < mcol; col++) {
 	  if ((f = fcol(row,col)) == 1) continue;
+#if defined(_STRICT_IMAGE)
+	  pix = working_image + row*width + col;
+#else
 	  pix = image + row*width + col;
+#endif
 	  hex = allhex[row % 3][col % 3][0];
 	  color[1][0] = 174 * (pix[  hex[1]][1] + pix[  hex[0]][1]) -
 			 46 * (pix[2*hex[1]][1] + pix[2*hex[0]][1]);
@@ -4510,7 +4561,11 @@ void CLASS xtrans_interpolate (int passes)
 	  for (row=top+2; row < mrow-2; row++)
 	    for (col=left+2; col < mcol-2; col++) {
 	      if ((f = fcol(row,col)) == 1) continue;
+#if defined(_STRICT_IMAGE)
+	      pix = working_image + row*width + col;
+#else
 	      pix = image + row*width + col;
+#endif
 	      hex = allhex[row % 3][col % 3][1];
 	      for (d=3; d < 6; d++) {
 		rix = &rgb[(d-2)^!((row-sgrow) % 3)][row-top][col-left];
@@ -4583,7 +4638,6 @@ void CLASS xtrans_interpolate (int passes)
 	  for (col=2; col < mcol-2; col++)
 	    cielab3 (rgb[d][row][col], lab[row][col]); // use cielab3 because X-trans is 3 colors
 	f=dir[d & 3];
-#pragma omp parallel for private (row, col, lix, g) default (none) shared (mrow, mcol, lab, drv, f, d)
 	for (row=3; row < mrow-3; row++)
 	  for (col=3; col < mcol-3; col++) {
 	    lix = &lab[row][col];
@@ -4596,11 +4650,6 @@ void CLASS xtrans_interpolate (int passes)
 
 /* Build homogeneity maps from the derivatives:			*/
       memset(homo, 0, ndir*TS*TS);
-#if defined(_FIXED_NDIR)
-#pragma omp parallel for private (row, col, tr, d, v, h) default (none) shared (mrow, mcol, drv, homo)
-#else
-#pragma omp parallel for private (row, col, tr, d, v, h) default (none) shared (mrow, mcol, drv, homo, ndir)
-#endif
       for (row=4; row < mrow-4; row++)
 	for (col=4; col < mcol-4; col++) {
 	  for (tr=FLT_MAX, d=0; d < ndir; d++)
@@ -4619,8 +4668,17 @@ void CLASS xtrans_interpolate (int passes)
 	for (col = MIN(left,8); col < mcol-8; col++) {
 	  for (d=0; d < ndir; d++)
 	    for (hm[d]=0, v=-2; v <= 2; v++)
-	      for (h=-2; h <= 2; h++)
+	      /*
+		for (h=-2; h <= 2; h++)
 		hm[d] += homo[d][row+v][col+h];
+	      */
+	      /* */
+	      hm[d] += homo[d][row+v][col-2] +
+		homo[d][row+v][col-1] +
+		homo[d][row+v][col+0] +
+		homo[d][row+v][col+1] +
+		homo[d][row+v][col+2];
+	  /* */
 	  for (d=0; d < ndir-4; d++)
 	    if (hm[d] < hm[d+4]) hm[d  ] = 0; else
 	    if (hm[d] > hm[d+4]) hm[d+4] = 0;
@@ -4636,6 +4694,7 @@ void CLASS xtrans_interpolate (int passes)
 	  FORC3 image[(row+top)*width+col+left][c] = avg[c]/avg[3];
 	}
     }
+  }
 #if ! defined(_STATIC_BUFFER)
   free(buffer);
 #endif
