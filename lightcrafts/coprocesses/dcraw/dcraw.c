@@ -4488,14 +4488,14 @@ void CLASS xtrans_interpolate (int passes)
 
 #ifdef _FIXED_NDIR
 #pragma omp parallel default (none)			\
-  shared (height, width, image, allhex, sgrow, sgcol, stderr, xtrans, \
+  shared (height, width, image, allhex, sgrow, sgcol, xtrans, \
 	  top_margin, left_margin, passes, verbose, working_image)			\
   private (top, left, mrow, mcol, row, col, color, pix, hex, c, pass, rix, \
 	   val, h, f, d, g, tr, v, hm, max, avg, lix, diff, i, \
 	   buffer, rgb, lab, drv, homo)
 #else
 #pragma omp parallel default (none)			\
-  shared (height, width, image, allhex, ndir, sgrow, sgcol, stderr, xtrans, top_margin, left_margin, passes, verbose, working_image) \
+  shared (height, width, image, allhex, ndir, sgrow, sgcol, xtrans, top_margin, left_margin, passes, verbose, working_image) \
   private (top, left, mrow, mcol, row, col, color, pix, hex, c, pass, rix, \
 	   val, h, f, d, g, tr, v, hm, max, avg, lix, diff, i, \
 	   buffer, rgb, lab, drv, homo)
