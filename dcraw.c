@@ -4501,12 +4501,6 @@ void CLASS xtrans_interpolate (int passes)
 	   buffer, rgb, lab, drv, homo)
 #endif
   {
-#if defined(_OPENMP)
-    if (verbose)
-      fprintf (stderr,_("> xtrans_interpolate thread #%d/%d/%d\n"), 
-	       omp_get_thread_num (), omp_get_num_threads (), omp_get_max_threads ());
-#endif
-
 #if ! defined(_STATIC_BUFFER)
   buffer = (char *) malloc (TS*TS*(ndir*11+6));
   merror (buffer, "xtrans_interpolate()");
