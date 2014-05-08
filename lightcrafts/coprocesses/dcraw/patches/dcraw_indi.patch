@@ -1,5 +1,7 @@
---- dcraw.c.orig	2014-04-26 23:18:45.141602600 +0900
-+++ dcraw.c	2014-04-26 23:30:17.844196500 +0900
+Index: dcraw/dcraw.c
+===================================================================
+--- dcraw.orig/dcraw.c
++++ dcraw/dcraw.c
 @@ -1,4 +1,8 @@
  /*
 + * OpenMP multithread version of dcraw
@@ -9,7 +11,7 @@
     dcraw.c -- Dave Coffin's raw photo decoder
     Copyright 1997-2014 by Dave Coffin, dcoffin a cybercom o net
  
-@@ -105,6 +109,15 @@
+@@ -105,6 +109,15 @@ typedef unsigned long long UINT64;
  #define ushort unsigned short
  #endif
  
@@ -25,19 +27,7 @@
  /*
     All global variables are defined here, and all functions that
     access them are prefixed with "CLASS".  Note that a thread-safe
-@@ -140,7 +153,10 @@
- int no_auto_bright=0;
- unsigned greybox[4] = { 0, 0, UINT_MAX, UINT_MAX };
- float cam_mul[4], pre_mul[4], cmatrix[3][4], rgb_cam[3][4];
--const double xyz_rgb[3][3] = {			/* XYZ from RGB */
-+#ifndef LIGHTZONE
-+const
-+#endif
-+double xyz_rgb[3][3] = {			/* XYZ from RGB */
-   { 0.412453, 0.357580, 0.180423 },
-   { 0.212671, 0.715160, 0.072169 },
-   { 0.019334, 0.119193, 0.950227 } };
-@@ -3768,6 +3784,19 @@
+@@ -3940,6 +3953,19 @@ void CLASS wavelet_denoise()
    merror (fimg, "wavelet_denoise()");
    temp = fimg + size*3;
    if ((nc = colors) == 3 && filters) nc++;
@@ -57,7 +47,7 @@
    FORC(nc) {			/* denoise R,G1,B,G3 individually */
      for (i=0; i < size; i++)
        fimg[i] = 256 * sqrt(image[i][c] << scale);
-@@ -4042,6 +4071,9 @@
+@@ -4214,6 +4240,9 @@ void CLASS lin_interpolate()
  	  *ip++ = 256 / sum[c];
  	}
      }
@@ -67,7 +57,7 @@
    for (row=1; row < height-1; row++)
      for (col=1; col < width-1; col++) {
        pix = image[row*width+col];
-@@ -4136,7 +4168,18 @@
+@@ -4308,7 +4337,18 @@ void CLASS vng_interpolate()
    merror (brow[4], "vng_interpolate()");
    for (row=0; row < 3; row++)
      brow[row] = brow[4] + row*width;
@@ -87,7 +77,7 @@
      for (col=2; col < width-2; col++) {
        pix = image[row*width+col];
        ip = code[row % prow][col % pcol];
-@@ -4188,6 +4231,7 @@
+@@ -4360,6 +4400,7 @@ void CLASS vng_interpolate()
    memcpy (image[(row-2)*width+2], brow[0]+2, (width-4)*sizeof *image);
    memcpy (image[(row-1)*width+2], brow[1]+2, (width-4)*sizeof *image);
    free (brow[4]);
@@ -95,7 +85,7 @@
    free (code[0][0]);
  }
  
-@@ -4203,7 +4247,17 @@
+@@ -4375,7 +4416,17 @@ void CLASS ppg_interpolate()
    border_interpolate(3);
    if (verbose) fprintf (stderr,_("PPG interpolation...\n"));
  
@@ -113,7 +103,7 @@
    for (row=3; row < height-3; row++)
      for (col=3+(FC(row,3) & 1), c=FC(row,col); col < width-3; col+=2) {
        pix = image + row*width+col;
-@@ -4220,6 +4274,9 @@
+@@ -4392,6 +4443,9 @@ void CLASS ppg_interpolate()
        pix[0][1] = ULIM(guess[i] >> 2, pix[d][1], pix[-d][1]);
      }
  /*  Calculate red and blue for each green pixel:		*/
@@ -123,7 +113,7 @@
    for (row=1; row < height-1; row++)
      for (col=1+(FC(row,2) & 1), c=FC(row,col+1); col < width-1; col+=2) {
        pix = image + row*width+col;
-@@ -4228,6 +4285,9 @@
+@@ -4400,6 +4454,9 @@ void CLASS ppg_interpolate()
  			- pix[-d][1] - pix[d][1]) >> 1);
      }
  /*  Calculate blue for red pixels and vice versa:		*/
@@ -133,7 +123,7 @@
    for (row=1; row < height-1; row++)
      for (col=1+(FC(row,1) & 1), c=2-FC(row,col); col < width-1; col+=2) {
        pix = image + row*width+col;
-@@ -4243,6 +4303,7 @@
+@@ -4415,6 +4472,7 @@ void CLASS ppg_interpolate()
        else
  	pix[0][c] = CLIP((guess[0]+guess[1]) >> 2);
      }
@@ -141,7 +131,7 @@
  }
  
  void CLASS cielab (ushort rgb[3], short lab[3])
-@@ -4519,6 +4580,12 @@
+@@ -4691,6 +4749,12 @@ void CLASS ahd_interpolate()
  
    if (verbose) fprintf (stderr,_("AHD interpolation...\n"));
  
@@ -154,7 +144,7 @@
    cielab (0,0);
    border_interpolate(5);
    buffer = (char *) malloc (26*TS*TS);
-@@ -4527,6 +4594,9 @@
+@@ -4699,6 +4763,9 @@ void CLASS ahd_interpolate()
    lab  = (short (*)[TS][TS][3])(buffer + 12*TS*TS);
    homo = (char  (*)[TS][TS])   (buffer + 24*TS*TS);
  
@@ -164,7 +154,7 @@
    for (top=2; top < height-5; top += TS-6)
      for (left=2; left < width-5; left += TS-6) {
  
-@@ -4609,6 +4679,7 @@
+@@ -4781,6 +4848,7 @@ void CLASS ahd_interpolate()
        }
      }
    free (buffer);
@@ -172,7 +162,7 @@
  }
  #undef TS
  
-@@ -8849,6 +8920,9 @@
+@@ -9075,6 +9143,9 @@ void CLASS fuji_rotate()
    img = (ushort (*)[4]) calloc (high, wide*sizeof *img);
    merror (img, "fuji_rotate()");
  
@@ -182,66 +172,3 @@
    for (row=0; row < high; row++)
      for (col=0; col < wide; col++) {
        ur = r = fuji_width + (row-col)*step;
-@@ -9113,6 +9187,9 @@
- #ifndef NO_LCMS
-   const char *cam_profile=0, *out_profile=0;
- #endif
-+#ifdef LIGHTZONE
-+  char *ofbase = 0;
-+#endif
- 
- #ifndef LOCALTIME
-   putenv ((char *) "TZ=UTC");
-@@ -9207,6 +9284,9 @@
-       case 'p':  cam_profile = argv[arg++];
- #endif
- 	break;
-+#ifdef LIGHTZONE
-+      case 'F':  ofbase     = argv[arg++];  break;
-+#endif
-       case 'P':  bpfile     = argv[arg++];  break;
-       case 'K':  dark_frame = argv[arg++];  break;
-       case 'z':  timestamp_only    = 1;  break;
-@@ -9235,6 +9315,19 @@
- 	return 1;
-     }
-   }
-+#ifdef LIGHTZONE
-+  if (!half_size && !thumbnail_only) {
-+    float rimm[3][3] = {
-+      { 0.7977, 0.2880, 0.0000 },
-+      { 0.1352, 0.7119, 0.0000 },
-+      { 0.0313, 0.0001, 0.8249 } };
-+    int i, j;
-+
-+    for (i=0; i < 3; ++i)
-+      for (j=0; j < 3; ++j)
-+        xyz_rgb[i][j] = rimm[j][i];
-+  }
-+#endif
-   if (arg == argc) {
-     fprintf (stderr,_("No files to process.\n"));
-     return 1;
-@@ -9373,6 +9466,10 @@
- 	  for (i=0; i < 16; i++)
- 	    putchar (cdesc[fcol(i >> 1,i & 1)]);
- 	}
-+#ifdef LIGHTZONE	
-+	printf(_("\nCamera RGB Profile:"));
-+	for (i=0; i<3; ++i) FORCC printf(" %f", rgb_cam[i][c]);
-+#endif
- 	printf (_("\nDaylight multipliers:"));
- 	FORCC printf (" %f", pre_mul[c]);
- 	if (cam_mul[0] > 0) {
-@@ -9485,6 +9582,11 @@
-     if (write_to_stdout)
-       strcpy (ofname,_("standard output"));
-     else {
-+#ifdef LIGHTZONE
-+      if (ofbase)
-+        strcpy (ofname, ofbase);
-+      else
-+#endif
-       strcpy (ofname, ifname);
-       if ((cp = strrchr (ofname, '.'))) *cp = 0;
-       if (multi_out)
