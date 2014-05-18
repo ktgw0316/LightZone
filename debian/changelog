@@ -1,3 +1,9 @@
+lightzone (4.1.0~beta9-0obs1) unstable; urgency=low
+
+  * Upstream sync
+
+ -- Masahiro Kitagawa <arctica0316@gmail.com>  Sun, 18 May 2014 12:52:30 +0900
+
 lightzone (4.1.0~beta8-0obs2) unstable; urgency=low
 
   * debian/control:
