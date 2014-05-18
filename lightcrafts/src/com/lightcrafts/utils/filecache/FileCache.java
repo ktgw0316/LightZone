@@ -337,7 +337,7 @@ public final class FileCache {
     private static void createVersionFile( File file ) throws IOException {
         final FileOutputStream fos = new FileOutputStream( file );
         try {
-            fos.write( Integer.toString( CACHE_VERSION ).getBytes( "ASCII" ) );
+            fos.write( Integer.toString( CACHE_VERSION ).getBytes( "UTF-8" ) );
         }
         finally {
             fos.close();

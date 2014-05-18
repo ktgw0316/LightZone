@@ -145,7 +145,7 @@ public final class UndefinedMetaValue extends ImageMetaValue {
             // probably aren't using UTF-8 (which is the only other reasonable
             // choice).
             //
-            return new String[]{ new String( m_value, "ISO-8859-1" ) };
+            return new String[]{ new String( m_value, "UTF-8" ) };
         }
         catch ( UnsupportedEncodingException e ) {
             throw new IllegalStateException( e );
@@ -167,7 +167,7 @@ public final class UndefinedMetaValue extends ImageMetaValue {
         } else
             s = newValue[0];
         try {
-            m_value = s.getBytes( "ISO-8859-1" );
+            m_value = s.getBytes( "UTF-8" );
         }
         catch ( UnsupportedEncodingException e ) {
             throw new IllegalStateException( e );

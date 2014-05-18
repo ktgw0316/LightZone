@@ -156,7 +156,7 @@ public final class EXIFEncoder {
             case META_STRING:
                 for ( String s : value.getValues() ) {
                     try {
-                        final byte[] b = s.getBytes( "ISO-8859-1" );
+                        final byte[] b = s.getBytes( "UTF-8" );
                         size += b.length + 1 /* for null */;
                     }
                     catch ( UnsupportedEncodingException e ) {
@@ -300,7 +300,7 @@ public final class EXIFEncoder {
                 case META_STRING: {
                     try {
                         final String[] strings = imValue.getValues();
-                        final byte[] b = strings[0].getBytes( "ISO-8859-1" );
+                        final byte[] b = strings[0].getBytes( "UTF-8" );
                         buf.put( b );
                         buf.put( (byte)0 );
                         for ( int j = b.length + 1 /* for null */;

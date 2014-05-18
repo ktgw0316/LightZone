@@ -119,7 +119,7 @@ public final class XMLUtil {
         final ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
             if ( includeXAPURL ) {
-                bos.write( XMP_XAP_NS.getBytes( "ASCII" ) );
+                bos.write( XMP_XAP_NS.getBytes( "UTF-8" ) );
                 bos.write( 0 );
             }
             writeDocumentTo( doc, bos );

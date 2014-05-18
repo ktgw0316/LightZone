@@ -22,6 +22,8 @@ extern "C" int tiffcp( TIFF*, TIFF* );
 
 char const AppName[] = "LightZone";
 
+#define	N(a)	(sizeof (a) / sizeof (a[0]))
+
 ////////// Local functions ////////////////////////////////////////////////////
 
 /**
@@ -90,6 +92,12 @@ JNIEXPORT void JNICALL LCTIFFWriter_METHOD(openForWriting)
     LC_setNativePtr( env, jLCTIFFWriter, LC_TIFFOpen( cFileName, "w" ) );
 }
 
+/* Define the extended Tag field info */
+static const TIFFFieldInfo xtiffFieldInfo[] = {
+    { TIFFTAG_LIGHTZONE, -1, -1, TIFF_BYTE, FIELD_CUSTOM, 1, 1, "LightZone" },
+    { TIFFTAG_MS_RATING, -1, -1, TIFF_SHORT, FIELD_CUSTOM, 1, 1, "Rating" },
+};
+
 /**
  * Set the given byte metadata field.
  */
@@ -99,12 +107,15 @@ JNIEXPORT jboolean JNICALL LCTIFFWriter_METHOD(setByteField)
     TIFF *const tiff = getNativePtr( env, jLCTIFFWriter );
     LC_TIFFFieldValue value;
 
+    /* Install the extended Tag field info */
+    TIFFMergeFieldInfo(tiff, xtiffFieldInfo, N(xtiffFieldInfo));
+
     jarray_to_c<jbyte> const cArray( env, jArray );
     switch ( tagID ) {
 
         case TIFFTAG_ICCPROFILE:
         case TIFFTAG_JPEGTABLES:
-        // case TIFFTAG_LIGHTCRAFTS_LIGHTZONE:
+        case TIFFTAG_LIGHTZONE:
         case TIFFTAG_PHOTOSHOP:
         case TIFFTAG_RICHTIFFIPTC:
         case TIFFTAG_XMLPACKET:
@@ -146,6 +157,10 @@ JNIEXPORT jboolean JNICALL LCTIFFWriter_METHOD(setIntField)
 {
     TIFF *const tiff = getNativePtr( env, jLCTIFFWriter );
     LC_TIFFFieldValue value;
+
+    /* Install the extended Tag field info */
+    TIFFMergeFieldInfo(tiff, xtiffFieldInfo, N(xtiffFieldInfo));
+
     switch ( tagID ) {
 
         case TIFFTAG_BADFAXLINES:
@@ -172,7 +187,7 @@ JNIEXPORT jboolean JNICALL LCTIFFWriter_METHOD(setIntField)
         case TIFFTAG_MATTEING:
         case TIFFTAG_MAXSAMPLEVALUE:
         case TIFFTAG_MINSAMPLEVALUE:
-        // case TIFFTAG_MS_RATING:
+        case TIFFTAG_MS_RATING:
         case TIFFTAG_ORIENTATION:
         case TIFFTAG_PHOTOMETRIC:
         case TIFFTAG_PLANARCONFIG:

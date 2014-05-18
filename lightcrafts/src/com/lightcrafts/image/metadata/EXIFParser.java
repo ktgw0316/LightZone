@@ -400,7 +400,7 @@ public final class EXIFParser {
         int length = 0;
         while ( length < maxLength && m_buf.get( offset + length ) != '\0' )
             ++length;
-        return m_buf.getString( offset, length, "ISO-8859-1" );
+        return m_buf.getString( offset, length, "UTF-8" );
     }
 
     /**

@@ -475,7 +475,7 @@ public final class IPTCDirectory extends ImageMetadataDirectory implements
                 case META_STRING:
                     for ( String s : imValue.getValues() ) {
                         try {
-                            final byte[] b = s.getBytes( "ISO-8859-1" );
+                            final byte[] b = s.getBytes( "UTF-8" );
                             size += IPTC_ENTRY_HEADER_SIZE + b.length;
                         }
                         catch ( UnsupportedEncodingException e ) {
@@ -589,7 +589,7 @@ public final class IPTCDirectory extends ImageMetadataDirectory implements
      */
     private static void encodeString( ByteBuffer buf, String s ) {
         try {
-            final byte[] b = s.getBytes( "ISO-8859-1" );
+            final byte[] b = s.getBytes( "UTF-8" );
             buf.putShort( (short)b.length );
             buf.put( b );
         }

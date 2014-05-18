@@ -205,7 +205,7 @@ public final class IPTCMetadataReader extends ImageMetadataReader
             case IPTC_EXPIRATION_DATE:
             case IPTC_RELEASE_DATE:
                 if ( byteCount >= IPTC_DATE_SIZE ) {
-                    final String s = m_buf.getString( byteCount, "ISO-8859-1" );
+                    final String s = m_buf.getString( byteCount, "UTF-8" );
                     return new DateMetaValue( s );
                 }
                 break;
@@ -220,7 +220,7 @@ public final class IPTCMetadataReader extends ImageMetadataReader
             default:
                 if ( byteCount < 1 )
                     break;
-                String s = m_buf.getString( byteCount, "ISO-8859-1" );
+                String s = m_buf.getString( byteCount, "UTF-8" );
                 final int nullByte = s.indexOf( '\0' );
                 if ( nullByte >= 0 ) {
                     s = s.substring( 0, nullByte );

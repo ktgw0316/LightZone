@@ -231,7 +231,7 @@ public final class CIFFMetadataReader extends ImageMetadataReader {
         int length = 0;
         while ( m_buf.get( offset + length ) != '\0' && length < maxLength )
             ++length;
-        return m_buf.getString( offset, length, "ISO-8859-1" );
+        return m_buf.getString( offset, length, "UTF-8" );
     }
 
     /**

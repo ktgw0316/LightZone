@@ -38,6 +38,13 @@ extern "C" void LC_TIFFErrorHandler( char const*, char const *fmt, va_list ap ){
 }
 
 /**
+ * Ignore all libtiff warnings
+ */
+extern "C" void LC_TIFFWarningHandler( char const*, char const *fmt, va_list ap ){
+    return;
+}
+
+/**
  *  Open a TIFF file.  This function correctly handles path names containing
  *  UTF-8 on all platforms.
  */
@@ -72,6 +79,7 @@ JNIEXPORT void JNICALL LCTIFFCommon_METHOD(init)
     );
     LCTIFFCommon_class = (jclass)env->NewGlobalRef( clazz );
 
+    TIFFSetWarningHandler( &LC_TIFFWarningHandler );
     TIFFSetErrorHandler( &LC_TIFFErrorHandler );
 }
 
