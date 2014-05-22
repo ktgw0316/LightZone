@@ -135,13 +135,13 @@ Index: dcraw/dcraw.c
  
    if (verbose) fprintf (stderr,_("AHD interpolation...\n"));
  
+   cielab (0,0);
 +#ifdef _OPENMP
 +    #pragma omp parallel				\
 +    default(shared)					\
 +    private(top, left, row, col, pix, rix, lix, c, val, d, tc, tr, i, j, ldiff, abdiff, leps, abeps, hm, buffer, rgb, lab, homo)
 +#endif
 +{
-   cielab (0,0);
    border_interpolate(5);
    buffer = (char *) malloc (26*TS*TS);
 @@ -4699,6 +4763,9 @@ void CLASS ahd_interpolate()
