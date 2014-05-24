@@ -4860,7 +4860,10 @@ void CLASS xtrans_interpolate (int passes)
 	  memset (avg, 0, sizeof avg);
 	  for (d=0; d < ndir; d++)
 	    if (hm[d] >= max) {
-	      FORC3 avg[c] += rgb[d][row][col][c];
+	      FORC3 {
+#pragma omp atomic
+		avg[c] += rgb[d][row][col][c];
+	      }
 	      avg[3]++;
 	    }
 	  FORC3 image[(row+top)*width+col+left][c] = avg[c]/avg[3];
