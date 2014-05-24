@@ -2,28 +2,41 @@ Index: dcraw/dcraw.c
 ===================================================================
 --- dcraw.orig/dcraw.c
 +++ dcraw/dcraw.c
-@@ -4475,7 +4475,7 @@ void CLASS ppg_interpolate()
+@@ -4490,6 +4490,45 @@ void CLASS ppg_interpolate()
  } /* pragma omp parallel */
  }
  
--void CLASS cielab (ushort rgb[3], short lab[3])
 +void CLASS cielab3 (ushort rgb[3], short lab[3])
- {
-   int c, i, j, k;
-   float r, xyz[3];
-@@ -4493,11 +4493,50 @@ void CLASS cielab (ushort rgb[3], short
-     return;
-   }
-   xyz[0] = xyz[1] = xyz[2] = 0.5;
--  FORCC {
--    xyz[0] += xyz_cam[0][c] * rgb[c];
--    xyz[1] += xyz_cam[1][c] * rgb[c];
--    xyz[2] += xyz_cam[2][c] * rgb[c];
++{
++  int c, i, j, k;
++  float r, xyz[3];
++  static float cbrt[0x10000], xyz_cam[3][4];
 +
-+    FORC(3) {
-+      xyz[c] += xyz_cam[c][0] * rgb [0] + xyz_cam[c][1] * rgb [1] + xyz_cam[c][2] * rgb [2] ;
++  if (!rgb) {
++#ifdef _OPENMP
++        #pragma omp for
++#endif
++    for (i=0; i < 0x10000; i++) {
++      r = i / 65535.0;
++      cbrt[i] = r > 0.008856 ? pow(r,1/3.0) : 7.787*r + 16/116.0;
 +    }
++#ifdef _OPENMP
++        #pragma omp for
++#endif
++    for (i=0; i < 3; i++)
++      for (j=0; j < colors; j++)
++	for (xyz_cam[i][j] = k=0; k < 3; k++)
++#ifdef _OPENMP
++        #pragma omp atomic
++#endif
++	  xyz_cam[i][j] += xyz_rgb[i][k] * rgb_cam[k][j] / d65_white[i];
++    return;
++  }
++  xyz[0] = xyz[1] = xyz[2] = 0.5;
 +
++  FORC(3) {
++    xyz[c] += xyz_cam[c][0] * rgb [0] + xyz_cam[c][1] * rgb [1] + xyz_cam[c][2] * rgb [2];
++  }
 +  xyz[0] = cbrt[CLIP((int) xyz[0])];
 +  xyz[1] = cbrt[CLIP((int) xyz[1])];
 +  xyz[2] = cbrt[CLIP((int) xyz[2])];
@@ -32,41 +45,10 @@ Index: dcraw/dcraw.c
 +  lab[2] = 64 * 200 * (xyz[1] - xyz[2]);
 +}
 +
-+
-+void CLASS cielab (ushort rgb[3], short lab[3])
-+{
-+  int c, i, j, k;
-+  float r, xyz[3];
-+  static float cbrt[0x10000], xyz_cam[3][4];
-+
-+  if (!rgb) {
-+    for (i=0; i < 0x10000; i++) {
-+      r = i / 65535.0;
-+      cbrt[i] = r > 0.008856 ? pow(r,1/3.0) : 7.787*r + 16/116.0;
-+    }
-+    for (i=0; i < 3; i++)
-+      for (j=0; j < colors; j++)
-+	for (xyz_cam[i][j] = k=0; k < 3; k++)
-+	  xyz_cam[i][j] += xyz_rgb[i][k] * rgb_cam[k][j] / d65_white[i];
-+    return;
-   }
-+  xyz[0] = xyz[1] = xyz[2] = 0.5;
-+
-+  if (colors == 3)
-+    FORC(3) {
-+      xyz[c] += xyz_cam[c][0] * rgb [0] + xyz_cam[c][1] * rgb [1] + xyz_cam[c][2] * rgb [2] ;
-+    }
-+  else
-+    FORCC {
-+      xyz[0] += xyz_cam[0][c] * rgb[c];
-+      xyz[1] += xyz_cam[1][c] * rgb[c];
-+      xyz[2] += xyz_cam[2][c] * rgb[c];
-+    }
-+
-   xyz[0] = cbrt[CLIP((int) xyz[0])];
-   xyz[1] = cbrt[CLIP((int) xyz[1])];
-   xyz[2] = cbrt[CLIP((int) xyz[2])];
-@@ -4509,36 +4548,70 @@ void CLASS cielab (ushort rgb[3], short
+ void CLASS cielab (ushort rgb[3], short lab[3])
+ {
+   int c, i, j, k;
+@@ -4533,38 +4572,94 @@ void CLASS cielab (ushort rgb[3], short
  #define TS 512		/* Tile Size */
  #define fcol(row,col) xtrans[(row+top_margin+6)%6][(col+left_margin+6)%6]
  
@@ -102,7 +84,7 @@ Index: dcraw/dcraw.c
 +#else
 +  int ndir = 4 << (passes > 1);
 +#endif
-+  
++
    static const short orth[12] = { 1,0,0,1,-1,0,0,-1,1,0,0,1 },
 -	patt[2][16] = { { 0,1,0,-1,2,0,-1,0,1,1,1,-1,0,0,0,0 },
 +    patt[2][16] = { { 0,1,0,-1,2,0,-1,0,1,1,1,-1,0,0,0,0 },
@@ -120,7 +102,7 @@ Index: dcraw/dcraw.c
 +#if defined(_STATIC_BUFFER)
 +  char (*homo)[TS][TS];
 +  static char buffer [TS*TS*(8*11+6)] __attribute__((aligned(64)));
-+#else 
++#else
 +  char (*homo)[TS][TS], *buffer;
 +#endif
 +
@@ -128,14 +110,37 @@ Index: dcraw/dcraw.c
    if (verbose)
 -    fprintf (stderr,_("%d-pass X-Trans interpolation...\n"), passes);
 +#if defined(_OPENMP)
-+    fprintf (stderr,_("%d-pass X-Trans interpolation with %d max threads...\n"), 
++    fprintf (stderr,_("%d-pass X-Trans interpolation with %d max threads...\n"),
 +	     passes, omp_get_max_threads ());
 +#else
-+    fprintf (stderr,_("%d-pass X-Trans interpolation...\n"), 
++    fprintf (stderr,_("%d-pass X-Trans interpolation...\n"),
 +	     passes);
 +#endif
++
++  if ((4 << (passes > 1)) != ndir)
++    fprintf (stderr,_("4 << (passes > 1) = %d != ndir = %d\n"),
++	     (4 << (passes > 1)), ndir);
  
 -  cielab (0,0);
++#if defined(_STRICT_IMAGE)
++  ushort (*working_image)[4];
++#endif
++#ifdef _FIXED_NDIR
++#pragma omp parallel default (none)			\
++  shared (height, width, image, allhex, sgrow, sgcol, xtrans, \
++	  top_margin, left_margin, passes, verbose, working_image, iwidth, iheight) \
++  private (top, left, mrow, mcol, row, col, color, pix, hex, c, pass, rix, \
++	   val, h, f, d, g, tr, v, hm, max, avg, lix, diff, i, \
++	   buffer, rgb, lab, drv, homo, ng, min)
++#else
++#pragma omp parallel default (none)			\
++  shared (height, width, image, allhex, ndir, sgrow, sgcol, xtrans, \
++	  top_margin, left_margin, passes, verbose, working_image, iwidth, iheight) \
++  private (top, left, mrow, mcol, row, col, color, pix, hex, c, pass, rix, \
++	   val, h, f, d, g, tr, v, hm, max, avg, lix, diff, i, \
++	   buffer, rgb, lab, drv, homo, ng, min)
++#endif
++  {
 +  cielab3 (0,0);
    border_interpolate(6);
 -  ndir = 4 << (passes > 1);
@@ -145,47 +150,36 @@ Index: dcraw/dcraw.c
 -  lab  = (short (*)    [TS][3])(buffer + TS*TS*(ndir*6));
 -  drv  = (float (*)[TS][TS])   (buffer + TS*TS*(ndir*6+6));
 -  homo = (char  (*)[TS][TS])   (buffer + TS*TS*(ndir*10+6));
-+
-+  if ((4 << (passes > 1)) != ndir)
-+    fprintf (stderr,_("4 << (passes > 1) = %d != ndir = %d\n"),
-+	     (4 << (passes > 1)), ndir);
  
  /* Map a green hexagon around each non-green pixel and vice versa:	*/
++#ifdef _OPENMP
++        #pragma omp for
++#endif
    for (row=0; row < 3; row++)
-@@ -4555,6 +4628,7 @@ void CLASS xtrans_interpolate (int passe
+     for (col=0; col < 3; col++)
+       for (ng=d=0; d < 10; d+=2) {
+@@ -4579,7 +4674,11 @@ void CLASS xtrans_interpolate (int passe
  	}
        }
  
 +
  /* Set green1 and green3 to the minimum and maximum allowed values:	*/
++#ifdef _OPENMP
++        #pragma omp for
++#endif
    for (row=2; row < height-2; row++)
      for (min=~(max=0), col=2; col < width-2; col++) {
-@@ -4574,20 +4648,61 @@ void CLASS xtrans_interpolate (int passe
+       if (fcol(row,col) == 1 && (min=~(max=0))) continue;
+@@ -4598,20 +4697,45 @@ void CLASS xtrans_interpolate (int passe
        }
      }
  
-+  ushort (*working_image)[4];
 +#if defined(_STRICT_IMAGE)
 +  working_image = (ushort (*)[4]) calloc (iheight, iwidth*sizeof *image);
 +  memcpy (working_image, image, iheight * iwidth * sizeof *image);
 +  merror (working_image, "xtrans_interpolate working_image");
 +#endif
 +
-+#ifdef _FIXED_NDIR
-+#pragma omp parallel default (none)			\
-+  shared (height, width, image, allhex, sgrow, sgcol, xtrans, \
-+	  top_margin, left_margin, passes, verbose, working_image)			\
-+  private (top, left, mrow, mcol, row, col, color, pix, hex, c, pass, rix, \
-+	   val, h, f, d, g, tr, v, hm, max, avg, lix, diff, i, \
-+	   buffer, rgb, lab, drv, homo)
-+#else
-+#pragma omp parallel default (none)			\
-+  shared (height, width, image, allhex, ndir, sgrow, sgcol, xtrans, top_margin, left_margin, passes, verbose, working_image) \
-+  private (top, left, mrow, mcol, row, col, color, pix, hex, c, pass, rix, \
-+	   val, h, f, d, g, tr, v, hm, max, avg, lix, diff, i, \
-+	   buffer, rgb, lab, drv, homo)
-+#endif
-+  {
 +#if ! defined(_STATIC_BUFFER)
 +  buffer = (char *) malloc (TS*TS*(ndir*11+6));
 +  merror (buffer, "xtrans_interpolate()");
@@ -223,7 +217,7 @@ Index: dcraw/dcraw.c
  	  hex = allhex[row % 3][col % 3][0];
  	  color[1][0] = 174 * (pix[  hex[1]][1] + pix[  hex[0]][1]) -
  			 46 * (pix[2*hex[1]][1] + pix[2*hex[0]][1]);
-@@ -4609,7 +4724,11 @@ void CLASS xtrans_interpolate (int passe
+@@ -4633,7 +4757,11 @@ void CLASS xtrans_interpolate (int passe
  	  for (row=top+2; row < mrow-2; row++)
  	    for (col=left+2; col < mcol-2; col++) {
  	      if ((f = fcol(row,col)) == 1) continue;
@@ -235,7 +229,7 @@ Index: dcraw/dcraw.c
  	      hex = allhex[row % 3][col % 3][1];
  	      for (d=3; d < 6; d++) {
  		rix = &rgb[(d-2)^!((row-sgrow) % 3)][row-top][col-left];
-@@ -4680,8 +4799,9 @@ void CLASS xtrans_interpolate (int passe
+@@ -4704,8 +4832,9 @@ void CLASS xtrans_interpolate (int passe
        for (d=0; d < ndir; d++) {
  	for (row=2; row < mrow-2; row++)
  	  for (col=2; col < mcol-2; col++)
@@ -247,7 +241,7 @@ Index: dcraw/dcraw.c
  	  for (col=3; col < mcol-3; col++) {
  	    lix = &lab[row][col];
  	    g = 2*lix[0][0] - lix[f][0] - lix[-f][0];
-@@ -4696,14 +4816,12 @@ void CLASS xtrans_interpolate (int passe
+@@ -4720,14 +4849,12 @@ void CLASS xtrans_interpolate (int passe
        for (row=4; row < mrow-4; row++)
  	for (col=4; col < mcol-4; col++) {
  	  for (tr=FLT_MAX, d=0; d < ndir; d++)
@@ -264,7 +258,7 @@ Index: dcraw/dcraw.c
  	}
  
  /* Average the most homogenous pixels for the final result:	*/
-@@ -4713,8 +4831,17 @@ void CLASS xtrans_interpolate (int passe
+@@ -4737,8 +4864,17 @@ void CLASS xtrans_interpolate (int passe
  	for (col = MIN(left,8); col < mcol-8; col++) {
  	  for (d=0; d < ndir; d++)
  	    for (hm[d]=0, v=-2; v <= 2; v++)
@@ -283,14 +277,24 @@ Index: dcraw/dcraw.c
  	  for (d=0; d < ndir-4; d++)
  	    if (hm[d] < hm[d+4]) hm[d  ] = 0; else
  	    if (hm[d] > hm[d+4]) hm[d+4] = 0;
-@@ -4730,7 +4857,10 @@ void CLASS xtrans_interpolate (int passe
+@@ -4748,13 +4884,19 @@ void CLASS xtrans_interpolate (int passe
+ 	  memset (avg, 0, sizeof avg);
+ 	  for (d=0; d < ndir; d++)
+ 	    if (hm[d] >= max) {
+-	      FORC3 avg[c] += rgb[d][row][col][c];
++	      FORC3 {
++#pragma omp atomic
++		avg[c] += rgb[d][row][col][c];
++	      }
+ 	      avg[3]++;
+ 	    }
  	  FORC3 image[(row+top)*width+col+left][c] = avg[c]/avg[3];
  	}
      }
-+  }
 +#if ! defined(_STATIC_BUFFER)
    free(buffer);
 +#endif
++  } /* pragma omp parallel */
  }
  #undef fcol
  

@@ -4194,6 +4194,9 @@ void CLASS border_interpolate (int border)
 {
   unsigned row, col, y, x, f, c, sum[8];
 
+#ifdef _OPENMP
+        #pragma omp for
+#endif
   for (row=0; row < height; row++)
     for (col=0; col < width; col++) {
       if (col==border && row >= border && row < height-border)
@@ -4220,7 +4223,15 @@ void CLASS lin_interpolate()
 
   if (verbose) fprintf (stderr,_("Bilinear interpolation...\n"));
   if (filters == 9) size = 6;
+#ifdef _OPENMP
+    #pragma omp parallel default(shared) \
+    private(ip, sum, f, c, i, x, y, row, col, shift, color, pix)
+#endif
+{
   border_interpolate(1);
+#ifdef _OPENMP
+        #pragma omp for
+#endif
   for (row=0; row < size; row++)
     for (col=0; col < size; col++) {
       ip = code[row][col]+1;
@@ -4244,7 +4255,7 @@ void CLASS lin_interpolate()
 	}
     }
 #ifdef _OPENMP
-    #pragma omp parallel for default(shared) private(row,col,pix,ip,sum,i)
+    #pragma omp for
 #endif
   for (row=1; row < height-1; row++)
     for (col=1; col < width-1; col++) {
@@ -4256,6 +4267,7 @@ void CLASS lin_interpolate()
       for (i=colors; --i; ip+=2)
 	pix[ip[0]] = sum[ip[0]] * ip[1] >> 8;
     }
+} /* pragma omp parallel */
 }
 
 /*
@@ -4299,13 +4311,24 @@ void CLASS vng_interpolate()
   int row, col, x, y, x1, x2, y1, y2, t, weight, grads, color, diag;
   int g, diff, thold, num, c;
 
+
   lin_interpolate();
   if (verbose) fprintf (stderr,_("VNG interpolation...\n"));
 
   if (filters == 1) prow = pcol = 16;
   if (filters == 9) prow = pcol =  6;
+#ifdef _OPENMP
+    #pragma omp parallel \
+    default(none) \
+    shared(image,filters,cp,prow,pcol,code,width,height,colors) \
+    private(row,col,x,x1,x2,y,y1,y2,weight,grads,diag,g,brow,pix,ip,gval,diff,gmin,gmax,thold,sum,color,num,c,t)
+#endif
+{
   ip = (int *) calloc (prow*pcol, 1280);
   merror (ip, "vng_interpolate()");
+#ifdef _OPENMP
+        #pragma omp for
+#endif
   for (row=0; row < prow; row++)		/* Precalculate for VNG */
     for (col=0; col < pcol; col++) {
       code[row][col] = ip;
@@ -4341,17 +4364,9 @@ void CLASS vng_interpolate()
   for (row=0; row < 3; row++)
     brow[row] = brow[4] + row*width;
 #ifdef _OPENMP
-    #pragma omp parallel				\
-    default(none)					\
-    shared(image,code,prow,pcol,width,height,colors)			\
-    private(row,col,g,brow,pix,ip,gval,diff,gmin,gmax,thold,sum,color,num,c,t)
+        #pragma omp for
 #endif
-{
-  int slice = (height - 4) / uf_omp_get_num_threads();
-  int start_row = 2 + slice * uf_omp_get_thread_num();
-  int end_row = MIN(start_row + slice, height - 2);
-
-  for (row=start_row; row < end_row; row++) {		/* Do VNG interpolation */
+  for (row=2; row < height-2; row++) {		/* Do VNG interpolation */
     for (col=2; col < width-2; col++) {
       pix = image[row*width+col];
       ip = code[row % prow][col % pcol];
@@ -4416,7 +4431,6 @@ void CLASS ppg_interpolate()
   int row, col, diff[2], guess[2], c, d, i;
   ushort (*pix)[4];
 
-  border_interpolate(3);
   if (verbose) fprintf (stderr,_("PPG interpolation...\n"));
 
 #ifdef _OPENMP
@@ -4426,6 +4440,7 @@ void CLASS ppg_interpolate()
     private(row,col,i,d,c,pix,guess)
 #endif
 {
+  border_interpolate(3);
 /*  Fill in the green layer with gradients and pattern recognition: */
 #ifdef _OPENMP
         #pragma omp for
@@ -4485,22 +4500,30 @@ void CLASS cielab3 (ushort rgb[3], short lab[3])
   static float cbrt[0x10000], xyz_cam[3][4];
 
   if (!rgb) {
+#ifdef _OPENMP
+        #pragma omp for
+#endif
     for (i=0; i < 0x10000; i++) {
       r = i / 65535.0;
       cbrt[i] = r > 0.008856 ? pow(r,1/3.0) : 7.787*r + 16/116.0;
     }
+#ifdef _OPENMP
+        #pragma omp for
+#endif
     for (i=0; i < 3; i++)
       for (j=0; j < colors; j++)
 	for (xyz_cam[i][j] = k=0; k < 3; k++)
+#ifdef _OPENMP
+        #pragma omp atomic
+#endif
 	  xyz_cam[i][j] += xyz_rgb[i][k] * rgb_cam[k][j] / d65_white[i];
     return;
   }
   xyz[0] = xyz[1] = xyz[2] = 0.5;
 
-    FORC(3) {
-      xyz[c] += xyz_cam[c][0] * rgb [0] + xyz_cam[c][1] * rgb [1] + xyz_cam[c][2] * rgb [2] ;
-    }
-
+  FORC(3) {
+    xyz[c] += xyz_cam[c][0] * rgb [0] + xyz_cam[c][1] * rgb [1] + xyz_cam[c][2] * rgb [2];
+  }
   xyz[0] = cbrt[CLIP((int) xyz[0])];
   xyz[1] = cbrt[CLIP((int) xyz[1])];
   xyz[2] = cbrt[CLIP((int) xyz[2])];
@@ -4508,7 +4531,6 @@ void CLASS cielab3 (ushort rgb[3], short lab[3])
   lab[1] = 64 * 500 * (xyz[0] - xyz[1]);
   lab[2] = 64 * 200 * (xyz[1] - xyz[2]);
 }
-
 
 void CLASS cielab (ushort rgb[3], short lab[3])
 {
@@ -4530,22 +4552,18 @@ void CLASS cielab (ushort rgb[3], short lab[3])
     for (i=0; i < 3; i++)
       for (j=0; j < colors; j++)
 	for (xyz_cam[i][j] = k=0; k < 3; k++)
+#ifdef _OPENMP
+        #pragma omp atomic
+#endif
 	  xyz_cam[i][j] += xyz_rgb[i][k] * rgb_cam[k][j] / d65_white[i];
     return;
   }
   xyz[0] = xyz[1] = xyz[2] = 0.5;
-
-  if (colors == 3)
-    FORC(3) {
-      xyz[c] += xyz_cam[c][0] * rgb [0] + xyz_cam[c][1] * rgb [1] + xyz_cam[c][2] * rgb [2] ;
-    }
-  else
-    FORCC {
-      xyz[0] += xyz_cam[0][c] * rgb[c];
-      xyz[1] += xyz_cam[1][c] * rgb[c];
-      xyz[2] += xyz_cam[2][c] * rgb[c];
-    }
-
+  FORCC {
+    xyz[0] += xyz_cam[0][c] * rgb[c];
+    xyz[1] += xyz_cam[1][c] * rgb[c];
+    xyz[2] += xyz_cam[2][c] * rgb[c];
+  }
   xyz[0] = cbrt[CLIP((int) xyz[0])];
   xyz[1] = cbrt[CLIP((int) xyz[1])];
   xyz[2] = cbrt[CLIP((int) xyz[2])];
@@ -4615,14 +4633,36 @@ void CLASS xtrans_interpolate (int passes)
 	     passes);
 #endif
 
-  cielab3 (0,0);
-  border_interpolate(6);
-
   if ((4 << (passes > 1)) != ndir)
     fprintf (stderr,_("4 << (passes > 1) = %d != ndir = %d\n"),
 	     (4 << (passes > 1)), ndir);
 
+#if defined(_STRICT_IMAGE)
+  ushort (*working_image)[4];
+#endif
+#ifdef _FIXED_NDIR
+#pragma omp parallel default (none)			\
+  shared (height, width, image, allhex, sgrow, sgcol, xtrans, \
+	  top_margin, left_margin, passes, verbose, working_image, iwidth, iheight) \
+  private (top, left, mrow, mcol, row, col, color, pix, hex, c, pass, rix, \
+	   val, h, f, d, g, tr, v, hm, max, avg, lix, diff, i, \
+	   buffer, rgb, lab, drv, homo, ng, min)
+#else
+#pragma omp parallel default (none)			\
+  shared (height, width, image, allhex, ndir, sgrow, sgcol, xtrans, \
+	  top_margin, left_margin, passes, verbose, working_image, iwidth, iheight) \
+  private (top, left, mrow, mcol, row, col, color, pix, hex, c, pass, rix, \
+	   val, h, f, d, g, tr, v, hm, max, avg, lix, diff, i, \
+	   buffer, rgb, lab, drv, homo, ng, min)
+#endif
+  {
+  cielab3 (0,0);
+  border_interpolate(6);
+
 /* Map a green hexagon around each non-green pixel and vice versa:	*/
+#ifdef _OPENMP
+        #pragma omp for
+#endif
   for (row=0; row < 3; row++)
     for (col=0; col < 3; col++)
       for (ng=d=0; d < 10; d+=2) {
@@ -4639,6 +4679,9 @@ void CLASS xtrans_interpolate (int passes)
 
 
 /* Set green1 and green3 to the minimum and maximum allowed values:	*/
+#ifdef _OPENMP
+        #pragma omp for
+#endif
   for (row=2; row < height-2; row++)
     for (min=~(max=0), col=2; col < width-2; col++) {
       if (fcol(row,col) == 1 && (min=~(max=0))) continue;
@@ -4657,28 +4700,12 @@ void CLASS xtrans_interpolate (int passes)
       }
     }
 
-  ushort (*working_image)[4];
 #if defined(_STRICT_IMAGE)
   working_image = (ushort (*)[4]) calloc (iheight, iwidth*sizeof *image);
   memcpy (working_image, image, iheight * iwidth * sizeof *image);
   merror (working_image, "xtrans_interpolate working_image");
 #endif
 
-#ifdef _FIXED_NDIR
-#pragma omp parallel default (none)			\
-  shared (height, width, image, allhex, sgrow, sgcol, xtrans, \
-	  top_margin, left_margin, passes, verbose, working_image)			\
-  private (top, left, mrow, mcol, row, col, color, pix, hex, c, pass, rix, \
-	   val, h, f, d, g, tr, v, hm, max, avg, lix, diff, i, \
-	   buffer, rgb, lab, drv, homo)
-#else
-#pragma omp parallel default (none)			\
-  shared (height, width, image, allhex, ndir, sgrow, sgcol, xtrans, top_margin, left_margin, passes, verbose, working_image) \
-  private (top, left, mrow, mcol, row, col, color, pix, hex, c, pass, rix, \
-	   val, h, f, d, g, tr, v, hm, max, avg, lix, diff, i, \
-	   buffer, rgb, lab, drv, homo)
-#endif
-  {
 #if ! defined(_STATIC_BUFFER)
   buffer = (char *) malloc (TS*TS*(ndir*11+6));
   merror (buffer, "xtrans_interpolate()");
@@ -4869,10 +4896,10 @@ void CLASS xtrans_interpolate (int passes)
 	  FORC3 image[(row+top)*width+col+left][c] = avg[c]/avg[3];
 	}
     }
-  }
 #if ! defined(_STATIC_BUFFER)
   free(buffer);
 #endif
+  } /* pragma omp parallel */
 }
 #undef fcol
 
