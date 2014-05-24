@@ -4517,10 +4517,16 @@ void CLASS cielab (ushort rgb[3], short lab[3])
   static float cbrt[0x10000], xyz_cam[3][4];
 
   if (!rgb) {
+#ifdef _OPENMP
+        #pragma omp for
+#endif
     for (i=0; i < 0x10000; i++) {
       r = i / 65535.0;
       cbrt[i] = r > 0.008856 ? pow(r,1/3.0) : 7.787*r + 16/116.0;
     }
+#ifdef _OPENMP
+        #pragma omp for
+#endif
     for (i=0; i < 3; i++)
       for (j=0; j < colors; j++)
 	for (xyz_cam[i][j] = k=0; k < 3; k++)
@@ -4582,7 +4588,7 @@ void CLASS xtrans_interpolate (int passes)
 #else
   int ndir = 4 << (passes > 1);
 #endif
-  
+
   static const short orth[12] = { 1,0,0,1,-1,0,0,-1,1,0,0,1 },
     patt[2][16] = { { 0,1,0,-1,2,0,-1,0,1,1,1,-1,0,0,0,0 },
 			{ 0,1,0,-2,1,0,-2,0,1,1,-2,-2,1,-1,-1,1 } },
@@ -4595,17 +4601,17 @@ void CLASS xtrans_interpolate (int passes)
 #if defined(_STATIC_BUFFER)
   char (*homo)[TS][TS];
   static char buffer [TS*TS*(8*11+6)] __attribute__((aligned(64)));
-#else 
+#else
   char (*homo)[TS][TS], *buffer;
 #endif
 
 
   if (verbose)
 #if defined(_OPENMP)
-    fprintf (stderr,_("%d-pass X-Trans interpolation with %d max threads...\n"), 
+    fprintf (stderr,_("%d-pass X-Trans interpolation with %d max threads...\n"),
 	     passes, omp_get_max_threads ());
 #else
-    fprintf (stderr,_("%d-pass X-Trans interpolation...\n"), 
+    fprintf (stderr,_("%d-pass X-Trans interpolation...\n"),
 	     passes);
 #endif
 
@@ -4882,13 +4888,13 @@ void CLASS ahd_interpolate()
 
   if (verbose) fprintf (stderr,_("AHD interpolation...\n"));
 
-  cielab (0,0);
 #ifdef _OPENMP
     #pragma omp parallel				\
     default(shared)					\
     private(top, left, row, col, pix, rix, lix, c, val, d, tc, tr, i, j, ldiff, abdiff, leps, abeps, hm, buffer, rgb, lab, homo)
 #endif
 {
+  cielab (0,0);
   border_interpolate(5);
   buffer = (char *) malloc (26*TS*TS);
   merror (buffer, "ahd_interpolate()");
