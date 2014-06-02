@@ -75,8 +75,8 @@ public class JAIContext {
     public static final TileCache defaultTileCache;
 
     /** Tile dimensions. */
-    public static final int TILE_WIDTH = 256;
-    public static final int TILE_HEIGHT = 256;
+    public static final int TILE_WIDTH = 512;
+    public static final int TILE_HEIGHT = 512;
 
     // public static final int fastMode = DataBuffer.TYPE_BYTE;
     // public static final int preciseMode = DataBuffer.TYPE_USHORT;
@@ -191,12 +191,14 @@ public class JAIContext {
         // don't use more than 2 processors, it uses too much memory,
         // and use 2 procs only if we have more than 750MB of heap
 
-        if (maxMemory >= 400 * 1024 * 1024)
+        final int MB = 1024 * 1024;
+
+        if (maxMemory >= 400 * MB)
             jaiInstance.getTileScheduler().setParallelism(processors);
         else
             jaiInstance.getTileScheduler().setParallelism(1);
 
-        fileCache = new LCTileCache(maxMemory/2, true);
+        fileCache = new LCTileCache(maxMemory <= 1024 * MB ? maxMemory/2 : maxMemory -  512 * MB, true);
         // fileCache.setMemoryThreshold(0.5f);
         jaiInstance.setTileCache(fileCache);
         fileCacheHint = new RenderingHints(JAI.KEY_TILE_CACHE, fileCache);
