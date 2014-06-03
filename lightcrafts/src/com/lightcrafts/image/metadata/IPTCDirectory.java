@@ -30,7 +30,6 @@ import static com.lightcrafts.image.types.AdobeConstants.*;
  *
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */
-@SuppressWarnings({"CloneableClassWithoutClone"})
 public final class IPTCDirectory extends ImageMetadataDirectory implements
     ArtistProvider, CaptureDateTimeProvider, CopyrightProvider, TitleProvider {
 
@@ -717,6 +716,7 @@ public final class IPTCDirectory extends ImageMetadataDirectory implements
         add( IPTC_CAPTION_ABSTRACT, "Caption/Abstract", META_STRING, true, 0 );
         add( IPTC_CATEGORY, "Category", META_STRING, true, 0 );
         add( IPTC_CITY, "City", META_STRING, true, 0 );
+        add( IPTC_CODED_CHARACTER_SET, "CodedCharacterSet", META_STRING, true, 0 );
         add( IPTC_CONTACT, "Contact", META_STRING, true, IPTC_TAG_MULTIVALUE );
         add( IPTC_CONTENT_LOCATION_CODE, "ContentLocationCode", META_STRING, true, IPTC_TAG_MULTIVALUE );
         add( IPTC_CONTENT_LOCATION_NAME, "ContentLocationName", META_STRING, true, IPTC_TAG_MULTIVALUE );

@@ -220,7 +220,16 @@ public final class IPTCMetadataReader extends ImageMetadataReader
             default:
                 if ( byteCount < 1 )
                     break;
-                String s = m_buf.getString( byteCount, "UTF-8" );
+
+                String c = "ISO-8859-1";
+                final ImageMetaValue oldCharset = dir.getValue( IPTC_CODED_CHARACTER_SET );
+                if ( oldCharset != null ) {
+                    byte[] utf8 = {0x1B, 0x25, 0x47}; // ESC, "%", "G"
+                    if ( oldCharset.getStringValue().getBytes() == utf8 )
+                        c = "UTF-8";
+                }
+                String s = m_buf.getString( byteCount, c );
+
                 final int nullByte = s.indexOf( '\0' );
                 if ( nullByte >= 0 ) {
                     s = s.substring( 0, nullByte );

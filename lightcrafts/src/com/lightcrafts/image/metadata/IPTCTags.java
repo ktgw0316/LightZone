@@ -62,6 +62,14 @@ public interface IPTCTags extends ImageMetaTags {
     int IPTC_CITY                               = IPTC_RECORD_APP << 8 | 0x5A;
 
     /**
+     * If the value of this tag is 0x1B 0x25 0x47, strings in IPTC_RECORD_APP
+     * tags are decoded as UTF-8. 
+     * <p>
+     * Type: ASCII.
+     */
+    int IPTC_CODED_CHARACTER_SET                = IPTC_RECORD_ENV << 8 | 0x5A;
+
+    /**
      * Identifies the person or organisation that can provide further
      * background information on the object data.
      * <p>
