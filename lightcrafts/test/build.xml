@@ -7,7 +7,6 @@
   <property name="test-dir" value="${ENV.LZ_TESTDIR}"/>
 
   <path id="classpath">
-    <pathelement location="lib/junit.jar"/>
     <pathelement location="../build"/>
   </path>
 
