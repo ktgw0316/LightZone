@@ -8,6 +8,8 @@ Building the LightZone source requires (at least) following packages:
 - __gcc__
 - __git__
 - __javahelp2__ for jhindexer
+- __libjpeg-dev__ or __libjpeg-turbo-dev__
+- __libtiff__
 - __make__
 - __openjdk-6-jdk__ or later
 - __tidy__
@@ -17,7 +19,7 @@ _For Debian (>= squeeze, i386/amd64) and Ubuntu (>= 10.04 lucid). See also [Pack
 
 Install required packages:
 
-    sudo apt-get install ant autoconf automake build-essential debhelper devscripts git javahelp2 libtool libx11-dev nasm default-jdk default-jre-headless tidy
+    sudo apt-get install debhelper devscripts build-essential ant autoconf git-core javahelp2 default-jdk default-jre-headless tidy libjpeg-turbo8-dev libtiff5-dev libx11-dev
 
 _(Note: gcc, g++, libc6-dev and make shall be installed with the build-essential.)_
 
@@ -28,7 +30,7 @@ Before start the build, you have to set JAVA_HOME environment variable, e.g.
 ### OpenSUSE (>= 12.2)
 Install required packages:
 
-    sudo zypper install ant autoconf automake nasm gcc gcc-c++ libtool make tidy git javahelp2 libX11-devel
+    sudo zypper install ant autoconf gcc gcc-c++ make tidy git javahelp2 libjpeg8-devel libtiff-devel libX11-devel java-1_7_0-openjdk-devel
 
 Set your JAVA_HOME variable to point to installed JDK, e.g.
 
