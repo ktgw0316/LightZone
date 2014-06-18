@@ -23,8 +23,8 @@
    *If you have not modified dcraw.c in any way, a link to my
    homepage qualifies as "full source code".
 
-   $Revision: 1.463 $
-   $Date: 2014/05/05 22:03:20 $
+   $Revision: 1.464 $
+   $Date: 2014/06/13 23:01:50 $
  */
 
 #define DCRAW_VERSION "9.21"
@@ -391,14 +391,15 @@ void CLASS read_shorts (ushort *pixel, int count)
 
 void CLASS cubic_spline (const int *x_, const int *y_, const int len)
 {
-  float A[2*len][2*len], b[2*len], c[2*len], d[2*len];
-  float x[len], y[len];
+  float **A, *b, *c, *d, *x, *y;
   int i, j;
 
-  memset (A, 0, sizeof(A));
-  memset (b, 0, sizeof(b));
-  memset (c, 0, sizeof(c));
-  memset (d, 0, sizeof(d));
+  A = (float **) calloc (((2*len + 4)*sizeof **A + sizeof *A), 2*len);
+  if (!A) return;
+  A[0] = (float *) (A + 2*len);
+  for (i = 1; i < 2*len; i++)
+    A[i] = A[0] + 2*len*i;
+  y = len + (x = i + (d = i + (c = i + (b = A[0] + i*i))));
   for (i = 0; i < len; i++) {
     x[i] = x_[i] / 65535.0;
     y[i] = y_[i] / 65535.0;
@@ -440,6 +441,7 @@ void CLASS cubic_spline (const int *x_, const int *y_, const int len)
     curve[i] = y_out < 0.0 ? 0 : (y_out >= 1.0 ? 65535 :
 		(ushort)(y_out * 65535.0 + 0.5));
   }
+  free (A);
 }
 
 void CLASS canon_600_fixed_wb (int temp)
@@ -5171,7 +5173,7 @@ void CLASS tiff_get (unsigned base,
   *type = get2();
   *len  = get4();
   *save = ftell(ifp) + 4;
-  if (*len * ("11124811248488"[*type < 14 ? *type:0]-'0') > 4)
+  if (*len * ("11124811248484"[*type < 14 ? *type:0]-'0') > 4)
     fseek (ifp, get4()+base, SEEK_SET);
 }
 
@@ -5466,7 +5468,7 @@ get2_256:
       cam_mul[0] = get2() / 256.0;
       cam_mul[2] = get2() / 256.0;
     }
-    if ((tag | 0x70) == 0x2070 && type == 4)
+    if ((tag | 0x70) == 0x2070 && (type == 4 || type == 13))
       fseek (ifp, get4()+base, SEEK_SET);
     if (tag == 0x2020)
       parse_thumb_note (base, 257, 258);
@@ -5760,6 +5762,7 @@ int CLASS parse_tiff_ifd (int base)
 	thumb_length = len;
 	break;
       case 61440:			/* Fuji HS10 table */
+	fseek (ifp, get4()+base, SEEK_SET);
 	parse_tiff_ifd (base);
 	break;
       case 2: case 256: case 61441:	/* ImageWidth */
