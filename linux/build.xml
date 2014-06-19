@@ -49,11 +49,10 @@
         <fileset dir="lib">
           <include name="*.jar"/>
         </fileset>
-        <fileset dir="/usr/share">
-          <include name="java*/**/*.jar"/>
-        </fileset>
-        <fileset dir="/usr/local/share">
-          <include name="java/classes/*.jar"/>
+        <fileset dir="/usr">
+          <include name="share/java*/**/*.jar"/>
+          <include name="local/share/java/classes/*.jar"/>
+          <include name="jdk/packages/lib/ext/*.jar"/>
         </fileset>
       </classpath>
     </javac>
@@ -100,11 +99,10 @@
         <fileset dir="products">
           <include name="*.jar"/>
         </fileset>
-        <fileset dir="/usr/share">
-          <include name="java*/**/*.jar"/>
-        </fileset>
-        <fileset dir="/usr/local/share">
-          <include name="java/classes/*.jar"/>
+        <fileset dir="/usr">
+          <include name="share/java*/**/*.jar"/>
+          <include name="local/share/java/classes/*.jar"/>
+          <include name="jdk/packages/lib/ext/*.jar"/>
         </fileset>
       </classpath>
       <env key="LD_LIBRARY_PATH" value="."/>
