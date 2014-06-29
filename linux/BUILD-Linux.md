@@ -8,10 +8,12 @@ Building the LightZone source requires (at least) following packages:
 - __gcc__
 - __git__
 - __javahelp2__ for jhindexer
+- __lcms2__
 - __libjpeg-dev__ or __libjpeg-turbo-dev__
 - __libtiff__
 - __make__
 - __openjdk-6-jdk__ or later
+- __pkg-config__
 - __tidy__
 
 ### Debian and Ubuntu

@@ -6,7 +6,9 @@ TARGET_BASE:=		LCMS
 # Uncomment to compile in debug mode.
 #DEBUG:=			true
 
-JNI_EXTRA_INCLUDES:=	-Ilcms/src
+ROOT:=			../../..
+include			$(ROOT)/lightcrafts/mk/platform.mk
+JNI_EXTRA_INCLUDES:=	$(shell $(PKGCFG) --cflags lcms2)
 ##
 # I didn't want to figure out how to tweak this EDISON stuff to have it conform
 # to the way JNI source is built, so I'll just define the TARGET rule manually.
@@ -21,15 +23,14 @@ JNI_WINDOWS_DEFINES:=	-D__CONSOLE__
 
 JAVAH_CLASSES:=		com.lightcrafts.utils.LCMS
 
-ROOT:=			../../..
 include			../jni.mk
 
-LCMS_SOURCE:=		$(wildcard lcms/src/*.c) $(wildcard *.c)
-LCMS_INCLUDES:=		$(wildcard lcms/src/*.h)
-LCMS_LDFLAGS:=		$(filter-out $(PLATFORM_LDFLAGS),$(LDFLAGS))
+LCMS_SOURCE:=		$(wildcard *.c)
+LCMS_LDFLAGS:=		$(filter-out $(PLATFORM_LDFLAGS),$(LDFLAGS)) \
+			$(shell $(PKGCFG) --libs lcms2)
 
 ifeq ($(UNIVERSAL),1)
-$(TARGET_PPC) $(TARGET_X86): $(LCMS_SOURCE) $(LCMS_INCLUDES)
+$(TARGET_PPC) $(TARGET_X86): $(LCMS_SOURCE)
 	-$(MKDIR) $(TARGET_DIR)
 	$(CC_LINK) $(CFLAGS) $(INCLUDES) $(LCMS_LDFLAGS) -o $@ $(LCMS_SOURCE)
 ifeq ($(PLATFORM),MacOSX)
@@ -37,7 +38,7 @@ ifeq ($(PLATFORM),MacOSX)
 endif
 	$(RM) $@.dSYM
 else
-$(TARGET): $(LCMS_SOURCE) $(LCMS_INCLUDES)
+$(TARGET): $(LCMS_SOURCE)
 	-$(MKDIR) $(TARGET_DIR)
 	$(CC_LINK) $(CFLAGS) $(INCLUDES) $(LCMS_LDFLAGS) -o $@ $(LCMS_SOURCE)
 ifeq ($(PLATFORM),MacOSX)

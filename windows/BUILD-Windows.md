@@ -18,8 +18,10 @@ Download and install (or unpack) following:
     -    __binutils__
     -    __git__
     -    __make__
+    -    __liblcms2-devel__
     -    __mingw64-i686-gcc-core__ (32-bit) or __mingw64-x86_64-gcc-core__ (64-bit)
     -    __mingw64-i686-gcc-g++__ (32-bit) or __mingw64-x86_64-gcc-g++__ (64-bit)
+    -    __mingw64-i686-pkg-config__ (32-bit) or __mingw64-x86_64-pkg-config__ (64-bit)
     -    __mingw64-i686-zlib__ (32-bit) or __mingw64-x86_zlib__ (64-bit)
     -    __vim__ or __nano__ — These are editors for console, might come handy. If you are not familiar with vim, install
          nano instead, it is more user friendly.
@@ -51,8 +53,9 @@ Few points for Cygwin beginners
 If you haven't changed anything, your default shell is Bash. Open `~/.bashrc` with an editor (nano or vim) and enter
 following environmental variables. (Modify the paths to match your environment.):
 
-    export JAVA_HOME="/cygdrive/c/Program Files/Java/jdk1.7.0_25";
-    export ANT_HOME="/cygdrive/c/Program Files/apache-ant-1.9.1"
+    export JAVA_HOME="/cygdrive/c/Program Files/Java/jdk1.7.0_60";
+    export ANT_HOME="/cygdrive/c/Program Files/apache-ant-1.9.1";
+    export PKG_CONFIG_PATH=/usr/lib/pkgconfig/;
     export MSSDK_HOME="/cygdrive/c/Program Files (x86)/Windows Kits/8.0";
     export INSTALL4J_HOME="/cygdrive/c/Program Files/install4j5";
     export PATH=$PATH:${JAVA_HOME}/bin:${ANT_HOME}/bin:${MSSDK_HOME}/bin/x86:${INSTALL4J_HOME}/bin;

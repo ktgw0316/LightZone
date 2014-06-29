@@ -37,6 +37,7 @@ CLASSPATH_SEP:=		:
 # The default C and C++ compilers.
 CC:=			gcc
 CXX:=			g++
+PKGCFG:=		pkg-config
 
 # Unset USE_ICC_HERE if the overall USE_ICC flags != 1.
 ifneq ($(USE_ICC),1)
@@ -203,6 +204,7 @@ ifeq ($(PLATFORM),Windows)
   endif
   CC:=			$(MINGW)-gcc
   CXX:=			$(MINGW)-g++
+  PKGCFG:=		$(MINGW)-pkg-config
   PLATFORM_CFLAGS+=	$(SSE_FLAGS)
 
   ifdef HIGH_PERFORMANCE
