@@ -267,6 +267,7 @@ ifeq ($(PLATFORM),$(filter $(PLATFORM),Linux FreeBSD SunOS))
     JAVA_INCLUDES:=	-I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux
     NUM_PROCESSORS:=	$(shell grep '^processor' /proc/cpuinfo | wc -l)
   else ifeq ($(PLATFORM),FreeBSD)
+    PKGCFG:=		pkgconf
     JAVA_INCLUDES:=	-I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/freebsd
     NUM_PROCESSORS:=	$(shell dmesg | grep '^cpu' | wc -l)
     PLATFORM_INCLUDES=	-I/usr/local/include

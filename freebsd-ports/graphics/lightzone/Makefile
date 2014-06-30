@@ -15,12 +15,13 @@ LICENSE=	BSD3CLAUSE
 
 LIB_DEPENDS=	libX11.so:${PORTSDIR}/x11/libX11 \
 		libjpeg.so:${PORTSDIR}/graphics/jpeg \
-		libjpeg.so:${PORTSDIR}/graphics/lcms2 \
+		liblcms2.so:${PORTSDIR}/graphics/lcms2 \
 		libtiff.so:${PORTSDIR}/graphics/tiff
 BUILD_DEPENDS=	ant:${PORTSDIR}/devel/apache-ant \
 		autoconf:${PORTSDIR}/devel/autoconf \
 		git:${PORTSDIR}/devel/git \
 		javahelp:${PORTSDIR}/java/javahelp \
+		pkgconf:${PORTSDIR}/devel/pkgconf \
 		tidy:${PORTSDIR}/www/tidy
 RUN_DEPENDS=	java:${PORTSDIR}/java/javavmwrapper
 
