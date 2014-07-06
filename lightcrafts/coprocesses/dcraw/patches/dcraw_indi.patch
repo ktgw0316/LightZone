@@ -1,7 +1,7 @@
 Index: dcraw/dcraw.c
 ===================================================================
---- dcraw.orig/dcraw.c
-+++ dcraw/dcraw.c
+--- dcraw.orig/dcraw.c	2014-07-06 20:38:46.637060946 +0900
++++ dcraw/dcraw.c	2014-07-06 20:39:45.879650998 +0900
 @@ -1,4 +1,8 @@
  /*
 + * OpenMP multithread version of dcraw
@@ -11,7 +11,7 @@ Index: dcraw/dcraw.c
     dcraw.c -- Dave Coffin's raw photo decoder
     Copyright 1997-2014 by Dave Coffin, dcoffin a cybercom o net
  
-@@ -105,6 +109,15 @@ typedef unsigned long long UINT64;
+@@ -105,6 +109,15 @@
  #define ushort unsigned short
  #endif
  
@@ -27,7 +27,7 @@ Index: dcraw/dcraw.c
  /*
     All global variables are defined here, and all functions that
     access them are prefixed with "CLASS".  Note that a thread-safe
-@@ -3940,6 +3953,19 @@ void CLASS wavelet_denoise()
+@@ -3948,6 +3961,19 @@
    merror (fimg, "wavelet_denoise()");
    temp = fimg + size*3;
    if ((nc = colors) == 3 && filters) nc++;
@@ -47,7 +47,7 @@ Index: dcraw/dcraw.c
    FORC(nc) {			/* denoise R,G1,B,G3 individually */
      for (i=0; i < size; i++)
        fimg[i] = 256 * sqrt(image[i][c] << scale);
-@@ -4165,6 +4191,9 @@ void CLASS border_interpolate (int borde
+@@ -4173,6 +4199,9 @@
  {
    unsigned row, col, y, x, f, c, sum[8];
  
@@ -57,7 +57,7 @@ Index: dcraw/dcraw.c
    for (row=0; row < height; row++)
      for (col=0; col < width; col++) {
        if (col==border && row >= border && row < height-border)
-@@ -4191,7 +4220,15 @@ void CLASS lin_interpolate()
+@@ -4199,7 +4228,15 @@
  
    if (verbose) fprintf (stderr,_("Bilinear interpolation...\n"));
    if (filters == 9) size = 6;
@@ -73,7 +73,7 @@ Index: dcraw/dcraw.c
    for (row=0; row < size; row++)
      for (col=0; col < size; col++) {
        ip = code[row][col]+1;
-@@ -4214,6 +4251,9 @@ void CLASS lin_interpolate()
+@@ -4222,6 +4259,9 @@
  	  *ip++ = 256 / sum[c];
  	}
      }
@@ -83,7 +83,7 @@ Index: dcraw/dcraw.c
    for (row=1; row < height-1; row++)
      for (col=1; col < width-1; col++) {
        pix = image[row*width+col];
-@@ -4224,6 +4264,7 @@ void CLASS lin_interpolate()
+@@ -4232,6 +4272,7 @@
        for (i=colors; --i; ip+=2)
  	pix[ip[0]] = sum[ip[0]] * ip[1] >> 8;
      }
@@ -91,7 +91,7 @@ Index: dcraw/dcraw.c
  }
  
  /*
-@@ -4267,13 +4308,24 @@ void CLASS vng_interpolate()
+@@ -4275,6 +4316,7 @@
    int row, col, x, y, x1, x2, y1, y2, t, weight, grads, color, diag;
    int g, diff, thold, num, c;
  
@@ -99,42 +99,7 @@ Index: dcraw/dcraw.c
    lin_interpolate();
    if (verbose) fprintf (stderr,_("VNG interpolation...\n"));
  
-   if (filters == 1) prow = pcol = 16;
-   if (filters == 9) prow = pcol =  6;
-+#ifdef _OPENMP
-+    #pragma omp parallel \
-+    default(none) \
-+    shared(image,filters,cp,prow,pcol,code,width,height,colors) \
-+    private(row,col,x,x1,x2,y,y1,y2,weight,grads,diag,g,brow,pix,ip,gval,diff,gmin,gmax,thold,sum,color,num,c,t)
-+#endif
-+{
-   ip = (int *) calloc (prow*pcol, 1280);
-   merror (ip, "vng_interpolate()");
-+#ifdef _OPENMP
-+        #pragma omp for
-+#endif
-   for (row=0; row < prow; row++)		/* Precalculate for VNG */
-     for (col=0; col < pcol; col++) {
-       code[row][col] = ip;
-@@ -4308,6 +4360,9 @@ void CLASS vng_interpolate()
-   merror (brow[4], "vng_interpolate()");
-   for (row=0; row < 3; row++)
-     brow[row] = brow[4] + row*width;
-+#ifdef _OPENMP
-+        #pragma omp for
-+#endif
-   for (row=2; row < height-2; row++) {		/* Do VNG interpolation */
-     for (col=2; col < width-2; col++) {
-       pix = image[row*width+col];
-@@ -4360,6 +4415,7 @@ void CLASS vng_interpolate()
-   memcpy (image[(row-2)*width+2], brow[0]+2, (width-4)*sizeof *image);
-   memcpy (image[(row-1)*width+2], brow[1]+2, (width-4)*sizeof *image);
-   free (brow[4]);
-+} /* pragma omp parallel */
-   free (code[0][0]);
- }
- 
-@@ -4372,10 +4428,20 @@ void CLASS ppg_interpolate()
+@@ -4380,10 +4422,20 @@
    int row, col, diff[2], guess[2], c, d, i;
    ushort (*pix)[4];
  
@@ -156,7 +121,7 @@ Index: dcraw/dcraw.c
    for (row=3; row < height-3; row++)
      for (col=3+(FC(row,3) & 1), c=FC(row,col); col < width-3; col+=2) {
        pix = image + row*width+col;
-@@ -4392,6 +4458,9 @@ void CLASS ppg_interpolate()
+@@ -4400,6 +4452,9 @@
        pix[0][1] = ULIM(guess[i] >> 2, pix[d][1], pix[-d][1]);
      }
  /*  Calculate red and blue for each green pixel:		*/
@@ -166,7 +131,7 @@ Index: dcraw/dcraw.c
    for (row=1; row < height-1; row++)
      for (col=1+(FC(row,2) & 1), c=FC(row,col+1); col < width-1; col+=2) {
        pix = image + row*width+col;
-@@ -4400,6 +4469,9 @@ void CLASS ppg_interpolate()
+@@ -4408,6 +4463,9 @@
  			- pix[-d][1] - pix[d][1]) >> 1);
      }
  /*  Calculate blue for red pixels and vice versa:		*/
@@ -176,7 +141,7 @@ Index: dcraw/dcraw.c
    for (row=1; row < height-1; row++)
      for (col=1+(FC(row,1) & 1), c=2-FC(row,col); col < width-1; col+=2) {
        pix = image + row*width+col;
-@@ -4415,6 +4487,7 @@ void CLASS ppg_interpolate()
+@@ -4423,6 +4481,7 @@
        else
  	pix[0][c] = CLIP((guess[0]+guess[1]) >> 2);
      }
@@ -184,7 +149,7 @@ Index: dcraw/dcraw.c
  }
  
  void CLASS cielab (ushort rgb[3], short lab[3])
-@@ -4424,13 +4497,22 @@ void CLASS cielab (ushort rgb[3], short
+@@ -4432,13 +4491,22 @@
    static float cbrt[0x10000], xyz_cam[3][4];
  
    if (!rgb) {
@@ -207,7 +172,7 @@ Index: dcraw/dcraw.c
  	  xyz_cam[i][j] += xyz_rgb[i][k] * rgb_cam[k][j] / d65_white[i];
      return;
    }
-@@ -4691,6 +4773,12 @@ void CLASS ahd_interpolate()
+@@ -4699,6 +4767,12 @@
  
    if (verbose) fprintf (stderr,_("AHD interpolation...\n"));
  
@@ -220,7 +185,7 @@ Index: dcraw/dcraw.c
    cielab (0,0);
    border_interpolate(5);
    buffer = (char *) malloc (26*TS*TS);
-@@ -4699,6 +4787,9 @@ void CLASS ahd_interpolate()
+@@ -4707,6 +4781,9 @@
    lab  = (short (*)[TS][TS][3])(buffer + 12*TS*TS);
    homo = (char  (*)[TS][TS])   (buffer + 24*TS*TS);
  
@@ -230,7 +195,7 @@ Index: dcraw/dcraw.c
    for (top=2; top < height-5; top += TS-6)
      for (left=2; left < width-5; left += TS-6) {
  
-@@ -4781,6 +4872,7 @@ void CLASS ahd_interpolate()
+@@ -4789,6 +4866,7 @@
        }
      }
    free (buffer);
@@ -238,7 +203,7 @@ Index: dcraw/dcraw.c
  }
  #undef TS
  
-@@ -9075,6 +9167,9 @@ void CLASS fuji_rotate()
+@@ -9102,6 +9180,9 @@
    img = (ushort (*)[4]) calloc (high, wide*sizeof *img);
    merror (img, "fuji_rotate()");
  
