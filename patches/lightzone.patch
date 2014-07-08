@@ -1,7 +1,7 @@
 Index: dcraw/dcraw.c
 ===================================================================
---- dcraw.orig/dcraw.c	2014-07-06 20:40:09.213520298 +0900
-+++ dcraw/dcraw.c	2014-07-06 20:40:09.209520662 +0900
+--- dcraw.orig/dcraw.c	2014-07-08 23:46:58.649258128 +0900
++++ dcraw/dcraw.c	2014-07-08 23:46:58.641258859 +0900
 @@ -153,7 +153,10 @@
  int no_auto_bright=0;
  unsigned greybox[4] = { 0, 0, UINT_MAX, UINT_MAX };
@@ -14,7 +14,7 @@ Index: dcraw/dcraw.c
    { 0.412453, 0.357580, 0.180423 },
    { 0.212671, 0.715160, 0.072169 },
    { 0.019334, 0.119193, 0.950227 } };
-@@ -9589,6 +9592,9 @@
+@@ -9599,6 +9602,9 @@
  #ifndef NO_LCMS
    const char *cam_profile=0, *out_profile=0;
  #endif
@@ -24,7 +24,7 @@ Index: dcraw/dcraw.c
  
  #ifndef LOCALTIME
    putenv ((char *) "TZ=UTC");
-@@ -9683,6 +9689,9 @@
+@@ -9693,6 +9699,9 @@
        case 'p':  cam_profile = argv[arg++];
  #endif
  	break;
@@ -34,7 +34,7 @@ Index: dcraw/dcraw.c
        case 'P':  bpfile     = argv[arg++];  break;
        case 'K':  dark_frame = argv[arg++];  break;
        case 'z':  timestamp_only    = 1;  break;
-@@ -9711,6 +9720,19 @@
+@@ -9721,6 +9730,19 @@
  	return 1;
      }
    }
@@ -54,7 +54,7 @@ Index: dcraw/dcraw.c
    if (arg == argc) {
      fprintf (stderr,_("No files to process.\n"));
      return 1;
-@@ -9849,6 +9871,10 @@
+@@ -9859,6 +9881,10 @@
  	  for (i=0; i < 16; i++)
  	    putchar (cdesc[fcol(i >> 1,i & 1)]);
  	}
@@ -65,7 +65,7 @@ Index: dcraw/dcraw.c
  	printf (_("\nDaylight multipliers:"));
  	FORCC printf (" %f", pre_mul[c]);
  	if (cam_mul[0] > 0) {
-@@ -9961,6 +9987,11 @@
+@@ -9971,6 +9997,11 @@
      if (write_to_stdout)
        strcpy (ofname,_("standard output"));
      else {

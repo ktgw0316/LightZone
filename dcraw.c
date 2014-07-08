@@ -4318,7 +4318,7 @@ void CLASS vng_interpolate()
   int prow=8, pcol=2, *ip, *code[16][16], gval[8], gmin, gmax, sum[4];
   int row, col, x, y, x1, x2, y1, y2, t, weight, grads, color, diag;
   int g, diff, thold, num, c;
-
+  ushort (*rowtmp[4])[width*4];
 
   lin_interpolate();
   if (verbose) fprintf (stderr,_("VNG interpolation...\n"));
@@ -4357,11 +4357,21 @@ void CLASS vng_interpolate()
 	  *ip++ = 0;
       }
     }
-  brow[4] = (ushort (*)[4]) calloc (width*3, sizeof **brow);
-  merror (brow[4], "vng_interpolate()");
-  for (row=0; row < 3; row++)
-    brow[row] = brow[4] + row*width;
-  for (row=2; row < height-2; row++) {		/* Do VNG interpolation */
+#ifdef _OPENMP
+    #pragma omp parallel				\
+    default(none)					\
+    shared(image,code,prow,pcol,width,height,colors)			\
+    private(row,col,g,brow,rowtmp,pix,ip,gval,diff,gmin,gmax,thold,sum,color,num,c,t)
+#endif
+{
+  int slice = (height - 4) / uf_omp_get_num_threads();
+  int start_row = 2 + slice * uf_omp_get_thread_num();
+  int end_row = MIN(start_row + slice, height - 2);
+  for (row = start_row; row < end_row; row++) {	/* Do VNG interpolation */
+
+    for (g = 0; g < 4; g++)
+      brow[g] = rowtmp[(row + g - 2) % 4];
+
     for (col=2; col < width-2; col++) {
       pix = image[row*width+col];
       ip = code[row % prow][col % pcol];
@@ -4405,14 +4415,14 @@ void CLASS vng_interpolate()
 	brow[2][col][c] = CLIP(t);
       }
     }
-    if (row > 3)				/* Write buffer to image */
+    if (row > start_row + 1)				/* Write buffer to image */
       memcpy (image[(row-2)*width+2], brow[0]+2, (width-4)*sizeof *image);
-    for (g=0; g < 4; g++)
-      brow[(g-1) & 3] = brow[g];
   }
-  memcpy (image[(row-2)*width+2], brow[0]+2, (width-4)*sizeof *image);
-  memcpy (image[(row-1)*width+2], brow[1]+2, (width-4)*sizeof *image);
-  free (brow[4]);
+  if (row == height - 2) {
+    memcpy (image[(row-2)*width+2], brow[0]+2, (width-4)*sizeof *image);
+    memcpy (image[(row-1)*width+2], brow[1]+2, (width-4)*sizeof *image);
+  }
+} /* pragma omp parallel */
   free (code[0][0]);
 }
 
