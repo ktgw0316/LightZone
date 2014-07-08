@@ -1,8 +1,8 @@
 Index: dcraw/dcraw.c
 ===================================================================
---- dcraw.orig/dcraw.c	2014-07-06 20:40:01.910187185 +0900
-+++ dcraw/dcraw.c	2014-07-06 20:40:01.906187551 +0900
-@@ -4484,6 +4484,45 @@
+--- dcraw.orig/dcraw.c	2014-07-08 23:46:57.633350972 +0900
++++ dcraw/dcraw.c	2014-07-08 23:46:57.601353896 +0900
+@@ -4494,6 +4494,45 @@
  } /* pragma omp parallel */
  }
  
@@ -48,7 +48,7 @@ Index: dcraw/dcraw.c
  void CLASS cielab (ushort rgb[3], short lab[3])
  {
    int c, i, j, k;
-@@ -4527,38 +4566,94 @@
+@@ -4537,38 +4576,94 @@
  #define TS 512		/* Tile Size */
  #define fcol(row,col) xtrans[(row+6) % 6][(col+6) % 6]
  
@@ -158,7 +158,7 @@ Index: dcraw/dcraw.c
    for (row=0; row < 3; row++)
      for (col=0; col < 3; col++)
        for (ng=d=0; d < 10; d+=2) {
-@@ -4573,7 +4668,11 @@
+@@ -4583,7 +4678,11 @@
  	}
        }
  
@@ -170,7 +170,7 @@ Index: dcraw/dcraw.c
    for (row=2; row < height-2; row++)
      for (min=~(max=0), col=2; col < width-2; col++) {
        if (fcol(row,col) == 1 && (min=~(max=0))) continue;
-@@ -4592,20 +4691,45 @@
+@@ -4602,20 +4701,45 @@
        }
      }
  
@@ -217,7 +217,7 @@ Index: dcraw/dcraw.c
  	  hex = allhex[row % 3][col % 3][0];
  	  color[1][0] = 174 * (pix[  hex[1]][1] + pix[  hex[0]][1]) -
  			 46 * (pix[2*hex[1]][1] + pix[2*hex[0]][1]);
-@@ -4627,7 +4751,11 @@
+@@ -4637,7 +4761,11 @@
  	  for (row=top+2; row < mrow-2; row++)
  	    for (col=left+2; col < mcol-2; col++) {
  	      if ((f = fcol(row,col)) == 1) continue;
@@ -229,7 +229,7 @@ Index: dcraw/dcraw.c
  	      hex = allhex[row % 3][col % 3][1];
  	      for (d=3; d < 6; d++) {
  		rix = &rgb[(d-2)^!((row-sgrow) % 3)][row-top][col-left];
-@@ -4698,8 +4826,9 @@
+@@ -4708,8 +4836,9 @@
        for (d=0; d < ndir; d++) {
  	for (row=2; row < mrow-2; row++)
  	  for (col=2; col < mcol-2; col++)
@@ -241,7 +241,7 @@ Index: dcraw/dcraw.c
  	  for (col=3; col < mcol-3; col++) {
  	    lix = &lab[row][col];
  	    g = 2*lix[0][0] - lix[f][0] - lix[-f][0];
-@@ -4714,14 +4843,12 @@
+@@ -4724,14 +4853,12 @@
        for (row=4; row < mrow-4; row++)
  	for (col=4; col < mcol-4; col++) {
  	  for (tr=FLT_MAX, d=0; d < ndir; d++)
@@ -258,7 +258,7 @@ Index: dcraw/dcraw.c
  	}
  
  /* Average the most homogenous pixels for the final result:	*/
-@@ -4731,8 +4858,17 @@
+@@ -4741,8 +4868,17 @@
  	for (col = MIN(left,8); col < mcol-8; col++) {
  	  for (d=0; d < ndir; d++)
  	    for (hm[d]=0, v=-2; v <= 2; v++)
@@ -277,7 +277,7 @@ Index: dcraw/dcraw.c
  	  for (d=0; d < ndir-4; d++)
  	    if (hm[d] < hm[d+4]) hm[d  ] = 0; else
  	    if (hm[d] > hm[d+4]) hm[d+4] = 0;
-@@ -4742,13 +4878,19 @@
+@@ -4752,13 +4888,19 @@
  	  memset (avg, 0, sizeof avg);
  	  for (d=0; d < ndir; d++)
  	    if (hm[d] >= max) {
