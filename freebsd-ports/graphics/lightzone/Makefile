@@ -23,7 +23,8 @@ BUILD_DEPENDS=	ant:${PORTSDIR}/devel/apache-ant \
 		javahelp:${PORTSDIR}/java/javahelp \
 		pkgconf:${PORTSDIR}/devel/pkgconf \
 		tidy:${PORTSDIR}/www/tidy
-RUN_DEPENDS=	java:${PORTSDIR}/java/javavmwrapper
+RUN_DEPENDS=	java:${PORTSDIR}/java/javavmwrapper \
+		javahelp:${PORTSDIR}/java/javahelp
 
 GIT_ACCOUNT=	Aries85
 GIT_PROJECT=	LightZone
