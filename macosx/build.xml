@@ -179,7 +179,7 @@
 
     <copy todir="${bundle-resources}/Java">
       <fileset dir="products" excludes=".git">
-        <include name="dcraw"/>
+        <include name="dcraw_lz"/>
         <include name="LightZone-forkd"/>
         <include name="EWSMacCompress.tar.gz"/>
         <include name="**/*.dylib"/>
@@ -187,7 +187,7 @@
         <include name="**/*.jnilib"/>
       </fileset>
     </copy>
-    <chmod file="${bundle-resources}/Java/dcraw" perm="775"/>
+    <chmod file="${bundle-resources}/Java/dcraw_lz" perm="775"/>
     <chmod file="${bundle-resources}/Java/LightZone-forkd" perm="775"/>
 
     <exec executable="make" dir="help" failonerror="true" vmlauncher="false">

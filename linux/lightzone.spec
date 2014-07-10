@@ -67,7 +67,7 @@ export NO_BRP_CHECK_BYTECODE_VERSION=true
 
 %define instdir /opt/%{name}
 install -dm 0755 "%buildroot/%{instdir}"
-cp -pH lightcrafts/products/dcraw "%buildroot/%{instdir}"
+cp -pH lightcrafts/products/dcraw_lz "%buildroot/%{instdir}"
 cp -pH lightcrafts/products/LightZone-forkd "%buildroot/%{instdir}"
 cp -pH linux/products/*.so "%buildroot/%{instdir}"
 cp -pH linux/products/*.jar "%buildroot/%{instdir}"

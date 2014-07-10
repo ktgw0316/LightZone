@@ -47,7 +47,7 @@ do-install:
 	${INSTALL_SCRIPT} ${WRKSRC}/products/${PORTNAME} ${STAGEDIR}${PREFIX}/bin/
 	@${MKDIR} ${STAGEDIR}${DATADIR}
 	${INSTALL_PROGRAM} ${WRKSRC}/products/LightZone-forkd ${STAGEDIR}${DATADIR}
-	${INSTALL_PROGRAM} ${WRKSRC}/products/dcraw ${STAGEDIR}${DATADIR}
+	${INSTALL_PROGRAM} ${WRKSRC}/products/dcraw_lz ${STAGEDIR}${DATADIR}
 	${INSTALL_DATA} ${WRKSRC}/products/*.jar ${STAGEDIR}${DATADIR}
 	${INSTALL_LIB} ${WRKSRC}/products/*.so ${STAGEDIR}${DATADIR}
 	${INSTALL_DATA} ${WRKSRC}/products/${PORTNAME}.desktop ${STAGEDIR}${PREFIX}/share/applications/

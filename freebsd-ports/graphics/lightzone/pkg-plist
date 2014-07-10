@@ -1,6 +1,6 @@
 %%LOCALBASE%%/bin/lightzone
 %%DATADIR%%/LightZone-forkd
-%%DATADIR%%/dcraw
+%%DATADIR%%/dcraw_lz
 %%DATADIR%%/lcjai.jar
 %%DATADIR%%/libDCRaw.so
 %%DATADIR%%/libFASTJAI.so
