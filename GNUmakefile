@@ -1,7 +1,7 @@
 HIGH_PERFORMANCE:=	1
 #USE_ICC_HERE:=		1
 
-TARGET_BASE:=		dcraw
+TARGET_BASE:=		dcraw_lz
 
 # Uncomment to compile in debug mode.
 #DEBUG:=		true
