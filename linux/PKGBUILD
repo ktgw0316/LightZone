@@ -7,8 +7,8 @@ url="http://lightzoneproject.org/"
 license=('custom:BSD-3-Clause')
 arch=('i686' 'x86_64')
 
-depends=('jre7-openjdk' 'libjpeg-turbo' 'libtiff')
-makedepends=('jdk7-openjdk' 'apache-ant' 'autoconf' 'gcc' 'make' 'tidyhtml' 'git' 'javahelp2' 'libx11')
+depends=('jre7-openjdk' 'javahelp2' 'liblcms2' 'libjpeg-turbo' 'libtiff')
+makedepends=('jdk7-openjdk' 'apache-ant' 'autoconf' 'gcc' 'make' 'tidyhtml' 'git' 'libx11' 'pkg-config')
 
 source=("${pkgname}-${pkgver}.tar.bz2")
 md5sums=()
@@ -28,7 +28,7 @@ package() {
 
   instdir="/opt/${pkgname}"
   install -dm 0755 "${pkgdir}/${instdir}"
-  cp -rpH lightcrafts/products/dcraw "${pkgdir}/${instdir}"
+  cp -rpH lightcrafts/products/dcraw_lz "${pkgdir}/${instdir}"
   cp -rpH lightcrafts/products/LightZone-forkd "${pkgdir}/${instdir}"
   cp -rpH linux/products/*.so "${pkgdir}/${instdir}"
   cp -rpH linux/products/*.jar "${pkgdir}/${instdir}"
@@ -36,24 +36,12 @@ package() {
 
 # create icons and shortcuts
   _datadir=/usr/share
-  icondir="${_datadir}/icons/hicolor"
   install -dm 0755 "${pkgdir}/${_datadir}/applications"
-  install -dm 0755 "${pkgdir}/${icondir}/256x256/apps"
-  install -dm 0755 "${pkgdir}/${icondir}/128x128/apps"
-  install -dm 0755 "${pkgdir}/${icondir}/64x64/apps"
-  install -dm 0755 "${pkgdir}/${icondir}/48x48/apps"
-  install -dm 0755 "${pkgdir}/${icondir}/32x32/apps"
-  install -dm 0755 "${pkgdir}/${icondir}/16x16/apps"
-
-  cp -rpH linux/products/lightzone.desktop "${pkgdir}/${_datadir}/applications/"
-  cp -rpH linux/icons/LightZone_256x256.png "${pkgdir}/${icondir}/256x256/apps/LightZone.png"
-  cp -rpH linux/icons/LightZone_128x128.png "${pkgdir}/${icondir}/128x128/apps/LightZone.png"
-  cp -rpH linux/icons/LightZone_64x64.png "${pkgdir}/${icondir}/64x64/apps/LightZone.png"
-  cp -rpH linux/icons/LightZone_48x48.png "${pkgdir}/${icondir}/48x48/apps/LightZone.png"
-  cp -rpH linux/icons/LightZone_32x32.png "${pkgdir}/${icondir}/32x32/apps/LightZone.png"
-  cp -rpH linux/icons/LightZone_16x16.png "${pkgdir}/${icondir}/16x16/apps/LightZone.png"
+  install -m 644 linux/products/lightzone.desktop "${pkgdir}/${_datadir}/applications/"
+  cp -pHR linux/icons "${pkgdir}/${_datadir}/"
 
   _bindir=/usr/bin
-  install -d -m 755 "${pkgdir}/${_bindir}"
+  install -dm 0755 "${pkgdir}/${_bindir}"
   install -m 755 "linux/products/${pkgname}" "${pkgdir}/${_bindir}"
 }
+
