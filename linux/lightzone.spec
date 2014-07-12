@@ -47,7 +47,7 @@ BuildRequires: update-desktop-files
 %endif
 
 BuildRequires:	java-%{java_version}-openjdk-devel, %{libX11_devel}, ant, autoconf, gcc, gcc-c++, make, tidy, git, javahelp2, liblcms2-devel, libjpeg8-devel, libtiff-devel, pkg-config
-Requires:	java-%{java_version}-openjdk, javahelp2, libjpeg8, libtiff
+Requires:	java-%{java_version}-openjdk, javahelp2, liblcms2, libjpeg8, libtiff
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
