@@ -2189,7 +2189,10 @@ public class Application {
                         else {
                             setLookAndFeel(new LightZoneSkin().getLightZoneLookAndFeel());
                         }
-                        openEmpty();
+                        ComboFrame frame = openEmpty();
+			File file = new File(args[0]);
+			if (file.exists())
+				open(file, frame, null);
                         Platform.getPlatform().readyToOpenFiles();
 
                         // Make sure this happens good and late, after a
