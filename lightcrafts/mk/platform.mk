@@ -205,6 +205,7 @@ ifeq ($(PLATFORM),Windows)
   CC:=			$(MINGW)-gcc
   CXX:=			$(MINGW)-g++
   PKGCFG:=		$(MINGW)-pkg-config
+  PKG_CONFIG_PATH:=	/usr/$(MINGW)/sys-root/mingw/lib/pkgconfig/
   PLATFORM_CFLAGS+=	$(SSE_FLAGS)
 
   ifdef HIGH_PERFORMANCE
