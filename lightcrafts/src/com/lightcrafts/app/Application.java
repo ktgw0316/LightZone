@@ -2181,18 +2181,24 @@ public class Application {
                         if (Platform.getType() == Platform.MacOSX) {
                             // Get a Mac menu bar before setting LaF, then restore.
                             Object menuBarUI = UIManager.get("MenuBarUI");
-                            setLookAndFeel(new LightZoneSkin().getLightZoneLookAndFeel());
+                            new LightZoneSkin();
+                            setLookAndFeel(LightZoneSkin.getLightZoneLookAndFeel());
                             UIManager.put("MenuBarUI", menuBarUI);
 
                             openMacPlaceholderFrame();
                         }
                         else {
-                            setLookAndFeel(new LightZoneSkin().getLightZoneLookAndFeel());
+                            new LightZoneSkin();
+                            setLookAndFeel(LightZoneSkin.getLightZoneLookAndFeel());
                         }
                         ComboFrame frame = openEmpty();
-			File file = new File(args[0]);
-			if (file.exists())
-				open(file, frame, null);
+                        for (int i = 0; i < args.length; ++i) {
+                            File file = new File(args[i]);
+                            if (file.exists()) {
+                                open(file, frame, null);
+                                break;
+                            }
+                        }
                         Platform.getPlatform().readyToOpenFiles();
 
                         // Make sure this happens good and late, after a

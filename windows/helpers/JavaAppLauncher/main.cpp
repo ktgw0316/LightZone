@@ -444,7 +444,7 @@ static void openFile( LPCWSTR wPathToFile, LPCWSTR wParentExe ) {
 
     jstring jParentExe = NULL;
     if ( wPathToFile && *wPathToFile ) {
-        char aParentExe[ 80 ];
+        char aParentExe[ MAX_PATH ];
         if ( !LC_toUTF8( wParentExe, aParentExe, sizeof aParentExe ) )
             LC_die( TEXT("WideCharToMultiByte() failed.") );
         jParentExe = env->NewStringUTF( aParentExe );
