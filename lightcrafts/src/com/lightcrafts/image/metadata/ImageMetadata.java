@@ -928,20 +928,20 @@ public class ImageMetadata implements
                     tiffDir.putValue( tagIDs[1], value.clone() );
                 }
             }
-        }
 
-        ////////// Always use UTF-8 to write IPTC metadata.
+            ////////// Always use UTF-8 to write IPTC metadata.
 
-        byte[] utf8Marker = {0x1B, 0x25, 0x47}; // ESC, "%", "G"
-        String value = "";
-        try {
-            value = new String( utf8Marker, "ASCII" );
-        } catch (UnsupportedEncodingException e) {
-            // This should never occur
+            byte[] utf8Marker = {0x1B, 0x25, 0x47}; // ESC, "%", "G"
+            String value = "";
+            try {
+                value = new String( utf8Marker, "ASCII" );
+            } catch (UnsupportedEncodingException e) {
+                // This should never occur
+            }
+            iptcDir.putValue(
+                IPTC_CODED_CHARACTER_SET, new StringMetaValue( value )
+            );
         }
-        iptcDir.putValue(
-            IPTC_CODED_CHARACTER_SET, new StringMetaValue( value )
-        );
 
         ////////// Remove other metadata because it makes no sense to export.
 
