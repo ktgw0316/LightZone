@@ -63,7 +63,8 @@ public interface XMPConstants {
     String XMP_XAP_NS = "http://ns.adobe.com/xap/1.0/";
 
     /** The XAP namespace prefix. */
-    String XMP_XAP_PREFIX = "xap";
+    // String XMP_XAP_PREFIX = "xap";
+    String XMP_XAP_PREFIX = "xmp";
 
     /** The XMP XPacket begin processing instruction. */
     String XMP_XPACKET_BEGIN =
