@@ -4,10 +4,7 @@ package com.lightcrafts.utils.file;
 
 import java.io.*;
 import java.util.Collection;
-import java.util.Arrays;
 import java.util.ArrayList;
-import java.util.Scanner;
-import java.util.NoSuchElementException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.nio.channels.FileChannel;
@@ -326,7 +323,7 @@ public final class FileUtil {
             // We must test for SmartFolders explicitly because they're not
             // considered "traversable" by Java.
             //
-            return file;
+            return null;
         }
         return platform.getFileSystemView().isTraversable( file ) ? file : null;
     }
@@ -366,16 +363,7 @@ public final class FileUtil {
     public static File[] listFiles( File dir, FileFilter filter,
                                     boolean includeDirs ) {
         dir = Platform.getPlatform().isSpecialFile( dir );
-        final File[] allFiles = dir.listFiles();
-        if ( allFiles == null || allFiles.length == 0 || filter == null )
-            return allFiles;
-        final Collection<File> filteredFiles = new ArrayList<File>();
-        for ( File file : allFiles ) {
-            final File file2 = Platform.getPlatform().isSpecialFile( file );
-            if ( file2.isDirectory() && includeDirs || filter.accept( file2 ) )
-                filteredFiles.add( file );
-        }
-        return filteredFiles.toArray( new File[0] );
+        return dir.listFiles( filter );
     }
 
     /**

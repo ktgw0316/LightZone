@@ -217,13 +217,12 @@ class FolderTreeNode implements TreeNode {
         }
         children = new ArrayList<FolderTreeNode>();
 
-        File[] files = FileUtil.listFiles(
-            resolvedFile, FolderFilter.INSTANCE, false
-        );
+        File[] files = FileSystemView.getFiles(resolvedFile, true);
         if (files != null && files.length > 0) {
             Arrays.sort(files);
             for (File file : files) {
-                children.add(new FolderTreeNode(file, this, index, monitor));
+                if (file.isDirectory())
+                    children.add(new FolderTreeNode(file, this, index, monitor));
             }
         }
         Collections.sort(children, FolderTreeNodeComparator.INSTANCE);
