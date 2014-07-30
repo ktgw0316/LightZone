@@ -189,8 +189,13 @@ public final class WindowsPlatform extends Platform {
         return file;
     }
 
+    /**
+     * True if it's newer than Vista.
+     */
     public static boolean isVista() {
-        return System.getProperty( "os.name" ).endsWith( "Vista" );
+        String version = System.getProperty( "os.version" );
+        int majorVersion = Character.getNumericValue(version.charAt(0));
+        return majorVersion >= 6;
     }
 
     public void loadLibraries() throws UnsatisfiedLinkError {

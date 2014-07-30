@@ -104,7 +104,7 @@ public final class WindowsSavedSearch extends SmartFolder {
      * @return Returns <code>true</code> only if it is.
      */
     public static boolean isSavedSearch( String path ) {
-        return path.endsWith( ".search-ms" );
+        return path.endsWith( ".searchconnector-ms" ) || path.endsWith( ".search-ms" );
     }
 
     /**
