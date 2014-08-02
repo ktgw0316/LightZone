@@ -2,7 +2,7 @@ Format: 1.8
 Source: lightzone
 Binary: lightzone
 Architecture: i386 amd64
-Version: 4.1.0~beta9
+Version: 4.1.0~beta10
 Maintainer: Masahiro Kitagawa <arctica0316@gmail.com>
 Homepage: http://lightzoneproject.org/
 Standards-Version: 3.9.4.0
