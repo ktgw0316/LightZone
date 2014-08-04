@@ -23,13 +23,24 @@ fi
 classdir='/usr/share/java/javahelp/*:/usr/share/java/*:/usr/share/javahelp/lib/*:/usr/local/share/java/classes/*'
 
 if [ $totalmem -ge 1024000 ]; then
-        maxmem=$(( $totalmem / 2 ))
-        # on 32-bit architectures there is ~2GB limit for maximum Java heap size
-        if [ $arch = "32" -a $totalmem -ge 4096000 ]; then
-                maxmem=2048000
-        fi
+  maxmem=$(( $totalmem / 2 ))
+  # on 32-bit architectures there is ~2GB limit for maximum Java heap size
+  if [ $arch = "32" -a $totalmem -ge 4096000 ]; then
+    maxmem=2048000
+  fi
 else
-        maxmem=512000
+    maxmem=512000
 fi
 
-(cd $sharedir && LD_LIBRARY_PATH=$sharedir exec java -Xmx${maxmem}k -Djava.library.path=$sharedir -Dfile.encoding=UTF8 -classpath "$sharedir/*:$classdir" com.lightcrafts.platform.linux.LinuxLauncher ${@} )
+# IFS should be \n to handle filenames that include space.
+IFS="
+"
+file=""
+for i in "$@"; do
+  if [ -f $i ] ; then
+    file=$(cd $(dirname $i) && pwd)/$(basename $i)
+    break
+  fi
+done
+
+(cd $sharedir && LD_LIBRARY_PATH=$sharedir exec java -Xmx${maxmem}k -Djava.library.path=$sharedir -Dfile.encoding=UTF8 -classpath "$sharedir/*:$classdir" com.lightcrafts.platform.linux.LinuxLauncher ${file} ${@} )
