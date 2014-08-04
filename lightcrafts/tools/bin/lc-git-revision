@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/sh
 ##
 # This is a utility script called by "ant bundle" to get the current Subversion
 # revision so it can be used as the "build number" in the Finder's "Get Info"

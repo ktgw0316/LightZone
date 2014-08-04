@@ -1,4 +1,4 @@
-#! /usr/bin/bash
+#!/bin/sh
 
 ##
 # Set just enough PATH so that make, pvk2pfx, and signtool are found.

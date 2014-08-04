@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/sh
 ##
 # Gets which branch (or trunk) we're on.
 #
