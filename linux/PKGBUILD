@@ -7,8 +7,8 @@ url="http://lightzoneproject.org/"
 license=('custom:BSD-3-Clause')
 arch=('i686' 'x86_64')
 
-depends=('jre7-openjdk' 'javahelp2' 'liblcms2' 'libjpeg-turbo' 'libtiff')
-makedepends=('jdk7-openjdk' 'apache-ant' 'autoconf' 'gcc' 'make' 'tidyhtml' 'git' 'libx11' 'pkg-config')
+depends=('jre7-openjdk' 'javahelp2' 'lcms2' 'libjpeg-turbo' 'libtiff')
+makedepends=('jdk7-openjdk' 'apache-ant' 'autoconf' 'gcc' 'make' 'tidyhtml' 'git' 'libx11' 'pkg-config' 'javahelp2' 'lcms2' 'libjpeg-turbo' 'libtiff')
 
 source=("${pkgname}-${pkgver}.tar.bz2")
 md5sums=()
@@ -28,12 +28,11 @@ package() {
 
   instdir="/opt/${pkgname}"
   install -dm 0755 "${pkgdir}/${instdir}"
-  cp -rpH lightcrafts/products/dcraw_lz "${pkgdir}/${instdir}"
-  cp -rpH lightcrafts/products/LightZone-forkd "${pkgdir}/${instdir}"
-  cp -rpH linux/products/*.so "${pkgdir}/${instdir}"
-  cp -rpH linux/products/*.jar "${pkgdir}/${instdir}"
-  cp -rpH linux/products/lightzone "${pkgdir}/${instdir}"
-
+  cp -pH lightcrafts/products/dcraw_lz "${pkgdir}/${instdir}"
+  cp -pH lightcrafts/products/LightZone-forkd "${pkgdir}/${instdir}"
+  cp -pH linux/products/*.so "${pkgdir}/${instdir}"
+  cp -pH linux/products/*.jar "${pkgdir}/${instdir}"
+  
 # create icons and shortcuts
   _datadir=/usr/share
   install -dm 0755 "${pkgdir}/${_datadir}/applications"
@@ -44,4 +43,3 @@ package() {
   install -dm 0755 "${pkgdir}/${_bindir}"
   install -m 755 "linux/products/${pkgname}" "${pkgdir}/${_bindir}"
 }
-

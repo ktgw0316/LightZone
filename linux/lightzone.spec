@@ -15,39 +15,45 @@ Source:		%{name}-%{version}.tar.bz2
 
 %if 0%{?fedora}
 %define java_version 1.7.0
+%define lcms2_devel lcms2-devel
 %define libX11_devel libX11-devel
 %define debug_package %{nil}
 %endif
 
 %if 0%{?sles_version}
 %define java_version 1_7_0
+%define lcms2_devel liblcms2-devel
 %define libX11_devel xorg-x11-libX11-devel
 BuildRequires: update-desktop-files
 %endif
 
 %if 0%{?suse_version} == 1210
 %define java_version 1_6_0
+%define lcms2_devel liblcms2-devel
 %define libX11_devel xorg-x11-libX11-devel
 %endif
 
 %if 0%{?suse_version} > 1210
 %define java_version 1_7_0
+%define lcms2_devel liblcms2-devel
 %define libX11_devel libX11-devel
 %endif
 
 %if 0%{?centos_version}
 %define java_version 1.6.0
+%define lcms2_devel lcms2-devel
 %define libX11_devel libX11-devel
 %define debug_package %{nil}
 %endif
 
 %if 0%{?mdkversion}
 %define java_version 1.6.0
+%define lcms2_devel liblcms2-devel
 %define libX11_devel libX11-devel
 %endif
 
-BuildRequires:	java-%{java_version}-openjdk-devel, %{libX11_devel}, ant, autoconf, gcc, gcc-c++, make, tidy, git, javahelp2, liblcms2-devel, libjpeg8-devel, libtiff-devel, pkg-config
-Requires:	java-%{java_version}-openjdk, javahelp2, liblcms2, libjpeg8, libtiff
+BuildRequires:	java-%{java_version}-openjdk-devel, %{libX11_devel}, ant, autoconf, gcc, gcc-c++, make, tidy, git, javahelp2, %{lcms2_devel}, libjpeg8-devel, libtiff-devel, pkg-config
+Requires:	java-%{java_version}-openjdk, javahelp2, lcms2, libjpeg8, libtiff
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
