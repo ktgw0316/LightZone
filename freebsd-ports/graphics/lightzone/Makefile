@@ -28,7 +28,7 @@ RUN_DEPENDS=	java:${PORTSDIR}/java/javavmwrapper \
 
 GIT_ACCOUNT=	Aries85
 GIT_PROJECT=	LightZone
-GIT_COMMIT=	c6a31b8
+GIT_COMMIT=	40f71bc
 
 USES=		desktop-file-utils
 USE_GCC=	yes

@@ -20,7 +20,6 @@
 %%DATADIR%%/lightcrafts.jar
 %%DATADIR%%/lightzonehelp.jar
 %%DATADIR%%/mlibwrapper_jai.jar
-%%DATADIR%%/script-api.jar
 %%DATADIR%%/substance-lite.jar
 %%LOCALBASE%%/share/applications/lightzone.desktop
 %%LOCALBASE%%/share/icons/hicolor/16x16/apps/lightzone.png
