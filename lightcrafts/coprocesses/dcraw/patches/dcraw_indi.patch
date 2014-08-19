@@ -1,7 +1,7 @@
-Index: dcraw/dcraw.c
+Index: dcraw/dcraw_lz.c
 ===================================================================
---- dcraw.orig/dcraw.c	2014-07-06 20:38:46.637060946 +0900
-+++ dcraw/dcraw.c	2014-07-08 23:46:33.535553383 +0900
+--- dcraw.orig/dcraw_lz.c	2014-08-19 22:35:52.697124775 +0900
++++ dcraw/dcraw_lz.c	2014-08-20 00:34:30.966045942 +0900
 @@ -1,4 +1,8 @@
  /*
 + * OpenMP multithread version of dcraw
@@ -91,42 +91,45 @@ Index: dcraw/dcraw.c
  }
  
  /*
-@@ -4274,6 +4315,7 @@
+@@ -4274,13 +4315,14 @@
    int prow=8, pcol=2, *ip, *code[16][16], gval[8], gmin, gmax, sum[4];
    int row, col, x, y, x1, x2, y1, y2, t, weight, grads, color, diag;
    int g, diff, thold, num, c;
-+  ushort (*rowtmp[4])[width*4];
++  ushort rowtmp[4][width*4];
  
    lin_interpolate();
    if (verbose) fprintf (stderr,_("VNG interpolation...\n"));
-@@ -4312,11 +4354,21 @@
- 	  *ip++ = 0;
-       }
+ 
+   if (filters == 1) prow = pcol = 16;
+   if (filters == 9) prow = pcol =  6;
+-  ip = (int *) calloc (prow*pcol, 1280);
++  int *ipalloc = ip = (int *) calloc (prow*pcol, 1280);
+   merror (ip, "vng_interpolate()");
+   for (row=0; row < prow; row++)		/* Precalculate for VNG */
+     for (col=0; col < pcol; col++) {
+@@ -4314,9 +4356,19 @@
      }
--  brow[4] = (ushort (*)[4]) calloc (width*3, sizeof **brow);
--  merror (brow[4], "vng_interpolate()");
+   brow[4] = (ushort (*)[4]) calloc (width*3, sizeof **brow);
+   merror (brow[4], "vng_interpolate()");
 -  for (row=0; row < 3; row++)
--    brow[row] = brow[4] + row*width;
++  for (row = 0; row < 4; row++)
+     brow[row] = brow[4] + row*width;
 -  for (row=2; row < height-2; row++) {		/* Do VNG interpolation */
 +#ifdef _OPENMP
 +    #pragma omp parallel				\
 +    default(none)					\
 +    shared(image,code,prow,pcol,width,height,colors)			\
-+    private(row,col,g,brow,rowtmp,pix,ip,gval,diff,gmin,gmax,thold,sum,color,num,c,t)
++    private(row,col,g,brow,pix,ip,gval,diff,gmin,gmax,thold,sum,color,num,c,t)
 +#endif
 +{
 +  int slice = (height - 4) / uf_omp_get_num_threads();
 +  int start_row = 2 + slice * uf_omp_get_thread_num();
 +  int end_row = MIN(start_row + slice, height - 2);
 +  for (row = start_row; row < end_row; row++) {	/* Do VNG interpolation */
-+
-+    for (g = 0; g < 4; g++)
-+      brow[g] = rowtmp[(row + g - 2) % 4];
-+
      for (col=2; col < width-2; col++) {
        pix = image[row*width+col];
        ip = code[row % prow][col % pcol];
-@@ -4360,14 +4412,14 @@
+@@ -4360,15 +4412,15 @@
  	brow[2][col][c] = CLIP(t);
        }
      }
@@ -139,14 +142,16 @@ Index: dcraw/dcraw.c
 -  memcpy (image[(row-2)*width+2], brow[0]+2, (width-4)*sizeof *image);
 -  memcpy (image[(row-1)*width+2], brow[1]+2, (width-4)*sizeof *image);
 -  free (brow[4]);
+-  free (code[0][0]);
 +  if (row == height - 2) {
 +    memcpy (image[(row-2)*width+2], brow[0]+2, (width-4)*sizeof *image);
 +    memcpy (image[(row-1)*width+2], brow[1]+2, (width-4)*sizeof *image);
 +  }
 +} /* pragma omp parallel */
-   free (code[0][0]);
++  free(ipalloc);
  }
  
+ /*
 @@ -4380,10 +4432,20 @@
    int row, col, diff[2], guess[2], c, d, i;
    ushort (*pix)[4];
