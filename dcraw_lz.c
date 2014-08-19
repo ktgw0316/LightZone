@@ -4318,14 +4318,14 @@ void CLASS vng_interpolate()
   int prow=8, pcol=2, *ip, *code[16][16], gval[8], gmin, gmax, sum[4];
   int row, col, x, y, x1, x2, y1, y2, t, weight, grads, color, diag;
   int g, diff, thold, num, c;
-  ushort (*rowtmp[4])[width*4];
+  ushort rowtmp[4][width*4];
 
   lin_interpolate();
   if (verbose) fprintf (stderr,_("VNG interpolation...\n"));
 
   if (filters == 1) prow = pcol = 16;
   if (filters == 9) prow = pcol =  6;
-  ip = (int *) calloc (prow*pcol, 1280);
+  int *ipalloc = ip = (int *) calloc (prow*pcol, 1280);
   merror (ip, "vng_interpolate()");
   for (row=0; row < prow; row++)		/* Precalculate for VNG */
     for (col=0; col < pcol; col++) {
@@ -4357,21 +4357,21 @@ void CLASS vng_interpolate()
 	  *ip++ = 0;
       }
     }
+  brow[4] = (ushort (*)[4]) calloc (width*3, sizeof **brow);
+  merror (brow[4], "vng_interpolate()");
+  for (row = 0; row < 4; row++)
+    brow[row] = brow[4] + row*width;
 #ifdef _OPENMP
     #pragma omp parallel				\
     default(none)					\
     shared(image,code,prow,pcol,width,height,colors)			\
-    private(row,col,g,brow,rowtmp,pix,ip,gval,diff,gmin,gmax,thold,sum,color,num,c,t)
+    private(row,col,g,brow,pix,ip,gval,diff,gmin,gmax,thold,sum,color,num,c,t)
 #endif
 {
   int slice = (height - 4) / uf_omp_get_num_threads();
   int start_row = 2 + slice * uf_omp_get_thread_num();
   int end_row = MIN(start_row + slice, height - 2);
   for (row = start_row; row < end_row; row++) {	/* Do VNG interpolation */
-
-    for (g = 0; g < 4; g++)
-      brow[g] = rowtmp[(row + g - 2) % 4];
-
     for (col=2; col < width-2; col++) {
       pix = image[row*width+col];
       ip = code[row % prow][col % pcol];
@@ -4423,7 +4423,7 @@ void CLASS vng_interpolate()
     memcpy (image[(row-1)*width+2], brow[1]+2, (width-4)*sizeof *image);
   }
 } /* pragma omp parallel */
-  free (code[0][0]);
+  free(ipalloc);
 }
 
 /*
@@ -8580,6 +8580,7 @@ canon_a5:
     width -= 44;
   } else if (!strcmp(model,"D3200") ||
 	     !strcmp(model,"D600")  ||
+	     !strcmp(model,"D610")  ||
 	    !strncmp(model,"D800",4)) {
     width -= 46;
   } else if (!strcmp(model,"D4") ||
@@ -9603,7 +9604,7 @@ int CLASS main (int argc, const char **argv)
   const char *cam_profile=0, *out_profile=0;
 #endif
 #ifdef LIGHTZONE
-  char *ofbase = 0;
+  const char *ofbase = 0;
 #endif
 
 #ifndef LOCALTIME
@@ -9881,7 +9882,7 @@ int CLASS main (int argc, const char **argv)
 	  for (i=0; i < 16; i++)
 	    putchar (cdesc[fcol(i >> 1,i & 1)]);
 	}
-#ifdef LIGHTZONE	
+#ifdef LIGHTZONE
 	printf(_("\nCamera RGB Profile:"));
 	for (i=0; i<3; ++i) FORCC printf(" %f", rgb_cam[i][c]);
 #endif
