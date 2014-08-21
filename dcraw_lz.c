@@ -4641,20 +4641,17 @@ void CLASS xtrans_interpolate (int passes)
     fprintf (stderr,_("4 << (passes > 1) = %d != ndir = %d\n"),
 	     (4 << (passes > 1)), ndir);
 
-#if defined(_STRICT_IMAGE)
-  ushort (*working_image)[4];
-#endif
 #ifdef _FIXED_NDIR
 #pragma omp parallel default (none)			\
   shared (height, width, image, allhex, sgrow, sgcol, xtrans, \
-	  top_margin, left_margin, passes, verbose, working_image, iwidth, iheight) \
+	  top_margin, left_margin, passes, verbose, iwidth, iheight) \
   private (top, left, mrow, mcol, row, col, color, pix, hex, c, pass, rix, \
 	   val, h, f, d, g, tr, v, hm, max, avg, lix, diff, i, \
 	   buffer, rgb, lab, drv, homo, ng, min)
 #else
 #pragma omp parallel default (none)			\
   shared (height, width, image, allhex, ndir, sgrow, sgcol, xtrans, \
-	  top_margin, left_margin, passes, verbose, working_image, iwidth, iheight) \
+	  top_margin, left_margin, passes, verbose, iwidth, iheight) \
   private (top, left, mrow, mcol, row, col, color, pix, hex, c, pass, rix, \
 	   val, h, f, d, g, tr, v, hm, max, avg, lix, diff, i, \
 	   buffer, rgb, lab, drv, homo, ng, min)
@@ -4684,7 +4681,7 @@ void CLASS xtrans_interpolate (int passes)
 
 /* Set green1 and green3 to the minimum and maximum allowed values:	*/
 #ifdef _OPENMP
-        #pragma omp for
+        #pragma omp single
 #endif
   for (row=2; row < height-2; row++)
     for (min=~(max=0), col=2; col < width-2; col++) {
@@ -4705,6 +4702,7 @@ void CLASS xtrans_interpolate (int passes)
     }
 
 #if defined(_STRICT_IMAGE)
+  ushort (*working_image)[4];
   working_image = (ushort (*)[4]) calloc (iheight, iwidth*sizeof *image);
   memcpy (working_image, image, iheight * iwidth * sizeof *image);
   merror (working_image, "xtrans_interpolate working_image");
