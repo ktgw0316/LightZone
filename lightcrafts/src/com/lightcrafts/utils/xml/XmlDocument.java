@@ -48,13 +48,15 @@ public class XmlDocument {
         }
         try {
             Transformers = TransformerFactory.newInstance();
-            // Here's how one controls XML output indentation in Java 1.5:
-            if (System.getProperty("java.version").startsWith("1.5")) {
-                Transformers.setAttribute("indent-number", "2");
-            }
         }
         catch (TransformerFactoryConfigurationError e) {
             throw new RuntimeException("Couldn't init XML transformer", e);
+        }
+        try {
+            Transformers.setAttribute("indent-number", "2");
+        }
+        catch (IllegalArgumentException e) {
+            // ignore, file will still be correct.
         }
     }
 
@@ -154,7 +156,6 @@ public class XmlDocument {
             e.printStackTrace();
         }
         xform.setOutputProperty(OutputKeys.INDENT, "yes");
-        // Here's how one controls XML output indentation in Java 1.4:
         xform.setOutputProperty(
             "{http://xml.apache.org/xalan}indent-amount", "2"
         );
