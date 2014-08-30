@@ -256,6 +256,9 @@ public class ZoneFinder extends Preview implements PaintListener {
             pixels = (byte[]) image.getData(bounds).getDataElements(bounds.x, bounds.y, bounds.width, bounds.height, null);
         }
 
+        if (pixels.length <= 0 || bounds.height <= 15 || bounds.width <= 15)
+            return null;
+
         pixels = Segment.segmentImage(pixels, colorMode ? 3 : 1, bounds.height, bounds.width);
 
         DataBufferByte data = new DataBufferByte(pixels, pixels.length);
@@ -308,8 +311,11 @@ public class ZoneFinder extends Preview implements PaintListener {
         public void run() {
             do {
                 if (getSize().width > 0 && getSize().height > 0) {
-                    zones = segment(image);
-                    repaint();
+                    RenderedImage newZones = segment(image);
+                    if (newZones != null) {
+                        zones = newZones;
+                        repaint();
+                    }
                 }
             } while (getNextView());
         }
