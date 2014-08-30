@@ -27,7 +27,7 @@ public final class FastBilateralFilterOpImage extends AreaOpImage {
         for (int i = 0; i < 0x10000; i++) {
             float x = i / (float) 0x10000;
             transform[i] = (float) (Math.log1p(x)/Math.log(2) + 1.5 * Math.exp(-10*x) * Math.pow(x, 0.7));
-        }        
+        }
     }
 
     private static ImageLayout fblLayout(RenderedImage source) {

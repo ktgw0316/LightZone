@@ -340,7 +340,7 @@ public abstract class RawImageType extends ImageType {
         if (indicator != null)
             indicator.incrementBy(1);
 
-        System.out.println("dcraw: " + (dcrawTime - startTime) + ", demosaic: " + (demosaicTime - dcrawTime));
+        System.out.println("dcraw: " + (dcrawTime - startTime) + "ms, demosaic: " + (demosaicTime - dcrawTime) + "ms");
 
         if (CACHE_CONVERSION && fileCache != null && imageFile == null) {
             if ( rgbImage != null && cacheKey != null)
