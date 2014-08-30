@@ -373,7 +373,7 @@ public final class DCRaw implements
                         m_rawColors = Integer.decode(rawColors);
                     } else if (line.startsWith(search = FILTER_PATTERN)) {
                         String pattern = line.substring(search.length());
-                        if (pattern.length() >= 8 && !pattern.substring(0,4).equals(pattern.substring(4,4)))
+                        if (pattern.length() >= 8 && !pattern.substring(0,4).equals(pattern.substring(4,8)))
                             m_filters = -1;
                         else if (pattern.startsWith("BGGR"))
                             m_filters = 0x16161616;
