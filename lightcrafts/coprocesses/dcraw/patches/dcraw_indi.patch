@@ -1,7 +1,7 @@
 Index: dcraw/dcraw_lz.c
 ===================================================================
---- dcraw.orig/dcraw_lz.c	2014-08-23 22:30:36.283429944 +0900
-+++ dcraw/dcraw_lz.c	2014-08-23 23:00:14.361178121 +0900
+--- dcraw.orig/dcraw_lz.c	2014-08-23 23:05:49.394396273 +0900
++++ dcraw/dcraw_lz.c	2014-09-04 00:00:57.380159269 +0900
 @@ -1,4 +1,8 @@
  /*
 + * OpenMP multithread version of dcraw
@@ -91,7 +91,7 @@ Index: dcraw/dcraw_lz.c
  }
  
  /*
-@@ -4270,17 +4311,18 @@
+@@ -4270,7 +4311,7 @@
      +1,-1,+1,+1,0,0x88, +1,+0,+1,+2,0,0x08, +1,+0,+2,-1,0,0x40,
      +1,+0,+2,+1,0,0x10
    }, chood[] = { -1,-1, -1,0, -1,+1, 0,+1, +1,+1, +1,0, +1,-1, 0,-1 };
@@ -100,10 +100,7 @@ Index: dcraw/dcraw_lz.c
    int prow=8, pcol=2, *ip, *code[16][16], gval[8], gmin, gmax, sum[4];
    int row, col, x, y, x1, x2, y1, y2, t, weight, grads, color, diag;
    int g, diff, thold, num, c;
-+  ushort rowtmp[4][width*4];
- 
-   lin_interpolate();
-   if (verbose) fprintf (stderr,_("VNG interpolation...\n"));
+@@ -4280,7 +4321,7 @@
  
    if (filters == 1) prow = pcol = 16;
    if (filters == 9) prow = pcol =  6;
@@ -112,7 +109,7 @@ Index: dcraw/dcraw_lz.c
    merror (ip, "vng_interpolate()");
    for (row=0; row < prow; row++)		/* Precalculate for VNG */
      for (col=0; col < pcol; col++) {
-@@ -4312,11 +4354,21 @@
+@@ -4312,11 +4353,22 @@
  	  *ip++ = 0;
        }
      }
@@ -125,16 +122,17 @@ Index: dcraw/dcraw_lz.c
 +    #pragma omp parallel				\
 +    default(none)					\
 +    shared(image,code,prow,pcol,width,height,colors)			\
-+    private(row,col,g,brow,rowtmp,pix,ip,gval,diff,gmin,gmax,thold,sum,color,num,c,t)
++    private(row,col,g,brow,pix,ip,gval,diff,gmin,gmax,thold,sum,color,num,c,t)
 +#endif
 +{
++  ushort rowtmp[4][width*4];
 +  int slice = (height - 4) / uf_omp_get_num_threads();
 +  int start_row = 2 + slice * uf_omp_get_thread_num();
 +  int end_row = MIN(start_row + slice, height - 2);
 +  for (row = start_row; row < end_row; row++) {	/* Do VNG interpolation */
 +
 +    for (g = 0; g < 4; g++)
-+      brow[g] = &rowtmp[(row + g - 2) % 4];
++      brow[g] = &rowtmp[(row + g - 2) % 4][0];
 +
      for (col=2; col < width-2; col++) {
        pix = image[row*width+col];
