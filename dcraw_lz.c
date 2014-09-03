@@ -4318,7 +4318,6 @@ void CLASS vng_interpolate()
   int prow=8, pcol=2, *ip, *code[16][16], gval[8], gmin, gmax, sum[4];
   int row, col, x, y, x1, x2, y1, y2, t, weight, grads, color, diag;
   int g, diff, thold, num, c;
-  ushort rowtmp[4][width*4];
 
   lin_interpolate();
   if (verbose) fprintf (stderr,_("VNG interpolation...\n"));
@@ -4361,16 +4360,17 @@ void CLASS vng_interpolate()
     #pragma omp parallel				\
     default(none)					\
     shared(image,code,prow,pcol,width,height,colors)			\
-    private(row,col,g,brow,rowtmp,pix,ip,gval,diff,gmin,gmax,thold,sum,color,num,c,t)
+    private(row,col,g,brow,pix,ip,gval,diff,gmin,gmax,thold,sum,color,num,c,t)
 #endif
 {
+  ushort rowtmp[4][width*4];
   int slice = (height - 4) / uf_omp_get_num_threads();
   int start_row = 2 + slice * uf_omp_get_thread_num();
   int end_row = MIN(start_row + slice, height - 2);
   for (row = start_row; row < end_row; row++) {	/* Do VNG interpolation */
 
     for (g = 0; g < 4; g++)
-      brow[g] = &rowtmp[(row + g - 2) % 4];
+      brow[g] = &rowtmp[(row + g - 2) % 4][0];
 
     for (col=2; col < width-2; col++) {
       pix = image[row*width+col];

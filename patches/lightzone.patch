@@ -1,7 +1,7 @@
 Index: dcraw/dcraw_lz.c
 ===================================================================
---- dcraw.orig/dcraw_lz.c	2014-08-23 23:00:28.287897275 +0900
-+++ dcraw/dcraw_lz.c	2014-08-23 23:00:28.283897643 +0900
+--- dcraw.orig/dcraw_lz.c	2014-09-04 00:01:33.741008603 +0900
++++ dcraw/dcraw_lz.c	2014-09-04 00:01:33.733009286 +0900
 @@ -153,7 +153,10 @@
  int no_auto_bright=0;
  unsigned greybox[4] = { 0, 0, UINT_MAX, UINT_MAX };
