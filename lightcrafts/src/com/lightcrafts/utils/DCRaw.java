@@ -504,8 +504,14 @@ public final class DCRaw implements
             ByteBuffer bb = c.map(FileChannel.MapMode.READ_ONLY, c.position(), totalData);
 
             if (dataType == DataBuffer.TYPE_USHORT) {
-                bb.order(ByteOrder.BIG_ENDIAN);
+                // bb.order(ByteOrder.BIG_ENDIAN);
+                bb.order(ByteOrder.nativeOrder());
                 bb.asShortBuffer().get((short[]) imageData.data);
+
+                // Darty hack to prevent crash on Arch Linux (issue #125)
+                if (ByteOrder.nativeOrder() != ByteOrder.BIG_ENDIAN)
+                    for (int i = 0; i < ((short[]) imageData.data).length; ++i)
+                        ((short[]) imageData.data)[i] = Shart.reverseBytes(((short[]) imageData.data)[i]);
             } else
                 bb.get((byte[]) imageData.data);
 
