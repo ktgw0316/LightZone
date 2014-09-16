@@ -511,7 +511,7 @@ public final class DCRaw implements
                 // Darty hack to prevent crash on Arch Linux (issue #125)
                 if (ByteOrder.nativeOrder() != ByteOrder.BIG_ENDIAN)
                     for (int i = 0; i < ((short[]) imageData.data).length; ++i)
-                        ((short[]) imageData.data)[i] = Shart.reverseBytes(((short[]) imageData.data)[i]);
+                        ((short[]) imageData.data)[i] = Short.reverseBytes(((short[]) imageData.data)[i]);
             } else
                 bb.get((byte[]) imageData.data);
 
