@@ -466,7 +466,7 @@ public class ImageDatum {
         queue.addTask(task);
     }
 
-    private void updatePreviews() {
+    private synchronized void updatePreviews() {
         // Push a rotation change out to all running PreviewUpdaters.
         LinkedList<PreviewUpdater> newRefs = new LinkedList<PreviewUpdater>();
         for (Iterator<PreviewUpdater> i=previews.iterator(); i.hasNext(); ) {
