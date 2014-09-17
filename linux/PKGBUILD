@@ -26,7 +26,8 @@ build() {
 package() {
   cd "${srcdir}/${pkgname}-${pkgver}/"
 
-  instdir="/opt/${pkgname}"
+  _datadir=/usr/share
+  instdir="${_datadir}/${pkgname}"
   install -dm 0755 "${pkgdir}/${instdir}"
   cp -pH lightcrafts/products/dcraw_lz "${pkgdir}/${instdir}"
   cp -pH lightcrafts/products/LightZone-forkd "${pkgdir}/${instdir}"
@@ -34,7 +35,6 @@ package() {
   cp -pH linux/products/*.jar "${pkgdir}/${instdir}"
   
 # create icons and shortcuts
-  _datadir=/usr/share
   install -dm 0755 "${pkgdir}/${_datadir}/applications"
   install -m 644 linux/products/lightzone.desktop "${pkgdir}/${_datadir}/applications/"
   cp -pHR linux/icons "${pkgdir}/${_datadir}/"

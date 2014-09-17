@@ -71,7 +71,7 @@ LightZone is open-source professional-level digital darkroom software for Window
 export NO_BRP_CHECK_BYTECODE_VERSION=true
 %endif
 
-%define instdir /opt/%{name}
+%define instdir /usr/share/%{name}
 install -dm 0755 "%buildroot/%{instdir}"
 cp -pH lightcrafts/products/dcraw_lz "%buildroot/%{instdir}"
 cp -pH lightcrafts/products/LightZone-forkd "%buildroot/%{instdir}"
