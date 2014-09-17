@@ -2,6 +2,7 @@
 
 package com.lightcrafts.model.ImageEditor;
 
+import static com.lightcrafts.model.ImageEditor.Locale.LOCALE;
 import com.lightcrafts.model.*;
 import com.lightcrafts.jai.utils.*;
 import com.lightcrafts.jai.JAIContext;
@@ -28,7 +29,7 @@ public class ZoneFinder extends Preview implements PaintListener {
     final ImageEditorEngine engine;
 
     public String getName() {
-        return colorMode ? "Color Zones" : "Zones";
+        return LOCALE.get( colorMode ? "ColorZones_Name" : "Zones_Name" );
     }
 
     public void setDropper(Point p) {

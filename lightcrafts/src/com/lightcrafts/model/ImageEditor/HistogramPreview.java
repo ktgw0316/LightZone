@@ -2,6 +2,7 @@
 
 package com.lightcrafts.model.ImageEditor;
 
+import static com.lightcrafts.model.ImageEditor.Locale.LOCALE;
 import com.lightcrafts.model.Preview;
 import com.lightcrafts.model.Region;
 import com.lightcrafts.jai.utils.Functions;
@@ -25,7 +26,7 @@ public class HistogramPreview extends Preview implements PaintListener {
     }
 
     public String getName() {
-        return "Histogram";
+        return LOCALE.get("Histogram_Name");
     }
 
     public void setDropper(Point p) {

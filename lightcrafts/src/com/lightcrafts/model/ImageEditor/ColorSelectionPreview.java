@@ -2,6 +2,7 @@
 
 package com.lightcrafts.model.ImageEditor;
 
+import static com.lightcrafts.model.ImageEditor.Locale.LOCALE;
 import com.lightcrafts.model.*;
 import com.lightcrafts.jai.utils.*;
 import com.lightcrafts.jai.JAIContext;
@@ -22,7 +23,7 @@ public class ColorSelectionPreview extends Preview implements PaintListener {
     final ImageEditorEngine engine;
 
     public String getName() {
-        return "Color Mask";
+        return LOCALE.get("ColorMask_Name");
     }
 
     public void setDropper(Point p) {

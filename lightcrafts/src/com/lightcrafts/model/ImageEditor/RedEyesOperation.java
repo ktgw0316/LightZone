@@ -31,15 +31,16 @@ import java.awt.image.RenderedImage;
  */
 
 public class RedEyesOperation extends BlendedOperation implements RedEyeOperation {
+    static final String TOLERANCE =  "Tolerance";
     private final double step = 0.01;
 
     public RedEyesOperation(Rendering rendering) {
         super(rendering, type);
-        addSliderKey("Tolerance");
+        addSliderKey(TOLERANCE);
 
         DecimalFormat format = new DecimalFormat("0.00");
 
-        setSliderConfig("Tolerance", new SliderConfig(0.5, 1.5, tolerance, step, false, format));
+        setSliderConfig(TOLERANCE, new SliderConfig(0.5, 1.5, tolerance, step, false, format));
     }
 
     public boolean neutralDefault() {
@@ -57,7 +58,7 @@ public class RedEyesOperation extends BlendedOperation implements RedEyeOperatio
     public void setSliderValue(String key, double value) {
         value = roundValue(key, value);
 
-        if (key == "Tolerance" && tolerance != value) {
+        if (key == TOLERANCE && tolerance != value) {
             tolerance = value;
         } else
             return;

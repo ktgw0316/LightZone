@@ -33,10 +33,8 @@ class DisplayProfileItem extends PreferencesItem implements ActionListener {
         text = new JTextField(20);
         text.setEditable(false);
 
-        chooserButton = new JButton("Choose");
-        chooserButton.setToolTipText(
-            "Pick a new color profile for this display"
-        );
+        chooserButton = new JButton(LOCALE.get("DisplayProfileItemButton"));
+        chooserButton.setToolTipText(LOCALE.get("DisplayProfileItemToolTip"));
         chooserButton.addActionListener(this);
 
         addHelpListeners();
@@ -79,6 +77,7 @@ class DisplayProfileItem extends PreferencesItem implements ActionListener {
         }
     }
 
+    // TODO: l10n
     // Conduct the dialog to accept a new color profile.
     public void actionPerformed(ActionEvent event) {
         FileChooser chooser = Platform.getPlatform().getFileChooser();
@@ -92,7 +91,7 @@ class DisplayProfileItem extends PreferencesItem implements ActionListener {
         }
         File file = new File(path);
         file = chooser.openFile(
-            "Display Color Profile", file, null, null
+            LOCALE.get("DisplayProfileDialogTitle"), file, null, null
         );
         if (file != null) {
             if (! file.isFile()) {

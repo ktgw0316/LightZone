@@ -2,6 +2,7 @@
 
 package com.lightcrafts.model.ImageEditor;
 
+import static com.lightcrafts.model.ImageEditor.Locale.LOCALE;
 import com.lightcrafts.model.Preview;
 import com.lightcrafts.model.Region;
 import com.lightcrafts.utils.ColorScience;
@@ -32,7 +33,7 @@ class DropperPreview extends Preview {
     }
 
     public String getName() {
-        return "Sampler";
+        return LOCALE.get("Sampler_Name");
     }
 
     public void setDropper(Point p) {

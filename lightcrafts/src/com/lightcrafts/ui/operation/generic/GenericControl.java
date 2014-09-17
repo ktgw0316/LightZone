@@ -176,7 +176,7 @@ public class GenericControl extends OpControl {
     private String getUserPresentableKey(String key) {
         OperationType type = op.getType();
         String name = type.getName();
-        name = name.replaceAll(" ", "");
+        name = name.replaceAll(" ", "").replaceAll("V[0-9]+\\Z", "");
         String propKey = name + "-" + key;
         try {
             return Resources.getString(propKey);

@@ -83,7 +83,7 @@ class LayoutHeader extends Box {
 
         modes = new BrowseEditButtons(frame);
         buttonBox = Box.createHorizontalBox();
-        help = new BoxedButton("Help", helpButton = new HelpButton());
+        help = new BoxedButton(LOCALE.get("HelpLabel"), helpButton = new HelpButton());
 
         Component logoButton = new LogoComponent();
 
