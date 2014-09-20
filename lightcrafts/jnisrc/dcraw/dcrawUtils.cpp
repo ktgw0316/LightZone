@@ -14,6 +14,8 @@
 
 #include<limits.h>
 
+#include<omp.h>
+
 static inline float fast_log2 (float val)
 {
     int * const  exp_ptr = reinterpret_cast <int *> (&val);
@@ -40,6 +42,9 @@ JNIEXPORT void JNICALL DCRaw_METHOD(interpolateGreen)
     
     const int SQRT2 = (int) (0x1000 * sqrt(2.0));
     
+#pragma omp parallel shared (srcData, destData)
+{
+#pragma omp for
     for (int y = 0; y < height; y++) {
         int cOffset = (y&1) == (ry&1) ? rOffset : bOffset;
         int x0 = (y&1) == (gy&1) ? gx+1 : gx;
@@ -94,6 +99,7 @@ JNIEXPORT void JNICALL DCRaw_METHOD(interpolateGreen)
     
     // green channel interpolation
     
+#pragma omp for
     for (int y = 2; y < height-2; y++) {
         int cOffset = (y&1) == (ry&1) ? rOffset : bOffset;
         int x0 = (y&1) == (gy&1) ? gx+1 : gx;
@@ -149,6 +155,7 @@ JNIEXPORT void JNICALL DCRaw_METHOD(interpolateGreen)
     // get the constant component out of the reconstructed green pixels and add to it
     // the "high frequency" part of the corresponding observed color channel
     
+#pragma omp for
     for (int y = 2; y < height-2; y++) {
         int cOffset = (y&1) == (ry&1) ? rOffset : bOffset;
         int x0 = (y&1) == (gy&1) ? gx+1 : gx;
@@ -247,6 +254,8 @@ JNIEXPORT void JNICALL DCRaw_METHOD(interpolateGreen)
         }
     }
 
+} // #pragma omp parallel
+
     env->ReleasePrimitiveArrayCritical(jsrcData, srcData, 0);
     env->ReleasePrimitiveArrayCritical(jdestData, destData, 0);
 }
@@ -260,6 +269,7 @@ JNIEXPORT void JNICALL DCRaw_METHOD(interpolateRedBlue)
 {
     unsigned short *data = (unsigned short *) env->GetPrimitiveArrayCritical(jdata, 0);
 
+#pragma omp parallel for shared (data)
     for (int y = 1; y < height-1; y++) {
         for (int x = 1; x < width-1; x++) {
             for (int i = 0; i < 2; i++) {
