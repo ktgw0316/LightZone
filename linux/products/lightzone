@@ -9,15 +9,22 @@ arch=`getconf LONG_BIT`
 PLATFORM=`uname`
 if [ "${PLATFORM}" = "Linux" ]; then
   totalmem=`cat /proc/meminfo | grep 'MemTotal: ' | sed -r 's/.* ([0-9]+) .*/\1/'`
-  sharedir=/usr/share/lightzone
+  usrdir=/usr
 elif [ "${PLATFORM}" = "SunOS" ]; then
   totalmem=`prtconf | grep 'Memory size:' | sed -r 's/.* ([0-9]+) .*/\1/'`
   totalmem=`expr $totalmem \* 1024`
-  sharedir=/usr/share/lightzone
+  usrdir=/usr
 elif [ "${PLATFORM}" = "FreeBSD" ]; then
   totalmem=`dmesg | grep 'real memory' | sed -r 's/.* ([0-9]+) .*/\1/'`
   totalmem=`expr $totalmem / 1024`
-  sharedir=/usr/local/share/java/lightzone
+  usrdir=/usr/local
+fi
+
+pkgjavadir=${usrdir}/share/java/lightzone
+if [ -d ${usrdir}/libexec/lightzone ]; then
+  pkglibexecdir=${usrdir}/libexec/lightzone
+else
+  pkglibexecdir=${usrdir}/lib/lightzone
 fi
 
 classdir='/usr/share/java/javahelp/*:/usr/share/java/*:/usr/share/javahelp/lib/*:/usr/local/share/java/classes/*'
@@ -43,4 +50,4 @@ for i in "$@"; do
   fi
 done
 
-(cd $sharedir && LD_LIBRARY_PATH=$sharedir exec java -Xmx${maxmem}k -Djava.library.path=$sharedir -Dfile.encoding=UTF8 -classpath "$sharedir/*:$classdir" com.lightcrafts.platform.linux.LinuxLauncher ${file} ${@} )
+(cd $pkgjavadir && LD_LIBRARY_PATH=$pkglibexecdir exec java -Xmx${maxmem}k -Djava.library.path=$pkglibexecdir -Dfile.encoding=UTF8 -classpath "$pkgjavadir/*:$classdir" com.lightcrafts.platform.linux.LinuxLauncher ${file} ${@} )

@@ -53,7 +53,7 @@ BuildRequires: update-desktop-files
 %endif
 
 BuildRequires:	java-%{java_version}-openjdk-devel, %{libX11_devel}, ant, autoconf, gcc, gcc-c++, make, tidy, git, javahelp2, %{lcms2_devel}, libjpeg8-devel, libtiff-devel, pkg-config
-Requires:	java-%{java_version}-openjdk, javahelp2, lcms2, libjpeg8, libtiff
+Requires:	java-%{java_version}-openjdk, javahelp2, lcms2
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
@@ -71,12 +71,13 @@ LightZone is open-source professional-level digital darkroom software for Window
 export NO_BRP_CHECK_BYTECODE_VERSION=true
 %endif
 
-%define instdir /usr/share/%{name}
-install -dm 0755 "%buildroot/%{instdir}"
-cp -pH lightcrafts/products/dcraw_lz "%buildroot/%{instdir}"
-cp -pH lightcrafts/products/LightZone-forkd "%buildroot/%{instdir}"
-cp -pH linux/products/*.so "%buildroot/%{instdir}"
-cp -pH linux/products/*.jar "%buildroot/%{instdir}"
+install -dm 0755 "%buildroot/%{_libexecdir}/%{name}"
+cp -pH lightcrafts/products/dcraw_lz "%buildroot/%{_libexecdir}/%{name}"
+cp -pH lightcrafts/products/LightZone-forkd "%buildroot/%{_libexecdir}/%{name}"
+cp -pH linux/products/*.so "%buildroot/%{_libexecdir}/%{name}"
+
+install -dm 0755 "%buildroot/%{_javadir}/%{name}"
+cp -pH linux/products/*.jar "%buildroot/%{_javadir}/%{name}"
 
 # create icons and shortcuts
 install -dm 0755 "%buildroot/%{_datadir}/applications"
@@ -93,10 +94,12 @@ install -m 755 linux/products/%{name} %{buildroot}/%{_bindir}
 %files
 %defattr(-,root,root)
 %doc COPYING README.md linux/BUILD-Linux.md
-%dir %{instdir}
-%{instdir}/*
+%dir %{_libexecdir}/%{name}
+%{_libexecdir}/%{name}/*
+%dir %{_javadir}/%{name}
+%{_javadir}/%{name}/*
 %{_bindir}/%{name}
-%{_datadir}/applications/lightzone.desktop
+%{_datadir}/applications/%{name}.desktop
 %define icondir %{_datadir}/icons/hicolor
 %dir %{icondir}
 %dir %{icondir}/256x256
@@ -111,11 +114,11 @@ install -m 755 linux/products/%{name} %{buildroot}/%{_bindir}
 %dir %{icondir}/32x32/apps
 %dir %{icondir}/16x16
 %dir %{icondir}/16x16/apps
-%{icondir}/256x256/apps/lightzone.png
-%{icondir}/128x128/apps/lightzone.png
-%{icondir}/64x64/apps/lightzone.png
-%{icondir}/48x48/apps/lightzone.png
-%{icondir}/32x32/apps/lightzone.png
-%{icondir}/16x16/apps/lightzone.png
+%{icondir}/256x256/apps/%{name}.png
+%{icondir}/128x128/apps/%{name}.png
+%{icondir}/64x64/apps/%{name}.png
+%{icondir}/48x48/apps/%{name}.png
+%{icondir}/32x32/apps/%{name}.png
+%{icondir}/16x16/apps/%{name}.png
 
 %changelog
