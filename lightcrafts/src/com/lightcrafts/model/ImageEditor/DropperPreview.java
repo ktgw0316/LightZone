@@ -102,7 +102,7 @@ class DropperPreview extends Preview {
             final String separator = ": ";
             final FontMetrics fm = getFontMetrics(font);
 
-            class gg {
+            class graph {
                 void drawAlignedString(String name, int value, float x, float y) {
                     drawAlignedString(name, Integer.toString(value), x, y);
                 }
@@ -112,28 +112,28 @@ class DropperPreview extends Preview {
                 }
             }
 
-            gg ggg = new gg();
+            graph gg = new graph();
 
-            ggg.drawAlignedString("x", loc.x, minx + 50, miny + 2 + textHeight);
-            ggg.drawAlignedString("y", loc.y, minx + 50, miny + 2 + 2 * textHeight);
+            gg.drawAlignedString("x", loc.x, minx + 50, miny + 2 + textHeight);
+            gg.drawAlignedString("y", loc.y, minx + 50, miny + 2 + 2 * textHeight);
 
             int red = color.getRed();
             int green = color.getGreen();
             int blue = color.getBlue();
 
-            ggg.drawAlignedString("Red",   red,   minx + 50, 12 + 3 * textHeight);
-            ggg.drawAlignedString("Green", green, minx + 50, 12 + 4 * textHeight);
-            ggg.drawAlignedString("Blue",  blue,  minx + 50, 12 + 5 * textHeight);
+            gg.drawAlignedString(LOCALE.get("Sampler_RedLabel"),   red,   minx + 50, 12 + 3 * textHeight);
+            gg.drawAlignedString(LOCALE.get("Sampler_GreenLabel"), green, minx + 50, 12 + 4 * textHeight);
+            gg.drawAlignedString(LOCALE.get("Sampler_BlueLabel"),  blue,  minx + 50, 12 + 5 * textHeight);
 
             double lightness = ColorScience.Wr * red + ColorScience.Wg * green + ColorScience.Wb * blue;
 
-            ggg.drawAlignedString("Luminosity", (int) lightness, minx + gap + 50, miny + 2 + textHeight);
+            gg.drawAlignedString(LOCALE.get("Sampler_LuminosityLabel"), (int) lightness, minx + gap + 50, miny + 2 + textHeight);
 
             double zone = Math.log1p(lightness) / (8 * Math.log(2));
 
             DecimalFormat format = new DecimalFormat("0.0");
 
-            ggg.drawAlignedString("Zone", format.format(16 * zone), minx + gap + 50, miny + 2 + 2 * textHeight);
+            gg.drawAlignedString(LOCALE.get("Sampler_ZoneLabel"), format.format(16 * zone), minx + gap + 50, miny + 2 + 2 * textHeight);
 
             float xyzColor[] = JAIContext.linearColorSpace.toCIEXYZ(new float[]{(float) (red / 255.),
                                                                                 (float) (green / 255.),
@@ -141,9 +141,9 @@ class DropperPreview extends Preview {
 
             float ihsColor[] = ihsCS.fromCIEXYZ(xyzColor);
 
-            ggg.drawAlignedString("Intensity",  (int) (100 * ihsColor[0]) + "%",                        minx + gap + 50, miny + 12 + 3 * textHeight);
-            ggg.drawAlignedString("Hue",        (int) (360 * (ihsColor[1] / (2 * Math.PI))) + "\u00B0", minx + gap + 50, miny + 12 + 4 * textHeight);
-            ggg.drawAlignedString("Saturation", (int) (100 * ihsColor[2]) + "%",                        minx + gap + 50, miny + 12 + 5 * textHeight);
+            gg.drawAlignedString(LOCALE.get("Sampler_IntensityLabel"),  (int) (100 * ihsColor[0]) + "%",                        minx + gap + 50, miny + 12 + 3 * textHeight);
+            gg.drawAlignedString(LOCALE.get("Sampler_HueLabel"),        (int) (360 * (ihsColor[1] / (2 * Math.PI))) + "\u00B0", minx + gap + 50, miny + 12 + 4 * textHeight);
+            gg.drawAlignedString(LOCALE.get("Sampler_SaturationLabel"), (int) (100 * ihsColor[2]) + "%",                        minx + gap + 50, miny + 12 + 5 * textHeight);
 
             // float labColor[] = JAIContext.labColorSpace.fromCIEXYZ(xyzColor);
 
@@ -158,9 +158,9 @@ class DropperPreview extends Preview {
             int a = ((0xffff & labColors[1]) - 128 * 256) / 256;
             int b = ((0xffff & labColors[2]) - 128 * 256) / 256;
 
-            ggg.drawAlignedString("L", L, minx + 50, miny + 12 + 7 * textHeight);
-            ggg.drawAlignedString("a", a, minx + 50, miny + 12 + 8 * textHeight);
-            ggg.drawAlignedString("b", b, minx + 50, miny + 12 + 9 * textHeight);
+            gg.drawAlignedString("L", L, minx + 50, miny + 12 + 7 * textHeight);
+            gg.drawAlignedString("a", a, minx + 50, miny + 12 + 8 * textHeight);
+            gg.drawAlignedString("b", b, minx + 50, miny + 12 + 9 * textHeight);
 
             float components[] = color.getRGBComponents(null);
 
