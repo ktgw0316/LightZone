@@ -256,12 +256,16 @@ public final class DCRaw implements
     private final static String CAMERA_RGB_PROFILE = "Camera RGB Profile: ";
     private final static String CAMERA_XYZ_PROFILE = "Camera XYZ Profile: ";
 
-    private static String DCRAW_PATH = "./dcraw_lz";
+    private static final String DCRAW_NAME = "dcraw_lz";
+    private static String DCRAW_PATH;
     static {
-        String appDir = System.getProperty("install4j.appDir");
-        if (appDir != null) {
-            DCRAW_PATH = appDir + "/dcraw_lz";
-        }
+        String dir = System.getProperty("install4j.appDir");
+        if (dir == null)
+            dir = ".";
+        DCRAW_PATH = dir + File.separatorChar + DCRAW_NAME;
+        if (! new File(DCRAW_PATH).canExecute())
+            // DCRAW_PATH = DCRAW_NAME; // It should be somewhere in PATH
+            DCRAW_PATH = System.getProperty("java.library.path") + File.separatorChar + DCRAW_NAME;
     }
 
     private static String match(String s, String tag) {

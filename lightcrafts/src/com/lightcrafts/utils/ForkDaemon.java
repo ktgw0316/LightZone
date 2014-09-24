@@ -102,7 +102,7 @@ public final class ForkDaemon {
     }
 
     private static final String FORKDAEMON_NAME = "LightZone-forkd";
-    private static final String FORKDAEMON_PATH;
+    private static String FORKDAEMON_PATH;
 
     private static final String CMDSTART = "CMDSTART";
     private static final String CMDEND = "CMDEND";
@@ -117,6 +117,8 @@ public final class ForkDaemon {
         if ( dir == null )
             dir = ".";
         FORKDAEMON_PATH = dir + File.separatorChar + FORKDAEMON_NAME;
+        if (! new File(FORKDAEMON_PATH).canExecute())
+            FORKDAEMON_PATH = System.getProperty( "java.library.path" ) + File.separatorChar + FORKDAEMON_NAME;
     }
 
     ////////// main() for testing /////////////////////////////////////////////
