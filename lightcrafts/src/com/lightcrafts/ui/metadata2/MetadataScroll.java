@@ -27,7 +27,7 @@ public class MetadataScroll extends JScrollPane {
         setOpaque(true);
         getViewport().setBackground(LightZoneSkin.Colors.ToolPanesBackground);
         setVerticalScrollBarPolicy(VERTICAL_SCROLLBAR_AS_NEEDED);
-        setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_NEVER);
+        setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_AS_NEEDED);
         setBorder(LightZoneSkin.getPaneBorder());
     }
 

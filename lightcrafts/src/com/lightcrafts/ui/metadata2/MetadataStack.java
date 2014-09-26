@@ -126,7 +126,7 @@ public class MetadataStack extends JPanel implements Scrollable {
     }
 
     public boolean getScrollableTracksViewportWidth() {
-        return true;
+        return false;
     }
 
     public Dimension getPreferredScrollableViewportSize() {

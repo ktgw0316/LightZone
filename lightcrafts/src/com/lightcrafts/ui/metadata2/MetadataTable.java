@@ -28,10 +28,10 @@ class MetadataTable extends JTable {
         setEnabled(false);
 
         // Hack to constrain the column sizes...
-        getColumnModel().getColumn(0).setMinWidth(90);
-        getColumnModel().getColumn(0).setMaxWidth(100);
+        getColumnModel().getColumn(0).setMinWidth(100);
+        getColumnModel().getColumn(0).setMaxWidth(120);
         
-        getColumnModel().getColumn(1).setMinWidth(120);
+        getColumnModel().getColumn(1).setMinWidth(300);
         // getColumnModel().getColumn(1).setMaxWidth(300);
 
         setFont(LightZoneSkin.fontSet.getSmallFont());
