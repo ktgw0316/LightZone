@@ -259,13 +259,13 @@ public final class DCRaw implements
     private static final String DCRAW_NAME = "dcraw_lz";
     private static String DCRAW_PATH;
     static {
-        String dir = System.getProperty("install4j.appDir");
-        if (dir == null)
-            dir = ".";
-        DCRAW_PATH = dir + File.separatorChar + DCRAW_NAME;
-        if (! new File(DCRAW_PATH).canExecute())
-            // DCRAW_PATH = DCRAW_NAME; // It should be somewhere in PATH
-            DCRAW_PATH = System.getProperty("java.library.path") + File.separatorChar + DCRAW_NAME;
+        DCRAW_PATH = System.getProperty("java.library.path") + File.separatorChar + DCRAW_NAME;
+        if (! new File(DCRAW_PATH).canExecute()) {
+            String dir = System.getProperty("install4j.appDir");
+            if (dir == null)
+                dir = ".";
+            DCRAW_PATH = dir + File.separatorChar + DCRAW_NAME;
+        }
     }
 
     private static String match(String s, String tag) {

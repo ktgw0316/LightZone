@@ -113,12 +113,13 @@ public final class ForkDaemon {
     private final InputStream stderr;
 
     static {
-        String dir = System.getProperty( "install4j.appDir" );
-        if ( dir == null )
-            dir = ".";
-        FORKDAEMON_PATH = dir + File.separatorChar + FORKDAEMON_NAME;
-        if (! new File(FORKDAEMON_PATH).canExecute())
-            FORKDAEMON_PATH = System.getProperty( "java.library.path" ) + File.separatorChar + FORKDAEMON_NAME;
+        FORKDAEMON_PATH = System.getProperty( "java.library.path" ) + File.separatorChar + FORKDAEMON_NAME;
+        if (! new File(FORKDAEMON_PATH).canExecute()) {
+            String dir = System.getProperty( "install4j.appDir" );
+            if ( dir == null )
+                dir = ".";
+            FORKDAEMON_PATH = dir + File.separatorChar + FORKDAEMON_NAME;
+        }
     }
 
     ////////// main() for testing /////////////////////////////////////////////
