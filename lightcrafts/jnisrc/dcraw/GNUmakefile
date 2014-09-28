@@ -15,9 +15,9 @@ endif
 
 ifeq ($(PLATFORM),MacOSX)
   JNI_EXTRA_LINK:=      -lstdc++
+else
+  JNI_EXTRA_CFLAGS+=	-fopenmp
 endif
-
-JNI_EXTRA_CFLAGS+=	-fopenmp
 
 JNI_EXTRA_DEFINES:=	-DNO_JPEG -DNO_LCMS
 JNI_LINUX_DEFINES:=	-Dfgetc=getc_unlocked
