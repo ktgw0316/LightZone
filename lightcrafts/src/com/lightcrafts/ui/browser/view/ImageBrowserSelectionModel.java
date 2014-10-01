@@ -20,12 +20,6 @@ class ImageBrowserSelectionModel {
     void setLeadSelected(ImageDatum datum) {
         if (leadSelected != datum) {
             leadSelected = datum;
-            selected.clear();
-            if (datum != null) {
-                selected.add(datum);
-            }
-            browser.notifySelectionChanged();
-            browser.repaint();
         }
     }
 

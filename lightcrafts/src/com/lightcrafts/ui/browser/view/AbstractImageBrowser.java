@@ -615,7 +615,7 @@ public abstract class AbstractImageBrowser
         return null;
     }
 
-    void addContinuousSelected(ImageDatum datum) {
+    void addContinuousSelected(ImageDatum datum, boolean add) {
         ImageDatum leadSelected = selection.getLeadSelected();
         if (leadSelected == null) {
             return;
@@ -635,7 +635,12 @@ public abstract class AbstractImageBrowser
                     selected.add(d);
                 }
             }
-            selection.setSelected(selected);
+            if (add) {
+                selection.addSelected(selected);
+            }
+            else {
+                selection.setSelected(selected);
+            }
         }
     }
 
