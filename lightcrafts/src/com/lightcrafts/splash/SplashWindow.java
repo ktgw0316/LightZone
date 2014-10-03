@@ -211,10 +211,20 @@ public final class SplashWindow extends Frame {
         final int imgWidth = image.getWidth(this);
         final int imgHeight = image.getHeight(this);
         setSize(imgWidth, imgHeight);
+        // Note: Do not use this since the window spans monitors
+        // on multi-monitor environment.
+        /*
         final Dimension screenDim = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(
             (screenDim.width - imgWidth) / 2,
             (screenDim.height - imgHeight) / 2
+        );
+        */
+        final DisplayMode dm = GraphicsEnvironment.getLocalGraphicsEnvironment().
+                getDefaultScreenDevice().getDisplayMode();
+        setLocation(
+            (dm.getWidth() - imgWidth) / 2,
+            (dm.getHeight() - imgHeight) / 2
         );
 
         // Users shall be able to close the splash window by
