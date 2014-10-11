@@ -8,7 +8,7 @@
 
 // local
 #import "ExportController.h"
-#import "KeystrokeNumberFormatter.h"
+#import "KeyStrokeNumberFormatter.h"
 #import "LC_CocoaUtils.h"
 #import "LC_CPPUtils.h"
 #import "LC_JNIUtils.h"

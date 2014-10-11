@@ -1,6 +1,6 @@
 // standard
-#import <appkit/AppKit.h>
-#import <foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
 #import <jni.h>
 
