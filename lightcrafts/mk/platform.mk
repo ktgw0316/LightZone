@@ -147,12 +147,9 @@ ifeq ($(PLATFORM),MacOSX)
 
   LIPO:=		lipo
 
-  ##
-  # Note that JAVA_INCLUDES is treated as relative to SDKROOT.
-  ##
   JAVA_HOME=		/Library/Java/Home
-  JAVA_INCLUDES=	-I/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers
-  JAVA_LDFLAGS=		-L/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Libraries
+  JAVA_INCLUDES=	-I$(SDKROOT)/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers
+  JAVA_LDFLAGS=		-L$(SDKROOT)/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Libraries
   JNILIB_PREFIX:=	lib
   JNILIB_EXT:=		.jnilib
   DYLIB_PREFIX:=	$(JNILIB_PREFIX)
