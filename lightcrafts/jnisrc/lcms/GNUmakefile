@@ -8,11 +8,13 @@ TARGET_BASE:=		LCMS
 
 ROOT:=			../../..
 include		$(ROOT)/lightcrafts/mk/platform.mk
-JNI_EXTRA_INCLUDES:=	$(shell $(PKGCFG) --cflags lcms2)
 JNI_EXTRA_LINK:=	$(shell $(PKGCFG) --libs-only-l lcms2)
 ifneq ($(PLATFORM),MacOSX)
+  JNI_EXTRA_INCLUDES:=	$(shell $(PKGCFG) --cflags lcms2)
   JNI_EXTRA_LDFLAGS:=	$(shell $(PKGCFG) --libs-only-L lcms2)
 endif
+JNI_MACOSX_INCLUDES:=	-I/usr/local/include
+JNI_MACOSX_LDFLAGS:=	-L/usr/local/lib
 
 ##
 # This is to prevent LCMS from using the MessageBox() function to report errors
