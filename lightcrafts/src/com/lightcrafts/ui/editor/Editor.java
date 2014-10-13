@@ -165,7 +165,7 @@ public class Editor {
         public void mouseWheelMoved(MouseWheelEvent e) {
             if (imageScroll.isWheelScrollingEnabled() && e.getScrollAmount() != 0) {
                 int direction = e.getWheelRotation() < 0 ? -1 : 1;
-                if (((! isMac()) && e.isControlDown()) || (isMac() && e.isMetaDown())) {
+                if (overlay.peekMode() == transientPanMode) {
                     scale.scaleUpDown(-direction);
                 } else {
                     JScrollBar toScroll = (e.getScrollType() < 2 && ! e.isShiftDown())
@@ -621,9 +621,5 @@ public class Editor {
         regions.restore(opControls, node);
 
         crop.restore(node);
-    }
-
-    private static boolean isMac() {
-        return Platform.getType() == Platform.MacOSX;
     }
 }

@@ -40,7 +40,7 @@ public class ModeManager
     // Look for the special key events to enter and exit the pan mode,
     // taking care to filter out auto-repeat events:
 
-    private static int PanKeyCode = KeyEvent.VK_SPACE;
+    private static int PanKeyCode = isMac() ? KeyEvent.VK_META : KeyEvent.VK_CONTROL;
 
     private KeyEventPostProcessor panModeKeyProcessor =
         new KeyEventPostProcessor() {
@@ -541,5 +541,9 @@ public class ModeManager
         KeyboardFocusManager focus =
             KeyboardFocusManager.getCurrentKeyboardFocusManager();
         focus.removeKeyEventPostProcessor(panModeKeyProcessor);
+    }
+
+    private static boolean isMac() {
+        return Platform.getType() == Platform.MacOSX;
     }
 }
