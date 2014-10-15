@@ -1,7 +1,7 @@
 #!/bin/sh
 chmod +x /usr/bin/lightzone
-chmod +x /usr/share/java/lightzone/LightZone-forkd
-chmod +x /usr/share/java/lightzone/dcraw_lz
+chmod +x /usr/lib/lightzone/LightZone-forkd
+chmod +x /usr/lib/lightzone/dcraw_lz
 
 if [ -x "`which update-menus 2>/dev/null`" ]; then
 	update-menus
