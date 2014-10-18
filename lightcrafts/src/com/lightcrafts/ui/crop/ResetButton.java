@@ -24,7 +24,7 @@ final class ResetButton extends CoolButton {
 
         // Shave off some of the width padded around the button text by the L&F.
         Dimension size = getPreferredSize();
-        size.width -= 22;
+        size.width -= 16;
         setMinimumSize(size);
         setPreferredSize(size);
         setMaximumSize(size);
