@@ -15,6 +15,8 @@ import javax.swing.event.MouseInputListener;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
@@ -29,7 +31,7 @@ import java.util.List;
 //
 // It works in screen coordinates (no AffineTransform).
 
-class CropOverlay extends JComponent implements MouseInputListener {
+class CropOverlay extends JComponent implements MouseInputListener, MouseWheelListener {
 
     private final static Stroke RectStroke = new BasicStroke(20f);
     private final static Color RectColor = new Color(0, 0, 0, 128);
@@ -103,6 +105,7 @@ class CropOverlay extends JComponent implements MouseInputListener {
         setCursor(cursor);
         addMouseListener(this);
         addMouseMotionListener(this);
+        addMouseWheelListener(this);
         addRotateKeyListener();
     }
 
@@ -263,8 +266,6 @@ class CropOverlay extends JComponent implements MouseInputListener {
         List<Point2D> downPts = getPointsBetween(hMidPoint, midBottom, GridSpacing);
         List<Point2D> rightPts = getPointsBetween(vMidPoint, midRight, GridSpacing);
         List<Point2D> leftPts = getPointsBetween(vMidPoint, midLeft, GridSpacing);
-
-        Shape shape = getCropAsShape();
 
         if (isInRect(poll)) {
             g.draw(hPollLine);
@@ -624,6 +625,25 @@ class CropOverlay extends JComponent implements MouseInputListener {
     public void mouseMoved(MouseEvent e) {
         updateCursor(e);
         updateHighlight(e);
+    }
+
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        int count = e.getWheelRotation();
+
+        rotateAngleStart = crop.getAngle();
+        double deg = rotateAngleStart * 180 / Math.PI;
+        deg = Math.round(100 * deg) * 0.01d;
+
+        final double STEPS_PER_DEG = 50;
+        double angle = Math.round(STEPS_PER_DEG * deg + count) / STEPS_PER_DEG * Math.PI / 180;
+
+        CropBounds newCrop = new CropBounds(crop, angle);
+        updateRotateConstraints();
+        newCrop = UnderlayConstraints.sizeToUnderlay(
+                newCrop, underlayRect, rotateWidthLimit, rotateHeightLimit
+                );
+        if (newCrop != null)
+            setCrop(newCrop);
     }
 
     private boolean isEdgeAdjusting() {
