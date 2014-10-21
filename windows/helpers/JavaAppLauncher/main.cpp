@@ -443,7 +443,7 @@ static void openFile( LPCWSTR wPathToFile, LPCWSTR wParentExe ) {
         LC_die( TEXT("NewStringUTF() failed.") );
 
     jstring jParentExe = NULL;
-    if ( wPathToFile && *wPathToFile ) {
+    if ( wParentExe && wPathToFile && *wPathToFile ) {
         char aParentExe[ MAX_PATH ];
         if ( !LC_toUTF8( wParentExe, aParentExe, sizeof aParentExe ) )
             LC_die( TEXT("WideCharToMultiByte() failed.") );
