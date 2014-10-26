@@ -19,7 +19,7 @@ from LightZone/macosx/resources/Info.plist and launch the MainClass defined ther
 Building the LightZone source requires the following software:
 
 - __Java 1.6__ from Apple or Oracle
-- __gcc__ (which includes __g++__)
+- __gcc__ (which includes __g++__; version 4.3 or greater to correctly compile OpenMP)
 - __git__
 - __homebrew__ from http://brew.sh/
 
