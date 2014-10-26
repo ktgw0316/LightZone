@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Sun Oct 26 2014 - KITAGAWA Masahiro <arctica0316@gmail.com>
+
+- Upstream sync to 4.1.0 beta13
+
+-------------------------------------------------------------------
 Wed Sep 17 2014 - KITAGAWA Masahiro <arctica0316@gmail.com>
 
 - Switched instdir from /opt/lightzone to /usr/share/lightzone
