@@ -615,7 +615,7 @@ public final class DCRaw implements
                 String line, args;
                 // output expected on stderr
                 while ((line = readln(dcrawStdErr)) != null) {
-                    // System.out.println(line);
+                    System.out.println(line);
 
                     if ((args = match(line, DCRAW_OUTPUT)) != null)
                         ofName = args.substring(0, args.indexOf(" ..."));
@@ -623,7 +623,7 @@ public final class DCRaw implements
 
                 // Flush stdout just in case...
                 while ((line = readln(dcrawStdOut)) != null)
-                    ; // System.out.println(line);
+                    System.out.println(line);
 
                 if (p != null) {
                     dcrawStdErr.close();
