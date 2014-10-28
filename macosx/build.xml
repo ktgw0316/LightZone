@@ -190,6 +190,10 @@
     <chmod file="${bundle-resources}/Java/dcraw_lz" perm="775"/>
     <chmod file="${bundle-resources}/Java/LightZone-forkd" perm="775"/>
 
+    <exec executable="./postprocess.sh" dir="." failonerror="true" vmlauncher="false">
+      <arg value="${bundle-resources}/Java"/>
+    </exec>
+
     <exec executable="make" dir="help" failonerror="true" vmlauncher="false">
       <arg value="APP_NAME=${app-name}"/>
     </exec>
@@ -199,6 +203,10 @@
     </copy>
     <chmod file="${bundle-resources}/CrashReporter.app/Contents/MacOS/CrashReporter"
            perm="775"/>
+
+    <exec executable="./postprocess.sh" dir="." failonerror="true" vmlauncher="false">
+      <arg value="${bundle-resources}/CrashReporter.app/Contents/MacOS"/>
+    </exec>
   </target>
 
   <!--===== Make a dmg file ================================================-->
