@@ -1430,12 +1430,12 @@ public class Application {
         }
     }
 
-    // Make the ever-present invisible window on the Mac, with a menu.
+    // Make an ever-present dot frame on the Mac, with a menu.
     private static void openMacPlaceholderFrame() {
         JMenuBar menus = new ComboFrameMenuBar();
         JFrame frame = new JFrame();
         frame.setJMenuBar(menus);
-        frame.setBounds(-1000000, -1000000, 0, 0);
+        frame.setBounds(0, 0, 1, 1);
         frame.setUndecorated(true);
         frame.setVisible(true);
     }
@@ -2178,17 +2178,16 @@ public class Application {
             EventQueue.invokeLater(
                 new Runnable() {
                     public void run() {
+                        new LightZoneSkin();
                         if (Platform.getType() == Platform.MacOSX) {
                             // Get a Mac menu bar before setting LaF, then restore.
                             Object menuBarUI = UIManager.get("MenuBarUI");
-                            new LightZoneSkin();
                             setLookAndFeel(LightZoneSkin.getLightZoneLookAndFeel());
                             UIManager.put("MenuBarUI", menuBarUI);
 
                             openMacPlaceholderFrame();
                         }
                         else {
-                            new LightZoneSkin();
                             setLookAndFeel(LightZoneSkin.getLightZoneLookAndFeel());
                         }
                         ComboFrame frame = openEmpty();
