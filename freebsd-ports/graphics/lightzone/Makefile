@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	lightzone
-DISTVERSION=	4.1.0beta12
+DISTVERSION=	4.1.0beta13
 CATEGORIES=	graphics java
 MASTER_SITES=	https://github.com/${GIT_ACCOUNT}/${GIT_PROJECT}/tarball/${DISTVERSION}/
 DISTNAME=	${GIT_PROJECT}-${DISTVERSION}-0-g${GIT_COMMIT}
@@ -28,7 +28,7 @@ RUN_DEPENDS=	java:${PORTSDIR}/java/javavmwrapper \
 
 GIT_ACCOUNT=	Aries85
 GIT_PROJECT=	LightZone
-GIT_COMMIT=	53d2e9f
+GIT_COMMIT=	ef2af27
 
 USES=		desktop-file-utils
 USE_GCC=	yes
