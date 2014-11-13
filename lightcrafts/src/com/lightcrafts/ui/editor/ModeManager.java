@@ -46,22 +46,22 @@ public class ModeManager
         new KeyEventPostProcessor() {
             private boolean isPanMode;
             public boolean postProcessKeyEvent(KeyEvent e) {
-                final boolean wasPanMode = isPanMode;
+                final boolean wasPanMode = (overlay.peekMode() == transientPanMode);
                 if (e.getKeyCode() == PanKeyCode) {
                     if (e.getID() == KeyEvent.KEY_PRESSED) {
                         isPanMode = true;
                     }
                     if (e.getID() == KeyEvent.KEY_RELEASED) {
-                        if (Platform.getType() != Platform.MacOSX) {
+                        if (Platform.getType() == Platform.MacOSX) {
+                            isPanMode = false;
+                        }
+                        else {
                             // Detect and ignore auto-repeat release events
                             final boolean isReallyPressed =
                                 Platform.getPlatform().isKeyPressed(
                                     PanKeyCode
                                 );
                             isPanMode = isReallyPressed;
-                        }
-                        else {
-                            isPanMode = false;
                         }
                     }
                 }
