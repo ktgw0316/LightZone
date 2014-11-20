@@ -7,7 +7,9 @@ import com.lightcrafts.model.LayerMode;
 import com.lightcrafts.model.Operation;
 import com.lightcrafts.ui.layout.Box;
 import com.lightcrafts.ui.layout.BoxLayout;
+
 import static com.lightcrafts.ui.operation.Locale.LOCALE;
+
 import com.lightcrafts.ui.toolkit.LCSliderUI;
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.utils.xml.XMLException;
@@ -16,12 +18,15 @@ import com.lightcrafts.utils.xml.XmlNode;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.*;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.beans.PropertyChangeSupport;
 
 /** Manage a combo box and a slider to control LayerConfig settings on
@@ -32,10 +37,13 @@ import java.beans.PropertyChangeSupport;
 final class LayerControls extends Box {
 
     private Operation op;
-    private JComboBox combo;    // Picks a LayerMode
+    private JComboBox<String> combo;    // Picks a LayerMode
     private JSlider slider;     // Sets an opacity number
 
     private List<LayerMode> layerModes;    // Allowed LayerModes
+
+    private Map<String, LayerMode> modeMap =
+            new HashMap<String, LayerMode>(); // Localized mode names
 
     private final PropertyChangeSupport pcs;
 
@@ -54,14 +62,16 @@ final class LayerControls extends Box {
 
         this.pcs = pcs;
 
-        combo = new JComboBox();
+        combo = new JComboBox<String>();
         combo.setBackground(OpControl.Background);
         combo.setFont(OpControl.ControlFont);
         combo.setMaximumRowCount(30);
         // combo.setMaximumSize(combo.getPreferredSize());
         combo.setFocusable(false);
         for ( LayerMode mode : layerModes ) {
-            combo.addItem( mode );
+            String localizedName = getLocalizedName(mode);
+            modeMap.put(localizedName, mode);
+            combo.addItem(localizedName);
         }
         slider = new JSlider();
         slider.setFocusable(false);
@@ -179,11 +189,19 @@ final class LayerControls extends Box {
 
     // Get the LayerMode from the combo box:
     private LayerMode getMode() {
-        return (LayerMode) combo.getSelectedItem();
+        String name = (String) combo.getSelectedItem();
+        return modeMap.get(name);
     }
 
     private void setMode(LayerMode mode) {
-        combo.setSelectedItem(mode);
+        String localizedName = getLocalizedName(mode);
+        combo.setSelectedItem(localizedName);
+    }
+
+    private String getLocalizedName(LayerMode mode) {
+        String label = mode.getName().replaceAll(" ", "").concat("Label");
+        System.out.println(label);
+        return LOCALE.get(label);
     }
 
     private void updateOperation() {

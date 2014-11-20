@@ -5,9 +5,7 @@ package com.lightcrafts.jai.opimage;
 import com.lightcrafts.media.jai.util.ImageUtil;
 import com.lightcrafts.media.jai.util.JDKWorkarounds;
 import com.lightcrafts.jai.LCROIShape;
-
 import com.lightcrafts.mediax.jai.*;
-import com.lightcrafts.model.ColorSelection;
 
 import java.awt.image.*;
 import java.awt.*;
@@ -86,7 +84,7 @@ public class BlendOpImage extends PointOpImage {
             modes.put(b.name, b);
     }
 
-    public static Set availableModes() {
+    public static Set<String> availableModes() {
         return modes.keySet();
     }
 
