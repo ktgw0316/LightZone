@@ -11,7 +11,7 @@
   <!-- maps -->
   <maps>
      <homeID>top</homeID>
-     <mapref location="Map.jhm"/>
+     <mapref location="English/Map.jhm"/>
   </maps>
 
   <!-- views -->
@@ -19,7 +19,7 @@
     <name>TOC</name>
     <label>Table Of Contents</label>
     <type>javax.help.TOCView</type>
-    <data>LightZoneTOC.xml</data>
+    <data>English/LightZoneTOC.xml</data>
   </view>
 
 <!--
@@ -27,7 +27,7 @@
     <name>Index</name>
     <label>Index</label>
     <type>javax.help.IndexView</type>
-    <data>LightZoneIndex.xml</data>
+    <data>English/LightZoneIndex.xml</data>
   </view>
 -->
 
@@ -36,7 +36,7 @@
     <label>Search</label>
     <type>javax.help.SearchView</type>
     <data engine="com.sun.java.help.search.DefaultSearchEngine">
-      JavaHelpSearch
+      English/JavaHelpSearch
     </data>
   </view>
 <!--

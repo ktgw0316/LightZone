@@ -1,12 +1,12 @@
 #!/bin/sh
 
-files=`ls *.html`
+files=`ls $@/*.html`
+echo tidyall $@
 
 for file in $files; do
-    echo tidy $file
-    tidy -m -i -q -ashtml --show-warnings false $file
+    tidy -m -i -q -ashtml -utf8 --show-warnings false $file
     if [ $? -eq 2 ]; then
-        echo "tidy error"
+        echo "tidy error: $file"
         exit 1
     fi
 done

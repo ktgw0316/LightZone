@@ -1,36 +1,40 @@
 <project name="linux-help" default="build">
 
     <property environment="ENV"/>
+    <property name="languages" value="English"/>
 
     <target name="copy">
         <mkdir dir="build"/>
         <copy todir="build">
-            <fileset dir="../../lightcrafts/help" includes="**"/>
+            <fileset dir="../../lightcrafts/help" includes="**" excludes="*.txt"/>
             <fileset file="LightZone.hs"/>
-            <fileset file="LightZoneTOC.xml"/>
-            <fileset file="Map.jhm"/>
-            <fileset file="Platform.css"/>
+            <fileset file="LightZone_*.hs"/>
         </copy>
-        <copy todir="build/images">
+        <copy todir="build/neutral/images">
             <fileset dir="images" includes="**"/>
         </copy>
+        <apply executable="rsync" parallel="false">
+            <arg value="-a"/>
+            <arg value="build/neutral/"/>
+            <dirset dir="build" includes="${languages}"/>
+        </apply>
     </target>
 
     <target name="tidy">
-        <exec executable="../../tidyall.sh" dir="build/English" vmlauncher="true" failonerror="true"/>
+        <apply executable="./tidyall.sh" parallel="false">
+            <dirset dir="build" includes="${languages}"/>
+        </apply>
     </target>
 
     <target name="index">
-        <exec executable="../jhindexer.sh" dir="build" vmlauncher="true" failonerror="true">
-            <arg value="."/>
-        </exec>
+        <apply executable="./jhindexer.sh" parallel="false">
+            <dirset dir="build" includes="${languages}"/>
+        </apply>
     </target>
 
     <target name="jar">
         <jar jarfile="lightzonehelp.jar">
-            <fileset dir="build" includes="**" excludes="English/**,neutral/**,JavaHelpSearch/**"/>
-            <fileset dir="build/English" includes="**"/>
-            <fileset dir="build/neutral" includes="**"/>
+            <fileset dir="build" includes="**" excludes="neutral/**"/>
         </jar>
     </target>
 
