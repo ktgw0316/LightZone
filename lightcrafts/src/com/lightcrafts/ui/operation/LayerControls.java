@@ -37,7 +37,7 @@ import java.beans.PropertyChangeSupport;
 final class LayerControls extends Box {
 
     private Operation op;
-    private JComboBox<String> combo;    // Picks a LayerMode
+    private JComboBox combo;    // Picks a LayerMode
     private JSlider slider;     // Sets an opacity number
 
     private List<LayerMode> layerModes;    // Allowed LayerModes
@@ -62,7 +62,7 @@ final class LayerControls extends Box {
 
         this.pcs = pcs;
 
-        combo = new JComboBox<String>();
+        combo = new JComboBox();
         combo.setBackground(OpControl.Background);
         combo.setFont(OpControl.ControlFont);
         combo.setMaximumRowCount(30);
@@ -200,7 +200,6 @@ final class LayerControls extends Box {
 
     private String getLocalizedName(LayerMode mode) {
         String label = mode.getName().replaceAll(" ", "").concat("Label");
-        System.out.println(label);
         return LOCALE.get(label);
     }
 
