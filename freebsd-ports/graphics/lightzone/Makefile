@@ -2,10 +2,9 @@
 # $FreeBSD$
 
 PORTNAME=	lightzone
-DISTVERSION=	4.1.0beta13
+DISTVERSION=	4.1.0rc2
 CATEGORIES=	graphics java
-MASTER_SITES=	https://github.com/${GIT_ACCOUNT}/${GIT_PROJECT}/tarball/${DISTVERSION}/
-DISTNAME=	${GIT_PROJECT}-${DISTVERSION}-0-g${GIT_COMMIT}
+MASTER_SITES=	GH
 DIST_SUBDIR=	${PORTNAME}
 
 MAINTAINER=	arctica0316@gmail.com
@@ -27,9 +26,10 @@ BUILD_DEPENDS=	ant:${PORTSDIR}/devel/apache-ant \
 RUN_DEPENDS=	java:${PORTSDIR}/java/javavmwrapper \
 		javahelp:${PORTSDIR}/java/javahelp
 
-GIT_ACCOUNT=	Aries85
-GIT_PROJECT=	LightZone
-GIT_COMMIT=	ef2af27
+USE_GITHUB=	yes
+GH_ACCOUNT=	Aries85
+GH_PROJECT=	LightZone
+GH_TAGNAME=	8765ace
 
 USES=		desktop-file-utils
 USE_GCC=	yes
@@ -42,7 +42,7 @@ JAVA_RUN=	yes
 
 DATADIR=	${PREFIX}/libexec/${PORTNAME}
 # DOCSDIR=	${PREFIX}/share/${PORTNAME}/doc
-WRKSRC=	${WRKDIR}/${GIT_ACCOUNT}-${GIT_PROJECT}-${GIT_COMMIT}/linux
+WRKSRC=	${WRKDIR}/${GH_ACCOUNT}-${GH_PROJECT}-${GH_TAGNAME}/linux
 
 do-install:
 	${INSTALL_SCRIPT} ${WRKSRC}/products/${PORTNAME} ${STAGEDIR}${PREFIX}/bin/
