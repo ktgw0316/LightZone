@@ -10,6 +10,9 @@
             <fileset file="LightZone.hs"/>
             <fileset file="LightZone_*.hs"/>
         </copy>
+        <copy todir="build/neutral">
+            <fileset dir="neutral" includes="**"/>
+        </copy>
         <copy todir="build/neutral/images">
             <fileset dir="images" includes="**"/>
         </copy>
