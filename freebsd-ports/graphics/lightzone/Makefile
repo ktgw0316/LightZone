@@ -22,6 +22,7 @@ BUILD_DEPENDS=	ant:${PORTSDIR}/devel/apache-ant \
 		git:${PORTSDIR}/devel/git \
 		javahelp:${PORTSDIR}/java/javahelp \
 		pkgconf:${PORTSDIR}/devel/pkgconf \
+		rsync:${PORTSDIR}/net/rsync \
 		tidy:${PORTSDIR}/www/tidy
 RUN_DEPENDS=	java:${PORTSDIR}/java/javavmwrapper \
 		javahelp:${PORTSDIR}/java/javahelp

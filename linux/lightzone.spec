@@ -52,7 +52,7 @@ BuildRequires: update-desktop-files
 %define libX11_devel libX11-devel
 %endif
 
-BuildRequires:	java-%{java_version}-openjdk-devel, %{libX11_devel}, ant, autoconf, gcc, gcc-c++, make, tidy, git, javahelp2, %{lcms2_devel}, libjpeg8-devel, libtiff-devel, pkg-config
+BuildRequires:	java-%{java_version}-openjdk-devel, %{libX11_devel}, ant, autoconf, gcc, gcc-c++, make, tidy, git, javahelp2, %{lcms2_devel}, libjpeg8-devel, libtiff-devel, pkg-config, rsync
 Requires:	java-%{java_version}-openjdk, javahelp2, lcms2
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
