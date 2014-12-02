@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8'  ?>
+<!DOCTYPE toc
+  PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 2.0//EN"
+            "../dtd/toc_2_0.dtd">
+<toc version="2.0">
+    <tocitem text="LightZone ヘルプ" target="index">
+        <tocitem text="Basics" target="">
+            <tocitem text="LightZone を知る" target="Discover"/>
+            <tocitem text="新機能" target="New_Features"/>
+            <tocitem text="設定" target="Preferences"/>
+        </tocitem>
+        <tocitem text="写真閲覧ウィンドウ" target="Anatomy-Browser" expand="false">
+            <tocitem text="フォルダーのナビゲーション" target="Navigating_Folders"/>
+            <tocitem text="サムネイル" target="Thumbnails"/>
+            <tocitem text="写真の回転" target="Photos-Rotating"/>
+            <tocitem text="写真の評価" target="Photos-Rating"/>
+            <tocitem text="写真の名前変更" target="Photos-Renaming"/>
+            <tocitem text="写真の削除" target="Photos-Deleting"/>
+            <tocitem text="写真のドラッグ &amp; ドロップ" target="Photos-Dragging_and_Dropping"/>
+            <tocitem text="メタデータ" target="Metadata"/>
+            <tocitem text="写真の編集" target="Photos-Editing"/>
+        </tocitem>
+        <tocitem text="編集ウィンドウ" target="Anatomy-Editor" expand="false">
+            <tocitem text="編集ウィンドウの詳細" target="Anatomy-Editor"/>
+            <tocitem text="ビュワー" target="">
+                <tocitem text="ゾーン ファインダー" target="ZoneFinder"/>
+                <tocitem text="色選択" target="Color_Selection_Viewer"/>
+                <tocitem text="ヒストグラム" target="Histogram"/>
+                <tocitem text="サンプラー" target="Sampler"/>
+            </tocitem>
+            <tocitem text="編集ツールの概要" target="Tools-Editing"/>
+            <tocitem text="コントロール ツールの概要" target="Tools-Controls"/>
+            <tocitem text="ツールの詳細" target="Tool_Anatomy"/>
+            <tocitem text="ツール メニュー" target="Tool_Anatomy-Menu"/>
+            <tocitem text="ツール スタック" target="Tool_Stack"/>
+            <tocitem text="既定のトーン カーブ" target="Default_Tone_Curve"/>
+            <tocitem text="履歴" target="History"/>
+            <tocitem text="領域とマスク" target="Regions"/>
+            <tocitem text="色/輝度の選択" target="Color_Luminosity_Selection"/>
+            <tocitem text="作品の保存" target="Saving"/>
+            <tocitem text="画像の変換" target="Converting"/>
+            <tocitem text="印刷" target="Printing"/>
+            <tocitem text="ツールのコピー &amp; ペースト" target="Tools-Copy_and_Paste"/>
+            <tocitem text="スタイル" target="Styles"/>
+        </tocitem>
+        <tocitem text="編集ツール" expand="false">
+            <tocitem text="白黒" target="Tool-Black_and_White"/>
+            <tocitem text="ぼかし" target="Tool-Blur"/>
+            <tocitem text="複製" target="Tool-Clone"/>
+            <tocitem text="カラー バランス" target="Tool-Color_Balance"/>
+            <tocitem text="切り抜き" target="Tool-Crop"/>
+            <tocitem text="色相/彩度" target="Tool-Hue_Saturation"/>
+            <tocitem text="ノイズ軽減" target="Tool-Noise_Reduction"/>
+            <tocitem text="プルーフ" target="Tool-Proof"/>
+            <tocitem text="RAW 調整" target="Tool-Raw_Adjustments"/>
+            <tocitem text="赤目軽減" target="Tool-Red-Eye"/>
+            <tocitem text="リライト" target="Tool-Relight"/>
+            <tocitem text="回転" target="Tool-Rotate"/>
+            <tocitem text="シャープ化" target="Tool-Sharpen"/>
+            <tocitem text="スポット" target="Tool-Spot"/>
+            <tocitem text="ホワイトバランス" target="Tool-White_Balance"/>
+            <tocitem text="ゾーン マッパー" target="Tool-ZoneMapper"/>
+        </tocitem>
+        <tocitem text="Other" expand="false">
+            <tocitem text="謝辞" target="Acknowledgments"/>
+            <tocitem text="法的事項" target="Legal"/>
+        </tocitem>
+    </tocitem>
+</toc>

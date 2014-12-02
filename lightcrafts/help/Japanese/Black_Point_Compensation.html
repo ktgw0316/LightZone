@@ -1,0 +1,57 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ja" xml:lang="ja">
+
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>黒点の補正</title><!--[if lt IE 7]>
+    <script defer type="text/javascript" src="IE_PNG.js"></script>
+    <link rel="stylesheet" type="text/css" href="IE.css" media="all"/>
+    <![endif]-->
+    <meta name="description"
+      content="黒点の補正の詳細"/>
+    <link rel="stylesheet" type="text/css" href="Help.css" media="all"/>
+    <link rel="stylesheet" type="text/css" href="Platform.css" media="all"/>
+    
+  </head>
+
+  <body>
+    <div id="banner">
+      <div id="banner_left">
+        <a href="index.html">LightZone ヘルプ</a>
+      </div>
+      <div id="banner_right">
+        <a href="index/index.html">索引</a>
+      </div>
+    </div><!-- LC_Index: black point > compensation --><!-- LC_Index: converting images > black point compensation and --><!-- LC_Index: printing > black point compensation and -->
+
+    
+    
+    
+    <a name="Black_Point_Compensation"></a>
+    <img src="images/app_icon-32.png" width="32" height="32"
+      class="title_icon"/>
+    <h1>黒点の補正</h1>
+
+    <p>
+      アプリケーションで管理された色を用いて写真を<a href="Converting.html">変換</a>または<a href="Printing.html">印刷</a>する際に、<a href="Rendering_Intent.html">レンダリング インテント</a>が「相対的色域を保持」であれば、<em>黒点の補正</em>を有効にすることができます。
+    </p>
+    <p>
+      RGB 色空間は 100% の白から 100% の黒まですべての輝度を再現できます。出力デバイス (プリンタやディスプレイなど) は描画できる黒の暗さに限界があります。黒点の補正は、写真のなかの最も暗い黒とデバイスが描画できる最も暗い黒との差を解決しようとします。
+    </p>
+    <p>
+      <img src="images/Black_Point_Compensation-en.png" width="207" height="133"
+        class="inline_right"/>
+      黒点の補正が行われない場合は、デバイスで描画できる最も暗い黒よりもさらに暗い黒は切り捨てられるため、写真のなかの最も暗いシャドウ部が失われる場合があります。
+    </p>
+    <p>
+      それに対し、黒点の補正が行われた場合は、写真の輝度範囲はデバイスの輝度範囲に合わせて圧縮されます。したがって、写真のなかの最も暗い黒とデバイスの最も暗い黒が一致します。
+    </p>
+    <p>
+      しかし、輝度範囲が圧縮されるため、写真の情報は失われます。暗い部分の輝度を切り詰めるのに比べて、損失が輝度範囲全域に分散されます (そのため気づきにくくなります) 。
+    </p>
+
+  </body>
+</html><!-- vim:set et sw=2 ts=2: -->
+
