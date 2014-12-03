@@ -50,6 +50,8 @@ public final class WindowsHelp {
         System.loadLibrary( "Windows" );
 
         m_availableISO639LangCodes.add( "en" );
+        m_availableISO639LangCodes.add( "es" );
+        m_availableISO639LangCodes.add( "ja" );
     }
 }
 /* vim:set et sw=4 ts=4: */

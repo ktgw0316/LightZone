@@ -7,12 +7,14 @@
 #	4. Windows region
 #	5. Help title (localized)
 #	6. Word for "index" (localized)
+#	7. HTML charset
 #
-# Accented characters must use HTML character entity references.
+# Accented characters must use HTML character entity references with backslashes.
 ##
 
-English	:en :0x409 :United States	:LightZone Help		:Index
-French	:fr :0x40c :France		:Aide de LightZone	:Index
-German	:de :0x407 :Germany		:LightZone Hilfe	:Index
-Italian	:it :0x410 :Italy		:Aiuto di LightZone	:Indice
-Spanish	:es :0x40a :Traditional Sort	:Ayuda de LightZone	:&Iacute;ndice
+English	:en :0x409 :United States	:LightZone Help		:Index	:ISO-8859-1
+French	:fr :0x40c :France		:Aide de LightZone	:Index	:ISO-8859-1
+German	:de :0x407 :Germany		:LightZone Hilfe	:Index	:ISO-8859-1
+Italian	:it :0x410 :Italy		:Aiuto di LightZone	:Indice	:ISO-8859-1
+Spanish	:es :0x40a :Traditional Sort	:Ayuda de LightZone	:\&Iacute\;ndice	:ISO-8859-1
+Japanese	:ja	:0x411	:Japan	:LightZone ヘルプ	:目次	:Shift_JIS

@@ -12,6 +12,7 @@ W32_LANG_CODE:=		$(strip $(shell echo $(LANG_LINE) | cut -f3 -d:))
 W32_REGION:=		$(strip $(shell echo $(LANG_LINE) | cut -f4 -d:))
 HELP_TITLE:=		$(strip $(shell echo $(LANG_LINE) | cut -f5 -d:))
 INDEX_WORD:=		$(strip $(shell echo $(LANG_LINE) | cut -f6 -d:))
+HTML_CHARSET:=		$(strip $(shell echo $(LANG_LINE) | cut -f7 -d:))
 
 TARGET_HELP_DIR:=	/tmp/$(HELP)
 
@@ -19,10 +20,12 @@ TARGET_HELP_DIR:=	/tmp/$(HELP)
 # to determine path to HTML Help Workshop
 UNAME:= $(shell uname -ms | grep 64)
 ifeq ($(strip $(UNAME)),)
-HTML_HELP_COMPILER:=	/cygdrive/c/Program\ Files/HTML\ Help\ Workshop/hhc
+HTML_HELP_DIR:=	/cygdrive/c/Program\ Files
 else
-HTML_HELP_COMPILER:=	/cygdrive/c/Program\ Files\ \(x86\)/HTML\ Help\ Workshop/hhc
+HTML_HELP_DIR:=	/cygdrive/c/Program\ Files\ \(x86\)
 endif
+HTML_HELP_COMPILER:=	$(HTML_HELP_DIR)/HTML\ Help\ Workshop/hhc
+
 HTML_HELP_PROJECT:=	$(APP_NAME).hhp
 HTML_HELP_TOC:=		TOC.hhc
 HTML_HELP_FILE:=	../../products/$(APP_NAME)-$(ISO_LANG_CODE).chm
@@ -47,20 +50,30 @@ copy: distclean $(TARGET_HELP_DIR)
 	$(call COPY,$(COMMON_DIR)/help/neutral)
 	$(call COPY,$(COMMON_DIR)/help/$(LANG))
 	$(call COPY,neutral/$(HELP))
-	$(call COPY,$(LANG)/$(HELP))
+#	$(call COPY,$(LANG)/$(HELP))
+	$(call COPY,$(HELP))
 
 copy_project: /tmp/$(HTML_HELP_PROJECT)
-	cp $(LANG)/$(HTML_HELP_TOC) /tmp
+ifeq ($(HTML_CHARSET),ISO-8859-1)
+	cp $(COMMON_DIR)/help/$(LANG)/$(HTML_HELP_TOC) /tmp
+else
+	iconv -f UTF-8 -t ${HTML_CHARSET} $(COMMON_DIR)/help/$(LANG)/$(HTML_HELP_TOC) > /tmp/$(HTML_HELP_TOC)
+endif
 
 /tmp/$(HTML_HELP_PROJECT): $(HTML_HELP_PROJECT).template
-	./build-hhp.pl -c $(W32_LANG_CODE) -h "$(HELP_TITLE)" -i $(ISO_LANG_CODE) -l $(LANG) -r "$(W32_REGION)" < $< > $@
+	./build-hhp.pl -c $(W32_LANG_CODE) -e $(HTML_CHARSET) -h "$(HELP_TITLE)" -i $(ISO_LANG_CODE) -l $(LANG) -r "$(W32_REGION)" < $< > $@
 
 $(TARGET_HELP_DIR):
 	$(MKDIR) $@
 
-$(INDEX_PAGE):
+$(INDEX_PAGE): convert_charset
 	-$(MKDIR) $(@D)
 	$(INDEX_PAGE_COMPILER) -C /tmp -h"$(HELP_TITLE)" -i"$(INDEX_WORD)" $(HELP) > $@
+
+convert_charset:
+ifneq ($(HTML_CHARSET),ISO-8859-1)
+	./iconvall.sh $(HTML_CHARSET) $(TARGET_HELP_DIR)
+endif
 
 $(HTML_HELP_FILE): copy_project
 	cd /tmp && $(HTML_HELP_COMPILER) $(HTML_HELP_PROJECT) || exit 0
