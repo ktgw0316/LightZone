@@ -1,0 +1,140 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ja" xml:lang="ja">
+
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>LightZone: ワークフローの統合: Aperture</title><!--[if lt IE 7]>
+    <script defer type="text/javascript" src="IE_PNG.js"></script>
+    <link rel="stylesheet" type="text/css" href="IE.css" media="all"/>
+    <![endif]-->
+    <meta name="description" content="LightZone を Aperture と一緒に使います。"/>
+    <link rel="stylesheet" type="text/css" href="Help.css" media="all"/>
+    <link rel="stylesheet" type="text/css" href="Platform.css" media="all"/>
+    
+  </head>
+
+  <body>
+    <div id="banner">
+      <div id="banner_left">
+        <a href="index.html">LightZone ヘルプ</a>
+      </div>
+      <div id="banner_right">
+        <a href="index/index.html">索引</a>
+      </div>
+    </div><!-- LC_Index: workflow integration > with Aperture --><!-- LC_Index: Aperture workflow integration -->
+
+    
+    
+    <a name="Integration-Aperture"></a>
+    <img src="images/app_icon-32.png" width="32" height="32"
+      class="title_icon"/>
+    <h1>ワークフローの統合: Aperture</h1>
+
+    <p>
+      Aperture (Apple 製) は写真を編集するための「外部エディタ」として他のアプリケーションを選択できます。LightZone を外部エディタとして設定することもできます。さらに、LightZone は<a href="Preferences.html#Preferences-Direct_Save">直接保存</a>を設定することで Aperture とシームレスに統合できます。
+    </p>
+    <p>
+      <b>註:</b> ここで述べる情報は Aperture バージョン 1.5.3 の時点のものであり、より新しいバージョンでは変更が必要な場合があります。
+    </p>
+
+    <div class="task_box">
+      <h2>Aperture を設定して LightZone と一緒に使えるようにするには:</h2>
+      <ol>
+        <li>
+          「Aperture」→「環境設定...」を選択し、環境設定ダイアログで「エクスポート」セクションを参照します。
+        </li>
+        <li>
+          「外部エディタ」で「選択...」ボタンをクリックします。
+        </li>
+        <li>
+          LightZone を探して選択します。
+        </li>
+        <li>
+          外部エディタのファイルフォーマット」で TIFF を選択します。
+        </li>
+        <li>
+          環境設定ダイアログを閉じます。
+        </li>
+      </ol>
+      <p>
+        <a href="help:runscript='LightZone_Help/scripts/Set_Aperture_Prefs.scpt'">
+        <img src="images/AppleScriptAppIcon.png" width="32" height="32"
+          class="inline_left"/></a>
+        別の方法として、左の AppleScript のアイコンをクリックして Aperture を自動設定することもできます。(Aperture を起動している場合は、先に終了する必要があります。)
+        <br clear="all"/>
+      </p>
+    </div>
+
+    <p>
+      外部エディタを使用する際の Aperture の動作:
+      <ol>
+        <li>
+          (補正後の) 写真を TIFF 形式でコピーしたものを作成する。
+        </li>
+        <li>
+          その TIFF 画像を現在の Aperture ライブラリに元画像として追加する。
+        </li>
+        <li>
+          TIFF 画像を外部エディタに渡す。
+        </li>
+      </ol>
+    </p>
+
+    <div class="task_box">
+      <h2>LightZone を設定して Aperture と一緒に使えるようにするには:</h2>
+      <ol>
+        <li>
+          「LightZone」→「設定...」を選択します。 (設定ダイアログが現れます。)
+        </li>
+        <li>
+          <a href="Preferences.html#Preferences-Direct_Save">直接保存</a>チェックボックスにチェックが入っているのを確認します。
+        </li>
+        <li>
+          環境設定ダイアログを閉じます。
+        </li>
+      </ol>
+    </div>
+
+    以上で設定が完了し、Aperture で写真を選択して LightZone で編集できるようになりました。
+
+    <div class="task_box">
+      <h2>Aperture の写真を LightZone で編集するには:</h2>
+      <ol>
+        <li>
+          編集したい写真を Aperture で選択します。
+        </li>
+        <li>
+          「画像」→「外部エディタで開く」を選択します。(LightZone が起動して TIFF 画像が開きます。)
+        </li>
+        <li>
+          LightZone で TIFF 画像を通常どおりに編集します。
+        </li>
+        <li>
+          「ファイル」→「保存」を選択して Aperture に戻ります。(LightZone は編集済みの写真を TIFF 画像に上書き保存し、Aperture に切り替え、Aperture はその編集済みの TIFF 画像を再読み込みします。)
+        </li>
+      </ol>
+    </div>
+
+    <div>
+      <h3>関連項目:</h3>
+      <ul>
+        <li>
+          <a href="Multipage_TIFF.html">マルチページ TIFF 画像</a>
+        </li>
+        <li class="Mac_only">
+          <a href="Integration-iPhoto.html">ワークフローの統合: iPhoto</a>
+        </li>
+        <li class="Not_Linux">
+          <a href="Integration-iView_MediaPro.html">ワークフローの統合: iView MediaPro</a>
+        </li>
+        <li class="Not_Linux">
+          <a href="Integration-Lightroom.html">ワークフローの統合: Lightroom</a>
+        </li>
+      </ul>
+    </div>
+
+  </body>
+</html><!-- vim:set et sw=2 ts=2: -->
+

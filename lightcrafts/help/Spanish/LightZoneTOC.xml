@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8'  ?>
+<!DOCTYPE toc
+  PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 2.0//EN"
+            "../dtd/toc_2_0.dtd">
+<toc version="2.0">
+    <tocitem text="LightZone Online Help" target="index">
+        <tocitem text="Basics" target="">
+            <tocitem text="Discover LightZone" target="Discover"/>
+            <tocitem text="New Features" target="New_Features"/>
+            <tocitem text="Preferences" target="Preferences"/>
+        </tocitem>
+        <tocitem text="Photo Browser" target="Anatomy-Browser" expand="false">
+            <tocitem text="Navigating folders" target="Navigating_Folders"/>
+            <tocitem text="Thumbnails" target="Thumbnails"/>
+            <tocitem text="Rotating photos" target="Photos-Rotating"/>
+            <tocitem text="Rating photos" target="Photos-Rating"/>
+            <tocitem text="Renaming a photo" target="Photos-Renaming"/>
+            <tocitem text="Deleting photos" target="Photos-Deleting"/>
+            <tocitem text="Dragging &amp; dropping photos" target="Photos-Dragging_and_Dropping"/>
+            <tocitem text="Metadata" target="Metadata"/>
+            <tocitem text="Editing a photo" target="Photos-Editing"/>
+        </tocitem>
+        <tocitem text="Photo Editor" target="Anatomy-Editor" expand="false">
+            <tocitem text="Editor anatomy" target="Anatomy-Editor"/>
+            <tocitem text="Viewers" target="">
+                <tocitem text="ZoneFinder" target="ZoneFinder"/>
+                <tocitem text="Color selection" target="Color_Selection_Viewer"/>
+                <tocitem text="Histogram" target="Histogram"/>
+                <tocitem text="Sampler" target="Sampler"/>
+            </tocitem>
+            <tocitem text="Editing tools overview" target="Tools-Editing"/>
+            <tocitem text="Control tools overview" target="Tools-Controls"/>
+            <tocitem text="Tool anatomy" target="Tool_Anatomy"/>
+            <tocitem text="Tool menu" target="Tool_Anatomy-Menu"/>
+            <tocitem text="Tool Stack" target="Tool_Stack"/>
+            <tocitem text="Default tone curve" target="Default_Tone_Curve"/>
+            <tocitem text="History" target="History"/>
+            <tocitem text="Regions and masks" target="Regions"/>
+            <tocitem text="Color/Luminosity selection" target="Color_Luminosity_Selection"/>
+            <tocitem text="Saving your work" target="Saving"/>
+            <tocitem text="Converting images" target="Converting"/>
+            <tocitem text="Printing" target="Printing"/>
+            <tocitem text="Copy &amp; paste tools" target="Tools-Copy_and_Paste"/>
+            <tocitem text="Estilos" target="Styles"/>
+        </tocitem>
+        <tocitem text="Editing Tools" expand="false">
+            <tocitem text="Black &amp; White" target="Tool-Black_and_White"/>
+            <tocitem text="Blur" target="Tool-Blur"/>
+            <tocitem text="Clonar" target="Tool-Clone"/>
+            <tocitem text="Balance de Color" target="Tool-Color_Balance"/>
+            <tocitem text="Recorte" target="Tool-Crop"/>
+            <tocitem text="Matiz/Saturacion" target="Tool-Hue_Saturation"/>
+            <tocitem text="Reduccion de ruido" target="Tool-Noise_Reduction"/>
+            <tocitem text="Prueba" target="Tool-Proof"/>
+            <tocitem text="Raw Adjustments" target="Tool-Raw_Adjustments"/>
+            <tocitem text="Red-Eye" target="Tool-Red-Eye"/>
+            <tocitem text="Reiluminar" target="Tool-Relight"/>
+            <tocitem text="Rotar" target="Tool-Rotate"/>
+            <tocitem text="Enfocar" target="Tool-Sharpen"/>
+            <tocitem text="Mota" target="Tool-Spot"/>
+            <tocitem text="Balance de blancos" target="Tool-White_Balance"/>
+            <tocitem text="Mapa de Zonas" target="Tool-ZoneMapper"/>
+        </tocitem>
+        <tocitem text="Other" expand="false">
+            <tocitem text="Acknowledgments" target="Acknowledgments"/>
+            <tocitem text="Legal notices" target="Legal"/>
+        </tocitem>
+    </tocitem>
+</toc>

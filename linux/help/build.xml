@@ -1,7 +1,7 @@
 <project name="linux-help" default="build">
 
     <property environment="ENV"/>
-    <property name="languages" value="English"/>
+    <property name="languages" value="English,Japanese,Spanish"/>
 
     <target name="copy">
         <mkdir dir="build"/>

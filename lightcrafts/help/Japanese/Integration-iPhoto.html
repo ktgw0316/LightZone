@@ -1,0 +1,129 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ja" xml:lang="ja">
+
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>LightZone: ワークフローの統合: iPhoto</title><!--[if lt IE 7]>
+    <script defer type="text/javascript" src="IE_PNG.js"></script>
+    <link rel="stylesheet" type="text/css" href="IE.css" media="all"/>
+    <![endif]-->
+    <meta name="description" content="LightZone を iPhoto と一緒に使います。"/>
+    <link rel="stylesheet" type="text/css" href="Help.css" media="all"/>
+    <link rel="stylesheet" type="text/css" href="Platform.css" media="all"/>
+    
+  </head>
+
+  <body>
+    <div id="banner">
+      <div id="banner_left">
+        <a href="index.html">LightZone ヘルプ</a>
+      </div>
+      <div id="banner_right">
+        <a href="index/index.html">索引</a>
+      </div>
+    </div><!-- LC_Index: workflow integration > with iPhoto --><!-- LC_Index: iPhoto workflow integration -->
+
+    
+    
+    <a name="Integration-iPhoto"></a>
+    <img src="images/app_icon-32.png" width="32" height="32"
+      class="title_icon"/>
+    <h1>ワークフローの統合: iPhoto</h1>
+
+    <p>
+      iPhoto (Apple 製) は写真を編集するための「外部エディタ」として他のアプリケーションを選択できます。LightZone を外部エディタとして設定することもできます。さらに、LightZone は<a href="Preferences.html#Preferences-Direct_Save">直接保存</a>を設定することで iPhoto とシームレスに統合できます。
+    </p>
+    <p>
+      <b>註:</b> ここで述べる情報は iPhoto バージョン 7.0.1 の時点のものであり、より新しいバージョンでは変更が必要な場合があります。
+    </p>
+
+    <div class="task_box">
+      <h2>iPhoto を設定して LightZone と一緒に使えるようにするには:</h2>
+      <ol>
+        <li>
+          「iPhoto」→「環境設定...」を選択します。 (環境設定ダイアログが現れます。)
+        </li>
+        <li>
+          「一般」タブを選択します。
+        </li>
+        <li>
+          「写真の編集」で「アプリケーションで編集...」を選択します。
+        </li>
+        <li>
+          LightZone を探して選択します。
+        </li>
+        <li>
+          「詳細」タブを選択します。
+        </li>
+        <li>
+          「RAW 写真」で「外部エディタの使用時に RAW ファイルを使用」にチェックを入れます。
+        </li>
+        <li>
+          環境設定ダイアログを閉じます。
+        </li>
+      </ol>
+      <p>
+        <a href="help:runscript='LightZone_Help/scripts/Set_iPhoto_Prefs.scpt'">
+        <img src="images/AppleScriptAppIcon.png" width="32" height="32"
+          class="inline_left"/></a>
+        別の方法として、左の AppleScript のアイコンをクリックして iPhoto を自動設定することもできます。(iPhoto を起動している場合は、先に終了する必要があります。)
+        <br clear="all"/>
+      </p>
+    </div>
+
+    <p>
+      外部エディタで編集する際に、iPhoto は元画像を外部エディタに渡します。
+    </p>
+
+    <div class="task_box">
+      <h2>LightZone を設定して iPhoto と一緒に使えるようにするには:</h2>
+      <ol>
+        <li>
+          「LightZone」→「設定...」を選択します。 (設定ダイアログが現れます。)
+        </li>
+        <li>
+          <a href="Preferences.html#Preferences-Direct_Save">直接保存</a>チェックボックスにチェックが入っているのを確認します。
+        </li>
+        <li>
+          環境設定ダイアログを閉じます。
+        </li>
+      </ol>
+    </div>
+
+    以上で設定が完了し、iPhoto で写真を選択して LightZone で編集できるようになりました。
+
+    <div class="task_box">
+      <h2>iPhoto の写真を LightZone で編集するには:</h2>
+      <ol>
+        <li>
+          編集したい写真を iPhoto でダブルクリックします。(LightZone が起動して写真が開きます。)
+        </li>
+        <li>
+          LightZone で写真を通常どおりに編集します。
+        </li>
+        <li>
+          「ファイル」→「保存」を選択して iPhoto に戻ります。(LightZone は編集済みの写真を自動で保存し、iPhoto に切り替え、iPhoto にその写真を現在のアルバムへ保存させます。)
+        </li>
+      </ol>
+    </div>
+
+    <div class="Not_Linux">
+      <h3>関連項目:</h3>
+      <ul>
+        <li class="Mac_only">
+          <a href="Integration-Aperture.html">ワークフローの統合: Aperture</a>
+        </li>
+        <li class="Not_Linux">
+          <a href="Integration-iView_MediaPro.html">ワークフローの統合: iView MediaPro</a>
+        </li>
+        <li class="Not_Linux">
+          <a href="Integration-Lightroom.html">ワークフローの統合: Lightroom</a>
+        </li>
+      </ul>
+    </div>
+
+  </body>
+</html><!-- vim:set et sw=2 ts=2: -->
+

@@ -1,0 +1,104 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es-ES" xml:lang="es-ES">
+
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>LightZone: Rendering Intent</title><!--[if lt IE 7]>
+    <script defer type="text/javascript" src="IE_PNG.js"></script>
+    <link rel="stylesheet" type="text/css" href="IE.css" media="all"/>
+    <![endif]-->
+    <meta name="description" content="Description of rendering intents."/>
+    <link rel="stylesheet" type="text/css" href="Help.css" media="all"/>
+    <link rel="stylesheet" type="text/css" href="Platform.css" media="all"/>
+    
+  </head>
+
+  <body>
+    <div id="banner">
+      <div id="banner_left">
+        <a href="index.html">Ayuda de LightZone</a>
+      </div>
+      <div id="banner_right">
+        <a href="index/index.html">Index</a>
+      </div>
+    </div><!-- LC_Index: converting images > rendering intent and --><!-- LC_Index: printing > rendering intent and --><!-- LC_Index: rendering intent -->
+
+    
+    
+    
+    <a name="Rendering_Intent"></a>
+    <img src="images/app_icon-32.png" width="32" height="32"
+      class="title_icon"/>
+    <h1>Rendering intent</h1>
+
+    <p>
+      
+      When either <a href="Converting.html">converting</a>
+      or <a href="Printing.html">printing</a> your photos
+      using application managed colors,
+      you can select the <em>rendering intent</em>.
+      The rending intents you can select are described below.
+    
+    </p>
+
+    <dl>
+
+      <dt>Absolute Colorimetric</dt>
+      <dd>
+        
+        Leaves colors that fall inside the destination gamut unchanged.
+        Out-of-gamut colors are clipped.
+        No scaling of colors to the destination white point is performed.
+        This intent tries to maintain color accuracy
+        at the expense of preserving relationships between colors
+        and is suitable for proofing to simulate the output
+        of a particular device.
+        This intent is particularly useful for previewing
+        how paper color affects printed colors.
+      
+      </dd>
+
+      <dt>Relative Colorimetric</dt>
+      <dd>
+        
+        Compares the extreme highlight of the source color space
+        to that of the destination color space
+        and shifts all colors accordingly.
+        Out-of-gamut colors are shifted to the closest reproducible color
+        in the destination color space.
+        This preserves more of the original colors
+        in a photo than Perceptual.
+        (See also
+        <a href="Black_Point_Compensation.html">Black point compensation</a>.)
+      
+      </dd>
+
+      <dt>Perceptual</dt>
+      <dd>
+        
+        Tries to preserve the visual relationship between colors
+        so it is perceived as natural to the human eye
+        even though the color values themselves may change.
+        This intent is suitable for photos
+        with lots of out-of-gamut colors.
+      
+      </dd>
+
+      <dt>Saturación</dt>
+      <dd>
+        
+        Tries to produce vivid colors in a photo
+        at the expense of color accuracy.
+        This intent is suitable for business graphics
+        like graphs or charts where bright saturated colors
+        are more important than the exact relationship between colors.
+      
+      </dd>
+
+    </dl>
+
+  </body>
+</html><!-- vim:set et sw=2 ts=2: -->
+

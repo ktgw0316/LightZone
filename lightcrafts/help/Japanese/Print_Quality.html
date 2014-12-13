@@ -1,0 +1,63 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ja" xml:lang="ja">
+
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>LightZone: 印刷の品質</title><!--[if lt IE 7]>
+    <script defer type="text/javascript" src="IE_PNG.js"></script>
+    <link rel="stylesheet" type="text/css" href="IE.css" media="all"/>
+    <![endif]-->
+    <meta name="description"
+      content="色の変換と印刷の品質について"/>
+    <link rel="stylesheet" type="text/css" href="Help.css" media="all"/>
+    <link rel="stylesheet" type="text/css" href="Platform.css" media="all"/>
+    
+  </head>
+
+  <body>
+    <div id="banner">
+      <div id="banner_left">
+        <a href="index.html">LightZone ヘルプ</a>
+      </div>
+      <div id="banner_right">
+        <a href="index/index.html">索引</a>
+      </div>
+    </div><!-- LC_Index: printing > quality -->
+
+    
+    <a name="Print_Quality"></a>
+    <img src="images/app_icon-32.png" width="32" height="32"
+      class="title_icon"/>
+    <h1>印刷の品質</h1>
+
+    <p>
+      LightZone は高品質なカラー マネージメントを内蔵しています。しかし、印刷品質はプリンターやプリンター ドライバー ソフトウェアや使用中のカラー マネージメントに大きく依存します。
+    </p>
+    <p>
+      最高の印刷品質を得るには、プリンター ドライバーの設定を理解して正しく使う必要があります。設定が間違っていると印刷品質が悪くなるおそれがあります。特に、色変換を LightZone とプリンター ドライバーのどちらに行わせるかには注意を払ってください。
+    </p>
+    <p>
+      プリンター ドライバーに (「アプリケーションによるカラー マネージメント」や「色調整なし」などの) 色変換をしない設定がある場合は、変換を LightZone とプリンター ドライバーのどちらに行わせるかを選べます。
+    </p>
+
+    <ul>
+      <li>
+        LightZone に色変換を行わせるには、印刷プレビュー ダイアログでプリンターのプロファイルと<a href="Rendering_Intent.html">レンダリング インテント</a>と<a href="Black_Point_Compensation.html">黒点の補正</a>の設定を選択します。そのうえで、プリンター設定ダイアログで、プリンター ドライバーによる色変換を行わないように設定します。
+      </li>
+      <li>
+        プリンター ドライバーに色変換を行わせるには、LightZone で「プリンターによる色管理」を選択し、そのうえでプリンターの設定ダイアログで適切な色設定を行います。
+      </li>
+    </ul>
+
+    <p>
+      重要な注意点として、ほとんどのプリンターでは、1種類の設定で常に最高の結果を得られるわけではありません。ある設定やカラー プロファイルで何枚かのカラー写真は綺麗に印刷できるのに、別の写真ではうまくいかない、という状況が起こることがあります。その場合は、全く別の設定を試してみてください。プリンターのカスタム ICC プロファイルを使っていて綺麗に印刷できない場合は、代わりにプリンター ドライバーの標準または鮮やかな設定を試してみてください。
+    </p>
+    <p>
+      白黒の印刷では、2005 年以前に製造されたインクジェット プリンターのほとんどが線形性とニュートラルさと条件等色の観点で劣っています (条件等色とはふたつの色サンプルが特定の条件下でのみ同じ色に見えることを指します)。しかし、ほとんどのインクジェット プリンター メーカーの最新版製品では問題ありません。
+    </p>
+
+  </body>
+</html><!-- vim:set et sw=2 ts=2: -->
+

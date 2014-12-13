@@ -1,0 +1,187 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ja" xml:lang="ja">
+
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>LightZone: ワークフローの統合: Lightroom</title>
+    <meta name="description" content="LightZone を Lightroom と一緒に使います。"/>
+    <link rel="stylesheet" type="text/css" href="Help.css" media="all"/>
+    <link rel="stylesheet" type="text/css" href="Platform.css" media="all"/>
+    <style type="text/css">
+      <!--
+      .boxed_text {
+        background: #DEE7F8;
+        border: 1px solid #A4BDEC;
+        padding: 0 1em 0 1em;
+      }
+      -->
+    </style><!--[if lt IE 7]>
+    <script defer type="text/javascript" src="IE_PNG.js"></script>
+    <link rel="stylesheet" type="text/css" href="IE.css" media="all"/>
+    <![endif]-->
+    
+  </head>
+
+  <body>
+    <div id="banner">
+      <div id="banner_left">
+        <a href="index.html">LightZone ヘルプ</a>
+      </div>
+      <div id="banner_right">
+        <a href="index/index.html">索引</a>
+      </div>
+    </div><!-- LC_Index: workflow integration > with Lightroom --><!-- LC_Index: Lightroom workflow integration -->
+
+    
+    
+    <a name="Integration-Lightroom"></a>
+    <img src="images/app_icon-32.png" width="32" height="32"
+      class="title_icon"/>
+    <h1>ワークフローの統合: Lightroom</h1>
+
+    <p>
+      Photoshop Lightroom (アドビ システムズ製) は写真を編集するための「外部エディタ」として他のアプリケーションを選択できます。LightZone を外部エディタとして設定することもできます。さらに、LightZone は<a href="Preferences.html#Preferences-Direct_Save">直接保存</a>を設定することで Lightroom とシームレスに統合できます。
+    </p>
+    <p>
+      <b>註:</b> ここで述べる情報は Lightroom バージョン 5.2 の時点のものであり、より新しいバージョンでは変更が必要な場合があります。
+    </p>
+
+    <div class="task_box">
+      <h2>Lightroom を設定して LightZone と一緒に使えるようにするには:</h2>
+      <ol>
+        <li>
+          <span class="Mac_only">Lightroom</span> で「<span class="Windows_only">編集</span>」→「環境設定...」を選択します。
+        </li>
+        <li>
+          「外部編集」タブをクリックします。
+        </li>
+        <li>
+          「追加外部エディター」で「選択...」ボタンをクリックします。
+        </li>
+        <li>
+          LightZone を探して選択します。
+        </li>
+        <li>
+          「ファイル形式」は TIFF を選択します。
+        </li>
+        <li>
+          「bit 数」は 16 ビットを選択します。
+        </li>
+        <li>
+          「外部編集ファイル名」で、「テンプレート」をクリックして「編集...」を選択します。
+        </li>
+        <li>
+          「ファイル名テンプレートエディター」で、テキスト エリアに {Filename &gt;&gt;}-Edit と入力します。
+        </li><li>
+          例に IMG_0002-Edit.psd と表示されているのを確認し、「完了」をクリックします。
+        </li>
+        <li>
+        </li>
+        <li>
+          「環境設定」ウィンドウを閉じます。
+        </li>
+      </ol>
+      <p class="Mac_only">
+        <a href="help:runscript='LightZone_Help/scripts/Set_Lightroom_Prefs.scpt'">
+        <img src="images/AppleScriptAppIcon.png" width="32" height="32"
+          class="inline_left"/></a>
+        別の方法として、左の AppleScript のアイコンをクリックして Lightroom を自動設定することもできます。(Lightroom を起動している場合は、先に終了する必要があります。)
+        <br clear="all"/>
+      </p>
+    </div>
+
+    <p>
+      外部エディタを使用する際に、Lightroom には以下の 3 つの選択肢があります:
+      <ul>
+        <li>
+          元画像を編集する
+        </li>
+        <li>
+          コピーを編集する
+        </li>
+        <li>
+          コピーを Lightroom Adjustments を使って編集する
+        </li>
+      </ul>
+      Raw 画像では、Lightroom では 3 番目の選択肢しか選べません。JPEG 画像または TIFF 画像でも、元画像が変更されるのを防ぐため「コピーを Lightroom Adjustments を使って編集する」を選ぶのが良いでしょう。その場合、Lightroom は次のように動作します。
+      <ol>
+        <li>
+          写真を TIFF 形式でコピーしたものを作成する。
+        </li>
+        <li>
+          その TIFF 画像を現在の Lightroom ライブラリに追加する。
+        </li>
+        <li>
+          TIFF 画像を外部エディタに渡す。
+        </li>
+      </ol>
+    </p>
+
+    <div class="task_box">
+      <h2>LightZone を設定して Lightroom と一緒に使えるようにするには:</h2>
+      <ol>
+        <li>
+          <span class="Mac_only">LightZone</span> で「<span class="Not_Mac">編集</span>」→「設定...」を選択します。
+        </li>
+        <li>
+          <a href="Preferences.html#Preferences-Direct_Save">直接保存</a>チェックボックスにチェックが入っているのを確認します。
+        </li>
+        <li>
+          環境設定ダイアログを閉じます。
+        </li>
+      </ol>
+    </div>
+
+    以上で設定が完了し、Lightroom で写真を選択して LightZone で編集できるようになりました。
+
+    <div class="task_box">
+      <h2>Lightroom の写真を LightZone で編集するには:</h2>
+      <ol>
+        <li>
+          編集したい写真を Lightroom で選択します。
+        </li>
+        <li>
+          「写真」→「編集」を選択します。(Lightroom は写真編集ダイアログを表示して 3 つの選択肢を提示します。)
+        </li>
+        <li>
+          元画像の場合、「コピーを Lightroom Adjustments を使って編集する」を選びます。以前にコピーとして作った TIFF 画像の場合、「元画像を編集」を選択します。 (LightZone が起動して写真が開きます。)
+        </li>
+        <li>
+          LightZone で写真を通常どおりに編集します。
+        </li>
+        <li>
+          「ファイル」→「保存」を選択して Lightroom に戻ります。(LightZone は編集済みの写真を TIFF 画像に上書き保存し<span class="Mac_only">、Lightroom に切り替え、Lightroom はその編集済みの TIFF 画像を再読み込みします。) </span><span class="Not_Mac"></span>
+        </li>
+        <li class="Not_Mac">
+          Lightroom に戻ると、編集済みの写真が再読み込みされます。
+        </li>
+      </ol>
+    </div>
+
+    <p>
+      <b>註:</b> Lightroom の他の設定によっては、LightZone で編集した TIFF 画像のサムネイルに Lightroom が感嘆符を付けることがあります。感嘆符をクリックすると、Lightroom は写真のメタデータが他のアプリケーションで変更されたことを通知し、データをどのように同期するか尋ねてきます。一番安全なのは「設定を上書き」することです。
+    </p>
+
+    <div>
+      <h3>関連項目:</h3>
+      <ul>
+        <li>
+          <a href="Multipage_TIFF.html">マルチページ TIFF 画像</a>
+        </li>
+        <li class="Mac_only">
+          <a href="Integration-Aperture.html">ワークフローの統合: Aperture</a>
+        </li>
+        <li class="Mac_only">
+          <a href="Integration-iPhoto.html">ワークフローの統合: iPhoto</a>
+        </li>
+        <li class="Not_Linux">
+          <a href="Integration-iView_MediaPro.html">ワークフローの統合: iView MediaPro</a>
+        </li>
+      </ul>
+    </div>
+
+  </body>
+</html><!-- vim:set et sw=2 ts=2: -->
+

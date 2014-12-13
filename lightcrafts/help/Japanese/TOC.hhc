@@ -1,0 +1,368 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML>
+<HEAD>
+<meta name="GENERATOR" content="Microsoft&reg; HTML Help Workshop 4.1">
+<!-- Sitemap 1.0 -->
+</HEAD><BODY>
+<OBJECT type="text/site properties">
+	<param name="ImageType" value="Folder">
+</OBJECT>
+<UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="はじめに">
+		<param name="Local" value="LightZone_Help/index.html">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="LightZone を知る">
+		<param name="Local" value="LightZone_Help/Discover.html">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="新機能">
+		<param name="Local" value="LightZone_Help/New_Features.html">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="設定">
+		<param name="Local" value="LightZone_Help/Preferences.html">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="写真閲覧ウィンドウ">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="写真閲覧ウィンドウの詳細">
+			<param name="Local" value="LightZone_Help/Anatomy-Browser.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="フォルダーのナビゲーション">
+			<param name="Local" value="LightZone_Help/Navigating_Folders.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="サムネイル">
+			<param name="Local" value="LightZone_Help/Thumbnails.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="写真の回転">
+			<param name="Local" value="LightZone_Help/Photos-Rotating.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="写真の評価">
+			<param name="Local" value="LightZone_Help/Photos-Rating.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="写真の名前変更">
+			<param name="Local" value="LightZone_Help/Photos-Renaming.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="写真の削除">
+			<param name="Local" value="LightZone_Help/Photos-Deleting.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="写真のドラッグ &amp; ドロップ">
+			<param name="Local" value="LightZone_Help/Photos-Dragging_and_Dropping.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="メタデータ">
+			<param name="Local" value="LightZone_Help/Metadata.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="写真の編集">
+			<param name="Local" value="LightZone_Help/Photos-Editing.html">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="写真編集ウィンドウ">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="編集ウィンドウの詳細">
+			<param name="Local" value="LightZone_Help/Anatomy-Editor.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="ゾーン ファインダー">
+			<param name="Local" value="LightZone_Help/ZoneFinder.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="色選択ビュワー">
+			<param name="Local" value="LightZone_Help/Color_Selection_Viewer.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="ヒストグラム">
+			<param name="Local" value="LightZone_Help/Histogram.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="サンプラー">
+			<param name="Local" value="LightZone_Help/Sampler.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="編集ツールの概要">
+			<param name="Local" value="LightZone_Help/Tools-Editing.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="コントロール ツールの概要">
+			<param name="Local" value="LightZone_Help/Tools-Controls.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="ツールの詳細">
+			<param name="Local" value="LightZone_Help/Tool_Anatomy.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="ツール メニュー">
+			<param name="Local" value="LightZone_Help/Tool_Anatomy-Menu.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="ブレンド モード">
+			<param name="Local" value="LightZone_Help/Blend_Modes.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="ツール スタック">
+			<param name="Local" value="LightZone_Help/Tool_Stack.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="ツール">
+			</OBJECT>
+		<UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="白黒">
+				<param name="Local" value="LightZone_Help/Tool-Black_and_White.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="ぼかし">
+				<param name="Local" value="LightZone_Help/Tool-Blur.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="複製">
+				<param name="Local" value="LightZone_Help/Tool-Clone.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="カラー バランス">
+				<param name="Local" value="LightZone_Help/Tool-Color_Balance.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="切り抜き">
+				<param name="Local" value="LightZone_Help/Tool-Crop.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="色相/彩度">
+				<param name="Local" value="LightZone_Help/Tool-Hue_Saturation.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="ノイズ軽減">
+				<param name="Local" value="LightZone_Help/Tool-Noise_Reduction.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="回転">
+				<param name="Local" value="LightZone_Help/Tool-Rotate.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="プルーフ">
+				<param name="Local" value="LightZone_Help/Tool-Proof.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Raw 調整">
+				<param name="Local" value="LightZone_Help/Tool-Raw_Adjustments.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="赤目軽減">
+				<param name="Local" value="LightZone_Help/Tool-Red-Eye.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="リライト">
+				<param name="Local" value="LightZone_Help/Tool-Relight.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="シャープ化">
+				<param name="Local" value="LightZone_Help/Tool-Sharpen.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="スポット">
+				<param name="Local" value="LightZone_Help/Tool-Spot.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="ホワイト バランス">
+				<param name="Local" value="LightZone_Help/Tool-White_Balance.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="ゾーン マッパー">
+				</OBJECT>
+			<UL>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="はじめに">
+					<param name="Local" value="LightZone_Help/Tool-ZoneMapper.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="ゾーンを探す">
+					<param name="Local" value="LightZone_Help/Tool-ZoneMapper-ZoneFinder.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="輝度の調整">
+					<param name="Local" value="LightZone_Help/Tool-ZoneMapper-Brightness.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="露出の調整">
+					<param name="Local" value="LightZone_Help/Tool-ZoneMapper-Exposure.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="コントラストの調整">
+					<param name="Local" value="LightZone_Help/Tool-ZoneMapper-Contrast.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="黒点の調整">
+					<param name="Local" value="LightZone_Help/Tool-ZoneMapper-Black_Point.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="輝度 vs. RGB の調整">
+					<param name="Local" value="LightZone_Help/Tool-ZoneMapper-Luminosity_RGB.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="キーボード ショートカット">
+					<param name="Local" value="LightZone_Help/Tool-ZoneMapper-Keys.html">
+					</OBJECT>
+			</UL>
+		</UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="規定のトーン カーブ">
+			<param name="Local" value="LightZone_Help/Default_Tone_Curve.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="履歴">
+			<param name="Local" value="LightZone_Help/History.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="領域とマスク">
+			</OBJECT>
+		<UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="はじめに">
+				<param name="Local" value="LightZone_Help/Regions.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="領域の種類">
+				<param name="Local" value="LightZone_Help/Regions-Kinds.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="領域の作成">
+				<param name="Local" value="LightZone_Help/Regions-Creating.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="領域の調整">
+				<param name="Local" value="LightZone_Help/Regions-Adjusting.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="フェザリング">
+				<param name="Local" value="LightZone_Help/Regions-Feathering.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="調整点の追加">
+				<param name="Local" value="LightZone_Help/Regions-Adding_Point.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="調整点の削除">
+				<param name="Local" value="LightZone_Help/Regions-Deleting_Point.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="マスクの反転">
+				<param name="Local" value="LightZone_Help/Regions-Inverting.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="領域のコピー">
+				<param name="Local" value="LightZone_Help/Regions-Copying.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="領域の削除">
+				<param name="Local" value="LightZone_Help/Regions-Deleting.html">
+				</OBJECT>
+		</UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="色/輝度の選択">
+			<param name="Local" value="LightZone_Help/Color_Luminosity_Selection.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="作品の保存">
+			<param name="Local" value="LightZone_Help/Saving.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="画像の変換">
+			<param name="Local" value="LightZone_Help/Converting.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="画像のバッチ変換">
+			<param name="Local" value="LightZone_Help/Converting-Batch.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="印刷">
+			</OBJECT>
+		<UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="印刷">
+				<param name="Local" value="LightZone_Help/Printing.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="印刷の品質">
+				<param name="Local" value="LightZone_Help/Print_Quality.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="レンダリング インテント">
+				<param name="Local" value="LightZone_Help/Rendering_Intent.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="黒点の補正">
+				<param name="Local" value="LightZone_Help/Black_Point_Compensation.html">
+				</OBJECT>
+		</UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="ワークフローの統合">
+			</OBJECT>
+		<UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="iView MediaPro">
+				<param name="Local" value="LightZone_Help/Integration-iView_MediaPro.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Lightroom">
+				<param name="Local" value="LightZone_Help/Integration-Lightroom.html">
+				</OBJECT>
+		</UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="コピー &amp; ペースト ツール">
+			<param name="Local" value="LightZone_Help/Tools-Copy_and_Paste.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="スタイル">
+			</OBJECT>
+		<UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="はじめに">
+				<param name="Local" value="LightZone_Help/Styles.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="作成">
+				<param name="Local" value="LightZone_Help/Styles-Creating.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="適用">
+				<param name="Local" value="LightZone_Help/Styles-Applying.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="エクスポート">
+				<param name="Local" value="LightZone_Help/Styles-Exporting.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="インポート">
+				<param name="Local" value="LightZone_Help/Styles-Importing.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="削除">
+				<param name="Local" value="LightZone_Help/Styles-Deleting.html">
+				</OBJECT>
+		</UL>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="謝辞">
+		<param name="Local" value="LightZone_Help/Acknowledgments.html">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="法的事項">
+		<param name="Local" value="LightZone_Help/Legal.html">
+		</OBJECT>
+</UL>
+</BODY></HTML>

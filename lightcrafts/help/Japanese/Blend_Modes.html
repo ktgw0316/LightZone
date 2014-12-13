@@ -1,0 +1,171 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ja" xml:lang="ja">
+
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>LightZone: ブレンド モード</title><!--[if lt IE 7]>
+    <script defer type="text/javascript" src="IE_PNG.js"></script>
+    <link rel="stylesheet" type="text/css" href="IE.css" media="all"/>
+    <![endif]-->
+    <meta name="description"
+      content="いろいろなブレンド モードの詳細"/>
+    <link rel="stylesheet" type="text/css" href="Help.css" media="all"/>
+    <link rel="stylesheet" type="text/css" href="Platform.css" media="all"/>
+    
+  </head>
+
+  <body>
+    <div id="banner">
+      <div id="banner_left">
+        <a href="index.html">LightZone ヘルプ</a>
+      </div>
+      <div id="banner_right">
+        <a href="index/index.html">索引</a>
+      </div>
+    </div><!-- LC_Index: blending modes > description --><!-- LC_Index: tool > blending modes for -->
+
+    
+    
+    <a name="Blending_Modes"></a>
+    <img src="images/app_icon-32.png" width="32" height="32"
+      class="title_icon"/>
+    <h1>ブレンド モード</h1>
+
+    <p>
+      ほとんどのツールにはそれに合わせた<em>ブレンド モード</em>があります。ブレンド モードは、写真を仕上げるために<a href="Tool_Stack.html">ツール スタック</a>の各ツールの効果がどのようにブレンドされるかをコントロールします。ブレンド モードを理解するために知っておいたほうがいい言葉が少しあります。
+      <dl>
+
+        <dt>ベース色</dt>
+        <dd>
+          写真にツールの効果が適用される前のピクセルの色です。
+        </dd>
+
+        <dt>ブレンド色</dt>
+        <dd>
+          写真にツールの効果が適用された後のピクセルの色です。
+        </dd>
+
+        <dt>結果色</dt>
+        <dd>
+          ブレンド モードによってベース色とブレンド色が混ぜ合わされた後のピクセルの色です。
+        </dd>
+
+      </dl>
+
+      次の図を使って説明しましょう。まず、緑の矢印で示したとおり、写真のベース色にツールの効果が適用されてブレンド色になります。次に、赤の矢印で示したとおり、ブレンド ツールを使ってベース色とブレンド色を混ぜ合わせると結果色になります。
+    </p>
+    <p>
+      <div class="figure">
+        <img src="images/Blend_Modes_Illustration-en.png"
+          width="416" height="139"/>
+      </div>
+    </p>
+
+    <p>
+      ブレンド モードはたくさんの種類のなかから選べます。それぞれの詳細を下記に示しましたが、実際に試してみるのが一番です。
+    </p>
+
+    <dl>
+
+      <dt><a name="Blend_Normal"></a>通常</dt>
+      <dd>
+        何の効果もありません。つまり、ブレンド色と結果色は同じです。
+      </dd>
+
+      <dt><a name="Blend_Average"></a>平均</dt>
+      <dd>
+        「通常」とほぼ同じですが、不透明度が 50% です。
+      </dd>
+
+      <dt><a name="Blend_Color_Burn"></a>色で焼き込み</dt>
+      <dd>
+        ベース色を暗くし、コントラストを上げることでブレンド色を反映します。(「色で覆い焼き」の逆です。「ソフト焼き込み」も参照。)
+      </dd>
+
+      <dt><a name="Blend_Color_Dodge"></a>色で覆い焼き</dt>
+      <dd>
+        ベース色を明るくし、コントラストを下げることでブレンド色を反映します。(「色で焼き込み」の逆です。)
+      </dd>
+
+      <dt><a name="Blend_Darken"></a>比較 (暗)</dt>
+      <dd>
+        結果色はベース色とブレンド色のうち暗い方になります。(「比較 (明) 」の逆です。)
+      </dd>
+
+      <dt><a name="Blend_Difference"></a>差の絶対値</dt>
+      <dd>
+        ベース色とブレンド色のうち明るい方から暗い方を引いたものになります。(「除外」も参照。)
+      </dd>
+
+      <dt><a name="Blend_Exclusion"></a>除外</dt>
+      <dd>
+        差の絶対値と似ていますが、コントラストが低くなります。(「反転」も参照。)
+      </dd>
+
+      <dt><a name="Blend_Hard_Light"></a>ハード ライト</dt>
+      <dd>
+        ブレンド色に応じて色を乗算またはスクリーンします。ブレンド色が 50% グレーよりも明るい場合は、色を明るく (スクリーン) します。50% グレーよりも暗い場合は、色を暗く (乗算) します。画像にハイライトやシャドウを加えるのに有用です。
+      </dd>
+
+      <dt><a name="Blend_Lighten"></a>比較 (明)</dt>
+      <dd>
+        結果色はベース色とブレンド色のうち明るい方になります。(「比較 (暗) 」の逆です。)
+      </dd>
+
+      <dt><a name="Blend_Midtones"></a>中間調</dt>
+      <dd>
+        「通常」とほぼ同じですが、中間調にのみ効果が適用されます。 
+      </dd>
+
+      <dt><a name="Blend_Mid_Hilights"></a>中間ハイライト</dt>
+      <dd>
+        「通常」とほぼ同じですが、中間調とハイライトにのみ効果が適用されます。 
+      </dd>
+
+      <dt><a name="Blend_Multiply"></a>乗算</dt>
+      <dd>
+        ベース色とブレンド色とを乗算します。結果色は常に暗くなります。この効果は写真をマーカー ペンで塗るのに似ています。(「スクリーン」も参照。)
+      </dd>
+
+      <dt><a name="Blend_Negation"></a>反転</dt>
+      <dd>
+        Exclusion とほぼ同じですが、色がより明るく鮮やかになります。
+      </dd>
+
+      <dt><a name="Blend_Overlay"></a>オーバーレイ</dt>
+      <dd>
+        ベース色に応じて色を乗算またはスクリーンします。ベース色のハイライトとシャドウはそのままに、パターンや色が既存のピクセルを覆います。ベース色は、置き換えられることはありませんが、ブレンド色と混合されて元の色の相対的な明るさや暗さを反映します。
+      </dd>
+
+      <dt><a name="Blend_Screen"></a>スクリーン</dt>
+      <dd>
+        乗算とほぼ同じですが、ベース色およびブレンド色の逆数どうしを乗算します。結果色は常に明るくなります。この効果は何枚かの写真スライドをひとつのスクリーンに重ねて映すのと似ています。
+      </dd>
+
+      <dt><a name="Blend_Shadows"></a>シャドウ</dt>
+      <dd>
+        シャドウにのみ効果が適用されます。
+      </dd>
+
+      <dt><a name="Blend_Soft_Burn"></a>ソフト焼き込み</dt>
+      <dd>
+        「色で焼き込み」とほぼ同じですが、彩度とコントラストが低くなります。
+      </dd>
+
+      <dt><a name="Blend_Soft_Dodge"></a>ソフト覆い焼き</dt>
+      <dd>
+        「色で覆い焼き」と「色で焼き込み」の逆を組み合わせたもので、どちらよりも滑らかになります。ベース色はわずかに暗くなり、極めて明るいブレンド色で覆い焼きされます。
+      </dd>
+
+      <dt><a name="Blend_Soft_Light"></a>ソフト ライト</dt>
+      <dd>
+        ブレンド色に応じて色を暗くまたは明るくします。ディフューズしたスポットライトで照らすのに似ています。ブレンド色の方が明るい場合は、覆い焼きされたように明るくなります。ブレンド色の方が暗い場合は、焼き込まれたように暗くなります。
+      </dd>
+
+    </dl>
+
+  </body>
+</html><!-- vim:set et sw=2 ts=2: -->
+
