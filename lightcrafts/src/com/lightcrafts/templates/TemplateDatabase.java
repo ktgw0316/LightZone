@@ -319,16 +319,29 @@ public class TemplateDatabase {
 
     // In later pre-release versions of LightZone 2, Templates on Windows were
     // stored as files under "Application Data\LightZone\Templates", instead
-    // of "My Documents\LightZone\Templates".  This method copies templates
-    // from the old folder to the new one.
+    // of "My Documents\LightZone\Templates".
+    // In versions of LightZone earlier than 4.1.0~beta14, Templates on Linux were
+    // stored as files under "~/LightZone/Templates", instead
+    // of "~/.local/share/LightZone/Templates".
+    // This method copies templates from the old folder to the new one.
     private static void migrateTemplateFolders() {
-        if (Platform.getType() != Platform.Windows) {
-            // Only on Windows did we move the template folder.
+        final Platform.Type platform = Platform.getType();
+        final String oldPath;
+
+        if (platform == Platform.Windows) {
+            oldPath = "Application Data\\LightZone\\Templates";
+        }
+        else if (platform == Platform.Linux) {
+            oldPath = "LightZone/Templates";
+        }
+        else {
+            // Only on Windows and Linux did we move the template folder.
             return;
         }
-        String home = System.getProperty("user.home");
-        String oldPath = "Application Data\\LightZone\\Templates";
-        File oldTemplateDir = new File(home, oldPath);
+
+        final String home = System.getProperty("user.home");
+        final File oldTemplateDir = new File(home, oldPath);
+
         if (oldTemplateDir.isDirectory()) {
             File[] oldFiles = FileUtil.listFiles(oldTemplateDir);
             if (oldFiles != null) {

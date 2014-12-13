@@ -7,11 +7,13 @@ import com.lightcrafts.platform.FileChooser;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.utils.ColorProfileInfo;
+import com.lightcrafts.utils.Version;
 
 import javax.help.HelpSet;
 import javax.help.HelpSetException;
 import javax.help.JHelp;
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.color.ICC_Profile;
 import java.io.BufferedReader;
@@ -43,6 +45,13 @@ public class LinuxPlatform extends Platform {
     );
 
     private static Collection<ColorProfileInfo> Profiles;
+
+    public File getLightZoneDocumentsDirectory() {
+        final String home = System.getProperty( "user.home" );
+        final String appName = Version.getApplicationName();
+        final String path = ".local/share/" + appName;
+        return new File( home, path );
+    }
 
     public LookAndFeel getLookAndFeel() {
         return LightZoneSkin.getLightZoneLookAndFeel();
