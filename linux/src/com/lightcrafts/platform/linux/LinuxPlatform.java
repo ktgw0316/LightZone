@@ -199,7 +199,15 @@ public class LinuxPlatform extends Platform {
             path = file.getParent();
         }
         String[] fileManagers = new String[] {
-            "nautilus", "konqueror" // others?
+            "nautilus",  // Gnome
+            "dolphin",   // KDE
+            "konqueror", // KDE
+            "nemo",      // Cinnamon
+            "caja",      // MATE
+            "thunar",    // Xfce
+            "pcmanfm",   // LXDE
+            "rox-filer"  // RQX
+            // others?
         };
         try {
             Runtime rt = Runtime.getRuntime();

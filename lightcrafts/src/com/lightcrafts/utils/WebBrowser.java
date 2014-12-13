@@ -62,11 +62,14 @@ public final class WebBrowser {
      * This is the list of the browsers to try.
      */
     private static final String[] m_browsers = {
+        "chromium-browser",
+        "google-chrome",
         "firefox",
+        "iceweasel",
+        "safari",
         "opera",
         "konqueror",
-        "mozilla",
-        "netscape"
+        "epiphany-browser"
     };
 }
 /* vim:set et sw=4 ts=4: */
