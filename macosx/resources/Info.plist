@@ -82,6 +82,8 @@
     </array>
     <key>CFBundleIconFile</key>
     <string>LightZone.icns</string>
+    <key>NSHighResolutionCapable</key>
+    <true/>
 
     <!-- Java stuff -->
 
@@ -106,8 +108,10 @@
         </array>
         <key>Properties</key>
         <dict>
-            <key>apple.awt.graphics.UseQuartz</key>
+            <key>apple.laf.useScreenMenuBar</key>
             <string>true</string>
+            <key>apple.awt.graphics.UseQuartz</key>
+            <string>false</string>
             <key>file.encoding</key>
             <string>utf-8</string>
         </dict>
