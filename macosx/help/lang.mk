@@ -16,6 +16,7 @@ LANG_LINE:=		$(shell grep '^$(LANG)' $(TRANSLATIONS_FILE))
 ISO_LANG_CODE:=		$(strip $(shell echo $(LANG_LINE) | cut -f2 -d:))
 HELP_TITLE:=		$(strip $(shell echo $(LANG_LINE) | cut -f5 -d:))
 INDEX_WORD:=		$(strip $(shell echo $(LANG_LINE) | cut -f6 -d:))
+HTML_CHARSET:=		$(strip $(shell echo $(LANG_LINE) | cut -f7 -d:))
 
 SOURCE_LANG_DIR:=	../resources/Resources/$(LANG).lproj
 SOURCE_HELP_DIR:=	$(SOURCE_LANG_DIR)/$(HELP)
@@ -24,9 +25,17 @@ APP_BUNDLE_DIR:=	../release/$(APP_NAME).app
 TARGET_LANG_DIR:=	$(APP_BUNDLE_DIR)/Contents/Resources/$(LANG).lproj
 TARGET_HELP_DIR:=	$(TARGET_LANG_DIR)/$(HELP)
 
+IS_ALPHABETIC=		$(shell echo $(HTML_CHARSET) | grep -i 'iso-8859-\|koi8-')
+
+ifneq ($(IS_ALPHABETIC),)
+MIN_TERM_LENGTH:=	3
+else
+MIN_TERM_LENGTH:=	1
+endif
+
 HELP_INDEX:=		$(TARGET_HELP_DIR)/$(HELP).helpindex
 HELP_INDEXER:=		hiutil
-HELP_INDEXER_OPTIONS:=	-Cag -f $(HELP_INDEX) -m3 -s $(ISO_LANG_CODE)
+HELP_INDEXER_OPTIONS:=	-Cag -f $(HELP_INDEX) -m $(MIN_TERM_LENGTH) -s $(ISO_LANG_CODE)
 
 INDEX_PAGE_COMPILER:=	$(COMMON_DIR)/tools/bin/lc-help-make_index
 INDEX_PAGE_DIR:=	$(TARGET_HELP_DIR)/index
