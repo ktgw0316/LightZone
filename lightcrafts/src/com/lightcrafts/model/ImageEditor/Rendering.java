@@ -329,7 +329,8 @@ public class Rendering implements Cloneable {
         if (scaleFactor < 1 || !isInputTransform) {
             double scaleX = Math.round(scaleFactor * sourceBounds.width) / (double) sourceBounds.width;
             double scaleY = Math.round(scaleFactor * sourceBounds.height) / (double) sourceBounds.height;
-            transform.preConcatenate(AffineTransform.getScaleInstance(scaleX, scaleY));
+            double scale = Math.min(scaleX, scaleY); // To avoid wrong cropping ratio.
+            transform.preConcatenate(AffineTransform.getScaleInstance(scale, scale));
         }
 
         // Rotate
