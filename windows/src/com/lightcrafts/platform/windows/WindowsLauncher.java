@@ -102,6 +102,8 @@ public final class WindowsLauncher {
         final File file = new File( pathToFile );
         final OtherApplication app =
             WindowsApplication.getAppForExe( parentExe );
+        System.out.println( "Parent process: " + parentExe );
+        System.out.println( "File path: " + pathToFile );
         EventQueue.invokeLater(
             new Runnable() {
                 public void run() {
