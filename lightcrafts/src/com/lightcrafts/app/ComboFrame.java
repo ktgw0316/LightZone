@@ -1188,16 +1188,9 @@ public class ComboFrame
                             "AutoSaveQuestion", options.getFile().getName()
                         )
                     );
-                    boolean defaultAutoSave =
-                        prefs.getBoolean("DefaultAutoSave", true);
-                    JCheckBox check = new JCheckBox(
-                        LOCALE.get("AlwaysAutoSaveLabel")
-                    );
-                    check.setSelected(defaultAutoSave);
 
                     Box message = Box.createVerticalBox();
                     message.add(prompt);
-                    message.add(check);
                     int dialogOption = UICompliance.showOptionDialog(
                         this,
                         message,
@@ -1213,19 +1206,6 @@ public class ComboFrame
                         },
                         LOCALE.get("AutoSaveSaveOption"), 3
                     );
-                    if (check.isSelected()) {
-                        prefs.putBoolean("AutoSave", true);
-                        AlertDialog alert =
-                            Platform.getPlatform().getAlertDialog();
-                        alert.showAlert(
-                            this,
-                            LOCALE.get("AutoSaveOnMessageMajor"),
-                            LOCALE.get("AutoSaveOnMessageMinor"),
-                            AlertDialog.WARNING_ALERT,
-                            LOCALE.get("AutoSaveOnButton")
-                        );
-                    }
-                    prefs.putBoolean("DefaultAutoSave", check.isSelected());
 
                     switch (dialogOption) {
                         case 0:
