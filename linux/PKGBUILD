@@ -1,6 +1,6 @@
 # Maintainer: KITAGAWA Masahiro <arctica0316@gmail.com>
 pkgname="lightzone"
-pkgver=4.1.0.beta13
+pkgver=4.1.0.beta14
 pkgrel=0
 pkgdesc="Open-source professional-level digital darkroom software"
 url="http://lightzoneproject.org/"
@@ -15,8 +15,7 @@ md5sums=()
 
 build() {
   # Set $JAVA_HOME and $ANT_HOME
-  [ -f /etc/profile.d/openjdk7.sh ] && source /etc/profile.d/openjdk7.sh
-  [ -f /etc/profile.d/jdk.sh ] && source /etc/profile.d/jdk.sh
+  export JAVA_HOME=/usr/lib/jvm/java-7-openjdk
   [ -f /etc/profile.d/apache-ant.sh ] && source /etc/profile.d/apache-ant.sh
 
   cd "${srcdir}/${pkgname}-${pkgver}/"
