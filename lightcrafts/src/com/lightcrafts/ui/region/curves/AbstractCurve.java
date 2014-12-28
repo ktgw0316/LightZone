@@ -23,8 +23,8 @@ abstract class AbstractCurve implements Curve {
     // update these member variables to match the current values for control
     // points in the "points" List:
     GeneralPath shape;
-    LinkedList segments;        // Line2D, QuadCurve2D, or CubicCurve2D
-    LinkedList points;          // Point2Ds for interpolation
+    LinkedList<Shape> segments;        // Line2D, QuadCurve2D, or CubicCurve2D
+    LinkedList<Point2D> points;          // Point2Ds for interpolation
 
     private final static float NominalRadius = 2f;  // Default for radius
 
@@ -55,8 +55,8 @@ abstract class AbstractCurve implements Curve {
     private boolean highlightInterior;  // Show the Shape interior
 
     public AbstractCurve() {
-        points = new LinkedList();
-        segments = new LinkedList();
+        points = new LinkedList<Point2D>();
+        segments = new LinkedList<Shape>();
         updateStrokes(NominalRadius);
         resetHighlights();
     }
@@ -88,7 +88,7 @@ abstract class AbstractCurve implements Curve {
     }
 
     public void translate(double dx, double dy) {
-        for (Iterator i=points.iterator(); i.hasNext(); ) {
+        for (Iterator<Point2D> i=points.iterator(); i.hasNext(); ) {
             Point2D p = (Point2D) i.next();
             double x = p.getX() + dx;
             double y = p.getY() + dy;
@@ -120,7 +120,7 @@ abstract class AbstractCurve implements Curve {
         Rectangle2D bounds = null;
         if (shape != null) {
             bounds = shape.getBounds();
-            for (Iterator i=points.iterator(); i.hasNext(); ) {
+            for (Iterator<Point2D> i=points.iterator(); i.hasNext(); ) {
                 Point2D p = (Point2D) i.next();
                 Rectangle2D r = getPointBounds(p);
                 bounds.add(r);
@@ -153,7 +153,7 @@ abstract class AbstractCurve implements Curve {
 
     public int getSegmentAt(Point2D p) {
         int n = 0;
-        for (Iterator i=segments.iterator(); i.hasNext(); ) {
+        for (Iterator<Shape> i=segments.iterator(); i.hasNext(); ) {
             Shape thinSegment = (Shape) i.next();
             Shape thickSegment =
                 mouseHitStroke.createStrokedShape(thinSegment);
@@ -313,7 +313,7 @@ abstract class AbstractCurve implements Curve {
                     drawRegular(g, shape);
                 }
                 if (highlightGlobal) {
-                    for (Iterator i=points.iterator(); i.hasNext(); ) {
+                    for (Iterator<Point2D> i=points.iterator(); i.hasNext(); ) {
                         Point2D p = (Point2D) i.next();
                         drawPointRegular(g, p);
                     }
@@ -351,12 +351,12 @@ abstract class AbstractCurve implements Curve {
             return false;
         }
         AbstractCurve curve = (AbstractCurve) c;
-        LinkedList p = curve.points;
+        LinkedList<Point2D> p = curve.points;
         if (points.size() != p.size()) {
             return false;
         }
-        Iterator i=points.iterator();
-        Iterator j=p.iterator();
+        Iterator<Point2D> i = points.iterator();
+        Iterator<Point2D> j = p.iterator();
         while (i.hasNext()) {
             if (! i.next().equals(j.next())) {
                 return false;
@@ -376,8 +376,8 @@ abstract class AbstractCurve implements Curve {
             // Can't happen: all members are Cloneable
             System.err.println("Broken Curve.clone(): " + e.getMessage());
         }
-        clone.segments = new LinkedList();
-        for (Iterator i=segments.iterator(); i.hasNext(); ) {
+        clone.segments = new LinkedList<Shape>();
+        for (Iterator<Shape> i=segments.iterator(); i.hasNext(); ) {
             Shape segment = (Shape) i.next();
             if (segment instanceof Line2D) {
                 segment = (Line2D) ((Line2D) segment).clone();
@@ -393,8 +393,8 @@ abstract class AbstractCurve implements Curve {
             }
             clone.segments.add(segment);
         }
-        clone.points = new LinkedList();
-        for (Iterator i=points.iterator(); i.hasNext(); ) {
+        clone.points = new LinkedList<Point2D>();
+        for (Iterator<Point2D> i=points.iterator(); i.hasNext(); ) {
             Point2D p = (Point2D) i.next();
             p = (Point2D) p.clone();
             clone.points.add(p);
@@ -528,7 +528,7 @@ abstract class AbstractCurve implements Curve {
 
     public void save(XmlNode node) {
         node.setAttribute(WidthTag, Float.toString(width));
-        for (Iterator i=points.iterator(); i.hasNext(); ) {
+        for (Iterator<Point2D> i=points.iterator(); i.hasNext(); ) {
             Point2D p = (Point2D) i.next();
             XmlNode pointNode = node.addChild(PointTag);
             pointNode.setAttribute("x", Double.toString(p.getX()));
