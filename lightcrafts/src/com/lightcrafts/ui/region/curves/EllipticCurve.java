@@ -34,10 +34,12 @@ public class EllipticCurve extends AbstractCurve {
     private final static String EllipticCloneXTag = "SpotCloneX";
     private final static String EllipticCloneYTag = "SpotCloneY";
 
+    // Minimum value for width and height of EllipticCurves
+    private static final double MIN_RADIUS = 0.5; 
     // Default width for new EllipticCurves.
-    private static double EllipticX = Prefs.getDouble(EllipticXTag, 30);
+    private static double EllipticX = Math.max(Prefs.getDouble(EllipticXTag, 30), MIN_RADIUS);
     // Default height for new EllipticCurves.
-    private static double EllipticY = Prefs.getDouble(EllipticYTag, 30);
+    private static double EllipticY = Math.max(Prefs.getDouble(EllipticYTag, 30), MIN_RADIUS);
 
     // Default clone point offsets for new EllipticCurves.
     private static double EllipticCloneX =
@@ -87,14 +89,14 @@ public class EllipticCurve extends AbstractCurve {
         double centerX = (p1.getX() + p2.getX()) / 2;
         double centerY = (p1.getY() + p2.getY()) / 2;
 
-        super.movePoint(n, p);
-
-        // Update the other control point to the complementary location, to
+        // Update the control points to the complementary locations, to
         // preserve the center.
-        double dx = p.getX() - centerX;
-        double dy = p.getY() - centerY;
-        Point2D q = new Point2D.Double(centerX - dx, centerY - dy);
-        super.movePoint(1 - n, q);
+        double dx = Math.max(p.getX() - centerX, MIN_RADIUS);
+        double dy = Math.max(p.getY() - centerY, MIN_RADIUS);
+        Point2D q1 = new Point2D.Double(centerX + dx, centerY + dy);
+        super.movePoint(n, q1);
+        Point2D q2 = new Point2D.Double(centerX - dx, centerY - dy);
+        super.movePoint(1 - n, q2);
 
         // Revise the default values.
         p1 = (Point2D) points.get(0);
