@@ -1,31 +1,12 @@
+/* Copyright (C) 2014-2015 Masahiro Kitagawa */
 /* Copyright (C) 2005-2011 Fabio Riccardi */
 
 package com.lightcrafts.utils;
 
 /*
- * Facets - A Web Application Framework
- * Copyright (c) 2005 Tom Bradford
- *
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
- *
- * The above copyright notice and this permission notice shall be included
- * in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
- * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
- * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
- * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
- * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- * $Id: SoftValueHashMap.java,v 1.1.1.1 2005/07/07 16:02:39 bradford Exp $
+ * This is a refactored version based on
+ * Facets Web Application Framework by Tom Bradford, 2005
+ * http://sourceforge.net/projects/facets/
  */
 
 import java.lang.ref.Reference;
@@ -45,7 +26,7 @@ import java.util.Set;
  * are garbage collected too frequently for the type of volatile caching
  * for which SoftValueHashMap is intended.
  */
-public final class SoftValueHashMap extends AbstractMap {
+public final class SoftValueHashMap<K,V> extends AbstractMap<K,V> {
 
     ////////// public /////////////////////////////////////////////////////////
 
@@ -62,13 +43,13 @@ public final class SoftValueHashMap extends AbstractMap {
         return m_map.containsKey( key );
     }
 
-    public Set entrySet() {
+    public Set<java.util.Map.Entry<K, V>> entrySet() {
         throw new UnsupportedOperationException();
     }
 
-    public Object get( Object key ) {
-        Object value = null;
-        final Reference valueRef = (Reference)m_map.get( key );
+    public V get( Object key ) {
+        V value = null;
+        final Reference<V> valueRef = m_map.get( key );
         if ( valueRef != null ) {
             value = valueRef.get();
             if ( value == null )
@@ -77,16 +58,17 @@ public final class SoftValueHashMap extends AbstractMap {
         return value;
     }
 
-    public Object put( Object key, Object value ) {
+    public V put( K key, V value ) {
         processQueue();
-        final Object newValueRef = new ValueReference( key, value, m_refQueue );
-        final Reference oldValueRef = (Reference)m_map.put( key, newValueRef );
+        final ValueReference<V> newValueRef = new ValueReference<V>( key, value, m_refQueue );
+        final ValueReference<V> oldValueRef = m_map.put( key, newValueRef );
         return oldValueRef != null ? oldValueRef.get() : null;
     }
 
-    public Object remove( Object key ) {
+    public V remove( Object key ) {
         processQueue();
-        return m_map.remove( key );
+        ValueReference<V> result = m_map.remove( key );
+        return result != null ? result.get() : null;
     }
 
     public int size() {
@@ -101,8 +83,8 @@ public final class SoftValueHashMap extends AbstractMap {
      * contains a strong reference to the key for the value.  The key is used
      * to remove the key from the map when the value is reclaimed.
      */
-    private static final class ValueReference extends SoftReference {
-        ValueReference( Object key, Object referrent, ReferenceQueue q ) {
+    private static final class ValueReference<V> extends SoftReference<V> {
+        ValueReference( Object key, V referrent, ReferenceQueue<V> q ) {
             super( referrent, q );
             m_key = key;
         }
@@ -111,19 +93,17 @@ public final class SoftValueHashMap extends AbstractMap {
 
     /**
      * Process the reference queue: for each {@link ValueReference} whose
-     * referrent has been reclaimed, remove that {@link ValueReference}'s key
+     * referent has been reclaimed, remove that {@link ValueReference}'s key
      * from the map.
      */
+    @SuppressWarnings("unchecked")
     private void processQueue() {
-        while ( true ) {
-            final ValueReference valueRef = (ValueReference)m_refQueue.poll();
-            if ( valueRef == null )
-                return;
+        ValueReference<V> valueRef;
+        while ( (valueRef = (ValueReference<V>) m_refQueue.poll()) != null )
             m_map.remove( valueRef.m_key );
-        }
     }
 
-    private final Map m_map = new HashMap();
-    private final ReferenceQueue m_refQueue = new ReferenceQueue();
+    private final Map<K, ValueReference<V>> m_map = new HashMap<K, ValueReference<V>>();
+    private final ReferenceQueue<V> m_refQueue = new ReferenceQueue<V>();
 }
 /* vim:set et sw=4 ts=4: */
