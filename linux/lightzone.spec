@@ -14,7 +14,11 @@ Group:		Productivity/Graphics/Convertors
 Source:		%{name}-%{version}.tar.bz2
 
 %if 0%{?fedora}
+%if 0%{?fedora} >= 20
+%define java_version 1.8.0
+%else
 %define java_version 1.7.0
+%endif
 %define lcms2_devel lcms2-devel
 %define libX11_devel libX11-devel
 %define debug_package %{nil}
