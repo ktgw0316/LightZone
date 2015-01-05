@@ -615,7 +615,7 @@ public abstract class AbstractImageBrowser
         return null;
     }
 
-    void addContinuousSelected(ImageDatum datum, boolean add) {
+    void addContinuousSelected(ImageDatum datum, boolean isAppendix) {
         ImageDatum leadSelected = selection.getLeadSelected();
         if (leadSelected == null) {
             return;
@@ -635,8 +635,13 @@ public abstract class AbstractImageBrowser
                     selected.add(d);
                 }
             }
-            if (add) {
-                selection.addSelected(selected);
+            if (isAppendix) {
+                if (selection.isSelected(leadSelected)) {
+                    selection.addSelected(selected);
+                }
+                else {
+                    selection.removeSelected(selected);
+                }
             }
             else {
                 selection.setSelected(selected);

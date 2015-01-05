@@ -77,7 +77,7 @@ class ImageBrowserMouseListener implements MouseInputListener {
                 else {
                     selection.addSelected(datum);
                 }
-                selection.setLeadSelected(datum);
+                selection.setLeadSelected(datum, false);
             }
             else {
                 if (
@@ -89,14 +89,14 @@ class ImageBrowserMouseListener implements MouseInputListener {
                     // ImageDatum selects it and unselects everything else.
                     if (! selection.isSelected(datum)) {
                         selection.setSelected(Collections.singletonList(datum));
+
+                        selection.setLeadSelected(datum, false);
                     }
                 }
                 else if (! selection.isSelected(datum)) {
                     // All other mouse presses select only the ImageDatum.
-                    selection.clearSelected();
-                    selection.addSelected(datum);
+                    selection.setLeadSelected(datum, true);
                 }
-                selection.setLeadSelected(datum);
             }
         }
         if (event.isPopupTrigger()) {

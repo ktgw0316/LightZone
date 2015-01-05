@@ -18,8 +18,20 @@ class ImageBrowserSelectionModel {
     }
 
     void setLeadSelected(ImageDatum datum) {
+        setLeadSelected(datum, true);
+    }
+
+    void setLeadSelected(ImageDatum datum, boolean clearSelection) {
         if (leadSelected != datum) {
             leadSelected = datum;
+            if (clearSelection) {
+                selected.clear();
+                if (datum != null) {
+                    selected.add(datum);
+                }
+                browser.notifySelectionChanged();
+                browser.repaint();
+            }
         }
     }
 
@@ -80,6 +92,23 @@ class ImageBrowserSelectionModel {
             }
             browser.notifySelectionChanged();
             browser.repaint(datum);
+        }
+    }
+
+    void removeSelected(Collection<ImageDatum> datums) {
+        boolean removed = false;
+        for (ImageDatum datum : datums) {
+            if (selected.contains(datum)) {
+                selected.remove(datum);
+                if ((leadSelected != null) && leadSelected.equals(datum)) {
+                    leadSelected = null;
+                }
+                removed = true;
+                browser.repaint(datum);
+            }
+        }
+        if (removed) {
+            browser.notifySelectionChanged();
         }
     }
 
