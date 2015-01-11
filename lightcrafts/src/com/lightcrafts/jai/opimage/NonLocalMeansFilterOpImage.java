@@ -1,10 +1,5 @@
+/* Copyright (C) 2015 Masahiro Kitagawa */
 package com.lightcrafts.jai.opimage;
-
-/**
- * Copyright (C) 2010 Light Crafts, Inc.
- * Author: fabio
- * 12/22/10 @ 11:20 AM
- */
 
 import com.lightcrafts.image.color.ColorScience;
 import com.lightcrafts.mediax.jai.*;
@@ -16,7 +11,7 @@ import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.util.Map;
 
-public final class BilateralFilterRGBOpImage extends AreaOpImage {
+public final class NonLocalMeansFilterOpImage extends AreaOpImage {
 
     final int y_wr, c_wr; /* window radius */
     final int y_ws, c_ws; /* window size */
@@ -31,7 +26,7 @@ public final class BilateralFilterRGBOpImage extends AreaOpImage {
         return (int) Math.max(Math.ceil(y_sigma_d), Math.ceil(c_sigma_d));
     }
 
-    public BilateralFilterRGBOpImage(RenderedImage source,
+    public NonLocalMeansFilterOpImage(RenderedImage source,
                                      BorderExtender extender,
                                      Map config,
                                      ImageLayout layout,
@@ -41,10 +36,10 @@ public final class BilateralFilterRGBOpImage extends AreaOpImage {
               config,
               true,
               extender,
-              border(y_sigma_d, c_sigma_d),
-              border(y_sigma_d, c_sigma_d),
-              border(y_sigma_d, c_sigma_d),
-              border(y_sigma_d, c_sigma_d));
+              2 * border(y_sigma_d, c_sigma_d),
+              2 * border(y_sigma_d, c_sigma_d),
+              2 * border(y_sigma_d, c_sigma_d),
+              2 * border(y_sigma_d, c_sigma_d));
 
         y_wr = (int) Math.ceil(y_sigma_d);   /* window radius */
         y_ws = 2 * y_wr + 1;		 /* window size */
@@ -102,7 +97,7 @@ public final class BilateralFilterRGBOpImage extends AreaOpImage {
 
         RasterAccessor srcAccessor =
                 new RasterAccessor(source, srcRect, formatTags[0],
-                                   getSource(0).getColorModel());
+                                   getSourceImage(0).getColorModel());
         RasterAccessor dstAccessor =
                 new RasterAccessor(dest, destRect, formatTags[1],
                                    this.getColorModel());
@@ -139,7 +134,7 @@ public final class BilateralFilterRGBOpImage extends AreaOpImage {
         short srcData[] = srcDataArrays[0];
 
         if (src.getNumBands() == 3)
-            bilateralFilterRGB(srcData, dstData,
+            nonLocalMeansFilter(srcData, dstData,
                     y_wr, c_wr, y_ws, c_ws,
                     4 * y_scale_r, 4 * c_scale_r,
                     y_kernel, c_kernel,
@@ -150,7 +145,7 @@ public final class BilateralFilterRGBOpImage extends AreaOpImage {
                     srcScanlineStride, dstScanlineStride);
     }
 
-    static native void bilateralFilterRGB(short srcData[], short destData[],
+    static native void nonLocalMeansFilter(short srcData[], short destData[],
                                     int y_wr, int c_wr, int y_ws, int c_ws,
                                     float y_scale_r, float c_scale_r,
                                     float y_kernel[], float c_kernel[],
