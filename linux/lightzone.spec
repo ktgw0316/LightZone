@@ -63,7 +63,11 @@ BuildRequires: update-desktop-files
 %endif
 
 BuildRequires:	java-%{java_version}-openjdk-devel, %{libX11_devel}, ant, autoconf, gcc, gcc-c++, make, tidy, git, javahelp2, %{lcms2_devel}, %{libjpeg_devel}, libtiff-devel, pkg-config, rsync
+%if 0%{?suse_version} >= 1320
+Requires:	java-%{java_version}-openjdk, javahelp2, lcms2, xerces-j2-xml-apis
+%else
 Requires:	java-%{java_version}-openjdk, javahelp2, lcms2
+%endif
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
