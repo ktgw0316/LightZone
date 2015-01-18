@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent;
 class StackDragListener extends MouseInputAdapter {
 
     private final static int DragThreshold = 5;
+    private final static boolean isJava8 = System.getProperty("java.version").startsWith("1.8.0_");
 
     private DraggableStack stack;
 
@@ -19,6 +20,28 @@ class StackDragListener extends MouseInputAdapter {
 
     StackDragListener(DraggableStack stack) {
         this.stack = stack;
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent event) {
+        if (! isJava8)
+            return;
+
+        if (SwingUtilities.isLeftMouseButton(event))
+            return; // Do nothing while dragging something
+        JComponent comp = getAncestorJComponent(event);
+        boolean isSwappable = ((StackableComponent) comp).isSwappable();
+        stack.dragStart(comp, isSwappable);
+    }
+
+    @Override
+    public void mouseExited(MouseEvent event) {
+        if (! isJava8)
+            return;
+
+        if (SwingUtilities.isLeftMouseButton(event))
+            return; // Do nothing while dragging something
+        tearDown(event);
     }
 
     @Override
@@ -34,8 +57,10 @@ class StackDragListener extends MouseInputAdapter {
             Point p = event.getPoint();
             if (startCursor.distance(p) > DragThreshold) {
                 startComponent = comp.getLocation();
-                boolean isSwappable = ((StackableComponent) comp).isSwappable();
-                stack.dragStart(comp, isSwappable);
+                if (! isJava8) {
+                    boolean isSwappable = ((StackableComponent) comp).isSwappable();
+                    stack.dragStart(comp, isSwappable);
+                }
                 dragging = true;
             }
         }
