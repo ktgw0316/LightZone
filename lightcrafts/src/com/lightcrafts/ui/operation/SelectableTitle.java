@@ -3,6 +3,7 @@
 package com.lightcrafts.ui.operation;
 
 import com.lightcrafts.ui.layout.Box;
+import static com.lightcrafts.ui.operation.Locale.LOCALE;
 import com.lightcrafts.ui.toolkit.ImageOnlyButton;
 import com.lightcrafts.ui.toolkit.IconFactory;
 import com.lightcrafts.ui.LightZoneSkin;
@@ -364,7 +365,7 @@ class SelectableTitle extends JPanel implements MouseListener {
 
         // A long list of JMenuItems whose actions point to the OpStack:
 
-        JMenuItem collapseItem = new JMenuItem("Collapse");
+        JMenuItem collapseItem = new JMenuItem(LOCALE.get("CollapseMenuItem"));
         collapseItem.addActionListener(
             new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -372,7 +373,7 @@ class SelectableTitle extends JPanel implements MouseListener {
                 }
             }
         );
-        JMenuItem collapseOthers = new JMenuItem("Collapse Others");
+        JMenuItem collapseOthers = new JMenuItem(LOCALE.get("CollapseOthersMenuItem"));
         collapseOthers.addActionListener(
             new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -382,7 +383,7 @@ class SelectableTitle extends JPanel implements MouseListener {
                 }
             }
         );
-        JMenuItem expandItem = new JMenuItem("Expand");
+        JMenuItem expandItem = new JMenuItem(LOCALE.get("ExpandMenuItem"));
         expandItem.addActionListener(
             new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -390,7 +391,7 @@ class SelectableTitle extends JPanel implements MouseListener {
                 }
             }
         );
-        JMenuItem autoItem = new JMenuItem("Auto Expand");
+        JMenuItem autoItem = new JMenuItem(LOCALE.get("AutoExpandMenuItem"));
         autoItem.addActionListener(
             new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -400,7 +401,7 @@ class SelectableTitle extends JPanel implements MouseListener {
                 }
             }
         );
-        JMenuItem noAutoItem = new JMenuItem("Don't Auto Expand");
+        JMenuItem noAutoItem = new JMenuItem(LOCALE.get("DontAutoExpandMenuItem"));
         noAutoItem.addActionListener(
             new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -408,7 +409,7 @@ class SelectableTitle extends JPanel implements MouseListener {
                 }
             }
         );
-        JMenuItem collapseAllItem = new JMenuItem("Collapse All");
+        JMenuItem collapseAllItem = new JMenuItem(LOCALE.get("CollapseAllMenuItem"));
         collapseAllItem.addActionListener(
             new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -417,7 +418,7 @@ class SelectableTitle extends JPanel implements MouseListener {
                 }
             }
         );
-        JMenuItem expandAllItem = new JMenuItem("Expand All");
+        JMenuItem expandAllItem = new JMenuItem(LOCALE.get("ExpandAllMenuItem"));
         expandAllItem.addActionListener(
             new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
