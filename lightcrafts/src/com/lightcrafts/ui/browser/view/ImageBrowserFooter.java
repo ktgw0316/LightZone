@@ -4,6 +4,7 @@ package com.lightcrafts.ui.browser.view;
 
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.ui.browser.model.ImageDatum;
+import static com.lightcrafts.ui.browser.view.Locale.LOCALE;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,7 +25,7 @@ public class ImageBrowserFooter extends Box implements ImageBrowserListener {
         super(BoxLayout.X_AXIS);
 
         lead = new JLabel();
-        all = new JLabel("No images selected"); // Init's preferred height
+        all = new JLabel(LOCALE.get("NoImagesSelectedText")); // Init's preferred height
         error = new JLabel();
 
         Font font = lead.getFont();
@@ -76,27 +77,32 @@ public class ImageBrowserFooter extends Box implements ImageBrowserListener {
         if (size == 0) {
             if (total > 0) {
                 if (total == 1) {
-                    all.setText("1 image");
+                    all.setText(LOCALE.get("SingleImageText"));
                 }
                 else {
-                    all.setText(total + " images");
+                    all.setText(total + " " + LOCALE.get("MultipleImagesText"));
                 }
             }
             else {
-                all.setText("No images");
+                all.setText(LOCALE.get("NoImagesText"));
             }
         }
         else if (size == total) {
             if (size == 1) {
-                all.setText("1 image selected (" + sizeText + ")");
+                all.setText(LOCALE.get("SingleImageSelectedText") +
+                    " (" + sizeText + ")");
             }
             else {
-                all.setText(size + " images selected (" + sizeText + ")");
+                all.setText(
+                    size + " " + LOCALE.get("MultipleImagesSelectedText") +
+                        " (" + sizeText + ")"
+		);
             }
         }
         else {
             all.setText(
-                size + " of " + total + " images selected (" + sizeText + ")"
+                size + " / " + total + " " + LOCALE.get("MultipleImagesSelectedText") +
+                    " (" + sizeText + ")"
             );
         }
         // On selection changes, warn if the lead selection is readonly,
@@ -104,7 +110,8 @@ public class ImageBrowserFooter extends Box implements ImageBrowserListener {
         String errorText = null;
         if (leadFile != null) {
             if (! leadFile.canWrite()) {
-                errorText = "\"" + leadFile.getName() + "\" is a readonly file";
+                errorText = "\"" + leadFile.getName() + "\" " +
+                    LOCALE.get("ReadonlyFileText");
             }
         }
         if (errorText == null) {
@@ -112,7 +119,7 @@ public class ImageBrowserFooter extends Box implements ImageBrowserListener {
                 File folder = files.get(0).getParentFile();
                 if ((folder != null) && ! folder.canWrite()) {
                     errorText = "\"" + folder.getName() + "\" " +
-                        "is a readonly folder";
+                        LOCALE.get("ReadonlyFolderText");
                 }
             }
         }

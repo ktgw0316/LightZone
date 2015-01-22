@@ -93,7 +93,7 @@ public class TemplateList extends JPanel implements ListSelectionListener {
                 }
             }
         );
-        deleteButton = new JButton("Delete");
+        deleteButton = new JButton(LOCALE.get("TemplateDeleteButton"));
         deleteButton.setEnabled(false);
         deleteButton.addActionListener(
             new ActionListener() {

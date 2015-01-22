@@ -3,6 +3,7 @@
 package com.lightcrafts.model.ImageEditor;
 
 import com.lightcrafts.model.Engine;
+import static com.lightcrafts.model.ImageEditor.Locale.LOCALE;
 
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
@@ -79,7 +80,7 @@ class RawSettings extends JPanel {
     }
 
     void showFrame() {
-        frame = new JFrame("RAW Settings");
+        frame = new JFrame(LOCALE.get("RawSettingTitle"));
         frame.getContentPane().add(this);
         frame.pack();
         frame.setLocation(0, 0);

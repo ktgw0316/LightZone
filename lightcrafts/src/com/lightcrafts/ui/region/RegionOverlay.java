@@ -6,6 +6,7 @@ import com.lightcrafts.model.Contour;
 import com.lightcrafts.model.Region;
 import com.lightcrafts.ui.mode.Mode;
 import com.lightcrafts.ui.action.ToggleAction;
+import static com.lightcrafts.ui.region.Locale.LOCALE;
 import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlNode;
 
@@ -375,7 +376,7 @@ public class RegionOverlay extends JPanel implements Mode {
 
     private void showPopup(MouseEvent event) {
         if (event.isPopupTrigger() && ! showHideToggle.getState()) {
-            JMenuItem item = new JMenuItem("Show Regions");
+            JMenuItem item = new JMenuItem(LOCALE.get("ShowRegionsMenuItemText"));
             item.addActionListener(
                 new ActionListener() {
                     public void actionPerformed(ActionEvent event) {
