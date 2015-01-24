@@ -21,21 +21,15 @@ class StackDragListener extends MouseInputAdapter {
         this.stack = stack;
     }
 
+    @Override
     public void mousePressed(MouseEvent event) {
-        JComponent comp = (JComponent) event.getComponent();
-        comp = (JComponent) SwingUtilities.getAncestorOfClass(
-            StackableComponent.class, comp
-        );
-        event.translatePoint(comp.getX(), comp.getY());
+        JComponent comp = getAncestorJComponent(event);
         startCursor = event.getPoint();
     }
 
+    @Override
     public void mouseDragged(MouseEvent event) {
-        JComponent comp = (JComponent) event.getComponent();
-        comp = (JComponent) SwingUtilities.getAncestorOfClass(
-            StackableComponent.class, comp
-        );
-        event.translatePoint(comp.getX(), comp.getY());
+        JComponent comp = getAncestorJComponent(event);
         if ((startCursor != null) && (! dragging)) {
             Point p = event.getPoint();
             if (startCursor.distance(p) > DragThreshold) {
@@ -48,22 +42,31 @@ class StackDragListener extends MouseInputAdapter {
         if (dragging) {
             Point p1 = startCursor;
             Point p2 = event.getPoint();
-
             Point interval = new Point(p2.x - p1.x, p2.y - p1.y);
-
             stack.dragTo(comp, startComponent.y + interval.y);
         }
     }
 
+    @Override
     public void mouseReleased(MouseEvent event) {
         if (dragging) {
-            JComponent comp = (JComponent) event.getComponent();
-            comp = (JComponent) SwingUtilities.getAncestorOfClass(
-                StackableComponent.class, comp
-            );
-            stack.dragEnd(comp);
+            tearDown(event);
             dragging = false;
         }
         startCursor = null;
+    }
+
+    private JComponent getAncestorJComponent(MouseEvent event) {
+        JComponent comp = (JComponent) event.getComponent();
+        comp = (JComponent) SwingUtilities.getAncestorOfClass(
+                StackableComponent.class, comp
+                );
+        event.translatePoint(comp.getX(), comp.getY());
+        return comp;
+    }
+
+    private void tearDown(MouseEvent event) {
+        JComponent comp = getAncestorJComponent(event);
+        stack.dragEnd(comp);
     }
 }
