@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2015 Masahiro Kitagawa */
 
 package com.lightcrafts.ui.browser.ctrls;
 
@@ -42,16 +43,12 @@ public class BrowserControls extends Box {
 
         AbstractImageBrowser browser = browserScroll.getBrowser();
 
-        RotateButtons rotators = new RotateButtons(browser);
-        ToggleTitleBorder.setBorder(rotators, LOCALE.get("RotateBorderTitle"));
+        BoxedButton rotator   = new BoxedButton(LOCALE.get("RotateBorderTitle"),    new RotateButtons(browser));
+        BoxedButton rater     = new BoxedButton(LOCALE.get("RateBorderTitle"),      new RatingButton(browser));
+        BoxedButton copyPaste = new BoxedButton(LOCALE.get("CopyToolsBorderTitle"), new CopyPasteButtons(browser));
 
-        BoxedButton rater = new BoxedButton(LOCALE.get("RateBorderTitle"), new RatingButton(browser));
-
-        CopyPasteButtons copyPaste = new CopyPasteButtons(browser);
-        ToggleTitleBorder.setBorder(copyPaste, LOCALE.get("CopyToolsBorderTitle"));
-
-        SortCtrl sort = new SortCtrl(browser);
-        ToggleTitleBorder.setBorder(sort, LOCALE.get("SortBorderTitle"));
+        SortCtrl sortCtrl = new SortCtrl(browser);
+        BoxedButton sort      = new BoxedButton(LOCALE.get("SortBorderTitle"),      sortCtrl);
 
         SizeSlider sizeSlider = new SizeSlider(browser);
         ToggleTitleBorder.setBorder(sizeSlider, LOCALE.get("SizeBorderTitle"));
@@ -68,12 +65,11 @@ public class BrowserControls extends Box {
                 }
             }
         );
+        //BoxedButton size      = new BoxedButton(LOCALE.get("SizeBorderTitle"),      sizeSlider);
 
-        BoxedButton collapse = new BoxedButton(LOCALE.get("CollapseBorderTitle"), new CollapseButton(frame));
-
-        BoxedButton latest = new BoxedButton(LOCALE.get("SelectBorderTitle"), new SelectLatestButton(browser));
-
-        BoxedButton trash = new BoxedButton(LOCALE.get("TrashBorderTitle"), new TrashButton(browser));
+        BoxedButton collapse  = new BoxedButton(LOCALE.get("CollapseBorderTitle"),  new CollapseButton(frame));
+        BoxedButton latest    = new BoxedButton(LOCALE.get("SelectBorderTitle"),    new SelectLatestButton(browser));
+        BoxedButton trash     = new BoxedButton(LOCALE.get("TrashBorderTitle"),     new TrashButton(browser));
 
         browserScroll.setCenteringLayout(false);
 
@@ -92,52 +88,54 @@ public class BrowserControls extends Box {
                 }
             }
         );
+
+        final int space = 8;
         // add(Box.createHorizontalGlue());
-        add(Box.createHorizontalStrut(8));
-        add(rotators);
-        add(Box.createHorizontalStrut(8));
+        add(Box.createHorizontalStrut(space));
+        add(rotator.box);
+        add(Box.createHorizontalStrut(space));
         add(rater.box);
-        add(Box.createHorizontalStrut(8));
+        add(Box.createHorizontalStrut(space));
 
         add(trash.box);
-        add(Box.createHorizontalStrut(8));
+        add(Box.createHorizontalStrut(space));
 
         add(new Separator());
-        add(Box.createHorizontalStrut(8));
+        add(Box.createHorizontalStrut(space));
 
-        add(copyPaste);
-        add(Box.createHorizontalStrut(8));
+        add(copyPaste.box);
+        add(Box.createHorizontalStrut(space));
 
         add(Box.createHorizontalGlue());
 
         add(browserError);
-        add(Box.createHorizontalStrut(8));
+        add(Box.createHorizontalStrut(space));
 
         add(collapse.box);
-        add(Box.createHorizontalStrut(8));
+        add(Box.createHorizontalStrut(space));
         add(latest.box);
-        add(Box.createHorizontalStrut(8));
+        add(Box.createHorizontalStrut(space));
 
         add(new Separator());
-        add(Box.createHorizontalStrut(8));
+        add(Box.createHorizontalStrut(space));
 
         add(sizeSlider);
-        add(Box.createHorizontalStrut(8));
-        add(sort);
-        add(Box.createHorizontalStrut(8));
-//        add(Box.createHorizontalGlue());
+        add(Box.createHorizontalStrut(space));
+        add(sort.box);
+        add(Box.createHorizontalStrut(space));
+        // add(Box.createHorizontalGlue());
 
         // Add space above and below, to tune the layout:
         Border border = BorderFactory.createEmptyBorder(0, 0, 3, 0);
         setBorder(border);
 
-        ImageDatumComparator comp = sort.getSort();
-        boolean inverted = sort.getSortInverted();
-        int size = sizeSlider.getValue();
+        ImageDatumComparator comp = sortCtrl.getSort();
+        boolean inverted = sortCtrl.getSortInverted();
+        int sizeValue = sizeSlider.getValue();
 
         browser.setSort(comp);
         browser.setSortInverted(inverted);
-        browser.setCharacteristicSize(size);
+        browser.setCharacteristicSize(sizeValue);
     }
 
     class Separator extends JSeparator {
@@ -148,13 +146,13 @@ public class BrowserControls extends Box {
     }
 
 /*
-        // add(Box.createHorizontalStrut(8));
+        // add(Box.createHorizontalStrut(space));
         // Box s = Box.createHorizontalBox();
         JSeparator separator = new JSeparator(SwingConstants.VERTICAL);
         // s.add(separator);
         // separator.setLayout(new BoxLayout(separator, BoxLayout.X_AXIS));
         add(separator);
-        // add(Box.createHorizontalStrut(8));
+        // add(Box.createHorizontalStrut(space));
         add(Box.createHorizontalGlue());
 
  */

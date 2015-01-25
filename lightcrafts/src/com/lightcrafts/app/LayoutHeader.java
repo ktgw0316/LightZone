@@ -10,6 +10,7 @@ import static com.lightcrafts.app.Locale.LOCALE;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.net.URL;
@@ -165,8 +166,9 @@ class LayoutHeader extends Box {
     // Called when things in the ComboFrame change (browser, document, etc.)
     void update() {
         for (BoxedButton boxedButton : buttonList) {
-            for (AbstractButton button : boxedButton.buttons)
-                ((FrameButton) button).updateButton();
+            for (JComponent button : boxedButton.buttons)
+                if (button instanceof JButton)
+                    ((FrameButton) button).updateButton();
         }
     }
 
