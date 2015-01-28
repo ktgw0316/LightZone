@@ -363,7 +363,15 @@ public final class FileUtil {
     public static File[] listFiles( File dir, FileFilter filter,
                                     boolean includeDirs ) {
         dir = Platform.getPlatform().isSpecialFile( dir );
-        return dir.listFiles( filter );
+        final File[] files = dir.listFiles(filter);
+        if (! includeDirs)
+            return files;
+
+        final File[] dirs = dir.listFiles(dirFilter);
+        File[] dirsAndFiles = new File[files.length + dirs.length];
+        System.arraycopy(files, 0, dirsAndFiles, 0, files.length);
+        System.arraycopy(dirs,  0, dirsAndFiles, files.length, dirs.length);
+        return dirsAndFiles;
     }
 
     /**
@@ -558,5 +566,10 @@ public final class FileUtil {
         System.loadLibrary( "LCFileUtil" );
     }
 
+    private static final FileFilter dirFilter = new FileFilter() {
+        public boolean accept(File file) {
+            return file.isDirectory();
+        }
+    };
 }
 /* vim:set et sw=4 ts=4: */
