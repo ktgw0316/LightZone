@@ -15,9 +15,8 @@ import java.awt.*;
 
 class CopyrightPrefsPanel extends JPanel {
 
-    private final static Dimension TextAreaSize = new Dimension(250, 100);
-
     private final static int TextFieldWidth = 250;
+    private final static Dimension TextAreaSize = new Dimension(TextFieldWidth, 150);
 
     // The copyright text
     private JTextArea copyrightText;
@@ -83,7 +82,9 @@ class CopyrightPrefsPanel extends JPanel {
         c.gridx = 1;
         c.gridy = 1;
         c.anchor = GridBagConstraints.WEST;
-        fields.add(copyrightText, c);
+        JScrollPane scrollpane = new JScrollPane(copyrightText);
+        scrollpane.setPreferredSize(TextAreaSize);
+        fields.add(scrollpane, c);
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         add(Box.createVerticalGlue());
@@ -121,9 +122,6 @@ class CopyrightPrefsPanel extends JPanel {
             isPlaceholderCopyrightTextShown = true;
         }
         copyrightText.setEditable(true);
-
-        copyrightText.setPreferredSize(TextAreaSize);
-        copyrightText.setMaximumSize(TextAreaSize);
     }
 
     private void initCreatorText() {
@@ -171,8 +169,6 @@ class CopyrightPrefsPanel extends JPanel {
             );
             isPlaceholderCopyrightTextShown = true;
         }
-        copyrightText.setPreferredSize(TextAreaSize);
-        copyrightText.setMaximumSize(TextAreaSize);
     }
 
     private void revertCreatorText() {

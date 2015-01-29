@@ -12,6 +12,7 @@ class HelpArea extends JTextArea{
 
     HelpArea() {
         setColumns(40);
+        setRows(4);
         setLineWrap(true);
         setWrapStyleWord(true);
         setEditable(false);
