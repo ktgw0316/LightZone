@@ -1,7 +1,7 @@
 Index: dcraw/dcraw_lz.c
 ===================================================================
---- dcraw.orig/dcraw_lz.c	2014-09-04 00:01:33.741008603 +0900
-+++ dcraw/dcraw_lz.c	2014-09-04 00:01:33.733009286 +0900
+--- dcraw.orig/dcraw_lz.c	2015-01-31 21:36:37.964722841 +0900
++++ dcraw/dcraw_lz.c	2015-01-31 21:36:37.960723201 +0900
 @@ -153,7 +153,10 @@
  int no_auto_bright=0;
  unsigned greybox[4] = { 0, 0, UINT_MAX, UINT_MAX };
@@ -14,15 +14,7 @@ Index: dcraw/dcraw_lz.c
    { 0.412453, 0.357580, 0.180423 },
    { 0.212671, 0.715160, 0.072169 },
    { 0.019334, 0.119193, 0.950227 } };
-@@ -8575,6 +8578,7 @@
-     width -= 44;
-   } else if (!strcmp(model,"D3200") ||
- 	     !strcmp(model,"D600")  ||
-+	     !strcmp(model,"D610")  ||
- 	    !strncmp(model,"D800",4)) {
-     width -= 46;
-   } else if (!strcmp(model,"D4") ||
-@@ -9597,6 +9601,9 @@
+@@ -9801,6 +9804,9 @@
  #ifndef NO_LCMS
    const char *cam_profile=0, *out_profile=0;
  #endif
@@ -32,7 +24,7 @@ Index: dcraw/dcraw_lz.c
  
  #ifndef LOCALTIME
    putenv ((char *) "TZ=UTC");
-@@ -9691,6 +9698,9 @@
+@@ -9895,6 +9901,9 @@
        case 'p':  cam_profile = argv[arg++];
  #endif
  	break;
@@ -42,7 +34,7 @@ Index: dcraw/dcraw_lz.c
        case 'P':  bpfile     = argv[arg++];  break;
        case 'K':  dark_frame = argv[arg++];  break;
        case 'z':  timestamp_only    = 1;  break;
-@@ -9719,6 +9729,19 @@
+@@ -9923,6 +9932,19 @@
  	return 1;
      }
    }
@@ -62,9 +54,9 @@ Index: dcraw/dcraw_lz.c
    if (arg == argc) {
      fprintf (stderr,_("No files to process.\n"));
      return 1;
-@@ -9857,6 +9880,10 @@
- 	  for (i=0; i < 16; i++)
- 	    putchar (cdesc[fcol(i >> 1,i & 1)]);
+@@ -10067,6 +10089,10 @@
+ 	    for (c = i && putchar('/') && 0; c < fwide; c++)
+ 	      putchar (cdesc[fcol(i,c)]);
  	}
 +#ifdef LIGHTZONE
 +	printf(_("\nCamera RGB Profile:"));
@@ -73,7 +65,7 @@ Index: dcraw/dcraw_lz.c
  	printf (_("\nDaylight multipliers:"));
  	FORCC printf (" %f", pre_mul[c]);
  	if (cam_mul[0] > 0) {
-@@ -9969,6 +9996,11 @@
+@@ -10179,6 +10205,11 @@
      if (write_to_stdout)
        strcpy (ofname,_("standard output"));
      else {
