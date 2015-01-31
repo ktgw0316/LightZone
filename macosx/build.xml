@@ -181,7 +181,6 @@
       <fileset dir="products" excludes=".git">
         <include name="dcraw_lz"/>
         <include name="LightZone-forkd"/>
-        <include name="EWSMacCompress.tar.gz"/>
         <include name="**/*.dylib"/>
         <include name="**/*.jar"/>
         <include name="**/*.jnilib"/>
