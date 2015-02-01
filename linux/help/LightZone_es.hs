@@ -22,15 +22,6 @@
     <data>Spanish/LightZoneTOC.xml</data>
   </view>
 
-<!--
-  <view>
-    <name>Index</name>
-    <label>Index</label>
-    <type>javax.help.IndexView</type>
-    <data>Spanish/LightZoneIndex.xml</data>
-  </view>
--->
-
   <view>
     <name>Search</name>
     <label>Search</label>
@@ -39,13 +30,7 @@
       Spanish/JavaHelpSearch
     </data>
   </view>
-<!--
-  <view>
-    <name>Favorites</name>
-    <label>Favorites</label>
-    <type>javax.help.FavoritesView</type>
-  </view>
--->
+
   <presentation default="true" displayviewimages="false">
      <name>main window</name>
      <size width="700" height="400" />

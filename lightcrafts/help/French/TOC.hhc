@@ -1,0 +1,368 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HTML>
+<HEAD>
+<meta name="GENERATOR" content="Microsoft&reg; HTML Help Workshop 4.1">
+<!-- Sitemap 1.0 -->
+</HEAD><BODY>
+<OBJECT type="text/site properties">
+	<param name="ImageType" value="Folder">
+</OBJECT>
+<UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Cover page">
+		<param name="Local" value="LightZone_Help/index.html">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="D&eacute;couvrir  LightZone">
+		<param name="Local" value="LightZone_Help/Discover.html">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Nouvelles fonctionnalit&eacute;s">
+		<param name="Local" value="LightZone_Help/New_Features.html">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+    <param name="Name" value="Pr&eacute;f&eacute;rences">
+		<param name="Local" value="LightZone_Help/Preferences.html">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Navigateur Photo">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Pr&eacute;sentation du Navigateur">
+			<param name="Local" value="LightZone_Help/Anatomy-Browser.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Parcourir les dossiers">
+			<param name="Local" value="LightZone_Help/Navigating_Folders.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Vignettes">
+			<param name="Local" value="LightZone_Help/Thumbnails.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Rotation des photos">
+			<param name="Local" value="LightZone_Help/Photos-Rotating.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Notez des photos">
+			<param name="Local" value="LightZone_Help/Photos-Rating.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Renommer des Photos">
+			<param name="Local" value="LightZone_Help/Photos-Renaming.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Supprimer des Photos">
+			<param name="Local" value="LightZone_Help/Photos-Deleting.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Glisser et D&eacute;poser des photos">
+			<param name="Local" value="LightZone_Help/Photos-Dragging_and_Dropping.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="M&eacute;tadonn&eacute;es">
+			<param name="Local" value="LightZone_Help/Metadata.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="&Eacute;diter une photo">
+			<param name="Local" value="LightZone_Help/Photos-Editing.html">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="&Eacute;diteur Photo">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Pr&eacute;sentation de l'&eacute;diteur">
+			<param name="Local" value="LightZone_Help/Anatomy-Editor.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="ZoneFinder">
+			<param name="Local" value="LightZone_Help/ZoneFinder.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="le visionneur de la S&eacute;lection Couleur">
+			<param name="Local" value="LightZone_Help/Color_Selection_Viewer.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="L'Histogramme">
+			<param name="Local" value="LightZone_Help/Histogram.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Pipette">
+			<param name="Local" value="LightZone_Help/Sampler.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Vue d'ensemble des Outils d'&eacute;dition">
+			<param name="Local" value="LightZone_Help/Tools-Editing.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Vue d'ensemble des Outils de Contr&oacute;le">
+			<param name="Local" value="LightZone_Help/Tools-Controls.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Pr&eacute;sentation des Outils">
+			<param name="Local" value="LightZone_Help/Tool_Anatomy.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Pr&eacute;sentation des Outils">
+			<param name="Local" value="LightZone_Help/Tool_Anatomy-Menu.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Les Modes de Fusion">
+			<param name="Local" value="LightZone_Help/Blend_Modes.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="La Cha&eacute;ne de d&eacute;veloppement">
+			<param name="Local" value="LightZone_Help/Tool_Stack.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Tools">
+			</OBJECT>
+		<UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Noir et Blanc">
+				<param name="Local" value="LightZone_Help/Tool-Black_and_White.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Flou">
+				<param name="Local" value="LightZone_Help/Tool-Blur.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Cloner">
+				<param name="Local" value="LightZone_Help/Tool-Clone.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Balance de Couleur">
+				<param name="Local" value="LightZone_Help/Tool-Color_Balance.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Recadrer">
+				<param name="Local" value="LightZone_Help/Tool-Crop.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Teinte/Saturation">
+				<param name="Local" value="LightZone_Help/Tool-Hue_Saturation.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="R&eacute;duction de Bruit">
+				<param name="Local" value="LightZone_Help/Tool-Noise_Reduction.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Tourner">
+				<param name="Local" value="LightZone_Help/Tool-Rotate.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="&eacute;preuvage">
+				<param name="Local" value="LightZone_Help/Tool-Proof.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Ajustements RAW">
+				<param name="Local" value="LightZone_Help/Tool-Raw_Adjustments.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Yeux-Rouges">
+				<param name="Local" value="LightZone_Help/Tool-Red-Eye.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Relight">
+				<param name="Local" value="LightZone_Help/Tool-Relight.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Nettet&eacute;">
+				<param name="Local" value="LightZone_Help/Tool-Sharpen.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Poussi&eacute;re">
+				<param name="Local" value="LightZone_Help/Tool-Spot.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Balance des Blancs">
+				<param name="Local" value="LightZone_Help/Tool-White_Balance.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="ZoneMapper">
+				</OBJECT>
+			<UL>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Introduction">
+					<param name="Local" value="LightZone_Help/Tool-ZoneMapper.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Identifier des Zones">
+					<param name="Local" value="LightZone_Help/Tool-ZoneMapper-ZoneFinder.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Ajuster la Luminosit&eacute;">
+					<param name="Local" value="LightZone_Help/Tool-ZoneMapper-Brightness.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Ajuster l'Exposition">
+					<param name="Local" value="LightZone_Help/Tool-ZoneMapper-Exposure.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Ajuster le Contraste">
+					<param name="Local" value="LightZone_Help/Tool-ZoneMapper-Contrast.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Ajustement du Point Noir">
+					<param name="Local" value="LightZone_Help/Tool-ZoneMapper-Black_Point.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Luminosity vs. RGB">
+					<param name="Local" value="LightZone_Help/Tool-ZoneMapper-Luminosity_RGB.html">
+					</OBJECT>
+				<LI> <OBJECT type="text/sitemap">
+					<param name="Name" value="Raccourcis Clavier">
+					<param name="Local" value="LightZone_Help/Tool-ZoneMapper-Keys.html">
+					</OBJECT>
+			</UL>
+		</UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="La Courbe de Tonalit&eacute;s par d&eacute;faut">
+			<param name="Local" value="LightZone_Help/Default_Tone_Curve.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="L'Historique">
+			<param name="Local" value="LightZone_Help/History.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="R&eacute;gions et Masques">
+			</OBJECT>
+		<UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Introduction">
+				<param name="Local" value="LightZone_Help/Regions.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Region types">
+				<param name="Local" value="LightZone_Help/Regions-Kinds.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Cr&eacute;ation des Regions">
+				<param name="Local" value="LightZone_Help/Regions-Creating.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Ajustement des Regions">
+				<param name="Local" value="LightZone_Help/Regions-Adjusting.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Adoucissement">
+				<param name="Local" value="LightZone_Help/Regions-Feathering.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Ajouter des points de contr&oacute;le">
+				<param name="Local" value="LightZone_Help/Regions-Adding_Point.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Supprimer des points de contr&oacute;le">
+				<param name="Local" value="LightZone_Help/Regions-Deleting_Point.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Inversion des Masques">
+				<param name="Local" value="LightZone_Help/Regions-Inverting.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Copier des Regions">
+				<param name="Local" value="LightZone_Help/Regions-Copying.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Suppression des Regions">
+				<param name="Local" value="LightZone_Help/Regions-Deleting.html">
+				</OBJECT>
+		</UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="S&eacute;lection de Couleur/Luminosit&eacute;">
+			<param name="Local" value="LightZone_Help/Color_Luminosity_Selection.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Enregistrez Votre Travail">
+			<param name="Local" value="LightZone_Help/Saving.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Conversion d'Images">
+			<param name="Local" value="LightZone_Help/Converting.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Conversion par lot d'Images">
+			<param name="Local" value="LightZone_Help/Converting-Batch.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Impressions">
+			</OBJECT>
+		<UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="How to print">
+				<param name="Local" value="LightZone_Help/Printing.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Qualit&eacute; d'Impression">
+				<param name="Local" value="LightZone_Help/Print_Quality.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Intention de Rendu">
+				<param name="Local" value="LightZone_Help/Rendering_Intent.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Compensation du Point Noir">
+				<param name="Local" value="LightZone_Help/Black_Point_Compensation.html">
+				</OBJECT>
+		</UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Workflow integration">
+			</OBJECT>
+		<UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="iView MediaPro">
+				<param name="Local" value="LightZone_Help/Integration-iView_MediaPro.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Lightroom">
+				<param name="Local" value="LightZone_Help/Integration-Lightroom.html">
+				</OBJECT>
+		</UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Copier &amp; Coller des Outils">
+			<param name="Local" value="LightZone_Help/Tools-Copy_and_Paste.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Styles">
+			</OBJECT>
+		<UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Introduction">
+				<param name="Local" value="LightZone_Help/Styles.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Cr&eacute;ation">
+				<param name="Local" value="LightZone_Help/Styles-Creating.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Application">
+				<param name="Local" value="LightZone_Help/Styles-Applying.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Exportation">
+				<param name="Local" value="LightZone_Help/Styles-Exporting.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Importation">
+				<param name="Local" value="LightZone_Help/Styles-Importing.html">
+				</OBJECT>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="Suppression">
+				<param name="Local" value="LightZone_Help/Styles-Deleting.html">
+				</OBJECT>
+		</UL>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Remerciements">
+		<param name="Local" value="LightZone_Help/Acknowledgments.html">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Mentions L&eacute;gales">
+		<param name="Local" value="LightZone_Help/Legal.html">
+		</OBJECT>
+</UL>
+</BODY></HTML>
