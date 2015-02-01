@@ -1,0 +1,198 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr-FR" xml:lang="fr-FR">
+
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>LightZone: Intégration à un flux de travail : Aperture</title><!--[if lt IE 7]>
+    <script defer type="text/javascript" src="IE_PNG.js"></script>
+    <link rel="stylesheet" type="text/css" href="IE.css" media="all"/>
+    <![endif]-->
+    <meta name="description" content="Utilisez LightZone avec Aperture."/>
+    <link rel="stylesheet" type="text/css" href="Help.css" media="all"/>
+    <link rel="stylesheet" type="text/css" href="Platform.css" media="all"/>
+    
+  </head>
+
+  <body>
+    <div id="banner">
+      <div id="banner_left">
+        <a href="index.html">Aide de LightZone</a>
+      </div>
+      <div id="banner_right">
+        <a href="index/index.html">Index</a>
+      </div>
+    </div><!-- LC_Index: workflow integration > with Aperture --><!-- LC_Index: Aperture workflow integration -->
+
+    
+    
+    <a name="Integration-Aperture"></a>
+    <img src="images/app_icon-32.png" width="32" height="32"
+      class="title_icon"/>
+    <h1>Intégration à un flux de travail : Aperture</h1>
+
+    <p>
+      Aperture (d'Apple) vous permet de choisir une autre application comme "éditeur externer" pour éditer vos photos. Vous pouvez configurer LightZone pour être seulement un éditeur. En complèment, LightZone s'intègre de façon transparente avec Aperture via le réglage de <a href="Preferences.html#Preferences-Direct_Save">Enregistrement Direct</a> dans les préférences.
+    </p>
+    <p>
+      <b>Note:</b> Les informations fournies ici correspondent à la version 1.5.3 d'Aperture mais peuvent avoir changé depuis.
+    </p>
+
+    <div class="task_box">
+      <h2>To configure Aperture to work with LightZone:</h2>
+      <ol>
+        <li>
+          
+          Select Aperture &gt; Preferences...
+          (the Preferences dialog will appear)
+          and refer to the Output section.
+        
+        </li>
+        <li>
+          
+          Under External Image Editor,
+          click the Choose... button.
+        
+        </li>
+        <li>
+          
+          Navigate to and select LightZone.
+        
+        </li>
+        <li>
+          
+          For External Editor File Format,
+          select TIFF.
+        
+        </li>
+        <li>
+          
+          Close the Preferences dialog.
+        
+        </li>
+      </ol>
+      <p>
+        <a href="help:runscript='LightZone_Help/scripts/Set_Aperture_Prefs.scpt'">
+        <img src="images/AppleScriptAppIcon.png" width="32" height="32"
+          class="inline_left"/></a>
+        
+        Alternatively,
+        you can click the AppleScript icon to the left
+        to configure Aperture automatically for you now.
+        (If Aperture is running, you must quit it first.)
+        
+        <br clear="all"/>
+      </p>
+    </div>
+
+    <p>
+      
+      When using an external editor, Aperture:
+      
+      <ol>
+        <li>
+          
+          Creates a TIFF copy of your photo (with corrections applied).
+        
+        </li>
+        <li>
+          
+          Adds this TIFF copy to the current Aperture library
+          as a version of the original.
+        
+        </li>
+        <li>
+          
+          Gives this TIFF copy to the external editor to edit.
+        
+        </li>
+      </ol>
+    </p>
+
+    <div class="task_box">
+      <h2>To configure LightZone to work with Aperture:</h2>
+      <ol>
+        <li>
+          
+          Select LightZone &gt; Preferences...
+          (The Preferences dialog will appear.)
+        
+        </li>
+        <li>
+          
+          Make sure the
+          <a href="Preferences.html#Preferences-Direct_Save">Direct Save</a>
+          check-box is checked.
+        
+        </li>
+        <li>
+          
+          Close the Preferences dialog.
+        
+        </li>
+      </ol>
+    </div>
+
+    
+
+    Now that everything has been configured,
+    you can select one of your photos in Aperture
+    and edit it in LightZone.
+
+    
+
+    <div class="task_box">
+      <h2>To edit your photo in LightZone from Aperture:</h2>
+      <ol>
+        <li>
+          
+          In Aperture, select the photo you want to edit.
+        
+        </li>
+        <li>
+          
+          Select Images &gt; Open With External Editor.
+          (LightZone will launch and open the TIFF copy of your photo.)
+        
+        </li>
+        <li>
+          
+          In LightZone, edit the TIFF copy of your photo
+          to your liking
+          as you would any photo.
+        
+        </li>
+        <li>
+          
+          Select File &gt; Save to Aperture.
+          (LightZone will save your edited photo
+          back to the TIFF copy overwriting it,
+          switch back to Aperture,
+          and Aperture will reload the now edited TIFF copy of your photo.)
+        
+        </li>
+      </ol>
+    </div>
+
+    <div>
+      <h3>Voir aussi :</h3>
+      <ul>
+        <li>
+          <a href="Multipage_TIFF.html">Images TIFF Multipages</a>
+        </li>
+        <li class="Mac_only">
+          <a href="Integration-iPhoto.html">Intégration à un flux de travail : iPhoto</a>
+        </li>
+        <li class="Not_Linux">
+          <a href="Integration-iView_MediaPro.html">Intégration à un flux de travail : iView MediaPro</a>
+        </li>
+        <li class="Not_Linux">
+          <a href="Integration-Lightroom.html">Intégration à un flux de travail : Lightroom</a>
+        </li>
+      </ul>
+    </div>
+
+  </body>
+</html><!-- vim:set et sw=2 ts=2: -->
+

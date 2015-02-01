@@ -1,0 +1,171 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr-FR" xml:lang="fr-FR">
+
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>LightZone: Les Modes de Fusion</title><!--[if lt IE 7]>
+    <script defer type="text/javascript" src="IE_PNG.js"></script>
+    <link rel="stylesheet" type="text/css" href="IE.css" media="all"/>
+    <![endif]-->
+    <meta name="description"
+      content="Description des différents Modes de Fusion."/>
+    <link rel="stylesheet" type="text/css" href="Help.css" media="all"/>
+    <link rel="stylesheet" type="text/css" href="Platform.css" media="all"/>
+    
+  </head>
+
+  <body>
+    <div id="banner">
+      <div id="banner_left">
+        <a href="index.html">Aide de LightZone</a>
+      </div>
+      <div id="banner_right">
+        <a href="index/index.html">Index</a>
+      </div>
+    </div><!-- LC_Index: blending modes > description --><!-- LC_Index: tool > blending modes for -->
+
+    
+    
+    <a name="Blending_Modes"></a>
+    <img src="images/app_icon-32.png" width="32" height="32"
+      class="title_icon"/>
+    <h1>Les Modes de Fusion</h1>
+
+    <p>
+      La plupart des outils peuvent avoir un <em>mode de Fusion</em> défini pour eux. Un mode de fusion contrôle la façon dont les résultats des outils dans la <a href="Tool_Stack.html">chaîne de développement</a> seront fusionnés ensemble pour former la photo finale. Avant tout, pour comprendre les Modes de Fusion, il y a quelques termes à connaître :
+      <dl>
+
+        <dt>Couleur de Base</dt>
+        <dd>
+          C'est la couleur d'un pixel avant que le résultat d'un outil n'ait été appliqué à la photo.
+        </dd>
+
+        <dt>Couleur de Fusion</dt>
+        <dd>
+          C'est la couleur d'un pixel après que le résultat d'un outil ait été appliqué à la photo.
+        </dd>
+
+        <dt>Couleur Finale</dt>
+        <dd>
+          C'est la couleur d'un pixel après que ses couleurs de base et de fusion aient été fusionnées ensemble en utilisant un mode fusion.
+        </dd>
+
+      </dl>
+
+      Ceci est expliqué dans l'illustration ci-dessous. D'abord, comme montré par les flèches vertes, les couleurs de base de la photo  sont modifiées par l'outil pour produire les couleurs de fusions. Ensuite, comme le montré par les flèches rouges, les couleurs de base et de fusion sont fusionnées ensemble en utilisant un mode de fusion pour produire les couleurs finales.
+    </p>
+    <p>
+      <div class="figure">
+        <img src="images/Blend_Modes_Illustration-en.png"
+          width="416" height="139"/>
+      </div>
+    </p>
+
+    <p>
+      Il existe de nombreux modes de fusions disponibles. Bien qu'une description pour chacun se trouve ci-dessous, il est mieux d'expérimenter.
+    </p>
+
+    <dl>
+
+      <dt><a name="Blend_Normal"></a>Normal</dt>
+      <dd>
+        Ce mode de fusion n'a pas d'effet; de ce fait, les couleurs de fusion et les couleurs finales sont identiques.
+      </dd>
+
+      <dt><a name="Blend_Average"></a>Moyenne</dt>
+      <dd>
+        Agit de la même façon que le mode de fusion Normal, mais avec une opacité de 50%.
+      </dd>
+
+      <dt><a name="Blend_Color_Burn"></a>Densité Couleur +</dt>
+      <dd>
+        Assombrit la couleur de base  pour reproduire la couleur de fusion en augmentant le contraste entre les deux. (Opposé de Densité Couleur - . Voir aussi: Soft Burn.)
+      </dd>
+
+      <dt><a name="Blend_Color_Dodge"></a>Densité Couleur -</dt>
+      <dd>
+        Éclaircit la couleur de base pour reproduire la couleur de fusion en diminuant le contraste entre les deux. (Opposé de Densité Couleur + .)
+      </dd>
+
+      <dt><a name="Blend_Darken"></a>Assombrir</dt>
+      <dd>
+        La couleur finale sera soit la couleur de base soit la couleur de fusion, choisissant la plus sombre des deux. (Opposé de Éclaircir.)
+      </dd>
+
+      <dt><a name="Blend_Difference"></a>Différence</dt>
+      <dd>
+        Soustrait soit la couleur de fusion de la couleur de base, soit la couleur de base de la couleur de fusion, en fonction de laquelle est la plus claire. (Voir aussi : Exclusion.)
+      </dd>
+
+      <dt><a name="Blend_Exclusion"></a>Exclusion</dt>
+      <dd>
+        Crée un effet similaire au modes de fusion Différence, mais avec un contraste moins fort. (Voir aussi : Negation.)
+      </dd>
+
+      <dt><a name="Blend_Hard_Light"></a>Lumière crue</dt>
+      <dd>
+        Ce mode de fusion multiplie ou superpose les couleurs de base et de fusion, en fonction de la couleur de fusion. Si la couleur de fusion est plus claire que le gris à 50%, la couleur sera éclaircie (superposée); Si la couleur de fusion est plus sombre que le gris à 50%, la couleur sera assombrie (multipliée). Il est utile pour ajouter des hautes lumières ou des ombres à une image.
+      </dd>
+
+      <dt><a name="Blend_Lighten"></a>Éclaircir</dt>
+      <dd>
+        La couleur finale sera soit la couleur de base soit la couleur de fusion, choisissant la plus claire des deux. (Opposé de Assombrir.)
+      </dd>
+
+      <dt><a name="Blend_Midtones"></a>Tons Moyens</dt>
+      <dd>
+        Ce mode de fusion est le même que le mode de fusion Normal excepté que l'outil n'est appliqué qu'aux tons moyens. 
+      </dd>
+
+      <dt><a name="Blend_Mid_Hilights"></a>Tons Clairs et Moyens</dt>
+      <dd>
+        Ce mode de fusion est le même que le mode de fusion Normal excepté que l'outil n'est appliqué qu'aux tons moyens et aux hautes lumières. 
+      </dd>
+
+      <dt><a name="Blend_Multiply"></a>Produit</dt>
+      <dd>
+        Ce mode de fusion multiplie les couleurs de base et de fusion. La couleur finale est toujours plus sombre. L'effet est similaire au fait de dessiner sur l'images avec plusieurs marqueurs. (Voir aussi : Superposition.)
+      </dd>
+
+      <dt><a name="Blend_Negation"></a>Négation</dt>
+      <dd>
+        Ce mode de fusion est similaire au mode de fusion Exclusion excepté un rendu de couleurs plus claires et plus vives.
+      </dd>
+
+      <dt><a name="Blend_Overlay"></a>Incrustation</dt>
+      <dd>
+        Multiplie ou superpose les couleurs, en fonction de la couleur de Base. Les motifs ou couleurs recouvre les pixels existants tandis que sont préservées les hautes et basses lumières des couleurs de base. La couleur de base n'est pas remplacée, mais mixée avec la couleur de fusion pour refléter les tons clairs ou foncés de la couleur d'origine.
+      </dd>
+
+      <dt><a name="Blend_Screen"></a>Superposition</dt>
+      <dd>
+        Ce mode de fusion est similaire au mode de fusion Multiplier excepté qu'il multiplie l'inverse de la couleur de fusion et la couleur de base. La couleur finale est toujours plus claire. Le résultat est similaire à projeter plusieurs couches de diapositives sur un écran.
+      </dd>
+
+      <dt><a name="Blend_Shadows"></a>Tons Foncés</dt>
+      <dd>
+        Ce mode de fusion n'applique la couleur de fusion que sur les tons foncés.
+      </dd>
+
+      <dt><a name="Blend_Soft_Burn"></a>Densité douce +</dt>
+      <dd>
+        Ce mode de fusion est similaire au mode de fusion Color Burn excepté que le résultat est moins saturé et contrasté.
+      </dd>
+
+      <dt><a name="Blend_Soft_Dodge"></a>Densité douce -</dt>
+      <dd>
+        Ce mode de fusion est une combinaison des modes Color Dodge et du mode Color Burn inversé, mais bien plus doux que l'un ou l'autre. Les couleurs de base sont légèrement assombries avec  des couleurs de fusions très claires.
+      </dd>
+
+      <dt><a name="Blend_Soft_Light"></a>Lumière Tamisée</dt>
+      <dd>
+        Ce mode de fusion assombrit ou éclaircit les couleurs en fonctions de la couleur de fusion. Le résultat est similaire à braquer une lampe avec un diffuseur sur l'image. Si la couleur de fusion est plus claire, l'image est éclaircie comme si elle était moins dense; si la couleur de fusion est plus sombre, l'image est assombrie comme si elle était plus dense.
+      </dd>
+
+    </dl>
+
+  </body>
+</html><!-- vim:set et sw=2 ts=2: -->
+

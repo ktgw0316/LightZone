@@ -1,0 +1,66 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr-FR" xml:lang="fr-FR">
+
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>LightZone : Intention de Rendu</title><!--[if lt IE 7]>
+    <script defer type="text/javascript" src="IE_PNG.js"></script>
+    <link rel="stylesheet" type="text/css" href="IE.css" media="all"/>
+    <![endif]-->
+    <meta name="description" content="Description des Intentions de rendu."/>
+    <link rel="stylesheet" type="text/css" href="Help.css" media="all"/>
+    <link rel="stylesheet" type="text/css" href="Platform.css" media="all"/>
+    
+  </head>
+
+  <body>
+    <div id="banner">
+      <div id="banner_left">
+        <a href="index.html">Aide de LightZone</a>
+      </div>
+      <div id="banner_right">
+        <a href="index/index.html">Index</a>
+      </div>
+    </div><!-- LC_Index: converting images > rendering intent and --><!-- LC_Index: printing > rendering intent and --><!-- LC_Index: rendering intent -->
+
+    
+    
+    
+    <a name="Rendering_Intent"></a>
+    <img src="images/app_icon-32.png" width="32" height="32"
+      class="title_icon"/>
+    <h1>Intention de rendu</h1>
+
+    <p>
+      Lors de la <a href="Converting.html">conversion</a> ou de l'<a href="Printing.html">impression</a> de vos photos avec les couleurs gérées par l'application, vous pouvez choisir l'<em>intention de rendu</em>. Les Intentions de Rendu que vous pouvez choisir sont décrites ci-dessous.
+    </p>
+
+    <dl>
+
+      <dt>Colorimétrie Absolue</dt>
+      <dd>
+        Laisse les couleurs qui entrent dans le gamut de destination inchangées. Les couleurs hors gamut sont écrêtées. Aucune mise à l’échelle des couleurs vers le point blanc de destination n’est effectuée. Ce mode tend à préserver la précision des couleurs aux dépens des relations entre les couleurs et est utilisable pour l'épreuvage pour simuler la sortie sur un périphérique particulier. Ce mode est particulièrement utile pour prévisualiser la façon dont la couleur du papier agit sur les couleurs imprimées.
+      </dd>
+
+      <dt>Colorimétrie Relative</dt>
+      <dd>
+        Ce mode compare les tons clairs les plus intenses de l’espace colorimétrique source à ceux de l’espace colorimétrique cible et décale toutes les couleurs en conséquence. Les couleurs hors gamut sont décalées vers la couleur reproductible la plus proche dans l’espace colorimétrique de destination. Ceci préserve davantage les couleurs originales de la photo que le mode Perception. (Voir aussi <a href="Black_Point_Compensation.html">Compensation du Point Noir</a>.)
+      </dd>
+
+      <dt>Perceptuel</dt>
+      <dd>
+        Ce mode tend à conserver les relations visuelles entre les couleurs, afin qu’elles soient perçues comme naturelles par l’œil humain, même si les valeurs chromatiques peuvent elles-mêmes varier. Ce mode convient aux photos contenant un grand nombre de couleurs non imprimables.
+      </dd>
+
+      <dt>Saturation</dt>
+      <dd>
+        Ce mode privilégie l’éclat des couleurs au détriment de leur précision. Ce mode de rendu convient aux images d’entreprise, telles que des graphiques ou des diagrammes, dans lesquelles l’éclat des couleurs saturées est plus important que la précision des relations visuelles entre les couleurs.
+      </dd>
+
+    </dl>
+
+  </body>
+</html><!-- vim:set et sw=2 ts=2: -->
+
