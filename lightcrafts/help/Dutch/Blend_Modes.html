@@ -1,0 +1,171 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="nl-NL" xml:lang="nl-NL">
+
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>LightZone: Vermengings modi</title><!--[if lt IE 7]>
+    <script defer type="text/javascript" src="IE_PNG.js"></script>
+    <link rel="stylesheet" type="text/css" href="IE.css" media="all"/>
+    <![endif]-->
+    <meta name="description"
+      content="Beschrijving van de verschillende vermengings modi."/>
+    <link rel="stylesheet" type="text/css" href="Help.css" media="all"/>
+    <link rel="stylesheet" type="text/css" href="Platform.css" media="all"/>
+    
+  </head>
+
+  <body>
+    <div id="banner">
+      <div id="banner_left">
+        <a href="index.html">LightZone Help</a>
+      </div>
+      <div id="banner_right">
+        <a href="index/index.html">Index</a>
+      </div>
+    </div><!-- LC_Index: blending modes > description --><!-- LC_Index: tool > blending modes for -->
+
+    
+    
+    <a name="Blending_Modes"></a>
+    <img src="images/app_icon-32.png" width="32" height="32"
+      class="title_icon"/>
+    <h1>Vermengings modi</h1>
+
+    <p>
+      Het is mogelijk om voor de meeste gereedschappen een <em>vermengingsmodus</em> te specificeren. Een vermengingsmodus beinvloedt hoe de effecten van de gereedschappen in een <a href="Tool_Stack.html">gereedschapsgroep</a> zich vermengen om de uiteindelijke foto te vormen. Om vermeningsmodi te begrijpen, zijn er een aantal termen die bekend worden verondersteld:
+      <dl>
+
+        <dt>Basis kleur</dt>
+        <dd>
+          Dit is de kleur van een pixel voordat enig effect van een gereedschap is toegepast op de foto.
+        </dd>
+
+        <dt>Vermengings kleur</dt>
+        <dd>
+          Dit is de kleur van een pixel nadat een effect van een gereedschap is toegepast op de foto.
+        </dd>
+
+        <dt>Resultaat kleur</dt>
+        <dd>
+          Dit is de kleur van een pixel nadat het effect van een gereedschap is vermengd met de basis kleur door toepassing van een vermengingsmodus.
+        </dd>
+
+      </dl>
+
+      Dit wordt geillustreerd in het plaatje hieronder. Ten eerste, getoond met de groene pijlen, de basis kleuren van een foto hebben een gereedschaps effect toegepast, wat vermengde kleuren oplevert. Ten tweede, getoond met de rode pijlen, de basis en vermengde kleuren worden samen vermengd, gebruik makend van een vermengings modus om de resultaat kleuren te produceren.
+    </p>
+    <p>
+      <div class="figure">
+        <img src="images/Blend_Modes_Illustration-en.png"
+          width="416" height="139"/>
+      </div>
+    </p>
+
+    <p>
+      Er zijn veel beschikbare vermengings modi. Hoewel een beschrijving van elke modus hieronder volgt, is het aan te raden te experimenteren.
+    </p>
+
+    <dl>
+
+      <dt><a name="Blend_Normal"></a>Normaal</dt>
+      <dd>
+        Deze vermengings modus heeft geen effect, daardoor zijn de vermengings en resultaat kleuren hetzelfde.
+      </dd>
+
+      <dt><a name="Blend_Average"></a>Gemiddeld</dt>
+      <dd>
+        Deze modus is dezelfde als Normaal, maar dan op 50% doozichtigheid.
+      </dd>
+
+      <dt><a name="Blend_Color_Burn"></a>Kleur doordrukken</dt>
+      <dd>
+        Maakt de basis kleur donkerder om de vermengings kleur weer te geven door het contrast op te voeren. (Tegenovergestelde van Kleur tegehouden. Zie ook: Zacht doordrukken.)
+      </dd>
+
+      <dt><a name="Blend_Color_Dodge"></a>Kleur tegenhouden</dt>
+      <dd>
+        Maakt de basis kleur lichter om de vermengings kleur weer te geven door het contrast te verminderen. (Tegenovergestelde van Kleur doordrukken.)
+      </dd>
+
+      <dt><a name="Blend_Darken"></a>Donkerder</dt>
+      <dd>
+        Het resultaat is de donkerste van de basis kleur en vermengings kleur. (Tegenovergestelde van Lichter.)
+      </dd>
+
+      <dt><a name="Blend_Difference"></a>Verschil</dt>
+      <dd>
+        Vermindert de vermengings of basis kleur met de lichtste van deze twee. (Zie ook: Uitsluiting.)
+      </dd>
+
+      <dt><a name="Blend_Exclusion"></a>Uitsluiting</dt>
+      <dd>
+        Creeert een effect zoals de Verschil modus, maar met minder contrast. Zie ook: Negatie.)
+      </dd>
+
+      <dt><a name="Blend_Hard_Light"></a>Hard Licht</dt>
+      <dd>
+        Deze vermengings modus vermenigvuldigt of verbleekt de kleuren, afhankelijk van de vermengings modus. Als de vermengings kleur lichter is dan 50% grijs wordt de kleur lichter (verbleekt); als de vermengings kleur donkerder is dan 50% grijs wordt de kleur donkerder (vermenigvuldigd). Dit is bruikbaar voor het toevoegen van hoge lichten of schaduwen aan een afbeelding.
+      </dd>
+
+      <dt><a name="Blend_Lighten"></a>Lichter</dt>
+      <dd>
+        De resultaat kleur is de lichtste van de basis kleur en de vermengings kleur. (Tegenovergestelde van Donker.)
+      </dd>
+
+      <dt><a name="Blend_Midtones"></a>Midden tonen</dt>
+      <dd>
+        Deze vermengings modus is hetzelfde als de Normaal vermengings modus, maar alleen maar toegepast op de midden tonen. 
+      </dd>
+
+      <dt><a name="Blend_Mid_Hilights"></a>Midden+Hoge lichten</dt>
+      <dd>
+        Deze vermengings modus is hetzelfde als de Normaal vermengings modus, maar alleen maar toegepast op de midden en hoge tonen. 
+      </dd>
+
+      <dt><a name="Blend_Multiply"></a>Vermenigvuldigen</dt>
+      <dd>
+        Deze vermengings modus vermenigvuldigt de basis kleur en de vermengings kleur. De resultaat kleur is altijd donkerder. The effect is similar to drawing on the image with multiple marking pens. (Zie ook: Bleken.)
+      </dd>
+
+      <dt><a name="Blend_Negation"></a>Negatie</dt>
+      <dd>
+        Deze vermengings modus is vergelijkbaar met de Uitsluiting vermengings modus, maar deze toont de lichtere en meer levendige kleuren.
+      </dd>
+
+      <dt><a name="Blend_Overlay"></a>Bedekken</dt>
+      <dd>
+        Vermenigvuldigt of bleekt kleuren afhankelijk van de basis kleur. Patronen of kleuren bedekken bestaande pixels, maar behouden de hoge lichten en schaduwen van de basis kleur. De basis kleur wordt niet vervangen, maar gemengd met de vermengings kleur om de relatieve lichtheid of donkerheid van de originele kleur weer te geven.
+      </dd>
+
+      <dt><a name="Blend_Screen"></a>Bleken</dt>
+      <dd>
+        Deze vermengings modus is vergelijkbaar met de Vermenigvuldiging vermengings modus, met als verschil dat deze het omgekeerde van de vermengings kleur en de basis kleur vermenigvuldigt. Het resultaat is altijd lichter. Het effect is vergelijkbaar aan het projecteren van meerdere foto dia's op hetzelfde scherm.
+      </dd>
+
+      <dt><a name="Blend_Shadows"></a>Schaduwen</dt>
+      <dd>
+        Deze vermengings modus beinvloedt alleen de schaduwen.
+      </dd>
+
+      <dt><a name="Blend_Soft_Burn"></a>Zacht doordrukken</dt>
+      <dd>
+        Deze vermengings modus is vergelijkbaar met de Kleur doordrukken vermengings modus, maar het resulteert in minder verzadiging en contrast.
+      </dd>
+
+      <dt><a name="Blend_Soft_Dodge"></a>Zacht tegenhouden</dt>
+      <dd>
+        Deze vermengings modus is een combinatie van zowel Kleur tegenhouden en omgekeerde Kleur doordrukken modi, maar met een meer effen resultaat. De basis kleuren worden in lichte mate donkerder door erg lichte vermengings kleuren in tegengehouden mate in te mengen.
+      </dd>
+
+      <dt><a name="Blend_Soft_Light"></a>Zacht licht</dt>
+      <dd>
+        Deze vermengings modus verdonkert of verlicht de kleuren afhankelij van de vermengings kleur. Het effect is vergelijkbaar met het schijnen van een diffuus licht op de afbeelding. Als de vermengings kleur lichter is, wordt de afbeelding lichter gemaakt alsof gebruik wordt gemaakt van tegenhouden. Als de vermengings kleur donderder is, wordt de afbeelding donkerder gemaakt alsof gebruik wordt gemaakt van doordrukken.
+      </dd>
+
+    </dl>
+
+  </body>
+</html><!-- vim:set et sw=2 ts=2: -->
+

@@ -1,0 +1,190 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="nl-NL" xml:lang="nl-NL">
+
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>LightZone: Workflow Integration: iPhoto</title><!--[if lt IE 7]>
+    <script defer type="text/javascript" src="IE_PNG.js"></script>
+    <link rel="stylesheet" type="text/css" href="IE.css" media="all"/>
+    <![endif]-->
+    <meta name="description" content="Using LightZone with iPhoto."/>
+    <link rel="stylesheet" type="text/css" href="Help.css" media="all"/>
+    <link rel="stylesheet" type="text/css" href="Platform.css" media="all"/>
+    
+  </head>
+
+  <body>
+    <div id="banner">
+      <div id="banner_left">
+        <a href="index.html">LightZone Help</a>
+      </div>
+      <div id="banner_right">
+        <a href="index/index.html">Index</a>
+      </div>
+    </div><!-- LC_Index: workflow integration > with iPhoto --><!-- LC_Index: iPhoto workflow integration -->
+
+    
+    
+    <a name="Integration-iPhoto"></a>
+    <img src="images/app_icon-32.png" width="32" height="32"
+      class="title_icon"/>
+    <h1>Workflow integration: iPhoto</h1>
+
+    <p>
+      
+      iPhoto (from Apple) allows you to select another application
+      as an "external editor" for editing your photos.
+      You can configure LightZone to be such an editor.
+
+      Additionally, LightZone integrates seamlessly with iPhoto via the
+      <a href="Preferences.html#Preferences-Direct_Save">Direct Save</a>
+      preference.
+    
+    </p>
+    <p>
+      <b>Note:</b>
+      The information provided here is accurate as of iPhoto version 7.0.1
+      but may need to change for future versions.
+    
+    </p>
+
+    <div class="task_box">
+      <h2>To configure iPhoto to work with LightZone:</h2>
+      <ol>
+        <li>
+          
+          Select iPhoto &gt; Preferences...
+          (the Preferences dialog will appear).
+        
+        </li>
+        <li>
+          
+          Select the "General" tab.
+        
+        </li>
+        <li>
+          
+          For Edit Photo,
+          select "In application..."
+        
+        </li>
+        <li>
+          
+          Navigate to and select LightZone.
+        
+        </li>
+        <li>
+          
+          Select the "Advanced" tab.
+        
+        </li>
+        <li>
+          
+          Under RAW Photos,
+          check "Use RAW files with external editor."
+        
+        </li>
+        <li>
+          
+          Close the Preferences dialog.
+        
+        </li>
+      </ol>
+      <p>
+        <a href="help:runscript='LightZone_Help/scripts/Set_iPhoto_Prefs.scpt'">
+        <img src="images/AppleScriptAppIcon.png" width="32" height="32"
+          class="inline_left"/></a>
+        
+        Alternatively,
+        you can click the AppleScript icon to the left
+        to configure iPhoto automatically for you now.
+        (If iPhoto is running, you must quit it first.)
+        
+        <br clear="all"/>
+      </p>
+    </div>
+
+    <p>
+      
+      When using an external editor, iPhoto gives your original photo
+      to the external editor to edit.
+    
+    </p>
+
+    <div class="task_box">
+      <h2>To configure LightZone to work with iPhoto:</h2>
+      <ol>
+        <li>
+          
+          Select LightZone &gt; Preferences...
+          (the Preferences dialog will appear).
+        
+        </li>
+        <li>
+          
+          Make sure the
+          <a href="Preferences.html#Preferences-Direct_Save">Direct Save</a>
+          check-box is checked.
+        
+        </li>
+        <li>
+          
+          Close the Preferences dialog.
+        
+        </li>
+      </ol>
+    </div>
+
+    
+
+    Now that everything has been configured,
+    you can select one of your photos in iPhoto
+    and edit it in LightZone.
+
+    
+
+    <div class="task_box">
+      <h2>To edit your photo in LightZone from iPhoto:</h2>
+      <ol>
+        <li>
+          
+          In iPhoto, double-click the photo you want to edit.
+          (LightZone will launch and open your photo.)
+        
+        </li>
+        <li>
+          
+          In LightZone, edit your photo to your liking as you would any photo.
+        
+        </li>
+        <li>
+          
+          Select File &gt; Save to iPhoto.
+          (LightZone will automatically save your edited photo,
+          switch to iPhoto,
+          and tell iPhoto to import it into the current album.)
+        
+        </li>
+      </ol>
+    </div>
+
+    <div class="Not_Linux">
+      <h3>Zie ook:</h3>
+      <ul>
+        <li class="Mac_only">
+          <a href="Integration-Aperture.html">Workflow integration: Aperture</a>
+        </li>
+        <li class="Not_Linux">
+          <a href="Integration-iView_MediaPro.html">Workflow integration: iView MediaPro</a>
+        </li>
+        <li class="Not_Linux">
+          <a href="Integration-Lightroom.html">Workflow integration: Lightroom</a>
+        </li>
+      </ul>
+    </div>
+
+  </body>
+</html><!-- vim:set et sw=2 ts=2: -->
+
