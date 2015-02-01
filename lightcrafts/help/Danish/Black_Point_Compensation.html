@@ -1,0 +1,89 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="da-DK" xml:lang="da-DK">
+
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>LightZone: sort punkts kompensation</title><!--[if lt IE 7]>
+    <script defer type="text/javascript" src="IE_PNG.js"></script>
+    <link rel="stylesheet" type="text/css" href="IE.css" media="all"/>
+    <![endif]-->
+    <meta name="description"
+      content="Beskrivelse af sort punkts kompensation."/>
+    <link rel="stylesheet" type="text/css" href="Help.css" media="all"/>
+    <link rel="stylesheet" type="text/css" href="Platform.css" media="all"/>
+    
+  </head>
+
+  <body>
+    <div id="banner">
+      <div id="banner_left">
+        <a href="index.html">LightZone Hjælp</a>
+      </div>
+      <div id="banner_right">
+        <a href="index/index.html">Indholdsfortegnelse</a>
+      </div>
+    </div><!-- LC_Index: black point > compensation --><!-- LC_Index: converting images > black point compensation and --><!-- LC_Index: printing > black point compensation and -->
+
+    
+    
+    
+    <a name="Black_Point_Compensation"></a>
+    <img src="images/app_icon-32.png" width="32" height="32"
+      class="title_icon"/>
+    <h1>Sort punkts kompensation</h1>
+
+    <p>
+      
+      When either <a href="Converting.html">converting</a>
+      or <a href="Printing.html">printing</a> your photos
+      using application managed colors,
+      you can enable <em>black point compensation</em>
+      when the <a href="Rendering_Intent.html">rendering intent</a>
+      is Relative Colorimetric.
+    
+    </p>
+    <p>
+      
+      The RGB color space can represent all luminosities
+      from 100% white to 100% black.
+      Output devices (such as printers and computer displays)
+      often have limitations in how black the darkest black they can render is.
+      Black point compensation attempts to resolve the difference between
+      the darkest black in your photo
+      and the darkest black that a particular device can render.
+    
+    </p>
+    <p>
+      <img src="images/Black_Point_Compensation-en.png" width="207" height="133"
+        class="inline_right"/>
+      
+      If no black point compensation is done,
+      then detail will be lost in the darkest shadow areas of your photo
+      because the dark areas beyond the darkest black the device can render
+      are truncated.
+    
+    </p>
+    <p>
+      
+      On the other hand, if black point compensation is done,
+      the luminosity range of your photo is compressed
+      to fit into the luminosity range of the device.
+      Hence, the darkest black of your photo
+      becomes the darkest black that the device can render.
+    
+    </p>
+    <p>
+      
+      However, because the luminosity range is compressed,
+      information from your photo is still lost:
+      the loss is just evenly spread out over the entire luminosity range
+      (and thus less noticeable)
+      rather than being truncated at the black end.
+    
+    </p>
+
+  </body>
+</html><!-- vim:set et sw=2 ts=2: -->
+
