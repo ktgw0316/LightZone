@@ -19,7 +19,7 @@ class VerticalToggleButton extends CoolToggleButton {
         setIcon(icon);
         // putClientProperty(SubstanceLookAndFeel.FLAT_PROPERTY, Boolean.FALSE);
         Dimension preferredSize = getPreferredSize();
-        preferredSize.height = 100;
+        preferredSize.height = 120;
         setPreferredSize(preferredSize);
     }
 
