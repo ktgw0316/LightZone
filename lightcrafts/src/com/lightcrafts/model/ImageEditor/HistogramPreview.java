@@ -143,6 +143,8 @@ public class HistogramPreview extends Preview implements PaintListener {
                         gp.lineTo(x, y);
                         lastx = x;
                         lasty = y;
+                    } else {
+                        gp.moveTo(x, y);
                     }
                 }
                 if (lasty != zeroY)
