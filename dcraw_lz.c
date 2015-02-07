@@ -1174,6 +1174,7 @@ void CLASS nikon_load_raw()
     fseek (ifp, 2110, SEEK_CUR);
   if (ver0 == 0x46) tree = 2;
   if (tiff_bps == 14) tree += 3;
+  else if (tiff_bps == 12) black >>= 2;
   read_shorts (vpred[0], 4);
   max = 1 << tiff_bps & 0x7fff;
   if ((csize = get2()) > 1)
