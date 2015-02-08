@@ -18,7 +18,7 @@ TARGET_HELP_DIR:=	/tmp/$(HELP)
 
 # check for 64 bit version of windows
 # to determine path to HTML Help Workshop
-UNAME:= $(shell uname -ms | grep 64)
+UNAME:= $(shell uname -ms | grep -e 64 -e WOW)
 ifeq ($(strip $(UNAME)),)
 HTML_HELP_DIR:=	/cygdrive/c/Program\ Files
 else
