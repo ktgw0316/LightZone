@@ -111,7 +111,7 @@ public class ImageBrowserFooter extends Box implements ImageBrowserListener {
         if (leadFile != null) {
             if (! leadFile.canWrite()) {
                 errorText = "\"" + leadFile.getName() + "\" " +
-                    LOCALE.get("ReadonlyFileText");
+                    LOCALE.get("ReadOnlyFileText");
             }
         }
         if (errorText == null) {
@@ -119,7 +119,7 @@ public class ImageBrowserFooter extends Box implements ImageBrowserListener {
                 File folder = files.get(0).getParentFile();
                 if ((folder != null) && ! folder.canWrite()) {
                     errorText = "\"" + folder.getName() + "\" " +
-                        LOCALE.get("ReadonlyFolderText");
+                        LOCALE.get("ReadOnlyFolderText");
                 }
             }
         }
