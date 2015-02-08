@@ -13,7 +13,7 @@
 ##
 
 English   :en :0x0409 :United States   :LightZone Help         :Index               :ISO-8859-1
-Danish    :da :0x0406 :Denmark         :LightZone Hj&aelig;lp  :Indholdsfortegnelse :ISO-8859-1
+Danish    :da :0x0406 :Denmark         :LightZone Hj\&aelig\;lp  :Indholdsfortegnelse :ISO-8859-1
 Dutch     :nl :0x0413 :The Netherlands :LightZone Help         :Index               :ISO-8859-1
 French    :fr :0x040c :France          :Aide de LightZone      :Index               :ISO-8859-1
 German    :de :0x0407 :Germany         :LightZone Hilfe        :Index               :ISO-8859-1
