@@ -430,8 +430,9 @@ public final class DCRaw implements
                 }
                 m_error = p.exitValue();
                 p.destroy();
-            } else
+            } else {
                 m_error = 0;
+            }
         }
     }
 
@@ -493,8 +494,9 @@ public final class DCRaw implements
                 // String STUPLTYPE = readln(s);
                 // String SENDHDR = readln(s);
                 imageData = new ImageData(width, height, bands, dataType);
-            } else
+            } else {
                 return null;
+            }
 
             int totalData = width * height * bands * (dataType == DataBuffer.TYPE_BYTE ? 1 : 2);
 
@@ -516,8 +518,9 @@ public final class DCRaw implements
                 if (ByteOrder.nativeOrder() != ByteOrder.BIG_ENDIAN)
                     for (int i = 0; i < ((short[]) imageData.data).length; ++i)
                         ((short[]) imageData.data)[i] = Short.reverseBytes(((short[]) imageData.data)[i]);
-            } else
+            } else {
                 bb.get((byte[]) imageData.data);
+            }
 
             if (bb instanceof DirectBuffer)
                 ((DirectBuffer) bb).cleaner().clean();
@@ -635,8 +638,9 @@ public final class DCRaw implements
                     }
                     m_error = p.exitValue();
                     p.destroy();
-                } else
+                } else {
                     m_error = 0;
+                }
             }
 
             System.out.println("dcraw value: " + m_error);
@@ -646,7 +650,10 @@ public final class DCRaw implements
                 throw new BadImageFileException(of);
             }
 
-            if (!ofName.equals(of.getPath())) {
+            if (ofName == null) {
+                ofName = of.getPath();
+                System.out.println("Cannot get output filename. Falling back to: " + ofName);
+            } else if (!ofName.equals(of.getPath())) {
                 of.delete();
                 of = new File(ofName);
             }
