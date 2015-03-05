@@ -109,7 +109,8 @@ void cmsDoTransformGeneric
     char *inputBuffer = (char *) (*env)->GetPrimitiveArrayCritical(env, jinputBuffer, 0);
     char *outputBuffer = (char *) (*env)->GetPrimitiveArrayCritical(env, joutputBuffer, 0);
 
-    cmsDoTransform((cmsHTRANSFORM) hTransform, inputBuffer, outputBuffer, size);
+    if (hTransform)
+        cmsDoTransform((cmsHTRANSFORM) hTransform, inputBuffer, outputBuffer, size);
 
     (*env)->ReleasePrimitiveArrayCritical(env, jinputBuffer, inputBuffer, 0);
     (*env)->ReleasePrimitiveArrayCritical(env, joutputBuffer, outputBuffer, 0);
