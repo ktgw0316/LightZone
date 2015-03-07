@@ -1130,6 +1130,12 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
                         // the files involved are closed first.
                         //
                         ImageInfo.closeAll();
+                        //
+                        // Ensure that the buf.close() takes effect.
+                        //
+                        for (int i = 0; !jpegFile.delete() && i < 5; i++) {
+                            System.gc();
+                        }
                         FileUtil.renameFile( newFile, jpegFile );
                     }
                 }
