@@ -18,18 +18,18 @@ Download and install (or unpack) following:
     -    __binutils__
     -    __git__
     -    __make__
-    -    __iconv__
+    -    __libiconv__ for iconv
     -    __mingw64-i686-gcc-core__ (32-bit) or __mingw64-x86_64-gcc-core__ (64-bit)
     -    __mingw64-i686-gcc-g++__ (32-bit) or __mingw64-x86_64-gcc-g++__ (64-bit)
     -    __mingw64-i686-pkg-config__ (32-bit) or __mingw64-x86_64-pkg-config__ (64-bit)
-    -    __mingw64-i686-zlib__ (32-bit) or __mingw64-x86_zlib__ (64-bit)
-    -    __vim__ or __nano__ — These are editors for console, might come handy. If you are not familiar with vim, install
+    -    __mingw64-i686-zlib__ (32-bit) or __mingw64-x86_64-zlib__ (64-bit)
+    -    __vim__ or __nano__ : These are editors for console, might come handy. If you are not familiar with vim, install
          nano instead, it is more user friendly.
 -   __Cygwin Ports__
     Following the instruction on [Cygwin Ports project](http://cygwinports.org/), install following:
     -    __mingw64-i686-lcms2__ (32-bit) or __mingw64-x86_64-lcms2__ (64-bit)
-    -    __mingw64-i686-libtiff__ (32-bit) or __mingw64-x86_libtiff__ (64-bit)
-    -    __mingw64-i686-libjpeg-turbo__ (32-bit) or __mingw64-x86_libjpeg-turbo__ (64-bit)
+    -    __mingw64-i686-tiff__ (32-bit) or __mingw64-x86_64-tiff__ (64-bit)
+    -    __mingw64-i686-libjpeg-turbo__ (32-bit) or __mingw64-x86_64-libjpeg-turbo__ (64-bit)
 -   __Oracle JDK SE 7__ (Java Development Kit)
 -   __Microsoft Windows SDK__
     Pick the right version based on your Windows version. Information and download links are available at
