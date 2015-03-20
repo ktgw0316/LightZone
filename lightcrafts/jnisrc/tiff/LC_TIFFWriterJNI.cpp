@@ -94,8 +94,8 @@ JNIEXPORT void JNICALL LCTIFFWriter_METHOD(openForWriting)
 
 /* Define the extended Tag field info */
 static const TIFFFieldInfo xtiffFieldInfo[] = {
-    { TIFFTAG_LIGHTZONE, -1, -1, TIFF_BYTE, FIELD_CUSTOM, 1, 1, "LightZone" },
-    { TIFFTAG_MS_RATING, -1, -1, TIFF_SHORT, FIELD_CUSTOM, 1, 1, "Rating" },
+    { TIFFTAG_LIGHTZONE, -1, -1, TIFF_BYTE, FIELD_CUSTOM, 1, 1, const_cast<char*>( "LightZone" ) },
+    { TIFFTAG_MS_RATING, -1, -1, TIFF_SHORT, FIELD_CUSTOM, 1, 1, const_cast<char*>( "Rating" ) },
 };
 
 /**

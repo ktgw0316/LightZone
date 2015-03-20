@@ -7,6 +7,7 @@
  *
  */
 #include <ctype.h>
+#include <stdint.h>
 
 #ifndef AUTO_DEP
 #include "javah/com_lightcrafts_utils_LCMS.h"
@@ -27,7 +28,7 @@ JNIEXPORT jlong JNICALL Java_com_lightcrafts_utils_LCMS_cmsOpenProfileFromMem
 
     (*env)->ReleasePrimitiveArrayCritical(env, jdata, data, 0);
 
-    return (jlong) result;
+    return (jlong)(intptr_t) result;
 }
 
 JNIEXPORT jlong JNICALL Java_com_lightcrafts_utils_LCMS_cmsCreateRGBProfile
@@ -49,7 +50,7 @@ JNIEXPORT jlong JNICALL Java_com_lightcrafts_utils_LCMS_cmsCreateRGBProfile
       cmsToneCurve* gammaTable[3];
       const int context = 1337;
 
-      gammaTable[0] = gammaTable[1] = gammaTable[2] = cmsBuildGamma(gamma == 1 ? &context : 0, gamma);
+      gammaTable[0] = gammaTable[1] = gammaTable[2] = cmsBuildGamma(gamma == 1 ? (cmsContext) &context : 0, gamma);
 
       result = cmsCreateRGBProfile(&w, &p, gammaTable);
       
@@ -60,19 +61,19 @@ JNIEXPORT jlong JNICALL Java_com_lightcrafts_utils_LCMS_cmsCreateRGBProfile
       (*env)->ReleasePrimitiveArrayCritical(env, jWhitePoint, WhitePoint, 0);
       (*env)->ReleasePrimitiveArrayCritical(env, jPrimaries, Primaries, 0);
 
-      return (jlong) result;
+      return (jlong)(intptr_t) result;
 }
 
 JNIEXPORT jlong JNICALL Java_com_lightcrafts_utils_LCMS_cmsCreateLab2Profile
   (JNIEnv *env, jclass clazz)
 {
-    return (jlong) cmsCreateLab2Profile(NULL);
+    return (jlong)(intptr_t) cmsCreateLab2Profile(NULL);
 }
 
 JNIEXPORT jboolean JNICALL Java_com_lightcrafts_utils_LCMS_cmsCloseProfile
   (JNIEnv *env, jclass clazz, jlong jhProfile)
 {
-    cmsHPROFILE hProfile = (cmsHPROFILE) jhProfile;
+    cmsHPROFILE hProfile = (cmsHPROFILE)(intptr_t) jhProfile;
     return cmsCloseProfile(hProfile);
 }
 
@@ -80,8 +81,8 @@ JNIEXPORT jlong JNICALL Java_com_lightcrafts_utils_LCMS_cmsCreateTransform
   (JNIEnv *env, jclass clazz, jlong inputProfile, jint inputFormat,
    jlong outputProfile, jint outputFormat, jint intent, jint flags)
 {
-    return (jlong) cmsCreateTransform((cmsHPROFILE) inputProfile, inputFormat,
-                                      (cmsHPROFILE) outputProfile, outputFormat,
+    return (jlong)(intptr_t) cmsCreateTransform((cmsHPROFILE)(intptr_t) inputProfile, inputFormat,
+                                      (cmsHPROFILE)(intptr_t) outputProfile, outputFormat,
                                       intent, flags);
 }
 
@@ -90,9 +91,9 @@ JNIEXPORT jlong JNICALL Java_com_lightcrafts_utils_LCMS_cmsCreateProofingTransfo
    jlong outputProfile, jint outputFormat, jlong proofingProfile,
    jint intent, jint proofingIntent, jint flags)
 {
-    return (jlong) cmsCreateProofingTransform((cmsHPROFILE) inputProfile, inputFormat,
-					      (cmsHPROFILE) outputProfile, outputFormat,
-					      (cmsHPROFILE) proofingProfile,
+    return (jlong)(intptr_t) cmsCreateProofingTransform((cmsHPROFILE)(intptr_t) inputProfile, inputFormat,
+					      (cmsHPROFILE)(intptr_t) outputProfile, outputFormat,
+					      (cmsHPROFILE)(intptr_t) proofingProfile,
 					      intent, proofingIntent, flags);
 }
 
@@ -100,7 +101,7 @@ JNIEXPORT jlong JNICALL Java_com_lightcrafts_utils_LCMS_cmsCreateProofingTransfo
 JNIEXPORT void JNICALL Java_com_lightcrafts_utils_LCMS_cmsDeleteTransform
   (JNIEnv *env, jclass clazz, jlong hTransform)
 {
-    cmsDeleteTransform((cmsHTRANSFORM) hTransform);
+    cmsDeleteTransform((cmsHTRANSFORM)(intptr_t) hTransform);
 }
 
 void cmsDoTransformGeneric
@@ -110,7 +111,7 @@ void cmsDoTransformGeneric
     char *outputBuffer = (char *) (*env)->GetPrimitiveArrayCritical(env, joutputBuffer, 0);
 
     if (hTransform)
-        cmsDoTransform((cmsHTRANSFORM) hTransform, inputBuffer, outputBuffer, size);
+        cmsDoTransform((cmsHTRANSFORM)(intptr_t) hTransform, inputBuffer, outputBuffer, size);
 
     (*env)->ReleasePrimitiveArrayCritical(env, jinputBuffer, inputBuffer, 0);
     (*env)->ReleasePrimitiveArrayCritical(env, joutputBuffer, outputBuffer, 0);

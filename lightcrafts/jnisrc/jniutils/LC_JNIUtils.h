@@ -439,7 +439,7 @@ namespace LightCrafts {
 
         void release() {
             if ( m_cString ) {
-                m_env->ReleaseByteArrayElements( m_jbyteArray, (jbyte *) m_cString, NULL );
+                m_env->ReleaseByteArrayElements( m_jbyteArray, (jbyte *) m_cString, 0 );
                 m_cString = 0;
             }
         }

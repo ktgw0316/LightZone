@@ -9,10 +9,6 @@ TARGET_BASE:=		DCRaw
 # Uncomment to compile in debug mode.
 #DEBUG:=			true
 
-ifneq ($(PLATFORM),Windows)
-  JNI_EXTRA_CFLAGS:=	-Wno-pointer-sign
-endif
-
 ifeq ($(PLATFORM),MacOSX)
   JNI_EXTRA_LINK:=      -lstdc++
 endif
