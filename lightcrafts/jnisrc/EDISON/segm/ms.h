@@ -705,7 +705,7 @@ class MeanShift {
    //			className, functName, errMessage)     //      
    /////////////////////////////////////////////////////                           
 
-   void ErrorHandler(char*, char*, char*);				// flags an error and halts the system
+   void ErrorHandler(const char*, const char*, const char*);		// flags an error and halts the system
 
 
   //===============================

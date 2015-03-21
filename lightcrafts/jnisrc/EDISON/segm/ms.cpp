@@ -1147,7 +1147,7 @@ void MeanShift::classConsistencyCheck(int iN, bool usingLattice)
 /*            (ErrorStatus = 1)                        */
 /*******************************************************/
 
-void MeanShift::ErrorHandler(char *className, char *methodName, char* errmsg)
+void MeanShift::ErrorHandler(const char *className, const char *methodName, const char* errmsg)
 {
 	
 	//store trace into error message

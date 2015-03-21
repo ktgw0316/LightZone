@@ -289,7 +289,7 @@ private:
   /*  Class Error Handler */
   /*\/\/\/\/\/\/\/\/\/\/\/*/
 
-	void ErrorHandler(char*, char*, ErrorType);
+	void ErrorHandler(const char*, const char*, ErrorType);
 
   //=============================
   // *** Private Data Members ***
