@@ -2,6 +2,7 @@
 
 // standard
 #include <X11/Xlib.h>
+#include <X11/XKBlib.h>
 #include <iostream>
 
 // local
@@ -74,7 +75,7 @@ JNIEXPORT jboolean JNICALL LinuxKeyUtil_METHOD(isKeyPressed)
 
     KeyCode code = keysToKeycode(keys);
 
-    KeySym sym = XKeycodeToKeysym(display, code, 0);
+    KeySym sym = XkbKeycodeToKeysym(display, code, 0, 0);
 
     bool pressed = keyCode == sym;
 #ifdef DEBUG
