@@ -10,6 +10,7 @@ SUBDIRS:=	jniutils \
 		jai \
 		fast_jai \
 		fast_bilateral \
+		lensfun \
 		jpeg \
 		lcms \
 		tiff

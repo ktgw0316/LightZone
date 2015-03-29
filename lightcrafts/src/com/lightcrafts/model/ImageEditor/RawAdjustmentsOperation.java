@@ -9,6 +9,7 @@ import com.lightcrafts.model.RawAdjustmentOperation;
 import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.opimage.BilateralFilterRGBOpImage;
+import com.lightcrafts.jai.opimage.DistortionOpImage;
 import com.lightcrafts.jai.opimage.HighlightRecoveryOpImage;
 
 import com.lightcrafts.mediax.jai.PlanarImage;
@@ -32,6 +33,8 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
     private static final String EXPOSURE = "Exposure";
     private static final String COLOR_NOISE = "Color_Noise";
     private static final String GRAIN_NOISE = "Grain_Noise";
+    private static final String DISTORTION_AUTO = "Distortion";
+    private static final String DISTORTION_K1 = "Distortion";
 
     private final float originalTemperature;
     private final float daylightTemperature;
@@ -41,6 +44,8 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
     private float exposure = 0;
     private float color_noise = 4;
     private float grain_noise = 0;
+    private boolean distortion_auto = false;
+    private float distortion_k1 = 0;
 
     private Point2D p = null;
     private boolean autoWB = false;
@@ -74,7 +79,7 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
     static final OperationType typeV2 = new OperationTypeImpl("RAW Adjustments V2");
 
     static final Matrix RGBtoZYX = new Matrix(ColorScience.RGBtoZYX()).transpose();
-    static final Matrix XYZtoRGB = RGBtoZYX.inverse();    
+    static final Matrix XYZtoRGB = RGBtoZYX.inverse();
 
     public RawAdjustmentsOperation(Rendering rendering, OperationType type) {
         super(rendering, type);
@@ -156,15 +161,20 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
             addSliderKey(GRAIN_NOISE);
         addSliderKey(SOURCE);
         addSliderKey(TINT);
+        addCheckboxKey(DISTORTION_AUTO);
+        addSliderKey(DISTORTION_K1);
 
-        DecimalFormat format = new DecimalFormat("0.00");
+        DecimalFormat formatPercent = new DecimalFormat("0.00");
+        DecimalFormat formatPermil  = new DecimalFormat("0.000");
 
-        setSliderConfig(EXPOSURE, new SliderConfig(-4, 4, exposure, .01, false, format));
+        setSliderConfig(EXPOSURE, new SliderConfig(-4, 4, exposure, .01, false, formatPercent));
         setSliderConfig(SOURCE, new SliderConfig(1000, 40000, temperature, 10, true, new DecimalFormat("0")));
         setSliderConfig(TINT, new SliderConfig(-20, 20, tint, 0.1, false, new DecimalFormat("0.0")));
-        setSliderConfig(COLOR_NOISE, new SliderConfig(0, 20, color_noise, .01, false, format));
+        setSliderConfig(COLOR_NOISE, new SliderConfig(0, 20, color_noise, .01, false, formatPercent));
         if (type == typeV2)
-            setSliderConfig(GRAIN_NOISE, new SliderConfig(0, 20, grain_noise, .01, false, format));
+            setSliderConfig(GRAIN_NOISE, new SliderConfig(0, 20, grain_noise, .01, false, formatPercent));
+        setCheckboxValue(DISTORTION_AUTO, false);
+        setSliderConfig(DISTORTION_K1, new SliderConfig(-0.1, 0.1, distortion_k1, .001, false, formatPermil));
     }
 
     static float neutralTemperature(float rgb[], float refT) {
@@ -200,6 +210,19 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
         return false;
     }
 
+    @Override
+    public void setCheckboxValue(String key, boolean value) {
+        if (key == DISTORTION_AUTO) {
+            distortion_auto = value;
+            // TODO: disoble k1 slider
+        } else {
+            return;
+        }
+
+        super.setCheckboxValue(key, value);
+    }
+
+    @Override
     public void setSliderValue(String key, double value) {
         value = roundValue(key, value);
 
@@ -213,6 +236,9 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
             color_noise = (float) value;
         } else if (key == GRAIN_NOISE && grain_noise != value) {
             grain_noise = (float) value;
+        } else if (key == DISTORTION_K1 && distortion_k1 != value
+                && !distortion_auto) { // TODO:
+            distortion_k1 = (float) value;
         } else
             return;
         
@@ -378,35 +404,22 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
             /* if (true) { */
                 BorderExtender borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
                 front = new BilateralFilterRGBOpImage(front, borderExtender, JAIContext.fileCacheHint, null, grain_noise * scale, 0.02f, color_noise * scale, 0.04f);
-                // front = new O1BilateralFilterOpImage(front, JAIContext.fileCacheHint, grain_noise * scale, 0.03f, color_noise * scale, 0.03f);
-                front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
-            /*
-            } else {
-                ColorScience.LinearTransform transform = new ColorScience.YST();
-
-                double[][] rgb2llab = transform.fromRGB(back.getSampleModel().getDataType());
-                double[][] llab2rgb = transform.toRGB(back.getSampleModel().getDataType());
-
-                ParameterBlock pb = new ParameterBlock();
-                pb.addSource( front );
-                pb.add( rgb2llab );
-                PlanarImage ystImage = JAI.create("BandCombine", pb, null);
-
-                RenderingHints mfHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-
-                pb = new ParameterBlock();
-                pb.addSource(ystImage);
-                pb.add(color_noise * scale);
-                pb.add(0.02f + 0.001f * color_noise);
-                ystImage = JAI.create("BilateralFilter", pb, mfHints);
-
-                pb = new ParameterBlock();
-                pb.addSource( ystImage );
-                pb.add( llab2rgb );
-                front = JAI.create("BandCombine", pb, null);
                 front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
             }
-            */
+
+            /*** DISTORTION CORRECTION ***/
+
+            if (distortion_auto) {
+                // TODO: set lens name
+                String lensName = "Samyang 8mm f/2.8";
+
+                BorderExtender borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
+                front = new DistortionOpImage(front, JAIContext.fileCacheHint, borderExtender, lensName);
+                front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
+            } else {
+                BorderExtender borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
+                front = new DistortionOpImage(front, JAIContext.fileCacheHint, borderExtender, distortion_k1);
+                front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
             }
 
             return front;
