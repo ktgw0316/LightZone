@@ -1,8 +1,8 @@
 Index: dcraw/dcraw_lz.c
 ===================================================================
---- dcraw.orig/dcraw_lz.c	2015-01-31 21:35:28.218979451 +0900
-+++ dcraw/dcraw_lz.c	2015-01-31 21:35:28.214979809 +0900
-@@ -4592,6 +4592,45 @@
+--- dcraw.orig/dcraw_lz.c	2015-03-29 13:35:48.777600561 +0900
++++ dcraw/dcraw_lz.c	2015-03-29 13:56:02.576344119 +0900
+@@ -4619,6 +4619,45 @@
  } /* pragma omp parallel */
  }
  
@@ -48,7 +48,7 @@ Index: dcraw/dcraw_lz.c
  void CLASS cielab (ushort rgb[3], short lab[3])
  {
    int c, i, j, k;
-@@ -4635,38 +4674,91 @@
+@@ -4662,13 +4701,38 @@
  #define TS 512		/* Tile Size */
  #define fcol(row,col) xtrans[(row+6) % 6][(col+6) % 6]
  
@@ -86,35 +86,26 @@ Index: dcraw/dcraw_lz.c
 +#endif
 +
    static const short orth[12] = { 1,0,0,1,-1,0,0,-1,1,0,0,1 },
--	patt[2][16] = { { 0,1,0,-1,2,0,-1,0,1,1,1,-1,0,0,0,0 },
-+    patt[2][16] = { { 0,1,0,-1,2,0,-1,0,1,1,1,-1,0,0,0,0 },
+ 	patt[2][16] = { { 0,1,0,-1,2,0,-1,0,1,1,1,-1,0,0,0,0 },
  			{ 0,1,0,-2,1,0,-2,0,1,1,-2,-2,1,-1,-1,1 } },
--	dir[4] = { 1,TS,TS+1,TS-1 };
-+      dir[4] = { 1,TS,TS+1,TS-1 };
-   short allhex[3][3][2][8], *hex;
-   ushort min, max, sgrow, sgcol;
+@@ -4678,12 +4742,43 @@
    ushort (*rgb)[TS][TS][3], (*rix)[3], (*pix)[4];
--   short (*lab)    [TS][3], (*lix)[3];
--   float (*drv)[TS][TS], diff[6], tr;
+    short (*lab)    [TS][3], (*lix)[3];
+    float (*drv)[TS][TS], diff[6], tr;
 -   char (*homo)[TS][TS], *buffer;
-+  short (*lab)    [TS][3], (*lix)[3];
-+  float (*drv)[TS][TS], diff[6], tr;
++   char (*homo)[TS][TS];
 +#if defined(_STATIC_BUFFER)
-+  char (*homo)[TS][TS];
-+  static char buffer [TS*TS*(8*11+6)] __attribute__((aligned(64)));
++   static char buffer [TS*TS*(8*11+6)] __attribute__((aligned(64)));
 +#else
-+  char (*homo)[TS][TS], *buffer;
++   char *buffer;
 +#endif
-+
  
    if (verbose)
--    fprintf (stderr,_("%d-pass X-Trans interpolation...\n"), passes);
 +#if defined(_OPENMP)
 +    fprintf (stderr,_("%d-pass X-Trans interpolation with %d max threads...\n"),
 +	     passes, omp_get_max_threads ());
 +#else
-+    fprintf (stderr,_("%d-pass X-Trans interpolation...\n"),
-+	     passes);
+     fprintf (stderr,_("%d-pass X-Trans interpolation...\n"), passes);
 +#endif
  
 -  cielab (0,0);
@@ -139,14 +130,12 @@ Index: dcraw/dcraw_lz.c
 +#endif
 +  {
 +  cielab3 (0,0);
-   border_interpolate(6);
--  ndir = 4 << (passes > 1);
--  buffer = (char *) malloc (TS*TS*(ndir*11+6));
--  merror (buffer, "xtrans_interpolate()");
--  rgb  = (ushort(*)[TS][TS][3]) buffer;
--  lab  = (short (*)    [TS][3])(buffer + TS*TS*(ndir*6));
--  drv  = (float (*)[TS][TS])   (buffer + TS*TS*(ndir*6+6));
--  homo = (char  (*)[TS][TS])   (buffer + TS*TS*(ndir*10+6));
++  border_interpolate(6);
+   ndir = 4 << (passes > 1);
+   buffer = (char *) malloc (TS*TS*(ndir*11+6));
+   merror (buffer, "xtrans_interpolate()");
+@@ -4693,6 +4788,9 @@
+   homo = (char  (*)[TS][TS])   (buffer + TS*TS*(ndir*10+6));
  
  /* Map a green hexagon around each non-green pixel and vice versa:	*/
 +#ifdef _OPENMP
@@ -155,7 +144,7 @@ Index: dcraw/dcraw_lz.c
    for (row=0; row < 3; row++)
      for (col=0; col < 3; col++)
        for (ng=d=0; d < 10; d+=2) {
-@@ -4681,7 +4773,11 @@
+@@ -4707,7 +4805,11 @@
  	}
        }
  
@@ -167,7 +156,7 @@ Index: dcraw/dcraw_lz.c
    for (row=2; row < height-2; row++)
      for (min=~(max=0), col=2; col < width-2; col++) {
        if (fcol(row,col) == 1 && (min=~(max=0))) continue;
-@@ -4700,20 +4796,46 @@
+@@ -4726,20 +4828,46 @@
        }
      }
  
@@ -215,7 +204,7 @@ Index: dcraw/dcraw_lz.c
  	  hex = allhex[row % 3][col % 3][0];
  	  color[1][0] = 174 * (pix[  hex[1]][1] + pix[  hex[0]][1]) -
  			 46 * (pix[2*hex[1]][1] + pix[2*hex[0]][1]);
-@@ -4735,7 +4857,11 @@
+@@ -4761,7 +4889,11 @@
  	  for (row=top+2; row < mrow-2; row++)
  	    for (col=left+2; col < mcol-2; col++) {
  	      if ((f = fcol(row,col)) == 1) continue;
@@ -227,7 +216,7 @@ Index: dcraw/dcraw_lz.c
  	      hex = allhex[row % 3][col % 3][1];
  	      for (d=3; d < 6; d++) {
  		rix = &rgb[(d-2)^!((row-sgrow) % 3)][row-top][col-left];
-@@ -4811,8 +4937,9 @@
+@@ -4837,8 +4969,9 @@
        for (d=0; d < ndir; d++) {
  	for (row=2; row < mrow-2; row++)
  	  for (col=2; col < mcol-2; col++)
@@ -239,7 +228,7 @@ Index: dcraw/dcraw_lz.c
  	  for (col=3; col < mcol-3; col++) {
  	    lix = &lab[row][col];
  	    g = 2*lix[0][0] - lix[f][0] - lix[-f][0];
-@@ -4827,14 +4954,12 @@
+@@ -4853,14 +4986,12 @@
        for (row=4; row < mrow-4; row++)
  	for (col=4; col < mcol-4; col++) {
  	  for (tr=FLT_MAX, d=0; d < ndir; d++)
@@ -256,7 +245,7 @@ Index: dcraw/dcraw_lz.c
  	}
  
  /* Average the most homogenous pixels for the final result:	*/
-@@ -4844,8 +4969,17 @@
+@@ -4870,8 +5001,17 @@
  	for (col = MIN(left,8); col < mcol-8; col++) {
  	  for (d=0; d < ndir; d++)
  	    for (hm[d]=0, v=-2; v <= 2; v++)
@@ -275,14 +264,14 @@ Index: dcraw/dcraw_lz.c
  	  for (d=0; d < ndir-4; d++)
  	    if (hm[d] < hm[d+4]) hm[d  ] = 0; else
  	    if (hm[d] > hm[d+4]) hm[d+4] = 0;
-@@ -4855,13 +4989,19 @@
+@@ -4881,14 +5021,20 @@
  	  memset (avg, 0, sizeof avg);
  	  for (d=0; d < ndir; d++)
  	    if (hm[d] >= max) {
 -	      FORC3 avg[c] += rgb[d][row][col][c];
 +	      FORC3 {
 +#pragma omp atomic
-+		avg[c] += rgb[d][row][col][c];
++            avg[c] += rgb[d][row][col][c];
 +	      }
  	      avg[3]++;
  	    }
@@ -292,6 +281,7 @@ Index: dcraw/dcraw_lz.c
 +#if ! defined(_STATIC_BUFFER)
    free(buffer);
 +#endif
+   border_interpolate(8);
 +  } /* pragma omp parallel */
  }
  #undef fcol
