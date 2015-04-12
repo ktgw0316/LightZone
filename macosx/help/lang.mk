@@ -68,7 +68,7 @@ $(HELP_INDEX): $(TARGET_HELP_DIR)
 
 $(INDEX_PAGE): $(TARGET_HELP_DIR)
 	-$(MKDIR) $(@D)
-	$(INDEX_PAGE_COMPILER) -C $(^D) -h"$(HELP_TITLE)" -i"$(INDEX_WORD)" $(HELP) > $@
+	$(INDEX_PAGE_COMPILER) -a "$(APP_NAME)" -C $(^D) -h "$(HELP_TITLE)" -i "$(INDEX_WORD)" -2 $(ISO_LANG_CODE) $(HELP) > $@
 
 ##
 # Utility rules

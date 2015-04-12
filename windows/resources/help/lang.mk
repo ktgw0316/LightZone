@@ -68,7 +68,7 @@ $(TARGET_HELP_DIR):
 
 $(INDEX_PAGE): convert_charset
 	-$(MKDIR) $(@D)
-	$(INDEX_PAGE_COMPILER) -C /tmp -h"$(HELP_TITLE)" -i"$(INDEX_WORD)" $(HELP) > $@
+	$(INDEX_PAGE_COMPILER) -C /tmp -h"$(HELP_TITLE)" -i"$(INDEX_WORD)" -2 $(ISO_LANG_CODE) $(HELP) > $@
 
 convert_charset:
 ifneq ($(HTML_CHARSET),ISO-8859-1)
