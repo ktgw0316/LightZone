@@ -46,7 +46,7 @@ public interface CanonConstants {
     int CANON_MODEL_ID_EOS_1D        = 0x80000001;
 
     /**
-     * Canon camera model id: EOS 1D.
+     * Canon camera model id: EOS 1Ds.
      * This is one of the possible values for the
      * {@link CanonTags#CANON_MODEL_ID} metadata tag.
      */
