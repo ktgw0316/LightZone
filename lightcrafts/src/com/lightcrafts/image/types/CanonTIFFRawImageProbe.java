@@ -13,7 +13,10 @@ import com.lightcrafts.image.metadata.values.ImageMetaValue;
 import com.lightcrafts.image.UnknownImageTypeException;
 
 import static com.lightcrafts.image.metadata.makernotes.CanonConstants.CANON_CS_QUALITY_RAW;
+import static com.lightcrafts.image.metadata.makernotes.CanonConstants.CANON_MODEL_ID_EOS_1D;
+import static com.lightcrafts.image.metadata.makernotes.CanonConstants.CANON_MODEL_ID_EOS_1DS;
 import static com.lightcrafts.image.metadata.makernotes.CanonTags.CANON_CS_QUALITY;
+import static com.lightcrafts.image.metadata.makernotes.CanonTags.CANON_MODEL_ID;
 
 /**
  * <code>CanonTIFFRawImageProbe</code> is-a {@link TrueImageTypeProvider} for
@@ -22,6 +25,7 @@ import static com.lightcrafts.image.metadata.makernotes.CanonTags.CANON_CS_QUALI
  * have a <code>.tif</code> extension.
  *
  * @author Paul J. Lucas [paul@lightcrafts.com]
+ * @author Masahiro Kitagawa [arctica0316@gmail.com]
  */
 final class CanonTIFFRawImageProbe implements TrueImageTypeProvider {
 
@@ -35,6 +39,13 @@ final class CanonTIFFRawImageProbe implements TrueImageTypeProvider {
     {
         try {
             final ImageMetadata metadata = imageInfo.getMetadata();
+            final ImageMetaValue modelId =
+                metadata.getValue( CanonDirectory.class, CANON_MODEL_ID );
+            if ( modelId == null )
+                return null;
+            final int id = modelId.getIntValue();
+            if ( id != CANON_MODEL_ID_EOS_1D && id != CANON_MODEL_ID_EOS_1DS )
+                return null;
             final ImageMetaValue qualityValue =
                 metadata.getValue( CanonDirectory.class, CANON_CS_QUALITY );
             if ( qualityValue == null )
