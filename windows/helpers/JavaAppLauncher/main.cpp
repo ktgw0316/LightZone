@@ -322,17 +322,37 @@ static void checkWindowsVersion() {
          << "\n    wServicePackMajor=" << info.wServicePackMajor << endl;
     //
     // dwMajorVersion:
-    //  4 = Windows NT 4.0
-    //  5 = Windows Server 2003, Windows 2000, or Windows XP
-    //  6 = Windows Vista
+    //   4 = Windows NT 4.0
+    //   5 = Windows Server 2003, Windows 2000, or Windows XP
+    //   6 = Windows Vista, Windows Server 2008, Windows 7,
+    //       Windows Server 2012, Windows 8, or Windows 8.1
+    //  10 = Windows 10
     //
-    if ( info.dwMajorVersion > 5 ) {
+    if ( info.dwMajorVersion >= 10 ) {
         //
-        // Be optimistic and assume we'll run on Vista or anything later.
+        // Be optimistic and assume we'll run on Windows 10 or anything later.
         //
-        if ( info.dwMajorVersion == 6 )
-            cout << "  = Windows Vista" << endl;
+        cout << "  = Windows 10" << endl;
         return;
+    }
+    if ( info.dwMajorVersion == 6 ) {
+        switch ( info.dwMinorVersion ) {
+            case 0:
+                cout << "  = Windows Vista" << endl;
+                return;
+            case 1:
+                cout << "  = Windows 7" << endl;
+                return;
+            case 2:
+                cout << "  = Windows 8" << endl;
+                return;
+            case 3:
+                cout << "  = Windows 8.1" << endl;
+                return;
+            default:
+                // Assume any future minor versions are OK.
+                return;
+        }
     }
     if ( info.dwMajorVersion == 5 ) {
         switch ( info.dwMinorVersion ) {
@@ -351,9 +371,7 @@ static void checkWindowsVersion() {
                     return;
                 break;
             default:
-                //
                 // Assume any future minor versions are OK.
-                //
                 return;
         }
     }
