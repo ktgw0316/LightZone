@@ -1,0 +1,38 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {fileTypeSelection = id; resetResize = id; }; 
+            CLASS = ExportController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                bitsPerChannelPopUp = NSPopUpButton; 
+                blackPointCheckBox = NSButton; 
+                colorProfilePopUp = NSPopUpButton; 
+                fileTypePopUp = NSPopUpButton; 
+                imageOptionsTabView = NSTabView; 
+                imageTabView = NSTabView; 
+                lzwCompressionCheckBox = NSButton; 
+                mainView = NSView; 
+                multilayerCheckBox = NSButton; 
+                qualityField = NSTextField; 
+                qualitySlider = NSSlider; 
+                renderingIntentPopUp = NSPopUpButton; 
+                resetResizeButton = NSButton; 
+                resizeXField = NSTextField; 
+                resizeYField = NSTextField; 
+                resolutionField = NSTextField; 
+                resolutionUnitPopUp = NSPopUpButton; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            CLASS = KeyStrokeNumberFormatter; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {listener = id; }; 
+            SUPERCLASS = NSNumberFormatter; 
+        }, 
+        {CLASS = NSSegmentedControl; LANGUAGE = ObjC; SUPERCLASS = NSControl; }
+    ); 
+    IBVersion = 1; 
+}
