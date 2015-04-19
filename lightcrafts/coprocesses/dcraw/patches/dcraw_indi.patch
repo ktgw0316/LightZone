@@ -1,7 +1,7 @@
 Index: dcraw/dcraw_lz.c
 ===================================================================
---- dcraw.orig/dcraw_lz.c	2015-03-29 13:34:30.148647602 +0900
-+++ dcraw/dcraw_lz.c	2015-03-29 13:34:30.144647961 +0900
+--- dcraw.orig/dcraw_lz.c	2015-04-19 16:10:46.024330708 +0900
++++ dcraw/dcraw_lz.c	2015-04-19 16:10:46.020331202 +0900
 @@ -1,4 +1,8 @@
  /*
 + * OpenMP multithread version of dcraw
@@ -264,7 +264,7 @@ Index: dcraw/dcraw_lz.c
  }
  #undef TS
  
-@@ -9351,6 +9439,9 @@
+@@ -9374,6 +9462,9 @@
    img = (ushort (*)[4]) calloc (high, wide*sizeof *img);
    merror (img, "fuji_rotate()");
  
