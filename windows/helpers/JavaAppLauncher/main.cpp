@@ -469,6 +469,9 @@ static void openFile( LPCWSTR wPathToFile, LPCWSTR wParentExe ) {
         if ( !jParentExe )
             LC_die( TEXT("NewStringUTF() failed.") );
     }
+    else {
+        jParentExe = env->NewStringUTF( "explorer.exe" ); // dummy
+    }
 
     env->CallStaticVoidMethod(
         g_jpb.main_class, openFile_methodID, jPathToFile, jParentExe
@@ -676,13 +679,13 @@ int APIENTRY WinMain( HINSTANCE, HINSTANCE, LPSTR, int ) {
                     //
                     // We have a parent process that requested the files to be
                     // opened: prepend the name of the parent process's exe
-                    // followed by a ':' to the command-line.
+                    // followed by a '|' to the command-line.
                     //
                     int const wParentExeLen = ::wcslen( wParentExe );
                     wPipeBufLen = wParentExeLen + 1 + wCommandLineLen;
                     wPipeBuf = new WCHAR[ wPipeBufLen + 1 /* for null */ ];
                     ::wcscpy( wPipeBuf, wParentExe );
-                    ::wcscat( wPipeBuf, TEXT(":" ) );
+                    ::wcscat( wPipeBuf, TEXT("|") );
                     ::wcscat( wPipeBuf, wCommandLine );
                     //
                     // Note: we don't care about delete[]'ing wParentExe since
@@ -762,11 +765,11 @@ int APIENTRY WinMain( HINSTANCE, HINSTANCE, LPSTR, int ) {
                 // We got a command-line from a secondary application instance:
                 // first see if it's preceeded by an exe name.
                 //
-                WCHAR *const colon = ::wcschr( wPipeBuf, TEXT(':') );
-                if ( colon ) {
+                WCHAR *const separator = ::wcschr( wPipeBuf, TEXT('|') );
+                if ( separator ) {
                     wParentExe = wPipeBuf;
-                    wCommandLine = colon + 1;
-                    *colon = 0;
+                    wCommandLine = separator + 1;
+                    *separator = 0;
                 } else {
                     wParentExe = NULL;
                     wCommandLine = wPipeBuf;
