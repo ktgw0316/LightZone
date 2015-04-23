@@ -39,56 +39,24 @@
 
     <dl>
 
-      <dt>Absolute Colorimetric</dt>
+      <dt>絶対的な色域を維持</dt>
       <dd>
-        
-        Leaves colors that fall inside the destination gamut unchanged.
-        Out-of-gamut colors are clipped.
-        No scaling of colors to the destination white point is performed.
-        This intent tries to maintain color accuracy
-        at the expense of preserving relationships between colors
-        and is suitable for proofing to simulate the output
-        of a particular device.
-        This intent is particularly useful for previewing
-        how paper color affects printed colors.
-      
+        変換先の色域に収まる色を変化させません。色域外の色はクリップされます。変換先の白色点に向けた色の伸縮を行いません。このインテントは色の正確さを維持するために色同士の関係を犠牲にします。特定のデバイスの出力をシミュレートするためのプルーフに適しています。このインテントは紙の色がプリントにどう影響するかをプレビューするのに特に便利です。
       </dd>
 
-      <dt>Relative Colorimetric</dt>
+      <dt>相対的な色域を維持</dt>
       <dd>
-        
-        Compares the extreme highlight of the source color space
-        to that of the destination color space
-        and shifts all colors accordingly.
-        Out-of-gamut colors are shifted to the closest reproducible color
-        in the destination color space.
-        This preserves more of the original colors
-        in a photo than Perceptual.
-        (See also
-        <a href="Black_Point_Compensation.html">Black point compensation</a>.)
-      
+        元の色空間と変換先の色空間とで特に明るい部分を比較し、それに従ってすべての色をシフトさせます。色域外の色は変換先の色空間で再現可能な最も近い色に変換されます。このインテントは「知覚的」よりもたくさんの元の色を維持します。(<a href="Black_Point_Compensation.html">黒点の補正</a>も参照。)
       </dd>
 
-      <dt>Perceptual</dt>
+      <dt>知覚的</dt>
       <dd>
-        
-        Tries to preserve the visual relationship between colors
-        so it is perceived as natural to the human eye
-        even though the color values themselves may change.
-        This intent is suitable for photos
-        with lots of out-of-gamut colors.
-      
+        色同士の関係を維持して人間の目に自然に見えるようにします。ただし、色の値自体は変化する場合があります。このインテントは色域外の色がたくさんある写真に適しています。
       </dd>
 
       <dt>彩度</dt>
       <dd>
-        
-        Tries to produce vivid colors in a photo
-        at the expense of color accuracy.
-        This intent is suitable for business graphics
-        like graphs or charts where bright saturated colors
-        are more important than the exact relationship between colors.
-      
+        写真を鮮やかな色にするために、色の正確さを犠牲にします。このインテントが適しているのは、グラフや図といったビジネス向けグラフィックなど、明るい色彩に満ちた色の方が実際の色同士の関係よりも重要な場合です。
       </dd>
 
     </dl>
