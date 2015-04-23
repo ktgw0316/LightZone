@@ -1,3 +1,9 @@
+lightzone (4.1.0~rc2-0obs1) unstable; urgency=medium
+
+  * Upstream sync
+
+ -- Masahiro Kitagawa <arctica0316@gmail.com>  Thu, 23 Apr 2015 22:45:28 +0900
+
 lightzone (4.1.0~rc1-0obs1) unstable; urgency=medium
 
   * Upstream sync
