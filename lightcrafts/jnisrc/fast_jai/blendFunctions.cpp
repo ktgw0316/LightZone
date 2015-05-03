@@ -159,7 +159,7 @@ class SoftDodgeBlendMode : public BlendMode {
   virtual ushort blendPixels(ushort front, ushort back) const {
     if (front + back < maxVal+1) {
       if (front == maxVal)
-	return maxVal;
+        return maxVal;
       unsigned int c = (unsigned int) back * (maxVal / 2) / (maxVal - front);
       return std::min(c, (unsigned int) maxVal);
     } else {
@@ -173,7 +173,7 @@ class SoftBurnBlendMode : public BlendMode {
   virtual ushort blendPixels(ushort front, ushort back) const {
     if (front + back < maxVal+1) {
       if (back == maxVal)
-	return maxVal;
+        return maxVal;
       unsigned int c = (unsigned int) front * (maxVal / 2) / (maxVal - back);
       return std::min(c, (unsigned int) maxVal);
     } else {
@@ -277,10 +277,10 @@ BlendMode *BlendMode::blendMode[] = {
 
 void blendLoop(ushort s1[], ushort s2[], ushort d[], byte m[],
                int bands, int s1bd, int s2bd,
-	       int s1LineOffset, int s2LineOffset, int dLineOffset, int mLineOffset,
-	       int s1LineStride, int s2LineStride, int dLineStride, int mLineStride,
-	       int s1PixelStride, int s2PixelStride, int dPixelStride, int mPixelStride,
-	       int dheight, int dwidth, int intOpacity, int mode, float colorSelection[])
+               int s1LineOffset, int s2LineOffset, int dLineOffset, int mLineOffset,
+               int s1LineStride, int s2LineStride, int dLineStride, int mLineStride,
+               int s1PixelStride, int s2PixelStride, int dPixelStride, int mPixelStride,
+               int dheight, int dwidth, int intOpacity, int mode, float colorSelection[])
 {
     bool inverted = false;
     
@@ -388,7 +388,7 @@ void blendLoop(ushort s1[], ushort s2[], ushort d[], byte m[],
                 } else {
                     if (mValue != 0) {
                         ushort blended = blender->blendPixels(s1[s1PixelOffset + s1b], s2Value);
-                        int maskedOpacity = (intOpacity * mValue) / 0x100;
+                        int maskedOpacity = (intOpacity * mValue) / 0xFF;
                         value = (maskedOpacity * blended + (maxVal - maskedOpacity) * s2Value) / (maxVal+1);
                     } else
                         value = s2Value;
@@ -439,17 +439,10 @@ void blendLoop(ushort s1[], ushort s2[], ushort d[], byte m[], byte cs[],
         
         for (int w = 0; w < dwidth; w++) {
             int mValue = 0xFF;
-            if (m != NULL || cs != NULL) {
-                if (m != NULL) {
-                    mValue = m[mPixelOffset];
-                    if (inverted)
-                        mValue = 0xFF - mValue;                    
-                }
-                if (cs != NULL)
-                    mValue = mValue * cs[csPixelOffset] / 0xFF;
-                
-                // mValue = inverted ? 0xFF - m[mPixelOffset] : m[mPixelOffset];                
-            }
+            if (m != NULL)
+                mValue = inverted ? 0xFF - m[mPixelOffset] : m[mPixelOffset];
+            if (cs != NULL)
+                mValue = mValue * cs[csPixelOffset] / 0xFF;
             
             ushort pixel[3] = {
                 s2[s2PixelOffset],
@@ -469,7 +462,7 @@ void blendLoop(ushort s1[], ushort s2[], ushort d[], byte m[], byte cs[],
                 } else {
                     if (mValue != 0) {
                         ushort blended = blender->blendPixels(s1[s1PixelOffset + s1b], s2Value);
-                        int maskedOpacity = (intOpacity * mValue) / 0x100;
+                        int maskedOpacity = (intOpacity * mValue) / 0xFF;
                         value = (maskedOpacity * blended + (maxVal - maskedOpacity) * s2Value) / (maxVal+1);
                     } else
                         value = s2Value;
@@ -545,3 +538,4 @@ extern "C" JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_PixelBlender_
     if (cm != NULL) env->ReleasePrimitiveArrayCritical(m, cm, 0);
     if (ccs != NULL) env->ReleasePrimitiveArrayCritical(cs, ccs, 0);
 }
+
