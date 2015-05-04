@@ -5,6 +5,7 @@ typedef unsigned short ushort;
 
 #include <stdlib.h>
 #include <math.h>
+#include <omp.h>
 
 static inline float orig_fast_log2 (float val)
 {
@@ -82,6 +83,7 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_RGBColorSelectionMaskOpI
 	const float rmin = (3 * radius) / 16;
 	const float rmax = (5 * radius) / 16;
 
+#pragma omp parallel for
     for (int row = 0; row < height; row++) {
         for (int col = 0; col < width; col++) {
             float L = srcData[3 * col + row * srcLineStride + srcROffset];

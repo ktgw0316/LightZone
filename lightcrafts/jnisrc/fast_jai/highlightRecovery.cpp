@@ -5,11 +5,12 @@
  *  
  *
  *  Created by Fabio Riccardi on 5/31/07.
- *  Copyright © 2007 Light Crafts, Inc.. All rights reserved.
+ *  Copyright (C) 2007 Light Crafts, Inc.. All rights reserved.
  *
  */
 
 #include <jni.h>
+#include <omp.h>
 #include "vecUtils.h"
 #include "../pixutils/HSB.h"
 
@@ -69,6 +70,7 @@ extern "C" JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_HighlightReco
     float hsb[3];
     float rgb3[3];
     
+#pragma omp parallel for private (raw, rgb3, hsb)
     for (int row = 0; row < height; row++) {
         for (int col = 0; col < width; col++) {
             int srcPixOffset = srcPixelStride * col + row * srcLineStride;
@@ -165,6 +167,7 @@ extern "C" JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_HighlightReco
     const float threshold = 0.8 * 0xffff;
     const float maximum = 1.0 * 0xffff;
     
+#pragma omp parallel for
     for (int row = 0; row < height; row++) {
         for (int col = 0; col < width; col++) {
             const int srcPixOffset = srcPixelStride * col + row * srcLineStride;
@@ -275,6 +278,7 @@ extern "C" JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_HighlightReco
     
     const vfloat vpremul(loadu(preMul));
     
+#pragma omp parallel for
     for (int row = 0; row < height; row++) {
         for (int col = 0; col < width; col++) {
             const int srcPixOffset = srcPixelStride * col + row * srcLineStride;

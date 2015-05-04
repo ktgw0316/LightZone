@@ -12,6 +12,7 @@ typedef unsigned char byte;
 typedef unsigned short ushort;
 
 #include <math.h>
+#include <omp.h>
 
 namespace hdr {
     template <typename T>
@@ -101,6 +102,7 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_HDROpImage2_cBlendLoop
     int dstGOffset = dstBandOffsets[1];
     int dstBOffset = dstBandOffsets[2];
 
+#pragma omp parallel for
     for (int row = 0; row < dstheight; row++) {
         for (int col = 0; col < dstwidth; col++) {
             int r = srcData[srcPixelStride * col + row * srcLineStride + srcROffset];

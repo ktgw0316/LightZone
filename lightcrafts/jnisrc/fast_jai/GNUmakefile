@@ -7,7 +7,10 @@ include			$(COMMON_DIR)/mk/platform.mk
 
 TARGET_BASE:=		FASTJAI
 
+JNI_EXTRA_CFLAGS+=	-fopenmp
+
 JNI_MACOSX_LINK:=	-lstdc++
+JNI_WINDOWS_LINK:=      -lgomp.dll
 # JNI_WINDOWS_LINK:=	-lLCJNI
 # JNI_LINUX_LINK:=	$(JNI_WINDOWS_LINK)
 
