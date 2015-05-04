@@ -122,15 +122,16 @@ final class OverlayOpImage extends PointOpImage {
 
         /* In case of PointOpImage, mapDestRect(destRect, i) = destRect). */
 
-        Raster[] sources = new Raster[1];
+        Raster[] sources = new Raster[2];
         if (srcOverBounds.contains(destRect)) {
             /* Tile is entirely inside sourceOver. */
-            sources[0] = srcOver.getData(destRect);
+            sources[0] = null;
+            sources[1] = srcOver.getData(destRect);
             computeRect(sources, dest, destRect);
 
             // Recycle the source tile
             if(srcOver.overlapsMultipleTiles(destRect)) {
-                recycleTile(sources[0]);
+                recycleTile(sources[1]);
             }
 
             return dest;
@@ -139,6 +140,7 @@ final class OverlayOpImage extends PointOpImage {
                    !srcOverBounds.intersects(destRect)) {
             /* Tile is entirely inside sourceUnder. */
             sources[0] = srcUnder.getData(destRect);
+            sources[1] = null;
             computeRect(sources, dest, destRect);
 
             // Recycle the source tile
@@ -152,6 +154,7 @@ final class OverlayOpImage extends PointOpImage {
             /* Tile is inside both sources. */
             Rectangle isectUnder = destRect.intersection(srcUnderBounds);
             sources[0] = srcUnder.getData(isectUnder);
+            sources[1] = null;
             computeRect(sources, dest, isectUnder);
 
             // Recycle the source tile
@@ -161,12 +164,13 @@ final class OverlayOpImage extends PointOpImage {
 
             if (srcOverBounds.intersects(destRect)) {
                 Rectangle isectOver = destRect.intersection(srcOverBounds);
-                sources[0] = srcOver.getData(isectOver);
+                sources[0] = null;
+                sources[1] = srcOver.getData(isectOver);
                 computeRect(sources, dest, isectOver);
 
                 // Recycle the source tile
                 if(srcOver.overlapsMultipleTiles(isectOver)) {
-                    recycleTile(sources[0]);
+                    recycleTile(sources[1]);
                 }
             }
 
@@ -190,8 +194,9 @@ final class OverlayOpImage extends PointOpImage {
         RasterFormatTag[] formatTags = getFormatTags();
 
 
-        RasterAccessor src = new RasterAccessor(sources[0], destRect,  
-                                                formatTags[0], 
+        RasterAccessor src = new RasterAccessor(sources[0] != null ? sources[0] : sources[1],
+                                                destRect,
+                                                formatTags[0],
                                                 getSource(0).getColorModel());
         RasterAccessor dst = new RasterAccessor(dest, destRect,  
                                                 formatTags[1], getColorModel());
