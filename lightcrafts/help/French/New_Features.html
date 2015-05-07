@@ -31,10 +31,284 @@
       class="title_icon"/>
     <h1>Quoi de neuf dans LightZone?</h1>
     <p>
-      Cette page répertorie uniquement les nouvelles fonctionnalités dans LightZone. Pour en savoir plus sur les fonctions clés, consultez la page <a href="Discover.html">Découvrir LightZone</a>.
+      Cette page répertorie uniquement les nouvelles fonctionnalités dans LightZone. Pour en savoir plus sur les fonctions clés, consultez la page <a href="Discover.html">Découvrir LightZone</a>. Pour vérifier tous les bugs corrigés, consultez le <a href="https://github.com/ktgw0316/LightZone/wiki/ChangeLog"> ChangeLog sur github</a>.
     </p><!-- ================================================================== -->
 
     <a name="New_Features"></a>
+
+    
+
+    <table class="chapter_box" width="100%">
+      <tr>
+        <td class="chapter_box_header">
+          
+          LightZone 4.1.0
+        
+        </td>
+      </tr>
+      <tr>
+        <td>
+
+          <h3>Interface Utilisateur</h3>
+          <ul>
+            <li>
+              Vous pouvez désormais ouvrir une image via une ligne de commande, le menu contextuel, ou en faisant un glisser-déposer sur l'îcone du raccourci de LightZone.
+            </li>
+            <li>
+              Sur Mac OS X:
+              <ul>
+                <li>
+                  Le mode plein écran est désormais supporté sous 10.7 (Lion) ou plus récent.
+                </li>
+                <li>
+                  Le mode retina HiDPI est désormais supporté.
+                </li>
+              </ul>
+            </li>
+          </ul>
+
+          <h3>Navigateur Photo</h3>
+          <ul>
+            <li>
+              Vous pouvez désormais sélectionner de aperçus multiples avec Ctrl-Maj-Clic. 
+            </li>
+          </ul>
+
+          <h3>Éditeur Photo</h3>
+          <ul>
+            <li>
+              Vous pouvez désormais zoomer/dézoomer avec Ctrl-molette, et déplacer l'image zoomée avec Ctrl-Glisser.
+            </li>
+            <li>
+              En mode Recadrage/Rotation, vous pouvez désormais faire tourner l'image avec la molette de la souris, et changer le point central de la grille de rotation d'un simple clic.
+            </li>
+            <li>
+              L'onglet "Info" est désormais disponible en mode Éditeur.
+            </li>
+            <li>
+              AdvancedNoiseReduction (réduction de bruit avancée) est mise à jour dans sa version V4.
+            </li>
+            <li>
+              L'agrandissement de résolution est désormais possible lors de la conversion d'une image éditée.
+            </li>
+          </ul>
+
+          <h3>Localisation</h3>
+          <ul>
+            <li>
+              L'interface utilisateur a été traduite en Danois, Néerlandais, Français, Allemand, Japonais, et Espanol.
+            </li>
+            <li>
+              Les fichiers d'aides ont été traduits en Danois, Néerlandais, Français, Japonais, et Espanol.
+            </li>
+          </ul>
+
+          <h3>Prise en charge de Système d'Exploitation</h3>
+          <ul>
+            <li>
+              Windows (64-bit), Mac OS X 10.10, FreeBSD, et OpenIndiana sont désormais supportés.
+            </li>
+          </ul>
+
+          <h3>Support d'Appareils photo</h3>
+          <ul>
+            <li>
+              Les fichiers bruts (Raw) des appareils suivant sont désormais supportés :
+              <ul>
+                <li>
+                  
+                  Canon:
+                  EOS&nbsp;1D-X,
+                  EOS&nbsp;6D,
+                  EOS&nbsp;7D&nbsp;Mark&nbsp;II,
+                  EOS&nbsp;70D,
+                  EOS&nbsp;100D&nbsp;/&nbsp;SL1&nbsp;/&nbsp;X7,
+                  EOS&nbsp;700D&nbsp;/&nbsp;T5i&nbsp;/&nbsp;X7i,
+                  EOS&nbsp;1200D&nbsp;/&nbsp;Rabel&nbsp;T5,
+                  Powershot&nbsp;G7&nbsp;X,
+                  Powershot&nbsp;G12,
+                  Powershot&nbsp;G16,
+                  Powershot&nbsp;S120
+                
+                </li>
+                <li>
+                  
+                  Epson:
+                  R-D1
+                
+                </li>
+                <li>
+                  
+                  Fujifilm:
+                  Finepix&nbsp;S1,
+                  X-A1,
+                  X-E2,
+                  X-M1,
+                  X-T1,
+                  X20,
+                  X30,
+                  X100s,
+                  X100T,
+                  XQ1
+                
+                </li>
+                <li>
+                  
+                  Leica:
+                  M9,
+                  X&nbsp;VARIO&nbsp;(TYP&nbsp;107)
+                
+                </li>
+                <li>
+                  
+                  Nikon:
+                  1&nbsp;AW1,
+                  1&nbsp;J3,
+                  1&nbsp;S1,
+                  1&nbsp;V2,
+                  1&nbsp;V3,
+                  Coolpix&nbsp;A,
+                  Coolpix&nbsp;P340,
+                  Coolpix&nbsp;P7800,
+                  D4S,
+                  D600,
+                  D810,
+                  D750,
+                  D800,
+                  D800E,
+                  D3300,
+                  D5300,
+                  D5200,
+                  D5500,
+                  D7100,
+                  D7200,
+                  DF
+                
+                </li>
+                <li>
+                  
+                  Olympus:
+                  E-M10,
+                  E-M1,
+                  E-P3,
+                  E-P5,
+                  E-PL1S,
+                  E-PL2,
+                  E-PL3,
+                  E-PL7,
+                  E-PM1,
+                  STYLUS1,
+                  XZ-1,
+                  XZ-2
+                
+                </li>
+                <li>
+                  
+                  Panasonic:
+                  DMC-FZ70,
+                  DMC-FZ200,
+                  DMC-FZ1000,
+                  DMC-G6,
+                  DMC-GF6,
+                  DMC-GM1,
+                  DMC-GX7,
+                  DMC-LF1,
+                  DMC-LX100
+                
+                </li>
+                <li>
+                  
+                  Pentax:
+                  645D,
+                  GR,
+                  K100D&nbsp;Super,
+                  K-3,
+                  K-5&nbsp;II,
+                  K-5&nbsp;IIs,
+                  K-50,
+                  K-500,
+                  Q7
+                
+                </li>
+                <li>
+                  
+                  Samsung:
+                  EK-GN120,
+                  EX2F,
+                  NX1,
+                  NX10,
+                  NX20,
+                  NX200,
+                  NX300,
+                  NX1000,
+                  NX&nbsp;Mini
+                
+                </li>
+                <li>
+                  
+                  Sony:
+                  A99,
+                  DSC-RX1R,
+                  DSC-RX10,
+                  DSC-RX100M2,
+                  DSC-RX100M3,
+                  DSLR-A230,
+                  DSLR-A290,
+                  DSLR-A380,
+                  DSLR-A500,
+                  DSLR-A580,
+                  ILCE-7,
+                  ILCE-7R,
+                  ILCE-3000,
+                  ILCE-5000,
+                  ILCE-5100,
+                  ILCE-6000,
+                  ILCE-QX1,
+                  SLT-A58
+                  NEX-3,
+                  NEX-3N,
+                  NEX-5,
+                  NEX-5T,
+                  NEX-C3
+                
+                </li>
+              </ul>
+            </li><li>
+              Le développement Raw est désormais multi-threadé avec OpenMP.
+            </li>
+          </ul>
+
+        </td>
+      </tr>
+    </table>
+
+    <br/><!-- ================================================================== -->
+
+    
+
+    <table class="chapter_box" width="100%">
+      <tr>
+        <td class="chapter_box_header">
+          
+          LightZone 4.0.0
+        
+        </td>
+      </tr>
+      <tr>
+        <td>
+
+          <h3>Changement de License</h3>
+          <ul>
+            <li>
+              LightZone est désormais publié comme un logiciel libre et Open Source sous la New BSD License.
+            </li>
+          </ul>
+
+        </td>
+      </tr>
+    </table>
+
+    <br/><!-- ================================================================== -->
 
     
 
