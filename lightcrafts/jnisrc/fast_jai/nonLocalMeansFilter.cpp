@@ -44,40 +44,29 @@ inline void separable_nlm_mono_tile(
     //--------------------------------------------------------------------------
 
     float *rbuf = new float[width];
-    float **barFr = new float*[2*wr+1]();
-    for (int i = 0; i < 2*wr+1; i++)
-        barFr[i] = new float[width]();
 
 #pragma omp for simd
     for (int y=2*wr; y < height - 2*wr; y++) {
         memcpy(rbuf, &ibuf[y * width], width * sizeof(float));
-
-        for (int dist = 0; dist <= wr; dist++) {
-            int x = wr;
-            for (int k = -wr; k <= wr; k++) {
-                barFr[dist][x] += rbuf[x+k] * rbuf[x+k+dist];
-            }
-            for (; x < width - 2*wr; x++) {
-                barFr[dist][x+1] = barFr[dist][x] + rbuf[x+wr+1] * rbuf[x+wr+dist+1]
-                                                  - rbuf[x-wr] * rbuf[x-wr+dist];
-            }
-        }
-
         for (int x=2*wr; x < width - 2*wr; x++) {
             // compute adaptive kernel and convolve color channels
             float num = 0;
             float denom = 0;
 
-            for (int k = -wr; k <= wr; k++) {
-                const int idx = x + k;
+            for (int k = 0; k <= 2*wr; k++) {
+                const int idx = k-wr + x;
                 const float I_s = rbuf[idx];
 
-                float D_sq = (k > 0) ?
-                        barFr[0][x] + barFr[0][idx] - 2*barFr[k][x] :
-                        barFr[0][x] + barFr[0][idx] - 2*barFr[-k][idx];
+                float D_sq = 0;
+                for (int i = -wr; i <= wr; i++) {
+                    const float I_s0 = rbuf[x+i];
+                    const float I_s1 = rbuf[idx+i];
+
+                    D_sq += SQR(I_s1 - I_s0);
+                }
                 D_sq /= 2*wr + 1;
 
-                const float f = fast_exp(Ar * D_sq - kernel[k+wr]);
+                const float f = fast_exp(Ar * D_sq - kernel[k]);
                 num += f * I_s;
                 denom += f;
             }
@@ -92,9 +81,6 @@ inline void separable_nlm_mono_tile(
     }
 
     delete [] rbuf;
-    for (int i = 0; i < 2*wr+1; i++)
-        delete [] barFr[i];
-    delete [] barFr;
 
     //--------------------------------------------------------------------------
     // Filter Columns
@@ -102,41 +88,31 @@ inline void separable_nlm_mono_tile(
 
     // Buffer for processing column data
     float *cbuf = new float[height];
-    float **barFc = new float*[2*wr+1]();
-    for (int i = 0; i < 2*wr+1; i++)
-        barFc[i] = new float[height]();
 
 #pragma omp for simd
     for (int x=2*wr; x < width - 2*wr; x++) {
         for (int y=0; y < height; y++)
             cbuf[y] = ibuf[x + y*width];
 
-        for (int dist = 0; dist <= wr; dist++) {
-            int y = wr;
-            for (int k = -wr; k <= wr; k++) {
-                barFc[dist][y] += cbuf[y+k] * cbuf[y+k+dist];
-            }
-            for (; y < height - 2*wr; y++) {
-                barFc[dist][y+1] = barFc[dist][y] + cbuf[y+wr+1] * cbuf[y+wr+dist+1]
-                                                  - cbuf[y-wr] * cbuf[y-wr+dist];
-            }
-        }
-
         for (int y=2*wr; y < height - 2*wr; y++) {
             // compute adaptive kernel and convolve color channels
             float num = 0;
             float denom = 0;
 
-            for (int k = -wr; k <= wr; k++) {
-                const int idx = k + y;
+            for (int k = 0; k <= 2*wr; k++) {
+                const int idx = k-wr + y;
                 const float b = cbuf[idx];
 
-                float D_sq = (k > 0) ?
-                        barFc[0][y] + barFc[0][idx] - 2*barFc[k][y] :
-                        barFc[0][y] + barFc[0][idx] - 2*barFc[-k][idx];
+                float D_sq = 0;
+                for (int i = -wr; i <= wr; i++) {
+                    const float b0 = cbuf[y+i];
+                    const float b1 = cbuf[idx+i];
+
+                    D_sq += SQR(b1 - b0);
+                }
                 D_sq /= 2*wr + 1;
 
-                const float f = fast_exp(Ar * D_sq - kernel[k+wr]);
+                const float f = fast_exp(Ar * D_sq - kernel[k]);
 
                 num += f * b;
                 denom += f;
@@ -152,9 +128,6 @@ inline void separable_nlm_mono_tile(
     }
 
     delete [] cbuf;
-    for (int i = 0; i < 2*wr+1; i++)
-        delete [] barFc[i];
-    delete [] barFc;
 }
 
 /*******************************************************************************
@@ -195,32 +168,11 @@ inline void separable_nlm_chroma_tile(
 
     float *rbuf_a = new float[width];
     float *rbuf_b = new float[width];
-    float **barFr_a = new float*[2*wr+1]();
-    for (int i = 0; i < 2*wr+1; i++)
-        barFr_a[i] = new float[width]();
-    float **barFr_b = new float*[2*wr+1]();
-    for (int i = 0; i < 2*wr+1; i++)
-        barFr_b[i] = new float[width]();
 
 #pragma omp for simd
     for (int y=2*wr; y < height - 2*wr; y++) {
         memcpy(rbuf_a, &buf_a[y * width], width * sizeof(float));
         memcpy(rbuf_b, &buf_b[y * width], width * sizeof(float));
-
-        for (int dist = 0; dist <= wr; dist++) {
-            int x = wr;
-            for (int k = -wr; k <= wr; k++) {
-                barFr_a[dist][x] += rbuf_a[x+k+dist] * rbuf_a[x+k]
-                                  + rbuf_b[x+k+dist] * rbuf_b[x+k];
-            }
-
-            for (; x < width - 2*wr; x++) {
-                barFr_a[dist][x+1] = barFr_a[dist][x] + rbuf_a[x+wr+1] * rbuf_a[x+dist+wr+1]
-                                                      - rbuf_a[x-wr] * rbuf_a[x+dist-wr]
-                                                      + rbuf_b[x+wr+1] * rbuf_b[x+dist+wr+1]
-                                                      - rbuf_b[x-wr] * rbuf_b[x+dist-wr];
-            }
-        }
 
         for (int x=2*wr; x < width - 2*wr; x++) {
             // compute adaptive kernel and convolve color channels
@@ -228,17 +180,23 @@ inline void separable_nlm_chroma_tile(
             float b_num = 0;
             float denom = 0;
 
-            for (int k = -wr; k <= wr; k++) {
-                const int idx = k + x;
+            for (int k = 0; k <= 2*wr; k++) {
+                const int idx = (k-wr) + x;
                 const float s_a = rbuf_a[idx];
                 const float s_b = rbuf_b[idx];
 
-                float D_sq = (k > 0) ?
-                             barFr_a[0][x] + barFr_a[0][idx] - 2*barFr_a[k][x] :
-                             barFr_a[0][x] + barFr_a[0][idx] - 2*barFr_a[-k][idx];
+                float D_sq = 0;
+                for (int i = -wr; i <= wr; i++) {
+                    const float s0_a = rbuf_a[x+i];
+                    const float s0_b = rbuf_b[x+i];
+                    const float s1_a = rbuf_a[idx+i];
+                    const float s1_b = rbuf_b[idx+i];
+
+                    D_sq += SQR(s1_a - s0_a) + SQR(s1_b - s0_b);
+                }
                 D_sq /= 2*wr + 1;
 
-                const float f = fast_exp(Ar * D_sq - kernel[k+wr]);
+                const float f = fast_exp(Ar * D_sq - kernel[k]);
 
                 a_num += f * s_a;
                 b_num += f * s_b;
@@ -256,12 +214,6 @@ inline void separable_nlm_chroma_tile(
     }
     delete [] rbuf_a;
     delete [] rbuf_b;
-    for (int i = 0; i < 2*wr+1; i++)
-        delete [] barFr_a[i];
-    delete [] barFr_a;
-    for (int i = 0; i < 2*wr+1; i++)
-        delete [] barFr_b[i];
-    delete [] barFr_b;
 
     //--------------------------------------------------------------------------
     // Filter Columns
