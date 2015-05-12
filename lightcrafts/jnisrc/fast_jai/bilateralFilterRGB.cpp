@@ -5,46 +5,19 @@
 #include <jni.h>
 #include <omp.h>
 #include "include/yst.h"
+#include "include/transpose.h"
 
-/*******************************************************************************
- * separable_bf_mono_tile()
- *
- * Apply a separable bilateral filter to a rectangular region of a single-band 
- * raster
- *
- * Dimensions of source and destination rectangles are related by
- *
- *     dst_width = src_width - 2*wr
- *     dst_height = src_height - 2*wr
- *
- * 'kernel' points to the mid-point of a (2*wr + 1)-length array containing 
- * either 
- *     1) spatial gaussian filter coefficients for distances 0, 1, ..., wr
- *     2) negated exponents of the spatial gaussian function (this is what Fabio 
- *        passes from his BilateralFilterOpImage class)
- *
- * The macro GS_x_GR(x) controls the interpretation.
- *******************************************************************************/
-inline void separable_bf_mono_tile(
+inline void separable_bf_mono_row(
     float *ibuf,                            // pointer to source data buffer 
     const float sr,                         // the usual range sigma
     const int wr,                           // window radius in pixels
     const float *kernel,                    // half-kernel containing the exponents of the spatial Gaussian
-    const int width, const int height)      // dimensions of the source image
+    const int width, const int height,      // dimensions of the source image
+    const float Ar)                         // coefficient of the exponent for the range Gaussian
 {
-    if (fabs(sr) < FLT_EPSILON)
-        return;
-
-    // coefficient of the exponent for the range Gaussian
-    const float Ar = - 1.0f / (2.0f * SQR(sr) );
-    
-    //--------------------------------------------------------------------------
-    // Filter Rows
-    //--------------------------------------------------------------------------
-    
     float *rbuf = new float[width];
     
-#pragma omp for simd
+#   pragma omp for simd
     for (int y=wr; y < height - wr; y++) {
         
         memcpy(rbuf, &ibuf[y * width], width * sizeof(float));
@@ -75,87 +48,21 @@ inline void separable_bf_mono_tile(
     }
     
     delete [] rbuf;
-    
-    //--------------------------------------------------------------------------
-    // Filter Columns
-    //--------------------------------------------------------------------------
-    
-    // Buffer for processing column data
-    float *cbuf = new float[height];
-    
-#pragma omp for simd
-    for (int x=wr; x < width - wr; x++) {
-        for (int y=0; y < height; y++)
-            cbuf[y] = ibuf[x + y*width];
-        
-        for (int y=wr; y < height - wr; y++) {
-            // initialize central pixel
-            const float b0 = cbuf[y];
-            
-            // compute adaptive kernel and convolve color channels
-            float num = 0;
-            float denom = 0;            
-            for (int k = 0; k <= 2*wr; k++) {
-                const float b = cbuf[(k-wr) + y];                
-                const float D_sq = SQR(b - b0);
-                const float f = fast_exp(Ar * D_sq - kernel[k]);
-                
-                num += f * b;
-                denom += f;
-            }
-            
-            // normalize
-            if (denom == 0)
-                denom = 1.0;
-            
-            const int idx = y * width + x;
-            ibuf[idx] = num / denom;
-        }
-    }    
-    
-    delete [] cbuf;
 }
 
-/*******************************************************************************
- * separable_bf_chroma_tile()
- *
- * Apply a separable bilateral filter to a rectangular region of a color raster 
- *
- * Dimensions of source and destination rectangles are related by
- *
- *     dst_width = src_width - 2*wr
- *     dst_height = src_height - 2*wr
- *
- * 'kernel' points to the mid-point of a (2*wr + 1)-length array containing 
- * either 
- *     1) spatial gaussian filter coefficients for distances 0, 1, ..., wr
- *     2) negated exponents of the spatial gaussian function (this is what Fabio 
- *        passes from his BilateralFilterOpImage class)
- *
- * The macro GS_x_GR(x) controls the interpretation.
- *******************************************************************************/
-inline void separable_bf_chroma_tile(
-    float *buf_a,                           // pointer to the s source/destination buffer 
+inline void separable_bf_chroma_row(
+    float *buf_a,                           // pointer to the s source/destination buffer
     float *buf_b,                           // pointer to the t source/destination buffer
     const float sr,                         // the usual range sigma
     const int wr,                           // window radius in pixels
     const float *kernel,                    // half-kernel containing the exponents of the spatial Gaussian
-    int width, int height)                  // dimensions of the source image
-{    
-    if (fabs(sr) < FLT_EPSILON)
-        return;
-
-    // coefficient of the exponent for the range Gaussian
-    const float Ar = - 1.0f / (2.0f * SQR(sr) );
-
-    //--------------------------------------------------------------------------
-    // Filter Rows
-    //--------------------------------------------------------------------------
-
+    const int width, const int height,      // dimensions of the source image
+    const float Ar)                         // coefficient of the exponent for the range Gaussian
+{
     float *rbuf_a = new float[width];
     float *rbuf_b = new float[width];
 
-#pragma omp for simd
+#   pragma omp for simd
     for (int y=wr; y < height - wr; y++) {
         memcpy(rbuf_a, &buf_a[y * width], width * sizeof(float));
         memcpy(rbuf_b, &buf_b[y * width], width * sizeof(float));
@@ -195,63 +102,109 @@ inline void separable_bf_chroma_tile(
             buf_b[idx0] = b_num / denom;
         }
     }
+
     delete [] rbuf_a;
     delete [] rbuf_b;
+}
 
-    //--------------------------------------------------------------------------
-    // Filter Columns
-    //--------------------------------------------------------------------------
+/*******************************************************************************
+ * separable_bf_mono_tile()
+ *
+ * Apply a separable bilateral filter to a rectangular region of a single-band
+ * raster
+ *
+ * Dimensions of source and destination rectangles are related by
+ *
+ *     dst_width = src_width - 2*wr
+ *     dst_height = src_height - 2*wr
+ *
+ * 'kernel' points to the mid-point of a (2*wr + 1)-length array containing
+ * either
+ *     1) spatial gaussian filter coefficients for distances 0, 1, ..., wr
+ *     2) negated exponents of the spatial gaussian function (this is what Fabio
+ *        passes from his BilateralFilterOpImage class)
+ *
+ * The macro GS_x_GR(x) controls the interpretation.
+ *******************************************************************************/
+inline void separable_bf_mono_tile(
+    float *ibuf,                            // pointer to source data buffer
+    const float sr,                         // the usual range sigma
+    const int wr,                           // window radius in pixels
+    const float *kernel,                    // half-kernel containing the exponents of the spatial Gaussian
+    const int width, const int height)      // dimensions of the source image
+{
+    if (fabs(sr) < FLT_EPSILON)
+        return;
 
-    // Buffers for processing column data
-    float *cbuf_a = new float[height];
-    float *cbuf_b = new float[height];
+    // coefficient of the exponent for the range Gaussian
+    const float Ar = - 1.0f / (2.0f * SQR(sr) );
+    
+    float *tbuf = new float[width*height];
 
-#pragma omp for simd
-    for (int x=wr; x < width - wr; x++) {
-        for (int y=0; y < height; y++) {
-            const int idx = x + y*width;
-            float a = buf_a[idx];
-            float b = buf_b[idx];
-            cbuf_a[y] = a;
-            cbuf_b[y] = b;
-        }
+#   pragma omp parallel
+    {
+        // Filter Rows
+        separable_bf_mono_row(ibuf, sr, wr, kernel, width, height, Ar);
 
-        for (int y=wr; y < height - wr; y++) {
-            // initialize central pixel
-            const float b0_a = cbuf_a[y];
-            const float b0_b = cbuf_b[y];
-
-            // compute adaptive kernel and convolve color channels
-            float a_num = 0;
-            float b_num = 0;
-            float denom = 0;
-
-            for (int k = 0; k <= 2*wr; k++) {
-                const int idx = (k-wr) + y;
-
-                const float b_a = cbuf_a[idx];
-                const float b_b = cbuf_b[idx];
-
-                const float D_sq = SQR(b_a - b0_a) + SQR(b_b - b0_b);
-                const float f = fast_exp(Ar * D_sq - kernel[k]);
-
-                a_num += f * b_a;
-                b_num += f * b_b;
-                denom += f;
-            }
-
-            // normalize
-            if (denom == 0)
-                denom = 1.0;
-
-            const int idx = y * width + x;
-            buf_a[idx] = a_num / denom;
-            buf_b[idx] = b_num / denom;
-        }
+        // Filter Columns
+        transpose(ibuf, tbuf, width, height);
+        separable_bf_mono_row(tbuf, sr, wr, kernel, height, width, Ar);
+        transpose(tbuf, ibuf, height, width);
     }
 
-    delete [] cbuf_a;
-    delete [] cbuf_b;
+    delete [] tbuf;
+}
+
+/*******************************************************************************
+ * separable_bf_chroma_tile()
+ *
+ * Apply a separable bilateral filter to a rectangular region of a color raster 
+ *
+ * Dimensions of source and destination rectangles are related by
+ *
+ *     dst_width = src_width - 2*wr
+ *     dst_height = src_height - 2*wr
+ *
+ * 'kernel' points to the mid-point of a (2*wr + 1)-length array containing 
+ * either 
+ *     1) spatial gaussian filter coefficients for distances 0, 1, ..., wr
+ *     2) negated exponents of the spatial gaussian function (this is what Fabio 
+ *        passes from his BilateralFilterOpImage class)
+ *
+ * The macro GS_x_GR(x) controls the interpretation.
+ *******************************************************************************/
+inline void separable_bf_chroma_tile(
+    float *buf_a,                           // pointer to the s source/destination buffer 
+    float *buf_b,                           // pointer to the t source/destination buffer
+    const float sr,                         // the usual range sigma
+    const int wr,                           // window radius in pixels
+    const float *kernel,                    // half-kernel containing the exponents of the spatial Gaussian
+    int width, int height)                  // dimensions of the source image
+{    
+    if (fabs(sr) < FLT_EPSILON)
+        return;
+
+    // coefficient of the exponent for the range Gaussian
+    const float Ar = - 1.0f / (2.0f * SQR(sr) );
+
+    float *tbuf_a = new float[width*height];
+    float *tbuf_b = new float[width*height];
+
+#   pragma omp parallel
+    {
+        // Filter Rows
+        separable_bf_chroma_row(buf_a, buf_b, sr, wr, kernel, width, height, Ar);
+
+        // Filter Columns
+        transpose(buf_a, tbuf_a, width, height);
+        transpose(buf_b, tbuf_b, width, height);
+        separable_bf_chroma_row(tbuf_a, tbuf_b, sr, wr, kernel, height, width, Ar);
+        transpose(tbuf_a, buf_a, height, width);
+        transpose(tbuf_b, buf_b, height, width);
+    }
+
+    delete [] tbuf_a;
+    delete [] tbuf_b;
 }
 
 /*******************************************************************************
@@ -284,17 +237,17 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_BilateralFilterRGBOpImag
     float *buf_s = new float[width*height];
     float *buf_t = new float[width*height];
 
-#pragma omp parallel
-    {
-        interleaved_RGB_to_planar_YST(srcData, srcLineStride, srcROffset, srcGOffset, srcBOffset,
-                                      buf_y, buf_s, buf_t, width, height, rgb_to_yst);
+    interleaved_RGB_to_planar_YST(srcData, srcLineStride, srcROffset, srcGOffset, srcBOffset,
+                                  buf_y, buf_s, buf_t, width, height, rgb_to_yst);
 
-        separable_bf_mono_tile(buf_y, y_sigma_r, y_wr, y_kernel, width, height);
-        separable_bf_chroma_tile(buf_s, buf_t, c_sigma_r, c_wr, c_kernel, width, height);
+#   pragma omp task
+    separable_bf_mono_tile(         buf_y, y_sigma_r, y_wr, y_kernel, width, height);
+#   pragma omp task
+    separable_bf_chroma_tile(buf_s, buf_t, c_sigma_r, c_wr, c_kernel, width, height);
+#   pragma omp taskwait
 
-        planar_YST_to_interleaved_RGB(destData, destLineStride, destROffset, destGOffset, destBOffset, wr,
-                                      buf_y, buf_s, buf_t, width, height, yst_to_rgb);
-    }
+    planar_YST_to_interleaved_RGB(destData, destLineStride, destROffset, destGOffset, destBOffset, wr,
+                                  buf_y, buf_s, buf_t, width, height, yst_to_rgb);
 
     delete [] buf_y;
     delete [] buf_s;
