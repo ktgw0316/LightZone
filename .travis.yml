@@ -5,5 +5,6 @@ jdk:
   - openjdk7
   - openjdk6
 before_install:
+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update -qq
-  - sudo apt-get install -qq autoconf javahelp2 tidy liblcms2-dev libtiff4-dev
+  - sudo apt-get install -qq autoconf g++-4.9 javahelp2 tidy liblcms2-dev libtiff4-dev
