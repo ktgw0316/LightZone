@@ -6,7 +6,6 @@ import com.lightcrafts.jai.operator.*;
 import com.lightcrafts.jai.opimage.*;
 import com.lightcrafts.jai.utils.LCTileCache;
 import com.lightcrafts.jai.utils.LCRecyclingTileFactory;
-import com.lightcrafts.jai.utils.LCTileScheduler;
 import com.lightcrafts.utils.ColorScience;
 import com.lightcrafts.utils.ColorProfileInfo;
 import com.lightcrafts.platform.Platform;
@@ -24,9 +23,7 @@ import java.awt.image.renderable.ContextualRenderedImageFactory;
 import java.awt.image.renderable.RenderedImageFactory;
 import java.io.*;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.ArrayList;
-import java.util.prefs.Preferences;
 
 /**
  * Created by IntelliJ IDEA.
@@ -167,9 +164,9 @@ public class JAIContext {
     }
 
     static {
-        long maxMemory = Runtime.getRuntime().maxMemory();
-        System.out.println("Max Memory: " + maxMemory);
-        System.out.println("Total Memory: " + Runtime.getRuntime().totalMemory());
+        final long maxMemory = Runtime.getRuntime().maxMemory();
+        System.out.printf("Max Memory:   %11d%n", maxMemory);
+        System.out.printf("Total Memory: %11d%n", Runtime.getRuntime().totalMemory());
 
         JAI jaiInstance = JAI.getDefaultInstance();
 
@@ -283,7 +280,6 @@ public class JAIContext {
         systemProfiles.addAll(Platform.getPlatform().getPrinterProfiles());
 
         ICC_Profile _sRGBColorProfile = null;
-        Iterator it = systemProfiles.iterator();
         for (ColorProfileInfo cpi : systemProfiles) {
             if ((cpi.getName().equals("sRGB Profile") || cpi.getName().equals("sRGB IEC61966-2.1"))) {
                 try {
