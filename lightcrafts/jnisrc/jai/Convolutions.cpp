@@ -393,7 +393,7 @@ void convolveBandsLoop(T *srcData, T *dstData, int srcScanlineOffset, int dstSca
     srcScanlineOffset += srcScanlineStride;
     dstScanlineOffset += dstScanlineStride;
   }
-  delete tmpBuffer;
+  delete[] tmpBuffer;
 #if defined( __POWERPC__ ) && defined( LC_USE_ALTIVEC )
   RestoreJavaMode(&oldJavaMode);
 #endif
@@ -544,7 +544,7 @@ void convolveLoop(T *srcData, T *dstData, int srcScanlineOffset, int dstScanline
     srcScanlineOffset += srcScanlineStride;
     dstScanlineOffset += dstScanlineStride;
   }
-  delete tmpBuffer;
+  delete[] tmpBuffer;
 #if defined( __POWERPC__ ) && defined( LC_USE_ALTIVEC )
   RestoreJavaMode(&oldJavaMode);
 #endif

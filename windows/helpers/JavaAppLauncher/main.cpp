@@ -199,11 +199,12 @@ static void checkCPUType() {
     //
     // but this isn't supported on Windows 2000 (non-Professional).
     //
-    int max_std_level, std_caps;
+    int max_std_level;
     int eax, ebx, ecx, edx;
 
     CPUID( 0, max_std_level, ebx, ecx, edx );
     if ( max_std_level >= 1 ) {
+        int std_caps;
         CPUID( 1, eax, ebx, ecx, std_caps );
         if ( std_caps & (1 << 26) /* SSE2 */ )
             return;
