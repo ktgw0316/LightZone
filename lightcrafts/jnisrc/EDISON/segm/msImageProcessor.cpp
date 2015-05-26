@@ -1135,11 +1135,14 @@ int msImageProcessor::GetRegions(int **labels_out, float **modes_out, int **MPC_
 	if(!(modes_	= new float [regionCount*N]))
 	{
 		ErrorHandler("msImageProcessor", "GetRegions", "Not enough memory.");
+		delete[] labels_;
 		return -1;
 	}
 	if(!(MPC_out_ = new int [regionCount]))
 	{
 		ErrorHandler("msImageProcessor", "GetRegions", "Not enough memory.");
+		delete[] labels_;
+		delete[] modes_;
 		return -1;
 	}
 
@@ -1156,6 +1159,9 @@ int msImageProcessor::GetRegions(int **labels_out, float **modes_out, int **MPC_
 		MPC_out_[i]	= modePointCounts[i];
 
 	//done. Return the number of regions resulting from filtering or segmentation.
+	delete[] labels_;
+	delete[] modes_;
+	delete[] MPC_out_;
 	return regionCount;
 }
 
@@ -2163,7 +2169,6 @@ void msImageProcessor::BuildRAM( void )
 				raNode2->label	= rightLabel;
 
 				//insert nodes into the RAM
-				exists			= 0;
 				raList[curLabel  ].Insert(raNode2);
 				exists			= raList[rightLabel].Insert(raNode1);
 
@@ -2199,7 +2204,6 @@ void msImageProcessor::BuildRAM( void )
 				raNode2->label	= bottomLabel;
 
 				//insert nodes into the RAM
-				exists			= 0;
 				raList[curLabel  ].Insert(raNode2);
 				exists			= raList[bottomLabel].Insert(raNode1);
 
@@ -2244,7 +2248,6 @@ void msImageProcessor::BuildRAM( void )
 			raNode2->label	= bottomLabel;
 			
 			//insert nodes into the RAM
-			exists			= 0;
 			raList[curLabel  ].Insert(raNode2);
 			exists			= raList[bottomLabel].Insert(raNode1);
 			
@@ -2291,7 +2294,6 @@ void msImageProcessor::BuildRAM( void )
 			raNode2->label	= rightLabel;
 			
 			//insert nodes into the RAM
-			exists			= 0;
 			raList[curLabel  ].Insert(raNode2);
 			exists			= raList[rightLabel].Insert(raNode1);
 			

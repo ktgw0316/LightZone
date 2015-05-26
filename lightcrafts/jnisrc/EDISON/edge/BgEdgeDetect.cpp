@@ -562,8 +562,12 @@ void BgEdgeDetect::DoRecompute(BgEdgeList* cel, double nmxr, double nmxc,
       feval = &BgEdgeDetect::LineEval;		
       bgLog("line\n");
       break;
-  	default:
+   default:
       bgLog("Type not known\n");
+      delete[] tr;
+      delete[] tc;
+      delete[] tdh;
+      delete[] tdl;
       return;
    }
    confTr_ = (float) nmxc;
@@ -827,8 +831,12 @@ void BgEdgeDetect::DoEdgeDetect(BgImage* cim, BgEdgeList* cel, double nmxr, doub
       feval = &BgEdgeDetect::LineEval;		
       bgLog("line\n");
       break;
-  	default:
+   default:
       bgLog("Type not known\n");
+      delete[] tr;
+      delete[] tc;
+      delete[] tdh;
+      delete[] tdl;
       return;
    }
 
@@ -1221,7 +1229,11 @@ void BgEdgeDetect::CompRanks(float* strength, float* ranks)
    int irra;
 
    if (n<2)
+   {
+      delete[] ra;
+      delete[] index;
       return;
+   }
    l = (n>>1)+1;
    ir = n;
    for (;;)

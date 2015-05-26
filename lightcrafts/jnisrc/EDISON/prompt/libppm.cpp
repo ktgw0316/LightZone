@@ -23,7 +23,7 @@ int writePPMImage(char *filename, unsigned char *image, int height, int width, i
   //Write header information and comments.
   //********************************************************
 
-  fprintf(fp, "P6\n", width, height);
+  fprintf(fp, "P6\n%d %d", width, height);
   if(comments && strlen(comments) <= 70) fprintf(fp, "%s\n", comments);
   fprintf(fp, "%d %d\n%d\n", width, height, depth);
   
@@ -48,7 +48,7 @@ int writePGMImage(char *filename, unsigned char *image, int height, int width, i
   //Write header information and comments.
   //********************************************************
 
-  fprintf(fp, "P5\n", width, height);
+  fprintf(fp, "P5\n%d %d", width, height);
   if(comments && strlen(comments) <= 70) fprintf(fp, "%s\n", comments);
   fprintf(fp, "%d %d\n%d\n", width, height, depth);
   
@@ -80,44 +80,76 @@ int readPPMImage(char *filename, unsigned char **image, int& height, int& width,
 
   if(!filename) return PPM_NULL_PTR;
   FILE *fp = fopen(filename, "rb");
+  if(!fp) return PPM_FILE_ERROR;
   
   //********************************************************
   //Read header information.
   //********************************************************
   
-/*  char buf[70];
-  if(!fgets(buf, 70, fp)) return PPM_FILE_ERROR;
-  if(strncmp(buf, "P6", 2)) return PPM_UNKNOWN_FORMAT;  
+/*
+  char buf[70];
+  if(!fgets(buf, 70, fp)) {
+	  fclose(fp);
+	  return PPM_FILE_ERROR;
+  }
+  if(strncmp(buf, "P6", 2)) {
+	  fclose(fp);
+	  return PPM_UNKNOWN_FORMAT;  
+  }
   do {
-    if(!fgets(buf, 70, fp)) return PPM_FILE_ERROR;
+    if(!fgets(buf, 70, fp)) {
+	  fclose(fp);
+	  return PPM_FILE_ERROR;
+  }
   } while(buf[0] == '#');
   sscanf(buf, "%d %d", &width, &height);  
-  if(!fgets(buf, 70, fp)) return PPM_FILE_ERROR;
+  if(!fgets(buf, 70, fp)) {
+	  fclose(fp);
+	  return PPM_FILE_ERROR;
+  }
   sscanf(buf , "%d", &depth);
   */
   
   //!-Start modification by Sushil Mittal for handling different kinds of formats of .ppm file, 05/05/2009
   char buf[70];
-  if(!fscanf(fp, "%s", buf)) return PPM_FILE_ERROR;
-  if(strncmp(buf, "P6", 2)) return PPM_UNKNOWN_FORMAT;  
-  fscanf(fp,"s",buf);
+  if(!fscanf(fp, "%69s", buf)) {
+	  fclose(fp);
+	  return PPM_FILE_ERROR;
+  }
+  if(strncmp(buf, "P6", 2)) {
+	  fclose(fp);
+	  return PPM_UNKNOWN_FORMAT;  
+  }
+  fscanf(fp,"%69s",buf);
   printf("%s\n",buf);
   if(buf[0] == '#')
   {
 	  
 	  while(buf[0] == '#')
 	  {
-		  if(!fscanf(fp, "%s", buf)) return PPM_FILE_ERROR;
+		  if(!fscanf(fp, "%69s", buf)) {
+			  fclose(fp);
+			  return PPM_FILE_ERROR;
+		  }
 	  }
   }
   else
   {
-	  if(!fscanf(fp, "%s", buf)) return PPM_FILE_ERROR;
+	  if(!fscanf(fp, "%69s", buf)) {
+		  fclose(fp);
+		  return PPM_FILE_ERROR;
+	  }
   }
   sscanf(buf,"%d",&width);
-  if(!fscanf(fp, "%s", buf)) return PPM_FILE_ERROR;  
+  if(!fscanf(fp, "%69s", buf)) {
+	  fclose(fp);
+	  return PPM_FILE_ERROR;  
+  }
   sscanf(buf,"%d",&height);
-  if(!fscanf(fp, "%s", buf)) return PPM_FILE_ERROR;
+  if(!fscanf(fp, "%69s", buf)) {
+	  fclose(fp);
+	  return PPM_FILE_ERROR;
+  }
   sscanf(buf,"%d",&depth);
   fgets(buf,70,fp);
   
@@ -144,13 +176,25 @@ int readPGMImage(char *filename, unsigned char **image, int& height, int& width,
   //********************************************************
   
   char buf[70];
-  if(!fgets(buf, 70, fp)) return PPM_FILE_ERROR;
-  if(strncmp(buf, "P5", 2)) return PPM_UNKNOWN_FORMAT;
+  if(!fgets(buf, 70, fp)) {
+	  fclose(fp);
+	  return PPM_FILE_ERROR;
+  }
+  if(strncmp(buf, "P5", 2)) {
+	  fclose(fp);
+	  return PPM_UNKNOWN_FORMAT;
+  }
   do {
-    if(!fgets(buf, 70, fp)) return PPM_FILE_ERROR;
+    if(!fgets(buf, 70, fp)) {
+	    fclose(fp);
+	    return PPM_FILE_ERROR;
+    }
   } while(buf[0] == '#');
   sscanf(buf, "%d %d", &width, &height);  
-  if(!fgets(buf, 70, fp)) return PPM_FILE_ERROR;
+  if(!fgets(buf, 70, fp)) {
+	  fclose(fp);
+	  return PPM_FILE_ERROR;
+  }
   sscanf(buf , "%d", &depth);
   
   //********************************************************

@@ -1076,7 +1076,10 @@ int CmCGetImageFormat(char *filename)
   FILE *fp = fopen(filename, "rb");
   if(!fp) return EXE_FILE_READ_ERROR;
   char buf[3];
-  if(!fgets(buf, 3, fp)) return EXE_FILE_READ_ERROR;  
+  if(!fgets(buf, 3, fp)) {
+    fclose(fp);
+    return EXE_FILE_READ_ERROR;  
+  }
   fclose(fp);
   int i;
   for(i = 0; i < FILETYPE_NUM-1; i++) {
@@ -1246,11 +1249,19 @@ int CmCReadMFile(char *filename, float **data, int rows, int cols)
   FILE *fp = fopen(filename, "rb");
   if(!fp) return EXE_FILE_READ_ERROR;
   *data = new float [rows * cols];
-  if(!data) return EXE_OUT_OF_MEMORY;
+  if(!data) {
+    fclose(fp);
+    return EXE_OUT_OF_MEMORY;
+  }
   int i;
   for(i = 0; i < rows*cols; i++) {
-    if(fscanf(fp, "%f", &((*data)[i])) == EOF) return EXE_FILE_READ_ERROR;
+    if(fscanf(fp, "%f", &((*data)[i])) == EOF) {
+      delete[] *data;
+      fclose(fp);
+      return EXE_FILE_READ_ERROR;
+    }
   }
+  delete[] *data;
   fclose(fp);
   return NO_ERRORS;
 }
