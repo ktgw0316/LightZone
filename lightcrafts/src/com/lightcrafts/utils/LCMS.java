@@ -720,7 +720,7 @@ public class LCMS {
     }
 
     static {
-        System.loadLibrary("LCMS");
+        System.loadLibrary("LCLCMS");
     }
 
     public static void main(String args[]) {
