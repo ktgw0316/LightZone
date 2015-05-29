@@ -48,8 +48,10 @@ public abstract class AbstractLayout extends JPanel {
     final static String RightDividerKey = "rightDividerLocation";
 
     // Minimum and maximum values of the split pane divider locations.
-    final static int MinFaderWidth = 200;
-    final static int MaxFaderWidth = 400;
+    final static int MinRightFaderWidth = 330;
+    final static int MaxRightFaderWidth = 480;
+    final static int MinLeftFaderWidth  = 200;
+    final static int MaxLeftFaderWidth  = 400;
 
     // Placeholder fader tab name, to indicate "no selection" in preferences:
     final String NoLabel = "NoTabSelected";
@@ -282,19 +284,19 @@ public abstract class AbstractLayout extends JPanel {
         Dimension size;
 
         size = leftFader.getMinimumSize();
-        size = new Dimension(Math.max(MinFaderWidth, size.width), size.height);
+        size = new Dimension(Math.max(MinLeftFaderWidth, size.width), size.height);
         leftFader.setMinimumSize(size);
 
         size = leftFader.getMaximumSize();
-        size = new Dimension(Math.min(MaxFaderWidth, size.width), size.height);
+        size = new Dimension(Math.min(MaxLeftFaderWidth, size.width), size.height);
         leftFader.setMaximumSize(size);
 
         size = rightFader.getMinimumSize();
-        size = new Dimension(Math.max(MinFaderWidth, size.width), size.height);
+        size = new Dimension(Math.max(MinRightFaderWidth, size.width), size.height);
         rightFader.setMinimumSize(size);
 
         size = rightFader.getMaximumSize();
-        size = new Dimension(Math.min(MaxFaderWidth, size.width), size.height);
+        size = new Dimension(Math.min(MaxRightFaderWidth, size.width), size.height);
         rightFader.setMaximumSize(size);
     }
 }

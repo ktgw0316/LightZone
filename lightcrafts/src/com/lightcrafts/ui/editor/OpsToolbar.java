@@ -61,7 +61,7 @@ class OpsToolbar extends JPanel {
     ) {
         BufferedImage image =
             (BufferedImage) action.getValue(OpActions.IconImageKey);
-        image = IconFactory.getScaledImage(image, IconFactory.StandardSize - 2);
+        image = IconFactory.getScaledImage(image, IconFactory.StandardSize + 1);
         Icon icon = new ImageIcon(image);
         
         CoolButton button = new CoolButton(style);
