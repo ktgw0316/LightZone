@@ -23,6 +23,8 @@ fi
 pkgjavadir=${usrdir}/share/java/lightzone
 if [ -d ${usrdir}/libexec/lightzone ]; then
   pkglibexecdir=${usrdir}/libexec/lightzone
+elif [ -d ${usrdir}/lib64/lightzone ]; then
+  pkglibexecdir=${usrdir}/lib64/lightzone
 else
   pkglibexecdir=${usrdir}/lib/lightzone
 fi

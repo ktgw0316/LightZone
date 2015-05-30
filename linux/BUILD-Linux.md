@@ -99,3 +99,26 @@ To install the package:
 
     sudo dpkg -i ../lightzone-*.deb
 
+### Re-packaging rpm from a source rpm
+If you already have a .src.rpm for other distro, you can create .rpm for your distro
+from the .src.rpm by yourself.
+
+First of all, you need to install rpm-build:
+
+    su -c 'apt-get install rpm-build'
+
+Then extract the containts of the .src.rpm, and copy its source archive to SOURCES
+directory:
+    rpm2cpio lightzone-*.src.rpm | cpio -idmv --no-absolute-filenames
+    cp lightzone-*.tar.bz2 ~/rpmbuild/SOURCES/
+
+Then build an .rpm package using .spec file:
+
+    rpmbuild -b lightzone.spec
+
+If package list for unsatisfied dependency is shown, install the packages via apt-get,
+then execute the rpmbuild command again. Your .rpm package will be created in
+~/rpmbuild/RPMS/i386/ or ~/rpmbuild/RPMS/x86_64/. Install it with
+
+    rpm -ivh ~/rpmbuild/RPMS/x86_64/lightzone-*.rpm
+

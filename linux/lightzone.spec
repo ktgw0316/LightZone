@@ -15,9 +15,9 @@ Source:		%{name}-%{version}.tar.bz2
 
 %if 0%{?fedora}
 %if 0%{?fedora} >= 20
-%define java_version 1.8.0
+%define java_version 1.8.0-openjdk
 %else
-%define java_version 1.7.0
+%define java_version 1.7.0-openjdk
 %endif
 %define lcms2_devel lcms2-devel
 %define libjpeg_devel libjpeg-turbo-devel
@@ -26,7 +26,7 @@ Source:		%{name}-%{version}.tar.bz2
 %endif
 
 %if 0%{?sles_version}
-%define java_version 1_7_0
+%define java_version 1_7_0-openjdk
 %define lcms2_devel liblcms2-devel
 %define libjpeg_devel libjpeg8-devel
 %define libX11_devel xorg-x11-libX11-devel
@@ -34,39 +34,44 @@ BuildRequires: update-desktop-files
 %endif
 
 %if 0%{?suse_version} == 1210
-%define java_version 1_6_0
+%define java_version 1_6_0-openjdk
 %define lcms2_devel liblcms2-devel
 %define libjpeg_devel libjpeg8-devel
 %define libX11_devel xorg-x11-libX11-devel
 %endif
 
 %if 0%{?suse_version} > 1210
-%define java_version 1_7_0
+%define java_version 1_7_0-openjdk
 %define lcms2_devel liblcms2-devel
 %define libjpeg_devel libjpeg8-devel
 %define libX11_devel libX11-devel
 %endif
 
 %if 0%{?centos_version}
-%define java_version 1.6.0
+%define java_version 1.6.0-openjdk
 %define lcms2_devel lcms2-devel
 %define libjpeg_devel libjpeg8-devel
 %define libX11_devel libX11-devel
 %define debug_package %{nil}
 %endif
 
-%if 0%{?mdkversion}
-%define java_version 1.6.0
+%if 0%{?mdkversion} || 0%{?pclinuxos}
+%define java_version 1.8.0-sun
 %define lcms2_devel liblcms2-devel
 %define libjpeg_devel libjpeg8-devel
 %define libX11_devel libX11-devel
 %endif
 
-BuildRequires:	java-%{java_version}-openjdk-devel, %{libX11_devel}, ant, autoconf, gcc, gcc-c++, make, tidy, git, javahelp2, %{lcms2_devel}, %{libjpeg_devel}, libtiff-devel, pkg-config, rsync
+BuildRequires:	java-%{java_version}-devel, %{libX11_devel}, ant, autoconf, gcc, gcc-c++, make, tidy, git, javahelp2, %{lcms2_devel}, %{libjpeg_devel}, libtiff-devel, pkg-config, rsync
+%if 0%{?mdkversion} || 0%{?pclinuxos}
+BuildRequires:	java-rpmbuild, libgomp-devel
+%endif
+
+Requires:	java-%{java_version}, javahelp2, lcms2
 %if 0%{?suse_version} >= 1320
-Requires:	java-%{java_version}-openjdk, javahelp2, lcms2, xerces-j2-xml-apis
-%else
-Requires:	java-%{java_version}-openjdk, javahelp2, lcms2
+Requires:	xerces-j2-xml-apis
+%elseif 0%{?mdkversion} || 0%{?pclinuxos}
+Requires:	libgomp1
 %endif
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
