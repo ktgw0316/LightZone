@@ -29,14 +29,14 @@ fi
 
 classdir='/usr/share/java/javahelp/*:/usr/share/java/*:/usr/share/javahelp/lib/*:/usr/local/share/java/classes/*'
 
-if [ $totalmem -ge 1024000 ]; then
+if [ $totalmem -ge 1048576 ]; then
   maxmem=$(( $totalmem / 2 ))
   # on 32-bit architectures there is ~2GB limit for maximum Java heap size
-  if [ $arch = "32" -a $totalmem -ge 4096000 ]; then
-    maxmem=2048000
+  if [ $arch = "32" -a $totalmem -ge 4194304 ]; then
+    maxmem=2097152
   fi
 else
-    maxmem=512000
+    maxmem=524288
 fi
 
 # IFS should be \n to handle filenames that include space.
