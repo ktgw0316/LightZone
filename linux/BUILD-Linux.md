@@ -103,9 +103,7 @@ To install the package:
 If you already have a .src.rpm for other distro, you can create .rpm for your distro
 from the .src.rpm by yourself.
 
-First of all, you need to install rpm-build:
-
-    su -c 'apt-get install rpm-build'
+First of all, you need to install rpm-build using package manager of your distro.
 
 Then extract the containts of the .src.rpm, and copy its source archive to SOURCES
 directory:
