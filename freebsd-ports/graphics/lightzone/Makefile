@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	lightzone
-DISTVERSION=	4.1.0
+DISTVERSION=	4.1.1
 CATEGORIES=	graphics java
 MASTER_SITES=	GH
 DIST_SUBDIR=	${PORTNAME}
@@ -29,7 +29,7 @@ RUN_DEPENDS=	java:${PORTSDIR}/java/javavmwrapper \
 USE_GITHUB=	yes
 GH_ACCOUNT=	Aries85
 GH_PROJECT=	LightZone
-GH_TAGNAME=	d15e8b3
+GH_TAGNAME=	bf1eac8
 
 USES=		desktop-file-utils
 USE_GCC=	yes
