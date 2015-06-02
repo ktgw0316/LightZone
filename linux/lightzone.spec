@@ -70,8 +70,10 @@ BuildRequires:	java-rpmbuild, libgomp-devel
 Requires:	java-%{java_version}, javahelp2, lcms2
 %if 0%{?suse_version} >= 1320
 Requires:	xerces-j2-xml-apis
-%elseif 0%{?mdkversion} || 0%{?pclinuxos}
+%else
+%if 0%{?mdkversion} || 0%{?pclinuxos}
 Requires:	libgomp1
+%endif
 %endif
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
