@@ -29,7 +29,7 @@ RUN_DEPENDS=	java:${PORTSDIR}/java/javavmwrapper \
 USE_GITHUB=	yes
 GH_ACCOUNT=	Aries85
 GH_PROJECT=	LightZone
-GH_TAGNAME=	bf1eac8
+GH_TAGNAME=	1bff4de
 
 USES=		desktop-file-utils
 USE_GCC=	yes
