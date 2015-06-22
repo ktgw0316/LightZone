@@ -1240,7 +1240,7 @@ public class RangeSelector extends JComponent {
      */
     private int getMaximumThumbX() {
         final Insets in = getInsets();
-        return getWidth() - in.right - 1 - ARROW_WIDTH - THUMB_WIDTH / 2;
+        return getWidth() - in.right - ARROW_WIDTH - THUMB_WIDTH / 2;
     }
 
     /**
