@@ -40,7 +40,7 @@ int const   JavaMinMemoryInMB = 512;
 #if _WIN64 || __amd64__
 int const   JavaMaxMemoryInMB = 32768;
 #else
-int const   JavaMaxMemoryInMB = 2048;
+int const   JavaMaxMemoryInMB = 1024;
 #endif
 
 /**
