@@ -6,3 +6,6 @@ chmod +x /usr/lib/lightzone/dcraw_lz
 if [ -x "`which update-menus 2>/dev/null`" ]; then
 	update-menus
 fi
+
+#DEBHELPER#
+

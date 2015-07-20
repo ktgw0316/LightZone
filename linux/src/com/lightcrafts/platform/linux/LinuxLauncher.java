@@ -17,6 +17,7 @@ public final class LinuxLauncher {
     public static void main(String[] args) {
         try {
             System.setProperty("awt.useSystemAAFontSettings", "on");
+            System.setProperty("com.sun.media.jai.disableMediaLib", "true");
 
             final boolean lafCond = sun.swing.SwingUtilities2.isLocalDisplay();
             Object aaTextInfo = sun.swing.SwingUtilities2.AATextInfo.getAATextInfo(lafCond);
