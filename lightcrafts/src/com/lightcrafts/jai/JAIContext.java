@@ -294,7 +294,7 @@ public class JAIContext {
         }
 
         if (_sRGBColorProfile == null) {
-            InputStream in = JAIContext.class.getResourceAsStream("resources/sRGB Color Space Profile.ICM");
+            InputStream in = JAIContext.class.getResourceAsStream("resources/sRGB.icc");
             try {
                 _sRGBColorProfile = ICC_Profile.getInstance(in);
             } catch (IOException e) {
@@ -354,7 +354,7 @@ public class JAIContext {
             _gray22Profile = ICC_Profile.getInstance(in);
             _gray22ColorSpace = new ICC_ColorSpace(_gray22Profile);
 
-            in = JAIContext.class.getResourceAsStream("resources/AdobeRGB1998.icc");
+            in = JAIContext.class.getResourceAsStream("resources/compatibleWithAdobeRGB1998.icc");
             _adobeRGBProfile = ICC_Profile.getInstance(in);
             _adobeRGBColorSpace = new ICC_ColorSpace(_adobeRGBProfile);
 
