@@ -2,13 +2,11 @@
 
 package com.lightcrafts.platform.macosx;
 
+import java.io.File;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.io.File;
-import java.io.FileNotFoundException;
-
-import com.apple.eio.FileManager;
 
 /**
  * Mac OS X file utilities.
@@ -31,9 +29,11 @@ public final class MacOSXFileUtil {
             // This works only when the application is started from a bundle
             // and not from either the command-line or an IDE.
             //
-            return FileManager.getResource( nibFilename );
+            Class fileManager = Class.forName( "com.apple.eio.FileManager" );
+            Method getResource = fileManager.getDeclaredMethod( "getResource", new Class[] {String.class} );
+            return getResource.invoke( null, nibFilename ).toString();
         }
-        catch ( FileNotFoundException e ) {
+        catch ( Exception e ) {
             //
             // Failing the above, assume that the working directory is the root
             // of the source tree and use a path relative to that.
