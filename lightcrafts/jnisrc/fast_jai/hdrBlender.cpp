@@ -102,7 +102,11 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_HDROpImage2_cBlendLoop
     int dstGOffset = dstBandOffsets[1];
     int dstBOffset = dstBandOffsets[2];
 
+#if _OPENMP < 201307
 #pragma omp parallel for
+#else
+#pragma omp parallel for simd
+#endif
     for (int row = 0; row < dstheight; row++) {
         for (int col = 0; col < dstwidth; col++) {
             int r = srcData[srcPixelStride * col + row * srcLineStride + srcROffset];

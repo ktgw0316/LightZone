@@ -70,7 +70,11 @@ extern "C" JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_HighlightReco
     float hsb[3];
     float rgb3[3];
     
-#pragma omp parallel for private (raw, rgb3, hsb)
+#if _OPENMP < 201307
+#pragma omp parallel for private (raw, rgb3, hsb) schedule (guided)
+#else
+#pragma omp parallel for simd private (raw, rgb3, hsb) schedule (guided)
+#endif
     for (int row = 0; row < height; row++) {
         for (int col = 0; col < width; col++) {
             int srcPixOffset = srcPixelStride * col + row * srcLineStride;
@@ -167,7 +171,11 @@ extern "C" JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_HighlightReco
     const float threshold = 0.8 * 0xffff;
     const float maximum = 1.0 * 0xffff;
     
-#pragma omp parallel for
+#if _OPENMP < 201307
+#pragma omp parallel for schedule (guided)
+#else
+#pragma omp parallel for simd schedule (guided)
+#endif
     for (int row = 0; row < height; row++) {
         for (int col = 0; col < width; col++) {
             const int srcPixOffset = srcPixelStride * col + row * srcLineStride;
@@ -278,7 +286,11 @@ extern "C" JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_HighlightReco
     
     const vfloat vpremul(loadu(preMul));
     
-#pragma omp parallel for
+#if _OPENMP < 201307
+#pragma omp parallel for schedule (guided)
+#else
+#pragma omp parallel for simd schedule (guided)
+#endif
     for (int row = 0; row < height; row++) {
         for (int col = 0; col < width; col++) {
             const int srcPixOffset = srcPixelStride * col + row * srcLineStride;

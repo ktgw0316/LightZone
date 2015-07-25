@@ -83,7 +83,11 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_RGBColorSelectionMaskOpI
 	const float rmin = (3 * radius) / 16;
 	const float rmax = (5 * radius) / 16;
 
-#pragma omp parallel for
+#if _OPENMP < 201307
+#pragma omp parallel for schedule (guided)
+#else
+#pragma omp parallel for simd schedule (guided)
+#endif
     for (int row = 0; row < height; row++) {
         for (int col = 0; col < width; col++) {
             float L = srcData[3 * col + row * srcLineStride + srcROffset];
