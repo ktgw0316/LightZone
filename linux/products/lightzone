@@ -15,9 +15,9 @@ elif [ "${PLATFORM}" = "SunOS" ]; then
   totalmem=`expr $totalmem \* 1024`
   usrdir=/usr
 elif [ "${PLATFORM}" = "FreeBSD" ]; then
-  totalmem=`dmesg | grep 'real memory' | sed -r 's/.* ([0-9]+) .*/\1/'`
+  totalmem=`sysctl -n hw.physmem`
   totalmem=`expr $totalmem / 1024`
-  usrdir=/usr/local
+  usrdir=%%LOCALBASE%%
 fi
 
 pkgjavadir=${usrdir}/share/java/lightzone

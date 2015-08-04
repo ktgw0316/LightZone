@@ -2,8 +2,8 @@
 # $FreeBSD$
 
 PORTNAME=	lightzone
-DISTVERSION=	4.1.1
-PORTREVISION=	2
+DISTVERSION=	4.1.2
+PORTREVISION=	0
 CATEGORIES=	graphics java
 DIST_SUBDIR=	${PORTNAME}
 
@@ -24,14 +24,13 @@ LIB_DEPENDS=	liblcms2.so:${PORTSDIR}/graphics/lcms2 \
 USE_GITHUB=	yes
 GH_ACCOUNT=	Aries85
 GH_PROJECT=	LightZone
-GH_TAGNAME=	1bff4de
 
 USES=		desktop-file-utils gmake jpeg pkgconfig
 USE_ANT=	yes
 USE_JAVA=	yes
 USE_GCC=	yes
 USE_LDCONFIG=	yes
-USE_XORG=	yes
+USE_XORG=	x11
 JAVA_VENDOR=	openjdk
 JAVA_VERSION=	1.6+
 JAVA_BUILD=	yes
@@ -48,7 +47,7 @@ post-patch:
 
 do-install:
 	${INSTALL_SCRIPT} ${WRKSRC}/products/${PORTNAME} ${STAGEDIR}${PREFIX}/bin/
-	#@${MKDIR} ${STAGEDIR}${JAVASHAREDIR}/${PORTNAME}
+	@${MKDIR} ${STAGEDIR}${JAVASHAREDIR}/${PORTNAME}
 	${INSTALL_DATA} ${WRKSRC}/products/*.jar ${STAGEDIR}${JAVASHAREDIR}/${PORTNAME}
 	@${MKDIR} ${STAGEDIR}${LIBDIR}
 	${INSTALL_PROGRAM} ${WRKSRC}/products/LightZone-forkd ${STAGEDIR}${LIBDIR}
