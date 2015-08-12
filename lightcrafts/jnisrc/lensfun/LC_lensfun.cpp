@@ -61,7 +61,7 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distor
   jint srcROffset, jint srcGOffset, jint srcBOffset,
   jint destROffset, jint destGOffset, jint destBOffset,
   jint srcLineStride, jint destLineStride,
-  jfloat k1)
+  jfloat k1, jfloat kr, jfloat kb)
 {
     unsigned short  *srcData = (unsigned short *) env->GetPrimitiveArrayCritical(jsrcData, 0);
     unsigned short *destData = (unsigned short *) env->GetPrimitiveArrayCritical(jdestData, 0);
@@ -90,19 +90,26 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distor
             const float offX = x - centerX;
             const float radiusSq = (offX * offX + offY * offY) / unitRadiusSq;
 
-            // 3rd order polynomial model of distortion
-            const float coeff = 1.f - k1 + k1 * radiusSq;
+            // 3rd order polynomial distortion model
+            const float coeff = 1 - k1 + k1 * radiusSq;
 
-            const float newX = coeff * offX + centerX;
-            const float newY = coeff * offY + centerY;
+            const float gX = coeff * offX + centerX;
+            const float gY = coeff * offY + centerY;
 
-            if (newX < 1 || newX >= fullWidth - 1 || newY < 1 || newY >= fullHeight - 1)
+            // Skip the pixels outside the source image
+            if (gX < 1 || gX >= fullWidth - 1 || gY < 1 || gY >= fullHeight - 1)
                 continue;
 
+            // Linear lateral chromatic aberrations model
+            const float rX = kr * coeff * offX + centerX;
+            const float rY = kr * coeff * offY + centerY;
+            const float bX = kb * coeff * offX + centerX;
+            const float bY = kb * coeff * offY + centerY;
+
             const int dstIdx = 3*(x - rectX) + (y - rectY) * destLineStride;
-            destData[dstIdx + destROffset] = BilinearInterp(srcData, srcLineStride, srcROffset, newX, newY);
-            destData[dstIdx + destGOffset] = BilinearInterp(srcData, srcLineStride, srcGOffset, newX, newY);
-            destData[dstIdx + destBOffset] = BilinearInterp(srcData, srcLineStride, srcBOffset, newX, newY);
+            destData[dstIdx + destROffset] = BilinearInterp(srcData, srcLineStride, srcROffset, rX, rY);
+            destData[dstIdx + destGOffset] = BilinearInterp(srcData, srcLineStride, srcGOffset, gX, gY);
+            destData[dstIdx + destBOffset] = BilinearInterp(srcData, srcLineStride, srcBOffset, bX, bY);
         }
     }
 

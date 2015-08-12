@@ -33,8 +33,10 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
     private static final String EXPOSURE = "Exposure";
     private static final String COLOR_NOISE = "Color_Noise";
     private static final String GRAIN_NOISE = "Grain_Noise";
-    private static final String DISTORTION_AUTO = "Distortion";
+    private static final String DISTORTION_AUTO = "Auto_Distortion";
     private static final String DISTORTION_K1 = "Distortion";
+    private static final String TCA_R = "TCA_Red";
+    private static final String TCA_B = "TCA_Blue";
 
     private final float originalTemperature;
     private final float daylightTemperature;
@@ -46,6 +48,8 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
     private float grain_noise = 0;
     private boolean distortion_auto = false;
     private float distortion_k1 = 0;
+    private float tca_r = 1;
+    private float tca_b = 1;
 
     private Point2D p = null;
     private boolean autoWB = false;
@@ -163,6 +167,8 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
         addSliderKey(TINT);
         addCheckboxKey(DISTORTION_AUTO);
         addSliderKey(DISTORTION_K1);
+        addSliderKey(TCA_R);
+        addSliderKey(TCA_B);
 
         DecimalFormat formatPercent = new DecimalFormat("0.00");
         DecimalFormat formatPermil  = new DecimalFormat("0.000");
@@ -175,6 +181,8 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
             setSliderConfig(GRAIN_NOISE, new SliderConfig(0, 20, grain_noise, .01, false, formatPercent));
         setCheckboxValue(DISTORTION_AUTO, false);
         setSliderConfig(DISTORTION_K1, new SliderConfig(-0.1, 0.1, distortion_k1, .001, false, formatPermil));
+        setSliderConfig(TCA_R, new SliderConfig(0.9, 1.1, tca_r, .001, false, formatPermil));
+        setSliderConfig(TCA_B, new SliderConfig(0.9, 1.1, tca_b, .001, false, formatPermil));
     }
 
     static float neutralTemperature(float rgb[], float refT) {
@@ -239,6 +247,12 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
         } else if (key == DISTORTION_K1 && distortion_k1 != value
                 && !distortion_auto) { // TODO:
             distortion_k1 = (float) value;
+        } else if (key == TCA_R && tca_r != value
+                && !distortion_auto) { // TODO:
+            tca_r = (float) value;
+        } else if (key == TCA_B && tca_b != value
+                && !distortion_auto) { // TODO:
+            tca_b = (float) value;
         } else
             return;
         
@@ -418,7 +432,7 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
                 front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
             } else {
                 BorderExtender borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
-                front = new DistortionOpImage(front, JAIContext.fileCacheHint, borderExtender, distortion_k1);
+                front = new DistortionOpImage(front, JAIContext.fileCacheHint, borderExtender, distortion_k1, tca_r, tca_b);
                 front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
             }
 

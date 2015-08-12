@@ -25,15 +25,19 @@ public class DistortionOpImage extends GeometricOpImage {
     // Coeffs for 5th order polynomial distortion model
     // c.f. http://www.imatest.com/docs/distortion.html
     private float k1 = 0f;
+    private float kr = 1f;
+    private float kb = 1f;
 
     public DistortionOpImage(RenderedImage sources, Map configuration, BorderExtender extender,
-            float k1) {
+            float k1, float kr, float kb) {
         super(OpImage.vectorize(sources), null, configuration, true, extender,
                 Interpolation.getInstance(Interpolation.INTERP_BILINEAR));
 
         fullWidth  = sources.getWidth();
         fullHeight = sources.getHeight();
         this.k1 = k1;
+        this.kr = kr;
+        this.kb = kb;
     }
 
     public DistortionOpImage(RenderedImage sources, Map configuration, BorderExtender extender,
@@ -120,7 +124,7 @@ public class DistortionOpImage extends GeometricOpImage {
                                dstX, dstY, dstWidth, dstHeight,
                                srcBandOffsets[0], srcBandOffsets[1], srcBandOffsets[2],
                                dstBandOffsets[0], dstBandOffsets[1], dstBandOffsets[2],
-                               srcScanlineStride, dstScanlineStride, k1);
+                               srcScanlineStride, dstScanlineStride, k1, kr, kb);
                 }
             }
             else {
@@ -145,7 +149,7 @@ public class DistortionOpImage extends GeometricOpImage {
                                   int srcROffset, int srcGOffset, int srcBOffset,
                                   int destROffset, int destGOffset, int destBOffset,
                                   int srcLineStride, int destLineStride,
-                                  float k1);
+                                  float k1, float kr, float kb);
 
     static native void lensfun(short srcData[], short destData[],
                                int fullWidth, int fullHeight,
