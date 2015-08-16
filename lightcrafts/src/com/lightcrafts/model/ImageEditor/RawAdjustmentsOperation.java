@@ -33,10 +33,6 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
     private static final String EXPOSURE = "Exposure";
     private static final String COLOR_NOISE = "Color_Noise";
     private static final String GRAIN_NOISE = "Grain_Noise";
-    private static final String DISTORTION_AUTO = "Auto_Distortion";
-    private static final String DISTORTION_K1 = "Distortion";
-    private static final String TCA_R = "TCA_Red";
-    private static final String TCA_B = "TCA_Blue";
 
     private final float originalTemperature;
     private final float daylightTemperature;
@@ -46,10 +42,6 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
     private float exposure = 0;
     private float color_noise = 4;
     private float grain_noise = 0;
-    private boolean distortion_auto = false;
-    private float distortion_k1 = 0;
-    private float tca_r = 1;
-    private float tca_b = 1;
 
     private Point2D p = null;
     private boolean autoWB = false;
@@ -165,24 +157,15 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
             addSliderKey(GRAIN_NOISE);
         addSliderKey(SOURCE);
         addSliderKey(TINT);
-        addCheckboxKey(DISTORTION_AUTO);
-        addSliderKey(DISTORTION_K1);
-        addSliderKey(TCA_R);
-        addSliderKey(TCA_B);
 
-        DecimalFormat formatPercent = new DecimalFormat("0.00");
-        DecimalFormat formatPermil  = new DecimalFormat("0.000");
+        DecimalFormat format = new DecimalFormat("0.00");
 
-        setSliderConfig(EXPOSURE, new SliderConfig(-4, 4, exposure, .01, false, formatPercent));
+        setSliderConfig(EXPOSURE, new SliderConfig(-4, 4, exposure, .01, false, format));
         setSliderConfig(SOURCE, new SliderConfig(1000, 40000, temperature, 10, true, new DecimalFormat("0")));
         setSliderConfig(TINT, new SliderConfig(-20, 20, tint, 0.1, false, new DecimalFormat("0.0")));
-        setSliderConfig(COLOR_NOISE, new SliderConfig(0, 20, color_noise, .01, false, formatPercent));
+        setSliderConfig(COLOR_NOISE, new SliderConfig(0, 20, color_noise, .01, false, format));
         if (type == typeV2)
-            setSliderConfig(GRAIN_NOISE, new SliderConfig(0, 20, grain_noise, .01, false, formatPercent));
-        setCheckboxValue(DISTORTION_AUTO, false);
-        setSliderConfig(DISTORTION_K1, new SliderConfig(-0.1, 0.1, distortion_k1, .001, false, formatPermil));
-        setSliderConfig(TCA_R, new SliderConfig(0.9, 1.1, tca_r, .001, false, formatPermil));
-        setSliderConfig(TCA_B, new SliderConfig(0.9, 1.1, tca_b, .001, false, formatPermil));
+            setSliderConfig(GRAIN_NOISE, new SliderConfig(0, 20, grain_noise, .01, false, format));
     }
 
     static float neutralTemperature(float rgb[], float refT) {
@@ -210,24 +193,14 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
         return minT;
     }
 
+    @Override
     public boolean isSingleton() {
         return true;
     }
 
+    @Override
     public boolean neutralDefault() {
         return false;
-    }
-
-    @Override
-    public void setCheckboxValue(String key, boolean value) {
-        if (key == DISTORTION_AUTO) {
-            distortion_auto = value;
-            // TODO: disoble k1 slider
-        } else {
-            return;
-        }
-
-        super.setCheckboxValue(key, value);
     }
 
     @Override
@@ -244,21 +217,13 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
             color_noise = (float) value;
         } else if (key == GRAIN_NOISE && grain_noise != value) {
             grain_noise = (float) value;
-        } else if (key == DISTORTION_K1 && distortion_k1 != value
-                && !distortion_auto) { // TODO:
-            distortion_k1 = (float) value;
-        } else if (key == TCA_R && tca_r != value
-                && !distortion_auto) { // TODO:
-            tca_r = (float) value;
-        } else if (key == TCA_B && tca_b != value
-                && !distortion_auto) { // TODO:
-            tca_b = (float) value;
         } else
             return;
         
         super.setSliderValue(key, value);
     }
 
+    @Override
     public Map<String, Float> setColor(Point2D p) {
         this.p = p;
         settingsChanged();
@@ -421,21 +386,6 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
                 front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
             }
 
-            /*** DISTORTION CORRECTION ***/
-
-            if (distortion_auto) {
-                // TODO: set lens name
-                String lensName = "Samyang 8mm f/2.8";
-
-                BorderExtender borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
-                front = new DistortionOpImage(front, JAIContext.fileCacheHint, borderExtender, lensName);
-                front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
-            } else {
-                BorderExtender borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
-                front = new DistortionOpImage(front, JAIContext.fileCacheHint, borderExtender, distortion_k1, tca_r, tca_b);
-                front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
-            }
-
             return front;
         }
     }
@@ -448,6 +398,7 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
         return new RawAdjustments(source);
     }
 
+    @Override
     public OperationType getType() {
         return type;
     }

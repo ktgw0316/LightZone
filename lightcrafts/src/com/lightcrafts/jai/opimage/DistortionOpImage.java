@@ -25,17 +25,19 @@ public class DistortionOpImage extends GeometricOpImage {
     // Coeffs for 5th order polynomial distortion model
     // c.f. http://www.imatest.com/docs/distortion.html
     private float k1 = 0f;
+    private float k2 = 0f;
     private float kr = 1f;
     private float kb = 1f;
 
     public DistortionOpImage(RenderedImage sources, Map configuration, BorderExtender extender,
-            float k1, float kr, float kb) {
+            float k1, float k2, float kr, float kb) {
         super(OpImage.vectorize(sources), null, configuration, true, extender,
                 Interpolation.getInstance(Interpolation.INTERP_BILINEAR));
 
         fullWidth  = sources.getWidth();
         fullHeight = sources.getHeight();
         this.k1 = k1;
+        this.k2 = k2;
         this.kr = kr;
         this.kb = kb;
     }
@@ -115,16 +117,13 @@ public class DistortionOpImage extends GeometricOpImage {
 
         if (src.getNumBands() == 3) {
             if (lensName.isEmpty()) {
-                // DEBUG
-                System.out.println("k1 = " + k1);
-
                 synchronized(this) {
                     distortion(srcData, dstData,
                                fullWidth, fullHeight,
                                dstX, dstY, dstWidth, dstHeight,
                                srcBandOffsets[0], srcBandOffsets[1], srcBandOffsets[2],
                                dstBandOffsets[0], dstBandOffsets[1], dstBandOffsets[2],
-                               srcScanlineStride, dstScanlineStride, k1, kr, kb);
+                               srcScanlineStride, dstScanlineStride, k1, k2, kr, kb);
                 }
             }
             else {
@@ -149,7 +148,7 @@ public class DistortionOpImage extends GeometricOpImage {
                                   int srcROffset, int srcGOffset, int srcBOffset,
                                   int destROffset, int destGOffset, int destBOffset,
                                   int srcLineStride, int destLineStride,
-                                  float k1, float kr, float kb);
+                                  float k1, float k2, float kr, float kb);
 
     static native void lensfun(short srcData[], short destData[],
                                int fullWidth, int fullHeight,

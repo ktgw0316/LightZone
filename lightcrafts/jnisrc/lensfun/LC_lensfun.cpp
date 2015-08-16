@@ -53,6 +53,12 @@ inline unsigned short BilinearInterp
             wait_b * (wait_l * data_bl + wait_r * data_br)) >> 16;
 }
 
+inline float Coeff(const float k1, const float k2, const float radiusSq)
+{
+    // 5th order polynomial distortion model, scaled
+    return (1 + k1 * radiusSq + k2 * radiusSq * radiusSq) / (1 + k1 + k2);
+}
+
 JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distortion
 ( JNIEnv *env, jclass cls,
   jshortArray jsrcData, jshortArray jdestData,
@@ -61,26 +67,15 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distor
   jint srcROffset, jint srcGOffset, jint srcBOffset,
   jint destROffset, jint destGOffset, jint destBOffset,
   jint srcLineStride, jint destLineStride,
-  jfloat k1, jfloat kr, jfloat kb)
+  jfloat k1, jfloat k2, jfloat kr, jfloat kb)
 {
     unsigned short  *srcData = (unsigned short *) env->GetPrimitiveArrayCritical(jsrcData, 0);
     unsigned short *destData = (unsigned short *) env->GetPrimitiveArrayCritical(jdestData, 0);
 
-    const float centerX = fullWidth  / 2.f;
-    const float centerY = fullHeight / 2.f;
+    const float centerX = 0.5 * fullWidth;
+    const float centerY = 0.5 * fullHeight;
 
-    float unitRadiusSq;
-    if (k1 > 0) {
-        // barrel distortion
-        unitRadiusSq = centerX * centerX + centerY * centerY;
-    }
-    else {
-        // pincushion distortion
-        if (fullHeight < fullWidth)
-            unitRadiusSq = centerY * centerY;
-        else
-            unitRadiusSq = centerX * centerX;
-    }
+    const float maxRadiusSq = centerX * centerX + centerY * centerY;
 
 #pragma omp parallel for schedule (guided)
     for (int y = rectY; y < rectY + rectHeight; ++y) {
@@ -88,10 +83,8 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distor
 
         for (int x = rectX; x < rectX + rectWidth; ++x) {
             const float offX = x - centerX;
-            const float radiusSq = (offX * offX + offY * offY) / unitRadiusSq;
-
-            // 3rd order polynomial distortion model
-            const float coeff = 1 - k1 + k1 * radiusSq;
+            const float radiusSq = (offX * offX + offY * offY) / maxRadiusSq;
+            const float coeff = Coeff(k1, k2, radiusSq);
 
             const float gX = coeff * offX + centerX;
             const float gY = coeff * offY + centerY;
