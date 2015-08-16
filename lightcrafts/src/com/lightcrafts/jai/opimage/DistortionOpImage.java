@@ -21,6 +21,8 @@ public class DistortionOpImage extends GeometricOpImage {
     private final int fullWidth;
     private final int fullHeight;
     private String lensName = "";
+    private float focal = 0f;
+    private float aperture = 0f;
 
     // Coeffs for 5th order polynomial distortion model
     // c.f. http://www.imatest.com/docs/distortion.html
@@ -43,13 +45,15 @@ public class DistortionOpImage extends GeometricOpImage {
     }
 
     public DistortionOpImage(RenderedImage sources, Map configuration, BorderExtender extender,
-            String lensName) {
+            String lensName, float focal, float aperture) {
         super(OpImage.vectorize(sources), null, configuration, true, extender,
                 Interpolation.getInstance(Interpolation.INTERP_BILINEAR));
 
         fullWidth  = sources.getWidth();
         fullHeight = sources.getHeight();
         this.lensName = lensName;
+        this.focal = focal;
+        this.aperture = aperture;
     }
 
     @Override
@@ -136,7 +140,8 @@ public class DistortionOpImage extends GeometricOpImage {
                             dstX, dstY, dstWidth, dstHeight,
                             srcBandOffsets[0], srcBandOffsets[1], srcBandOffsets[2],
                             dstBandOffsets[0], dstBandOffsets[1], dstBandOffsets[2],
-                            srcScanlineStride, dstScanlineStride, lensName);
+                            srcScanlineStride, dstScanlineStride,
+                            lensName, focal, aperture);
                 }
             }
         }
@@ -156,5 +161,5 @@ public class DistortionOpImage extends GeometricOpImage {
                                int srcROffset, int srcGOffset, int srcBOffset,
                                int destROffset, int destGOffset, int destBOffset,
                                int srcLineStride, int destLineStride,
-                               String lensName);
+                               String lensName, float focal, float aperture);
 }

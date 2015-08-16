@@ -15,9 +15,7 @@ const float     scale = 0.0; // automatic scaling
 const lfLensType geom = LF_RECTILINEAR; // TODO;
 const int       flags = LF_MODIFY_SCALE | LF_MODIFY_GEOMETRY | LF_MODIFY_DISTORTION;
 const bool    inverse = false;
-float  crop;
-float  focal;
-float  aperture;
+float crop;
 
 /*
  * Round float to int
@@ -118,7 +116,7 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_lensfu
   jint srcROffset, jint srcGOffset, jint srcBOffset,
   jint destROffset, jint destGOffset, jint destBOffset,
   jint srcLineStride, jint destLineStride,
-  jstring lensNameStr )
+  jstring lensNameStr, jfloat focal, jfloat aperture)
 {
     unsigned short  *srcData = (unsigned short *) env->GetPrimitiveArrayCritical(jsrcData, 0);
     unsigned short *destData = (unsigned short *) env->GetPrimitiveArrayCritical(jdestData, 0);
@@ -145,16 +143,17 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_lensfu
     env->ReleaseStringUTFChars(lensNameStr, 0);
 
     crop = lens->CropFactor;
-    focal = lens->MinFocal;
-    aperture = lens->MinAperture;
+    if (focal < 0.1f)
+        focal = lens->MaxFocal;
+    if (aperture < 0.1f)
+        aperture = lens->MinAperture;
 
+#ifdef DEBUG
     lfLensCalibDistortion** dists = lens->CalibDistortion;
     lfLensCalibDistortion* dist = dists[0];
     const lfDistortionModel model = dist->Model;
-    const float focal = dist->Focal;
     const float* terms = dist->Terms;
 
-#ifdef DEBUG
     switch (model) {
         case LF_DIST_MODEL_POLY3:
             std::cerr << "DistortionModel: poly3" << std::endl;
