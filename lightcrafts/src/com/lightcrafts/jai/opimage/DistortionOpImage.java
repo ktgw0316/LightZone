@@ -20,6 +20,8 @@ public class DistortionOpImage extends GeometricOpImage {
 
     private final int fullWidth;
     private final int fullHeight;
+    private String cameraMaker = "";
+    private String cameraModel = "";
     private String lensName = "";
     private float focal = 0f;
     private float aperture = 0f;
@@ -32,7 +34,7 @@ public class DistortionOpImage extends GeometricOpImage {
     private float kb = 1f;
 
     public DistortionOpImage(RenderedImage sources, Map configuration, BorderExtender extender,
-            float k1, float k2, float kr, float kb) {
+                             float k1, float k2, float kr, float kb) {
         super(OpImage.vectorize(sources), null, configuration, true, extender,
                 Interpolation.getInstance(Interpolation.INTERP_BILINEAR));
 
@@ -45,12 +47,15 @@ public class DistortionOpImage extends GeometricOpImage {
     }
 
     public DistortionOpImage(RenderedImage sources, Map configuration, BorderExtender extender,
-            String lensName, float focal, float aperture) {
+                             String cameraMaker, String cameraModel,
+                             String lensName, float focal, float aperture) {
         super(OpImage.vectorize(sources), null, configuration, true, extender,
                 Interpolation.getInstance(Interpolation.INTERP_BILINEAR));
 
         fullWidth  = sources.getWidth();
         fullHeight = sources.getHeight();
+        this.cameraMaker = cameraMaker;
+        this.cameraModel = cameraModel;
         this.lensName = lensName;
         this.focal = focal;
         this.aperture = aperture;
@@ -110,56 +115,92 @@ public class DistortionOpImage extends GeometricOpImage {
 
         short dstDataArrays[][] = dst.getShortDataArrays();
         final int dstBandOffsets[] = dst.getBandOffsets();
+        final int dstPixelStride = dst.getPixelStride();
         final int dstScanlineStride = dst.getScanlineStride();
 
         final short srcDataArrays[][] = src.getShortDataArrays();
         final int srcBandOffsets[] = src.getBandOffsets();
+        final int srcPixelStride = src.getPixelStride();
         final int srcScanlineStride = src.getScanlineStride();
 
         short dstData[] = dstDataArrays[0];
         short srcData[] = srcDataArrays[0];
 
-        if (src.getNumBands() == 3) {
-            if (lensName.isEmpty()) {
-                synchronized(this) {
-                    distortion(srcData, dstData,
+        System.out.println("srcPixelStride = " + srcPixelStride); // DEBUG
+        System.out.println("srcLineStride  = " + srcScanlineStride); // DEBUG
+        System.out.println("dstWidth  = " + dstWidth); // DEBUG
+        System.out.println("dstHeight = " + dstHeight); // DEBUG
+
+        if (src.getNumBands() == 1) {
+            System.out.println("srcBandOffsets = " + srcBandOffsets[0]); // DEBUG
+
+            synchronized(this) {
+                distortionMono(srcData, dstData,
                                fullWidth, fullHeight,
                                dstX, dstY, dstWidth, dstHeight,
-                               srcBandOffsets[0], srcBandOffsets[1], srcBandOffsets[2],
-                               dstBandOffsets[0], dstBandOffsets[1], dstBandOffsets[2],
-                               srcScanlineStride, dstScanlineStride, k1, k2, kr, kb);
+                               srcPixelStride, dstPixelStride,
+                               srcBandOffsets[0], dstBandOffsets[0],
+                               srcScanlineStride, dstScanlineStride, k1, k2);
+            }
+        }
+        else if (src.getNumBands() == 3) {
+            System.out.println("srcBandOffsets = " + srcBandOffsets[0]
+                    + ", " + srcBandOffsets[1] + ", " + srcBandOffsets[2]); // DEBUG
+
+            if (cameraModel.isEmpty() && lensName.isEmpty()) {
+                synchronized(this) {
+                    distortionColor(srcData, dstData,
+                                    fullWidth, fullHeight,
+                                    dstX, dstY, dstWidth, dstHeight,
+                                    srcPixelStride, dstPixelStride,
+                                    srcBandOffsets[0], srcBandOffsets[1], srcBandOffsets[2],
+                                    dstBandOffsets[0], dstBandOffsets[1], dstBandOffsets[2],
+                                    srcScanlineStride, dstScanlineStride, k1, k2, kr, kb);
                 }
             }
             else {
-                // DEBUG
-                System.out.println("lens = " + lensName);
-
+                System.out.println("camera maker = " + cameraMaker); // DEBUG
+                System.out.println("camera model = " + cameraModel); // DEBUG
+                System.out.println("lens name    = " + lensName);    // DEBUG
                 synchronized(this) {
                     lensfun(srcData, dstData,
                             fullWidth, fullHeight,
                             dstX, dstY, dstWidth, dstHeight,
+                            srcPixelStride, dstPixelStride,
                             srcBandOffsets[0], srcBandOffsets[1], srcBandOffsets[2],
                             dstBandOffsets[0], dstBandOffsets[1], dstBandOffsets[2],
                             srcScanlineStride, dstScanlineStride,
+                            cameraMaker, cameraModel,
                             lensName, focal, aperture);
                 }
             }
         }
     }
 
-    static native void distortion(short srcData[], short destData[],
-                                  int fullWidth, int fullHeight,
-                                  int rectX, int rectY, int rectWidth, int rectHeight,
-                                  int srcROffset, int srcGOffset, int srcBOffset,
-                                  int destROffset, int destGOffset, int destBOffset,
-                                  int srcLineStride, int destLineStride,
-                                  float k1, float k2, float kr, float kb);
+    static native void distortionMono(short srcData[], short dstData[],
+                                      int fullWidth, int fullHeight,
+                                      int rectX, int rectY, int rectWidth, int rectHeight,
+                                      int srcPixelStride, int dstPixelStride,
+                                      int srcOffset, int dstOffset,
+                                      int srcLineStride, int dstLineStride,
+                                      float k1, float k2);
 
-    static native void lensfun(short srcData[], short destData[],
+    static native void distortionColor(short srcData[], short dstData[],
+                                       int fullWidth, int fullHeight,
+                                       int rectX, int rectY, int rectWidth, int rectHeight,
+                                       int srcPixelStride, int dstPixelStride,
+                                       int srcROffset, int srcGOffset, int srcBOffset,
+                                       int dstROffset, int dstGOffset, int dstBOffset,
+                                       int srcLineStride, int dstLineStride,
+                                       float k1, float k2, float kr, float kb);
+
+    static native void lensfun(short srcData[], short dstData[],
                                int fullWidth, int fullHeight,
                                int rectX, int rectY, int rectWidth, int rectHeight,
+                               int srcPixelStride, int dstPixelStride,
                                int srcROffset, int srcGOffset, int srcBOffset,
-                               int destROffset, int destGOffset, int destBOffset,
-                               int srcLineStride, int destLineStride,
+                               int dstROffset, int dstGOffset, int dstBOffset,
+                               int srcLineStride, int dstLineStride,
+                               String cameraMaker, String cameraModel,
                                String lensName, float focal, float aperture);
 }
