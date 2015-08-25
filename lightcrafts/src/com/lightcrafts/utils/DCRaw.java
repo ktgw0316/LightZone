@@ -379,13 +379,13 @@ public final class DCRaw implements
                         String pattern = line.substring(search.length());
                         if (pattern.length() >= 8 && !pattern.substring(0,4).equals(pattern.substring(4,8)))
                             m_filters = -1;
-                        else if (pattern.startsWith("BGGR"))
+                        else if (pattern.startsWith("BG/GR"))
                             m_filters = 0x16161616;
-                        else if (pattern.startsWith("GRBG"))
+                        else if (pattern.startsWith("GR/BG"))
                             m_filters = 0x61616161;
-                        else if (pattern.startsWith("GBRG"))
+                        else if (pattern.startsWith("GB/RG"))
                             m_filters = 0x49494949;
-                        else if (pattern.startsWith("RGGB"))
+                        else if (pattern.startsWith("RG/GB"))
                             m_filters = 0x94949494;
                         else
                             m_filters = -1;

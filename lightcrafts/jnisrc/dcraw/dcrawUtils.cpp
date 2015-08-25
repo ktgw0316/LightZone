@@ -13,20 +13,7 @@
         name4(Java_,com_lightcrafts_utils_DCRaw,_,method)
 
 #include<limits.h>
-
 #include<omp.h>
-
-static inline float fast_log2 (float val)
-{
-    int * const  exp_ptr = reinterpret_cast <int *> (&val);
-    int          x = *exp_ptr;
-    const int    log_2 = ((x >> 23) & 255) - 128;
-    x &= ~(255 << 23);
-    x += 127 << 23;
-    *exp_ptr = x;
-    
-    return (val + log_2);
-}
 
 JNIEXPORT void JNICALL DCRaw_METHOD(interpolateGreen)
 ( JNIEnv *env, jclass cls,
@@ -38,13 +25,12 @@ JNIEXPORT void JNICALL DCRaw_METHOD(interpolateGreen)
     unsigned short *srcData = (unsigned short *) env->GetPrimitiveArrayCritical(jsrcData, 0);
     unsigned short *destData = (unsigned short *) env->GetPrimitiveArrayCritical(jdestData, 0);
 
-    // copy RAW data to RGB layer and remove hot pixels
-    
-    const int SQRT2 = (int) (0x1000 * sqrt(2.0));
-    
 #pragma omp parallel shared (srcData, destData)
 {
-#pragma omp for
+
+    // copy RAW data to RGB layer and remove hot pixels
+
+#pragma omp for schedule (dynamic)
     for (int y = 0; y < height; y++) {
         int cOffset = (y&1) == (ry&1) ? rOffset : bOffset;
         int x0 = (y&1) == (gy&1) ? gx+1 : gx;
@@ -78,7 +64,7 @@ JNIEXPORT void JNICALL DCRaw_METHOD(interpolateGreen)
                     v[5] = 2 * srcData[(y-1) * srcLineStride + x+1 + srcOffset];
                     v[6] = 2 * srcData[(y+1) * srcLineStride + x-1 + srcOffset];
                     v[7] = 2 * srcData[(y+1) * srcLineStride + x+1 + srcOffset];
-                    
+
                     v[8] = 2 * srcData[(y-1) * srcLineStride + x + srcOffset];
                     v[9] = 2 * srcData[(y+1) * srcLineStride + x + srcOffset];
                     v[10] = 2 * srcData[y * srcLineStride + x-1 + srcOffset];
@@ -96,10 +82,10 @@ JNIEXPORT void JNICALL DCRaw_METHOD(interpolateGreen)
             destData[3 * (y * destLineStride + x) + offset] = value;
         }
     }
-    
+
     // green channel interpolation
-    
-#pragma omp for
+
+#pragma omp for schedule (dynamic)
     for (int y = 2; y < height-2; y++) {
         int cOffset = (y&1) == (ry&1) ? rOffset : bOffset;
         int x0 = (y&1) == (gy&1) ? gx+1 : gx;
@@ -108,54 +94,53 @@ JNIEXPORT void JNICALL DCRaw_METHOD(interpolateGreen)
         int cxy = destData[3 * (y * destLineStride + x0) + cOffset];
         int chl = destData[3 * (y * destLineStride + (x0-2)) + cOffset];
         
-        for (int x = 2; x < width-2; x++) {
-            if ((x & 1) == (x0 & 1)) {
-                int hr = destData[3 * (y * destLineStride + (x+1)) + gOffset];
-                int vu = destData[3 * ((y-1) * destLineStride + x) + gOffset];
-                int vd = destData[3 * ((y+1) * destLineStride + x) + gOffset];
-                int dh = abs(hl - hr);
-                int dv = abs(vu - vd);
+        const int x_min = (x0 & 1) ? 3 : 2; 
+        for (int x = x_min; x < width-2; x += 2) {
+            int hr = destData[3 * (y * destLineStride + (x+1)) + gOffset];
+            int vu = destData[3 * ((y-1) * destLineStride + x) + gOffset];
+            int vd = destData[3 * ((y+1) * destLineStride + x) + gOffset];
+            int dh = abs(hl - hr);
+            int dv = abs(vu - vd);
 
-                int chr = destData[3 * (y * destLineStride + (x+2)) + cOffset];
-                int cvu = destData[3 * ((y-2) * destLineStride + x) + cOffset];
-                int cvd = destData[3 * ((y+2) * destLineStride + x) + cOffset];
-                int cdh = abs(chl + chr - 2 * cxy);
-                int cdv = abs(cvu + cvd - 2 * cxy);
+            int chr = destData[3 * (y * destLineStride + (x+2)) + cOffset];
+            int cvu = destData[3 * ((y-2) * destLineStride + x) + cOffset];
+            int cvd = destData[3 * ((y+2) * destLineStride + x) + cOffset];
+            int cdh = abs(chl + chr - 2 * cxy);
+            int cdv = abs(cvu + cvd - 2 * cxy);
 
-                // we're doing edge directed bilinear interpolation on the green channel,
-                // which is a low pass operation (averaging), so we add some signal from the
-                // high frequencies of the observed color channel
-                
-                int sample;
-                if (dv + cdv - (dh + cdh) > 0) {
-                    sample = (hl + hr) / 2;
-                    if (sample < 4 * cxy && cxy < 4 * sample)
-                        sample += (cxy - (chl + chr)/2) / 4;
-                } else if (dh + cdh - (dv + cdv) > 0) {
-                    sample = (vu + vd) / 2;
-                    if (sample < 4 * cxy && cxy < 4 * sample)
-                        sample += (cxy - (cvu + cvd)/2) / 4;
-                } else {
-                    sample = (vu + hl + vd + hr) / 4;
-                    if (sample < 4 * cxy && cxy < 4 * sample)
-                        sample += (cxy - (chl + chr + cvu + cvd)/4) / 8;
-                }
+            // we're doing edge directed bilinear interpolation on the green channel,
+            // which is a low pass operation (averaging), so we add some signal from the
+            // high frequencies of the observed color channel
 
-                int value = sample < 0 ? 0 : sample > 0xffff ? 0xffff : sample;
-
-                destData[3 * (y * destLineStride + x) + gOffset] = (unsigned short) value;
-                
-                hl = hr;
-                chl = cxy;
-                cxy = chr;
+            int sample;
+            if (dv + cdv - (dh + cdh) > 0) {
+                sample = (hl + hr) / 2;
+                if (sample < 4 * cxy && cxy < 4 * sample)
+                    sample += (cxy - (chl + chr)/2) / 4;
+            } else if (dh + cdh - (dv + cdv) > 0) {
+                sample = (vu + vd) / 2;
+                if (sample < 4 * cxy && cxy < 4 * sample)
+                    sample += (cxy - (cvu + cvd)/2) / 4;
+            } else {
+                sample = (vu + hl + vd + hr) / 4;
+                if (sample < 4 * cxy && cxy < 4 * sample)
+                    sample += (cxy - (chl + chr + cvu + cvd)/4) / 8;
             }
+
+            int value = sample < 0 ? 0 : sample > 0xffff ? 0xffff : sample;
+
+            destData[3 * (y * destLineStride + x) + gOffset] = (unsigned short) value;
+
+            hl = hr;
+            chl = cxy;
+            cxy = chr;
         }
     }
 
     // get the constant component out of the reconstructed green pixels and add to it
     // the "high frequency" part of the corresponding observed color channel
     
-#pragma omp for
+#pragma omp for schedule (dynamic)
     for (int y = 2; y < height-2; y++) {
         int cOffset = (y&1) == (ry&1) ? rOffset : bOffset;
         int x0 = (y&1) == (gy&1) ? gx+1 : gx;
@@ -200,15 +185,10 @@ JNIEXPORT void JNICALL DCRaw_METHOD(interpolateGreen)
                 
                 int mind = 4, maxd = 4;
                 int ming = INT_MAX;
-                int maxg = 0;
                 for (int i = 0; i < 4; i++) {
                     if (gradients[i] < ming) {
                         ming = gradients[i];
                         mind = i;
-                    }
-                    if (gradients[i] > maxg) {
-                        maxg = gradients[i];
-                        maxd = i;
                     }
                 }
                 
@@ -269,21 +249,21 @@ JNIEXPORT void JNICALL DCRaw_METHOD(interpolateRedBlue)
 {
     unsigned short *data = (unsigned short *) env->GetPrimitiveArrayCritical(jdata, 0);
 
-#pragma omp parallel for shared (data)
-    for (int y = 1; y < height-1; y++) {
-        for (int x = 1; x < width-1; x++) {
-            for (int i = 0; i < 2; i++) {
-                int cx0, cy0, cOffset;
-                if (i == 0) {
-                    cx0 = rx0;
-                    cy0 = ry0;
-                    cOffset = rOffset;
-                } else {
-                    cx0 = bx0;
-                    cy0 = by0;
-                    cOffset = bOffset;
-                }
+    for (int i = 0; i < 2; i++) {
+        int cx0, cy0, cOffset;
+        if (i == 0) {
+            cx0 = rx0;
+            cy0 = ry0;
+            cOffset = rOffset;
+        } else {
+            cx0 = bx0;
+            cy0 = by0;
+            cOffset = bOffset;
+        }
 
+#pragma omp parallel for shared (data) schedule (dynamic)
+        for (int y = 1; y < height-1; y++) {
+            for (int x = 1; x < width-1; x++) {
                 if (((x+cx0)&1) != (cx0&1) || ((y+cy0)&1) != (cy0&1)) {
                     int sample;
                     int cg = data[3 * (x + cx0 + (y + cy0) * lineStride) + gOffset];
@@ -322,10 +302,10 @@ JNIEXPORT void JNICALL DCRaw_METHOD(interpolateRedBlue)
                     }
 
                     data[3 * (x + cx0 + (y + cy0) * lineStride) + cOffset] = (unsigned short) (sample < 0
-                                                                                          ? 0
-                                                                                          : sample > 0xffff
-                                                                                          ? 0xffff
-                                                                                          : sample);
+                            ? 0
+                            : sample > 0xffff
+                            ? 0xffff
+                            : sample);
                 }
             }
         }
