@@ -67,6 +67,18 @@ public final class NikonDirectory extends MakerNotesDirectory implements
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getLens() {
+        final String name = valueToString( getValue( NIKON_LENS ) );
+        if (name != null)
+            return name;
+
+        return super.getLens();
+    }
+
+    /**
      * Gets the maker-notes adjustments for Nikon.
      *
      * @param buf The {@link LCByteBuffer} the metadata is in.
@@ -232,8 +244,9 @@ switch_tagID:
                         explodeSubfields( tagID << 8 | 0x10, data, 4 );
                         break;
                     case 0x0201:
+                    case 0x0204:
                         //
-                        // This version of lens data is encrypted.  To decrypt
+                        // These versions of lens data are encrypted. To decrypt
                         // it, the serial-number and shutter-count metadata are
                         // needed but they might not have been encountered yet
                         // so just increment a counter for now.
@@ -319,6 +332,7 @@ switch_tagID:
             // Since we support two version of Nikon lens data, we use
             // NIKON_LENS_DATA << 8 | 0x21 for this version.
             //
+            // TODO: support tag version 0x0204
             explodeSubfields( NIKON_LENS_DATA << 8 | 0x21, lensData, 4 );
         }
     }
@@ -385,9 +399,6 @@ switch_tagID:
      */
     @Override
     protected ImageMetaValue getLensNamesValue() {
-        // return getLensData( NIKON_LD1X_LENS_ID,
-        //                     NIKON_LD21_LENS_ID );
-
         //
         // Here, we always use the NIKON_LD1X_LENS_ID tag ID because the
         // resources file doesn't have the lens labels duplicated for
@@ -400,19 +411,22 @@ switch_tagID:
     @Override
     protected ImageMetaValue getLongFocalValue() {
         return getLensData( NIKON_LD1X_MAX_FOCAL_LENGTH,
-                            NIKON_LD21_MAX_FOCAL_LENGTH );
+                            NIKON_LD21_MAX_FOCAL_LENGTH,
+                            NIKON_LD24_MAX_FOCAL_LENGTH );
     }
 
     @Override
     protected ImageMetaValue getShortFocalValue() {
         return getLensData( NIKON_LD1X_MIN_FOCAL_LENGTH,
-                            NIKON_LD21_MIN_FOCAL_LENGTH );
+                            NIKON_LD21_MIN_FOCAL_LENGTH,
+                            NIKON_LD24_MIN_FOCAL_LENGTH );
     }
 
     @Override
     protected ImageMetaValue getMaxApertureValue() {
         return getLensData( NIKON_LD1X_APERTURE_AT_MAX_FOCAL,
-                            NIKON_LD21_EFFECTIVE_MAX_APERTURE );
+                            NIKON_LD21_EFFECTIVE_MAX_APERTURE,
+                            NIKON_LD24_EFFECTIVE_MAX_APERTURE );
     }
 
     /**
@@ -573,19 +587,27 @@ switch_tagID:
      *
      * @param tag0100 The tag ID for versions 0x0100 and 0x0101.
      * @param tag0201 The tag ID for version 0x0201.
+     * @param tag0204 The tag ID for version 0x0204.
      * @return Returns the metadata or <code>null</code> if there is no such
      * metadata.
      */
-    // TODO: tag0204 and tag0400
-    private ImageMetaValue getLensData( int tag0100, int tag0201 ) {
+    private ImageMetaValue getLensData( int tag0100, int tag0201, int tag0204 ) {
         final ImageMetaValue version = getValue( NIKON_LD_VERSION );
         if ( version != null )
             switch ( version.getUnsignedShortValue() ) {
-                case 0x0100:
-                case 0x0101:
+                case 0x0100: // D100, D1X
+                case 0x0101: // D70, D70s
                     return getValue( tag0100 );
-                case 0x0201:
+                case 0x0201: // D200, D2Hs, D2X, D2Xs
+                case 0x0202: // D40, D40X, D80
+                case 0x0203: // D300
                     return getValue( tag0201 );
+                case 0x0204: // D90, D7000
+                    return getValue( tag0204 );
+                case 0x0400: // 1J1, 1V1
+                    // TODO:
+                default:
+                    break;
             }
         return null;
     }
