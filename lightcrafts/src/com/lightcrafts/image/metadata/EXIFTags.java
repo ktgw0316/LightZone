@@ -228,7 +228,14 @@ public interface EXIFTags extends ImageMetaTags {
      * Indicates the image source. If a DSC recorded the image, this tag value
      * of this tag always be set to 3 indicating that the image was recorded on
      * a DSC.
-     * <p>
+     *  <blockquote>
+     *    <table border="0" cellpadding="0">
+     *      <tr><td>0 =&nbsp;</td><td>others</td></tr>
+     *      <tr><td>1 =&nbsp;</td><td>scanner of transparent type</td></tr>
+     *      <tr><td>2 =&nbsp;</td><td>scanner of reflex type</td></tr>
+     *      <tr><td>3 =&nbsp;</td><td>DSC</td></tr>
+     *    </table>
+     *  </blockquote>
      * Type: Undefined.
      */
     int EXIF_FILE_SOURCE                    = 0xA300;
@@ -313,6 +320,19 @@ public interface EXIFTags extends ImageMetaTags {
     int EXIF_GAIN_CONTROL                   = 0xA407;
 
     /**
+     * Indicates the value of coefficient gamma.  The formula of transfer
+     * function used for image reproduction is:
+     *  <blockquote>
+     *    (Reproduced value) = (Input value)<sup><small>gamma</small></sup>
+     *  </blockquote>
+     * Both reproduced value and input value indicate normalized value, whose
+     * minimum value is 0 and maximum value if 1.
+     * <p>
+     * Type: Rational.
+     */
+    int EXIF_GAMMA                          = 0xA500;
+
+    /**
      * @see TIFFTags#TIFF_GPS_IFD_POINTER
      */
     int EXIF_GPS_IFD_POINTER                = TIFFTags.TIFF_GPS_IFD_POINTER;
@@ -377,6 +397,18 @@ public interface EXIFTags extends ImageMetaTags {
      * @see TIFFTags#TIFF_LIGHT_SOURCE
      */
     int EXIF_LIGHT_SOURCE                   = TIFFTags.TIFF_LIGHT_SOURCE;
+
+    /**
+     * Lens make name.
+     * Type: ASCII.
+     */
+    int EXIF_LENS_MAKE                      = 0xA433;
+
+    /**
+     * Lens model name.
+     * Type: ASCII.
+     */
+    int EXIF_LENS_MODEL                     = 0xA434;
 
     /**
      * @see TIFFTags#TIFF_MAKE
