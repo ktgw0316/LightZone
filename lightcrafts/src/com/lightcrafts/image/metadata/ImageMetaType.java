@@ -44,6 +44,19 @@ public enum ImageMetaType {
         }
     },
 
+    /** 32-bit unsigned integer. */
+    META_IFD64( TIFF_FIELD_TYPE_IFD64 ) {
+        public boolean isCompatibleWith( ImageMetaType t ) {
+            switch ( t ) {
+                case META_IFD64:
+                case META_UINT64:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+    },
+
     /** 8-bit signed integer. */
     META_SBYTE( TIFF_FIELD_TYPE_SBYTE ) {
         public boolean isCompatibleWith( ImageMetaType t ) {
@@ -53,6 +66,13 @@ public enum ImageMetaType {
 
     /** 32-bit signed integer. */
     META_SLONG( TIFF_FIELD_TYPE_SLONG ) {
+        public boolean isCompatibleWith( ImageMetaType t ) {
+            return t.isIntegerType();
+        }
+    },
+
+    /** 64-bit signed integer. */
+    META_SINT64( TIFF_FIELD_TYPE_SINT64 ) {
         public boolean isCompatibleWith( ImageMetaType t ) {
             return t.isIntegerType();
         }
@@ -89,6 +109,9 @@ public enum ImageMetaType {
         }
     },
 
+    /** UNICODE. **/
+    // META_UNICODE( TIFF_FIELD_TYPE_UNICODE ),
+
     /** An unknown type. */
     META_UNKNOWN( (byte)-2 ),
 
@@ -96,6 +119,13 @@ public enum ImageMetaType {
     META_ULONG( TIFF_FIELD_TYPE_ULONG ) {
         public boolean isCompatibleWith( ImageMetaType t ) {
             return t.isIntegerType() || t == META_IFD;
+        }
+    },
+
+    /** 64-bit unsigned integer. */
+    META_UINT64( TIFF_FIELD_TYPE_UINT64 ) {
+        public boolean isCompatibleWith( ImageMetaType t ) {
+            return t.isIntegerType() || t == META_IFD64;
         }
     },
 
@@ -139,10 +169,14 @@ public enum ImageMetaType {
                 return META_FLOAT;
             case TIFF_FIELD_TYPE_IFD:
                 return META_IFD;
+            case TIFF_FIELD_TYPE_IFD64:
+                return META_IFD64;
             case TIFF_FIELD_TYPE_SBYTE:
                 return META_SBYTE;
             case TIFF_FIELD_TYPE_SLONG:
                 return META_SLONG;
+            case TIFF_FIELD_TYPE_SINT64:
+                return META_SINT64;
             case TIFF_FIELD_TYPE_SRATIONAL:
                 return META_SRATIONAL;
             case TIFF_FIELD_TYPE_SSHORT:
@@ -151,12 +185,18 @@ public enum ImageMetaType {
                 return META_UBYTE;
             case TIFF_FIELD_TYPE_ULONG:
                 return META_ULONG;
+            case TIFF_FIELD_TYPE_UINT64:
+                return META_UINT64;
             case TIFF_FIELD_TYPE_UNDEFINED:
                 return META_UNDEFINED;
             case TIFF_FIELD_TYPE_URATIONAL:
                 return META_URATIONAL;
             case TIFF_FIELD_TYPE_USHORT:
                 return META_USHORT;
+            // case TIFF_FIELD_TYPE_UNICODE:
+                // return META_UNICODE;
+            // case TIFF_FIELD_TYPE_COMPLEX:
+                // return META_COMPLEX;
             case -1:
                 return META_DATE;
             default:
@@ -227,9 +267,11 @@ public enum ImageMetaType {
     public final boolean isIntegerType() {
         switch ( this ) {
             case META_SBYTE:
+            case META_SINT64:
             case META_SLONG:
             case META_SSHORT:
             case META_UBYTE:
+            case META_UINT64:
             case META_ULONG:
             case META_USHORT:
                 return true;
@@ -277,7 +319,13 @@ public enum ImageMetaType {
      * <code>ImageMetaType</code> is a string type.
      */
     public final boolean isStringType() {
-        return this == META_STRING;
+        switch ( this ) {
+            case META_STRING:
+            // case META_UNICODE:
+                return true;
+            default:
+                return false;
+        }
     }
 
     ////////// private ////////////////////////////////////////////////////////

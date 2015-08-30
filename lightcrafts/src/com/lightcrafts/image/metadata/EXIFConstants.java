@@ -194,6 +194,31 @@ public interface EXIFConstants {
     byte EXIF_FIELD_TYPE_DOUBLE    = TIFF_FIELD_TYPE_DOUBLE;
 
     /**
+     * @see {@link TIFFConstants#TIFF_FIELD_TYPE_UNICODE}.
+     */
+    byte EXIF_FIELD_TYPE_UNICODE   = TIFF_FIELD_TYPE_UNICODE;
+
+    /**
+     * @see {@link TIFFConstants#TIFF_FIELD_TYPE_COMPLEX}.
+     */
+    byte EXIF_FIELD_TYPE_COMPLEX   = TIFF_FIELD_TYPE_COMPLEX;
+
+    /**
+     * @see {@link TIFFConstants#TIFF_FIELD_TYPE_UINT64}.
+     */
+    byte EXIF_FIELD_TYPE_UINT64    = TIFF_FIELD_TYPE_UINT64;
+
+    /**
+     * @see {@link TIFFConstants#TIFF_FIELD_TYPE_SINT64}.
+     */
+    byte EXIF_FIELD_TYPE_SINT64    = TIFF_FIELD_TYPE_SINT64;
+
+    /**
+     * @see {@link TIFFConstants#TIFF_FIELD_TYPE_IFD64}.
+     */
+    byte EXIF_FIELD_TYPE_IFD64     = TIFF_FIELD_TYPE_IFD64;
+
+    /**
      * EXIF metering mode: unknown.
      * This is one of the possible values for the
      * {@link EXIFTags#EXIF_METERING_MODE} metadata tag.
