@@ -27,7 +27,6 @@ import static com.lightcrafts.image.metadata.makernotes.OlympusTags.*;
  *
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */
-@SuppressWarnings({"CloneableClassWithoutClone"})
 public final class OlympusDirectory extends MakerNotesDirectory implements
     PreviewImageProvider {
 
@@ -39,17 +38,16 @@ public final class OlympusDirectory extends MakerNotesDirectory implements
      * @param buf The {@link LCByteBuffer} the metadata is in.
      * @param offset The offset to the start of the maker-notes.
      * @return Returns said adjustments.
+     * @throws IOException 
      */
-    public int[] getMakerNotesAdjustments( LCByteBuffer buf, int offset ) {
-        //
-        // The 8 bytes are:
-        //
-        //      0-4: "OLYMP"
-        //      5  : 0
-        //      6  : version
-        //      7  : unknown
-        //
-        return new int[]{ 8, offset };
+    public int[] getMakerNotesAdjustments( LCByteBuffer buf, int offset )
+        throws IOException
+    {
+        if ( buf.getEquals( offset, "OLYMPUS", "ASCII" ) )
+            return new int[]{ 12, offset };
+        if ( buf.getEquals( offset, "OLYMP", "ASCII" ) )
+            return new int[]{ 8, offset };
+        throw new IOException( "unknown maker notes header" );
     }
 
     /**
