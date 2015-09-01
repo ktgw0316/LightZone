@@ -2,6 +2,7 @@
 
 package com.lightcrafts.image.metadata.makernotes;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -12,6 +13,7 @@ import com.lightcrafts.image.metadata.ImageMetaType;
 import com.lightcrafts.image.metadata.ImageMetaTags;
 import com.lightcrafts.utils.bytebuffer.LCByteBuffer;
 
+import static com.lightcrafts.image.metadata.EXIFConstants.EXIF_HEADER_START_SIZE;
 import static com.lightcrafts.image.metadata.ImageMetaType.*;
 import static com.lightcrafts.image.metadata.makernotes.FujiTags.*;
 
@@ -32,8 +34,13 @@ public final class FujiDirectory extends MakerNotesDirectory {
      * @param buf The {@link LCByteBuffer} the metadata is in.
      * @param offset The offset to the start of the maker-notes.
      * @return Returns said adjustments.
+     * @throws IOException
      */
-    public int[] getMakerNotesAdjustments( LCByteBuffer buf, int offset ) {
+    public int[] getMakerNotesAdjustments( LCByteBuffer buf, int offset )
+        throws IOException
+    {
+        if ( buf.getEquals( 0, "FUJIFILMCCD-RAW", "ASCII" ) )
+            offset -= EXIF_HEADER_START_SIZE;
         //
         // The 12 bytes are:
         //
