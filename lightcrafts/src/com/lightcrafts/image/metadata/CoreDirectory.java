@@ -365,8 +365,12 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
      * Gets the priority of this directory for providing the metadata supplied
      * by implementing the given provider interface.
      * <p>
-     * The <code>CoreDirectory</code> is given the highest priority because its
-     * considered authoritative.
+     * By default, the <code>CoreDirectory</code> is given the highest priority
+     * because it is considered authoritative.
+     * <p>
+     * However, an exception is made for {@link LensProvider} because
+     * orientation from EXIF/TIFF metadata (when merged from an XMP file) and
+     * makernotes metadata must take priority.
      *
      * @param provider The provider interface to get the priority for.
      * @return Returns a priority guaranteed to be higher than all others.
@@ -374,7 +378,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     protected int getProviderPriorityFor(
         Class<? extends ImageMetadataProvider> provider )
     {
-        return Integer.MAX_VALUE;
+        return provider == LensProvider.class ? 0 : Integer.MAX_VALUE;
     }
 
     /**
