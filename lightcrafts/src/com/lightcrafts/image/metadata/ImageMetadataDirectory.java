@@ -1004,18 +1004,20 @@ public abstract class ImageMetadataDirectory
                 if ( lensValues.length != 4 )
                     break;
                 final StringBuilder sb = new StringBuilder();
-                sb.append( TextUtil.tenths( lensValues[0] ) );
+                sb.append( TextUtil.tenthsNoDotZero( lensValues[0] ) );
                 if ( lensValues[0].compareTo( lensValues[1] ) != 0 ) {
                     sb.append( '-' );
-                    sb.append( TextUtil.tenths( lensValues[1] ) );
+                    sb.append( TextUtil.tenthsNoDotZero( lensValues[1] ) );
                 }
                 sb.append( "mm F" );
-                sb.append( TextUtil.tenths( lensValues[2] ) );
+                sb.append( TextUtil.tenthsNoDotZero( lensValues[2] ) );
                 if ( lensValues[2].compareTo( lensValues[3] ) != 0 ) {
                     sb.append( '-' );
-                    sb.append( TextUtil.tenths( lensValues[3] ) );
+                    sb.append( TextUtil.tenthsNoDotZero( lensValues[3] ) );
                 }
                 return sb.toString();
+            default:
+                break;
         }
         return null;
     }
@@ -1053,10 +1055,10 @@ public abstract class ImageMetadataDirectory
                     }
                 }
                 final StringBuilder sb = new StringBuilder();
-                sb.append( TextUtil.tenths( shortFocalLen ) );
+                sb.append( TextUtil.tenthsNoDotZero( shortFocalLen ) );
                 if ( longFocalLen > shortFocalLen ) {
                     sb.append( '-' );
-                    sb.append( TextUtil.tenths( longFocalLen ) );
+                    sb.append( TextUtil.tenthsNoDotZero( longFocalLen ) );
                 }
                 sb.append( "mm" );          // TODO: localize "mm"
                 return sb.toString();

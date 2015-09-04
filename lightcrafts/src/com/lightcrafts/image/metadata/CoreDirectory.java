@@ -231,6 +231,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
      */
     public String getLens() {
         final ImageMetaValue value = getValue( CORE_LENS );
+
         return value != null ? value.getStringValue() : null;
     }
 
@@ -341,11 +342,11 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     public String valueToString( ImageMetaValue value ) {
         switch ( value.getOwningTagID() ) {
             case CORE_APERTURE:
-                return TextUtil.tenths( value.getFloatValue() );
+                return TextUtil.tenthsNoDotZero( value.getFloatValue() );
             case CORE_FILE_SIZE:
                 return TextUtil.quantify( value.getLongValue() );
             case CORE_FOCAL_LENGTH:
-                return TextUtil.tenths( value.getFloatValue() ) + "mm";
+                return TextUtil.tenthsNoDotZero( value.getFloatValue() ) + "mm";
             case CORE_RATING:
                 final int rating = value.getIntValue();
                 if ( rating >= 1 && rating <= 5 )
