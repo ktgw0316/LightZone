@@ -4,14 +4,14 @@ package com.lightcrafts.jai.opimage;
 
 import com.lightcrafts.mediax.jai.PointOpImage;
 import com.lightcrafts.mediax.jai.ImageLayout;
+import com.lightcrafts.mediax.jai.RasterAccessor;
+import com.lightcrafts.mediax.jai.RasterFormatTag;
 
 import java.awt.image.RenderedImage;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.awt.*;
 import java.util.Map;
-
-import sun.awt.image.ShortInterleavedRaster;
 
 public class HighlightRecoveryOpImage extends PointOpImage {
     private final float[] preMul;
@@ -27,7 +27,20 @@ public class HighlightRecoveryOpImage extends PointOpImage {
     protected void computeRect(Raster[] sources,
                                WritableRaster dest,
                                Rectangle destRect) {
-        ushortLoop((ShortInterleavedRaster) sources[0], (ShortInterleavedRaster) dest);
+        // Retrieve format tags.
+        RasterFormatTag[] formatTags = getFormatTags();
+
+        Raster source = sources[0];
+        Rectangle srcRect = mapDestRect(destRect, 0);
+
+        RasterAccessor srcAccessor =
+                new RasterAccessor(source, srcRect, formatTags[0],
+                                   getSourceImage(0).getColorModel());
+        RasterAccessor dstAccessor =
+                new RasterAccessor(dest, destRect, formatTags[1],
+                                   this.getColorModel());
+
+        ushortLoop(srcAccessor, dstAccessor);
     }
 
     native private void floatNativeUshortLoop(short dstData[], short srcData[],
@@ -37,17 +50,19 @@ public class HighlightRecoveryOpImage extends PointOpImage {
                                               int width, int height,
                                               float preMul[], float[] csMatrix);
 
-    protected void ushortLoop(ShortInterleavedRaster src, ShortInterleavedRaster dst) {
+    protected void ushortLoop(RasterAccessor src, RasterAccessor dst) {
         int width = src.getWidth();
         int height = src.getHeight();
 
-        short dstData[] = dst.getDataStorage();
-        int dstBandOffsets[] = dst.getDataOffsets();
+        short dstDataArrays[][] = dst.getShortDataArrays();
+        short dstData[] = dstDataArrays[0];
+        int dstBandOffsets[] = dst.getBandOffsets();
         int dstLineStride = dst.getScanlineStride();
         int dstPixelStride = dst.getPixelStride();
 
-        short srcData[] = src.getDataStorage();
-        int srcBandOffsets[] = src.getDataOffsets();
+        short srcDataArrays[][] = src.getShortDataArrays();
+        short srcData[] = srcDataArrays[0];
+        int srcBandOffsets[] = src.getBandOffsets();
         int srcLineStride = src.getScanlineStride();
         int srcPixelStride = src.getPixelStride();
 
