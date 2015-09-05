@@ -62,12 +62,12 @@ BuildRequires: update-desktop-files
 %define libX11_devel libX11-devel
 %endif
 
-BuildRequires:	java-%{java_version}-devel, %{libX11_devel}, ant, autoconf, gcc, gcc-c++, make, tidy, git, javahelp2, %{lcms2_devel}, %{libjpeg_devel}, libtiff-devel, pkg-config, rsync
+BuildRequires:	java-%{java_version}-devel, %{libX11_devel}, ant, autoconf, gcc, gcc-c++, make, tidy, git, javahelp2, %{lcms2_devel}, lensfun-devel, %{libjpeg_devel}, libtiff-devel, pkg-config, rsync
 %if 0%{?mdkversion} || 0%{?pclinuxos}
 BuildRequires:	java-rpmbuild, libgomp-devel
 %endif
 
-Requires:	java-%{java_version}, javahelp2, lcms2
+Requires:	java-%{java_version}, javahelp2, lcms2, lensfun
 %if 0%{?suse_version} >= 1320
 Requires:	xerces-j2-xml-apis
 %else
