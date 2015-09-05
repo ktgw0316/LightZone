@@ -4,7 +4,7 @@
 #include <iostream>
 #include <jni.h>
 #include <omp.h>
-#include <lensfun/lensfun.h>
+#include <lensfun.h>
 #ifndef AUTO_DEP
 #include "javah/com_lightcrafts_jai_opimage_DistortionOpImage.h"
 #endif
