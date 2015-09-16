@@ -8,7 +8,7 @@ license=('custom:BSD-3-Clause')
 arch=('i686' 'x86_64')
 
 depends=('jre7-openjdk' 'javahelp2' 'lcms2' 'libjpeg-turbo' 'libtiff')
-makedepends=('jdk7-openjdk' 'apache-ant' 'autoconf' 'gcc' 'make' 'tidyhtml' 'git' 'libx11' 'pkg-config' 'rsync' 'javahelp2' 'lcms2' 'libjpeg-turbo' 'libtiff')
+makedepends=('jdk7-openjdk' 'apache-ant' 'autoconf' 'gcc' 'make' 'git' 'libx11' 'pkg-config' 'rsync' 'javahelp2' 'lcms2' 'libjpeg-turbo' 'libtiff')
 
 source=("${pkgname}-${pkgver}.tar.bz2")
 md5sums=()

@@ -44,7 +44,7 @@
     <target name="build">
         <antcall target="clean"/>
         <antcall target="copy"/>
-        <antcall target="tidy"/>
+        <!--antcall target="tidy"/-->
         <antcall target="index"/>
         <antcall target="jar"/>
         <copy todir="../products" file="lightzonehelp.jar"/>

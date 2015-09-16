@@ -16,8 +16,7 @@ BUILD_DEPENDS=	ant:${PORTSDIR}/devel/apache-ant \
 		autoconf:${PORTSDIR}/devel/autoconf \
 		git:${PORTSDIR}/devel/git \
 		jhindexer:${PORTSDIR}/java/javahelp \
-		rsync:${PORTSDIR}/net/rsync \
-		tidy:${PORTSDIR}/www/tidy
+		rsync:${PORTSDIR}/net/rsync
 LIB_DEPENDS=	liblcms2.so:${PORTSDIR}/graphics/lcms2 \
 		libtiff.so:${PORTSDIR}/graphics/tiff
 
