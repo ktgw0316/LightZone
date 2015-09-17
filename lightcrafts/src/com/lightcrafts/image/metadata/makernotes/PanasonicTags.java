@@ -13,6 +13,13 @@ import com.lightcrafts.image.metadata.ImageMetaTags;
 public interface PanasonicTags extends ImageMetaTags {
 
     /**
+     * Accessory type.
+     * <p>
+     * Type: ASCII.
+     */
+    int PANASONIC_ACCESSORY_TYPE            = 0x0053;
+
+    /**
      * Audio
      *  <blockquote>
      *    <table border="0" cellpadding="0">
@@ -27,6 +34,32 @@ public interface PanasonicTags extends ImageMetaTags {
      * Type: Unsigned short.
      */
     int PANASONIC_AUDIO                     = 0x0020;
+
+    /**
+     * Auto-focus assist lamp.
+     *  <blockquote>
+     *    <table border="0" cellpadding="0">
+     *      <tr><td>1 =&nbsp;</td><td>fired</td></tr>
+     *      <tr><td>2 =&nbsp;</td><td>enabled but not used</td></tr>
+     *      <tr><td>3 =&nbsp;</td><td>disabled but required</td></tr>
+     *      <tr><td>4 =&nbsp;</td><td>disabled but not required</td></tr>
+     *    </table>
+     *  </blockquote>
+     * Type: Unsigned short.
+     */
+    int PANASONIC_AUTO_FOCUS_ASSIST_LAMP    = 0x0031;
+
+    /**
+     * Baby (or pet) age.
+     * <p>
+     * Type: Date.
+     */
+    int PANASONIC_BABY_AGE                  = 0x0033;
+
+    /**
+     * @see #PANASONIC_BABY_AGE
+     */
+    int PANASONIC_BABY_AGE_2                = 0x8010;
 
     /**
      * Burst mode.
@@ -46,6 +79,13 @@ public interface PanasonicTags extends ImageMetaTags {
      * Type: Unsigned short.
      */
     int PANASONIC_BURST_MODE                = 0x002A;
+
+    /**
+     * City.
+     * <p>
+     * Type: ASCII.
+     */
+    int PANASONIC_CITY                      = 0x006D;
 
     /**
      * Color effect.
@@ -90,6 +130,13 @@ public interface PanasonicTags extends ImageMetaTags {
 
     /**
      * Contrast.
+     * <p>
+     * Type: Signed short.
+     */
+    int PANASONIC_CONTRAST                  = 0x0039;
+
+    /**
+     * Contrast mode.
      *  <blockquote>
      *    <table border="0" cellpadding="0">
      *      <tr valign="top">
@@ -105,7 +152,61 @@ public interface PanasonicTags extends ImageMetaTags {
      *  </blockquote>
      * Type: Unsigned short.
      */
-    int PANASONIC_CONTRAST                  = 0x002C;
+    int PANASONIC_CONTRAST_MODE             = 0x002C;
+
+    /**
+     * Conversion lens.
+     *  <blockquote>
+     *    <table border="0" cellpadding="0">
+     *      <tr><td>1 =&nbsp;</td><td>off</td></tr>
+     *      <tr><td>2 =&nbsp;</td><td>wide</td></tr>
+     *      <tr><td>3 =&nbsp;</td><td>telephoto</td></tr>
+     *      <tr><td>4 =&nbsp;</td><td>macro</td></tr>
+     *    </table>
+     *  </blockquote>
+     * Type: Unsigned short.
+     */
+    int PANASONIC_CONVERSION_LENS           = 0x0035;
+
+    /**
+     * Country.
+     * <p>
+     * Type: ASCII.
+     */
+    int PANASONIC_COUNTRY                   = 0x0069;
+
+    /**
+     * EXIF version.
+     * <p>
+     * Type: Undefined.
+     */
+    int PANASONIC_EXIF_VERSION              = 0x0026;
+
+    /**
+     * Faces detected.
+     * <p>
+     * Type: Unsigned short.
+     */
+    int PANASONIC_FACES_DETECTED            = 0x003F;
+
+    /**
+     * Film mode.
+     *  <blockquote>
+     *    <table border="0" cellpadding="0">
+     *      <tr><td align="right">1 =&nbsp;</td><td>standard (color)</td></tr>
+     *      <tr><td align="right">2 =&nbsp;</td><td>dynamic (color)</td></tr>
+     *      <tr><td align="right">3 =&nbsp;</td><td>nature (color)</td></tr>
+     *      <tr><td align="right">4 =&nbsp;</td><td>smooth (color)</td></tr>
+     *      <tr><td align="right">5 =&nbsp;</td><td>standard (B&amp;W)</td></tr>
+     *      <tr><td align="right">6 =&nbsp;</td><td>dynamic (B&amp;W)</td></tr>
+     *      <tr><td align="right">7 =&nbsp;</td><td>smooth (B&amp;W)</td></tr>
+     *      <tr><td align="right">10 =&nbsp;</td><td>nostalgic</td></tr>
+     *      <tr><td align="right">11 =&nbsp;</td><td>vibrant</td></tr>
+     *    </table>
+     *  </blockquote>
+     * Type: Unsigned short.
+     */
+    int PANASONIC_FILM_MODE                 = 0x0042;
 
     /**
      * Firmware version.
@@ -120,6 +221,30 @@ public interface PanasonicTags extends ImageMetaTags {
      * Type: Signed short.
      */
     int PANASONIC_FLASH_BIAS                = 0x0024;
+
+    /**
+     * Flash fired.
+     *  <blockquote>
+     *    <table border="0" cellpadding="0">
+     *      <tr><td>0 =&nbsp;</td><td>no</td></tr>
+     *      <tr><td>1 =&nbsp;</td><td>yes</td></tr>
+     *    </table>
+     *  </blockquote>
+     * Type: Unsigned short.
+     */
+    int PANASONIC_FLASH_FIRED               = 0x8007;
+
+    /**
+     * Flash warning.
+     *  <blockquote>
+     *    <table border="0" cellpadding="0">
+     *      <tr><td>0 =&nbsp;</td><td>no</td></tr>
+     *      <tr><td>1 =&nbsp;</td><td>yes</td></tr>
+     *    </table>
+     *  </blockquote>
+     * Type: Unsigned short.
+     */
+    int PANASONIC_FLASH_WARNING             = 0x0062;
 
     /**
      * Focus mode.
@@ -185,11 +310,57 @@ public interface PanasonicTags extends ImageMetaTags {
     int PANASONIC_IMAGE_STABILIZER          = 0x001A;
 
     /**
+     * Intelligent resolution.
+     *  <blockquote>
+     *    <table border="0" cellpadding="0">
+     *      <tr><td>0 =&nbsp;</td><td>off</td></tr>
+     *      <tr><td>3 =&nbsp;</td><td>on</td></tr>
+     *    </table>
+     *  </blockquote>
+     * Type: Unsigned short.
+     */
+    int PANASONIC_INTELLIGENT_RESOLUTION    = 0x0070;
+
+    /**
      * Internal serial number.
      * <p>
      * Type: TODO
      */
     int PANASONIC_INTERNAL_SERIAL_NUMBER    = 0x0025;
+
+    /**
+     * ISO.
+     *  <blockquote>
+     *    <table border="0" cellpadding="0">
+     *      <tr><td align="right">65534 =&nbsp;</td><td>intelligent ISO</td></tr>
+     *      <tr><td align="right">65535 =&nbsp;</td><td>n/a</td></tr>
+     *      <tr><td align="right">(else) =&nbsp;</td><td>actual ISO value</td></tr>
+     *    </table>
+     *  </blockquote>
+     * Type: Unsigned short.
+     */
+    int PANASONIC_ISO                       = 0x003C;
+
+    /**
+     * Landmark.
+     * <p>
+     * Type: ASCII.
+     */
+    int PANASONIC_LANDMARK                  = 0x006F;
+
+    /**
+     * Lens serial number.
+     * <p>
+     * Type: ASCII.
+     */
+    int PANASONIC_LENS_SERIAL_NUMBER        = 0x0052;
+
+    /**
+     * Lens type.
+     * <p>
+     * Type: ASCII.
+     */
+    int PANASONIC_LENS_TYPE                 = 0x0051;
 
     /**
      * Macro mode.
@@ -230,6 +401,18 @@ public interface PanasonicTags extends ImageMetaTags {
     int PANASONIC_NOISE_REDUCTION           = 0x002D;
 
     /**
+     * Optical zoom mode.
+     *  <blockquote>
+     *    <table border="0" cellpadding="0">
+     *      <tr><td>1 =&nbsp;</td><td>standard</td></tr>
+     *      <tr><td>2 =&nbsp;</td><td>extended</td></tr>
+     *    </table>
+     *  </blockquote>
+     * Type: Unsigned short.
+     */
+    int PANASONIC_OPTICAL_ZOOM_MODE         = 0x0034;
+
+    /**
      * Rotation.
      *  <blockquote>
      *    <table border="0" cellpadding="0">
@@ -247,6 +430,18 @@ public interface PanasonicTags extends ImageMetaTags {
      * Type: Unsigned short.
      */
     int PANASONIC_ROTATION                  = 0x0030;
+
+    /**
+     * Saturation.
+     * <p>
+     * Type: Unsigned long.
+     */
+    int PANASONIC_SATURATION                = 0x0040;
+
+    /**
+     * @see #PANASONIC_SHOOTING_MODE
+     */
+    int PANASONIC_SCENE_MODE                = 0x8001;
 
     /**
      * Self timer.
@@ -273,6 +468,13 @@ public interface PanasonicTags extends ImageMetaTags {
      * Type: Unsigned long.
      */
     int PANASONIC_SEQUENCE_NUMBER           = 0x002B;
+
+    /**
+     * Sharpness.
+     * <p>
+     * Type: Unsigned long.
+     */
+    int PANASONIC_SHARPNESS                 = 0x0041;
 
     /**
      * Shooting mode.
@@ -349,6 +551,54 @@ public interface PanasonicTags extends ImageMetaTags {
     int PANASONIC_SPOT_MODE                 = 0x000F;
 
     /**
+     * State.
+     * <p>
+     * Type: ASCII.
+     */
+    int PANASONIC_STATE                     = 0x006B;
+
+    /**
+     * Text stamp.
+     *  <blockquote>
+     *    <table border="0" cellpadding="0">
+     *      <tr><td>1 =&nbsp;</td><td>off</td></tr>
+     *      <tr><td>2 =&nbsp;</td><td>on</td></tr>
+     *    </table>
+     *  </blockquote>
+     * Type: Unsigned short.
+     */
+    int PANASONIC_TEXT_STAMP                = 0x003B;
+
+    /**
+     * @see #PANASONIC_TEXT_STAMP
+     */
+    int PANASONIC_TEXT_STAMP_2              = 0x003E;
+
+    /**
+     * @see #PANASONIC_TEXT_STAMP
+     */
+    int PANASONIC_TEXT_STAMP_3              = 0x8008;
+
+    /**
+     * @see #PANASONIC_TEXT_STAMP
+     */
+    int PANASONIC_TEXT_STAMP_4              = 0x8009;
+
+    /**
+     * Time since power on.
+     * <p>
+     * Type: Unsigned long.
+     */
+    int PANASONIC_TIME_SINCE_POWER_ON       = 0x0029;
+
+    /**
+     * Travel day:
+     * <p>
+     * Type: Unsigned short.
+     */
+    int PANASONIC_TRAVEL_DAY                = 0x0036;
+
+    /**
      * White balance.
      *  <blockquote>
      *    <table border="0" cellpadding="0">
@@ -385,6 +635,18 @@ public interface PanasonicTags extends ImageMetaTags {
      * Type: Signed short.
      */
     int PANASONIC_WHITE_BALANCE_BIAS        = 0x0023;
+
+    /**
+     * World time location.
+     *  <blockquote>
+     *    <table border="0" cellpadding="0">
+     *      <tr><td>1 =&nbsp;</td><td>home</td></tr>
+     *      <tr><td>2 =&nbsp;</td><td>destination</td></tr>
+     *    </table>
+     *  </blockquote>
+     * Type: Unsigned short.
+     */
+    int PANASONIC_WORLD_TIME_LOCATION       = 0x003A;
 
 }
 /* vim:set et sw=4 ts=4: */
