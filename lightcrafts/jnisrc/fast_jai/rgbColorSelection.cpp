@@ -80,9 +80,6 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_RGBColorSelectionMaskOpI
     float luminosityUpper           = colorSelection[6];
     float luminosityUpperFeather    = colorSelection[7];
     
-	const float rmin = (3 * radius) / 16;
-	const float rmax = (5 * radius) / 16;
-
 #if _OPENMP < 201307
 #pragma omp parallel for schedule (guided)
 #else
@@ -97,6 +94,8 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_RGBColorSelectionMaskOpI
             float brightnessMask, colorMask;
             
             if (radius >= 0) {
+                const float rmin = 3 * radius / 16;
+                const float rmax = 5 * radius / 16;
                 
                 float da = sa - a;
                 float db = sb - b;
