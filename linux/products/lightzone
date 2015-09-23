@@ -52,4 +52,4 @@ for i in "$@"; do
   fi
 done
 
-(cd $pkgjavadir && LD_LIBRARY_PATH=$pkglibexecdir exec java -Xmx${maxmem}k -Djava.library.path=$pkglibexecdir -Dfile.encoding=UTF8 -classpath "$pkgjavadir/*:$classdir" com.lightcrafts.platform.linux.LinuxLauncher ${file} ${@} )
+(cd $pkgjavadir && LD_LIBRARY_PATH=$pkglibexecdir exec java -Xmx${maxmem}k -Djava.library.path=$pkglibexecdir -Dfile.encoding=UTF8 -classpath ".:$pkgjavadir/*:$classdir" com.lightcrafts.platform.linux.LinuxLauncher ${file} ${@} )

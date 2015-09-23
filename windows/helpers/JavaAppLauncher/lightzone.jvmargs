@@ -9,7 +9,7 @@
 # JVM options.
 -Xrs
 -XX:+UseParallelGC
--Djava.class.path=lightcrafts-windows.jar;lightcrafts.jar;lcjai.jar;mlibwrapper_jai.jar;substance-lite.jar
+-Djava.class.path=.;lightcrafts-windows.jar;lightcrafts.jar;lcjai.jar;mlibwrapper_jai.jar;substance-lite.jar
 -Dfile.encoding=UTF8
 
 # Main class.

@@ -95,6 +95,7 @@
         <string>1.6*</string>
         <key>ClassPath</key>
         <array>
+            <string>.</string>
             <string>lightcrafts-apple.jar</string>
             <string>lightcrafts.jar</string>
             <string>quaqua.jar</string>
