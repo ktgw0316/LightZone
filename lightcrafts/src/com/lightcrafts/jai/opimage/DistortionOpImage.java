@@ -5,7 +5,6 @@ package com.lightcrafts.jai.opimage;
 import com.lightcrafts.mediax.jai.BorderExtender;
 import com.lightcrafts.mediax.jai.GeometricOpImage;
 import com.lightcrafts.mediax.jai.Interpolation;
-import com.lightcrafts.mediax.jai.OpImage;
 import com.lightcrafts.mediax.jai.RasterFormatTag;
 import com.lightcrafts.mediax.jai.RasterAccessor;
 
@@ -33,27 +32,27 @@ public class DistortionOpImage extends GeometricOpImage {
     private float kr = 1f;
     private float kb = 1f;
 
-    public DistortionOpImage(RenderedImage sources, Map configuration, BorderExtender extender,
+    public DistortionOpImage(RenderedImage source, Map configuration, BorderExtender extender,
                              float k1, float k2, float kr, float kb) {
-        super(OpImage.vectorize(sources), null, configuration, true, extender,
+        super(vectorize(source), null, configuration, true, extender,
                 Interpolation.getInstance(Interpolation.INTERP_BILINEAR));
 
-        fullWidth  = sources.getWidth();
-        fullHeight = sources.getHeight();
+        fullWidth  = source.getWidth();
+        fullHeight = source.getHeight();
         this.k1 = k1;
         this.k2 = k2;
         this.kr = kr;
         this.kb = kb;
     }
 
-    public DistortionOpImage(RenderedImage sources, Map configuration, BorderExtender extender,
+    public DistortionOpImage(RenderedImage source, Map configuration, BorderExtender extender,
                              String cameraMaker, String cameraModel,
                              String lensName, float focal, float aperture) {
-        super(OpImage.vectorize(sources), null, configuration, true, extender,
+        super(vectorize(source), null, configuration, true, extender,
                 Interpolation.getInstance(Interpolation.INTERP_BILINEAR));
 
-        fullWidth  = sources.getWidth();
-        fullHeight = sources.getHeight();
+        fullWidth  = source.getWidth();
+        fullHeight = source.getHeight();
         this.cameraMaker = cameraMaker;
         this.cameraModel = cameraModel;
         this.lensName = lensName;
