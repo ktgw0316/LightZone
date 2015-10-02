@@ -1,6 +1,6 @@
 # Maintainer: KITAGAWA Masahiro <arctica0316@gmail.com>
 pkgname="lightzone"
-pkgver=4.1.2
+pkgver=4.1.3
 pkgrel=0
 pkgdesc="Open-source professional-level digital darkroom software"
 url="http://lightzoneproject.org/"
@@ -8,7 +8,7 @@ license=('custom:BSD-3-Clause')
 arch=('i686' 'x86_64')
 
 depends=('jre7-openjdk' 'javahelp2' 'lcms2' 'libjpeg-turbo' 'libtiff')
-makedepends=('jdk7-openjdk' 'apache-ant' 'autoconf' 'gcc' 'make' 'tidyhtml' 'git' 'libx11' 'pkg-config' 'rsync' 'javahelp2' 'lcms2' 'libjpeg-turbo' 'libtiff')
+makedepends=('jdk7-openjdk' 'apache-ant' 'autoconf' 'gcc' 'make' 'git' 'libx11' 'pkg-config' 'rsync' 'javahelp2' 'lcms2' 'libjpeg-turbo' 'libtiff')
 
 source=("${pkgname}-${pkgver}.tar.bz2")
 md5sums=()

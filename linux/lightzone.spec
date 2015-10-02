@@ -5,13 +5,26 @@
 Name:           lightzone
 # Do not use hyphens in Version tag. OBS doesn't handle it properly.
 # Use 4.1.0.beta2 for betas and 4.1.0.0 for final, since RPM sorts A-Z before 0-9.
-Version:	4.1.0.beta12
-Release:	0
+Version:	4.1.2
+Release:	0%{?dist}
 License:	BSD-3-Clause
 Summary:	Open-source professional-level digital darkroom software
 Url:		http://lightzoneproject.org/
 Group:		Productivity/Graphics/Convertors 
 Source:		%{name}-%{version}.tar.bz2
+
+%if 0%{?rhel}
+%if 0%{?rhel} >= 7
+%define java_version 1.7.0-openjdk
+%else
+%define java_version 1.6.0-openjdk
+%endif
+%define lcms2_devel lcms2-devel
+%define libjpeg_devel libjpeg-turbo-devel
+%define libX11_devel libX11-devel
+%define pkg_config pkgconfig
+%define debug_package %{nil}
+%endif
 
 %if 0%{?fedora}
 %if 0%{?fedora} >= 20
@@ -22,6 +35,7 @@ Source:		%{name}-%{version}.tar.bz2
 %define lcms2_devel lcms2-devel
 %define libjpeg_devel libjpeg-turbo-devel
 %define libX11_devel libX11-devel
+%define pkg_config pkgconfig
 %define debug_package %{nil}
 %endif
 
@@ -30,29 +44,21 @@ Source:		%{name}-%{version}.tar.bz2
 %define lcms2_devel liblcms2-devel
 %define libjpeg_devel libjpeg8-devel
 %define libX11_devel xorg-x11-libX11-devel
+%define pkg_config pkg-config
 BuildRequires: update-desktop-files
 %endif
 
-%if 0%{?suse_version} == 1210
-%define java_version 1_6_0-openjdk
-%define lcms2_devel liblcms2-devel
-%define libjpeg_devel libjpeg8-devel
-%define libX11_devel xorg-x11-libX11-devel
-%endif
-
+%if 0%{?suse_version}
 %if 0%{?suse_version} > 1210
 %define java_version 1_7_0-openjdk
+%define libX11_devel libX11-devel
+%else
+%define java_version 1_6_0-openjdk
+%define libX11_devel xorg-x11-libX11-devel
+%endif
 %define lcms2_devel liblcms2-devel
 %define libjpeg_devel libjpeg8-devel
-%define libX11_devel libX11-devel
-%endif
-
-%if 0%{?centos_version}
-%define java_version 1.6.0-openjdk
-%define lcms2_devel lcms2-devel
-%define libjpeg_devel libjpeg8-devel
-%define libX11_devel libX11-devel
-%define debug_package %{nil}
+%define pkg_config pkg-config
 %endif
 
 %if 0%{?mdkversion} || 0%{?pclinuxos}
@@ -60,9 +66,10 @@ BuildRequires: update-desktop-files
 %define lcms2_devel liblcms2-devel
 %define libjpeg_devel libjpeg8-devel
 %define libX11_devel libX11-devel
+%define pkg_config pkg-config
 %endif
 
-BuildRequires:	java-%{java_version}-devel, %{libX11_devel}, ant, autoconf, gcc, gcc-c++, make, tidy, git, javahelp2, %{lcms2_devel}, lensfun-devel, %{libjpeg_devel}, libtiff-devel, pkg-config, rsync
+BuildRequires:	java-%{java_version}-devel, %{libX11_devel}, ant, autoconf, gcc, gcc-c++, make, git, javahelp2, %{lcms2_devel}, lensfun-devel, %{libjpeg_devel}, libtiff-devel, pkg-config, rsync
 %if 0%{?mdkversion} || 0%{?pclinuxos}
 BuildRequires:	java-rpmbuild, libgomp-devel
 %endif
