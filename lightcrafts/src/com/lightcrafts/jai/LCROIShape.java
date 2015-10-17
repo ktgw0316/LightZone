@@ -5,9 +5,8 @@ package com.lightcrafts.jai;
 import com.lightcrafts.model.Region;
 import com.lightcrafts.model.Contour;
 import com.lightcrafts.jai.opimage.ShapedMask;
-
 import com.lightcrafts.mediax.jai.*;
-import java.util.Iterator;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.awt.*;
@@ -46,9 +45,7 @@ public class LCROIShape extends ROIShape {
     }
 
     public boolean intersects(Rectangle2D rect) {
-        Iterator it = region.getContours().iterator();
-        while (it.hasNext()) {
-            Contour c = (Contour) it.next();
+        for (Contour c : region.getContours()) {
             AffineTransform combined = transform;
             if (c.getTranslation() != null) {
                 combined = AffineTransform.getTranslateInstance(c.getTranslation().getX(), c.getTranslation().getY());
@@ -78,24 +75,23 @@ public class LCROIShape extends ROIShape {
         return ShapedMask.getOuterBounds(region, transform);
     }
 
-    List contours = new LinkedList();
+    List<Object> contours = new LinkedList<Object>();
 
     private synchronized boolean somethingChanged() {
-        Iterator it = region.getContours().iterator();
 
         int i = 0;
-        while (it.hasNext()) {
-            Contour c = (Contour) it.next();
-
+        for (Contour c : region.getContours()) {
             if (c != contours.get(i))
                 return true;
 
             if (c.getTranslation() != null) {
                 if (contours.size() > (i+1) && c.getTranslation() != contours.get(i+1))
                     return true;
-                i+=2;
-            } else
+                i += 2;
+            }
+            else {
                 i++;
+            }
         }
 
         if (contours.size() != i)
@@ -112,14 +108,11 @@ public class LCROIShape extends ROIShape {
                 We keep the current configuration around
                 to check if something changes in this region.
             */
-            Iterator it = region.getContours().iterator();
-            while (it.hasNext()) {
-                Contour c = (Contour) it.next();
+            for (Contour c : region.getContours()) {
                 contours.add(c);
 
                 // if  a contour has a translation
                 // put that in the next list slot
-
                 if (c.getTranslation() != null)
                     contours.add(c.getTranslation());
             }
