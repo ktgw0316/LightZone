@@ -1,15 +1,17 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2015 Masahiro Kitagawa */
 
 package com.lightcrafts.jai.opimage;
 
+import com.lightcrafts.model.CloneContour;
 import com.lightcrafts.model.Region;
 import com.lightcrafts.model.Contour;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.LCROIShape;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.utils.SoftValueHashMap;
-
 import com.lightcrafts.mediax.jai.*;
+
 import java.awt.image.*;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.color.ColorSpace;
@@ -30,10 +32,7 @@ public class ShapedMask extends PlanarImage {
 
     public static Rectangle getOuterBounds(Region region, AffineTransform transform) {
         Rectangle outerBounds = null;
-        Iterator it = region.getContours().iterator();
-        while (it.hasNext()) {
-            Contour c = (Contour) it.next();
-
+        for (Contour c : region.getContours()) {
             AffineTransform combined = transform;
             if (c.getTranslation() != null) {
                 combined = AffineTransform.getTranslateInstance(c.getTranslation().getX(), c.getTranslation().getY());
@@ -83,25 +82,28 @@ public class ShapedMask extends PlanarImage {
         this.shape = shape;
     }
 
-    static private Shape[] createBlurs(Shape shape, int width) {
-        java.util.List blurs = new LinkedList();
+    static private Shape[] createBlurs(Shape shape, int width, float padding) {
+        java.util.List<Shape> blurs = new LinkedList<Shape>();
+        int feathering = (int) (width - 2 * padding);
         do {
-            Stroke stroke = new BasicStroke(2 * width, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+            Stroke stroke = new BasicStroke(2 * (padding + feathering),
+                                            BasicStroke.CAP_ROUND,
+                                            BasicStroke.JOIN_ROUND);
             Shape blur = stroke.createStrokedShape(shape);
             blurs.add(blur);
-            width /= 2;
-        } while (width > 0);
+            feathering /= 2;
+        } while (feathering > 0);
 
         int size = blurs.size();
         Shape[] result = new Shape[size];
-        Iterator it = blurs.iterator();
         int i = 0;
-        while (it.hasNext())
-            result[size - 1 - i++] = (Shape) it.next();
+        for (Shape b : blurs)
+            result[size - 1 - i++] = b;
         return result;
     }
 
-    private static Map bitmaps = Collections.synchronizedMap(new WeakHashMap());
+    private static Map<Contour, ScaledImage> bitmaps =
+            Collections.synchronizedMap(new WeakHashMap<Contour, ScaledImage>());
 
     private static BorderExtender extender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
 
@@ -111,15 +113,14 @@ public class ShapedMask extends PlanarImage {
         PlanarImage image = null;
     }
 
-
-    private static void drawBlurs(Graphics2D g2d, Shape shape, float contourWidth) {
+    private static void drawBlurs(Graphics2D g2d, Shape shape, float contourWidth, float paddingWidth) {
         g2d.setColor(Color.white);
         g2d.fill(shape);
 
         // Draw the blurs in shades of gray:
         if (contourWidth > 1) {
-            int width = (int) Math.round(contourWidth);
-            Shape[] blurs = createBlurs(shape, width);
+            int width = (int) Math.floor(contourWidth);
+            Shape[] blurs = createBlurs(shape, width, paddingWidth);
 
             int count = blurs.length;
             Area shapeArea = new Area(shape);
@@ -164,7 +165,19 @@ public class ShapedMask extends PlanarImage {
 
         g2d.setTransform(AffineTransform.getTranslateInstance(-bounds.x, -bounds.y));
 
-        drawBlurs(g2d, shape, contourWidth);
+        final float paddingWidth;
+        final float kernelWidth;
+        if (contour instanceof CloneContour && ((CloneContour)contour).getVersion() != null) {
+            paddingWidth = contourWidth/6;
+            kernelWidth = paddingWidth;
+        }
+        else {
+            // make it backward compatible to LightZone v4.1.3 or earlier
+            paddingWidth = 0;
+            kernelWidth = contourWidth/4;
+        }
+
+        drawBlurs(g2d, shape, contourWidth, paddingWidth);
 
         g2d.dispose();
 
@@ -175,7 +188,7 @@ public class ShapedMask extends PlanarImage {
         ScaledImage contourImage = new ScaledImage();
 
         if (contourWidth > 1) {
-            KernelJAI kernel = Functions.getGaussKernel(contourWidth/4);
+            KernelJAI kernel = Functions.getGaussKernel(kernelWidth);
             ParameterBlock pb = new ParameterBlock();
             pb.addSource(supportImage);
             pb.add(kernel);
@@ -194,10 +207,10 @@ public class ShapedMask extends PlanarImage {
     }
 
     private static synchronized ScaledImage getContourImage(Contour contour) {
-        ScaledImage contourImage = (ScaledImage) bitmaps.get(contour);
+        ScaledImage contourImage = bitmaps.get(contour);
 
         if (contourImage == null) {
-            if ((contourImage = (ScaledImage) bitmaps.get(contour)) == null) {
+            if ((contourImage = bitmaps.get(contour)) == null) {
                 contourImage = createContourImage(contour);
                 bitmaps.put(contour, contourImage);
             }
@@ -228,7 +241,8 @@ public class ShapedMask extends PlanarImage {
         }
     }
 
-    private static Map expandedMasks = new SoftValueHashMap();
+    private static Map<AffinedImage, PlanarImage> expandedMasks =
+            new SoftValueHashMap<AffinedImage, PlanarImage>();
 
     private static class AffinedImage {
         PlanarImage image;
@@ -260,8 +274,6 @@ public class ShapedMask extends PlanarImage {
     }
 
     public Raster getData(Rectangle rect) {
-        Iterator it = region.getContours().iterator();
-
         // SampleModel sampleModel = RasterFactory.createPixelInterleavedSampleModel(DataBuffer.TYPE_BYTE, rect.width, rect.height, 1);
         ColorModel colorModel = new ComponentColorModel(ColorSpace.getInstance(ColorSpace.CS_GRAY),
                                                         false, false,
@@ -275,8 +287,7 @@ public class ShapedMask extends PlanarImage {
 
         boolean overlay = false;
 
-        while (it.hasNext()) {
-            Contour c = (Contour) it.next();
+        for (Contour c : region.getContours()) {
             AffineTransform combined = shape.getTransform();
             if (c.getTranslation() != null) {
                 combined = AffineTransform.getTranslateInstance(c.getTranslation().getX(),
@@ -313,7 +324,7 @@ public class ShapedMask extends PlanarImage {
 
                     synchronized (expandedMasks) {
                         AffinedImage key = new AffinedImage(maskImage, transform);
-                        PlanarImage affinedImage = (PlanarImage) expandedMasks.get(key);
+                        PlanarImage affinedImage = expandedMasks.get(key);
                         if (affinedImage == null) {
                             RenderingHints hints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
                                                                       BorderExtender.createInstance(BorderExtender.BORDER_COPY));
