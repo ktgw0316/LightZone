@@ -231,6 +231,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
      */
     public String getLens() {
         final ImageMetaValue value = getValue( CORE_LENS );
+
         return value != null ? value.getStringValue() : null;
     }
 
@@ -341,11 +342,11 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     public String valueToString( ImageMetaValue value ) {
         switch ( value.getOwningTagID() ) {
             case CORE_APERTURE:
-                return TextUtil.tenths( value.getFloatValue() );
+                return TextUtil.tenthsNoDotZero( value.getFloatValue() );
             case CORE_FILE_SIZE:
                 return TextUtil.quantify( value.getLongValue() );
             case CORE_FOCAL_LENGTH:
-                return TextUtil.tenths( value.getFloatValue() ) + "mm";
+                return TextUtil.tenthsNoDotZero( value.getFloatValue() ) + "mm";
             case CORE_RATING:
                 final int rating = value.getIntValue();
                 if ( rating >= 1 && rating <= 5 )
@@ -365,8 +366,12 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
      * Gets the priority of this directory for providing the metadata supplied
      * by implementing the given provider interface.
      * <p>
-     * The <code>CoreDirectory</code> is given the highest priority because its
-     * considered authoritative.
+     * By default, the <code>CoreDirectory</code> is given the highest priority
+     * because it is considered authoritative.
+     * <p>
+     * However, an exception is made for {@link LensProvider} because
+     * orientation from EXIF/TIFF metadata (when merged from an XMP file) and
+     * makernotes metadata must take priority.
      *
      * @param provider The provider interface to get the priority for.
      * @return Returns a priority guaranteed to be higher than all others.
@@ -374,7 +379,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     protected int getProviderPriorityFor(
         Class<? extends ImageMetadataProvider> provider )
     {
-        return Integer.MAX_VALUE;
+        return provider == LensProvider.class ? 0 : Integer.MAX_VALUE;
     }
 
     /**

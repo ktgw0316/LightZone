@@ -166,10 +166,7 @@ public final class MacOSXPlatform extends Platform {
     }
 
     public void readyToOpenFiles() {
-        if ( System.getProperty( "IDE" ) != null )
-            ApplicationAdapterForIDE.initialize();
-        else
-            MacOSXLauncher.readyToOpenFiles();
+        MacOSXLauncher.readyToOpenFiles();
     }
 
     public String resolveAliasFile( File file ) {

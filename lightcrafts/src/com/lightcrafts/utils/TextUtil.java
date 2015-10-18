@@ -126,6 +126,33 @@ public final class TextUtil {
     }
 
     /**
+     * A version of {@link #tenths(double)} that returns an integer when the
+     * tenths is ".0".
+     *
+     * @param n The {@code double} to convert.
+     * @return Returns said {@link String}.
+     * @see #tenths(double)
+     * @see #tenthsNoDotZero(Rational)
+     */
+    public static String tenthsNoDotZero( double n ) {
+        final String s = tenths( n );
+        return s.endsWith( ".0" ) ? s.substring( 0, s.length() - 2 ) : s;
+    }
+
+    /**
+     * A version of {@link #tenths(Rational)} that returns an integer when the
+     * tenths is ".0".
+     *
+     * @param n The {@code double} to convert.
+     * @return Returns said {@link String}.
+     * @see #tenths(Rational)
+     * @see #tenthsNoDotZero(double)
+     */
+    public static String tenthsNoDotZero( Rational n ) {
+        return tenthsNoDotZero( n.doubleValue() );
+    }
+
+    /**
      * Trims null characters from both the beginning and ending of the given
      * {@link String}.
      *

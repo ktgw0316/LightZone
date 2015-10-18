@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
@@ -112,6 +113,9 @@ public class LinuxPlatform extends Platform {
         // Try to interpret every file in there as a color profile:
 
         File[] files = profileDir.listFiles();
+        if (files == null) {
+            return Collections.emptyList(); // Just in case of I/O error
+        }
         for (File file : files) {
             if (file.isDirectory()) {
                 profiles.addAll(getColorProfiles(file));

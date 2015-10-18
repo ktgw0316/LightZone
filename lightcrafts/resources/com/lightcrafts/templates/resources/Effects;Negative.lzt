@@ -1,0 +1,19 @@
+<Template version="8">
+  <Scale Factor="0.29938272"/>
+  <Image path=""/>
+  <Controls>
+    <ZoneOperation Active="true" Collapsed="true" Locked="false" Mode="Difference" Name="Negative" Opacity="100" layerControlsIndex="0" regionsInverted="false" scale="0">
+      <ColorSelection HueBlue="0.5" HueEnabled="true" HueGreen="0.5" HueRadius="-1.0" HueRed="0.5" Inverted="false" LuminosityEnabled="true" LuminosityLower="0.0" LuminosityLowerFeather="0.0" LuminosityUpper="1.0" LuminosityUpperFeather="0.0"/>
+      <Points Size="16">
+        <Point X="0" Y="1.0"/>
+      </Points>
+    </ZoneOperation>
+    <Region/>
+    <Crop>
+      <UpperLeft X="0.0" Y="0.0"/>
+      <UpperRight X="2592.0" Y="0.0"/>
+      <LowerLeft X="0.0" Y="1728.0"/>
+      <LowerRight X="2592.0" Y="1728.0"/>
+    </Crop>
+  </Controls>
+</Template>

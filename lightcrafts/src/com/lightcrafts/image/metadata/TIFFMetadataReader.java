@@ -624,7 +624,8 @@ public class TIFFMetadataReader extends ImageMetadataReader {
 
             default:
                 throw new IllegalStateException(
-                    "unknown field type (" + fieldType + ") for tag ID " + tagID
+                    String.format( "unknown field type (0x%x) for tag ID 0x%x",
+                                   fieldType, tagID )
                 );
         }
     }

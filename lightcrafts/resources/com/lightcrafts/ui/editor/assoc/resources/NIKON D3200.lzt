@@ -4,12 +4,12 @@
   <Controls>
     <ZoneOperation Locked="true" Active="true" Collapsed="true" Mode="Normal" Name="RAW Tone Curve" Opacity="100" regionsInverted="false" scale="0">
       <Points Size="16">
-        <Point X="4" Y="0.34956"/>
-        <Point X="6" Y="0.54532"/>
-        <Point X="8" Y="0.67699"/>
-        <Point X="10" Y="0.78319"/>
-        <Point X="12" Y="0.91593"/>
-        <Point X="13" Y="0.99115"/>
+        <Point X="7" Y="0.5796460176991151"/>
+        <Point X="9" Y="0.7345132743362832"/>
+        <Point X="10" Y="0.7831858407079646"/>
+        <Point X="12" Y="0.9070796460176991"/>
+        <Point X="13" Y="0.9911504424778761"/>
+        <Point X="14" Y="1.0"/>
       </Points>
     </ZoneOperation>
     <Region/>

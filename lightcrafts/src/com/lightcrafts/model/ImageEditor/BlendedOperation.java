@@ -356,7 +356,8 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
                             mask = null;
 
                         if (colorSelection != null && !colorSelection.isAllSelected()
-                            && (!colorSelection.equals(lastColorSelection)
+                            && (newFront
+                                || !colorSelection.equals(lastColorSelection)
                                 || !rendering.getInputTransform().equals(lastTransform)
                                 || (blender != null && blender.getParameters().get(3) != colorSelectionMask))) {
 

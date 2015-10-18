@@ -158,7 +158,7 @@ int EDISON::writeImage(char *filename, unsigned char *image, int *dataPoints, in
   memset(data, 0, height_*width_*dim_*sizeof(unsigned char));
   if(image) memcpy(data, image, height_*width_*dim_*sizeof(unsigned char));
   if(dataPoints) {
-    int i, j, x, y;
+    int i, j;
     for(i = 0; i < n; i++) {
       for(j = 0; j < dim_; j++) {
 	data[dim_*dataPoints[i]+j] = 255;

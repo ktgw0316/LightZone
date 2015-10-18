@@ -127,6 +127,11 @@ public interface TIFFConstants {
         4,  // 11: FLOAT
         8,  // 12: DOUBLE
         4,  // 13: IFD
+        2,  // 14: UNICODE
+        8,  // 15: COMPLEX
+        8,  // 16: UINT64
+        8,  // 17: SINT64
+        8,  // 18: IFD64
     };
 
     /**
@@ -195,6 +200,33 @@ public interface TIFFConstants {
      * TIFF IFD pointer (32 bits).
      */
     byte TIFF_FIELD_TYPE_IFD       = 13;
+
+    /**
+     * TIFF UNICODE
+     */
+    byte TIFF_FIELD_TYPE_UNICODE   = 14;
+
+    /**
+     * TIFF COMPLEX
+     */
+    byte TIFF_FIELD_TYPE_COMPLEX   = 15;
+
+    /**
+     * BigTIFF unsigned long long (64 bits).
+     * Note that this is the same size as a Java <code>long</code>.
+     */
+    byte TIFF_FIELD_TYPE_UINT64    = 16;
+
+    /**
+     * BigTIFF signed long long (64 bits).
+     * Note that this is the same size as a Java <code>long</code>.
+     */
+    byte TIFF_FIELD_TYPE_SINT64    = 17;
+
+    /**
+     * BigTIFF IFD pointer (64 bits).
+     */
+    byte TIFF_FIELD_TYPE_IFD64     = 18;
 
     /**
      * The size of the TIFF header (in bytes).

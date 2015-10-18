@@ -14,14 +14,13 @@ Building the LightZone source requires (at least) following packages:
 - __make__
 - __openjdk-6-jdk__ or later
 - __pkg-config__
-- __tidy__
 
 ### Debian and Ubuntu
 _For Debian (>= squeeze, i386/amd64) and Ubuntu (>= 10.04 lucid). See also [Packaging on Debian or Ubuntu](#packaging_deb) below._
 
 Install required packages:
 
-    sudo apt-get install debhelper devscripts build-essential ant autoconf git-core javahelp2 default-jdk default-jre-headless tidy libjpeg-turbo8-dev libtiff5-dev libx11-dev
+    sudo apt-get install debhelper devscripts build-essential ant autoconf git-core javahelp2 default-jdk default-jre-headless libjpeg-turbo8-dev libtiff5-dev libx11-dev
 
 _(Note: gcc, g++, libc6-dev and make shall be installed with the build-essential.)_
 
@@ -32,7 +31,7 @@ Before start the build, you have to set JAVA_HOME environment variable, e.g.
 ### OpenSUSE (>= 12.2)
 Install required packages:
 
-    sudo zypper install ant autoconf gcc gcc-c++ make tidy git javahelp2 libjpeg8-devel libtiff-devel libX11-devel java-1_7_0-openjdk-devel
+    sudo zypper install ant autoconf gcc gcc-c++ make git javahelp2 libjpeg8-devel libtiff-devel libX11-devel java-1_7_0-openjdk-devel
 
 Set your JAVA_HOME variable to point to installed JDK, e.g.
 
@@ -98,4 +97,25 @@ will create lightzone-*.deb package in parent directory,
 To install the package:
 
     sudo dpkg -i ../lightzone-*.deb
+
+### Re-packaging rpm from a source rpm
+If you already have a .src.rpm for other distro, you can create .rpm for your distro
+from the .src.rpm by yourself.
+
+First of all, you need to install rpm-build using package manager of your distro.
+
+Then extract the containts of the .src.rpm, and copy its source archive to SOURCES
+directory:
+    rpm2cpio lightzone-*.src.rpm | cpio -idmv --no-absolute-filenames
+    cp lightzone-*.tar.bz2 ~/rpmbuild/SOURCES/
+
+Then build an .rpm package using .spec file:
+
+    rpmbuild -b lightzone.spec
+
+If package list for unsatisfied dependency is shown, install the packages via apt-get,
+then execute the rpmbuild command again. Your .rpm package will be created in
+~/rpmbuild/RPMS/i386/ or ~/rpmbuild/RPMS/x86_64/. Install it with
+
+    rpm -ivh ~/rpmbuild/RPMS/x86_64/lightzone-*.rpm
 

@@ -1,7 +1,7 @@
 HIGH_PERFORMANCE:=	1
 USE_ICC_HERE:=		1
 
-TARGET_BASE:=		LCMS
+TARGET_BASE:=		LCLCMS
 
 # Uncomment to compile in debug mode.
 #DEBUG:=			true

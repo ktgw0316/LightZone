@@ -23,7 +23,7 @@
   <property name="windows-jar" value="products/lightcrafts-windows.jar"/>
 
   <!-- The default maxmemory for the run* targets. -->
-  <property name="maxmemory" value="256m"/>
+  <property name="maxmemory" value="512m"/>
 
   <exec executable="cat" vmlauncher="false" failonerror="true"
         outputproperty="app-version">

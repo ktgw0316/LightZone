@@ -86,7 +86,7 @@ namespace LightCrafts {
      */
     template<typename T> class auto_GlobalLock {
     public:
-        auto_GlobalLock( HGLOBAL g ) : m_g( g ), m_v( ::GlobalLock( g ) ) {
+        explicit auto_GlobalLock( HGLOBAL g ) : m_g( g ), m_v( ::GlobalLock( g ) ) {
         }
 
         ~auto_GlobalLock() {

@@ -11,7 +11,7 @@
   <property name="macosx-jar" value="products/lightcrafts-apple.jar"/>
 
   <!-- The default maxmemory for the run target. -->
-  <property name="maxmemory" value="256m"/>
+  <property name="maxmemory" value="512m"/>
 
   <exec executable="cat" vmlauncher="false" failonerror="true"
         outputproperty="app-version">

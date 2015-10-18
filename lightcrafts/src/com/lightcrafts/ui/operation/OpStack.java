@@ -78,7 +78,7 @@ public class OpStack extends DraggableStack
     /**
      * This width number is public, for the no-Document display mode.
      */
-    public final static int PreferredWidth = 320;
+    public final static int PreferredWidth = 280;
 
     // The auto-expand property is a persistent boolean.
     private final static Preferences Prefs = Preferences.userRoot().node(

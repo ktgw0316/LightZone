@@ -13,10 +13,10 @@
 #include <cstdlib>                      /* for exit(3) */
 #include <cstring>
 #include <fstream>
-#include <io.h>                         /* for _open_osfhandle() */
 #include <iostream>
 
 // windows
+#include <io.h>                         /* for _open_osfhandle() */
 #include <shlobj.h>
 #include <tlhelp32.h>
 #include <w32api.h>
@@ -169,11 +169,7 @@ static void checkCPUType() {
     // Before we can check for anything about the CPU, we first need to check
     // for cpuid instruction support.
     //
-#if _WIN64 || __amd64__
-    long long a, c;
-#else
-    long a, c;
-#endif
+    INT_PTR a, c;
     asm volatile (
         /* Copy EFLAGS into eax and ecx. */
         "pushf\n\t"
@@ -203,11 +199,12 @@ static void checkCPUType() {
     //
     // but this isn't supported on Windows 2000 (non-Professional).
     //
-    int max_std_level, std_caps;
+    int max_std_level;
     int eax, ebx, ecx, edx;
 
     CPUID( 0, max_std_level, ebx, ecx, edx );
     if ( max_std_level >= 1 ) {
+        int std_caps;
         CPUID( 1, eax, ebx, ecx, std_caps );
         if ( std_caps & (1 << 26) /* SSE2 */ )
             return;
@@ -605,11 +602,7 @@ static void redirectOutput() {
     // same log file, we have to convert logHandle to a FILE* then replace
     // stdout and stderr with it.
     //
-#if _WIN64 || __amd64__
-    int const logFD = _open_osfhandle( reinterpret_cast<long long>( logHandle ), 0 );
-#else
-    int const logFD = _open_osfhandle( reinterpret_cast<long>( logHandle ), 0 );
-#endif
+    int const logFD = _open_osfhandle( reinterpret_cast<INT_PTR>( logHandle ), 0 );
     FILE *const logFile = ::_fdopen( logFD, "w" );
     ::setvbuf( logFile, NULL, _IONBF, 0 );
     ::fclose( stdout ); *stdout = *logFile;

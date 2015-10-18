@@ -9,8 +9,6 @@ DEST_COMMON_PRODUCTS:=	$(notdir $(COMMON_PRODUCTS))
 LINUX_LIBS:=		$(wildcard ../lib/*.jar)
 DEST_LINUX_LIBS:=	$(notdir $(LINUX_LIBS))
 
-DEST_LIBMLIB_JAI:=	libmlib_jai.so
-
 PROCESSOR:=		$(shell uname -m)
 ifeq ($(PROCESSOR),i486)
   PROCESSOR:=		i386
@@ -31,16 +29,13 @@ endif
 
 .PHONY: all
 
-all: $(DEST_COMMON_PRODUCTS) $(DEST_LINUX_LIBS) $(DEST_LIBMLIB_JAI)
+all: $(DEST_COMMON_PRODUCTS) $(DEST_LINUX_LIBS)
 
 $(DEST_COMMON_PRODUCTS):
 	$(call SYMLINK,$(COMMON_DIR)/products/$@,$@)
 
 $(DEST_LINUX_LIBS):
 	$(call SYMLINK,../lib/$@,$@)
-
-$(DEST_LIBMLIB_JAI):
-	$(call SYMLINK,../lib/${PROCESSOR}/$@,$@)
 
 ##
 # Utility rules
@@ -49,6 +44,6 @@ $(DEST_LIBMLIB_JAI):
 .PHONY: clean distclean mostlyclean
 
 clean distclean mostlyclean:
-	$(RM) *.jar *.so
+	$(RM) *.jar
 
 # vim:set noet sw=8 ts=8:

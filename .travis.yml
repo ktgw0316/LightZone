@@ -1,7 +1,7 @@
 language: java
 script: ant -f linux/build.xml
 jdk:
-  - oraclejdk7
+  - oraclejdk8
   - openjdk7
   - openjdk6
 before_install:

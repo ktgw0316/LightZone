@@ -9,11 +9,14 @@
 
 // standard
 #include <jni.h>
+#include <stdio.h>
 #ifdef DEBUG
 #include <iostream>
 #endif
 
 // windows
+#include <locale.h>
+#include <stdlib.h>
 #include <windows.h>
 
 // local
@@ -154,11 +157,36 @@ void startJava( JavaParamBlock *jpb ) {
     // Load our private jvm.dll and get the pointer to the JNI_CreeateJavaVM()
     // function to use create the JVM.
     //
-    HINSTANCE libHandle = ::LoadLibrary( TEXT("jre\\bin\\client\\jvm.dll") );
-    if ( !libHandle )
-        libHandle = ::LoadLibrary( TEXT("jre\\bin\\server\\jvm.dll") );
-    if ( !libHandle )
-        LC_die( TEXT("Could not load JVM library.") );
+    TCHAR path[_MAX_PATH+1], drive[_MAX_DRIVE+1], dir[_MAX_DIR+1];
+    ::GetModuleFileName(NULL, path, _MAX_PATH);
+    ::_wsplitpath(path, drive, dir, NULL, NULL);
+
+    ::wcscat(dir, TEXT("jre\\bin\\"));
+    TCHAR jreBinDir[_MAX_PATH+1];
+    ::_wmakepath(jreBinDir, drive, dir, NULL, NULL);
+    ::SetDllDirectory(jreBinDir);
+
+    char jreBinDir_mb[_MAX_PATH+1];
+    ::WideCharToMultiByte(CP_UTF8, 0, jreBinDir, -1, jreBinDir_mb, _MAX_PATH, NULL, NULL);
+    _wsetlocale(LC_ALL, TEXT(""));
+    printf("Set jre\\bin\\ directory: %s\n", jreBinDir_mb);
+
+    TCHAR serverJvmDll[_MAX_PATH+1] = TEXT("");
+    ::wcscat(serverJvmDll, jreBinDir);
+    ::wcscat(serverJvmDll, TEXT("server\\jvm.dll"));
+
+    HINSTANCE libHandle = ::LoadLibrary(serverJvmDll);
+    if ( !libHandle ) {
+        TCHAR clientJvmDll[_MAX_PATH+1] = TEXT("");
+        ::wcscat(clientJvmDll, jreBinDir);
+        ::wcscat(clientJvmDll, TEXT("client\\jvm.dll"));
+
+        libHandle = ::LoadLibrary(clientJvmDll);
+        if ( !libHandle ) {
+            LC_die( TEXT("Could not load JVM library.") );
+        }
+    }
+
     jpb->CreateJavaVM_func = (JavaParamBlock::CreateJavaVM_t)
         ::GetProcAddress( libHandle, "JNI_CreateJavaVM" );
     if ( !jpb->CreateJavaVM_func )

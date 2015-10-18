@@ -280,7 +280,8 @@ public final class EXIFParser {
 
             default:
                 throw new IllegalStateException(
-                    "unknown field type (" + fieldType + ") for tag ID " + tagID
+                    String.format( "unknown field type (0x%0) for tag ID 0x%0",
+                                   fieldType, tagID )
                 );
         }
     }
@@ -355,7 +356,8 @@ public final class EXIFParser {
         final int fieldType = m_buf.getUnsignedShort();
         if ( fieldType <= 0 || fieldType >= EXIF_FIELD_SIZE.length ) {
             m_handler.gotBadMetadata(
-                "unknown field type (" + fieldType + ") for tag ID " + tagID
+                String.format( "unknown field type (0x%0) for tag ID 0x%0",
+                               fieldType, tagID )
             );
             return;
         }
@@ -363,7 +365,8 @@ public final class EXIFParser {
         final int numValues = m_buf.getInt();
         if ( numValues < 0 ) {
             m_handler.gotBadMetadata(
-                "numValues (" + numValues + ") < 0 for tag ID " + tagID
+                String.format( "numValues (0x%x) < 0 for tag ID 0x%x",
+                               numValues, tagID )
             );
             return;
         }
@@ -373,7 +376,9 @@ public final class EXIFParser {
         final int valueOffset =
             calcValueOffset( byteCount, valueOffsetAdjustment );
         if ( valueOffset < 0 ) {
-            m_handler.gotBadMetadata( "valueOffset < 0 for tag ID " + tagID );
+            m_handler.gotBadMetadata(
+                String.format( "valueOffset < 0 for tag ID 0x%x", tagID )
+            );
             return;
         }
 

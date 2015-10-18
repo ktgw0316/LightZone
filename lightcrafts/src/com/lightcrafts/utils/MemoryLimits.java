@@ -4,6 +4,9 @@ package com.lightcrafts.utils;
 
 import com.lightcrafts.platform.Platform;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryPoolMXBean;
+
 /**
  * Some memory limit routines that must be shared among the launchers, the
  * tile cache mechanism, and the preference controls.
@@ -20,17 +23,23 @@ public class MemoryLimits {
     public final static double DefaultMemoryFraction = .3;
 
     public static int getMinimum() {
-        return 256;
+        return 512;
     }
 
+    private final static int physicalMax = Platform.getPlatform().getPhysicalMemoryInMB();
+
     public static int getMaximum() {
-        int physicalMax = Platform.getPlatform().getPhysicalMemoryInMB();
-        int platformMax = (int)(Runtime.getRuntime().maxMemory() / 1048576);
-        return Math.min(physicalMax, platformMax);
+        int maximum = physicalMax / 2;
+        maximum = Math.max(maximum, getMinimum());
+
+        // there is ~2GB limit for Java heap size on 32-bit JVM
+        if (System.getProperty("sun.arch.data.model").equals("32")) {
+            maximum = Math.min(maximum, 2048);
+        }
+        return maximum;
     }
 
     public static int getDefault() {
-        int physicalMax = Platform.getPlatform().getPhysicalMemoryInMB();
         int limit = (int) Math.round(DefaultMemoryFraction * physicalMax);
         limit = Math.max(limit, getMinimum());
         limit = Math.min(limit, getMaximum());

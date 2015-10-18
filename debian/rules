@@ -8,8 +8,9 @@ configure-stamp:
 	dh_testdir
 	touch configure-stamp
 
-build: build-stamp
+build: build-arch build-indep
 build-arch: build-stamp
+build-indep: build-stamp
 build-stamp: configure-stamp
 	dh_testdir
 	JAVA_HOME=$(JAVA_HOME) ant $(ANT_OPTIONS) jar
@@ -31,7 +32,8 @@ install: build
 	cp -pH $(CURDIR)/linux/products/*.so $(CURDIR)/debian/lightzone/usr/lib/lightzone/
 	cp -pH $(CURDIR)/linux/products/*.jar $(CURDIR)/debian/lightzone/usr/share/java/lightzone/
 
-binary-arch: build install
+binary-indep: build-indep install
+binary-arch: build-arch install
 	dh_testdir
 	dh_testroot
 #	dh_installdocs
@@ -51,6 +53,6 @@ clean:
 	JAVA_HOME=$(JAVA_HOME) ant $(ANT_OPTIONS) clean
 	-$(RM) configure-stamp build-stamp
 
-binary: binary-arch
-.PHONY: build-arch build clean binary-arch binary install configure
+binary: binary-arch binary-indep
+.PHONY: build-arch build clean binary-arch binary-indep binary install configure
 

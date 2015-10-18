@@ -33,13 +33,17 @@ float const DefaultMaxMemoryPercentage = 0.3;
 /**
  * Insist on at least this much RAM.
  */
-int const   JavaMinMemoryInMB = 256;
+int const   JavaMinMemoryInMB = 512;
 
 /**
  * Limit the JVM heap size because we now use non-heap memory for things like
  * tile caches.
  */
-int const   JavaMaxMemoryInMB = 1536;
+#ifdef __LP64__
+int const   JavaMaxMemoryInMB = 32768;
+#else
+int const   JavaMaxMemoryInMB = 2048;
+#endif
 
 extern cpu_type_t lc_cpuType;
 

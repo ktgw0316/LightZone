@@ -148,6 +148,7 @@ int CmCParser::Parse(char *filename)
     }
   
   //done.
+  fclose(fp);
   return 0;  
 }
 
