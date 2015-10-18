@@ -36,8 +36,6 @@ class SelectableTitle extends JPanel implements MouseListener {
 
     private final static Color TitleTextColor = LightZoneSkin.Colors.ToolTitleTextColor;
 
-    private final static boolean isJava8 = System.getProperty("java.version").startsWith("1.8.0_");
-
     SelectableControl control;
     Box buttonBox;
     JTextField label;       // give access for the title editor in OpTitle
@@ -307,9 +305,6 @@ class SelectableTitle extends JPanel implements MouseListener {
     }
 
     public void mouseClicked(MouseEvent e) {
-        if (isJava8)
-            return;
-
         int count = e.getClickCount();
         if (count == 2) {
             if (! control.isContentShown()) {
