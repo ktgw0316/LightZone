@@ -17,7 +17,11 @@ inline void separable_bf_mono_row(
 {
     float *rbuf = new float[width];
     
+#if _OPENMP < 201307
+#   pragma omp for
+#else
 #   pragma omp for simd
+#endif
     for (int y=wr; y < height - wr; y++) {
         
         memcpy(rbuf, &ibuf[y * width], width * sizeof(float));
@@ -62,7 +66,11 @@ inline void separable_bf_chroma_row(
     float *rbuf_a = new float[width];
     float *rbuf_b = new float[width];
 
+#if _OPENMP < 201307
+#   pragma omp for
+#else
 #   pragma omp for simd
+#endif
     for (int y=wr; y < height - wr; y++) {
         memcpy(rbuf_a, &buf_a[y * width], width * sizeof(float));
         memcpy(rbuf_b, &buf_b[y * width], width * sizeof(float));
@@ -240,11 +248,8 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_BilateralFilterRGBOpImag
     interleaved_RGB_to_planar_YST(srcData, srcLineStride, srcROffset, srcGOffset, srcBOffset,
                                   buf_y, buf_s, buf_t, width, height, rgb_to_yst);
 
-#   pragma omp task
     separable_bf_mono_tile(         buf_y, y_sigma_r, y_wr, y_kernel, width, height);
-#   pragma omp task
     separable_bf_chroma_tile(buf_s, buf_t, c_sigma_r, c_wr, c_kernel, width, height);
-#   pragma omp taskwait
 
     planar_YST_to_interleaved_RGB(destData, destLineStride, destROffset, destGOffset, destBOffset, wr,
                                   buf_y, buf_s, buf_t, width, height, yst_to_rgb);
