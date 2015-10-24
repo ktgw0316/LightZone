@@ -338,6 +338,21 @@ public class ZoneFinder extends Preview implements PaintListener {
                && image.getSampleModel().getDataType() == DataBuffer.TYPE_BYTE;
 
         if (previewDimension.getHeight() > 1 && previewDimension.getWidth() > 1) {
+            Operation op = engine.getSelectedOperation();
+            if (op != null && op instanceof ZoneOperation /* && op.isActive() */ ) {
+                PlanarImage processedImage = engine.getRendering(engine.getSelectedOperationIndex() + 1);
+                image = Functions.fromUShortToByte(Functions.toColorSpace(processedImage,
+                                                                          JAIContext.systemColorSpace,
+                                                                          engine.getProofProfile(),
+                                                                          null,
+                                                                          engine.getProofIntent(),
+                                                                          null),
+                                                   null);
+
+                if (image.getSampleModel().getDataType() == DataBuffer.TYPE_USHORT)
+                    image = Functions.fromUShortToByte(image, null);
+            }
+
             if (segmenter == null || !segmenter.isAlive()) {
                 segmenter = new Segmenter(visibleRect, image);
                 segmenter.start();

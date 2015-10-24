@@ -502,6 +502,17 @@ public class ImageEditorEngine implements Engine {
             return null;
     }
 
+    public synchronized int getSelectedOperationIndex() {
+        return selectedOperation;
+    }
+
+    public PlanarImage getRendering(int stopBefore) {
+        if (stopBefore >= 0) {
+            return rendering.getRendering(stopBefore);
+        }
+        return null;
+    }
+
     /*
         Main Pipeline update routine
     */
@@ -698,6 +709,14 @@ public class ImageEditorEngine implements Engine {
 
     private ICC_Profile proofProfile = null;
     private LCMSColorConvertDescriptor.RenderingIntent proofIntent = null;
+
+    public ICC_Profile getProofProfile() {
+        return proofProfile;
+    }
+
+    public LCMSColorConvertDescriptor.RenderingIntent getProofIntent() {
+        return proofIntent;
+    }
 
     public void preview(PrintSettings settings) {
         if (settings != null) {
