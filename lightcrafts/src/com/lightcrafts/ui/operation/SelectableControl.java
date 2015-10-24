@@ -38,13 +38,13 @@ public class SelectableControl
     public SelectableControl() {
         setBackground(Background);
 
+        setContent(new JLabel("Default Control"));
+        setShowContent(true);
+
         title = new SelectableTitle(this);
         title.setBackground(Background);
         title.setFont(ControlFont);
         add(title);
-
-        setContent(new JLabel("Default Control"));
-        setShowContent(true);
 
         setOpaque(false);
         setFont(ControlFont);
