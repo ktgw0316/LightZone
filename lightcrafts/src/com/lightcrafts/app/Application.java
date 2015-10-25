@@ -970,31 +970,35 @@ public class Application {
         final Engine engine = doc.getEngine();
         Dimension size = engine.getNaturalSize();
 
+        Preferences prefs = getPreferences();
+        boolean byOriginal = prefs.getBoolean("ExportByOriginal", true);
+
         ImageExportOptions newOptions;
-        if (oldOptions != null) {
-            // This Document has been exported before.
-            newOptions = ExportLogic.getDefaultExportOptions(
-                oldOptions, size
-            );
-        }
-        else if (LastExportOptions != null) {
-            // This Document has never been exported, but export has been used.
-            File file = doc.getFile();
-            if (file != null) {
-                // This Document has been saved:
+        if (!byOriginal && (oldOptions != null || LastExportOptions != null)) {
+            if (oldOptions != null) {
+                // This Document has been exported before.
                 newOptions = ExportLogic.getDefaultExportOptions(
-                    LastExportOptions, meta, size, file.getName()
-                );
+                        oldOptions, size
+                        );
             }
-            else {
-                // This Document not has been saved:
-                newOptions = ExportLogic.getDefaultExportOptions(
-                    LastExportOptions, meta, size
-                );
+            else { // LastExportOptions != null
+                // This Document has never been exported, but export has been used.
+                File file = doc.getFile();
+                if (file != null) {
+                    // This Document has been saved:
+                    newOptions = ExportLogic.getDefaultExportOptions(
+                            LastExportOptions, meta, size, file.getName()
+                            );
+                }
+                else {
+                    // This Document not has been saved:
+                    newOptions = ExportLogic.getDefaultExportOptions(
+                            LastExportOptions, meta, size
+                            );
+                }
             }
         }
         else {
-            // Export has never been used.
             newOptions = ExportLogic.getDefaultExportOptions(
                 meta, size
             );
