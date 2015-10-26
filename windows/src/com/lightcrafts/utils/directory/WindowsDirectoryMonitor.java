@@ -8,9 +8,11 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import com.lightcrafts.utils.file.FileUtil;
 import com.lightcrafts.platform.windows.WindowsFileUtil;
+
 import sun.awt.shell.ShellFolder;
 
 /**
@@ -65,14 +67,16 @@ public final class WindowsDirectoryMonitor extends DirectoryMonitor {
     public void dispose() {
         super.dispose();
         synchronized ( m_dirMap ) {
-            for ( Map.Entry<File,Long> entry : m_dirMap.entrySet() )
-                if ( !WindowsFileUtil.isGUID( entry.getKey() ) )
-                    try {
-                        disposeHandle( entry.getValue() );
-                    }
-                    catch ( IOException e ) {
-                        // ignore
-                    }
+            m_dirMap.entrySet().stream()
+            .filter(entry -> !WindowsFileUtil.isGUID(entry.getKey()))
+            .forEach(entry -> {
+                try {
+                    disposeHandle( entry.getValue() );
+                }
+                catch ( IOException e ) {
+                    // ignore
+                }
+            });
         }
     }
 
@@ -214,8 +218,8 @@ public final class WindowsDirectoryMonitor extends DirectoryMonitor {
             FileUtil.listFiles( dir, DirectoryOnlyFilter.INSTANCE, false );
         long hashCode = 0;
         if ( contents != null )
-            for ( File file : contents )
-                hashCode ^= file.hashCode();
+            hashCode = Stream.of(contents).map(File::hashCode)
+                                          .reduce(0, (a, b) -> a ^ b);
         return hashCode;
     }
 
