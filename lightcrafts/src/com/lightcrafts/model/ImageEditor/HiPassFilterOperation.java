@@ -66,8 +66,7 @@ public class HiPassFilterOperation extends BlendedOperation {
             super(source);
         }
         public PlanarImage setFront() {
-            kernel = Functions.LoGSharpenKernel(radius, gain);
-            // kernel = Functions.getLoGKernel(radius);
+            kernel = Functions.LoGSharpenKernel(radius * scale, gain);
             ParameterBlock pb = new ParameterBlock();
             pb.addSource(back);
             pb.add(kernel);
