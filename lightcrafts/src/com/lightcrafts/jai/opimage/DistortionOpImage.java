@@ -4,7 +4,6 @@ package com.lightcrafts.jai.opimage;
 
 import com.lightcrafts.mediax.jai.BorderExtender;
 import com.lightcrafts.mediax.jai.GeometricOpImage;
-import com.lightcrafts.mediax.jai.Interpolation;
 import com.lightcrafts.mediax.jai.RasterFormatTag;
 import com.lightcrafts.mediax.jai.RasterAccessor;
 
@@ -34,8 +33,7 @@ public class DistortionOpImage extends GeometricOpImage {
 
     public DistortionOpImage(RenderedImage source, Map configuration, BorderExtender extender,
                              float k1, float k2, float kr, float kb) {
-        super(vectorize(source), null, configuration, true, extender,
-                Interpolation.getInstance(Interpolation.INTERP_BILINEAR));
+        super(vectorize(source), null, configuration, true, extender, null);
 
         fullWidth  = source.getWidth();
         fullHeight = source.getHeight();
@@ -48,8 +46,7 @@ public class DistortionOpImage extends GeometricOpImage {
     public DistortionOpImage(RenderedImage source, Map configuration, BorderExtender extender,
                              String cameraMaker, String cameraModel,
                              String lensName, float focal, float aperture) {
-        super(vectorize(source), null, configuration, true, extender,
-                Interpolation.getInstance(Interpolation.INTERP_BILINEAR));
+        super(vectorize(source), null, configuration, true, extender, null);
 
         fullWidth  = source.getWidth();
         fullHeight = source.getHeight();
@@ -62,9 +59,6 @@ public class DistortionOpImage extends GeometricOpImage {
 
     @Override
     protected Rectangle forwardMapRect(Rectangle sourceRect, int sourceIndex) {
-        if (sourceIndex != 0)
-            return null;
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -72,8 +66,63 @@ public class DistortionOpImage extends GeometricOpImage {
     protected Rectangle backwardMapRect(Rectangle destRect, int sourceIndex) {
         if (sourceIndex != 0)
             return null;
-        // TODO Auto-generated method stub
-        return null;
+
+        final float centerX = fullWidth / 2;
+        final float centerY = fullHeight / 2;
+
+        final float rx0 = destRect.x - centerX;
+        final float ry0 = destRect.y - centerY;
+        final float rx1 = rx0 + destRect.width;
+        final float ry1 = ry0 + destRect.height;
+
+        final float rMaxSq = (fullWidth * fullWidth + fullHeight * fullHeight) / 4;
+
+        final float smallestMagnitude = Math.min(Math.min(kr, kb), 1);
+        final float biggestMagnitude  = Math.max(Math.max(kr, kb), 1);
+
+        // Find minimum of top edge and maximum of bottom edge
+        float top    = (int) coeff((rx0 * rx0 + ry0 * ry0) / rMaxSq) * ry0;
+        float bottom = (int) coeff((rx0 * rx0 + ry1 * ry1) / rMaxSq) * ry1;
+        for (int rx = (int) rx0; rx <= rx1; rx++) {
+            float topTmp = coeff((rx * rx + ry0 * ry0) / rMaxSq) * ry0;
+            topTmp *= (topTmp < 0) ? biggestMagnitude : smallestMagnitude;
+            if (topTmp < top) {
+                top = topTmp;
+            }
+            float bottomTmp = coeff((rx * rx + ry1 * ry1) / rMaxSq) * ry1;
+            bottomTmp *= (bottomTmp > 0) ? biggestMagnitude : smallestMagnitude;
+            if (bottomTmp > bottom) {
+                bottom = bottomTmp;
+            }
+        }
+        final int h = (int) (bottom - top + 1);
+        top += centerY;
+
+        // Find minimum of left edge and maximum of right edge
+        float left  = (int) coeff((rx0 * rx0 + ry0 * ry0) / rMaxSq) * rx0;
+        float right = (int) coeff((rx1 * rx1 + ry0 * ry0) / rMaxSq) * rx1;
+        for (int ry = (int) ry0; ry <= ry1; ry++) {
+            float leftTmp = coeff((rx0 * rx0 + ry * ry) / rMaxSq) * rx0;
+            leftTmp *= (leftTmp < 0) ? biggestMagnitude : smallestMagnitude;
+            if (leftTmp < left) {
+                left = leftTmp;
+            }
+            float rightTmp = coeff((rx1 * rx1 + ry * ry) / rMaxSq) * rx1;
+            rightTmp *= (rightTmp > 0) ? biggestMagnitude : smallestMagnitude;
+            if (rightTmp > right) {
+                right = rightTmp;
+            }
+        }
+        final int w = (int) (right - left + 1);
+        left += centerX;
+
+        Rectangle rect = new Rectangle((int) left, (int) top, w, h);
+        return rect;
+    }
+
+    private float coeff(final float radiusSq) {
+        // 5th order polynomial distortion model, scaled
+        return (1 + k1 * radiusSq + k2 * radiusSq * radiusSq) / (1 + k1 + k2);
     }
 
     @Override
@@ -122,20 +171,19 @@ public class DistortionOpImage extends GeometricOpImage {
         final int srcPixelStride = src.getPixelStride();
         final int srcScanlineStride = src.getScanlineStride();
 
+        final int srcX = src.getX();
+        final int srcY = src.getY();
+        final int srcWidth = src.getWidth();
+        final int srcHeight = src.getHeight();
+
         short dstData[] = dstDataArrays[0];
         short srcData[] = srcDataArrays[0];
 
-        System.out.println("srcPixelStride = " + srcPixelStride); // DEBUG
-        System.out.println("srcLineStride  = " + srcScanlineStride); // DEBUG
-        System.out.println("dstWidth  = " + dstWidth); // DEBUG
-        System.out.println("dstHeight = " + dstHeight); // DEBUG
-
         if (src.getNumBands() == 1) {
-            System.out.println("srcBandOffsets = " + srcBandOffsets[0]); // DEBUG
-
             synchronized(this) {
                 distortionMono(srcData, dstData,
                                fullWidth, fullHeight,
+                               srcX, srcY, srcWidth, srcHeight,
                                dstX, dstY, dstWidth, dstHeight,
                                srcPixelStride, dstPixelStride,
                                srcBandOffsets[0], dstBandOffsets[0],
@@ -143,13 +191,11 @@ public class DistortionOpImage extends GeometricOpImage {
             }
         }
         else if (src.getNumBands() == 3) {
-            System.out.println("srcBandOffsets = " + srcBandOffsets[0]
-                    + ", " + srcBandOffsets[1] + ", " + srcBandOffsets[2]); // DEBUG
-
             if (cameraModel.isEmpty() && lensName.isEmpty()) {
                 synchronized(this) {
                     distortionColor(srcData, dstData,
                                     fullWidth, fullHeight,
+                                    srcX, srcY, srcWidth, srcHeight,
                                     dstX, dstY, dstWidth, dstHeight,
                                     srcPixelStride, dstPixelStride,
                                     srcBandOffsets[0], srcBandOffsets[1], srcBandOffsets[2],
@@ -164,6 +210,7 @@ public class DistortionOpImage extends GeometricOpImage {
                 synchronized(this) {
                     lensfun(srcData, dstData,
                             fullWidth, fullHeight,
+                            // srcX, srcY,
                             dstX, dstY, dstWidth, dstHeight,
                             srcPixelStride, dstPixelStride,
                             srcBandOffsets[0], srcBandOffsets[1], srcBandOffsets[2],
@@ -178,7 +225,10 @@ public class DistortionOpImage extends GeometricOpImage {
 
     static native void distortionMono(short srcData[], short dstData[],
                                       int fullWidth, int fullHeight,
-                                      int rectX, int rectY, int rectWidth, int rectHeight,
+                                      int srcRectX, int srcRectY,
+                                      int srcRectWidth, int srcRectHeight,
+                                      int dstRectX, int dstRectY,
+                                      int dstRectWidth, int dstRectHeight,
                                       int srcPixelStride, int dstPixelStride,
                                       int srcOffset, int dstOffset,
                                       int srcLineStride, int dstLineStride,
@@ -186,7 +236,10 @@ public class DistortionOpImage extends GeometricOpImage {
 
     static native void distortionColor(short srcData[], short dstData[],
                                        int fullWidth, int fullHeight,
-                                       int rectX, int rectY, int rectWidth, int rectHeight,
+                                       int srcRectX, int srcRectY,
+                                       int srcRectWidth, int srcRectHeight,
+                                       int dstRectX, int dstRectY,
+                                       int dstRectWidth, int dstRectHeight,
                                        int srcPixelStride, int dstPixelStride,
                                        int srcROffset, int srcGOffset, int srcBOffset,
                                        int dstROffset, int dstGOffset, int dstBOffset,

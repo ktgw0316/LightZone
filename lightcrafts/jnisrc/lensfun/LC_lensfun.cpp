@@ -22,7 +22,10 @@ inline float Coeff(const float k1, const float k2, const float radiusSq)
 void correct_distortion_mono
 ( const unsigned short *srcData, unsigned short *dstData,
   const int fullWidth, const int fullHeight,
-  const int rectX, const int rectY, const int rectWidth, const int rectHeight,
+  const int srcRectX, const int srcRectY,
+  const int srcRectWidth, const int srcRectHeight,
+  const int dstRectX, const int dstRectY,
+  const int dstRectWidth, const int dstRectHeight,
   const int srcPixelStride, const int dstPixelStride,
   const int srcOffset, const int dstOffset,
   const int srcLineStride, const int dstLineStride,
@@ -34,31 +37,31 @@ void correct_distortion_mono
     const float maxRadiusSq = centerX * centerX + centerY * centerY;
 
 #pragma omp parallel for schedule (guided)
-    for (int y = rectY; y < rectY + rectHeight; ++y) {
+    for (int y = dstRectY; y < dstRectY + dstRectHeight; ++y) {
         const float offY = y - centerY;
 
-        for (int x = rectX; x < rectX + rectWidth; ++x) {
+        for (int x = dstRectX; x < dstRectX + dstRectWidth; ++x) {
             // Calc distortion
             const float offX = x - centerX;
             const float radiusSq = (offX * offX + offY * offY) / maxRadiusSq;
             const float coeff = Coeff(k1, k2, radiusSq);
 
-            const float srcX = magnitude * coeff * offX + centerX;
-            const float srcY = magnitude * coeff * offY + centerY;
+            const float srcX = magnitude * coeff * offX + centerX - srcRectX;
+            const float srcY = magnitude * coeff * offY + centerY - srcRectY;
 
-            // Skip the pixels outside of the source image
-            if (srcX < 1 || srcX >= fullWidth  - 1 ||
-                srcY < 1 || srcY >= fullHeight - 1)
-                continue;
 
             const int dstIdx =
-                dstPixelStride * (x - rectX) + (y - rectY) * dstLineStride;
-            const unsigned short value =
-                // BilinearInterp(srcData, srcPixelStride, srcOffset, srcLineStride,
-                               // srcX, srcY);
-                MitchellInterp(srcData, srcPixelStride, srcOffset, srcLineStride,
-                               srcX, srcY);
-            dstData[dstIdx + dstOffset] = value < 0xffff ? value : 0xffff;
+                dstPixelStride * (x - dstRectX) + (y - dstRectY) * dstLineStride;
+
+            if (srcX < 0 || srcX >= srcRectWidth || srcY < 0 || srcY >= srcRectHeight) {
+                dstData[dstIdx + dstOffset] = 0;
+            }
+            else {
+                const unsigned short value =
+                    BilinearInterp(srcData, srcPixelStride, srcOffset, srcLineStride,
+                                   srcX, srcY);
+                dstData[dstIdx + dstOffset] = value < 0xffff ? value : 0xffff;
+            }
         }
     }
 }
@@ -68,7 +71,8 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distor
 ( JNIEnv *env, jclass cls,
   jshortArray jsrcData, jshortArray jdstData,
   jint fullWidth, jint fullHeight,
-  jint rectX, jint rectY, jint rectWidth, jint rectHeight,
+  jint srcRectX, jint srcRectY, jint srcRectWidth, jint srcRectHeight,
+  jint dstRectX, jint dstRectY, jint dstRectWidth, jint dstRectHeight,
   jint srcPixelStride, jint dstPixelStride,
   jint srcOffset, jint dstOffset,
   jint srcLineStride, jint dstLineStride,
@@ -78,7 +82,9 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distor
     unsigned short *dstData = (unsigned short *)env->GetPrimitiveArrayCritical(jdstData, 0);
 
     correct_distortion_mono(srcData, dstData, fullWidth, fullHeight,
-            rectX, rectY, rectWidth, rectHeight, srcPixelStride,dstPixelStride,
+            srcRectX, srcRectY, srcRectWidth, srcRectHeight,
+            dstRectX, dstRectY, dstRectWidth, dstRectHeight,
+            srcPixelStride,dstPixelStride,
             srcOffset, dstOffset, srcLineStride, dstLineStride,
             k1, k2, 1.f);
 
@@ -91,7 +97,8 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distor
 ( JNIEnv *env, jclass cls,
   jshortArray jsrcData, jshortArray jdstData,
   jint fullWidth, jint fullHeight,
-  jint rectX, jint rectY, jint rectWidth, jint rectHeight,
+  jint srcRectX, jint srcRectY, jint srcRectWidth, jint srcRectHeight,
+  jint dstRectX, jint dstRectY, jint dstRectWidth, jint dstRectHeight,
   jint srcPixelStride, jint dstPixelStride,
   jint srcROffset, jint srcGOffset, jint srcBOffset,
   jint dstROffset, jint dstGOffset, jint dstBOffset,
@@ -107,21 +114,27 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distor
         // Red
 #pragma omp task mergable
         correct_distortion_mono(srcData, dstData, fullWidth, fullHeight,
-                rectX, rectY, rectWidth, rectHeight, srcPixelStride,dstPixelStride,
+                srcRectX, srcRectY, srcRectWidth, srcRectHeight,
+                dstRectX, dstRectY, dstRectWidth, dstRectHeight,
+                srcPixelStride,dstPixelStride,
                 srcROffset, dstROffset, srcLineStride, dstLineStride,
                 k1, k2, kr);
 
         // Green
 #pragma omp task mergable
         correct_distortion_mono(srcData, dstData, fullWidth, fullHeight,
-                rectX, rectY, rectWidth, rectHeight, srcPixelStride,dstPixelStride,
+                srcRectX, srcRectY, srcRectWidth, srcRectHeight,
+                dstRectX, dstRectY, dstRectWidth, dstRectHeight,
+                srcPixelStride,dstPixelStride,
                 srcGOffset, dstGOffset, srcLineStride, dstLineStride,
                 k1, k2, 1);
 
         // Blue
 #pragma omp task mergable
         correct_distortion_mono(srcData, dstData, fullWidth, fullHeight,
-                rectX, rectY, rectWidth, rectHeight, srcPixelStride,dstPixelStride,
+                srcRectX, srcRectY, srcRectWidth, srcRectHeight,
+                dstRectX, dstRectY, dstRectWidth, dstRectHeight,
+                srcPixelStride,dstPixelStride,
                 srcBOffset, dstBOffset, srcLineStride, dstLineStride,
                 k1, k2, kb);
     }
