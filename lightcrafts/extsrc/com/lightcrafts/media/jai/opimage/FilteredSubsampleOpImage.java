@@ -16,8 +16,16 @@ import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.awt.image.DataBuffer;
+
 import com.lightcrafts.mediax.jai.ImageLayout;
+
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import com.lightcrafts.mediax.jai.GeometricOpImage;
 import com.lightcrafts.mediax.jai.BorderExtender;
 import com.lightcrafts.mediax.jai.Interpolation;
@@ -738,128 +746,141 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
     protected void computeRectByte(RasterAccessor src, RasterAccessor dst) {
 
         // Get dimensions.
-        int dwidth = dst.getWidth();
-        int dheight = dst.getHeight();
-        int dnumBands = dst.getNumBands();
+        final int dwidth = dst.getWidth();
+        final int dheight = dst.getHeight();
+        final int dnumBands = dst.getNumBands();
 
         // Get destination data array references and strides.
-        byte dstDataArrays[][] = dst.getByteDataArrays();
-        int dstBandOffsets[] = dst.getBandOffsets();
-        int dstPixelStride = dst.getPixelStride();
-        int dstScanlineStride = dst.getScanlineStride();
+        final byte dstDataArrays[][] = dst.getByteDataArrays();
+        final int dstBandOffsets[] = dst.getBandOffsets();
+        final int dstPixelStride = dst.getPixelStride();
+        final int dstScanlineStride = dst.getScanlineStride();
 
         // Get source data array references and strides.
-        byte srcDataArrays[][] = src.getByteDataArrays();
-        int srcBandOffsets[] = src.getBandOffsets();
-        int srcPixelStride = src.getPixelStride();
-        int srcScanlineStride = src.getScanlineStride();
+        final byte srcDataArrays[][] = src.getByteDataArrays();
+        final int srcBandOffsets[] = src.getBandOffsets();
+        final int srcPixelStride = src.getPixelStride();
+        final int srcScanlineStride = src.getScanlineStride();
 
         // Compute reused numbers
-	int kernelNx = 2*hKernel.length - hParity;
-	int kernelNy = 2*vKernel.length - vParity;
-	int stepDown = (kernelNy - 1)*srcScanlineStride;
-	int stepRight = (kernelNx - 1)*srcPixelStride;
+        final int kernelNx = 2*hKernel.length - hParity;
+        final int kernelNy = 2*vKernel.length - vParity;
+        final int stepDown = (kernelNy - 1)*srcScanlineStride;
+        final int stepRight = (kernelNx - 1)*srcPixelStride;
 
-	int upLeft, upRight, dnLeft, dnRight;
-	float kk;
-        float vCtr = vKernel[0];
-        float hCtr = hKernel[0];
-        int kInd, xLeft, xRight, xUp, xDown;
+        final float vCtr = vKernel[0];
+        final float hCtr = hKernel[0];
 
-        for (int band = 0; band < dnumBands ; band++)  {
-            byte dstData[] = dstDataArrays[band];
-            byte srcData[] = srcDataArrays[band];
-            int srcScanlineOffset = srcBandOffsets[band];
-            int dstScanlineOffset = dstBandOffsets[band];
+        ExecutorService threadPool = Executors.newFixedThreadPool(dnumBands);
+        Collection<Callable<Void>> processes = new LinkedList<Callable<Void>>();
+        for (int dstBand = 0; dstBand < dnumBands; dstBand++) {
+            final int band = dstBand;
+            processes.add(new Callable<Void>() {
+                @Override
+                public Void call() {
+                    byte dstData[] = dstDataArrays[band];
+                    byte srcData[] = srcDataArrays[band];
+                    int srcScanlineOffset = srcBandOffsets[band];
+                    int dstScanlineOffset = dstBandOffsets[band];
 
-            // Step over source raster coordinates
-            for (int ySrc = 0 ; ySrc < scaleY*dheight ; ySrc += scaleY) {
-                int dInd = dstScanlineOffset;
-                for (int xSrc = 0 ; xSrc < scaleX*dwidth ; xSrc += scaleX) {
+                    // Step over source raster coordinates
+                    for (int ySrc = 0; ySrc < scaleY*dheight; ySrc += scaleY) {
+                        int dInd = dstScanlineOffset;
+                        for (int xSrc = 0; xSrc < scaleX*dwidth; xSrc += scaleX) {
 
-                    int upLeft0 = xSrc*srcPixelStride + ySrc*srcScanlineStride + srcScanlineOffset;
-                    int upRight0 = upLeft0 + stepRight;
-                    int dnLeft0 = upLeft0 + stepDown;
-                    int dnRight0 = upRight0 + stepDown;
+                            int upLeft0  = xSrc*srcPixelStride + ySrc*srcScanlineStride + srcScanlineOffset;
+                            int upRight0 = upLeft0 + stepRight;
+                            int dnLeft0  = upLeft0 + stepDown;
+                            int dnRight0 = upRight0 + stepDown;
 
-                   // Exploit 4-fold symmetry
-                   float sum = 0;
+                            // Exploit 4-fold symmetry
+                            float sum = 0;
 
-                   // Make the rectangle squeeze in the vertical direction
-                   for (int iy = vKernel.length - 1 ; iy > vParity - 1 ; iy--) {
-                       upLeft = upLeft0;
-                       upRight = upRight0;
-                       dnLeft = dnLeft0;
-                       dnRight = dnRight0;
+                            // Make the rectangle squeeze in the vertical direction
+                            for (int iy = vKernel.length - 1; iy > vParity - 1; iy--) {
+                                int upLeft  = upLeft0;
+                                int upRight = upRight0;
+                                int dnLeft  = dnLeft0;
+                                int dnRight = dnRight0;
 
-                       // Make the rectangle squeeze in the horizontal direction
-                       for (int ix = hKernel.length - 1 ; ix > hParity - 1 ; ix--) {
-                            kk = hKernel[ix]*vKernel[iy];
-                            sum += kk*((int)(srcData[upLeft]&0xff) + (int)(srcData[upRight]&0xff)
-                                     + (int)(srcData[dnLeft]&0xff) + (int)(srcData[dnRight]&0xff));
-                            upLeft += srcPixelStride;
-                            upRight -= srcPixelStride;
-                            dnLeft += srcPixelStride;
-                            dnRight -= srcPixelStride;
-                        } // ix
-                        upLeft0 += srcScanlineStride;   // down a row
-                        upRight0 += srcScanlineStride;
-                        dnLeft0 -= srcScanlineStride;   // up a row
-                        dnRight0 -= srcScanlineStride;
-                    } // iy
+                                // Make the rectangle squeeze in the horizontal direction
+                                for (int ix = hKernel.length - 1; ix > hParity - 1; ix--) {
+                                    float kk = hKernel[ix]*vKernel[iy];
+                                    sum += kk*((int)(srcData[upLeft] &0xff) +
+                                               (int)(srcData[upRight]&0xff) +
+                                               (int)(srcData[dnLeft] &0xff) +
+                                               (int)(srcData[dnRight]&0xff));
+                                    upLeft  += srcPixelStride;
+                                    upRight -= srcPixelStride;
+                                    dnLeft  += srcPixelStride;
+                                    dnRight -= srcPixelStride;
+                                } // ix
+                                upLeft0  += srcScanlineStride;   // down a row
+                                upRight0 += srcScanlineStride;
+                                dnLeft0  -= srcScanlineStride;   // up a row
+                                dnRight0 -= srcScanlineStride;
+                            } // iy
 
-                    // Compute the remaining 2-Fold symmetry portions (across and down as needed)
+                            // Compute the remaining 2-Fold symmetry portions (across and down as needed)
 
-                    // Loop down the center (hParity is odd)
-                    if (hParity == 1) {
-                        xUp = (xSrc + hKernel.length - 1)*srcPixelStride +
-                               ySrc*srcScanlineStride + srcScanlineOffset;
-                        xDown = xUp + stepDown;
-                        kInd = vKernel.length - 1;
-                        while (xUp < xDown) {
-                            kk = hCtr*vKernel[kInd--];
-                            sum += kk*((int)(srcData[xUp]&0xff) + (int)(srcData[xDown]&0xff));
-                            xUp += srcScanlineStride;
-                            xDown -= srcScanlineStride;
-                        }
-                    } // hParity
+                            // Loop down the center (hParity is odd)
+                            if (hParity == 1) {
+                                int xUp = (xSrc + hKernel.length - 1)*srcPixelStride +
+                                        ySrc*srcScanlineStride + srcScanlineOffset;
+                                int xDown = xUp + stepDown;
+                                int kInd = vKernel.length - 1;
+                                while (xUp < xDown) {
+                                    float kk = hCtr*vKernel[kInd--];
+                                    sum += kk*((int)(srcData[xUp]&0xff) +
+                                               (int)(srcData[xDown]&0xff));
+                                    xUp   += srcScanlineStride;
+                                    xDown -= srcScanlineStride;
+                                }
+                            } // hParity
 
-                    // Loop across the center (vParity is odd), pick up the center if hParity was odd
-                    if (vParity == 1) {
-                        xLeft = xSrc*srcPixelStride +
-                            (ySrc + vKernel.length - 1)*srcScanlineStride +
-                            srcScanlineOffset;
-                        xRight = xLeft + stepRight;
-                        kInd = hKernel.length - 1;
-                        while (xLeft < xRight) {
-                            kk = vCtr*hKernel[kInd--];
-                            sum += kk*((int)(srcData[xLeft]&0xff) + (int)(srcData[xRight]&0xff));
-                            xLeft += srcPixelStride;
-                            xRight -= srcPixelStride;
-                        } // while xLeft
+                            // Loop across the center (vParity is odd), pick up the center if hParity was odd
+                            if (vParity == 1) {
+                                int xLeft = xSrc*srcPixelStride +
+                                        (ySrc + vKernel.length - 1)*srcScanlineStride +
+                                        srcScanlineOffset;
+                                int xRight = xLeft + stepRight;
+                                int kInd = hKernel.length - 1;
+                                while (xLeft < xRight) {
+                                    float kk = vCtr*hKernel[kInd--];
+                                    sum += kk*((int)(srcData[xLeft]&0xff) +
+                                               (int)(srcData[xRight]&0xff));
+                                    xLeft  += srcPixelStride;
+                                    xRight -= srcPixelStride;
+                                } // while xLeft
 
-                        // Grab the center pixel if hParity was odd also
-                        if (hParity == 1) sum += vCtr*hCtr*(int)(srcData[xLeft]&0xff);
+                                // Grab the center pixel if hParity was odd also
+                                if (hParity == 1) sum += vCtr*hCtr*(int)(srcData[xLeft]&0xff);
 
-                    } // if vParity
+                            } // if vParity
 
-                    // Convert the sum to an output pixel
-                    if (sum < 0.0) sum = 0;
-                    if (sum > 255.0) sum = 255;
+                            // Convert the sum to an output pixel
+                            if (sum < 0.0)   sum = 0;
+                            if (sum > 255.0) sum = 255;
 
-                    dstData[dInd] = (byte)(sum + 0.5);
+                            dstData[dInd] = (byte)(sum + 0.5);
 
-                    dInd += dstPixelStride;
-                } // for xSrc
+                            dInd += dstPixelStride;
+                        } // for xSrc
 
-                dstScanlineOffset += dstScanlineStride;
+                        dstScanlineOffset += dstScanlineStride;
+                    } // for ySrc
 
-            } // for ySrc
-
-        } // for band
-
-        return;
-
+                    return null;
+                }
+            });
+        }
+        try {
+            threadPool.invokeAll(processes);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            threadPool.shutdown();
+        }
     } // computeRectByte
 
     /** <code>computeRectUShort</code> filter subsamples unsigned short pixel data.
@@ -870,129 +891,137 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
     protected void computeRectUShort(RasterAccessor src, RasterAccessor dst) {
 
         // Get dimensions.
-        int dwidth = dst.getWidth();
-        int dheight = dst.getHeight();
-        int dnumBands = dst.getNumBands();
+        final int dwidth = dst.getWidth();
+        final int dheight = dst.getHeight();
+        final int dnumBands = dst.getNumBands();
 
         // Get destination data array references and strides.
-        short dstDataArrays[][] = dst.getShortDataArrays();
-        int dstBandOffsets[] = dst.getBandOffsets();
-        int dstPixelStride = dst.getPixelStride();
-        int dstScanlineStride = dst.getScanlineStride();
+        final short dstDataArrays[][] = dst.getShortDataArrays();
+        final int dstBandOffsets[] = dst.getBandOffsets();
+        final int dstPixelStride = dst.getPixelStride();
+        final int dstScanlineStride = dst.getScanlineStride();
 
         // Get source data array references and strides.
-        short srcDataArrays[][] = src.getShortDataArrays();
-        int srcBandOffsets[] = src.getBandOffsets();
-        int srcPixelStride = src.getPixelStride();
-        int srcScanlineStride = src.getScanlineStride();
+        final short srcDataArrays[][] = src.getShortDataArrays();
+        final int srcBandOffsets[] = src.getBandOffsets();
+        final int srcPixelStride = src.getPixelStride();
+        final int srcScanlineStride = src.getScanlineStride();
 
         // Compute reused numbers
-	int kernelNx = 2*hKernel.length - hParity;
-	int kernelNy = 2*vKernel.length - vParity;
-	int stepDown = (kernelNy - 1)*srcScanlineStride;
-	int stepRight = (kernelNx - 1)*srcPixelStride;
+        final int kernelNx = 2*hKernel.length - hParity;
+        final int kernelNy = 2*vKernel.length - vParity;
+        final int stepDown = (kernelNy - 1)*srcScanlineStride;
+        final int stepRight = (kernelNx - 1)*srcPixelStride;
 
-	int upLeft, upRight, dnLeft, dnRight;
-	float kk;
-        float vCtr = vKernel[0];
-        float hCtr = hKernel[0];
-        int kInd, xLeft, xRight, xUp, xDown;
+        final float vCtr = vKernel[0];
+        final float hCtr = hKernel[0];
 
-        for (int band = 0; band < dnumBands ; band++)  {
-            short dstData[] = dstDataArrays[band];
-            short srcData[] = srcDataArrays[band];
-            int srcScanlineOffset = srcBandOffsets[band];
-            int dstScanlineOffset = dstBandOffsets[band];
+        ExecutorService threadPool = Executors.newFixedThreadPool(dnumBands);
+        Collection<Callable<Void>> processes = new LinkedList<Callable<Void>>();
+        for (int dstBand = 0; dstBand < dnumBands; dstBand++) {
+            final int band = dstBand;
+            processes.add(new Callable<Void>() {
+                @Override
+                public Void call() {
+                    short dstData[] = dstDataArrays[band];
+                    short srcData[] = srcDataArrays[band];
+                    int srcScanlineOffset = srcBandOffsets[band];
+                    int dstScanlineOffset = dstBandOffsets[band];
 
-            // Step over source raster coordinates
-            for (int ySrc = 0 ; ySrc < scaleY*dheight ; ySrc += scaleY) {
-                int dInd = dstScanlineOffset;
-                for (int xSrc = 0 ; xSrc < scaleX*dwidth ; xSrc += scaleX) {
+                    // Step over source raster coordinates
+                    for (int ySrc = 0; ySrc < scaleY*dheight; ySrc += scaleY) {
+                        int dInd = dstScanlineOffset;
+                        for (int xSrc = 0; xSrc < scaleX*dwidth; xSrc += scaleX) {
 
-                    int upLeft0 = xSrc*srcPixelStride + ySrc*srcScanlineStride + srcScanlineOffset;
-                    int upRight0 = upLeft0 + stepRight;
-                    int dnLeft0 = upLeft0 + stepDown;
-                    int dnRight0 = upRight0 + stepDown;
+                            int upLeft0  = xSrc*srcPixelStride + ySrc*srcScanlineStride + srcScanlineOffset;
+                            int upRight0 = upLeft0 + stepRight;
+                            int dnLeft0  = upLeft0 + stepDown;
+                            int dnRight0 = upRight0 + stepDown;
 
-                   // Exploit 4-fold symmetry
-                   float sum = 0;
+                            // Exploit 4-fold symmetry
+                            float sum = 0;
 
-                   // Make the rectangle squeeze in the vertical direction
-                   for (int iy = vKernel.length - 1 ; iy > vParity - 1 ; iy--) {
-                       upLeft = upLeft0;
-                       upRight = upRight0;
-                       dnLeft = dnLeft0;
-                       dnRight = dnRight0;
+                            // Make the rectangle squeeze in the vertical direction
+                            for (int iy = vKernel.length - 1; iy > vParity - 1; iy--) {
+                                int upLeft  = upLeft0;
+                                int upRight = upRight0;
+                                int dnLeft  = dnLeft0;
+                                int dnRight = dnRight0;
 
-                       // Make the rectangle squeeze in the horizontal direction
-                       for (int ix = hKernel.length - 1 ; ix > hParity - 1 ; ix--) {
-                            kk = hKernel[ix]*vKernel[iy];
-                            sum += kk*((int)(srcData[upLeft] &0xffff) +
-                                       (int)(srcData[upRight]&0xffff) +
-                                       (int)(srcData[dnLeft] &0xffff) +
-                                       (int)(srcData[dnRight]&0xffff));
-                            upLeft += srcPixelStride;
-                            upRight -= srcPixelStride;
-                            dnLeft += srcPixelStride;
-                            dnRight -= srcPixelStride;
-                        } // ix
-                        upLeft0 += srcScanlineStride;   // down a row
-                        upRight0 += srcScanlineStride;
-                        dnLeft0 -= srcScanlineStride;   // up a row
-                        dnRight0 -= srcScanlineStride;
-                    } // iy
+                                // Make the rectangle squeeze in the horizontal direction
+                                for (int ix = hKernel.length - 1; ix > hParity - 1; ix--) {
+                                    float kk = hKernel[ix]*vKernel[iy];
+                                    sum += kk*((int)(srcData[upLeft] &0xffff) +
+                                               (int)(srcData[upRight]&0xffff) +
+                                               (int)(srcData[dnLeft] &0xffff) +
+                                               (int)(srcData[dnRight]&0xffff));
+                                    upLeft  += srcPixelStride;
+                                    upRight -= srcPixelStride;
+                                    dnLeft  += srcPixelStride;
+                                    dnRight -= srcPixelStride;
+                                } // ix
+                                upLeft0  += srcScanlineStride;   // down a row
+                                upRight0 += srcScanlineStride;
+                                dnLeft0  -= srcScanlineStride;   // up a row
+                                dnRight0 -= srcScanlineStride;
+                            } // iy
 
-                    // Compute the remaining 2-Fold symmetry portions
-                    // (across and down as needed)
+                            // Compute the remaining 2-Fold symmetry portions
+                            // (across and down as needed)
 
-                    // Loop down the center (hParity is odd)
-                    if (hParity == 1) {
-                        xUp = (xSrc + hKernel.length - 1)*srcPixelStride +
-                               ySrc*srcScanlineStride + srcScanlineOffset;
-                        xDown = xUp + stepDown;
-                        kInd = vKernel.length - 1;
-                        while (xUp < xDown) {
-                            kk = hCtr*vKernel[kInd--];
-                            sum += kk*((int)(srcData[xUp]  &0xffff) +
-                                       (int)(srcData[xDown]&0xffff));
-                            xUp += srcScanlineStride;
-                            xDown -= srcScanlineStride;
-                        }
-                    } // hParity
+                            // Loop down the center (hParity is odd)
+                            if (hParity == 1) {
+                                int xUp = (xSrc + hKernel.length - 1)*srcPixelStride +
+                                        ySrc*srcScanlineStride + srcScanlineOffset;
+                                int xDown = xUp + stepDown;
+                                int kInd = vKernel.length - 1;
+                                while (xUp < xDown) {
+                                    float kk = hCtr*vKernel[kInd--];
+                                    sum += kk*((int)(srcData[xUp]  &0xffff) +
+                                               (int)(srcData[xDown]&0xffff));
+                                    xUp   += srcScanlineStride;
+                                    xDown -= srcScanlineStride;
+                                }
+                            } // hParity
 
-                    // Loop across the center (vParity is odd), pick up the center if hParity was odd
-                    if (vParity == 1) {
-                        xLeft = xSrc*srcPixelStride +
-                            (ySrc + vKernel.length - 1)*srcScanlineStride +
-                            srcScanlineOffset;
-                        xRight = xLeft + stepRight;
-                        kInd = hKernel.length - 1;
-                        while (xLeft < xRight) {
-                            kk = vCtr*hKernel[kInd--];
-                            sum += kk*((int)(srcData[xLeft] &0xffff) +
-                                       (int)(srcData[xRight]&0xffff));
-                            xLeft += srcPixelStride;
-                            xRight -= srcPixelStride;
-                        } // while xLeft
+                            // Loop across the center (vParity is odd), pick up the center if hParity was odd
+                            if (vParity == 1) {
+                                int xLeft = xSrc*srcPixelStride +
+                                        (ySrc + vKernel.length - 1)*srcScanlineStride +
+                                        srcScanlineOffset;
+                                int xRight = xLeft + stepRight;
+                                int kInd = hKernel.length - 1;
+                                while (xLeft < xRight) {
+                                    float kk = vCtr*hKernel[kInd--];
+                                    sum += kk*((int)(srcData[xLeft] &0xffff) +
+                                               (int)(srcData[xRight]&0xffff));
+                                    xLeft  += srcPixelStride;
+                                    xRight -= srcPixelStride;
+                                } // while xLeft
 
-                        // Grab the center pixel if hParity was odd also
-                        if (hParity == 1) sum += vCtr*hCtr*(int)(srcData[xLeft]&0xffff);
+                                // Grab the center pixel if hParity was odd also
+                                if (hParity == 1) sum += vCtr*hCtr*(int)(srcData[xLeft]&0xffff);
 
-                    } // if vParity
-                    int val = (int)(sum + 0.5);
-                    dstData[dInd] = (short)(val > 0xffff ? 0xffff : (val < 0 ? 0 : val));
+                            } // if vParity
+                            int val = (int)(sum + 0.5);
+                            dstData[dInd] = (short)(val > 0xffff ? 0xffff : (val < 0 ? 0 : val));
 
-                    dInd += dstPixelStride;
-                } // for xSrc
+                            dInd += dstPixelStride;
+                        } // for xSrc
 
-                dstScanlineOffset += dstScanlineStride;
-
-            } // for ySrc
-
-        } // for band
-
-        return;
-
+                        dstScanlineOffset += dstScanlineStride;
+                    } // for ySrc
+                    return null;
+                }
+            });
+        }
+        try {
+            threadPool.invokeAll(processes);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            threadPool.shutdown();
+        }
     } // computeRectUShort
 
     /** <code>computeRectShort</code> filter subsamples short pixel data.
@@ -1003,129 +1032,138 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
     protected void computeRectShort(RasterAccessor src, RasterAccessor dst) {
 
         // Get dimensions.
-        int dwidth = dst.getWidth();
-        int dheight = dst.getHeight();
-        int dnumBands = dst.getNumBands();
+        final int dwidth = dst.getWidth();
+        final int dheight = dst.getHeight();
+        final int dnumBands = dst.getNumBands();
 
         // Get destination data array references and strides.
-        short dstDataArrays[][] = dst.getShortDataArrays();
-        int dstBandOffsets[] = dst.getBandOffsets();
-        int dstPixelStride = dst.getPixelStride();
-        int dstScanlineStride = dst.getScanlineStride();
+        final short dstDataArrays[][] = dst.getShortDataArrays();
+        final int dstBandOffsets[] = dst.getBandOffsets();
+        final int dstPixelStride = dst.getPixelStride();
+        final int dstScanlineStride = dst.getScanlineStride();
 
         // Get source data array references and strides.
-        short srcDataArrays[][] = src.getShortDataArrays();
-        int srcBandOffsets[] = src.getBandOffsets();
-        int srcPixelStride = src.getPixelStride();
-        int srcScanlineStride = src.getScanlineStride();
+        final short srcDataArrays[][] = src.getShortDataArrays();
+        final int srcBandOffsets[] = src.getBandOffsets();
+        final int srcPixelStride = src.getPixelStride();
+        final int srcScanlineStride = src.getScanlineStride();
 
         // Compute reused numbers
-	int kernelNx = 2*hKernel.length - hParity;
-	int kernelNy = 2*vKernel.length - vParity;
-	int stepDown = (kernelNy - 1)*srcScanlineStride;
-	int stepRight = (kernelNx - 1)*srcPixelStride;
+        int kernelNx = 2*hKernel.length - hParity;
+        int kernelNy = 2*vKernel.length - vParity;
+        int stepDown = (kernelNy - 1)*srcScanlineStride;
+        int stepRight = (kernelNx - 1)*srcPixelStride;
 
-	int upLeft, upRight, dnLeft, dnRight;
-	float kk;
-        float vCtr = vKernel[0];
-        float hCtr = hKernel[0];
-        int kInd, xLeft, xRight, xUp, xDown;
+        final float vCtr = vKernel[0];
+        final float hCtr = hKernel[0];
 
-        for (int band = 0; band < dnumBands ; band++)  {
-            short dstData[] = dstDataArrays[band];
-            short srcData[] = srcDataArrays[band];
-            int srcScanlineOffset = srcBandOffsets[band];
-            int dstScanlineOffset = dstBandOffsets[band];
+        ExecutorService threadPool = Executors.newFixedThreadPool(dnumBands);
+        Collection<Callable<Void>> processes = new LinkedList<Callable<Void>>();
+        for (int dstBand = 0; dstBand < dnumBands; dstBand++) {
+            final int band = dstBand;
+            processes.add(new Callable<Void>() {
+                @Override
+                public Void call() {
+                    short dstData[] = dstDataArrays[band];
+                    short srcData[] = srcDataArrays[band];
+                    int srcScanlineOffset = srcBandOffsets[band];
+                    int dstScanlineOffset = dstBandOffsets[band];
 
-            // Step over source raster coordinates
-            for (int ySrc = 0 ; ySrc < scaleY*dheight ; ySrc += scaleY) {
-                int dInd = dstScanlineOffset;
-                for (int xSrc = 0 ; xSrc < scaleX*dwidth ; xSrc += scaleX) {
+                    // Step over source raster coordinates
+                    for (int ySrc = 0 ; ySrc < scaleY*dheight ; ySrc += scaleY) {
+                        int dInd = dstScanlineOffset;
+                        for (int xSrc = 0 ; xSrc < scaleX*dwidth ; xSrc += scaleX) {
 
-                    int upLeft0 = xSrc*srcPixelStride + ySrc*srcScanlineStride + srcScanlineOffset;
-                    int upRight0 = upLeft0 + stepRight;
-                    int dnLeft0 = upLeft0 + stepDown;
-                    int dnRight0 = upRight0 + stepDown;
+                            int upLeft0 = xSrc*srcPixelStride + ySrc*srcScanlineStride + srcScanlineOffset;
+                            int upRight0 = upLeft0 + stepRight;
+                            int dnLeft0 = upLeft0 + stepDown;
+                            int dnRight0 = upRight0 + stepDown;
 
-                   // Exploit 4-fold symmetry
-                   float sum = 0;
+                            // Exploit 4-fold symmetry
+                            float sum = 0;
 
-                   // Make the rectangle squeeze in the vertical direction
-                   for (int iy = vKernel.length - 1 ; iy > vParity - 1 ; iy--) {
-                       upLeft = upLeft0;
-                       upRight = upRight0;
-                       dnLeft = dnLeft0;
-                       dnRight = dnRight0;
+                            // Make the rectangle squeeze in the vertical direction
+                            for (int iy = vKernel.length - 1 ; iy > vParity - 1 ; iy--) {
+                                int upLeft = upLeft0;
+                                int upRight = upRight0;
+                                int dnLeft = dnLeft0;
+                                int dnRight = dnRight0;
 
-                       // Make the rectangle squeeze in the horizontal direction
-                       for (int ix = hKernel.length - 1 ; ix > hParity - 1 ; ix--) {
-                            kk = hKernel[ix]*vKernel[iy];
-                            sum += kk*((int)(srcData[upLeft]) +
-                                       (int)(srcData[upRight]) +
-                                       (int)(srcData[dnLeft]) +
-                                       (int)(srcData[dnRight]));
-                            upLeft += srcPixelStride;
-                            upRight -= srcPixelStride;
-                            dnLeft += srcPixelStride;
-                            dnRight -= srcPixelStride;
-                        } // ix
-                        upLeft0 += srcScanlineStride;   // down a row
-                        upRight0 += srcScanlineStride;
-                        dnLeft0 -= srcScanlineStride;   // up a row
-                        dnRight0 -= srcScanlineStride;
-                    } // iy
+                                // Make the rectangle squeeze in the horizontal direction
+                                for (int ix = hKernel.length - 1 ; ix > hParity - 1 ; ix--) {
+                                    float kk = hKernel[ix]*vKernel[iy];
+                                    sum += kk*((int)(srcData[upLeft]) +
+                                            (int)(srcData[upRight]) +
+                                            (int)(srcData[dnLeft]) +
+                                            (int)(srcData[dnRight]));
+                                    upLeft += srcPixelStride;
+                                    upRight -= srcPixelStride;
+                                    dnLeft += srcPixelStride;
+                                    dnRight -= srcPixelStride;
+                                } // ix
+                                upLeft0 += srcScanlineStride;   // down a row
+                                upRight0 += srcScanlineStride;
+                                dnLeft0 -= srcScanlineStride;   // up a row
+                                dnRight0 -= srcScanlineStride;
+                            } // iy
 
-                    // Compute the remaining 2-Fold symmetry portions
-                    // (across and down as needed)
+                            // Compute the remaining 2-Fold symmetry portions
+                            // (across and down as needed)
 
-                    // Loop down the center (hParity is odd)
-                    if (hParity == 1) {
-                        xUp = (xSrc + hKernel.length - 1)*srcPixelStride +
-                               ySrc*srcScanlineStride + srcScanlineOffset;
-                        xDown = xUp + stepDown;
-                        kInd = vKernel.length - 1;
-                        while (xUp < xDown) {
-                            kk = hCtr*vKernel[kInd--];
-                            sum += kk*((int)(srcData[xUp]) +
-                                       (int)(srcData[xDown]));
-                            xUp += srcScanlineStride;
-                            xDown -= srcScanlineStride;
-                        }
-                    } // hParity
+                            // Loop down the center (hParity is odd)
+                            if (hParity == 1) {
+                                int xUp = (xSrc + hKernel.length - 1)*srcPixelStride +
+                                        ySrc*srcScanlineStride + srcScanlineOffset;
+                                int xDown = xUp + stepDown;
+                                int kInd = vKernel.length - 1;
+                                while (xUp < xDown) {
+                                    float kk = hCtr*vKernel[kInd--];
+                                    sum += kk*((int)(srcData[xUp]) +
+                                            (int)(srcData[xDown]));
+                                    xUp += srcScanlineStride;
+                                    xDown -= srcScanlineStride;
+                                }
+                            } // hParity
 
-                    // Loop across the center (vParity is odd), pick up the center if hParity was odd
-                    if (vParity == 1) {
-                        xLeft = xSrc*srcPixelStride +
-                            (ySrc + vKernel.length - 1)*srcScanlineStride +
-                            srcScanlineOffset;
-                        xRight = xLeft + stepRight;
-                        kInd = hKernel.length - 1;
-                        while (xLeft < xRight) {
-                            kk = vCtr*hKernel[kInd--];
-                            sum += kk*((int)(srcData[xLeft]) +
-                                       (int)(srcData[xRight]));
-                            xLeft += srcPixelStride;
-                            xRight -= srcPixelStride;
-                        } // while xLeft
+                            // Loop across the center (vParity is odd), pick up the center if hParity was odd
+                            if (vParity == 1) {
+                                int xLeft = xSrc*srcPixelStride +
+                                        (ySrc + vKernel.length - 1)*srcScanlineStride +
+                                        srcScanlineOffset;
+                                int xRight = xLeft + stepRight;
+                                int kInd = hKernel.length - 1;
+                                while (xLeft < xRight) {
+                                    float kk = vCtr*hKernel[kInd--];
+                                    sum += kk*((int)(srcData[xLeft]) +
+                                            (int)(srcData[xRight]));
+                                    xLeft += srcPixelStride;
+                                    xRight -= srcPixelStride;
+                                } // while xLeft
 
-                        // Grab the center pixel if hParity was odd also
-                        if (hParity == 1) sum += vCtr*hCtr*(int)(srcData[xLeft]);
+                                // Grab the center pixel if hParity was odd also
+                                if (hParity == 1) sum += vCtr*hCtr*(int)(srcData[xLeft]);
 
-                    } // if vParity
+                            } // if vParity
 
-                    dstData[dInd] = ImageUtil.clampShort((int)(sum + 0.5));
-                    dInd += dstPixelStride;
+                            dstData[dInd] = ImageUtil.clampShort((int)(sum + 0.5));
+                            dInd += dstPixelStride;
 
-                } // for xSrc
+                        } // for xSrc
 
-                dstScanlineOffset += dstScanlineStride;
+                        dstScanlineOffset += dstScanlineStride;
 
-            } // for ySrc
-
-        } // for band
-
-        return;
-
+                    } // for ySrc
+                    return null;
+                }
+            });
+        }
+        try {
+            threadPool.invokeAll(processes);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            threadPool.shutdown();
+        }
     } // computeRectShort
 
     /** <code>computeRectInt</code> filter subsamples int pixel data.
@@ -1136,125 +1174,134 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
     protected void computeRectInt(RasterAccessor src, RasterAccessor dst) {
 
         // Get dimensions.
-        int dwidth = dst.getWidth();
-        int dheight = dst.getHeight();
-        int dnumBands = dst.getNumBands();
+        final int dwidth = dst.getWidth();
+        final int dheight = dst.getHeight();
+        final int dnumBands = dst.getNumBands();
 
         // Get destination data array references and strides.
-        int dstDataArrays[][] = dst.getIntDataArrays();
-        int dstBandOffsets[] = dst.getBandOffsets();
-        int dstPixelStride = dst.getPixelStride();
-        int dstScanlineStride = dst.getScanlineStride();
+        final int dstDataArrays[][] = dst.getIntDataArrays();
+        final int dstBandOffsets[] = dst.getBandOffsets();
+        final int dstPixelStride = dst.getPixelStride();
+        final int dstScanlineStride = dst.getScanlineStride();
 
         // Get source data array references and strides.
-        int srcDataArrays[][] = src.getIntDataArrays();
-        int srcBandOffsets[] = src.getBandOffsets();
-        int srcPixelStride = src.getPixelStride();
-        int srcScanlineStride = src.getScanlineStride();
+        final int srcDataArrays[][] = src.getIntDataArrays();
+        final int srcBandOffsets[] = src.getBandOffsets();
+        final int srcPixelStride = src.getPixelStride();
+        final int srcScanlineStride = src.getScanlineStride();
 
         // Compute reused numbers
-	int kernelNx = 2*hKernel.length - hParity;
-	int kernelNy = 2*vKernel.length - vParity;
-	int stepDown = (kernelNy - 1)*srcScanlineStride;
-	int stepRight = (kernelNx - 1)*srcPixelStride;
+        final int kernelNx = 2*hKernel.length - hParity;
+        final int kernelNy = 2*vKernel.length - vParity;
+        final int stepDown = (kernelNy - 1)*srcScanlineStride;
+        final int stepRight = (kernelNx - 1)*srcPixelStride;
 
-	int upLeft, upRight, dnLeft, dnRight;
-	double kk;
-        double vCtr = (double)vKernel[0];
-        double hCtr = (double)hKernel[0];
-        int kInd, xLeft, xRight, xUp, xDown;
+        final double vCtr = (double)vKernel[0];
+        final double hCtr = (double)hKernel[0];
 
-        for (int band = 0; band < dnumBands ; band++)  {
-            int dstData[] = dstDataArrays[band];
-            int srcData[] = srcDataArrays[band];
-            int srcScanlineOffset = srcBandOffsets[band];
-            int dstScanlineOffset = dstBandOffsets[band];
+        ExecutorService threadPool = Executors.newFixedThreadPool(dnumBands);
+        Collection<Callable<Void>> processes = new LinkedList<Callable<Void>>();
+        for (int dstBand = 0; dstBand < dnumBands; dstBand++) {
+            final int band = dstBand;
+            processes.add(new Callable<Void>() {
+                @Override
+                public Void call() {
+                    int dstData[] = dstDataArrays[band];
+                    int srcData[] = srcDataArrays[band];
+                    int srcScanlineOffset = srcBandOffsets[band];
+                    int dstScanlineOffset = dstBandOffsets[band];
 
-            // Step over source raster coordinates
-            for (int ySrc = 0 ; ySrc < scaleY*dheight ; ySrc += scaleY) {
-                int dInd = dstScanlineOffset;
-                for (int xSrc = 0 ; xSrc < scaleX*dwidth ; xSrc += scaleX) {
+                    // Step over source raster coordinates
+                    for (int ySrc = 0 ; ySrc < scaleY*dheight ; ySrc += scaleY) {
+                        int dInd = dstScanlineOffset;
+                        for (int xSrc = 0 ; xSrc < scaleX*dwidth ; xSrc += scaleX) {
 
-                    int upLeft0 = xSrc*srcPixelStride + ySrc*srcScanlineStride + srcScanlineOffset;
-                    int upRight0 = upLeft0 + stepRight;
-                    int dnLeft0 = upLeft0 + stepDown;
-                    int dnRight0 = upRight0 + stepDown;
+                            int upLeft0 = xSrc*srcPixelStride + ySrc*srcScanlineStride + srcScanlineOffset;
+                            int upRight0 = upLeft0 + stepRight;
+                            int dnLeft0 = upLeft0 + stepDown;
+                            int dnRight0 = upRight0 + stepDown;
 
-                   // Exploit 4-fold symmetry
-                   double sum = 0;
+                            // Exploit 4-fold symmetry
+                            double sum = 0;
 
-                   // Make the rectangle squeeze in the vertical direction
-                   for (int iy = vKernel.length - 1 ; iy > vParity - 1 ; iy--) {
-                       upLeft = upLeft0;
-                       upRight = upRight0;
-                       dnLeft = dnLeft0;
-                       dnRight = dnRight0;
+                            // Make the rectangle squeeze in the vertical direction
+                            for (int iy = vKernel.length - 1 ; iy > vParity - 1 ; iy--) {
+                                int upLeft = upLeft0;
+                                int upRight = upRight0;
+                                int dnLeft = dnLeft0;
+                                int dnRight = dnRight0;
 
-                       // Make the rectangle squeeze in the horizontal direction
-                       for (int ix = hKernel.length - 1 ; ix > hParity - 1 ; ix--) {
-                            kk = hKernel[ix]*vKernel[iy];
-                            sum += kk*((long)srcData[upLeft] + (long)srcData[upRight] +
-                                       (long)srcData[dnLeft] + (long)srcData[dnRight]);
-                            upLeft += srcPixelStride;
-                            upRight -= srcPixelStride;
-                            dnLeft += srcPixelStride;
-                            dnRight -= srcPixelStride;
-                        } // ix
-                        upLeft0 += srcScanlineStride;   // down a row
-                        upRight0 += srcScanlineStride;
-                        dnLeft0 -= srcScanlineStride;   // up a row
-                        dnRight0 -= srcScanlineStride;
-                    } // iy
+                                // Make the rectangle squeeze in the horizontal direction
+                                for (int ix = hKernel.length - 1 ; ix > hParity - 1 ; ix--) {
+                                    double kk = hKernel[ix]*vKernel[iy];
+                                    sum += kk*((long)srcData[upLeft] + (long)srcData[upRight] +
+                                            (long)srcData[dnLeft] + (long)srcData[dnRight]);
+                                    upLeft += srcPixelStride;
+                                    upRight -= srcPixelStride;
+                                    dnLeft += srcPixelStride;
+                                    dnRight -= srcPixelStride;
+                                } // ix
+                                upLeft0 += srcScanlineStride;   // down a row
+                                upRight0 += srcScanlineStride;
+                                dnLeft0 -= srcScanlineStride;   // up a row
+                                dnRight0 -= srcScanlineStride;
+                            } // iy
 
-                    // Compute the remaining 2-Fold symmetry portions
-                    // (across and down as needed)
+                            // Compute the remaining 2-Fold symmetry portions
+                            // (across and down as needed)
 
-                    // Loop down the center (hParity is odd)
-                    if (hParity == 1) {
-                        xUp = (xSrc + hKernel.length - 1)*srcPixelStride +
-                               ySrc*srcScanlineStride + srcScanlineOffset;
-                        xDown = xUp + stepDown;
-                        kInd = vKernel.length - 1;
-                        while (xUp < xDown) {
-                            kk = hCtr*vKernel[kInd--];
-                            sum += kk*((long)srcData[xUp] + (long)srcData[xDown]);
-                            xUp += srcScanlineStride;
-                            xDown -= srcScanlineStride;
-                        }
-                    } // hParity
+                            // Loop down the center (hParity is odd)
+                            if (hParity == 1) {
+                                int xUp = (xSrc + hKernel.length - 1)*srcPixelStride +
+                                        ySrc*srcScanlineStride + srcScanlineOffset;
+                                int xDown = xUp + stepDown;
+                                int kInd = vKernel.length - 1;
+                                while (xUp < xDown) {
+                                    double kk = hCtr*vKernel[kInd--];
+                                    sum += kk*((long)srcData[xUp] + (long)srcData[xDown]);
+                                    xUp += srcScanlineStride;
+                                    xDown -= srcScanlineStride;
+                                }
+                            } // hParity
 
-                    // Loop across the center (vParity is odd), pick up the center if hParity was odd
-                    if (vParity == 1) {
-                        xLeft = xSrc*srcPixelStride +
-                            (ySrc + vKernel.length - 1)*srcScanlineStride +
-                            srcScanlineOffset;
-                        xRight = xLeft + stepRight;
-                        kInd = hKernel.length - 1;
-                        while (xLeft < xRight) {
-                            kk = vCtr*hKernel[kInd--];
-                            sum += kk*((long)(srcData[xLeft]) + (long)(srcData[xRight]));
-                            xLeft += srcPixelStride;
-                            xRight -= srcPixelStride;
-                        } // while xLeft
+                            // Loop across the center (vParity is odd), pick up the center if hParity was odd
+                            if (vParity == 1) {
+                                int xLeft = xSrc*srcPixelStride +
+                                        (ySrc + vKernel.length - 1)*srcScanlineStride +
+                                        srcScanlineOffset;
+                                int xRight = xLeft + stepRight;
+                                int kInd = hKernel.length - 1;
+                                while (xLeft < xRight) {
+                                    double kk = vCtr*hKernel[kInd--];
+                                    sum += kk*((long)(srcData[xLeft]) + (long)(srcData[xRight]));
+                                    xLeft += srcPixelStride;
+                                    xRight -= srcPixelStride;
+                                } // while xLeft
 
-                        // Grab the center pixel if hParity was odd also
-                        if (hParity == 1) sum += vCtr*hCtr*((long)srcData[xLeft]);
+                                // Grab the center pixel if hParity was odd also
+                                if (hParity == 1) sum += vCtr*hCtr*((long)srcData[xLeft]);
 
-                    } // if vParity
+                            } // if vParity
 
-                    dstData[dInd] = ImageUtil.clampInt((int)(sum + 0.5));
+                            dstData[dInd] = ImageUtil.clampInt((int)(sum + 0.5));
 
-                    dInd += dstPixelStride;
-                } // for xSrc
+                            dInd += dstPixelStride;
+                        } // for xSrc
 
-                dstScanlineOffset += dstScanlineStride;
+                        dstScanlineOffset += dstScanlineStride;
 
-            } // for ySrc
-
-        } // for band
-
-        return;
-
+                    } // for ySrc
+                    return null;
+                }
+            });
+        }
+        try {
+            threadPool.invokeAll(processes);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            threadPool.shutdown();
+        }
     } // computeRectInt
 
     /** <code>computeRectFloat</code> filter subsamples float pixel data.
@@ -1265,125 +1312,134 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
     protected void computeRectFloat(RasterAccessor src, RasterAccessor dst) {
 
         // Get dimensions.
-        int dwidth = dst.getWidth();
-        int dheight = dst.getHeight();
-        int dnumBands = dst.getNumBands();
+        final int dwidth = dst.getWidth();
+        final int dheight = dst.getHeight();
+        final int dnumBands = dst.getNumBands();
 
         // Get destination data array references and strides.
-        float dstDataArrays[][] = dst.getFloatDataArrays();
-        int dstBandOffsets[] = dst.getBandOffsets();
-        int dstPixelStride = dst.getPixelStride();
-        int dstScanlineStride = dst.getScanlineStride();
+        final float dstDataArrays[][] = dst.getFloatDataArrays();
+        final int dstBandOffsets[] = dst.getBandOffsets();
+        final int dstPixelStride = dst.getPixelStride();
+        final int dstScanlineStride = dst.getScanlineStride();
 
         // Get source data array references and strides.
-        float srcDataArrays[][] = src.getFloatDataArrays();
-        int srcBandOffsets[] = src.getBandOffsets();
-        int srcPixelStride = src.getPixelStride();
-        int srcScanlineStride = src.getScanlineStride();
+        final float srcDataArrays[][] = src.getFloatDataArrays();
+        final int srcBandOffsets[] = src.getBandOffsets();
+        final int srcPixelStride = src.getPixelStride();
+        final int srcScanlineStride = src.getScanlineStride();
 
         // Compute reused numbers
-	int kernelNx = 2*hKernel.length - hParity;
-	int kernelNy = 2*vKernel.length - vParity;
-	int stepDown = (kernelNy - 1)*srcScanlineStride;
-	int stepRight = (kernelNx - 1)*srcPixelStride;
+        final int kernelNx = 2*hKernel.length - hParity;
+        final int kernelNy = 2*vKernel.length - vParity;
+        final int stepDown = (kernelNy - 1)*srcScanlineStride;
+        final int stepRight = (kernelNx - 1)*srcPixelStride;
 
-	int upLeft, upRight, dnLeft, dnRight;
-	double kk;
-        double vCtr = (double)vKernel[0];
-        double hCtr = (double)hKernel[0];
-        int kInd, xLeft, xRight, xUp, xDown;
+        final double vCtr = (double)vKernel[0];
+        final double hCtr = (double)hKernel[0];
 
-        for (int band = 0; band < dnumBands ; band++)  {
-            float dstData[] = dstDataArrays[band];
-            float srcData[] = srcDataArrays[band];
-            int srcScanlineOffset = srcBandOffsets[band];
-            int dstScanlineOffset = dstBandOffsets[band];
+        ExecutorService threadPool = Executors.newFixedThreadPool(dnumBands);
+        Collection<Callable<Void>> processes = new LinkedList<Callable<Void>>();
+        for (int dstBand = 0; dstBand < dnumBands; dstBand++) {
+            final int band = dstBand;
+            processes.add(new Callable<Void>() {
+                @Override
+                public Void call() {
+                    float dstData[] = dstDataArrays[band];
+                    float srcData[] = srcDataArrays[band];
+                    int srcScanlineOffset = srcBandOffsets[band];
+                    int dstScanlineOffset = dstBandOffsets[band];
 
-            // Step over source raster coordinates
-            for (int ySrc = 0 ; ySrc < scaleY*dheight ; ySrc += scaleY) {
-                int dInd = dstScanlineOffset;
-                for (int xSrc = 0 ; xSrc < scaleX*dwidth ; xSrc += scaleX) {
+                    // Step over source raster coordinates
+                    for (int ySrc = 0 ; ySrc < scaleY*dheight ; ySrc += scaleY) {
+                        int dInd = dstScanlineOffset;
+                        for (int xSrc = 0 ; xSrc < scaleX*dwidth ; xSrc += scaleX) {
 
-                    int upLeft0 = xSrc*srcPixelStride + ySrc*srcScanlineStride + srcScanlineOffset;
-                    int upRight0 = upLeft0 + stepRight;
-                    int dnLeft0 = upLeft0 + stepDown;
-                    int dnRight0 = upRight0 + stepDown;
+                            int upLeft0 = xSrc*srcPixelStride + ySrc*srcScanlineStride + srcScanlineOffset;
+                            int upRight0 = upLeft0 + stepRight;
+                            int dnLeft0 = upLeft0 + stepDown;
+                            int dnRight0 = upRight0 + stepDown;
 
-                   // Exploit 4-fold symmetry
-                   double sum = 0;
+                            // Exploit 4-fold symmetry
+                            double sum = 0;
 
-                   // Make the rectangle squeeze in the vertical direction
-                   for (int iy = vKernel.length - 1 ; iy > vParity - 1 ; iy--) {
-                       upLeft = upLeft0;
-                       upRight = upRight0;
-                       dnLeft = dnLeft0;
-                       dnRight = dnRight0;
+                            // Make the rectangle squeeze in the vertical direction
+                            for (int iy = vKernel.length - 1 ; iy > vParity - 1 ; iy--) {
+                                int upLeft = upLeft0;
+                                int upRight = upRight0;
+                                int dnLeft = dnLeft0;
+                                int dnRight = dnRight0;
 
-                       // Make the rectangle squeeze in the horizontal direction
-                       for (int ix = hKernel.length - 1 ; ix > hParity - 1 ; ix--) {
-                            kk = hKernel[ix]*vKernel[iy];
-                            sum += kk*((double)srcData[upLeft] + (double)srcData[upRight] +
-                                       (double)srcData[dnLeft] + (double)srcData[dnRight]);
-                            upLeft += srcPixelStride;
-                            upRight -= srcPixelStride;
-                            dnLeft += srcPixelStride;
-                            dnRight -= srcPixelStride;
-                        } // ix
-                        upLeft0 += srcScanlineStride;   // down a row
-                        upRight0 += srcScanlineStride;
-                        dnLeft0 -= srcScanlineStride;   // up a row
-                        dnRight0 -= srcScanlineStride;
-                    } // iy
+                                // Make the rectangle squeeze in the horizontal direction
+                                for (int ix = hKernel.length - 1 ; ix > hParity - 1 ; ix--) {
+                                    double kk = hKernel[ix]*vKernel[iy];
+                                    sum += kk*((double)srcData[upLeft] + (double)srcData[upRight] +
+                                            (double)srcData[dnLeft] + (double)srcData[dnRight]);
+                                    upLeft += srcPixelStride;
+                                    upRight -= srcPixelStride;
+                                    dnLeft += srcPixelStride;
+                                    dnRight -= srcPixelStride;
+                                } // ix
+                                upLeft0 += srcScanlineStride;   // down a row
+                                upRight0 += srcScanlineStride;
+                                dnLeft0 -= srcScanlineStride;   // up a row
+                                dnRight0 -= srcScanlineStride;
+                            } // iy
 
-                    // Compute the remaining 2-Fold symmetry portions
-                    // (across and down as needed)
+                            // Compute the remaining 2-Fold symmetry portions
+                            // (across and down as needed)
 
-                    // Loop down the center (hParity is odd)
-                    if (hParity == 1) {
-                        xUp = (xSrc + hKernel.length - 1)*srcPixelStride +
-                               ySrc*srcScanlineStride + srcScanlineOffset;
-                        xDown = xUp + stepDown;
-                        kInd = vKernel.length - 1;
-                        while (xUp < xDown) {
-                            kk = hCtr*vKernel[kInd--];
-                            sum += kk*((double)srcData[xUp] + (double)srcData[xDown]);
-                            xUp += srcScanlineStride;
-                            xDown -= srcScanlineStride;
-                        }
-                    } // hParity
+                            // Loop down the center (hParity is odd)
+                            if (hParity == 1) {
+                                int xUp = (xSrc + hKernel.length - 1)*srcPixelStride +
+                                        ySrc*srcScanlineStride + srcScanlineOffset;
+                                int xDown = xUp + stepDown;
+                                int kInd = vKernel.length - 1;
+                                while (xUp < xDown) {
+                                    double kk = hCtr*vKernel[kInd--];
+                                    sum += kk*((double)srcData[xUp] + (double)srcData[xDown]);
+                                    xUp += srcScanlineStride;
+                                    xDown -= srcScanlineStride;
+                                }
+                            } // hParity
 
-                    // Loop across the center (vParity is odd), pick up the center if hParity was odd
-                    if (vParity == 1) {
-                        xLeft = xSrc*srcPixelStride +
-                            (ySrc + vKernel.length - 1)*srcScanlineStride +
-                            srcScanlineOffset;
-                        xRight = xLeft + stepRight;
-                        kInd = hKernel.length - 1;
-                        while (xLeft < xRight) {
-                            kk = vCtr*hKernel[kInd--];
-                            sum += kk*((double)(srcData[xLeft]) + (double)(srcData[xRight]));
-                            xLeft += srcPixelStride;
-                            xRight -= srcPixelStride;
-                        } // while xLeft
+                            // Loop across the center (vParity is odd), pick up the center if hParity was odd
+                            if (vParity == 1) {
+                                int xLeft = xSrc*srcPixelStride +
+                                        (ySrc + vKernel.length - 1)*srcScanlineStride +
+                                        srcScanlineOffset;
+                                int xRight = xLeft + stepRight;
+                                int kInd = hKernel.length - 1;
+                                while (xLeft < xRight) {
+                                    double kk = vCtr*hKernel[kInd--];
+                                    sum += kk*((double)(srcData[xLeft]) + (double)(srcData[xRight]));
+                                    xLeft += srcPixelStride;
+                                    xRight -= srcPixelStride;
+                                } // while xLeft
 
-                        // Grab the center pixel if hParity was odd also
-                        if (hParity == 1) sum += vCtr*hCtr*((double)srcData[xLeft]);
+                                // Grab the center pixel if hParity was odd also
+                                if (hParity == 1) sum += vCtr*hCtr*((double)srcData[xLeft]);
 
-                    } // if vParity
+                            } // if vParity
 
-                    dstData[dInd] = ImageUtil.clampFloat(sum);
+                            dstData[dInd] = ImageUtil.clampFloat(sum);
 
-                    dInd += dstPixelStride;
-                } // for xSrc
+                            dInd += dstPixelStride;
+                        } // for xSrc
 
-                dstScanlineOffset += dstScanlineStride;
+                        dstScanlineOffset += dstScanlineStride;
 
-            } // for ySrc
-
-        } // for band
-
-        return;
-
+                    } // for ySrc
+                    return null;
+                }
+            });
+        }
+        try {
+            threadPool.invokeAll(processes);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            threadPool.shutdown();
+        }
     } // computeRectFloat
 
     /** <code>computeRectDouble</code> filter subsamples double pixel data.
@@ -1394,125 +1450,134 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
     protected void computeRectDouble(RasterAccessor src, RasterAccessor dst) {
 
         // Get dimensions.
-        int dwidth = dst.getWidth();
-        int dheight = dst.getHeight();
-        int dnumBands = dst.getNumBands();
+        final int dwidth = dst.getWidth();
+        final int dheight = dst.getHeight();
+        final int dnumBands = dst.getNumBands();
 
         // Get destination data array references and strides.
-        double dstDataArrays[][] = dst.getDoubleDataArrays();
-        int dstBandOffsets[] = dst.getBandOffsets();
-        int dstPixelStride = dst.getPixelStride();
-        int dstScanlineStride = dst.getScanlineStride();
+        final double dstDataArrays[][] = dst.getDoubleDataArrays();
+        final int dstBandOffsets[] = dst.getBandOffsets();
+        final int dstPixelStride = dst.getPixelStride();
+        final int dstScanlineStride = dst.getScanlineStride();
 
         // Get source data array references and strides.
-        double srcDataArrays[][] = src.getDoubleDataArrays();
-        int srcBandOffsets[] = src.getBandOffsets();
-        int srcPixelStride = src.getPixelStride();
-        int srcScanlineStride = src.getScanlineStride();
+        final double srcDataArrays[][] = src.getDoubleDataArrays();
+        final int srcBandOffsets[] = src.getBandOffsets();
+        final int srcPixelStride = src.getPixelStride();
+        final int srcScanlineStride = src.getScanlineStride();
 
         // Compute reused numbers
-	int kernelNx = 2*hKernel.length - hParity;
-	int kernelNy = 2*vKernel.length - vParity;
-	int stepDown = (kernelNy - 1)*srcScanlineStride;
-	int stepRight = (kernelNx - 1)*srcPixelStride;
+        final int kernelNx = 2*hKernel.length - hParity;
+        final int kernelNy = 2*vKernel.length - vParity;
+        final int stepDown = (kernelNy - 1)*srcScanlineStride;
+        final int stepRight = (kernelNx - 1)*srcPixelStride;
 
-	int upLeft, upRight, dnLeft, dnRight;
-	double kk;
-        double vCtr = (double)vKernel[0];
-        double hCtr = (double)hKernel[0];
-        int kInd, xLeft, xRight, xUp, xDown;
+        final double vCtr = (double)vKernel[0];
+        final double hCtr = (double)hKernel[0];
+ 
+        ExecutorService threadPool = Executors.newFixedThreadPool(dnumBands);
+        Collection<Callable<Void>> processes = new LinkedList<Callable<Void>>();
+        for (int dstBand = 0; dstBand < dnumBands; dstBand++) {
+            final int band = dstBand;
+            processes.add(new Callable<Void>() {
+                @Override
+                public Void call() {
+                    double dstData[] = dstDataArrays[band];
+                    double srcData[] = srcDataArrays[band];
+                    int srcScanlineOffset = srcBandOffsets[band];
+                    int dstScanlineOffset = dstBandOffsets[band];
 
-        for (int band = 0; band < dnumBands ; band++)  {
-            double dstData[] = dstDataArrays[band];
-            double srcData[] = srcDataArrays[band];
-            int srcScanlineOffset = srcBandOffsets[band];
-            int dstScanlineOffset = dstBandOffsets[band];
+                    // Step over source raster coordinates
+                    for (int ySrc = 0 ; ySrc < scaleY*dheight ; ySrc += scaleY) {
+                        int dInd = dstScanlineOffset;
+                        for (int xSrc = 0 ; xSrc < scaleX*dwidth ; xSrc += scaleX) {
 
-            // Step over source raster coordinates
-            for (int ySrc = 0 ; ySrc < scaleY*dheight ; ySrc += scaleY) {
-                int dInd = dstScanlineOffset;
-                for (int xSrc = 0 ; xSrc < scaleX*dwidth ; xSrc += scaleX) {
+                            int upLeft0 = xSrc*srcPixelStride + ySrc*srcScanlineStride + srcScanlineOffset;
+                            int upRight0 = upLeft0 + stepRight;
+                            int dnLeft0 = upLeft0 + stepDown;
+                            int dnRight0 = upRight0 + stepDown;
 
-                    int upLeft0 = xSrc*srcPixelStride + ySrc*srcScanlineStride + srcScanlineOffset;
-                    int upRight0 = upLeft0 + stepRight;
-                    int dnLeft0 = upLeft0 + stepDown;
-                    int dnRight0 = upRight0 + stepDown;
+                            // Exploit 4-fold symmetry
+                            double sum = 0;
 
-                   // Exploit 4-fold symmetry
-                   double sum = 0;
+                            // Make the rectangle squeeze in the vertical direction
+                            for (int iy = vKernel.length - 1 ; iy > vParity - 1 ; iy--) {
+                                int upLeft = upLeft0;
+                                int upRight = upRight0;
+                                int dnLeft = dnLeft0;
+                                int dnRight = dnRight0;
 
-                   // Make the rectangle squeeze in the vertical direction
-                   for (int iy = vKernel.length - 1 ; iy > vParity - 1 ; iy--) {
-                       upLeft = upLeft0;
-                       upRight = upRight0;
-                       dnLeft = dnLeft0;
-                       dnRight = dnRight0;
+                                // Make the rectangle squeeze in the horizontal direction
+                                for (int ix = hKernel.length - 1 ; ix > hParity - 1 ; ix--) {
+                                    double kk = hKernel[ix]*vKernel[iy];
+                                    sum += kk*(srcData[upLeft] + srcData[upRight] +
+                                            srcData[dnLeft] + srcData[dnRight]);
+                                    upLeft += srcPixelStride;
+                                    upRight -= srcPixelStride;
+                                    dnLeft += srcPixelStride;
+                                    dnRight -= srcPixelStride;
+                                } // ix
+                                upLeft0 += srcScanlineStride;   // down a row
+                                upRight0 += srcScanlineStride;
+                                dnLeft0 -= srcScanlineStride;   // up a row
+                                dnRight0 -= srcScanlineStride;
+                            } // iy
 
-                       // Make the rectangle squeeze in the horizontal direction
-                       for (int ix = hKernel.length - 1 ; ix > hParity - 1 ; ix--) {
-                            kk = hKernel[ix]*vKernel[iy];
-                            sum += kk*(srcData[upLeft] + srcData[upRight] +
-                                       srcData[dnLeft] + srcData[dnRight]);
-                            upLeft += srcPixelStride;
-                            upRight -= srcPixelStride;
-                            dnLeft += srcPixelStride;
-                            dnRight -= srcPixelStride;
-                        } // ix
-                        upLeft0 += srcScanlineStride;   // down a row
-                        upRight0 += srcScanlineStride;
-                        dnLeft0 -= srcScanlineStride;   // up a row
-                        dnRight0 -= srcScanlineStride;
-                    } // iy
+                            // Compute the remaining 2-Fold symmetry portions
+                            // (across and down as needed)
 
-                    // Compute the remaining 2-Fold symmetry portions
-                    // (across and down as needed)
+                            // Loop down the center (hParity is odd)
+                            if (hParity == 1) {
+                                int xUp = (xSrc + hKernel.length - 1)*srcPixelStride +
+                                        ySrc*srcScanlineStride + srcScanlineOffset;
+                                int xDown = xUp + stepDown;
+                                int kInd = vKernel.length - 1;
+                                while (xUp < xDown) {
+                                    double kk = hCtr*vKernel[kInd--];
+                                    sum += kk*(srcData[xUp] + srcData[xDown]);
+                                    xUp += srcScanlineStride;
+                                    xDown -= srcScanlineStride;
+                                }
+                            } // hParity
 
-                    // Loop down the center (hParity is odd)
-                    if (hParity == 1) {
-                        xUp = (xSrc + hKernel.length - 1)*srcPixelStride +
-                               ySrc*srcScanlineStride + srcScanlineOffset;
-                        xDown = xUp + stepDown;
-                        kInd = vKernel.length - 1;
-                        while (xUp < xDown) {
-                            kk = hCtr*vKernel[kInd--];
-                            sum += kk*(srcData[xUp] + srcData[xDown]);
-                            xUp += srcScanlineStride;
-                            xDown -= srcScanlineStride;
-                        }
-                    } // hParity
+                            // Loop across the center (vParity is odd), pick up the center if hParity was odd
+                            if (vParity == 1) {
+                                int xLeft = xSrc*srcPixelStride +
+                                        (ySrc + vKernel.length - 1)*srcScanlineStride +
+                                        srcScanlineOffset;
+                                int xRight = xLeft + stepRight;
+                                int kInd = hKernel.length - 1;
+                                while (xLeft < xRight) {
+                                    double kk = vCtr*hKernel[kInd--];
+                                    sum += kk*(srcData[xLeft] + srcData[xRight]);
+                                    xLeft += srcPixelStride;
+                                    xRight -= srcPixelStride;
+                                } // while xLeft
 
-                    // Loop across the center (vParity is odd), pick up the center if hParity was odd
-                    if (vParity == 1) {
-                        xLeft = xSrc*srcPixelStride +
-                            (ySrc + vKernel.length - 1)*srcScanlineStride +
-                            srcScanlineOffset;
-                        xRight = xLeft + stepRight;
-                        kInd = hKernel.length - 1;
-                        while (xLeft < xRight) {
-                            kk = vCtr*hKernel[kInd--];
-                            sum += kk*(srcData[xLeft] + srcData[xRight]);
-                            xLeft += srcPixelStride;
-                            xRight -= srcPixelStride;
-                        } // while xLeft
+                                // Grab the center pixel if hParity was odd also
+                                if (hParity == 1) sum += vCtr*hCtr*srcData[xLeft];
 
-                        // Grab the center pixel if hParity was odd also
-                        if (hParity == 1) sum += vCtr*hCtr*srcData[xLeft];
+                            } // if vParity
 
-                    } // if vParity
+                            dstData[dInd] = sum;
 
-                    dstData[dInd] = sum;
+                            dInd += dstPixelStride;
+                        } // for xSrc
 
-                    dInd += dstPixelStride;
-                } // for xSrc
+                        dstScanlineOffset += dstScanlineStride;
 
-                dstScanlineOffset += dstScanlineStride;
-
-            } // for ySrc
-
-        } // for band
-
-        return;
-
+                    } // for ySrc
+                    return null;
+                }
+            });
+        }
+        try {
+            threadPool.invokeAll(processes);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            threadPool.shutdown();
+        }
     } // computeRectDouble
 
 } // class FilteredSubsampleOpImage

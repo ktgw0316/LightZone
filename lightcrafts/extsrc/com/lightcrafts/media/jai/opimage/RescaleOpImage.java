@@ -15,11 +15,19 @@ import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
+
 import com.lightcrafts.mediax.jai.ColormapOpImage;
 import com.lightcrafts.mediax.jai.ImageLayout;
 import com.lightcrafts.mediax.jai.RasterAccessor;
 import com.lightcrafts.mediax.jai.RasterFormatTag;
+
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import com.lightcrafts.media.jai.util.ImageUtil;
 
 /**
@@ -166,7 +174,7 @@ final class RescaleOpImage extends ColormapOpImage {
                                                 formatTags[1], getColorModel());
         RasterAccessor src = new RasterAccessor(sources[0], srcRect,  
                                                 formatTags[0], 
-                                                getSource(0).getColorModel());
+                                                getSourceImage(0).getColorModel());
 
         switch (dst.getDataType()) {
         case DataBuffer.TYPE_BYTE:
@@ -198,258 +206,352 @@ final class RescaleOpImage extends ColormapOpImage {
 
     private void computeRectByte(RasterAccessor src,
                                  RasterAccessor dst) {
-        int dstWidth = dst.getWidth();
-        int dstHeight = dst.getHeight();
-        int dstBands = dst.getNumBands();
+        final int dstWidth = dst.getWidth();
+        final int dstHeight = dst.getHeight();
+        final int dstBands = dst.getNumBands();
 
-        int dstLineStride = dst.getScanlineStride();
-        int dstPixelStride = dst.getPixelStride();
-        int[] dstBandOffsets = dst.getBandOffsets();
-        byte[][] dstData = dst.getByteDataArrays();
+        final int dstLineStride = dst.getScanlineStride();
+        final int dstPixelStride = dst.getPixelStride();
+        final int[] dstBandOffsets = dst.getBandOffsets();
+        final byte[][] dstData = dst.getByteDataArrays();
 
-        int srcLineStride = src.getScanlineStride();
-        int srcPixelStride = src.getPixelStride();
-        int[] srcBandOffsets = src.getBandOffsets();
-        byte[][] srcData = src.getByteDataArrays();
+        final int srcLineStride = src.getScanlineStride();
+        final int srcPixelStride = src.getPixelStride();
+        final int[] srcBandOffsets = src.getBandOffsets();
+        final byte[][] srcData = src.getByteDataArrays();
 
-	initByteTable();
+        initByteTable();
 
-        for (int b = 0; b < dstBands; b++) {
-            byte[] d = dstData[b];
-            byte[] s = srcData[b];
+        ExecutorService threadPool = Executors.newFixedThreadPool(dstBands);
+        Collection<Callable<Void>> processes = new LinkedList<Callable<Void>>();
+        for (int band = 0; band < dstBands; band++) {
+            final int b = band;
+            processes.add(new Callable<Void>() {
+                @Override
+                public Void call() {
+                    final byte[] s = srcData[b];
+                    byte[] d = dstData[b];
 
-            int dstLineOffset = dstBandOffsets[b];
-            int srcLineOffset = srcBandOffsets[b];
+                    int dstLineOffset = dstBandOffsets[b];
+                    int srcLineOffset = srcBandOffsets[b];
 
-	    byte[] clamp = byteTable[b];
-	    double c = constants[b];
-	    double o = offsets[b];
+                    byte[] clamp = byteTable[b];
 
-            for (int h = 0; h < dstHeight; h++) {
-                int dstPixelOffset = dstLineOffset;
-                int srcPixelOffset = srcLineOffset;
+                    for (int h = 0; h < dstHeight; h++) {
+                        int dstPixelOffset = dstLineOffset;
+                        int srcPixelOffset = srcLineOffset;
 
-                dstLineOffset += dstLineStride;
-                srcLineOffset += srcLineStride;
+                        dstLineOffset += dstLineStride;
+                        srcLineOffset += srcLineStride;
 
-                for (int w = 0; w < dstWidth; w++) {
-                    d[dstPixelOffset] = clamp[s[srcPixelOffset] & 0xFF];
+                        for (int w = 0; w < dstWidth; w++) {
+                            d[dstPixelOffset] = clamp[s[srcPixelOffset] & 0xFF];
 
-                    dstPixelOffset += dstPixelStride;
-                    srcPixelOffset += srcPixelStride;
+                            dstPixelOffset += dstPixelStride;
+                            srcPixelOffset += srcPixelStride;
+                        }
+                    }
+                    return null;
                 }
-            }
+            });
+        }
+        try {
+            threadPool.invokeAll(processes);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            threadPool.shutdown();
         }
     }
-    
+
     private void computeRectUShort(RasterAccessor src,
                                    RasterAccessor dst) {
-        int dstWidth = dst.getWidth();
-        int dstHeight = dst.getHeight();
-        int dstBands = dst.getNumBands();
+        final int dstWidth = dst.getWidth();
+        final int dstHeight = dst.getHeight();
+        final int dstBands = dst.getNumBands();
 
-        int dstLineStride = dst.getScanlineStride();
-        int dstPixelStride = dst.getPixelStride();
-        int[] dstBandOffsets = dst.getBandOffsets();
-        short[][] dstData = dst.getShortDataArrays();
+        final int dstLineStride = dst.getScanlineStride();
+        final int dstPixelStride = dst.getPixelStride();
+        final int[] dstBandOffsets = dst.getBandOffsets();
+        final short[][] dstData = dst.getShortDataArrays();
 
-        int srcLineStride = src.getScanlineStride();
-        int srcPixelStride = src.getPixelStride();
-        int[] srcBandOffsets = src.getBandOffsets();
-        short[][] srcData = src.getShortDataArrays();
+        final int srcLineStride = src.getScanlineStride();
+        final int srcPixelStride = src.getPixelStride();
+        final int[] srcBandOffsets = src.getBandOffsets();
+        final short[][] srcData = src.getShortDataArrays();
 
-        for (int b = 0; b < dstBands; b++) {
-            float c = (float)constants[b];
-            float o = (float)offsets[b];
-            short[] d = dstData[b];
-            short[] s = srcData[b];
+        ExecutorService threadPool = Executors.newFixedThreadPool(dstBands);
+        Collection<Callable<Void>> processes = new LinkedList<Callable<Void>>();
+        for (int band = 0; band < dstBands; band++) {
+            final int b = band;
+            processes.add(new Callable<Void>() {
+                @Override
+                public Void call() {
+                    final float c = (float)constants[b];
+                    final float o = (float)offsets[b];
+                    final short[] s = srcData[b];
+                    short[] d = dstData[b];
 
-            int dstLineOffset = dstBandOffsets[b];
-            int srcLineOffset = srcBandOffsets[b];
+                    int dstLineOffset = dstBandOffsets[b];
+                    int srcLineOffset = srcBandOffsets[b];
 
-            for (int h = 0; h < dstHeight; h++) {
-                int dstPixelOffset = dstLineOffset;
-                int srcPixelOffset = srcLineOffset;
+                    for (int h = 0; h < dstHeight; h++) {
+                        int dstPixelOffset = dstLineOffset;
+                        int srcPixelOffset = srcLineOffset;
 
-                dstLineOffset += dstLineStride;
-                srcLineOffset += srcLineStride;
+                        dstLineOffset += dstLineStride;
+                        srcLineOffset += srcLineStride;
 
-                for (int w = 0; w < dstWidth; w++) {
-                    d[dstPixelOffset] = ImageUtil.clampRoundUShort(
-                                        (s[srcPixelOffset] & 0xFFFF) * c + o);
+                        for (int w = 0; w < dstWidth; w++) {
+                            d[dstPixelOffset] = ImageUtil.clampRoundUShort(
+                                    (s[srcPixelOffset] & 0xFFFF) * c + o);
 
-                    dstPixelOffset += dstPixelStride;
-                    srcPixelOffset += srcPixelStride;
+                            dstPixelOffset += dstPixelStride;
+                            srcPixelOffset += srcPixelStride;
+                        }
+                    }
+                    return null;
                 }
-            }
+            });
+        }
+        try {
+            threadPool.invokeAll(processes);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            threadPool.shutdown();
         }
     }
 
     private void computeRectShort(RasterAccessor src,
                                   RasterAccessor dst) {
-        int dstWidth = dst.getWidth();
-        int dstHeight = dst.getHeight();
-        int dstBands = dst.getNumBands();
+        final int dstWidth = dst.getWidth();
+        final int dstHeight = dst.getHeight();
+        final int dstBands = dst.getNumBands();
 
-        int dstLineStride = dst.getScanlineStride();
-        int dstPixelStride = dst.getPixelStride();
-        int[] dstBandOffsets = dst.getBandOffsets();
-        short[][] dstData = dst.getShortDataArrays();
+        final int dstLineStride = dst.getScanlineStride();
+        final int dstPixelStride = dst.getPixelStride();
+        final int[] dstBandOffsets = dst.getBandOffsets();
+        final short[][] dstData = dst.getShortDataArrays();
 
-        int srcLineStride = src.getScanlineStride();
-        int srcPixelStride = src.getPixelStride();
-        int[] srcBandOffsets = src.getBandOffsets();
-        short[][] srcData = src.getShortDataArrays();
+        final int srcLineStride = src.getScanlineStride();
+        final int srcPixelStride = src.getPixelStride();
+        final int[] srcBandOffsets = src.getBandOffsets();
+        final short[][] srcData = src.getShortDataArrays();
 
-        for (int b = 0; b < dstBands; b++) {
-            float c = (float)constants[b];
-            float o = (float)offsets[b];
-            short[] d = dstData[b];
-            short[] s = srcData[b];
+        ExecutorService threadPool = Executors.newFixedThreadPool(dstBands);
+        Collection<Callable<Void>> processes = new LinkedList<Callable<Void>>();
+        for (int band = 0; band < dstBands; band++) {
+            final int b = band;
+            processes.add(new Callable<Void>() {
+                @Override
+                public Void call() {
+                    final float c = (float)constants[b];
+                    final float o = (float)offsets[b];
+                    final short[] s = srcData[b];
+                    short[] d = dstData[b];
 
-            int dstLineOffset = dstBandOffsets[b];
-            int srcLineOffset = srcBandOffsets[b];
+                    int dstLineOffset = dstBandOffsets[b];
+                    int srcLineOffset = srcBandOffsets[b];
 
-            for (int h = 0; h < dstHeight; h++) {
-                int dstPixelOffset = dstLineOffset;
-                int srcPixelOffset = srcLineOffset;
+                    for (int h = 0; h < dstHeight; h++) {
+                        int dstPixelOffset = dstLineOffset;
+                        int srcPixelOffset = srcLineOffset;
 
-                dstLineOffset += dstLineStride;
-                srcLineOffset += srcLineStride;
+                        dstLineOffset += dstLineStride;
+                        srcLineOffset += srcLineStride;
 
-                for (int w = 0; w < dstWidth; w++) {
-                    d[dstPixelOffset] = ImageUtil.clampRoundShort(s[srcPixelOffset] * c + o);
+                        for (int w = 0; w < dstWidth; w++) {
+                            d[dstPixelOffset] = ImageUtil.clampRoundShort(s[srcPixelOffset] * c + o);
 
-                    dstPixelOffset += dstPixelStride;
-                    srcPixelOffset += srcPixelStride;
+                            dstPixelOffset += dstPixelStride;
+                            srcPixelOffset += srcPixelStride;
+                        }
+                    }
+                    return null;
                 }
-            }
+            });
+        }
+        try {
+            threadPool.invokeAll(processes);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            threadPool.shutdown();
         }
     }
 
     private void computeRectInt(RasterAccessor src,
                                 RasterAccessor dst) {
-        int dstWidth = dst.getWidth();
-        int dstHeight = dst.getHeight();
-        int dstBands = dst.getNumBands();
+        final int dstWidth = dst.getWidth();
+        final int dstHeight = dst.getHeight();
+        final int dstBands = dst.getNumBands();
 
-        int dstLineStride = dst.getScanlineStride();
-        int dstPixelStride = dst.getPixelStride();
-        int[] dstBandOffsets = dst.getBandOffsets();
-        int[][] dstData = dst.getIntDataArrays();
+        final int dstLineStride = dst.getScanlineStride();
+        final int dstPixelStride = dst.getPixelStride();
+        final int[] dstBandOffsets = dst.getBandOffsets();
+        final int[][] dstData = dst.getIntDataArrays();
 
-        int srcLineStride = src.getScanlineStride();
-        int srcPixelStride = src.getPixelStride();
-        int[] srcBandOffsets = src.getBandOffsets();
-        int[][] srcData = src.getIntDataArrays();
+        final int srcLineStride = src.getScanlineStride();
+        final int srcPixelStride = src.getPixelStride();
+        final int[] srcBandOffsets = src.getBandOffsets();
+        final int[][] srcData = src.getIntDataArrays();
 
-        for (int b = 0; b < dstBands; b++) {
-            double c = constants[b];
-            double o = offsets[b];
-            int[] d = dstData[b];
-            int[] s = srcData[b];
+        ExecutorService threadPool = Executors.newFixedThreadPool(dstBands);
+        Collection<Callable<Void>> processes = new LinkedList<Callable<Void>>();
+        for (int band = 0; band < dstBands; band++) {
+            final int b = band;
+            processes.add(new Callable<Void>() {
+                @Override
+                public Void call() {
+                    final double c = constants[b];
+                    final double o = offsets[b];
+                    final int[] s = srcData[b];
+                    int[] d = dstData[b];
 
-            int dstLineOffset = dstBandOffsets[b];
-            int srcLineOffset = srcBandOffsets[b];
+                    int dstLineOffset = dstBandOffsets[b];
+                    int srcLineOffset = srcBandOffsets[b];
 
-            for (int h = 0; h < dstHeight; h++) {
-                int dstPixelOffset = dstLineOffset;
-                int srcPixelOffset = srcLineOffset;
+                    for (int h = 0; h < dstHeight; h++) {
+                        int dstPixelOffset = dstLineOffset;
+                        int srcPixelOffset = srcLineOffset;
 
-                dstLineOffset += dstLineStride;
-                srcLineOffset += srcLineStride;
+                        dstLineOffset += dstLineStride;
+                        srcLineOffset += srcLineStride;
 
-                for (int w = 0; w < dstWidth; w++) {
-                    d[dstPixelOffset] = ImageUtil.clampRoundInt(s[srcPixelOffset] * c + o);
+                        for (int w = 0; w < dstWidth; w++) {
+                            d[dstPixelOffset] = ImageUtil.clampRoundInt(s[srcPixelOffset] * c + o);
 
-                    dstPixelOffset += dstPixelStride;
-                    srcPixelOffset += srcPixelStride;
+                            dstPixelOffset += dstPixelStride;
+                            srcPixelOffset += srcPixelStride;
+                        }
+                    }
+                    return null;
                 }
-            }
+            });
+        }
+        try {
+            threadPool.invokeAll(processes);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            threadPool.shutdown();
         }
     }
 
     private void computeRectFloat(RasterAccessor src,
                                   RasterAccessor dst) {
-        int dstWidth = dst.getWidth();
-        int dstHeight = dst.getHeight();
-        int dstBands = dst.getNumBands();
+        final int dstWidth = dst.getWidth();
+        final int dstHeight = dst.getHeight();
+        final int dstBands = dst.getNumBands();
 
-        int dstLineStride = dst.getScanlineStride();
-        int dstPixelStride = dst.getPixelStride();
-        int[] dstBandOffsets = dst.getBandOffsets();
-        float[][] dstData = dst.getFloatDataArrays();
+        final int dstLineStride = dst.getScanlineStride();
+        final int dstPixelStride = dst.getPixelStride();
+        final int[] dstBandOffsets = dst.getBandOffsets();
+        final float[][] dstData = dst.getFloatDataArrays();
 
-        int srcLineStride = src.getScanlineStride();
-        int srcPixelStride = src.getPixelStride();
-        int[] srcBandOffsets = src.getBandOffsets();
-        float[][] srcData = src.getFloatDataArrays();
+        final int srcLineStride = src.getScanlineStride();
+        final int srcPixelStride = src.getPixelStride();
+        final int[] srcBandOffsets = src.getBandOffsets();
+        final float[][] srcData = src.getFloatDataArrays();
 
-        for (int b = 0; b < dstBands; b++) {
-            double c = constants[b];
-            double o = offsets[b];
-            float[] d = dstData[b];
-            float[] s = srcData[b];
+        ExecutorService threadPool = Executors.newFixedThreadPool(dstBands);
+        Collection<Callable<Void>> processes = new LinkedList<Callable<Void>>();
+        for (int band = 0; band < dstBands; band++) {
+            final int b = band;
+            processes.add(new Callable<Void>() {
+                @Override
+                public Void call() {
+                    final double c = constants[b];
+                    final double o = offsets[b];
+                    final float[] s = srcData[b];
+                    float[] d = dstData[b];
 
-            int dstLineOffset = dstBandOffsets[b];
-            int srcLineOffset = srcBandOffsets[b];
+                    int dstLineOffset = dstBandOffsets[b];
+                    int srcLineOffset = srcBandOffsets[b];
 
-            for (int h = 0; h < dstHeight; h++) {
-                int dstPixelOffset = dstLineOffset;
-                int srcPixelOffset = srcLineOffset;
+                    for (int h = 0; h < dstHeight; h++) {
+                        int dstPixelOffset = dstLineOffset;
+                        int srcPixelOffset = srcLineOffset;
 
-                dstLineOffset += dstLineStride;
-                srcLineOffset += srcLineStride;
+                        dstLineOffset += dstLineStride;
+                        srcLineOffset += srcLineStride;
 
-                for (int w = 0; w < dstWidth; w++) {
-                    d[dstPixelOffset] = ImageUtil.clampFloat(s[srcPixelOffset] * c + o);
+                        for (int w = 0; w < dstWidth; w++) {
+                            d[dstPixelOffset] = ImageUtil.clampFloat(s[srcPixelOffset] * c + o);
 
-                    dstPixelOffset += dstPixelStride;
-                    srcPixelOffset += srcPixelStride;
+                            dstPixelOffset += dstPixelStride;
+                            srcPixelOffset += srcPixelStride;
+                        }
+                    }
+                    return null;
                 }
-            }
+            });
+        }
+        try {
+            threadPool.invokeAll(processes);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            threadPool.shutdown();
         }
     }
 
     private void computeRectDouble(RasterAccessor src,
                                    RasterAccessor dst) {
-        int dstWidth = dst.getWidth();
-        int dstHeight = dst.getHeight();
-        int dstBands = dst.getNumBands();
+        final int dstWidth = dst.getWidth();
+        final int dstHeight = dst.getHeight();
+        final int dstBands = dst.getNumBands();
 
-        int dstLineStride = dst.getScanlineStride();
-        int dstPixelStride = dst.getPixelStride();
-        int[] dstBandOffsets = dst.getBandOffsets();
-        double[][] dstData = dst.getDoubleDataArrays();
+        final int dstLineStride = dst.getScanlineStride();
+        final int dstPixelStride = dst.getPixelStride();
+        final int[] dstBandOffsets = dst.getBandOffsets();
+        final double[][] dstData = dst.getDoubleDataArrays();
 
-        int srcLineStride = src.getScanlineStride();
-        int srcPixelStride = src.getPixelStride();
-        int[] srcBandOffsets = src.getBandOffsets();
-        double[][] srcData = src.getDoubleDataArrays();
+        final int srcLineStride = src.getScanlineStride();
+        final int srcPixelStride = src.getPixelStride();
+        final int[] srcBandOffsets = src.getBandOffsets();
+        final double[][] srcData = src.getDoubleDataArrays();
 
-        for (int b = 0; b < dstBands; b++) {
-            double c = constants[b];
-            double o = offsets[b];
-            double[] d = dstData[b];
-            double[] s = srcData[b];
+        ExecutorService threadPool = Executors.newFixedThreadPool(dstBands);
+        Collection<Callable<Void>> processes = new LinkedList<Callable<Void>>();
+        for (int band = 0; band < dstBands; band++) {
+            final int b = band;
+            processes.add(new Callable<Void>() {
+                @Override
+                public Void call() {
+                    final double c = constants[b];
+                    final double o = offsets[b];
+                    final double[] s = srcData[b];
+                    double[] d = dstData[b];
 
-            int dstLineOffset = dstBandOffsets[b];
-            int srcLineOffset = srcBandOffsets[b];
+                    int dstLineOffset = dstBandOffsets[b];
+                    int srcLineOffset = srcBandOffsets[b];
 
-            for (int h = 0; h < dstHeight; h++) {
-                int dstPixelOffset = dstLineOffset;
-                int srcPixelOffset = srcLineOffset;
+                    for (int h = 0; h < dstHeight; h++) {
+                        int dstPixelOffset = dstLineOffset;
+                        int srcPixelOffset = srcLineOffset;
 
-                dstLineOffset += dstLineStride;
-                srcLineOffset += srcLineStride;
+                        dstLineOffset += dstLineStride;
+                        srcLineOffset += srcLineStride;
 
-                for (int w = 0; w < dstWidth; w++) {
-                    d[dstPixelOffset] = s[srcPixelOffset] * c + o;
+                        for (int w = 0; w < dstWidth; w++) {
+                            d[dstPixelOffset] = s[srcPixelOffset] * c + o;
 
-                    dstPixelOffset += dstPixelStride;
-                    srcPixelOffset += srcPixelStride;
+                            dstPixelOffset += dstPixelStride;
+                            srcPixelOffset += srcPixelStride;
+                        }
+                    }
+                    return null;
                 }
-            }
+            });
+        }
+        try {
+            threadPool.invokeAll(processes);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            threadPool.shutdown();
         }
     }
 }
