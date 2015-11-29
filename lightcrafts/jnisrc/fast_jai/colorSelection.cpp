@@ -5,6 +5,7 @@ typedef unsigned short ushort;
 
 #include <math.h>
 #include <stdlib.h>
+#include <omp.h>
 
 static const int sMath_scale = 0x8000;
 static const int sMath_PI = (int) (sMath_scale * M_PI);
@@ -116,6 +117,11 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_ColorSelectionMaskOpImag
         hueOffset = -1;
     }
     
+#if _OPENMP < 201307
+#pragma omp parallel for schedule (guided)
+#else
+#pragma omp parallel for simd schedule (guided)
+#endif
     for (int row = 0; row < height; row++) {
         for (int col = 0; col < width; col++) {
             float r = srcData[3 * col + row * srcLineStride + srcROffset];

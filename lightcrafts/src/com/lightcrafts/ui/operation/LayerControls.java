@@ -23,6 +23,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.*;
 import java.util.List;
 import java.util.Map;
@@ -67,14 +69,12 @@ final class LayerControls extends Box {
         combo.setFont(OpControl.ControlFont);
         combo.setMaximumRowCount(30);
         // combo.setMaximumSize(combo.getPreferredSize());
-        combo.setFocusable(false);
         for ( LayerMode mode : layerModes ) {
             String localizedName = getLocalizedName(mode);
             modeMap.put(localizedName, mode);
             combo.addItem(localizedName);
         }
         slider = new JSlider();
-        slider.setFocusable(false);
         slider.setBackground(OpControl.Background);
         slider.setFont(OpControl.ControlFont);
         slider.setPaintTicks(true);
@@ -135,6 +135,20 @@ final class LayerControls extends Box {
                 public void mouseReleased(MouseEvent event) {
                     op.changeBatchEnded();
                     undoSupport.postEdit(LOCALE.get("OpacityEditName"));
+                }
+            }
+        );
+        combo.addMouseWheelListener(
+            new MouseWheelListener() {
+                public void mouseWheelMoved(MouseWheelEvent e) {
+                    JComboBox source = (JComboBox) e.getComponent();
+                    if (!source.hasFocus()) {
+                        return;
+                    }
+                    int ni = source.getSelectedIndex() + e.getWheelRotation();
+                    if (ni >= 0 && ni < source.getItemCount()) {
+                        source.setSelectedIndex(ni);
+                    }
                 }
             }
         );

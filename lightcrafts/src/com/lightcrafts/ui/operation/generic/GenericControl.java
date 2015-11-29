@@ -146,6 +146,20 @@ public class GenericControl extends OpControl {
                     }
                 }
             );
+            choice.addMouseWheelListener(
+                new MouseWheelListener() {
+                    public void mouseWheelMoved(MouseWheelEvent e) {
+                        JComboBox source = (JComboBox) e.getComponent();
+                        if (!source.hasFocus()) {
+                            return;
+                        }
+                        int ni = source.getSelectedIndex() + e.getWheelRotation();
+                        if (ni >= 0 && ni < source.getItemCount()) {
+                            source.setSelectedIndex(ni);
+                        }
+                    }
+                }
+            );
             JComboBox oldChoice = (JComboBox) choices.get(key);
             if (oldChoice != null) {
                 choice.setSelectedItem(oldChoice.getSelectedItem());
