@@ -53,6 +53,8 @@ public interface Curve extends SharedShape, Cloneable {
 
     void setWidth(float width);
 
+    Integer getVersion();
+
     void setClonePoint(Point2D p);
 
     Point2D getClonePoint();

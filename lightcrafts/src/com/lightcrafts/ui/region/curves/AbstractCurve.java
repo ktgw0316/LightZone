@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2015 Masahiro Kitagawa */
 
 package com.lightcrafts.ui.region.curves;
 
@@ -46,6 +47,9 @@ abstract class AbstractCurve implements Curve {
     private Shape innerShape;           // Keep slaved to "shape" above
     private float width;                // Gap between shape and innerShape
 
+    private Integer version;            // Curve version, null if the Curve was
+                                        // created with LightZone v4.1.3 or less
+
     private ClonePoint clonePt;         // The clone point, maybe null
 
     private int highlightPoint;         // A point for special drawing
@@ -57,6 +61,7 @@ abstract class AbstractCurve implements Curve {
     public AbstractCurve() {
         points = new LinkedList<Point2D>();
         segments = new LinkedList<Shape>();
+        version = 2;
         updateStrokes(NominalRadius);
         resetHighlights();
     }
@@ -524,6 +529,7 @@ abstract class AbstractCurve implements Curve {
 
     private final static String PointTag = "Point";
     private final static String WidthTag = "Width";
+    private final static String VersionTag = "Version";
     private final static String CloneTag = "Clone";
 
     public void save(XmlNode node) {
@@ -533,6 +539,9 @@ abstract class AbstractCurve implements Curve {
             XmlNode pointNode = node.addChild(PointTag);
             pointNode.setAttribute("x", Double.toString(p.getX()));
             pointNode.setAttribute("y", Double.toString(p.getY()));
+        }
+        if (version != null) {
+            node.setAttribute(VersionTag, Integer.toString(version));
         }
         if (clonePt != null) {
             node = node.addChild(CloneTag);
@@ -565,11 +574,27 @@ abstract class AbstractCurve implements Curve {
         }
         updateShapes();
 
+        if (node.hasAttribute(VersionTag)) {
+            try {
+                version = Integer.parseInt(node.getAttribute(VersionTag));
+            }
+            catch (NumberFormatException e) {
+                throw new XMLException("Invalid curve version", e);
+            }
+        }
+        else {
+            version = null;
+        }
+
         if (node.hasChild(CloneTag)) {
             clonePt = new ClonePoint();
             node = node.getChild(CloneTag);
             clonePt.restore(node);
         }
+    }
+
+    public Integer getVersion() {
+        return version;
     }
 
     // Derived Curves must override this method, to update "shape" and

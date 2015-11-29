@@ -24,5 +24,5 @@ public interface Region extends Contour {
      * the Shape returned by <code>getOuterShape()</code> on this instance.
      * @return A Collection of Contours whose union is this Region.
      */
-    Collection getContours();
+    Collection<Contour> getContours();
 }
