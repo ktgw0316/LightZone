@@ -1049,10 +1049,10 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
         final int srcScanlineStride = src.getScanlineStride();
 
         // Compute reused numbers
-        int kernelNx = 2*hKernel.length - hParity;
-        int kernelNy = 2*vKernel.length - vParity;
-        int stepDown = (kernelNy - 1)*srcScanlineStride;
-        int stepRight = (kernelNx - 1)*srcPixelStride;
+        final int kernelNx = 2*hKernel.length - hParity;
+        final int kernelNy = 2*vKernel.length - vParity;
+        final int stepDown = (kernelNy - 1)*srcScanlineStride;
+        final int stepRight = (kernelNx - 1)*srcPixelStride;
 
         final float vCtr = vKernel[0];
         final float hCtr = hKernel[0];
