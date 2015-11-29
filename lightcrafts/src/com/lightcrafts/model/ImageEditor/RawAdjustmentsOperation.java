@@ -8,8 +8,8 @@ import com.lightcrafts.model.ColorDropperOperation;
 import com.lightcrafts.model.RawAdjustmentOperation;
 import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.jai.JAIContext;
-import com.lightcrafts.jai.opimage.BilateralFilterRGBOpImage;
 import com.lightcrafts.jai.opimage.HighlightRecoveryOpImage;
+import com.lightcrafts.jai.opimage.NonLocalMeansFilterOpImage;
 
 import com.lightcrafts.mediax.jai.PlanarImage;
 import com.lightcrafts.mediax.jai.BorderExtender;
@@ -376,38 +376,9 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
             /*** NOISE REDUCTION ***/
 
             if (color_noise != 0 || grain_noise != 0) {
-            /* if (true) { */
                 BorderExtender borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
-                front = new BilateralFilterRGBOpImage(front, borderExtender, JAIContext.fileCacheHint, null, grain_noise * scale, 0.02f, color_noise * scale, 0.04f);
-                // front = new O1BilateralFilterOpImage(front, JAIContext.fileCacheHint, grain_noise * scale, 0.03f, color_noise * scale, 0.03f);
+                front = new NonLocalMeansFilterOpImage(front, borderExtender, JAIContext.fileCacheHint, null, grain_noise * scale, 0.02f, color_noise * scale, 0.04f);
                 front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
-            /*
-            } else {
-                ColorScience.LinearTransform transform = new ColorScience.YST();
-
-                double[][] rgb2llab = transform.fromRGB(back.getSampleModel().getDataType());
-                double[][] llab2rgb = transform.toRGB(back.getSampleModel().getDataType());
-
-                ParameterBlock pb = new ParameterBlock();
-                pb.addSource( front );
-                pb.add( rgb2llab );
-                PlanarImage ystImage = JAI.create("BandCombine", pb, null);
-
-                RenderingHints mfHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-
-                pb = new ParameterBlock();
-                pb.addSource(ystImage);
-                pb.add(color_noise * scale);
-                pb.add(0.02f + 0.001f * color_noise);
-                ystImage = JAI.create("BilateralFilter", pb, mfHints);
-
-                pb = new ParameterBlock();
-                pb.addSource( ystImage );
-                pb.add( llab2rgb );
-                front = JAI.create("BandCombine", pb, null);
-                front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
-            }
-            */
             }
 
             return front;

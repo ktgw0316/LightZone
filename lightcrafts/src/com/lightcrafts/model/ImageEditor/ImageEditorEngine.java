@@ -301,6 +301,7 @@ public class ImageEditorEngine implements Engine {
         operationsSet.put(AdvancedNoiseReductionOperation.typeV2, AdvancedNoiseReductionOperation.class);
         operationsSet.put(AdvancedNoiseReductionOperation.typeV3, AdvancedNoiseReductionOperation.class);
         operationsSet.put(AdvancedNoiseReductionOperationV4.type, AdvancedNoiseReductionOperationV4.class);
+        operationsSet.put(AdvancedNoiseReductionOperationV5.type, AdvancedNoiseReductionOperationV5.class);
         operationsSet.put(HiPassFilterOperation.type, HiPassFilterOperation.class);
         operationsSet.put(HueSaturationOperation.typeV1, HueSaturationOperation.class);
         operationsSet.put(HueSaturationOperation.typeV2, HueSaturationOperation.class);
