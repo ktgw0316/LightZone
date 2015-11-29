@@ -58,6 +58,6 @@ public class BilateralFilterDescriptor extends OperationDescriptorImpl {
         pb.setParameter("sigma_r", new Float(sigma_r));
         pb.setParameter("luminosity", new Boolean(luminosity));
 
-        return JAI.create("LCSeparableConvolve", pb, hints);
+        return JAI.create("BilateralFilter", pb, hints);
     }
 }
