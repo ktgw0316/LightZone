@@ -13,10 +13,91 @@
 
 #include "interpolation.h"
 
-inline float Coeff(const float k1, const float k2, const float radiusSq)
+class DistModel
 {
-    // 5th order polynomial distortion model, scaled
-    return (1 + k1 * radiusSq + k2 * radiusSq * radiusSq) / (1 + k1 + k2);
+protected:
+    DistModel(const float* k) : k(k) { }
+    const float* k;
+
+public:
+    virtual float coeff(float radiusSq) = 0;
+};
+
+class DistModelNone : public DistModel
+{
+public:
+    DistModelNone(const float* k) : DistModel(k) { }
+
+    virtual float coeff(float radiusSq)
+    {
+        return 1;
+    }
+};
+
+class DistModelPoly3 : public DistModel
+{
+public:
+    DistModelPoly3(const float* k) : DistModel(k) { }
+
+    virtual float coeff(float radiusSq)
+    {
+        // 3rd order polynomial distortion model
+        return (1 - k[0] + k[0] * radiusSq);
+    }
+};
+
+class DistModelPoly5 : public DistModel
+{
+public:
+    DistModelPoly5(const float* k) : DistModel(k) { }
+
+    virtual float coeff(float radiusSq)
+    {
+        // 5th order polynomial distortion model
+        return (1 + k[0] * radiusSq + k[1] * radiusSq * radiusSq);
+    }
+};
+
+class DistModelPTLens : public DistModel
+{
+public:
+    DistModelPTLens(const float* k) : DistModel(k) { }
+
+    virtual float coeff(float radiusSq)
+    {
+        // PTLens distortion model
+        const float radius = sqrt(radiusSq);
+        return (k[0] * radiusSq * radius + k[1] * radiusSq + k[2] * radius
+                + 1 - k[0] - k[1] - k[2]);
+    }
+};
+
+class DistModelLightZone : public DistModel
+{
+public:
+    DistModelLightZone(const float* k) : DistModel(k) { }
+
+    virtual float coeff(float radiusSq)
+    {
+        // 5th order polynomial distortion model, scaled
+        return (1 + k[0] * radiusSq + k[1] * radiusSq * radiusSq) / (1 + k[0] + k[1]);
+    }
+};
+
+DistModel* makeDistModel(int distModelType, const float* k)
+{
+    switch (distModelType) {
+    case 0:
+        return new DistModelNone(k);
+    case 1:
+        return new DistModelPoly3(k);
+    case 2:
+        return new DistModelPoly5(k);
+    case 3:
+        return new DistModelPTLens(k);
+    default:
+        return new DistModelLightZone(k);
+    }
 }
 
 void correct_distortion_mono
@@ -29,7 +110,8 @@ void correct_distortion_mono
   const int srcPixelStride, const int dstPixelStride,
   const int srcOffset, const int dstOffset,
   const int srcLineStride, const int dstLineStride,
-  const float k1, const float k2, const float magnitude )
+  DistModel* distModel,
+  const float magnitude )
 {
     const float centerX = 0.5 * fullWidth;
     const float centerY = 0.5 * fullHeight;
@@ -44,11 +126,10 @@ void correct_distortion_mono
             // Calc distortion
             const float offX = x - centerX;
             const float radiusSq = (offX * offX + offY * offY) / maxRadiusSq;
-            const float coeff = Coeff(k1, k2, radiusSq);
+            const float coeff = distModel->coeff(radiusSq);
 
             const float srcX = magnitude * coeff * offX + centerX - srcRectX;
             const float srcY = magnitude * coeff * offY + centerY - srcRectY;
-
 
             const int dstIdx =
                 dstPixelStride * (x - dstRectX) + (y - dstRectY) * dstLineStride;
@@ -76,18 +157,25 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distor
   jint srcPixelStride, jint dstPixelStride,
   jint srcOffset, jint dstOffset,
   jint srcLineStride, jint dstLineStride,
-  jfloat k1, jfloat k2 )
+  jint distModelType, jfloatArray jDistTerms )
 {
     unsigned short *srcData = (unsigned short *)env->GetPrimitiveArrayCritical(jsrcData, 0);
     unsigned short *dstData = (unsigned short *)env->GetPrimitiveArrayCritical(jdstData, 0);
+    jfloat* distTerms = env->GetFloatArrayElements(jDistTerms, 0);
+
+    const float k[] = {distTerms[0], distTerms[1], distTerms[2]};
+    DistModel* distModel = makeDistModel(distModelType, k);
 
     correct_distortion_mono(srcData, dstData, fullWidth, fullHeight,
             srcRectX, srcRectY, srcRectWidth, srcRectHeight,
             dstRectX, dstRectY, dstRectWidth, dstRectHeight,
             srcPixelStride,dstPixelStride,
             srcOffset, dstOffset, srcLineStride, dstLineStride,
-            k1, k2, 1.f);
+            distModel, 1.f);
 
+    delete distModel;
+
+    env->ReleaseFloatArrayElements(jDistTerms, distTerms, 0);
     env->ReleasePrimitiveArrayCritical(jsrcData, srcData, 0);
     env->ReleasePrimitiveArrayCritical(jdstData, dstData, 0);
 }
@@ -103,12 +191,21 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distor
   jint srcROffset, jint srcGOffset, jint srcBOffset,
   jint dstROffset, jint dstGOffset, jint dstBOffset,
   jint srcLineStride, jint dstLineStride,
-  jfloat k1, jfloat k2, jfloat kr, jfloat kb )
+  jint distModelType, jfloatArray jDistTerms,
+  jfloatArray jTcaTerms )
 {
     unsigned short *srcData = (unsigned short *)env->GetPrimitiveArrayCritical(jsrcData, 0);
     unsigned short *dstData = (unsigned short *)env->GetPrimitiveArrayCritical(jdstData, 0);
 
-#pragma omp parallel
+    jfloat*  tcaTerms = env->GetFloatArrayElements(jTcaTerms, 0);
+    const float kr = tcaTerms[0];
+    const float kb = tcaTerms[1];
+
+    jfloat* distTerms = env->GetFloatArrayElements(jDistTerms, 0);
+    const float k[] = {distTerms[0], distTerms[1], distTerms[2]};
+    DistModel* distModel = makeDistModel(distModelType, k);
+
+#pragma omp parallel shared (distModel)
 #pragma omp for single nowait
     {
         // Red
@@ -118,7 +215,7 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distor
                 dstRectX, dstRectY, dstRectWidth, dstRectHeight,
                 srcPixelStride,dstPixelStride,
                 srcROffset, dstROffset, srcLineStride, dstLineStride,
-                k1, k2, kr);
+                distModel, kr);
 
         // Green
 #pragma omp task mergable
@@ -127,7 +224,7 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distor
                 dstRectX, dstRectY, dstRectWidth, dstRectHeight,
                 srcPixelStride,dstPixelStride,
                 srcGOffset, dstGOffset, srcLineStride, dstLineStride,
-                k1, k2, 1);
+                distModel, 1);
 
         // Blue
 #pragma omp task mergable
@@ -136,36 +233,25 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distor
                 dstRectX, dstRectY, dstRectWidth, dstRectHeight,
                 srcPixelStride,dstPixelStride,
                 srcBOffset, dstBOffset, srcLineStride, dstLineStride,
-                k1, k2, kb);
+                distModel, kb);
     }
 
+    delete distModel;
+
+    env->ReleaseFloatArrayElements(jTcaTerms, tcaTerms, 0);
+    env->ReleaseFloatArrayElements(jDistTerms, distTerms, 0);
     env->ReleasePrimitiveArrayCritical(jsrcData, srcData, 0);
     env->ReleasePrimitiveArrayCritical(jdstData, dstData, 0);
 }
 
 extern "C"
-JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_lensfun
+JNIEXPORT jboolean JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_lensfunTerms
 ( JNIEnv *env, jclass cls,
-  jshortArray jsrcData, jshortArray jdstData,
-  jint fullWidth, jint fullHeight,
-  jint rectX, jint rectY, jint rectWidth, jint rectHeight,
-  jint srcPixelStride, jint dstPixelStride,
-  jint srcROffset, jint srcGOffset, jint srcBOffset,
-  jint dstROffset, jint dstGOffset, jint dstBOffset,
-  jint srcLineStride, jint dstLineStride,
+  jintArray jDistModel, jfloatArray jDistTerms,
+  jfloatArray jTcaTerms,
   jstring cameraMakerStr, jstring cameraModelStr,
   jstring lensNameStr, jfloat focal, jfloat aperture )
 {
-    unsigned short *srcData = (unsigned short *)env->GetPrimitiveArrayCritical(jsrcData, 0);
-    unsigned short *dstData = (unsigned short *)env->GetPrimitiveArrayCritical(jdstData, 0);
-
-    const float  distance = 0.0; // TODO;
-    const float     scale = 0.0; // automatic scaling
-    const lfLensType geom = LF_RECTILINEAR; // TODO;
-    const int       flags = LF_MODIFY_SCALE | LF_MODIFY_GEOMETRY | LF_MODIFY_DISTORTION;
-    const bool    inverse = false;
-    float crop;
-
     const char *cameraMaker = env->GetStringUTFChars(cameraMakerStr, NULL);
     const char *cameraModel = env->GetStringUTFChars(cameraModelStr, NULL);
     const char *lensName    = env->GetStringUTFChars(lensNameStr, NULL);
@@ -175,115 +261,135 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_lensfu
     ldb->Load();
 
     // Find camera in the database
-    const lfCamera *cam = NULL;
+    const lfCamera *camera = NULL;
     const lfCamera **cameras = ldb->FindCamerasExt(cameraMaker, cameraModel);
 
     if (!cameras) {
         std::cerr << "Cannot find the camera " << cameraModel << " in database" << std::endl;
     }
     else {
-        cam = cameras[0];
-        std::cerr << "camera: " << cam->Model << std::endl; // DEBUG
+        camera = cameras[0];
+        std::cerr << "camera: " << camera->Model << std::endl; // DEBUG
     }
     lf_free(cameras);
     env->ReleaseStringUTFChars(cameraMakerStr, 0);
     env->ReleaseStringUTFChars(cameraModelStr, 0);
 
     // Get lens informations from the database
-    const lfLens **lenses = ldb->FindLenses(cam, NULL, lensName);
+    const lfLens **lenses = ldb->FindLenses(camera, NULL, lensName);
 
     if (!lenses) {
         std::cerr << "Cannot find the lens " << lensName << " in database" << std::endl;
         env->ReleaseStringUTFChars(lensNameStr, 0);
-        // TODO: Copy src to dst
-        env->ReleasePrimitiveArrayCritical(jsrcData, srcData, 0);
-        env->ReleasePrimitiveArrayCritical(jdstData, dstData, 0);
-        return;
+        return false;
     }
 
     for (int i = 0, imax = sizeof(lenses) / sizeof(lenses[0]); i < imax; ++i) {
-        std::cerr << "lense: " << lenses[i]->Model << std::endl; // DEBUG
+        std::cerr << "lense" << i << ": " << lenses[i]->Model << std::endl; // DEBUG
     }
     const lfLens *lens = lenses[0];
     lf_free(lenses);
     env->ReleaseStringUTFChars(lensNameStr, 0);
 
-    crop = lens->CropFactor;
-    if (focal < 0.1f)
+    float crop = lens->CropFactor;
+    if (focal < 0.1f) {
         focal = lens->MaxFocal;
-    if (aperture < 0.1f)
+    }
+    if (aperture < 0.1f) {
         aperture = lens->MinAperture;
+    }
 
-#ifdef DEBUG
-    lfLensCalibDistortion** dists = lens->CalibDistortion;
-    lfLensCalibDistortion* dist = dists[0];
-    const lfDistortionModel model = dist->Model;
-    const float* terms = dist->Terms;
+    // Get distortion model and terms
+    lfLensCalibDistortion dist;
+    if (lens->InterpolateDistortion((float)focal, dist)) {
+        const lfDistortionModel dist_model = dist.Model;
+        float* dist_terms = dist.Terms;
 
-    switch (model) {
+        jint* distModel = env->GetIntArrayElements(jDistModel, 0);
+        jfloat* distTerms = env->GetFloatArrayElements(jDistTerms, 0);
+
+        switch (dist_model) {
         case LF_DIST_MODEL_POLY3:
+            distModel[0] = 1;
+            distTerms[0] = dist_terms[0];
+
             std::cerr << "DistortionModel: poly3" << std::endl;
-            std::cerr << "Terms: " << terms[0] << std::endl;
+            std::cerr << "Terms: " << dist_terms[0] << std::endl;
             break;
         case LF_DIST_MODEL_POLY5:
+            distModel[0] = 2;
+            distTerms[0] = dist_terms[0];
+            distTerms[1] = dist_terms[1];
+
             std::cerr << "DistortionModel: poly5" << std::endl;
-            std::cerr << "Terms: " << terms[0] << ", " << terms[1] << std::endl;
+            std::cerr << "Terms: " << dist_terms[0] << ", "
+                                   << dist_terms[1] << std::endl;
             break;
         case LF_DIST_MODEL_PTLENS:
+            distModel[0] = 3;
+            distTerms[0] = dist_terms[0];
+            distTerms[1] = dist_terms[1];
+            distTerms[2] = dist_terms[2];
+
             std::cerr << "DistortionModel: PTLens" << std::endl;
-            std::cerr << "Terms: " << terms[0] << ", " << terms[1] << ", "
-                      << terms[2] << std::endl;
+            std::cerr << "Terms: " << dist_terms[0] << ", "
+                                   << dist_terms[1] << ", "
+                                   << dist_terms[2] << std::endl;
             break;
         default:
             std::cerr << "DistortionModel: Unknown" << std::endl;
-    }
-
-    std::cerr << "full size: " << fullWidth << ", " << fullHeight << std::endl;
-    std::cerr << "rect pos.: " << rectX << ", " << rectY << std::endl;
-    std::cerr << "rect size: " << rectWidth << ", " << rectHeight << std::endl;
-#endif
-
-	// Define modifier
-    lfModifier *mod = lfModifier::Create(lens, crop, fullWidth, fullHeight);
-    int modflags = mod->Initialize(lens, LF_PF_U8, focal, aperture,
-                                   distance, scale, geom, flags, inverse);
-
-    // Apply modifier
-#pragma omp parallel
-    {
-        float *pos = new float[rectWidth * 2 * 3];
-
-        // TCA and geometry correction
-#pragma omp for schedule (guided)
-        for (int y = 0; y < rectHeight; ++y) {
-            mod->ApplySubpixelGeometryDistortion(rectX, y + rectY, rectWidth, 1, pos);
-
-            float *src = pos;
-
-            for (int x = 0, i = 0; x < rectWidth; ++x, i += 6) {
-                const int dstIdx = dstPixelStride * x + y * dstLineStride;
-
-                const float rX = src[i+0], rY = src[i+1];
-                const float gX = src[i+2], gY = src[i+3];
-                const float bX = src[i+4], bY = src[i+5];
-
-                if (rX < 1 || rX >= fullWidth - 1 || rY < 1 || rY >= fullHeight - 1 ||
-                    gX < 1 || gX >= fullWidth - 1 || gY < 1 || gY >= fullHeight - 1 ||
-                    bX < 1 || bX >= fullWidth - 1 || bY < 1 || bY >= fullHeight - 1)
-                    continue;
-
-                dstData[dstROffset + dstIdx] = BilinearInterp(srcData, srcPixelStride, srcROffset, srcLineStride, rX, rY);
-                dstData[dstGOffset + dstIdx] = BilinearInterp(srcData, srcPixelStride, srcGOffset, srcLineStride, gX, gY);
-                dstData[dstBOffset + dstIdx] = BilinearInterp(srcData, srcPixelStride, srcBOffset, srcLineStride, bX, bY);
-            }
         }
 
-        delete[] pos;
-    } // omp parallel
+        env->ReleaseIntArrayElements(jDistModel, distModel, 0);
+        env->ReleaseFloatArrayElements(jDistTerms, distTerms, 0);
+    }
 
-    lf_free(mod);
+    // Get TCA model and terms
+    lfLensCalibTCA tca;
+    if (lens->InterpolateTCA((float)focal, tca)) {
+        const lfTCAModel tca_model = tca.Model;
+        float* tca_terms = tca.Terms;
+
+        // jint* tcaModel = env->GetIntArrayElements(jTcaModel, 0);
+        jfloat* tcaTerms = env->GetFloatArrayElements(jTcaTerms, 0);
+
+        switch (tca_model) {
+        case LF_TCA_MODEL_LINEAR:
+            // tcaModel[0] = 1;
+            tcaTerms[0] = tca_terms[0];
+            tcaTerms[1] = tca_terms[1];
+
+            std::cerr << "TCAModel: Linear" << std::endl;
+            std::cerr << "Terms: " << "kr = "<< tca_terms[0] << ", "
+                                   << "kb = "<< tca_terms[1] << std::endl;
+            break;
+        case LF_TCA_MODEL_POLY3:
+            // tcaModel[0] = 2;
+            // for (int i = 0; i < 6; ++i) {
+            //     tcaTerms[0] = tca_terms[0];
+            // }
+
+            // NOTE: LightZone currently supports linear TCA model only.
+            tcaTerms[0] = 1;
+            tcaTerms[1] = 1;
+
+            std::cerr << "TCAModel: Poly3" << std::endl;
+            std::cerr << "Terms: " << "br = " << tca_terms[0] << ", "
+                                   << "cr = " << tca_terms[1] << ", "
+                                   << "vr = " << tca_terms[2] << "; "
+                                   << "bb = " << tca_terms[3] << ", "
+                                   << "cb = " << tca_terms[4] << ", "
+                                   << "vb = " << tca_terms[5] << std::endl;
+            break;
+        default:
+            std::cerr << "TCAModel: Unknown" << std::endl;
+        }
+
+        env->ReleaseFloatArrayElements(jTcaTerms, tcaTerms, 0);
+    }
+
+    // TODO: Get vignetting model and terms
+
     ldb->Destroy();
-    env->ReleasePrimitiveArrayCritical(jsrcData, srcData, 0);
-    env->ReleasePrimitiveArrayCritical(jdstData, dstData, 0);
+    return true;
 }
-

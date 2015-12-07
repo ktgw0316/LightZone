@@ -24,12 +24,57 @@ public class DistortionOpImage extends GeometricOpImage {
     private float focal = 0f;
     private float aperture = 0f;
 
-    // Coeffs for 5th order polynomial distortion model
-    // c.f. http://www.imatest.com/docs/distortion.html
-    private float k1 = 0f;
-    private float k2 = 0f;
-    private float kr = 1f;
-    private float kb = 1f;
+    private static float[] distTerms = {0, 0, 0};
+    private static float[] tcaTerms = {1f, 1f};
+
+    private interface DistModel {
+        float coeff(final float radiusSq);
+    }
+
+    private enum DistModelImpl implements DistModel {
+        // c.f. http://lensfun.sourceforge.net/manual/group__Lens.html#gaa505e04666a189274ba66316697e308e
+        DIST_MODEL_NONE {
+            @Override
+            public float coeff(final float radiusSq) {
+                return 1f;
+            }
+        },
+        DIST_MODEL_POLY3 {
+            @Override
+            public float coeff(final float radiusSq) {
+                float k1 = distTerms[0];
+                return 1f - k1 + k1 * radiusSq;
+            }
+        },
+        DIST_MODEL_POLY5 {
+            @Override
+            public float coeff(final float radiusSq) {
+                float k1 = distTerms[0];
+                float k2 = distTerms[1];
+                return (1f + k1 * radiusSq + k2 * radiusSq * radiusSq);
+            }
+        },
+        DIST_MODEL_PTLENS {
+            @Override
+            public float coeff(final float radiusSq) {
+                float k1 = distTerms[0];
+                float k2 = distTerms[1];
+                float k3 = distTerms[2];
+                final float radius = (float) Math.sqrt(radiusSq);
+                return k1 * radius * radiusSq + k2 * radiusSq + k3 * radius + 1f - k1 - k2 - k3;
+            }
+        },
+        DIST_MODEL_LIGHTZONE {
+            @Override
+            public float coeff(final float radiusSq) {
+                float k1 = distTerms[0];
+                float k2 = distTerms[1];
+                return (1f + k1 * radiusSq + k2 * radiusSq * radiusSq) / (1f + k1 + k2);
+            }
+        };
+    }
+
+    private DistModelImpl distModel = DistModelImpl.DIST_MODEL_LIGHTZONE;
 
     public DistortionOpImage(RenderedImage source, Map configuration, BorderExtender extender,
                              float k1, float k2, float kr, float kb) {
@@ -37,11 +82,44 @@ public class DistortionOpImage extends GeometricOpImage {
 
         fullWidth  = source.getWidth();
         fullHeight = source.getHeight();
-        this.k1 = k1;
-        this.k2 = k2;
-        this.kr = kr;
-        this.kb = kb;
+        distTerms[0] = k1;
+        distTerms[1] = k2;
+        tcaTerms[0] = kr;
+        tcaTerms[1] = kb;
+
+        // distModel = DistModelImpl.DIST_MODEL_POLY5;
+        distModel = DistModelImpl.DIST_MODEL_LIGHTZONE;
     }
+
+    /*
+    public DistortionOpImage(RenderedImage source, Map configuration, BorderExtender extender,
+                             float k1, float kr, float kb) {
+        super(vectorize(source), null, configuration, true, extender, null);
+
+        fullWidth  = source.getWidth();
+        fullHeight = source.getHeight();
+        distTerms[0] = k1;
+        tcaTerms[0] = kr;
+        tcaTerms[1] = kb;
+
+        distModel = DistModelImpl.DIST_MODEL_POLY3;
+    }
+
+    public DistortionOpImage(RenderedImage source, Map configuration, BorderExtender extender,
+                             float k1, float k2, float k3, float kr, float kb) {
+        super(vectorize(source), null, configuration, true, extender, null);
+
+        fullWidth  = source.getWidth();
+        fullHeight = source.getHeight();
+        distTerms[0] = k1;
+        distTerms[1] = k2;
+        distTerms[2] = k3;
+        tcaTerms[0] = kr;
+        tcaTerms[1] = kb;
+
+        distModel = DistModelImpl.DIST_MODEL_PTLENS;
+    }
+    */
 
     public DistortionOpImage(RenderedImage source, Map configuration, BorderExtender extender,
                              String cameraMaker, String cameraModel,
@@ -55,6 +133,28 @@ public class DistortionOpImage extends GeometricOpImage {
         this.lensName = lensName;
         this.focal = focal;
         this.aperture = aperture;
+
+        if (!cameraModel.isEmpty() || !lensName.isEmpty()) {
+            System.out.println("camera maker = " + cameraMaker); // DEBUG
+            System.out.println("camera model = " + cameraModel); // DEBUG
+            System.out.println("lens name    = " + lensName);    // DEBUG
+            System.out.println("focal length = " + focal);       // DEBUG
+            System.out.println("aperture     = " + aperture);    // DEBUG
+
+            int[] ret_distModel = {0};
+
+            synchronized(this) {
+                lensfunTerms(ret_distModel, distTerms,
+                             tcaTerms,
+                             cameraMaker, cameraModel,
+                             lensName, focal, aperture);
+            }
+            distModel = DistModelImpl.values()[ret_distModel[0]];
+        }
+        else {
+            distModel = DistModelImpl.DIST_MODEL_NONE;
+        }
+        System.out.println("distortion model = " + distModel.name()); // DEBUG
     }
 
     @Override
@@ -77,19 +177,21 @@ public class DistortionOpImage extends GeometricOpImage {
 
         final float rMaxSq = (fullWidth * fullWidth + fullHeight * fullHeight) / 4;
 
+        final float kr = tcaTerms[0];
+        final float kb = tcaTerms[1];
         final float smallestMagnitude = Math.min(Math.min(kr, kb), 1);
         final float biggestMagnitude  = Math.max(Math.max(kr, kb), 1);
 
         // Find minimum of top edge and maximum of bottom edge
-        float top    = (int) coeff((rx0 * rx0 + ry0 * ry0) / rMaxSq) * ry0;
-        float bottom = (int) coeff((rx0 * rx0 + ry1 * ry1) / rMaxSq) * ry1;
+        float top    = (int) distModel.coeff((rx0 * rx0 + ry0 * ry0) / rMaxSq) * ry0;
+        float bottom = (int) distModel.coeff((rx0 * rx0 + ry1 * ry1) / rMaxSq) * ry1;
         for (int rx = (int) rx0; rx <= rx1; rx++) {
-            float topTmp = coeff((rx * rx + ry0 * ry0) / rMaxSq) * ry0;
+            float topTmp = distModel.coeff((rx * rx + ry0 * ry0) / rMaxSq) * ry0;
             topTmp *= (topTmp < 0) ? biggestMagnitude : smallestMagnitude;
             if (topTmp < top) {
                 top = topTmp;
             }
-            float bottomTmp = coeff((rx * rx + ry1 * ry1) / rMaxSq) * ry1;
+            float bottomTmp = distModel.coeff((rx * rx + ry1 * ry1) / rMaxSq) * ry1;
             bottomTmp *= (bottomTmp > 0) ? biggestMagnitude : smallestMagnitude;
             if (bottomTmp > bottom) {
                 bottom = bottomTmp;
@@ -99,15 +201,15 @@ public class DistortionOpImage extends GeometricOpImage {
         top += centerY;
 
         // Find minimum of left edge and maximum of right edge
-        float left  = (int) coeff((rx0 * rx0 + ry0 * ry0) / rMaxSq) * rx0;
-        float right = (int) coeff((rx1 * rx1 + ry0 * ry0) / rMaxSq) * rx1;
+        float left  = (int) distModel.coeff((rx0 * rx0 + ry0 * ry0) / rMaxSq) * rx0;
+        float right = (int) distModel.coeff((rx1 * rx1 + ry0 * ry0) / rMaxSq) * rx1;
         for (int ry = (int) ry0; ry <= ry1; ry++) {
-            float leftTmp = coeff((rx0 * rx0 + ry * ry) / rMaxSq) * rx0;
+            float leftTmp = distModel.coeff((rx0 * rx0 + ry * ry) / rMaxSq) * rx0;
             leftTmp *= (leftTmp < 0) ? biggestMagnitude : smallestMagnitude;
             if (leftTmp < left) {
                 left = leftTmp;
             }
-            float rightTmp = coeff((rx1 * rx1 + ry * ry) / rMaxSq) * rx1;
+            float rightTmp = distModel.coeff((rx1 * rx1 + ry * ry) / rMaxSq) * rx1;
             rightTmp *= (rightTmp > 0) ? biggestMagnitude : smallestMagnitude;
             if (rightTmp > right) {
                 right = rightTmp;
@@ -118,11 +220,6 @@ public class DistortionOpImage extends GeometricOpImage {
 
         Rectangle rect = new Rectangle((int) left, (int) top, w, h);
         return rect;
-    }
-
-    private float coeff(final float radiusSq) {
-        // 5th order polynomial distortion model, scaled
-        return (1 + k1 * radiusSq + k2 * radiusSq * radiusSq) / (1 + k1 + k2);
     }
 
     @Override
@@ -187,38 +284,21 @@ public class DistortionOpImage extends GeometricOpImage {
                                dstX, dstY, dstWidth, dstHeight,
                                srcPixelStride, dstPixelStride,
                                srcBandOffsets[0], dstBandOffsets[0],
-                               srcScanlineStride, dstScanlineStride, k1, k2);
+                               srcScanlineStride, dstScanlineStride,
+                               distModel.ordinal(), distTerms);
             }
         }
         else if (src.getNumBands() == 3) {
-            if (cameraModel.isEmpty() && lensName.isEmpty()) {
-                synchronized(this) {
-                    distortionColor(srcData, dstData,
-                                    fullWidth, fullHeight,
-                                    srcX, srcY, srcWidth, srcHeight,
-                                    dstX, dstY, dstWidth, dstHeight,
-                                    srcPixelStride, dstPixelStride,
-                                    srcBandOffsets[0], srcBandOffsets[1], srcBandOffsets[2],
-                                    dstBandOffsets[0], dstBandOffsets[1], dstBandOffsets[2],
-                                    srcScanlineStride, dstScanlineStride, k1, k2, kr, kb);
-                }
-            }
-            else {
-                System.out.println("camera maker = " + cameraMaker); // DEBUG
-                System.out.println("camera model = " + cameraModel); // DEBUG
-                System.out.println("lens name    = " + lensName);    // DEBUG
-                synchronized(this) {
-                    lensfun(srcData, dstData,
-                            fullWidth, fullHeight,
-                            // srcX, srcY,
-                            dstX, dstY, dstWidth, dstHeight,
-                            srcPixelStride, dstPixelStride,
-                            srcBandOffsets[0], srcBandOffsets[1], srcBandOffsets[2],
-                            dstBandOffsets[0], dstBandOffsets[1], dstBandOffsets[2],
-                            srcScanlineStride, dstScanlineStride,
-                            cameraMaker, cameraModel,
-                            lensName, focal, aperture);
-                }
+            synchronized(this) {
+                distortionColor(srcData, dstData,
+                        fullWidth, fullHeight,
+                        srcX, srcY, srcWidth, srcHeight,
+                        dstX, dstY, dstWidth, dstHeight,
+                        srcPixelStride, dstPixelStride,
+                        srcBandOffsets[0], srcBandOffsets[1], srcBandOffsets[2],
+                        dstBandOffsets[0], dstBandOffsets[1], dstBandOffsets[2],
+                        srcScanlineStride, dstScanlineStride,
+                        distModel.ordinal(), distTerms, tcaTerms);
             }
         }
     }
@@ -232,7 +312,7 @@ public class DistortionOpImage extends GeometricOpImage {
                                       int srcPixelStride, int dstPixelStride,
                                       int srcOffset, int dstOffset,
                                       int srcLineStride, int dstLineStride,
-                                      float k1, float k2);
+                                      int distModel, float[] distTerms);
 
     static native void distortionColor(short srcData[], short dstData[],
                                        int fullWidth, int fullHeight,
@@ -244,15 +324,11 @@ public class DistortionOpImage extends GeometricOpImage {
                                        int srcROffset, int srcGOffset, int srcBOffset,
                                        int dstROffset, int dstGOffset, int dstBOffset,
                                        int srcLineStride, int dstLineStride,
-                                       float k1, float k2, float kr, float kb);
+                                       int distModel, float[] distTerms,
+                                       float[] tcaTerms);
 
-    static native void lensfun(short srcData[], short dstData[],
-                               int fullWidth, int fullHeight,
-                               int rectX, int rectY, int rectWidth, int rectHeight,
-                               int srcPixelStride, int dstPixelStride,
-                               int srcROffset, int srcGOffset, int srcBOffset,
-                               int dstROffset, int dstGOffset, int dstBOffset,
-                               int srcLineStride, int dstLineStride,
-                               String cameraMaker, String cameraModel,
-                               String lensName, float focal, float aperture);
+    static native boolean lensfunTerms(int[] ret_distModel, float[] ret_distTerms,
+                                       float[] ret_tcaTerms,
+                                       String cameraMaker, String cameraModel,
+                                       String lensName, float focal, float aperture);
 }
