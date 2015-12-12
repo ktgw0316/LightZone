@@ -17,6 +17,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.*;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import javax.swing.*;
 import javax.swing.Timer;
 
@@ -48,7 +49,8 @@ public class ImageEditorDisplay extends JPanel {
     SoftValueHashMap backgroundCache = null;
 
     // Workaround for unreliable ComponentListener.componentResized() callbacks.
-    LinkedList<ComponentListener> compListeners = new LinkedList<ComponentListener>();
+    ConcurrentLinkedQueue<ComponentListener> compListeners =
+        new ConcurrentLinkedQueue<ComponentListener>();
 
     public void reshape(int x, int y, int w, int h) {
         super.reshape(x, y, w, h);        
@@ -63,12 +65,20 @@ public class ImageEditorDisplay extends JPanel {
         }
     }
 
+    @Override
     public void addComponentListener(ComponentListener listener) {
+        if (listener == null) {
+            return;
+        }
         compListeners.add(listener);
         super.addComponentListener(listener);
     }
 
+    @Override
     public void removeComponentListener(ComponentListener listener) {
+        if (listener == null) {
+            return;
+        }
         compListeners.remove(listener);
         super.removeComponentListener(listener);
     }
