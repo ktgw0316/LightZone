@@ -8,7 +8,6 @@ import com.lightcrafts.model.Preview;
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.ui.editor.EditorControls;
 import com.lightcrafts.ui.operation.OpControl;
-import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlNode;
 
 import javax.swing.*;
@@ -96,9 +95,14 @@ class TemplatePreview extends JPanel {
         }
     }
 
+    @Override
     public void doLayout() {
         Dimension size = getSize();
-        Component comp = getComponents()[0];
+        Component[] comps = getComponents();
+        if (comps.length < 1) {
+            return;
+        }
+        Component comp = comps[0];
         if (editControls != null) {
             // The Engine Component needs centering.
             editEngine.setScale(new Rectangle(0, 0, size.width, size.height));
