@@ -46,12 +46,14 @@ public class ImageEditorDisplay extends JPanel {
 
     private RenderedImage backgroundImage;
 
-    SoftValueHashMap backgroundCache = null;
+    SoftValueHashMap<CacheKey, BufferedImage> backgroundCache = null;
 
     // Workaround for unreliable ComponentListener.componentResized() callbacks.
     ConcurrentLinkedQueue<ComponentListener> compListeners =
         new ConcurrentLinkedQueue<ComponentListener>();
 
+    @SuppressWarnings("deprecation")
+    @Override
     public void reshape(int x, int y, int w, int h) {
         super.reshape(x, y, w, h);        
 
@@ -92,6 +94,7 @@ public class ImageEditorDisplay extends JPanel {
             tileY = _tileY;
         }
 
+        @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (!(o instanceof CacheKey)) return false;
@@ -102,6 +105,7 @@ public class ImageEditorDisplay extends JPanel {
                    tileY == cacheKey.tileY;
         }
 
+        @Override
         public int hashCode() {
             int result;
             result = tileX;
@@ -121,7 +125,7 @@ public class ImageEditorDisplay extends JPanel {
 
         source = image;
         if (source != null) {
-            backgroundCache = new SoftValueHashMap();
+            backgroundCache = new SoftValueHashMap<CacheKey, BufferedImage>();
             source.addTileComputationListener(tileManager);
             // Swing geometry
             setPreferredSize(new Dimension(source.getWidth(), source.getHeight()));
@@ -172,7 +176,7 @@ public class ImageEditorDisplay extends JPanel {
         synchronizedImage = synchronous;
 
         if (oldImage == null || !oldImage.getBounds().equals(image.getBounds())) {
-            backgroundCache = new SoftValueHashMap();
+            backgroundCache = new SoftValueHashMap<CacheKey, BufferedImage>();
 
             // Swing geometry
             Dimension dim = new Dimension(source.getWidth(), source.getHeight());
@@ -210,6 +214,7 @@ public class ImageEditorDisplay extends JPanel {
             this.ctx = ctx;
         }
 
+        @Override
         public void run() {
             repaintTile(ctx, tileX, tileY);
         }
@@ -263,6 +268,7 @@ public class ImageEditorDisplay extends JPanel {
             this.y = y;
         }
 
+        @Override
         public int compare(Point t1, Point t2) {
             int dx1 = t1.x - x;
             int dy1 = t1.y - y;
@@ -275,6 +281,10 @@ public class ImageEditorDisplay extends JPanel {
                 return -1;
             return 0;
         }
+    }
+
+    private Raster[] availableTiles(Point tileIndex) {
+        return availableTiles(new Point[] {tileIndex});
     }
 
     private Raster[] availableTiles(Point[] tileIndices) {
@@ -324,6 +334,7 @@ public class ImageEditorDisplay extends JPanel {
     private boolean firstTime;
 
     final Timer paintTimer = new Timer(300, new ActionListener() {
+        @Override
         public void actionPerformed(ActionEvent e) {
             firstTime = false;
             paintTimer.stop();
@@ -339,6 +350,7 @@ public class ImageEditorDisplay extends JPanel {
         backgroundImage = image;
     }
 
+    @Override
     public synchronized void paintComponent(Graphics g) {
         if (firstTime) {
             if (!paintTimer.isRunning())
@@ -357,148 +369,111 @@ public class ImageEditorDisplay extends JPanel {
         g2d.setColor(Color.blue);
         g2d.fillRect(0, 0, getWidth(), getHeight());
 
+        if (!ADVANCED_REPAINT) {
+            g2d.drawRenderedImage(source, identityTransform);
+            return;
+        }
+
         Rectangle clipBounds = g2d.getClipBounds();
 
-        if (ADVANCED_REPAINT) {
-            Point[] tileIndices = source.getTileIndices(clipBounds);
-
-            if (tileIndices == null)
-                return;
-
-            if (ASYNCH_REPAINT) {
-                List<Point> dirtyTiles = new LinkedList<Point>();
-
-                Raster tiles[] = availableTiles(tileIndices);
-
-                for (int i = 0; i < tileIndices.length; i++) {
-                    Rectangle tileClipRect = new Rectangle(tileIndices[i].x * JAIContext.TILE_WIDTH,
-                        tileIndices[i].y * JAIContext.TILE_HEIGHT,
-                        JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT);
-
-                    g2d.setClip(tileClipRect.intersection(clipBounds));
-
-                    if (validImageBackground[tileIndices[i].x][tileIndices[i].y] || tiles == null || tiles[i] == null) {
-                        if (!validImageBackground[tileIndices[i].x][tileIndices[i].y])
-                            dirtyTiles.add(tileIndices[i]);
-
-                        // if we don't have a fresh tile, try and see if we have an old one around
-                        BufferedImage backgroundTile;
-
-                        if ((backgroundTile = (BufferedImage) backgroundCache.get(new CacheKey(tileIndices[i].x, tileIndices[i].y))) != null) {
-                            int xOffset = source.tileXToX(tileIndices[i].x);
-                            int yOffset = source.tileYToY(tileIndices[i].y);
-
-                            try {
-                                g2d.drawImage(backgroundTile, null, xOffset, yOffset);
-
-                                // System.out.println("recycled background tile for: " + xOffset + ", " + yOffset);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        } else {
-                            Raster cachedTiles[] = availableTiles(new Point[] {new Point(tileIndices[i].x, tileIndices[i].y)});
-                            if (cachedTiles.length == 1 && cachedTiles[0] != null) {
-                                WritableRaster tile = (WritableRaster) cachedTiles[0];
-                                BufferedImage image = getBackgroundTile(tile, tileIndices[i].x, tileIndices[i].y);
-                                g2d.drawImage(image, null, tile.getMinX(), tile.getMinY());
-                            } else {
-                                if (backgroundImage != null) {
-                                    g2d.drawRenderedImage(
-                                        backgroundImage, new AffineTransform()
-                                    );
-                                }
-                                else {
-                                    // if all fails paint the default background color
-                                    g2d.setColor(backgroundColor);
-                                    g2d.fillRect(tileClipRect.x,
-                                        tileClipRect.y,
-                                        tileClipRect.width,
-                                        tileClipRect.height);
-                                }
-                            }
-                        }
-                    } else {
-                        try {
-                            WritableRaster tile = (WritableRaster) tiles[i];
-                            BufferedImage image = getBackgroundTile(tile, tileIndices[i].x, tileIndices[i].y);
-                            g2d.drawImage(image, null, tile.getMinX(), tile.getMinY());
-                            validImageBackground[tileIndices[i].x][tileIndices[i].y] = true;
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-                g2d.setClip(clipBounds); // reset the clip rect
-
-                if (!dirtyTiles.isEmpty()) {
-                    startGetTiles = System.currentTimeMillis();
-
-                    Collections.sort(dirtyTiles,
-                                     new TileComparator((clipBounds.x + clipBounds.width / 2) / source.getTileWidth(),
-                                                        (clipBounds.y + clipBounds.height / 2) / source.getTileHeight()));
-
-                    computingTiles = true;
-                    tileManager.queueTiles(source, epoch, dirtyTiles, synchronizedImage, false, tileHandler);
-
-                    /* Area area = new Area();
-
-                    for (Point tile : dirtyTiles) {
-                        area.add(new Area(new Rectangle(tile.x * source.getTileWidth(),
-                                                        tile.y * source.getTileHeight(),
-                                                        source.getTileWidth(),
-                                                        source.getTileHeight())));
-                    }
-                    // System.out.println("Dirty area: " + area.getBounds());
-                    engine.prefetchRendering(area.getBounds()); */
-                } else {
-                    if (tileManager.pendingTiles(source, epoch) == 0) {
-                        long endGetTiles = System.currentTimeMillis();
-
-                        if (paintListener != null) {
-                            if (computingTiles) {
-                                if (synchronizedImage) {
-                                    if (startGetTiles > 0)
-                                        paintListener.paintDone(source, getVisibleRect(), synchronizedImage, endGetTiles - startGetTiles);
-                                } else
-                                    paintListener.paintDone(source, getVisibleRect(), synchronizedImage, 0);
-                            } else
-                                paintListener.paintDone(source, getVisibleRect(), synchronizedImage, 0);
-                        }
-                        startGetTiles = -1;
-                        computingTiles = false;
-
-                        if (false && !synchronizedImage) {
-                            tileIndices = source.getTileIndices(source.getBounds());
-                            tiles = availableTiles(tileIndices);
-
-                            if (tileIndices != null) {
-                                dirtyTiles = new LinkedList<Point>();
-
-                                for (int i = 0; i < tileIndices.length; i++)
-                                    if (tiles[i] == null)
-                                        dirtyTiles.add(tileIndices[i]);
-
-                                if (!dirtyTiles.isEmpty()) {
-                                    Collections.sort(dirtyTiles,
-                                                     new TileComparator((clipBounds.x + clipBounds.width / 2) / JAIContext.TILE_WIDTH,
-                                                                        (clipBounds.y + clipBounds.height / 2) / JAIContext.TILE_HEIGHT));
-
-                                    tileManager.queueTiles(source, epoch, dirtyTiles, false, true, tileHandler);
-                                }
-                            }
-                        }
-                    }
-                }
-                progressNotifyer.setTiles(tileManager.pendingTiles(source, epoch));
-            } else {
-                // fetching tiles explicitly allows to schedule them on separate threads,
-                // this is good if we have multiple CPUs
-                source.getTiles(tileIndices); // this blocks until the tiles are all available
-
-                g2d.drawRenderedImage(source, identityTransform);
-            }
-        } else {
-            g2d.drawRenderedImage(source, identityTransform);
+        Point[] tileIndices = source.getTileIndices(clipBounds);
+        if (tileIndices == null) {
+            return;
         }
+
+        if (!ASYNCH_REPAINT) {
+            // fetching tiles explicitly allows to schedule them on separate threads,
+            // this is good if we have multiple CPUs
+            source.getTiles(tileIndices); // this blocks until the tiles are all available
+            g2d.drawRenderedImage(source, identityTransform);
+            return;
+        }
+
+        List<Point> dirtyTiles = new LinkedList<Point>();
+
+        final Raster[] tiles = availableTiles(tileIndices);
+
+        for (int i = 0; i < tileIndices.length; i++) {
+            final Point tileIndex = tileIndices[i];
+            final WritableRaster tile = (tiles == null) ? null : (WritableRaster) tiles[i];
+
+            final Rectangle tileClipRect = new Rectangle(tileIndex.x * JAIContext.TILE_WIDTH,
+                                                   tileIndex.y * JAIContext.TILE_HEIGHT,
+                                                   JAIContext.TILE_WIDTH,
+                                                   JAIContext.TILE_HEIGHT);
+            g2d.setClip(tileClipRect.intersection(clipBounds));
+
+            if (validImageBackground[tileIndex.x][tileIndex.y] || tile == null) {
+                if (!validImageBackground[tileIndex.x][tileIndex.y])
+                    dirtyTiles.add(tileIndex);
+
+                // if we don't have a fresh tile, try and see if we have an old one around
+                final BufferedImage backgroundTile =
+                        (BufferedImage) backgroundCache.get(new CacheKey(tileIndex.x, tileIndex.y));
+
+                if (backgroundTile != null) {
+                    final int xOffset = source.tileXToX(tileIndex.x);
+                    final int yOffset = source.tileYToY(tileIndex.y);
+
+                    try {
+                        g2d.drawImage(backgroundTile, null, xOffset, yOffset);
+                        // System.out.println("recycled background tile for: " + xOffset + ", " + yOffset);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Raster cachedTiles[] = availableTiles(new Point(tileIndex.x, tileIndex.y));
+                    if (cachedTiles.length == 1 && cachedTiles[0] != null) {
+                        WritableRaster cachedTile = (WritableRaster) cachedTiles[0];
+                        BufferedImage image = getBackgroundTile(cachedTile, tileIndex.x, tileIndex.y);
+                        g2d.drawImage(image, null, cachedTile.getMinX(), cachedTile.getMinY());
+                    } else {
+                        if (backgroundImage != null) {
+                            g2d.drawRenderedImage(backgroundImage, new AffineTransform());
+                        } else {
+                            // if all fails paint the default background color
+                            g2d.setColor(backgroundColor);
+                            g2d.fillRect(tileClipRect.x,
+                                         tileClipRect.y,
+                                         tileClipRect.width,
+                                         tileClipRect.height);
+                        }
+                    }
+                }
+            } else {
+                try {
+                    BufferedImage image = getBackgroundTile(tile, tileIndex.x, tileIndex.y);
+                    g2d.drawImage(image, null, tile.getMinX(), tile.getMinY());
+                    validImageBackground[tileIndex.x][tileIndex.y] = true;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        g2d.setClip(clipBounds); // reset the clip rect
+
+        if (!dirtyTiles.isEmpty()) {
+            startGetTiles = System.currentTimeMillis();
+
+            Collections.sort(dirtyTiles,
+                    new TileComparator((clipBounds.x + clipBounds.width  / 2) / source.getTileWidth(),
+                                       (clipBounds.y + clipBounds.height / 2) / source.getTileHeight()));
+
+            computingTiles = true;
+            tileManager.queueTiles(source, epoch, dirtyTiles, synchronizedImage, false, tileHandler);
+        } else {
+            if (tileManager.pendingTiles(source, epoch) == 0) {
+                final long endGetTiles = System.currentTimeMillis();
+                final long time = (computingTiles && synchronizedImage && startGetTiles > 0) ?
+                        endGetTiles - startGetTiles : 0;
+
+                if (paintListener != null) {
+                    paintListener.paintDone(source, getVisibleRect(), synchronizedImage, time);
+                }
+                startGetTiles = -1;
+                computingTiles = false;
+            }
+        }
+        progressNotifyer.setTiles(tileManager.pendingTiles(source, epoch));
     }
 }
