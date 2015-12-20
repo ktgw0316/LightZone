@@ -1,6 +1,7 @@
 /* Copyright (C) 2015 Masahiro Kitagawa */
 
 #include <cmath>
+#include <functional>
 #include <iostream>
 #include <jni.h>
 #include <omp.h>
@@ -13,90 +14,31 @@
 
 #include "interpolation.h"
 
-class DistModel
-{
-protected:
-    DistModel(const float* k) : k(k) { }
-    const float* k;
-
-public:
-    virtual float coeff(float radiusSq) = 0;
-};
-
-class DistModelNone : public DistModel
-{
-public:
-    DistModelNone(const float* k) : DistModel(k) { }
-
-    virtual float coeff(float radiusSq)
-    {
-        return 1;
-    }
-};
-
-class DistModelPoly3 : public DistModel
-{
-public:
-    DistModelPoly3(const float* k) : DistModel(k) { }
-
-    virtual float coeff(float radiusSq)
-    {
-        // 3rd order polynomial distortion model
-        return (1 - k[0] + k[0] * radiusSq);
-    }
-};
-
-class DistModelPoly5 : public DistModel
-{
-public:
-    DistModelPoly5(const float* k) : DistModel(k) { }
-
-    virtual float coeff(float radiusSq)
-    {
-        // 5th order polynomial distortion model
-        return (1 + k[0] * radiusSq + k[1] * radiusSq * radiusSq);
-    }
-};
-
-class DistModelPTLens : public DistModel
-{
-public:
-    DistModelPTLens(const float* k) : DistModel(k) { }
-
-    virtual float coeff(float radiusSq)
-    {
-        // PTLens distortion model
-        const float radius = sqrt(radiusSq);
-        return (k[0] * radiusSq * radius + k[1] * radiusSq + k[2] * radius
-                + 1 - k[0] - k[1] - k[2]);
-    }
-};
-
-class DistModelLightZone : public DistModel
-{
-public:
-    DistModelLightZone(const float* k) : DistModel(k) { }
-
-    virtual float coeff(float radiusSq)
-    {
-        // 5th order polynomial distortion model, scaled
-        return (1 + k[0] * radiusSq + k[1] * radiusSq * radiusSq) / (1 + k[0] + k[1]);
-    }
-};
-
-DistModel* makeDistModel(int distModelType, const float* k)
+std::function<float(float)> makeCoeff(int distModelType, const float* k)
 {
     switch (distModelType) {
     case 0:
-        return new DistModelNone(k);
-    case 1:
-        return new DistModelPoly3(k);
-    case 2:
-        return new DistModelPoly5(k);
-    case 3:
-        return new DistModelPTLens(k);
-    default:
-        return new DistModelLightZone(k);
+        return [](float radiusSq){
+            return 1;
+        };
+    case 1: // 3rd order polynomial distortion model
+        return [k](float radiusSq){
+            return (1 - k[0] + k[0] * radiusSq);
+        };
+    case 2: // 5th order polynomial distortion model
+        return [k](float radiusSq){
+            return (1 + k[0] * radiusSq + k[1] * radiusSq * radiusSq);
+        };
+    case 3: // PTLens distortion model
+        return [k](float radiusSq){
+            const float radius = sqrt(radiusSq);
+            return (k[0] * radiusSq * radius + k[1] * radiusSq + k[2] * radius
+                    + 1 - k[0] - k[1] - k[2]);
+        };
+    default: // LightZone's scaled 5th order polynomial distortion model
+        return [k](float radiusSq){
+            return (1 + k[0] * radiusSq + k[1] * radiusSq * radiusSq) / (1 + k[0] + k[1]);
+        };
     }
 }
 
@@ -110,7 +52,7 @@ void correct_distortion_mono
   const int srcPixelStride, const int dstPixelStride,
   const int srcOffset, const int dstOffset,
   const int srcLineStride, const int dstLineStride,
-  DistModel* distModel,
+  std::function<float(float)> coeff,
   const float magnitude )
 {
     const float centerX = 0.5 * fullWidth;
@@ -126,10 +68,10 @@ void correct_distortion_mono
             // Calc distortion
             const float offX = x - centerX;
             const float radiusSq = (offX * offX + offY * offY) / maxRadiusSq;
-            const float coeff = distModel->coeff(radiusSq);
+            const float c = coeff(radiusSq);
 
-            const float srcX = magnitude * coeff * offX + centerX - srcRectX;
-            const float srcY = magnitude * coeff * offY + centerY - srcRectY;
+            const float srcX = magnitude * c * offX + centerX - srcRectX;
+            const float srcY = magnitude * c * offY + centerY - srcRectY;
 
             const int dstIdx =
                 dstPixelStride * (x - dstRectX) + (y - dstRectY) * dstLineStride;
@@ -164,16 +106,14 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distor
     jfloat* distTerms = env->GetFloatArrayElements(jDistTerms, 0);
 
     const float k[] = {distTerms[0], distTerms[1], distTerms[2]};
-    DistModel* distModel = makeDistModel(distModelType, k);
+    auto coeff = makeCoeff(distModelType, k);
 
     correct_distortion_mono(srcData, dstData, fullWidth, fullHeight,
             srcRectX, srcRectY, srcRectWidth, srcRectHeight,
             dstRectX, dstRectY, dstRectWidth, dstRectHeight,
             srcPixelStride,dstPixelStride,
             srcOffset, dstOffset, srcLineStride, dstLineStride,
-            distModel, 1.f);
-
-    delete distModel;
+            coeff, 1.f);
 
     env->ReleaseFloatArrayElements(jDistTerms, distTerms, 0);
     env->ReleasePrimitiveArrayCritical(jsrcData, srcData, 0);
@@ -203,7 +143,7 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distor
 
     jfloat* distTerms = env->GetFloatArrayElements(jDistTerms, 0);
     const float k[] = {distTerms[0], distTerms[1], distTerms[2]};
-    DistModel* distModel = makeDistModel(distModelType, k);
+    auto coeff = makeCoeff(distModelType, k);
 
 #pragma omp parallel shared (distModel)
 #pragma omp for single nowait
@@ -215,7 +155,7 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distor
                 dstRectX, dstRectY, dstRectWidth, dstRectHeight,
                 srcPixelStride,dstPixelStride,
                 srcROffset, dstROffset, srcLineStride, dstLineStride,
-                distModel, kr);
+                coeff, kr);
 
         // Green
 #pragma omp task mergable
@@ -224,7 +164,7 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distor
                 dstRectX, dstRectY, dstRectWidth, dstRectHeight,
                 srcPixelStride,dstPixelStride,
                 srcGOffset, dstGOffset, srcLineStride, dstLineStride,
-                distModel, 1);
+                coeff, 1);
 
         // Blue
 #pragma omp task mergable
@@ -233,10 +173,8 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distor
                 dstRectX, dstRectY, dstRectWidth, dstRectHeight,
                 srcPixelStride,dstPixelStride,
                 srcBOffset, dstBOffset, srcLineStride, dstLineStride,
-                distModel, kb);
+                coeff, kb);
     }
-
-    delete distModel;
 
     env->ReleaseFloatArrayElements(jTcaTerms, tcaTerms, 0);
     env->ReleaseFloatArrayElements(jDistTerms, distTerms, 0);

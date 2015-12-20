@@ -5,7 +5,7 @@ Building the LightZone source requires (at least) following packages:
 - __ant__
 - __fakeroot__ for linux package creation
 - __g++__
-- __gcc__
+- __gcc__ version 4.4 or later
 - __git__
 - __javahelp2__ for jhindexer
 - __liblcms2-dev__
