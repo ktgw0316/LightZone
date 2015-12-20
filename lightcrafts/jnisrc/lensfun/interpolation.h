@@ -13,10 +13,10 @@ inline T interp1D
     /*
     const idx = d * sizeof(wait) / sizeof(wait[0]);
     T value;
-    value  = wait[idx][0] * p0 >> 8;
-    value += wait[idx][1] * p1 >> 8;
-    value += wait[idx][2] * p2 >> 8;
-    value += wait[idx][3] * p3 >> 8;
+    value  = wait[idx][0] * p0 / 256;
+    value += wait[idx][1] * p1 / 256;
+    value += wait[idx][2] * p2 / 256;
+    value += wait[idx][3] * p3 / 256;
     */
 
     const T limit = std::numeric_limits<T>::max();
@@ -64,8 +64,8 @@ inline T BilinearInterp
 (const T *data, const int pixelStride, const int offset, const int lineStride,
  const float x, const float y)
 {
-    const float x_floor = floor(x);
-    const float y_floor = floor(y); 
+    const int x_floor = floor(x);
+    const int y_floor = floor(y); 
 
     const int pos_tl = pixelStride * x_floor + y_floor * lineStride; // top-left
     const int pos_tr = pos_tl + pixelStride;                         // top-right
@@ -84,7 +84,7 @@ inline T BilinearInterp
     const int wait_l = 256 - wait_r;
     
     const T value = (wait_t * (wait_l * data_tl + wait_r * data_tr) +
-                     wait_b * (wait_l * data_bl + wait_r * data_br)) >> 8 >> 8;
+                     wait_b * (wait_l * data_bl + wait_r * data_br)) / 65536;
     const T limit = std::numeric_limits<T>::max();
     return value < limit ? value : limit;
 }
