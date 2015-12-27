@@ -196,8 +196,8 @@ public interface PentaxTags extends ImageMetaTags {
 
     /**
      * Focal length.
-     * If the camera modem matches the regex .*(\*IST D|OPTIO [A-Z]).*, then
-     * the value is n / 100; otherwise, n / 10.
+     * If the camera model is one of Optio 30, 33WR, 43WR, 450, 550, 555,
+     * 750Z or X, then the value is n / 10; otherwise, n / 100.
      * <p>
      * Type: Unsigned short.
      */
