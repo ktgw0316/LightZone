@@ -45,6 +45,7 @@ std::function<float(float)> makeCoeff(int distModelType, const float* k)
 void correct_distortion_mono
 ( const unsigned short *srcData, unsigned short *dstData,
   const int fullWidth, const int fullHeight,
+  const int centerX, const int centerY,
   const int srcRectX, const int srcRectY,
   const int srcRectWidth, const int srcRectHeight,
   const int dstRectX, const int dstRectY,
@@ -55,10 +56,7 @@ void correct_distortion_mono
   std::function<float(float)> coeff,
   const float magnitude )
 {
-    const float centerX = 0.5 * fullWidth;
-    const float centerY = 0.5 * fullHeight;
-
-    const float maxRadiusSq = centerX * centerX + centerY * centerY;
+    const float maxRadiusSq = (fullWidth * fullWidth + fullHeight * fullHeight) / 4.0;
 
 #pragma omp parallel for schedule (guided)
     for (int y = dstRectY; y < dstRectY + dstRectHeight; ++y) {
@@ -94,6 +92,7 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distor
 ( JNIEnv *env, jclass cls,
   jshortArray jsrcData, jshortArray jdstData,
   jint fullWidth, jint fullHeight,
+  jint centerX, jint centerY,
   jint srcRectX, jint srcRectY, jint srcRectWidth, jint srcRectHeight,
   jint dstRectX, jint dstRectY, jint dstRectWidth, jint dstRectHeight,
   jint srcPixelStride, jint dstPixelStride,
@@ -108,7 +107,7 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distor
     const float k[] = {distTerms[0], distTerms[1], distTerms[2]};
     auto coeff = makeCoeff(distModelType, k);
 
-    correct_distortion_mono(srcData, dstData, fullWidth, fullHeight,
+    correct_distortion_mono(srcData, dstData, fullWidth, fullHeight, centerX, centerY,
             srcRectX, srcRectY, srcRectWidth, srcRectHeight,
             dstRectX, dstRectY, dstRectWidth, dstRectHeight,
             srcPixelStride,dstPixelStride,
@@ -125,6 +124,7 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distor
 ( JNIEnv *env, jclass cls,
   jshortArray jsrcData, jshortArray jdstData,
   jint fullWidth, jint fullHeight,
+  jint centerX, jint centerY,
   jint srcRectX, jint srcRectY, jint srcRectWidth, jint srcRectHeight,
   jint dstRectX, jint dstRectY, jint dstRectWidth, jint dstRectHeight,
   jint srcPixelStride, jint dstPixelStride,
@@ -150,7 +150,7 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distor
     {
         // Red
 #pragma omp task mergable
-        correct_distortion_mono(srcData, dstData, fullWidth, fullHeight,
+        correct_distortion_mono(srcData, dstData, fullWidth, fullHeight, centerX, centerY,
                 srcRectX, srcRectY, srcRectWidth, srcRectHeight,
                 dstRectX, dstRectY, dstRectWidth, dstRectHeight,
                 srcPixelStride,dstPixelStride,
@@ -159,7 +159,7 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distor
 
         // Green
 #pragma omp task mergable
-        correct_distortion_mono(srcData, dstData, fullWidth, fullHeight,
+        correct_distortion_mono(srcData, dstData, fullWidth, fullHeight, centerX, centerY,
                 srcRectX, srcRectY, srcRectWidth, srcRectHeight,
                 dstRectX, dstRectY, dstRectWidth, dstRectHeight,
                 srcPixelStride,dstPixelStride,
@@ -168,7 +168,7 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distor
 
         // Blue
 #pragma omp task mergable
-        correct_distortion_mono(srcData, dstData, fullWidth, fullHeight,
+        correct_distortion_mono(srcData, dstData, fullWidth, fullHeight, centerX, centerY,
                 srcRectX, srcRectY, srcRectWidth, srcRectHeight,
                 dstRectX, dstRectY, dstRectWidth, dstRectHeight,
                 srcPixelStride,dstPixelStride,

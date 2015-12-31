@@ -12,12 +12,14 @@ import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.awt.image.DataBuffer;
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.util.Map;
 
 public class DistortionOpImage extends GeometricOpImage {
 
     private final int fullWidth;
     private final int fullHeight;
+    private final Point2D center;
     private String cameraMaker = "";
     private String cameraModel = "";
     private String lensName = "";
@@ -71,17 +73,20 @@ public class DistortionOpImage extends GeometricOpImage {
                 float k2 = distTerms[1];
                 return (1f + k1 * radiusSq + k2 * radiusSq * radiusSq) / (1f + k1 + k2);
             }
-        };
+        }
     }
 
     private DistModelImpl distModel = DistModelImpl.DIST_MODEL_LIGHTZONE;
 
     public DistortionOpImage(RenderedImage source, Map configuration, BorderExtender extender,
+                             int fullWidth, int fullHeight, Point2D center,
                              float k1, float k2, float kr, float kb) {
         super(vectorize(source), null, configuration, true, extender, null);
 
-        fullWidth  = source.getWidth();
-        fullHeight = source.getHeight();
+        this.fullWidth  = fullWidth;
+        this.fullHeight = fullHeight;
+        this.center = center;
+
         distTerms[0] = k1;
         distTerms[1] = k2;
         tcaTerms[0] = kr;
@@ -122,12 +127,15 @@ public class DistortionOpImage extends GeometricOpImage {
     */
 
     public DistortionOpImage(RenderedImage source, Map configuration, BorderExtender extender,
+                             int fullWidth, int fullHeight, Point2D center,
                              String cameraMaker, String cameraModel,
                              String lensName, float focal, float aperture) {
         super(vectorize(source), null, configuration, true, extender, null);
 
-        fullWidth  = source.getWidth();
-        fullHeight = source.getHeight();
+        this.fullWidth  = fullWidth;
+        this.fullHeight = fullHeight;
+        this.center = center;
+
         this.cameraMaker = cameraMaker;
         this.cameraModel = cameraModel;
         this.lensName = lensName;
@@ -167,8 +175,8 @@ public class DistortionOpImage extends GeometricOpImage {
         if (sourceIndex != 0)
             return null;
 
-        final float centerX = fullWidth / 2;
-        final float centerY = fullHeight / 2;
+        final float centerX = (float) center.getX();
+        final float centerY = (float) center.getY();
 
         final float rx0 = destRect.x - centerX;
         final float ry0 = destRect.y - centerY;
@@ -218,8 +226,7 @@ public class DistortionOpImage extends GeometricOpImage {
         final int w = (int) (right - left + 1);
         left += centerX;
 
-        Rectangle rect = new Rectangle((int) left, (int) top, w, h);
-        return rect;
+        return new Rectangle((int) left, (int) top, w, h);
     }
 
     @Override
@@ -280,6 +287,7 @@ public class DistortionOpImage extends GeometricOpImage {
             synchronized(this) {
                 distortionMono(srcData, dstData,
                                fullWidth, fullHeight,
+                               (int)center.getX(), (int)center.getY(),
                                srcX, srcY, srcWidth, srcHeight,
                                dstX, dstY, dstWidth, dstHeight,
                                srcPixelStride, dstPixelStride,
@@ -292,6 +300,7 @@ public class DistortionOpImage extends GeometricOpImage {
             synchronized(this) {
                 distortionColor(srcData, dstData,
                         fullWidth, fullHeight,
+                        (int)center.getX(), (int)center.getY(),
                         srcX, srcY, srcWidth, srcHeight,
                         dstX, dstY, dstWidth, dstHeight,
                         srcPixelStride, dstPixelStride,
@@ -305,6 +314,7 @@ public class DistortionOpImage extends GeometricOpImage {
 
     static native void distortionMono(short srcData[], short dstData[],
                                       int fullWidth, int fullHeight,
+                                      int centerX, int centerY,
                                       int srcRectX, int srcRectY,
                                       int srcRectWidth, int srcRectHeight,
                                       int dstRectX, int dstRectY,
@@ -316,6 +326,7 @@ public class DistortionOpImage extends GeometricOpImage {
 
     static native void distortionColor(short srcData[], short dstData[],
                                        int fullWidth, int fullHeight,
+                                       int centerX, int centerY,
                                        int srcRectX, int srcRectY,
                                        int srcRectWidth, int srcRectHeight,
                                        int dstRectX, int dstRectY,

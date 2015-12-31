@@ -2,6 +2,8 @@
 
 package com.lightcrafts.model.ImageEditor;
 
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.text.DecimalFormat;
 
 import com.lightcrafts.image.metadata.ImageMetadata;
@@ -25,9 +27,6 @@ public class LensCorrectionsOperation extends BlendedOperation {
     private float distortion_k2 = 0;
     private float tca_r_offset = 0;
     private float tca_b_offset = 0;
-    private final float distortion_k1_scale = 1e-3f;
-    private final float distortion_k2_scale = 1e-3f;
-    private final float tca_scale = 1e-3f;
 
     private String cameraMaker = "";
     private String cameraModel = "";
@@ -58,7 +57,6 @@ public class LensCorrectionsOperation extends BlendedOperation {
 
         if (engine != null) {
             ImageMetadata meta = engine.getMetadata();
-
             cameraMaker = meta.getCameraMake(false);
             cameraModel = cameraMaker == null ? ""
                         : meta.getCameraMake(true).substring(cameraMaker.length() + 1);
@@ -80,7 +78,7 @@ public class LensCorrectionsOperation extends BlendedOperation {
 
     @Override
     public void setCheckboxValue(String key, boolean value) {
-        if (key == AUTO_CORRECTION) {
+        if (key.equals(AUTO_CORRECTION)) {
             auto_correction = value;
             // TODO: disoble manual settings
         } else {
@@ -97,13 +95,13 @@ public class LensCorrectionsOperation extends BlendedOperation {
 
         value = roundValue(key, value);
 
-        if (key == DISTORTION_K1 && distortion_k1 != value)
+        if (key.equals(DISTORTION_K1) && distortion_k1 != value)
             distortion_k1 = (float) value;
-        else if (key == DISTORTION_K2 && distortion_k2 != value)
+        else if (key.equals(DISTORTION_K2) && distortion_k2 != value)
             distortion_k2 = (float) value;
-        else if (key == TCA_R && tca_r_offset != value)
+        else if (key.equals(TCA_R) && tca_r_offset != value)
             tca_r_offset = (float) value;
-        else if (key == TCA_B && tca_b_offset != value)
+        else if (key.equals(TCA_B) && tca_b_offset != value)
             tca_b_offset = (float) value;
         else
             return;
@@ -119,20 +117,45 @@ public class LensCorrectionsOperation extends BlendedOperation {
         public PlanarImage setFront() {
             PlanarImage front = back;
 
-            if (auto_correction) {
-                BorderExtender borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
-                front = new DistortionOpImage(front, JAIContext.fileCacheHint, borderExtender,
-                                              cameraMaker, cameraModel, lensName, focal, aperture);
-                front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
-            } else if ( Math.abs(distortion_k1) > 1e-3 || Math.abs(distortion_k2) > 1e-3 ||
-                        Math.abs(tca_r_offset)  > 1e-3 || Math.abs(tca_b_offset)  > 1e-3) {
-                BorderExtender borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
-                front = new DistortionOpImage(front, JAIContext.fileCacheHint, borderExtender,
-                                              distortion_k1_scale * distortion_k1,
-                                              distortion_k2_scale * distortion_k2,
-                                              1 + tca_scale * tca_r_offset,
-                                              1 + tca_scale * tca_b_offset);
-                front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
+            ImageEditorEngine engine = rendering.getEngine();
+
+            if (engine != null) {
+                PlanarImage sourceImage = engine.getSourceImage();
+                int fullWidth = sourceImage.getWidth();
+                int fullHeight = sourceImage.getHeight();
+
+                final float scaleFactor = rendering.getScaleFactor();
+                if (scaleFactor < 1) {
+                    // Append pyramid ratio
+                    fullWidth *= scaleFactor;
+                    fullHeight *= scaleFactor;
+                }
+
+                AffineTransform transform = rendering.getTransform();
+                transform.preConcatenate(AffineTransform.getScaleInstance(1 / scaleFactor, 1 / scaleFactor));
+                Point2D center = transform.transform(new Point2D.Double(fullWidth / 2, fullHeight / 2), null);
+
+                if (auto_correction) {
+                    BorderExtender borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
+                    front = new DistortionOpImage(front, JAIContext.fileCacheHint, borderExtender,
+                            fullWidth, fullHeight, center,
+                                                  cameraMaker, cameraModel, lensName, focal, aperture);
+                    front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
+                }
+                else if (Math.abs(distortion_k1) > 1e-3 || Math.abs(distortion_k2) > 1e-3 ||
+                         Math.abs(tca_r_offset)  > 1e-3 || Math.abs(tca_b_offset)  > 1e-3) {
+                    BorderExtender borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
+                    float tca_scale = 1e-3f;
+                    float distortion_k2_scale = 1e-3f;
+                    float distortion_k1_scale = 1e-3f;
+                    front = new DistortionOpImage(front, JAIContext.fileCacheHint, borderExtender,
+                            fullWidth, fullHeight, center,
+                                                  distortion_k1_scale * distortion_k1,
+                                                  distortion_k2_scale * distortion_k2,
+                                                  1 + tca_scale * tca_r_offset,
+                                                  1 + tca_scale * tca_b_offset);
+                    front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
+                }
             }
 
             return front;
