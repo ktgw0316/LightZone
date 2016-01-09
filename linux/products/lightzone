@@ -2,8 +2,9 @@
 #
 # LightZone startscript
 #
-echo Starting LightZone version 4.1.4 ...
+echo Starting LightZone version 4.1.5 ...
 echo with options : ${@}
+java -version
 
 arch=`getconf LONG_BIT`
 PLATFORM=`uname`
