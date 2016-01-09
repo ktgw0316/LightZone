@@ -20,7 +20,13 @@ elif [ "${PLATFORM}" = "FreeBSD" ]; then
   usrdir=%%LOCALBASE%%
 fi
 
-pkgjavadir=${usrdir}/share/java/lightzone
+if [ -d ${usrdir}/share/java/lightzone ]; then
+  pkgjavadir=${usrdir}/share/java/lightzone
+else
+  # Gentoo
+  pkgjavadir=${usrdir}/share/lightzone/lib
+fi
+
 if [ -d ${usrdir}/libexec/lightzone ]; then
   pkglibexecdir=${usrdir}/libexec/lightzone
 elif [ -d ${usrdir}/lib64/lightzone ]; then
