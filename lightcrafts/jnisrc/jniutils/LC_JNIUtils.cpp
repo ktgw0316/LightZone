@@ -22,7 +22,7 @@
 #define LC_JNIUtils_IMPLEMENTATION
 #include "LC_JNIUtils.h"
 
-#ifndef __APPLE__
+#if defined(__x86_64__) || defined(__i386__)
 
 /* Registers for 32-bit x86. */
 #define CPU_REG_b "ebx"
@@ -37,7 +37,7 @@
             : "0" (index)                                       \
         )
 
-#endif  /* __APPLE__ */
+#endif  /* __x86_64__ || __i386__ */
 
 using namespace std;
 using namespace LightCrafts;
@@ -173,7 +173,7 @@ void* LC_getNativePtr( JNIEnv *env, jobject jObject ) {
     return reinterpret_cast<void*>( env->GetLongField( jObject, fieldID ) );
 }
 
-#ifndef __APPLE__
+#if defined(__x86_64__) || defined(__i386__)
 /**
  * Returns non-zero only if the CPU has SSE2 support.
  */
@@ -189,7 +189,7 @@ int LC_hasSSE2() {
     }
     return 0;
 }
-#endif  /* __APPLE__ */
+#endif  /* __x86_64__ || __i386__ */
 
 /**
  * Sets a float field of a Java class to a given value.

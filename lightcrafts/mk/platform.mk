@@ -2,6 +2,7 @@
 # Platform Makefile
 #
 # Paul J. Lucas [paul@lightcrafts.com]
+# Masahiro Kitagawa [arctica0316@gmail.com]
 ##
 
 ifndef PLATFORM0
@@ -15,17 +16,15 @@ endif
 PROCESSOR:=		$(shell uname -m)
 ifeq ($(PROCESSOR),i486)
   PROCESSOR:=		i386
-endif
-ifeq ($(PROCESSOR),i586)
+else ifeq ($(PROCESSOR),i586)
   PROCESSOR:=		i386
-endif
-ifeq ($(PROCESSOR),i686)
+else ifeq ($(PROCESSOR),i686)
   PROCESSOR:=		i386
-endif
-ifeq ($(PROCESSOR),amd64)
+else ifeq ($(PROCESSOR),i86pc)
+  PROCESSOR:=		i386
+else ifeq ($(PROCESSOR),amd64)
   PROCESSOR:=		x86_64
-endif
-ifeq ($(PROCESSOR),"Power Macintosh")
+else ifeq ($(PROCESSOR),"Power Macintosh")
   PROCESSOR:=		powerpc
 endif
 
@@ -173,8 +172,9 @@ else
   endif
 
   SSE_FLAGS_OFF:=	$(P4_CPU_FLAGS) -mno-sse
-  SSE_FLAGS_ON:=	$(P4_CPU_FLAGS) -msse2
-  SSE_FLAGS:=		$(SSE_FLAGS_OFF)
+  SSE_FLAGS_ON:=	$(P4_CPU_FLAGS) -msse2 -mfpmath=sse
+  # SSE_FLAGS:=		$(SSE_FLAGS_OFF)
+  SSE_FLAGS:=		$(SSE_FLAGS_ON)
 
   %_sse.o:
     SSE_FLAGS:= $(SSE_FLAGS_ON)
@@ -241,16 +241,19 @@ endif
 ##
 ifeq ($(PLATFORM),$(filter $(PLATFORM),Linux FreeBSD SunOS))
   ifeq ($(PROCESSOR),x86_64)
-    PLATFORM_CFLAGS+=	-march=athlon64 -mtune=generic $(SSE_FLAGS_ON) -fPIC
-  else
-    PLATFORM_CFLAGS+=	-march=pentium4 -mtune=generic $(SSE_FLAGS_ON) -fPIC
+    PLATFORM_CFLAGS+=	-march=athlon64 -mtune=generic $(SSE_FLAGS) -fPIC
+  else ifeq ($(PROCESSOR),i386)
+    PLATFORM_CFLAGS+=	-march=pentium4 -mtune=generic $(SSE_FLAGS) -fPIC
+  else ifeq ($(PROCESSOR),ppc)
+    PLATFORM_CFLAGS+=	-mcpu=powerpc -fPIC
+  else ifeq ($(PROCESSOR),ppc64)
+    PLATFORM_CFLAGS+=	-mcpu=powerpc64 -fPIC
   endif
 
   ifdef HIGH_PERFORMANCE
     PLATFORM_CFLAGS+=	-O3 \
 			-fno-trapping-math \
-			-fomit-frame-pointer \
-			-msse2 -mfpmath=sse
+			-fomit-frame-pointer
   else
     PLATFORM_CFLAGS+=	-Os
   endif
