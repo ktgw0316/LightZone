@@ -29,12 +29,11 @@ public class BilateralFilterRIF implements RenderedImageFactory {
 
         float sigma_d = paramBlock.getFloatParameter(0);
         float sigma_r = paramBlock.getFloatParameter(1);
-        boolean luminosity = ((Boolean) paramBlock.getObjectParameter(2)).booleanValue();
 
         return new BilateralFilterOpImage(paramBlock.getRenderedSource(0),
                                                    extender,
                                                    renderHints,
                                                    layout,
-                                                   sigma_d, sigma_r, luminosity);
+                                                   sigma_d, sigma_r);
     }
 }
