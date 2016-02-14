@@ -14,6 +14,8 @@ bin/lightzone
 %%LIBDIR%%/libLinux.so
 %%LIBDIR%%/libSegment.so
 %%LIBDIR%%/libfbf.so
+%%JAVASHAREDIR%%/lightzone/asm-all-2.2.2.jar
+%%JAVASHAREDIR%%/lightzone/laf-widget.jar
 %%JAVASHAREDIR%%/lightzone/lcjai.jar
 %%JAVASHAREDIR%%/lightzone/lightcrafts-linux.jar
 %%JAVASHAREDIR%%/lightzone/lightcrafts.jar

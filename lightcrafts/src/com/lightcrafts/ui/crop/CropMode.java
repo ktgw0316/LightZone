@@ -112,7 +112,7 @@ public class CropMode extends AbstractMode {
     }
 
     public void removeCropListener(CropListener listener) {
-        listeners.add(listener);
+        listeners.remove(listener);
     }
 
     public CropControl getControl() {

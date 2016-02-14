@@ -2,6 +2,7 @@
 
 package com.lightcrafts.app;
 
+import com.lightcrafts.splash.SplashWindow;
 import com.lightcrafts.ui.toolkit.TextAreaFactory;
 import com.lightcrafts.utils.filecache.FileCacheFactory;
 import com.lightcrafts.utils.filecache.FileCache;
@@ -48,6 +49,9 @@ class StartupCrash {
         Preferences prefs = Preferences.userRoot().node("/com/lightcrafts/app");
         boolean wasSuccessful = prefs.getBoolean(StartupKey, true);
         if (! wasSuccessful) {
+            // The splash can conceal other dialogs:
+            SplashWindow.disposeSplash();
+
             JButton help = new JButton(LOCALE.get("StartupErrorHelpOption"));
             help.addActionListener(
                 new ActionListener() {

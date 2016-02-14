@@ -96,10 +96,12 @@
         <key>ClassPath</key>
         <array>
             <string>.</string>
+            <string>asm-all-2.2.2.jar</string>
+            <string>laf-widget.jar</string>
+            <string>lcjai.jar</string>
             <string>lightcrafts-apple.jar</string>
             <string>lightcrafts.jar</string>
             <string>quaqua.jar</string>
-            <string>lcjai.jar</string>
             <string>substance-lite.jar</string>
             <string>/System/Library/Java</string>
         </array>

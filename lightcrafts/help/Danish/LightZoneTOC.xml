@@ -41,7 +41,7 @@
             <tocitem text="Converting images" target="Converting"/>
             <tocitem text="Printing" target="Printing"/>
             <tocitem text="Copy &amp; paste tools" target="Tools-Copy_and_Paste"/>
-            <tocitem text="Stil" target="Styles"/>
+            <tocitem text="Filtre" target="Styles"/>
         </tocitem>
         <tocitem text="Editing Tools" expand="false">
             <tocitem text="Sort &amp; hvid" target="Tool-Black_and_White"/>

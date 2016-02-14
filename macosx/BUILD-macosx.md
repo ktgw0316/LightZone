@@ -1,6 +1,6 @@
 # Development guide
 
-Written and tested on MacOSX 10.5.8 with Java 1.6 64-bit and Eclipse 3.6.
+Written and tested on MacOSX 10.10.1 with Java 1.6 64-bit and Eclipse 3.6.
 
 LightZone can be built with Ant, and edited with any java IDE; these instructions use Eclipse for convenience,
 since it's a common IDE with Ant built in.
@@ -19,11 +19,11 @@ from LightZone/macosx/resources/Info.plist and launch the MainClass defined ther
 Building the LightZone source requires the following software:
 
 - __Java 1.6__ from Apple or Oracle
-- __gcc__ (which includes __g++__; version 4.3 or greater to correctly compile OpenMP)
 - __git__
 - __homebrew__ from http://brew.sh/
 
 You need to install following packages using homebrew:
+- __clang-omp__ (to correctly compile OpenMP; it includes __clang-omp++__)
 - __autoconf__
 - __jpeg-turbo__
 - __libtiff__
@@ -32,6 +32,7 @@ You need to install following packages using homebrew:
 
 If you need to install gcc and git, the easiest route is to download XCode's command-line tools; the link depends on your OS X version.
 
+- Run `xcode-select --install` on OS X 10.9 or later
 - http://stackoverflow.com/questions/9353444/how-to-use-install-gcc-on-mac-os-x-10-8-xcode-4-4
 - http://stackoverflow.com/questions/4360110/installing-gcc-to-mac-os-x-leopard-without-installing-xcode
 - http://stackoverflow.com/questions/10904774/install-git-separately-from-xcode
