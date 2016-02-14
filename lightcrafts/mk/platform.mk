@@ -60,8 +60,9 @@ RM:=			rm -fr
 # Mac OS X
 ##
 ifeq ($(PLATFORM),MacOSX)
+  CC:=			clang-omp
+  CXX:=			clang-omp++
   MACOSX_DEPLOYMENT_TARGET:= 	$(shell sw_vers -productVersion | cut -d. -f-2)
-  SDKROOT:=		$(shell xcodebuild -version -sdk macosx${MACOSX_DEPLOYMENT_TARGET} | sed -n '/^Path:/p' | sed 's/^Path: //')
   ifndef EXECUTABLE
     PLATFORM_CFLAGS+=	-fPIC
   endif
@@ -76,12 +77,15 @@ ifeq ($(PLATFORM),MacOSX)
   ##
   # Don't use := here so other makefiles can override SDKROOT.
   ##
-  ifdef USE_ICC_HERE
+  ifeq ($(UNIVERSAL),1)
+    SDKROOT:=		$(shell xcodebuild -version -sdk macosx${MACOSX_DEPLOYMENT_TARGET} | sed -n '/^Path:/p' | sed 's/^Path: //')
     MACOSX_ISYSROOT=	-isysroot $(SDKROOT)
+    MACOSX_SYSLIBROOT=	-Wl,-syslibroot,$(SDKROOT)
   else
-    MACOSX_ISYSROOT=	-isysroot$(SDKROOT)
+    SDKROOT:=
+    MACOSX_ISYSROOT=
+    MACOSX_SYSLIBROOT=
   endif
-  MACOSX_SYSLIBROOT=	-Wl,-syslibroot,$(SDKROOT)
   PLATFORM_LDFLAGS=	$(MACOSX_SYSLIBROOT)
 
   ##
