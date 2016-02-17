@@ -43,10 +43,10 @@ import com.lightcrafts.media.jai.util.ImageUtil;
  *     for (int h = 0; h < dstHeight; h++) {
  *         for (int w = 0; w < dstWidth; w++) {
  *             for (int b = 0; b < dstNumBands; b++) {
- *		   scale = (scales.length < dstNumBands)? 
- *			    scales[0]:scales[b];
- *		   offset = (offsets.length < dstNumBands)?
- *			    offsets[0]:offsets[b];
+ *                 scale = (scales.length < dstNumBands)?
+ *                 scales[0]:scales[b];
+ *                 offset = (offsets.length < dstNumBands)?
+ *                 offsets[0]:offsets[b];
  *                 dst[h][w][b] = srcs[h][w][b] * scale + offset;
  *             }
  *         }
@@ -67,6 +67,8 @@ final class RescaleOpImage extends ColormapOpImage {
 
     private byte[][] byteTable = null;
 
+    static final int numProc = Runtime.getRuntime().availableProcessors();
+
     private synchronized void initByteTable() {
 
         if (byteTable != null) {
@@ -80,10 +82,10 @@ final class RescaleOpImage extends ColormapOpImage {
         // Initialize table which implements Rescale and clamp
         for(int band=0; band<nbands; band++) {
             byte[] t = byteTable[band];
-	    double c = constants[band];
-	    double o = offsets[band];
+            double c = constants[band];
+            double o = offsets[band];
             for (int i = 0; i < 256; i++) {
-		t[i] = ImageUtil.clampRoundByte(i * c + o);
+                t[i] = ImageUtil.clampRoundByte(i * c + o);
             }
         }
     }
@@ -92,7 +94,7 @@ final class RescaleOpImage extends ColormapOpImage {
      * Constructor.
      *
      * @param source     The source image.
-     * @param configuration Configurable attributes of the image including
+     * @param config     Configurable attributes of the image including
      *        configuration variables indexed by
      *        <code>RenderingHints.Key</code>s and image properties indexed
      *        by <code>String</code>s or <code>CaselessStringKey</code>s.
@@ -170,10 +172,10 @@ final class RescaleOpImage extends ColormapOpImage {
 
         Rectangle srcRect = mapDestRect(destRect, 0);
 
-        RasterAccessor dst = new RasterAccessor(dest, destRect,  
+        RasterAccessor dst = new RasterAccessor(dest, destRect,
                                                 formatTags[1], getColorModel());
-        RasterAccessor src = new RasterAccessor(sources[0], srcRect,  
-                                                formatTags[0], 
+        RasterAccessor src = new RasterAccessor(sources[0], srcRect,
+                                                formatTags[0],
                                                 getSourceImage(0).getColorModel());
 
         switch (dst.getDataType()) {
@@ -222,27 +224,24 @@ final class RescaleOpImage extends ColormapOpImage {
 
         initByteTable();
 
-        ExecutorService threadPool = Executors.newFixedThreadPool(dstBands);
+        ExecutorService threadPool = Executors.newFixedThreadPool(numProc);
         Collection<Callable<Void>> processes = new LinkedList<Callable<Void>>();
         for (int band = 0; band < dstBands; band++) {
-            final int b = band;
-            processes.add(new Callable<Void>() {
-                @Override
-                public Void call() {
-                    final byte[] s = srcData[b];
-                    byte[] d = dstData[b];
+            final byte[] s = srcData[band];
+            final byte[] d = dstData[band];
 
-                    int dstLineOffset = dstBandOffsets[b];
-                    int srcLineOffset = srcBandOffsets[b];
+            final int dstLineOffset = dstBandOffsets[band];
+            final int srcLineOffset = srcBandOffsets[band];
 
-                    byte[] clamp = byteTable[b];
+            final byte[] clamp = byteTable[band];
 
-                    for (int h = 0; h < dstHeight; h++) {
-                        int dstPixelOffset = dstLineOffset;
-                        int srcPixelOffset = srcLineOffset;
-
-                        dstLineOffset += dstLineStride;
-                        srcLineOffset += srcLineStride;
+            for (int h = 0; h < dstHeight; h++) {
+                final int hh = h;
+                processes.add(new Callable<Void>() {
+                    @Override
+                    public Void call() {
+                        int dstPixelOffset = dstLineOffset + hh * dstLineStride;
+                        int srcPixelOffset = srcLineOffset + hh * srcLineStride;
 
                         for (int w = 0; w < dstWidth; w++) {
                             d[dstPixelOffset] = clamp[s[srcPixelOffset] & 0xFF];
@@ -250,10 +249,10 @@ final class RescaleOpImage extends ColormapOpImage {
                             dstPixelOffset += dstPixelStride;
                             srcPixelOffset += srcPixelStride;
                         }
+                        return null;
                     }
-                    return null;
-                }
-            });
+                });
+            }
         }
         try {
             threadPool.invokeAll(processes);
@@ -280,27 +279,24 @@ final class RescaleOpImage extends ColormapOpImage {
         final int[] srcBandOffsets = src.getBandOffsets();
         final short[][] srcData = src.getShortDataArrays();
 
-        ExecutorService threadPool = Executors.newFixedThreadPool(dstBands);
+        ExecutorService threadPool = Executors.newFixedThreadPool(numProc);
         Collection<Callable<Void>> processes = new LinkedList<Callable<Void>>();
         for (int band = 0; band < dstBands; band++) {
-            final int b = band;
-            processes.add(new Callable<Void>() {
-                @Override
-                public Void call() {
-                    final float c = (float)constants[b];
-                    final float o = (float)offsets[b];
-                    final short[] s = srcData[b];
-                    short[] d = dstData[b];
+            final float c = (float)constants[band];
+            final float o = (float)offsets[band];
+            final short[] s = srcData[band];
+            final short[] d = dstData[band];
 
-                    int dstLineOffset = dstBandOffsets[b];
-                    int srcLineOffset = srcBandOffsets[b];
+            final int dstLineOffset = dstBandOffsets[band];
+            final int srcLineOffset = srcBandOffsets[band];
 
-                    for (int h = 0; h < dstHeight; h++) {
-                        int dstPixelOffset = dstLineOffset;
-                        int srcPixelOffset = srcLineOffset;
-
-                        dstLineOffset += dstLineStride;
-                        srcLineOffset += srcLineStride;
+            for (int h = 0; h < dstHeight; h++) {
+                final int hh = h;
+                processes.add(new Callable<Void>() {
+                    @Override
+                    public Void call() {
+                        int dstPixelOffset = dstLineOffset + hh * dstLineStride;
+                        int srcPixelOffset = srcLineOffset + hh * srcLineStride;
 
                         for (int w = 0; w < dstWidth; w++) {
                             d[dstPixelOffset] = ImageUtil.clampRoundUShort(
@@ -309,10 +305,10 @@ final class RescaleOpImage extends ColormapOpImage {
                             dstPixelOffset += dstPixelStride;
                             srcPixelOffset += srcPixelStride;
                         }
-                    }
                     return null;
-                }
-            });
+                    }
+                });
+            }
         }
         try {
             threadPool.invokeAll(processes);
@@ -339,27 +335,24 @@ final class RescaleOpImage extends ColormapOpImage {
         final int[] srcBandOffsets = src.getBandOffsets();
         final short[][] srcData = src.getShortDataArrays();
 
-        ExecutorService threadPool = Executors.newFixedThreadPool(dstBands);
+        ExecutorService threadPool = Executors.newFixedThreadPool(numProc);
         Collection<Callable<Void>> processes = new LinkedList<Callable<Void>>();
         for (int band = 0; band < dstBands; band++) {
-            final int b = band;
-            processes.add(new Callable<Void>() {
-                @Override
-                public Void call() {
-                    final float c = (float)constants[b];
-                    final float o = (float)offsets[b];
-                    final short[] s = srcData[b];
-                    short[] d = dstData[b];
+            final float c = (float)constants[band];
+            final float o = (float)offsets[band];
+            final short[] s = srcData[band];
+            final short[] d = dstData[band];
 
-                    int dstLineOffset = dstBandOffsets[b];
-                    int srcLineOffset = srcBandOffsets[b];
+            final int dstLineOffset = dstBandOffsets[band];
+            final int srcLineOffset = srcBandOffsets[band];
 
-                    for (int h = 0; h < dstHeight; h++) {
-                        int dstPixelOffset = dstLineOffset;
-                        int srcPixelOffset = srcLineOffset;
-
-                        dstLineOffset += dstLineStride;
-                        srcLineOffset += srcLineStride;
+            for (int h = 0; h < dstHeight; h++) {
+                final int hh = h;
+                processes.add(new Callable<Void>() {
+                    @Override
+                    public Void call() {
+                        int dstPixelOffset = dstLineOffset + hh * dstLineStride;
+                        int srcPixelOffset = srcLineOffset + hh * srcLineStride;
 
                         for (int w = 0; w < dstWidth; w++) {
                             d[dstPixelOffset] = ImageUtil.clampRoundShort(s[srcPixelOffset] * c + o);
@@ -367,10 +360,10 @@ final class RescaleOpImage extends ColormapOpImage {
                             dstPixelOffset += dstPixelStride;
                             srcPixelOffset += srcPixelStride;
                         }
-                    }
                     return null;
-                }
-            });
+                    }
+                });
+            }
         }
         try {
             threadPool.invokeAll(processes);
@@ -397,27 +390,24 @@ final class RescaleOpImage extends ColormapOpImage {
         final int[] srcBandOffsets = src.getBandOffsets();
         final int[][] srcData = src.getIntDataArrays();
 
-        ExecutorService threadPool = Executors.newFixedThreadPool(dstBands);
+        ExecutorService threadPool = Executors.newFixedThreadPool(numProc);
         Collection<Callable<Void>> processes = new LinkedList<Callable<Void>>();
-        for (int band = 0; band < dstBands; band++) {
-            final int b = band;
-            processes.add(new Callable<Void>() {
-                @Override
-                public Void call() {
-                    final double c = constants[b];
-                    final double o = offsets[b];
-                    final int[] s = srcData[b];
-                    int[] d = dstData[b];
+        for (int b = 0; b < dstBands; b++) {
+            final double c = constants[b];
+            final double o = offsets[b];
+            final int[] s = srcData[b];
+            final int[] d = dstData[b];
 
-                    int dstLineOffset = dstBandOffsets[b];
-                    int srcLineOffset = srcBandOffsets[b];
+            final int dstLineOffset = dstBandOffsets[b];
+            final int srcLineOffset = srcBandOffsets[b];
 
-                    for (int h = 0; h < dstHeight; h++) {
-                        int dstPixelOffset = dstLineOffset;
-                        int srcPixelOffset = srcLineOffset;
-
-                        dstLineOffset += dstLineStride;
-                        srcLineOffset += srcLineStride;
+            for (int h = 0; h < dstHeight; h++) {
+                final int hh = h;
+                processes.add(new Callable<Void>() {
+                    @Override
+                    public Void call() {
+                        int dstPixelOffset = dstLineOffset + hh * dstLineStride;
+                        int srcPixelOffset = srcLineOffset + hh * srcLineStride;
 
                         for (int w = 0; w < dstWidth; w++) {
                             d[dstPixelOffset] = ImageUtil.clampRoundInt(s[srcPixelOffset] * c + o);
@@ -425,10 +415,10 @@ final class RescaleOpImage extends ColormapOpImage {
                             dstPixelOffset += dstPixelStride;
                             srcPixelOffset += srcPixelStride;
                         }
+                        return null;
                     }
-                    return null;
-                }
-            });
+                });
+            }
         }
         try {
             threadPool.invokeAll(processes);
@@ -455,27 +445,24 @@ final class RescaleOpImage extends ColormapOpImage {
         final int[] srcBandOffsets = src.getBandOffsets();
         final float[][] srcData = src.getFloatDataArrays();
 
-        ExecutorService threadPool = Executors.newFixedThreadPool(dstBands);
+        ExecutorService threadPool = Executors.newFixedThreadPool(numProc);
         Collection<Callable<Void>> processes = new LinkedList<Callable<Void>>();
         for (int band = 0; band < dstBands; band++) {
-            final int b = band;
-            processes.add(new Callable<Void>() {
-                @Override
-                public Void call() {
-                    final double c = constants[b];
-                    final double o = offsets[b];
-                    final float[] s = srcData[b];
-                    float[] d = dstData[b];
+            final double c = constants[band];
+            final double o = offsets[band];
+            final float[] s = srcData[band];
+            final float[] d = dstData[band];
 
-                    int dstLineOffset = dstBandOffsets[b];
-                    int srcLineOffset = srcBandOffsets[b];
+            final int dstLineOffset = dstBandOffsets[band];
+            final int srcLineOffset = srcBandOffsets[band];
 
-                    for (int h = 0; h < dstHeight; h++) {
-                        int dstPixelOffset = dstLineOffset;
-                        int srcPixelOffset = srcLineOffset;
-
-                        dstLineOffset += dstLineStride;
-                        srcLineOffset += srcLineStride;
+            for (int h = 0; h < dstHeight; h++) {
+                final int hh = h;
+                processes.add(new Callable<Void>() {
+                    @Override
+                    public Void call() {
+                        int dstPixelOffset = dstLineOffset + hh * dstLineStride;
+                        int srcPixelOffset = srcLineOffset + hh * srcLineStride;
 
                         for (int w = 0; w < dstWidth; w++) {
                             d[dstPixelOffset] = ImageUtil.clampFloat(s[srcPixelOffset] * c + o);
@@ -483,10 +470,10 @@ final class RescaleOpImage extends ColormapOpImage {
                             dstPixelOffset += dstPixelStride;
                             srcPixelOffset += srcPixelStride;
                         }
+                        return null;
                     }
-                    return null;
-                }
-            });
+                });
+            }
         }
         try {
             threadPool.invokeAll(processes);
@@ -513,27 +500,24 @@ final class RescaleOpImage extends ColormapOpImage {
         final int[] srcBandOffsets = src.getBandOffsets();
         final double[][] srcData = src.getDoubleDataArrays();
 
-        ExecutorService threadPool = Executors.newFixedThreadPool(dstBands);
+        ExecutorService threadPool = Executors.newFixedThreadPool(numProc);
         Collection<Callable<Void>> processes = new LinkedList<Callable<Void>>();
         for (int band = 0; band < dstBands; band++) {
-            final int b = band;
-            processes.add(new Callable<Void>() {
-                @Override
-                public Void call() {
-                    final double c = constants[b];
-                    final double o = offsets[b];
-                    final double[] s = srcData[b];
-                    double[] d = dstData[b];
+            final double c = constants[band];
+            final double o = offsets[band];
+            final double[] s = srcData[band];
+            final double[] d = dstData[band];
 
-                    int dstLineOffset = dstBandOffsets[b];
-                    int srcLineOffset = srcBandOffsets[b];
+            final int dstLineOffset = dstBandOffsets[band];
+            final int srcLineOffset = srcBandOffsets[band];
 
-                    for (int h = 0; h < dstHeight; h++) {
-                        int dstPixelOffset = dstLineOffset;
-                        int srcPixelOffset = srcLineOffset;
-
-                        dstLineOffset += dstLineStride;
-                        srcLineOffset += srcLineStride;
+            for (int h = 0; h < dstHeight; h++) {
+                final int hh = h;
+                processes.add(new Callable<Void>() {
+                    @Override
+                    public Void call() {
+                        int dstPixelOffset = dstLineOffset + hh * dstLineStride;
+                        int srcPixelOffset = srcLineOffset + hh * srcLineStride;
 
                         for (int w = 0; w < dstWidth; w++) {
                             d[dstPixelOffset] = s[srcPixelOffset] * c + o;
@@ -541,10 +525,10 @@ final class RescaleOpImage extends ColormapOpImage {
                             dstPixelOffset += dstPixelStride;
                             srcPixelOffset += srcPixelStride;
                         }
-                    }
                     return null;
-                }
-            });
+                    }
+                });
+            }
         }
         try {
             threadPool.invokeAll(processes);
