@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
+import javax.swing.JMenuItem;
+
 /**
  * An Engine is the basic image interpretation and manipulation object.
  * Each Engine instance maintains a single Image.  The Engine's behavior is
@@ -130,7 +132,7 @@ public interface Engine {
      * arguments for the LayerConfig constructor.
      * @return A List of LayerModes.
      */
-    List getLayerModes();
+    List<LayerMode> getLayerModes();
 
     /**
      * Interchange the Operation at the given position with its neighbor
@@ -155,7 +157,7 @@ public interface Engine {
      * values it prefers for some reason.
      * @return A List of Scale objects.
      */
-    List getPreferredScales();
+    List<Scale> getPreferredScales();
 
     /**
      * Force the Engine to adopt a given Scale.
@@ -261,7 +263,7 @@ public interface Engine {
      * development and testing.
      * @return A List of JMenuItems.
      */
-    List getDebugItems();
+    List<JMenuItem> getDebugItems();
 
     /**
      * Clean up whatever resources this Engine is holding.  Call this only

@@ -143,7 +143,7 @@ public class OpStack extends DraggableStack
     }
 
     // Get disabled Actions from resources, for the no-Document display mode:
-    public static List getStaticAddActions() {
+    public static List<Action> getStaticAddActions() {
         return OpActions.createStaticAddActions();
     }
 
@@ -229,7 +229,7 @@ public class OpStack extends DraggableStack
     }
 
     // OpControls use this to populate the layer choices in LayerControls:
-    List getLayerModes() {
+    List<LayerMode> getLayerModes() {
         return engine.getLayerModes();
     }
 
@@ -246,6 +246,11 @@ public class OpStack extends DraggableStack
     }
 
     private void addControl(final OpControl control, final int index) {
+        if ((control.isRawCorrection() || control.isSingleton()) &&
+            getMatchingControl(control, new LinkedList<OpControl>()) != null) {
+            return;
+        }
+
         opControls.add(index, control);
 
         push(control, index);
