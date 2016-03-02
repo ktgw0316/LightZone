@@ -47,9 +47,6 @@ final class OneToOneButton
      }
 
      public void actionPerformed(ActionEvent event) {
-         final ComboFrame frame = getComboFrame();
-         if ( frame != null )
-             frame.getEditor().setMode( EditorMode.ARROW );
          scale.setScale(Unity);
      }
 
