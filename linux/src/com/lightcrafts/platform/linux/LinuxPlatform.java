@@ -31,6 +31,8 @@ import java.util.regex.Pattern;
 
 public class LinuxPlatform extends Platform {
 
+    private final static String home = System.getProperty( "user.home" );
+
     // My understanding of the state of standard linux color profile
     // locations comes from:
     //
@@ -41,27 +43,52 @@ public class LinuxPlatform extends Platform {
     );
 
     private final static File UserProfileDir = new File(
-        System.getProperty("user.home"),
-        ".color/icc"
+        home, ".color/icc"
     );
 
     private static Collection<ColorProfileInfo> Profiles;
 
+    @Override
+    public File getDefaultImageDirectory() {
+        ProcessBuilder pb = new ProcessBuilder("xdg-user-dir", "PICTURES");
+        try {
+            Process p = pb.start();
+            BufferedReader br =
+                    new BufferedReader(new InputStreamReader(p.getInputStream()));
+            String line = br.readLine();
+            br.close();
+            p.waitFor();
+            p.destroy();
+            if (p.exitValue() == 0 && line != null && ! line.equals(home)) {
+                return new File(line);
+            }
+        }
+        catch (IOException e) {
+        }
+        catch (InterruptedException e) {
+        }
+
+        return new File( home, Version.getApplicationName() );
+    }
+
+    @Override
     public File getLightZoneDocumentsDirectory() {
-        final String home = System.getProperty( "user.home" );
         final String appName = Version.getApplicationName();
         final String path = ".local/share/" + appName;
         return new File( home, path );
     }
 
+    @Override
     public LookAndFeel getLookAndFeel() {
         return LightZoneSkin.getLightZoneLookAndFeel();
     }
 
+    @Override
     public FileChooser getFileChooser() {
         return new LinuxFileChooser();
     }
 
+    @Override
     public ICC_Profile getDisplayProfile() {
         Preferences prefs = Preferences.userRoot().node(
             "/com/lightcrafts/platform/linux"
@@ -79,14 +106,17 @@ public class LinuxPlatform extends Platform {
         return null;
     }
 
+    @Override
     public Collection<ColorProfileInfo> getPrinterProfiles() {
         return getColorProfiles();
     }
 
+    @Override
     public Collection<ColorProfileInfo> getExportProfiles() {
         return getColorProfiles();
     }
 
+    @Override
     public boolean isKeyPressed(int keyCode) {
         return LinuxKeyUtil.isKeyPressed(keyCode);
     }
@@ -149,6 +179,7 @@ public class LinuxPlatform extends Platform {
         return profiles;
     }
 
+    @Override
     public int getPhysicalMemoryInMB() {
         final String osname = System.getProperty("os.name");
 
@@ -197,10 +228,12 @@ public class LinuxPlatform extends Platform {
         return super.getPhysicalMemoryInMB();
     }
 
+    @Override
     public void loadLibraries() throws UnsatisfiedLinkError {
         System.loadLibrary("Linux");
     }
 
+    @Override
     public void makeModal(Dialog dialog) {
         dialog.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
     }
@@ -240,6 +273,7 @@ public class LinuxPlatform extends Platform {
         return false;
     }
 
+    @Override
     public void showHelpTopic(String topic) {
         // TODO: use the "topic" argument to pick an initial page
         try {

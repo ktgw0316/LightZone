@@ -32,16 +32,19 @@ public final class WindowsPlatform extends Platform {
 
     ////////// public /////////////////////////////////////////////////////////
 
+    @Override
     public File getDefaultImageDirectory() {
         final String path =
             WindowsFileUtil.getFolderPathOf( FOLDER_MY_PICTURES );
         return path != null ? new File( path ) : null;
     }
 
+    @Override
     public DirectoryMonitor getDirectoryMonitor() {
         return new WindowsDirectoryMonitor();
     }
 
+    @Override
     public ICC_Profile getDisplayProfile() {
         final String path =
             WindowsColorProfileManager.getSystemDisplayProfilePath();
@@ -60,15 +63,18 @@ public final class WindowsPlatform extends Platform {
         }
     }
 
+    @Override
     public Collection<ColorProfileInfo> getExportProfiles() {
         return getColorProfiles();
     }
 
+    @Override
     public FileChooser getFileChooser() {
         return super.getFileChooser();
         // return new WindowsFileChooser();
     }
 
+    @Override
     public String getDisplayNameOf( File file ) {
         String displayName;
 
@@ -98,12 +104,14 @@ public final class WindowsPlatform extends Platform {
         return displayName;
     }
 
+    @Override
     public File getLightZoneDocumentsDirectory() {
         final File myDocuments =
             FileSystemView.getFileSystemView().getDefaultDirectory();
         return new File( myDocuments, Version.getApplicationName() );
     }
 
+    @Override
     public LookAndFeel getLookAndFeel() {
         LookAndFeel laf = LightZoneSkin.getLightZoneLookAndFeel();
 
@@ -133,6 +141,7 @@ public final class WindowsPlatform extends Platform {
         return laf;
     }
 
+    @Override
     public String[] getPathComponentsToPicturesFolder() {
         final File picturesDir =
             Platform.getPlatform().getDefaultImageDirectory();
@@ -159,26 +168,32 @@ public final class WindowsPlatform extends Platform {
         return wantedComponents;
     }
 
+    @Override
     public int getPhysicalMemoryInMB() {
         return WindowsMemory.getPhysicalMemoryInMB();
     }
 
+    @Override
     public Collection<ColorProfileInfo> getPrinterProfiles() {
         return getColorProfiles();
     }
 
+    @Override
     public boolean hasInternetConnectionTo( String hostName ) {
         return WindowsInternetConnection.hasConnection();
     }
 
+    @Override
     public void hideFile( File file ) throws IOException {
         WindowsFileUtil.hideFile( file.getAbsolutePath() );
     }
 
+    @Override
     public boolean isKeyPressed( int keyCode ) {
         return WindowsKeyUtil.isKeyPressed( keyCode );
     }
 
+    @Override
     public File isSpecialFile( File file ) {
         file = FileUtil.resolveAliasFile( file );
         if ( !(file instanceof WindowsSavedSearch) &&
@@ -198,35 +213,42 @@ public final class WindowsPlatform extends Platform {
         return majorVersion >= 6;
     }
 
+    @Override
     public void loadLibraries() throws UnsatisfiedLinkError {
         // We may need clib_jiio and either mlib_jai or mlib_jai_mmx, but we
         // don't load these explicitly so JAI can make up its own mind.
         System.loadLibrary( "Windows" );
     }
 
+    @Override
     public boolean moveFilesToTrash( String[] pathNames ) {
         return WindowsFileUtil.moveToRecycleBin( pathNames );
     }
 
+    @Override
     public void readyToOpenFiles() {
         if ( System.getProperty( "IDE" ) == null )
             WindowsLauncher.readyToOpenFiles();
     }
 
+    @Override
     public String resolveAliasFile( File file ) {
         return WindowsFileUtil.resolveShortcut( file.getAbsolutePath() );
     }
 
+    @Override
     public boolean showFileInFolder( String path ) {
         return WindowsFileUtil.showInExplorer( path );
     }
 
+    @Override
     public void showHelpTopic( String topic ) {
         WindowsHelp.showHelpTopic( topic );
     }
 
     private PrinterLayer printerLayer = new WindowsPrinterLayer();
 
+    @Override
     public PrinterLayer getPrinterLayer() {
         return printerLayer;
     }

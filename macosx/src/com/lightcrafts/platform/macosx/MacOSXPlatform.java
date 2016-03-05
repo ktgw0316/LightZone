@@ -26,14 +26,17 @@ import com.lightcrafts.ui.LightZoneSkin;
  */
 public final class MacOSXPlatform extends Platform {
 
+    @Override
     public void bringAppToFront( String appName ) {
         AppleScript.bringAppToFront( appName );
     }
 
+    @Override
     public AlertDialog getAlertDialog() {
         return DefaultAlertDialog.INSTANCE; // new MacOSXAlertDialog();
     }
 
+    @Override
     public ICC_Profile getDisplayProfile() {
         try {
             final String path =
@@ -46,11 +49,13 @@ public final class MacOSXPlatform extends Platform {
         }
     }
 
+    @Override
     public File getDefaultImageDirectory() {
         final String home = System.getProperty( "user.home" );
         return new File( home, "Pictures" );
     }
 
+    @Override
     public synchronized Collection<ColorProfileInfo> getExportProfiles() {
         if ( m_exportProfiles == null ) {
             final Collection<ColorProfileInfo> colorspaceProfiles =
@@ -78,14 +83,17 @@ public final class MacOSXPlatform extends Platform {
         return m_exportProfiles;
     }
 
+    @Override
     public FileChooser getFileChooser() {
         return MacOSXFileChooser.getFileChooser();
     }
 
+    @Override
     public FileSystemView getFileSystemView() {
         return QuaquaFileSystemView.getQuaquaFileSystemView();
     }
 
+    @Override
     public File getLightZoneDocumentsDirectory() {
         final String home = System.getProperty( "user.home" );
         final String appName = Version.getApplicationName();
@@ -93,6 +101,7 @@ public final class MacOSXPlatform extends Platform {
         return new File( home, path );
     }
 
+    @Override
     public LookAndFeel getLookAndFeel() {
         LookAndFeel lookAndFeel = LightZoneSkin.getLightZoneLookAndFeel();
 
@@ -126,14 +135,17 @@ public final class MacOSXPlatform extends Platform {
         return lookAndFeel;
     }
 
+    @Override
     public String[] getPathComponentsToPicturesFolder() {
         return new String[]{ System.getProperty( "user.name" ), "Pictures" };
     }
 
+    @Override
     public int getPhysicalMemoryInMB() {
         return MacOSXMemory.getPhysicalMemoryInMB();
     }
 
+    @Override
     public Collection<ColorProfileInfo> getPrinterProfiles() {
         return getExportProfiles();
         /* return MacOSXColorProfileManager.getProfilesFor(
@@ -141,14 +153,17 @@ public final class MacOSXPlatform extends Platform {
         ); */
     }
 
+    @Override
     public ProgressDialog getProgressDialog() {
         return new DefaultProgressDialog(); // new MacOSXProgressDialog();
     }
 
+    @Override
     public boolean hasInternetConnectionTo( String hostName ) {
         return MacOSXInternetConnection.hasConnectionTo( hostName );
     }
 
+    @Override
     public File isSpecialFile( File file ) {
         file = FileUtil.resolveAliasFile( file );
         if ( !(file instanceof MacOSXSmartFolder) &&
@@ -157,37 +172,44 @@ public final class MacOSXPlatform extends Platform {
         return file;
     }
 
+    @Override
     public void loadLibraries() throws UnsatisfiedLinkError {
         System.loadLibrary( "MacOSX" );
     }
 
+    @Override
     public boolean moveFilesToTrash( String[] pathNames ) {
         return MacOSXFileUtil.moveToTrash( pathNames );
     }
 
+    @Override
     public void readyToOpenFiles() {
         MacOSXLauncher.readyToOpenFiles();
     }
 
+    @Override
     public String resolveAliasFile( File file ) {
         return MacOSXFileUtil.resolveAlias( file.getAbsolutePath() );
     }
 
+    @Override
     public boolean showFileInFolder( String path ) {
         return MacOSXFileUtil.showInFinder( path );
     }
 
+    @Override
     public void showHelpTopic( String topic ) {
         MacOSXHelp.showHelpTopic( topic );
     }
 
+    @Override
     public PrinterLayer getPrinterLayer() {
         return MacOSXPrinterLayer.INSTANCE;
     }
 
-    public static final int WHEEL_HORIZONTAL_SCROLL = 2;
-
 /*
+    public static final int WHEEL_HORIZONTAL_SCROLLg = 2;
+
     static class MouseWheelDispatcher implements MacOSXMightyMouse.Listener {
         final JFrame frame;
         final MouseWheelListener listener;
