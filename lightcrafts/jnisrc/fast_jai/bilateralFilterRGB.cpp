@@ -1,4 +1,5 @@
 #include <math.h>
+#include <omp.h>
 #include <stdlib.h>
 #include <string.h>
 #include <jni.h>
@@ -125,12 +126,15 @@ void separable_bf_mono_tile(
     // coefficient of the exponent for the range Gaussian
     const float Ar = - 1.0f / (2.0f * SQR(sr) );
     
+#pragma omp parallel
+{
     //--------------------------------------------------------------------------
     // Filter Rows
     //--------------------------------------------------------------------------
     
     float *rbuf = new float[width];
     
+#pragma omp for
     for (int y=wr; y < height - wr; y++) {
         
         memcpy(rbuf, &ibuf[y * width], width * sizeof(float));
@@ -197,6 +201,7 @@ void separable_bf_mono_tile(
     // Buffer for processing column data
     float *cbuf = new float[height];
     
+#pragma omp for
     for (int x=wr; x < width - wr; x++) {
         for (int y=0; y < height; y++)
             cbuf[y] = ibuf[x + y*width];
@@ -264,6 +269,7 @@ void separable_bf_mono_tile(
     }    
     
     delete [] cbuf;
+} // omp parallel
 }
 
 #ifdef __INTEL_COMPILER
@@ -341,6 +347,7 @@ void planar_YST_to_interleaved_RGB(unsigned short * const dstData, int dstStep,
         v_yst_to_rgb[i] = F32vec4(yst_to_rgb[i]);
 #endif    
     
+#pragma omp parallel for
     for (int y=wr; y < height-wr; y++) {
         int x=wr;
 #ifdef __INTEL_COMPILER
@@ -460,6 +467,7 @@ void interleaved_RGB_to_planar_YST(const unsigned short * const srcData, int src
             v_rgb_to_yst[y][x] = F32vec4(rgb_to_yst[3 * y + x]);
 #endif
         
+#pragma omp parallel for
     for (int y=0; y < height; y++) {
         int x=0;
 #ifdef __INTEL_COMPILER
@@ -571,9 +579,12 @@ void separable_bf_chroma_tile(
     // Filter Rows
     //--------------------------------------------------------------------------
     
+#pragma omp parallel
+{
     float *rbuf_a = new float[width];
     float *rbuf_b = new float[width];
     
+#pragma omp for
     for (int y=wr; y < height - wr; y++) {
         int x=wr;
         
@@ -663,6 +674,7 @@ void separable_bf_chroma_tile(
     float *cbuf_a = new float[height];
     float *cbuf_b = new float[height];
     
+#pragma omp for
     for (int x=wr; x < width - wr; x++) {
         for (int y=0; y < height; y++) {
             const int idx = x + y*width;
@@ -755,6 +767,7 @@ void separable_bf_chroma_tile(
     
     delete [] cbuf_a;
     delete [] cbuf_b;
+} // omp parallel for
 }
 
 /*******************************************************************************
