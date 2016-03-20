@@ -15,7 +15,13 @@ import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import com.lightcrafts.mediax.jai.ImageLayout;
 import com.lightcrafts.mediax.jai.PointOpImage;
 import com.lightcrafts.mediax.jai.RasterAccessor;
@@ -47,6 +53,8 @@ import com.lightcrafts.media.jai.util.JDKWorkarounds;
  * @since EA3
  */
 final class BandCombineOpImage extends PointOpImage {
+
+    static final int numProc = Runtime.getRuntime().availableProcessors();
 
     private double[][] matrix;
 
@@ -172,45 +180,60 @@ final class BandCombineOpImage extends PointOpImage {
     }
 
     private void computeRectUShort(RasterAccessor src, RasterAccessor dst) {
-        int sLineStride = src.getScanlineStride();
-        int sPixelStride = src.getPixelStride();
-        int sbands = src.getNumBands();
-        int[] sBandOffsets = src.getBandOffsets();
-        short[][] sData = src.getShortDataArrays();
+        final int sLineStride = src.getScanlineStride();
+        final int sPixelStride = src.getPixelStride();
+        final int sbands = src.getNumBands();
+        final int[] sBandOffsets = src.getBandOffsets();
+        final short[][] sData = src.getShortDataArrays();
 
-        int dwidth = dst.getWidth();
-        int dheight = dst.getHeight();
-        int dbands = dst.getNumBands();
-        int dLineStride = dst.getScanlineStride();
-        int dPixelStride = dst.getPixelStride();
-        int[] dBandOffsets = dst.getBandOffsets();
-        short[][] dData = dst.getShortDataArrays();
+        final int dwidth = dst.getWidth();
+        final int dheight = dst.getHeight();
+        final int dbands = dst.getNumBands();
+        final int dLineStride = dst.getScanlineStride();
+        final int dPixelStride = dst.getPixelStride();
+        final int[] dBandOffsets = dst.getBandOffsets();
+        final short[][] dData = dst.getShortDataArrays();
 
         int sso = 0, dso = 0;
 
+        ExecutorService threadPool = Executors.newFixedThreadPool(numProc);
+        Collection<Callable<Void>> processes = new LinkedList<Callable<Void>>();
         for (int h = 0; h < dheight; h++) {
-            int spo = sso;
-            int dpo = dso;
+            final int sso_f = sso;
+            final int dso_f = dso;
+            processes.add(new Callable<Void>() {
+                @Override
+                public Void call() {
+                    int spo = sso_f;
+                    int dpo = dso_f;
 
-            for (int w = 0; w < dwidth; w++) {
-                for (int b = 0; b < dbands; b++) {
-                    float sum = 0.0F;
-                    double[] mat = matrix[b];
+                    for (int w = 0; w < dwidth; w++) {
+                        for (int b = 0; b < dbands; b++) {
+                            float sum = 0.0F;
+                            double[] mat = matrix[b];
 
-                    for (int k = 0; k < sbands; k++ ) {
-                        sum += (float)mat[k] *
-                               (float)(sData[k][spo+sBandOffsets[k]] & 0xFFFF);
+                            for (int k = 0; k < sbands; k++) {
+                                sum += (float) mat[k] *
+                                       (float) (sData[k][spo + sBandOffsets[k]] & 0xFFFF);
+                            }
+                            dData[b][dpo + dBandOffsets[b]] =
+                                    ImageUtil.clampRoundUShort(sum + (float) matrix[b][sbands]);
+                        }
+                        spo += sPixelStride;
+                        dpo += dPixelStride;
                     }
-
-                    dData[b][dpo+dBandOffsets[b]] = ImageUtil.clampRoundUShort(sum + (float)matrix[b][sbands]);
+                    return null;
                 }
-
-                spo += sPixelStride;
-                dpo += dPixelStride;
-            }
-
+            });
             sso += sLineStride;
             dso += dLineStride;
+        }
+        try {
+            threadPool.invokeAll(processes);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            threadPool.shutdown();
         }
     }
 
