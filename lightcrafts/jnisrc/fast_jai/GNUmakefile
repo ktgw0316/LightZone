@@ -7,7 +7,7 @@ include			$(COMMON_DIR)/mk/platform.mk
 
 TARGET_BASE:=		FASTJAI
 
-JNI_EXTRA_CFLAGS+=	-fopenmp
+JNI_EXTRA_CFLAGS+=	-fopenmp -std=c++0x
 
 # Must not use := here!
 JNI_MACOSX_LINK=	-lstdc++

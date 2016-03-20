@@ -69,7 +69,11 @@ static inline float fast_exp(float val)
         int i;
     } result;
     
-    result.i = (int)(fast_exp_a * val + fast_exp_b_c);
+#ifdef FP_FAST_FMAF
+    result.i = int(fmaf(fast_exp_a, val, fast_exp_b_c));
+#else
+    result.i = int(fast_exp_a * val + fast_exp_b_c);
+#endif
     return result.f;
 }
 
@@ -178,8 +182,14 @@ void separable_bf_mono_tile(
             for (int k = 0; k <= 2*wr; k++) {
                 const float I_s = rbuf[k-wr + x];
                 const float D_sq = SQR(I_s - I_s0);
+
+#ifdef FP_FAST_FMAF
+                const float f = fast_exp(fmaf(Ar, D_sq, -kernel[k]));
+                num = fmaf(f, I_s, num);
+#else
                 const float f = fast_exp(Ar * D_sq - kernel[k]);
                 num += f * I_s;
+#endif
                 denom += f;
             }
             
@@ -251,11 +261,16 @@ void separable_bf_mono_tile(
             float num = 0;
             float denom = 0;            
             for (int k = 0; k <= 2*wr; k++) {
-                const float b = cbuf[(k-wr) + y];                
-                const float D_sq = SQR(b - b0);		
+                const float b = cbuf[(k-wr) + y];
+                const float D_sq = SQR(b - b0);
+
+#ifdef FP_FAST_FMAF
+                const float f = fast_exp(fmaf(Ar, D_sq, -kernel[k]));
+                num = fmaf(f, b, num);
+#else
                 const float f = fast_exp(Ar * D_sq - kernel[k]);
-                
                 num += f * b;
+#endif
                 denom += f;
             }
             
@@ -418,14 +433,22 @@ void planar_YST_to_interleaved_RGB(unsigned short * const dstData, int dstStep,
             const int dst_idx = 3*(x-wr) + (y-wr)*dstStep + r_offset;
             const int idx = x + y*width;
             
-            float y = buf_y[idx];
-            float s = buf_s[idx] - 0.5f;
-            float t = buf_t[idx] - 0.5f;
+            const float y = buf_y[idx];
+            const float s = buf_s[idx] - 0.5f;
+            const float t = buf_t[idx] - 0.5f;
                         
-            for (int c = 0; c < 3; c++)
-                dstData[dst_idx+c] = clampUShort(0xffff * (yst_to_rgb[3*c] * y +
-                                                           yst_to_rgb[3*c+1] * s +
-                                                           yst_to_rgb[3*c+2] * t));
+            for (int c = 0; c < 3; c++) {
+#ifdef FP_FAST_FMAF
+                const float rgb = fmaf(yst_to_rgb[3*c+2], t,
+                                  fmaf(yst_to_rgb[3*c+1], s,
+                                       yst_to_rgb[3*c]  * y));
+#else
+                const float rgb = yst_to_rgb[3*c]   * y +
+                                  yst_to_rgb[3*c+1] * s +
+                                  yst_to_rgb[3*c+2] * t;
+#endif
+                dstData[dst_idx+c] = clampUShort(0xffff * rgb);
+            }
         }
     }
 }
@@ -515,9 +538,15 @@ void interleaved_RGB_to_planar_YST(const unsigned short * const srcData, int src
             v_g = v_inv_norm * src4_rgb[1];
             v_b = v_inv_norm * src4_rgb[2];
             
+#ifdef FP_FAST_FMAF
+            y = fmaf(v_rgb_to_yst[0][2], v_b, fmaf(v_rgb_to_yst[0][1], v_g,      v_rgb_to_yst[0][0] * v_r));
+            s = fmaf(v_rgb_to_yst[1][2], v_b, fmaf(v_rgb_to_yst[1][1], v_g, fmaf(v_rgb_to_yst[1][0], v_r, v_05)));
+            t = fmaf(v_rgb_to_yst[2][2], v_b, fmaf(v_rgb_to_yst[2][1], v_g, fmaf(v_rgb_to_yst[2][0], v_r, v_05)));
+#else
             y = v_rgb_to_yst[0][0] * v_r + v_rgb_to_yst[0][1] * v_g + v_rgb_to_yst[0][2] * v_b;
             s = v_rgb_to_yst[1][0] * v_r + v_rgb_to_yst[1][1] * v_g + v_rgb_to_yst[1][2] * v_b + v_05;
             t = v_rgb_to_yst[2][0] * v_r + v_rgb_to_yst[2][1] * v_g + v_rgb_to_yst[2][2] * v_b + v_05;
+#endif
             
             _mm_storeu_ps(&buf_y[idx+4], y);
             _mm_storeu_ps(&buf_s[idx+4], s);
@@ -534,10 +563,19 @@ void interleaved_RGB_to_planar_YST(const unsigned short * const srcData, int src
             
             float YST[3];
             
-            for (int c = 0; c < 3; c++)
-                YST[c] = rgb_to_yst[3*c] * r +
+            for (int c = 0; c < 3; c++) {
+#ifdef FP_FAST_FMAF
+                YST[c] = fmaf(rgb_to_yst[3*c+2], b,
+                         fmaf(rgb_to_yst[3*c+1], g,
+                         fmaf(rgb_to_yst[3*c],   r,
+                         (c > 0 ? 0.5f : 0))));
+#else
+                YST[c] = rgb_to_yst[3*c]   * r +
                          rgb_to_yst[3*c+1] * g +
-                         rgb_to_yst[3*c+2] * b + (c > 0 ? 0.5f : 0);
+                         rgb_to_yst[3*c+2] * b +
+                         (c > 0 ? 0.5f : 0);
+#endif
+            }
             
             buf_y[idx] = YST[0];
             buf_s[idx] = YST[1];
@@ -647,10 +685,16 @@ void separable_bf_chroma_tile(
                 const float s_b = rbuf_b[idx];
                 
                 const float D_sq = /* SQR(s_L - s0_L) + */ SQR(s_a - s0_a) + SQR(s_b - s0_b);
+
+#ifdef FP_FAST_FMAF
+                const float f = fast_exp(fmaf(Ar, D_sq, -kernel[k]));
+                a_num = fmaf(f, s_a, a_num);
+                b_num = fmaf(f, s_b, b_num);
+#else
                 const float f = fast_exp(Ar * D_sq - kernel[k]);
-                
                 a_num += f * s_a;
                 b_num += f * s_b;
+#endif
                 denom += f;
             }
             
@@ -658,7 +702,7 @@ void separable_bf_chroma_tile(
             if (denom == 0)
                 denom = 1.0;
             
-            const int idx0 = x + y*width;            
+            const int idx0 = x + y*width;
             buf_a[idx0] = a_num / denom;
             buf_b[idx0] = b_num / denom;
         }
@@ -748,10 +792,16 @@ void separable_bf_chroma_tile(
                 const float b_b = cbuf_b[idx];
                 
                 const float D_sq = SQR(b_a - b0_a) + SQR(b_b - b0_b);		
+
+#ifdef FP_FAST_FMAF
+                const float f = fast_exp(fmaf(Ar, D_sq, -kernel[k]));
+                a_num = fmaf(f, b_a, a_num);
+                b_num = fmaf(f, b_b, b_num);
+#else
                 const float f = fast_exp(Ar * D_sq - kernel[k]);
-                
                 a_num += f * b_a;
                 b_num += f * b_b;
+#endif
                 denom += f;
             }
             
@@ -763,7 +813,7 @@ void separable_bf_chroma_tile(
             buf_a[idx] = a_num / denom;
             buf_b[idx] = b_num / denom;
         }
-    }    
+    }
     
     delete [] cbuf_a;
     delete [] cbuf_b;
