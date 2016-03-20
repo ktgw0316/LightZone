@@ -61,8 +61,8 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
             return 0;
         final String make = getOwningMetadata().getCameraMake( true );
         if ( m_focalLengthPattern.matcher( make ).matches() )
-            return value.getIntValue() / 100F;
-        return value.getIntValue() / 10F;
+            return value.getIntValue() / 10F;
+        return value.getIntValue() / 100F;
     }
 
     /**
@@ -332,7 +332,7 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
      * This pattern is used to determine how to calculate the focal length.
      */
     private static final Pattern m_focalLengthPattern =
-        Pattern.compile( ".*(?:\\*IST D|K10D|OPTIO [A-Z]).*" );
+        Pattern.compile( ".*\\bOPTIO (?:30|33WR|43WR|450|550|555|750Z|X)\\b.*" );
 
     /**
      * A mapping of tags by ID.
