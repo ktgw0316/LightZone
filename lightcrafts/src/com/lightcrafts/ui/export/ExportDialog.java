@@ -34,10 +34,12 @@ public class ExportDialog extends JFileChooser {
             this.exportOptions = exportOptions;
         }
 
+        @Override
         public boolean accept(File f) {
             return true;
         }
 
+        @Override
         public String getDescription() {
             return exportOptions.getImageType().getName();
         }
@@ -58,9 +60,6 @@ public class ExportDialog extends JFileChooser {
     // The default button for the dialog:
     private JButton exportButton;
 
-    // Keep track of the expanded/collapsed state of the controls toggle:
-    private ExportCtrlToggle toggle;
-
     // This is the ComponentUI backdoor for validating and polishing the
     // chooser's text field input when the user clicks "Export":
     private Action approveAction;
@@ -79,6 +78,7 @@ public class ExportDialog extends JFileChooser {
         // Update the file's suffix and options when the filter changes:
         addPropertyChangeListener(
             new PropertyChangeListener() {
+                @Override
                 public void propertyChange(PropertyChangeEvent event) {
                     if (event.getPropertyName().equals(
                         JFileChooser.FILE_FILTER_CHANGED_PROPERTY
@@ -123,6 +123,7 @@ public class ExportDialog extends JFileChooser {
     /**
      * Add ExportControls and control buttons to the JFileChooser dialog.
      */
+    @Override
     protected JDialog createDialog(Component parent) {
         dialog = super.createDialog(parent);
         initButtons();
@@ -138,6 +139,8 @@ public class ExportDialog extends JFileChooser {
         ExportFilter filter = (ExportFilter) getFileFilter();
         ImageExportOptions options = filter.getExportOptions();
         File file = getSelectedFile();
+        final String extension = filter.getSuffix();
+        file = ExportNameUtility.setFileExtension(file, extension);
         options.setExportFile(file);
         return options;
     }
@@ -174,7 +177,9 @@ public class ExportDialog extends JFileChooser {
                 ExportLogic.mergeExportOptions(oldOptions, newOptions);
             }
             ExportControls ctrls = new ExportControls(newOptions, true);
-            toggle = new ExportCtrlToggle(ctrls, dialog);
+
+            // Keep track of the expanded/collapsed state of the controls toggle:
+            ExportCtrlToggle toggle = new ExportCtrlToggle(ctrls, dialog);
 
             controls = Box.createVerticalBox();
             controls.add(toggle);
