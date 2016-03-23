@@ -252,9 +252,9 @@ extern "C" JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_HighlightReco
             const int srcPixOffset = srcPixelStride * col + row * srcLineStride;
             
             float raw[3] = {
-                srcData[srcPixOffset + srcROffset],
-                srcData[srcPixOffset + srcGOffset],
-                srcData[srcPixOffset + srcBOffset]
+                static_cast<float>(srcData[srcPixOffset + srcROffset]),
+                static_cast<float>(srcData[srcPixOffset + srcGOffset]),
+                static_cast<float>(srcData[srcPixOffset + srcBOffset])
             };
             
             float rgb[3];
