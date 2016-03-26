@@ -51,9 +51,15 @@ public class Launcher {
     }
 
     protected void enableTextAntiAliasing() {
-        final boolean lafCond = sun.swing.SwingUtilities2.isLocalDisplay();
-        Object aaTextInfo = sun.swing.SwingUtilities2.AATextInfo.getAATextInfo(lafCond);
-        UIManager.getDefaults().put(sun.swing.SwingUtilities2.AA_TEXT_PROPERTY_KEY, aaTextInfo);
+        try {
+            final boolean lafCond = sun.swing.SwingUtilities2.isLocalDisplay();
+            Object aaTextInfo = sun.swing.SwingUtilities2.AATextInfo.getAATextInfo(lafCond);
+            UIManager.getDefaults().put(sun.swing.SwingUtilities2.AA_TEXT_PROPERTY_KEY, aaTextInfo);
+        }
+        catch (NoClassDefFoundError e) {
+            // Java 9 does not have the class SwingUtilities2.AATextInfo anymore,
+            // but text anti-aliasing is enabled by default.
+        }
     }
 
     protected void showAppVersion() {
