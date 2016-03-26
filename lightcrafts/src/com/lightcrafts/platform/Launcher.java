@@ -10,6 +10,8 @@ import com.lightcrafts.utils.ForkDaemon;
 import com.lightcrafts.utils.Version;
 
 import javax.swing.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.io.IOException;
 
 /**
@@ -51,12 +53,17 @@ public class Launcher {
     }
 
     protected void enableTextAntiAliasing() {
+        final boolean lafCond = sun.swing.SwingUtilities2.isLocalDisplay();
         try {
-            final boolean lafCond = sun.swing.SwingUtilities2.isLocalDisplay();
-            Object aaTextInfo = sun.swing.SwingUtilities2.AATextInfo.getAATextInfo(lafCond);
-            UIManager.getDefaults().put(sun.swing.SwingUtilities2.AA_TEXT_PROPERTY_KEY, aaTextInfo);
+            Class<?> clazz = Class.forName("sun.swing.SwingUtilities2$AATextInfo");
+            Method method = clazz.getMethod("getAATextInfo", boolean.class);
+            Object aaTextInfo = method.invoke(null, lafCond);
+            Field field =
+                    sun.swing.SwingUtilities2.class.getField("AA_TEXT_PROPERTY_KEY");
+            Object aaTextPropertyKey = field.get(null);
+            UIManager.getDefaults().put(aaTextPropertyKey, aaTextInfo);
         }
-        catch (NoClassDefFoundError e) {
+        catch (ReflectiveOperationException e) {
             // Java 9 does not have the class SwingUtilities2.AATextInfo anymore,
             // but text anti-aliasing is enabled by default.
         }

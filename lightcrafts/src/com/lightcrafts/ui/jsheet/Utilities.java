@@ -15,28 +15,15 @@ import java.lang.reflect.InvocationTargetException;
  * To change this template use File | Settings | File Templates.
  */
 public class Utilities {
-    static final void setWindowAlpha(Window w, int value) {
+    static void setWindowAlpha(Window w, int value) {
         if (w == null) return;
 
-        if (w.getPeer() == null) {
+        if (!w.isDisplayable()) {
             w.pack();
         }
-        java.awt.peer.ComponentPeer peer = w.getPeer();
-
-        try {
-            // Alpha API for Apple's Java 1.4 + 1.5 on Mac OS X 10.4 Tiger.
-            invoke(peer, "setAlpha", (float) (value / 255f));
-        } catch (NoSuchMethodException e) {
-            // Alpha API for Apple's Java 1.3.
-            try {
-                invoke(peer, "_setAlpha", value);
-            } catch (NoSuchMethodException e2) {
-                // Platform neutral API
-                w.setBackground(new Color(255,255,255,value));
-                if (w instanceof RootPaneContainer) {
-                    ((RootPaneContainer) w).getContentPane().setBackground(new Color(255,255,255,0));
-                }
-            }
+        w.setBackground(new Color(255,255,255,value));
+        if (w instanceof RootPaneContainer) {
+            ((RootPaneContainer) w).getContentPane().setBackground(new Color(255,255,255,0));
         }
     }
 
@@ -44,7 +31,7 @@ public class Utilities {
     throws NoSuchMethodException {
         try {
             Method method =  obj.getClass().getMethod(methodName,  new Class[] { Boolean.TYPE} );
-           return method.invoke(obj, new Object[] { new Boolean(newValue)});
+           return method.invoke(obj, newValue);
         } catch (IllegalAccessException e) {
             throw new NoSuchMethodException(methodName+" is not accessible");
         } catch (InvocationTargetException e) {
@@ -57,7 +44,7 @@ public class Utilities {
     throws NoSuchMethodException {
         try {
             Method method =  obj.getClass().getMethod(methodName,  new Class[] { Integer.TYPE} );
-            return method.invoke(obj, new Object[] { new Integer(newValue)});
+            return method.invoke(obj, newValue);
         } catch (IllegalAccessException e) {
             throw new NoSuchMethodException(methodName+" is not accessible");
         } catch (InvocationTargetException e) {
@@ -70,7 +57,7 @@ public class Utilities {
     throws NoSuchMethodException {
         try {
             Method method =  obj.getClass().getMethod(methodName,  new Class[] { Float.TYPE} );
-            return method.invoke(obj, new Object[] { new Float(newValue)});
+            return method.invoke(obj, newValue);
         } catch (IllegalAccessException e) {
             throw new NoSuchMethodException(methodName+" is not accessible");
         } catch (InvocationTargetException e) {
