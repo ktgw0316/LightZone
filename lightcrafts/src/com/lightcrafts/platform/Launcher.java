@@ -11,6 +11,7 @@ import com.lightcrafts.utils.Version;
 
 import javax.swing.*;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.io.IOException;
 
@@ -63,10 +64,13 @@ public class Launcher {
             Object aaTextPropertyKey = field.get(null);
             UIManager.getDefaults().put(aaTextPropertyKey, aaTextInfo);
         }
-        catch (ReflectiveOperationException e) {
-            // Java 9 does not have the class SwingUtilities2.AATextInfo anymore,
-            // but text anti-aliasing is enabled by default.
-        }
+        // Java 9 does not have the class SwingUtilities2.AATextInfo anymore,
+        // but text anti-aliasing is enabled by default.
+        catch (ClassNotFoundException    ignored) {}
+        catch (NoSuchMethodException     ignored) {}
+        catch (InvocationTargetException ignored) {}
+        catch (IllegalAccessException    ignored) {}
+        catch (NoSuchFieldException      ignored) {}
     }
 
     protected void showAppVersion() {
