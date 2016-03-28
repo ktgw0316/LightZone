@@ -363,9 +363,10 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
                 CA = CA.times(new Matrix(new double[][]{{1/max, 0, 0},{0, 1/max, 0},{0, 0, 1/max}}));
 
             // The matrix taking into account the camera color space and its basic white balance and exposure
-            float camMatrix[][] = new Matrix(cameraRGB(temperature)).times(Math.pow(2, exposure)).getArrayFloat();
+            float camMatrix[][] = CA.times(new Matrix(cameraRGB(temperature)).times(Math.pow(2, exposure))).getArrayFloat();
 
-            front = new HighlightRecoveryOpImage(front, preMul, camMatrix, CA.getArrayFloat(), null);
+            front = new HighlightRecoveryOpImage(front, preMul, camMatrix, JAIContext.fileCacheHint);
+            front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
 
             if (tint != 0)
                 front = WhiteBalanceV2.tintCast(front, tint, lightness);
