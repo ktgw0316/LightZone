@@ -390,6 +390,7 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
      *  <code>ImageLayout</code> object.
      *
      * @param source a RenderedImage object.
+     * @param interp an Interpolation object.
      * @param scaleX an int downsample factor.
      * @param scaleY an int downsample factor.
      * @param filterSize an int representing the size of the combined
@@ -398,6 +399,7 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
      * @return validated ImageLayout object.
      */
     private static ImageLayout layoutHelper(RenderedImage source,
+                                            Interpolation interp,
                                             int scaleX,
                                             int scaleY,
                                             int filterSize,
@@ -462,12 +464,12 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
 
         // Propagate to GeometricOpImage constructor
         super(vectorize(source),
-              layoutHelper(source, scaleX, scaleY, qsFilter.length, layout),
-              config,   // Map object
-              true,     // cobbleSources,
-              extender, // extender
-              interp,    // Interpolation object
-              null);
+                layoutHelper(source, interp, scaleX, scaleY, qsFilter.length, layout),
+                config,   // Map object
+                true,     // cobbleSources,
+                extender, // extender
+                interp,    // Interpolation object
+                null);
 
         int resampleType;
 
@@ -804,8 +806,10 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
                                 // Make the rectangle squeeze in the horizontal direction
                                 for (int ix = hKernel.length - 1; ix > hParity - 1; ix--) {
                                     float kk = hKernel[ix]*vKernel[iy];
-                                    sum += kk*((int)srcData[upLeft] + (int)srcData[upRight] +
-                                               (int)srcData[dnLeft] + (int)srcData[dnRight]);
+                                    sum += kk*((srcData[upLeft] &0xff) +
+                                            (srcData[upRight]&0xff) +
+                                            (srcData[dnLeft] &0xff) +
+                                            (srcData[dnRight]&0xff));
                                     upLeft  += srcPixelStride;
                                     upRight -= srcPixelStride;
                                     dnLeft  += srcPixelStride;
@@ -827,7 +831,8 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
                                 int kInd = vKernel.length - 1;
                                 while (xUp < xDown) {
                                     float kk = hCtr*vKernel[kInd--];
-                                    sum += kk*((int)srcData[xUp] + (int)srcData[xDown]);
+                                    sum += kk*((srcData[xUp]&0xff) +
+                                            (srcData[xDown]&0xff));
                                     xUp   += srcScanlineStride;
                                     xDown -= srcScanlineStride;
                                 }
@@ -842,13 +847,14 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
                                 int kInd = hKernel.length - 1;
                                 while (xLeft < xRight) {
                                     float kk = vCtr*hKernel[kInd--];
-                                    sum += kk*((int)srcData[xLeft] + (int)srcData[xRight]);
+                                    sum += kk*((srcData[xLeft]&0xff) +
+                                            (srcData[xRight]&0xff));
                                     xLeft  += srcPixelStride;
                                     xRight -= srcPixelStride;
                                 } // while xLeft
 
                                 // Grab the center pixel if hParity was odd also
-                                if (hParity == 1) sum += vCtr*hCtr*(int)srcData[xLeft];
+                                if (hParity == 1) sum += vCtr*hCtr* (srcData[xLeft]&0xff);
 
                             } // if vParity
 
@@ -944,8 +950,10 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
                                 // Make the rectangle squeeze in the horizontal direction
                                 for (int ix = hKernel.length - 1; ix > hParity - 1; ix--) {
                                     float kk = hKernel[ix]*vKernel[iy];
-                                    sum += kk*((int)srcData[upLeft] + (int)srcData[upRight] +
-                                               (int)srcData[dnLeft] + (int)srcData[dnRight]);
+                                    sum += kk*((srcData[upLeft] &0xffff) +
+                                            (srcData[upRight]&0xffff) +
+                                            (srcData[dnLeft] &0xffff) +
+                                            (srcData[dnRight]&0xffff));
                                     upLeft  += srcPixelStride;
                                     upRight -= srcPixelStride;
                                     dnLeft  += srcPixelStride;
@@ -968,7 +976,8 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
                                 int kInd = vKernel.length - 1;
                                 while (xUp < xDown) {
                                     float kk = hCtr*vKernel[kInd--];
-                                    sum += kk*((int)srcData[xUp] + (int)srcData[xDown]);
+                                    sum += kk*((srcData[xUp]  &0xffff) +
+                                            (srcData[xDown]&0xffff));
                                     xUp   += srcScanlineStride;
                                     xDown -= srcScanlineStride;
                                 }
@@ -983,13 +992,14 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
                                 int kInd = hKernel.length - 1;
                                 while (xLeft < xRight) {
                                     float kk = vCtr*hKernel[kInd--];
-                                    sum += kk*((int)srcData[xLeft] + (int)srcData[xRight]);
+                                    sum += kk*((srcData[xLeft] &0xffff) +
+                                            (srcData[xRight]&0xffff));
                                     xLeft  += srcPixelStride;
                                     xRight -= srcPixelStride;
                                 } // while xLeft
 
                                 // Grab the center pixel if hParity was odd also
-                                if (hParity == 1) sum += vCtr*hCtr*(int)srcData[xLeft];
+                                if (hParity == 1) sum += vCtr*hCtr* (srcData[xLeft]&0xffff);
 
                             } // if vParity
                             int val = (int)(sum + 0.5);
