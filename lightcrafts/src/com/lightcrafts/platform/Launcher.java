@@ -54,13 +54,16 @@ public class Launcher {
     }
 
     protected void enableTextAntiAliasing() {
-        final boolean lafCond = sun.swing.SwingUtilities2.isLocalDisplay();
         try {
+            Class<?> clazz0 = Class.forName("sun.swing.SwingUtilities2");
+            Method isLocalDisplay = clazz0.getMethod("isLocalDisplay");
+            final Object lafCond = isLocalDisplay.invoke(null);
+
             Class<?> clazz = Class.forName("sun.swing.SwingUtilities2$AATextInfo");
             Method method = clazz.getMethod("getAATextInfo", boolean.class);
             Object aaTextInfo = method.invoke(null, lafCond);
-            Field field =
-                    sun.swing.SwingUtilities2.class.getField("AA_TEXT_PROPERTY_KEY");
+
+            Field field = clazz0.getField("AA_TEXT_PROPERTY_KEY");
             Object aaTextPropertyKey = field.get(null);
             UIManager.getDefaults().put(aaTextPropertyKey, aaTextInfo);
         }
