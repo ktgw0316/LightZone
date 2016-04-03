@@ -143,6 +143,7 @@ public class LCMSColorConvertDescriptor extends OperationDescriptorImpl {
     }
 
     /** Returns <code>true</code> since renderable operation is supported. */
+    @Override
     public boolean isRenderableSupported() {
         return true;
     }
@@ -163,8 +164,7 @@ public class LCMSColorConvertDescriptor extends OperationDescriptorImpl {
      * @param hints The <code>RenderingHints</code> to use.
      * May be <code>null</code>.
      * @return The <code>RenderedOp</code> destination.
-     * @throws IllegalArgumentException if <code>source0</code> is <code>null</code>.
-     * @throws IllegalArgumentException if <code>colorModel</code> is <code>null</code>.
+     * @throws IllegalArgumentException if <code>source0</code> or <code>colorModel</code> is <code>null</code>.
      */
     public static RenderedOp create(RenderedImage source0,
                                     ColorModel colorModel,
@@ -202,8 +202,7 @@ public class LCMSColorConvertDescriptor extends OperationDescriptorImpl {
      * @param hints The <code>RenderingHints</code> to use.
      * May be <code>null</code>.
      * @return The <code>RenderableOp</code> destination.
-     * @throws IllegalArgumentException if <code>source0</code> is <code>null</code>.
-     * @throws IllegalArgumentException if <code>colorModel</code> is <code>null</code>.
+     * @throws IllegalArgumentException if <code>source0</code> or <code>colorModel</code> is <code>null</code>.
      */
     public static RenderableOp createRenderable(RenderableImage source0,
                                                 ColorModel colorModel,

@@ -10,7 +10,6 @@ import java.awt.color.ColorSpace;
 import java.awt.color.ICC_ColorSpace;
 import java.awt.image.*;
 import java.awt.*;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Arrays;
 
@@ -41,15 +40,15 @@ public class LCMS {
 //            B: Bytes per sample
 //            Y: Swap first - changes ABGR to BGRA and KCMY to CMYK
 
-    private static final int COLORSPACE_SH(int s)       { return ((s) << 16); }
-    private static final int SWAPFIRST_SH(int s)        { return ((s) << 14); }
-    private static final int FLAVOR_SH(int s)           { return ((s) << 13); }
-    private static final int PLANAR_SH(int p)           { return ((p) << 12); }
-    private static final int ENDIAN16_SH(int e)         { return ((e) << 11); }
-    private static final int DOSWAP_SH(int e)           { return ((e) << 10); }
-    private static final int EXTRA_SH(int e)            { return ((e) << 7); }
-    private static final int CHANNELS_SH(int c)         { return ((c) << 3); }
-    private static final int BYTES_SH(int b)            { return (b); }
+    private static int COLORSPACE_SH(int s)       { return ((s) << 16); }
+    private static int SWAPFIRST_SH(int s)        { return ((s) << 14); }
+    private static int FLAVOR_SH(int s)           { return ((s) << 13); }
+    private static int PLANAR_SH(int p)           { return ((p) << 12); }
+    private static int ENDIAN16_SH(int e)         { return ((e) << 11); }
+    private static int DOSWAP_SH(int e)           { return ((e) << 10); }
+    private static int EXTRA_SH(int e)            { return ((e) << 7); }
+    private static int CHANNELS_SH(int c)         { return ((c) << 3); }
+    private static int BYTES_SH(int b)            { return (b); }
 
 // Pixel types
 
@@ -161,7 +160,7 @@ public class LCMS {
     public static final int TYPE_CMYKcm_16_PLANAR= (CHANNELS_SH(6)|BYTES_SH(2)|PLANAR_SH(1));
     public static final int TYPE_CMYKcm_16_SE    = (CHANNELS_SH(6)|BYTES_SH(2)|ENDIAN16_SH(1));
 
-// Separations with more than 6 channels aren't very standarized,
+// Separations with more than 6 channels aren't very standardized,
 // Except most start with CMYK and add other colors, so I just used
 // then total number of channels after CMYK i.e CMYK8_8
 
@@ -301,33 +300,22 @@ public class LCMS {
 
 // Gridpoints
 
-    private static final int cmsFLAGS_GRIDPOINTS(int n)       { return (((n) & 0xFF) << 16); }
+    private static int cmsFLAGS_GRIDPOINTS(int n)       { return (((n) & 0xFF) << 16); }
 
 // Public Interface
 
     // TODO: exception handling
 
-    private final static class LRUHashMap extends LinkedHashMap {
-        LRUHashMap(int initialCapacity, float loadFactor, int max_entries) {
-            super(initialCapacity, loadFactor, true);
-            this.max_entries = max_entries;
+    private final static class RCHandleHashMap<K,V extends RCHandle> extends LRUHashMap<K,V> {
+
+        public RCHandleHashMap(int max_entries) {
+            super(max_entries);
         }
 
-        public LRUHashMap(int initialCapacity, int max_entries) {
-            super(initialCapacity);
-            this.max_entries = max_entries;
-        }
-
-        public LRUHashMap(int max_entries) {
-            super();
-            this.max_entries = max_entries;
-        }
-
-        private final int max_entries;
-
-        protected boolean removeEldestEntry(Map.Entry eldest) {
-            if (size() > max_entries) {
-                ((RCHandle) eldest.getValue()).decrement();
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<K,V> eldest) {
+            if (size() > m_maxEntries) {
+                eldest.getValue().decrement();
                 return true;
             }
             return false;
@@ -364,19 +352,19 @@ public class LCMS {
             this.gamma = gamma;
         }
 
+        @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
 
             RGBProfileComponents that = (RGBProfileComponents) o;
 
-            if (Double.compare(that.gamma, gamma) != 0) return false;
-            if (!Arrays.equals(primaries, that.primaries)) return false;
-            if (!Arrays.equals(whitePoint, that.whitePoint)) return false;
-
-            return true;
+            return (Double.compare(that.gamma, gamma) == 0
+                    && Arrays.equals(primaries, that.primaries)
+                    && Arrays.equals(whitePoint, that.whitePoint));
         }
 
+        @Override
         public int hashCode() {
             int result;
             long temp;
@@ -389,14 +377,14 @@ public class LCMS {
     }
 
     public static class Profile {
-        private static Map profileCache = new LRUHashMap(20);
+        private static Map<Object, RCHandle> profileCache = new RCHandleHashMap<Object, RCHandle>(20);
 
         protected RCHandle cmsProfile = null;
 
         protected Profile() { }
 
         public Profile(ICC_Profile iccProfile) {
-            RCHandle handle = (RCHandle) profileCache.get(iccProfile);
+            RCHandle handle = profileCache.get(iccProfile);
             
             if (handle != null && handle.increment() > 1)
                 cmsProfile = handle;
@@ -410,7 +398,7 @@ public class LCMS {
 
         public Profile(double whitePoint[], double primaries[], double gamma) {
             RGBProfileComponents components = new RGBProfileComponents(whitePoint, primaries, gamma);
-            RCHandle handle = (RCHandle) profileCache.get(components);
+            RCHandle handle = profileCache.get(components);
 
             if (handle != null && handle.increment() > 1)
                 cmsProfile = handle;
@@ -428,6 +416,7 @@ public class LCMS {
             cmsProfile = null;
         }
 
+        @Override
         public void finalize() {
             dispose();
         }
@@ -446,6 +435,7 @@ public class LCMS {
             }
         }
 
+        @Override
         public void dispose() { }
     }
 
@@ -512,7 +502,7 @@ public class LCMS {
     }
 
     public static class Transform {
-        private static Map transformCache = new LRUHashMap(20);
+        private static Map<Object, RCHandle> transformCache = new RCHandleHashMap<Object, RCHandle>(20);
 
         private RCHandle cmsTransform = null;
 
@@ -549,24 +539,24 @@ public class LCMS {
                 this.flags = flags;
             }
 
+            @Override
             public boolean equals(Object o) {
                 if (this == o) return true;
                 if (o == null || getClass() != o.getClass()) return false;
 
                 TransformData that = (TransformData) o;
 
-                if (flags != that.flags) return false;
-                if (inputProfileHandle != that.inputProfileHandle) return false;
-                if (inputType != that.inputType) return false;
-                if (intent != that.intent) return false;
-                if (outputProfileHandle != that.outputProfileHandle) return false;
-                if (outputType != that.outputType) return false;
-                if (proofIntent != that.proofIntent) return false;
-                if (proofProfileHandle != that.proofProfileHandle) return false;
-
-                return true;
+                return ((flags == that.flags)
+                        && (inputProfileHandle == that.inputProfileHandle)
+                        && (inputType == that.inputType)
+                        && (intent == that.intent)
+                        && (outputProfileHandle == that.outputProfileHandle)
+                        && (outputType == that.outputType)
+                        && (proofIntent == that.proofIntent)
+                        && (proofProfileHandle == that.proofProfileHandle));
             }
 
+            @Override
             public int hashCode() {
                 int result;
                 result = (int) (inputProfileHandle ^ (inputProfileHandle >>> 32));
@@ -583,7 +573,7 @@ public class LCMS {
 
         public Transform(Profile input, int inputType, Profile output, int outputType, int intent, int flags) {
             TransformData td = new TransformData(input, inputType, output, outputType, intent, flags);
-            RCHandle transformHandle = (RCHandle) transformCache.get(td);
+            RCHandle transformHandle = transformCache.get(td);
 
             if (transformHandle != null && transformHandle.increment() > 1)
                 cmsTransform = transformHandle;
@@ -604,7 +594,7 @@ public class LCMS {
         public Transform(Profile input, int inputType, Profile output, int outputType, Profile proof,
                          int intent, int proofIntent, int flags) {
             TransformData td = new TransformData(input, inputType, output, outputType, proof, intent, proofIntent, flags);
-            RCHandle transformHandle = (RCHandle) transformCache.get(td);
+            RCHandle transformHandle = transformCache.get(td);
 
             if (transformHandle != null && transformHandle.increment() > 1)
                 cmsTransform = transformHandle;
@@ -683,6 +673,7 @@ public class LCMS {
             cmsTransform = null;
         }
 
+        @Override
         public void finalize() {
             dispose();
         }

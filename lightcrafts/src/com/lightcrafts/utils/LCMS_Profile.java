@@ -2,7 +2,6 @@
 
 package com.lightcrafts.utils;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.awt.color.ICC_Profile;
 
@@ -15,41 +14,19 @@ import java.awt.color.ICC_Profile;
  */
 
 public class LCMS_Profile {
-    private final static class LRUHashMap extends LinkedHashMap {
-        LRUHashMap(int initialCapacity, float loadFactor, int max_entries) {
-            super(initialCapacity, loadFactor, true);
-            this.max_entries = max_entries;
-        }
 
-        public LRUHashMap(int initialCapacity, int max_entries) {
-            super(initialCapacity);
-            this.max_entries = max_entries;
-        }
-
-        public LRUHashMap(int max_entries) {
-            super();
-            this.max_entries = max_entries;
-        }
-
-        private final int max_entries;
-
-        protected boolean removeEldestEntry(Map.Entry eldest) {
-            return size() > max_entries;
-        }
-    }
-
-    private static Map profileCache = new LRUHashMap(20);
+    private static Map<ICC_Profile, Long> profileCache = new LRUHashMap<ICC_Profile, Long>(20);
 
     private long cmsProfileHandle = 0;
 
     public LCMS_Profile(ICC_Profile iccProfile) {
-        Long handle = (Long) profileCache.get(iccProfile);
+        Long handle = profileCache.get(iccProfile);
         if (handle == null) {
             byte data[] = iccProfile.getData();
             cmsProfileHandle = LCMSNative.cmsOpenProfileFromMem(data, data.length);
-            profileCache.put(iccProfile, new Long(cmsProfileHandle));
+            profileCache.put(iccProfile, cmsProfileHandle);
         } else
-            cmsProfileHandle = handle.longValue();
+            cmsProfileHandle = handle;
     }
 
     public void dispose() {
@@ -59,7 +36,4 @@ public class LCMS_Profile {
         }
     }
 
-    /* public void finalize() {
-        dispose();
-    } */
 }
