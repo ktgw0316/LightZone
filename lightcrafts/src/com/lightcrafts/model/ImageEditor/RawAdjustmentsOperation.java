@@ -389,7 +389,7 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
 
             if (color_noise != 0 || grain_noise != 0) {
                 BorderExtender borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
-                front = new NonLocalMeansFilterOpImage(front, borderExtender, JAIContext.fileCacheHint, null, grain_noise * scale, 0.02f, color_noise * scale, 0.04f);
+                front = new NonLocalMeansFilterOpImage(front, borderExtender, JAIContext.fileCacheHint, null, (int)grain_noise, 2 * (int)grain_noise, 3, (int)color_noise, 2 * (int)color_noise, 3);
                 front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
             }
 

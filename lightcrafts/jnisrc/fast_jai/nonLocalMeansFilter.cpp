@@ -1,4 +1,5 @@
-/* Copyright (C) 2015 Masahiro Kitagawa */
+/* Copyright (C) 2015- Masahiro Kitagawa */
+#include <algorithm>
 #include <float.h>
 #include <math.h>
 #include <stdlib.h>
@@ -7,129 +8,74 @@
 #include <omp.h>
 #include "include/yst.h"
 #include "include/transpose.h"
+#include "include/omp_util.h"
 
-inline void separable_nlm_mono_row(
-    float *ibuf,                            // pointer to source data buffer
-    const float sr,                         // the usual range sigma
-    const int wr,                           // window radius in pixels
-    const float *kernel,                    // half-kernel containing the exponents of the spatial Gaussian
-    const int width, const int height,      // dimensions of the source image
-    const float Ar)                         // coefficient of the exponent for the range Gaussian
+void box_sum_horizontal_and_transpose(
+    const float * const src, float *dst, const int swidth, const int sheight,
+    const int r)
 {
-    float *rbuf = new float[width];
+    const int dwidth = sheight;
+    const int dheight = swidth;
 
-#if _OPENMP < 201307
-#   pragma omp for
-#else
-#   pragma omp for simd
-#endif
-    for (int y=2*wr; y < height - 2*wr; y++) {
-        memcpy(rbuf, &ibuf[y * width], width * sizeof(float));
-        for (int x=2*wr; x < width - 2*wr; x++) {
-            // compute adaptive kernel and convolve color channels
-            float num = 0;
-            float denom = 0;
+    float *srct = new float[sheight * swidth]();
 
-            for (int k = 0; k <= 2*wr; k++) {
-                const int idx = (k-wr) + x;
-                const float I_s = rbuf[idx];
+#pragma omp parallel
+    {
+        // Calculate the head (x = r) elements in original coordinate
+#pragma omp for nowait
+        for (int y = 0; y < sheight; ++y) {
+            const int x0 = y * swidth;
 
-                float D_sq = 0;
-                for (int i = -wr; i <= wr; i++) {
-                    const float I_s0 = rbuf[x+i];
-                    const float I_s1 = rbuf[idx+i];
+            const int pos = r * dwidth + y; // transeposed
+            dst[pos] = 0.0;
 
-                    D_sq += SQR(I_s1 - I_s0);
-                }
-                D_sq /= 2*wr + 1;
-
-                const float f = fast_exp(Ar * D_sq - kernel[k]);
-                num += f * I_s;
-                denom += f;
+            OMP_SIMD
+            for (int x = 0; x < 2 * r + 1; ++x) {
+                dst[pos] += src[x0 + x];
             }
+        }
 
-            // normalize
-            if (fabs(denom) < FLT_EPSILON) // denom == 0
-                denom = 1.0;
-            const int idx0 = x + y * width;
-            ibuf[idx0] = num / denom;
+        // Transpose src. Note that dst is already transposed.
+        transpose(src, srct, swidth, sheight);
+
+        // Calculate the other elements in transposed coordinate
+#pragma omp for ordered
+        for (int y = r + 1; y < dheight - r; ++y) {
+            const int x0 = y * dwidth;
+
+#pragma omp ordered
+            OMP_SIMD
+            for (int pos = x0; pos < x0 + dwidth; ++pos) {
+                dst[pos] = dst[pos - dwidth]
+                        - srct[pos - (r + 1) * dwidth]
+                        + srct[pos + r * dwidth];
+            }
         }
     }
 
-    delete [] rbuf;
+    delete[] srct;
 }
 
-inline void separable_nlm_chroma_row(
-    float *buf_a,                           // pointer to the s source/destination buffer
-    float *buf_b,                           // pointer to the t source/destination buffer
-    const float sr,                         // the usual range sigma
-    const int wr,                           // window radius in pixels
-    const float *kernel,                    // half-kernel containing the exponents of the spatial Gaussian
-    const int width, const int height,      // dimensions of the source image
-    const float Ar)                         // coefficient of the exponent for the range Gaussian
+void box_sum(
+    const float * const src, float *dst,
+    const int width, const int height, // dimensions of the source image
+    const int box_radius_x, const int box_radius_y)
 {
-    float *rbuf_a = new float[width];
-    float *rbuf_b = new float[width];
-
-#if _OPENMP < 201307
-#   pragma omp for
-#else
-#   pragma omp for simd
-#endif
-    for (int y=2*wr; y < height - 2*wr; y++) {
-        memcpy(rbuf_a, &buf_a[y * width], width * sizeof(float));
-        memcpy(rbuf_b, &buf_b[y * width], width * sizeof(float));
-
-        for (int x=2*wr; x < width - 2*wr; x++) {
-            // compute adaptive kernel and convolve color channels
-            float a_num = 0;
-            float b_num = 0;
-            float denom = 0;
-
-            for (int k = 0; k <= 2*wr; k++) {
-                const int idx = (k-wr) + x;
-                const float s_a = rbuf_a[idx];
-                const float s_b = rbuf_b[idx];
-
-                float D_sq = 0;
-                for (int i = -wr; i <= wr; i++) {
-                    const float s0_a = rbuf_a[x+i];
-                    const float s0_b = rbuf_b[x+i];
-                    const float s1_a = rbuf_a[idx+i];
-                    const float s1_b = rbuf_b[idx+i];
-
-                    D_sq += SQR(s1_a - s0_a) + SQR(s1_b - s0_b);
-                }
-                D_sq /= 2*wr + 1;
-
-                const float f = fast_exp(Ar * D_sq - kernel[k]);
-                a_num += f * s_a;
-                b_num += f * s_b;
-                denom += f;
-            }
-
-            // normalize
-            if (fabs(denom) < FLT_EPSILON) // denom == 0
-                denom = 1.0;
-            const int idx0 = x + y*width;
-            buf_a[idx0] = a_num / denom;
-            buf_b[idx0] = b_num / denom;
-        }
-    }
-
-    delete [] rbuf_a;
-    delete [] rbuf_b;
+    float *buf = new float[height * width]();
+    box_sum_horizontal_and_transpose(src, buf, width, height, box_radius_x);
+    box_sum_horizontal_and_transpose(buf, dst, height, width, box_radius_y);
+    delete[] buf;
 }
 
 /*******************************************************************************
- * separable_nlm_mono_tile()
+ * nlm_mono_tile()
  *
- * Apply a separable Non-Local Means filter to a rectangular region of a single-band
+ * Apply a Non-Local Means filter to a rectangular region of a single-band
  * raster
  *
  * Dimensions of source and destination rectangles are related by
  *
- *     dst_width = src_width - 2*wr
+ *     dst_width  = src_width - 2*wr
  *     dst_height = src_height - 2*wr
  *
  * 'kernel' points to the mid-point of a (2*wr + 1)-length array containing
@@ -138,41 +84,101 @@ inline void separable_nlm_chroma_row(
  *     2) negated exponents of the spatial gaussian function (this is what Fabio
  *        passes from his BilateralFilterOpImage class)
  *
- * The macro GS_x_GR(x) controls the interpretation.
+ * This implementation is based on
+ * Laurent Condat, "A Simple Trick to Speed Up and Improve the Non-Local Means"
  *******************************************************************************/
-inline void separable_nlm_mono_tile(
-    float *ibuf,                            // pointer to source data buffer
-    const float sr,                         // the usual range sigma
-    const int wr,                           // window radius in pixels
-    const float *kernel,                    // half-kernel containing the exponents of the spatial Gaussian
-    const int width, const int height)      // dimensions of the source image
+inline void nlm_mono_tile(
+    float *ibuf,                       // pointer to source data buffer
+    const float h,                     // intensity
+    const int sr,                      // search window radius in pixels
+    const int pr,                      // patch radius in pixels
+    const float *kernel,               // half-kernel containing the exponents of the spatial Gaussian
+    const int width, const int height) // dimensions of the source image
 {
-    if (fabs(sr) < FLT_EPSILON)
+    if (fabs(h) < FLT_EPSILON)
+        return;
+    if (sr < 1)
         return;
 
-    // coefficient of the exponent for the range Gaussian
-    const float Ar = - 1.0f / (2.0f * SQR(sr) );
+    const int pd = 2 * pr + 1; // search window full width in pixels
+    const float C_inv = -1.0f / (SQR(h) * SQR(pd));
 
-    float *tbuf = new float[width*height];
+    const size_t elems = width * height;
+    float *obuf  = new float[elems](); // output data buffer
+    float *w_sum = new float[elems]();
+    float *w_max = new float[elems]();
 
-#   pragma omp parallel
-    {
-        // Filter Rows
-        separable_nlm_mono_row(ibuf, sr, wr, kernel, width, height, Ar);
+    float *v     = new float[elems](); // weight map
+    float *ui    = new float[elems](); // integral image of square distances
 
-        // Filter Columns
-        transpose(ibuf, tbuf, width, height);
-        separable_nlm_mono_row(tbuf, sr, wr, kernel, height, width, Ar);
-        transpose(tbuf, ibuf, height, width);
+    for (int ny = -sr; ny <= 0; ++ny) {
+        for (int nx = -(ny+sr), n_offset = ny * width + nx; nx <= ny+sr && n_offset < 0; ++nx, ++n_offset) {
+            const int margin_left  = nx < 0 ? -nx : 0;
+            const int margin_right = nx > 0 ?  nx : 0;
+            const float f = kernel[-ny] * kernel[abs(nx)];
+
+            // square distances
+            OMP_PARALLEL_FOR_SIMD
+            for (int y = -ny; y < height; ++y) {
+                const int x0 = y * width;
+
+                for (int x = margin_left; x < width - margin_right; ++x) {
+                    const int pos0 = x0 + x;
+                    const int pos1 = pos0 + n_offset;
+                    ui[pos0] = SQR(ibuf[pos0] - ibuf[pos1]);
+                }
+            }
+
+            // sum in each patch
+            box_sum(ui, v, width, height, pr, pr);
+
+            // Update the output pixel values using the weight map
+            OMP_PARALLEL_FOR_SIMD // TODO: Is this safe?
+            for (int y = -ny; y < height; ++y) {
+                const int x0 = y * width;
+                for (int x = margin_left; x < width - margin_right; ++x) {
+                    const int pos0 = x0 + x;
+                    const int pos1 = pos0 + n_offset;
+                    const float w = f * fast_exp(v[pos0] * C_inv);
+
+                    obuf[pos0] += w * ibuf[pos1];
+                    obuf[pos1] += w * ibuf[pos0];
+
+                    w_sum[pos0] += w;
+                    w_sum[pos1] += w;
+                    if (w > w_max[pos0])
+                        w_max[pos0] = w;
+                    if (w > w_max[pos1])
+                        w_max[pos1] = w;
+                }
+            }
+        }
     }
+    delete [] v;
+    delete [] ui;
 
-    delete [] tbuf;
+    // The weight attached to current pixels (n_offset == 0) is maximum of
+    // all the weights. Add the contribution of the current pixels to their
+    // denoised versions, then normalize.
+    OMP_PARALLEL_FOR_SIMD
+    for (int pos = 0; pos < elems; ++pos) {
+        const float w_cur = w_max[pos] > FLT_EPSILON ? w_max[pos] : 1.0f;
+        w_sum[pos] += w_cur;
+
+        obuf[pos] += w_cur * ibuf[pos];
+        obuf[pos] /= w_sum[pos];
+    }
+    delete [] w_max;
+    delete [] w_sum;
+
+    std::copy(&obuf[0], &obuf[elems], ibuf);
+    delete [] obuf;
 }
 
 /*******************************************************************************
- * separable_nlm_chroma_tile()
+ * nlm_chroma_tile()
  *
- * Apply a separable Non-Local Means filter to a rectangular region of a color raster
+ * Apply a Non-Local Means filter to a rectangular region of a color raster
  *
  * Dimensions of source and destination rectangles are related by
  *
@@ -187,49 +193,115 @@ inline void separable_nlm_mono_tile(
  *
  * The macro GS_x_GR(x) controls the interpretation.
  *******************************************************************************/
-inline void separable_nlm_chroma_tile(
-    float *buf_a,                           // pointer to the s source/destination buffer
-    float *buf_b,                           // pointer to the t source/destination buffer
-    const float sr,                         // the usual range sigma
-    const int wr,                           // window radius in pixels
-    const float *kernel,                    // half-kernel containing the exponents of the spatial Gaussian
-    const int width, const int height)      // dimensions of the source image
+inline void nlm_chroma_tile(
+    float *ibuf_a,                     // pointer to the s source/destination buffer
+    float *ibuf_b,                     // pointer to the t source/destination buffer
+    const float h,                     // intensity
+    const int sr,                      // search window radius in pixels
+    const int pr,                      // patch radius in pixels
+    const float *kernel,               // half-kernel containing the exponents of the spatial Gaussian
+    const int width, const int height) // dimensions of the source image
 {
-    if (fabs(sr) < FLT_EPSILON)
+    if (fabs(h) < FLT_EPSILON)
+        return;
+    if (sr < 1)
         return;
 
-    // coefficient of the exponent for the range Gaussian
-    const float Ar = - 1.0f / (2.0f * SQR(sr) );
+    const int pd = 2 * pr + 1; // search window full width in pixels
+    const float C_inv = -1.0f / (SQR(h) * SQR(pd));
 
-    float *tbuf_a = new float[width*height];
-    float *tbuf_b = new float[width*height];
+    const size_t elems = width * height;
+    float *obuf_a = new float[elems](); // output data buffer for a
+    float *obuf_b = new float[elems](); // output data buffer for b
+    float *w_sum  = new float[elems]();
+    float *w_max  = new float[elems]();
 
-#   pragma omp parallel
-    {
-        // Filter Rows
-        separable_nlm_chroma_row(buf_a, buf_b, sr, wr, kernel, width, height, Ar);
+    float *v     = new float[elems](); // weight map
+    float *ui    = new float[elems](); // integral image of square distances
 
-        // Filter Columns
-        transpose(buf_a, tbuf_a, width, height);
-        transpose(buf_b, tbuf_b, width, height);
-        separable_nlm_chroma_row(tbuf_a, tbuf_b, sr, wr, kernel, height, width, Ar);
-        transpose(tbuf_a, buf_a, height, width);
-        transpose(tbuf_b, buf_b, height, width);
+    for (int ny = -sr; ny <= 0; ++ny) {
+        for (int nx = -(ny+sr), n_offset = ny * width + nx; nx <= ny+sr && n_offset < 0; ++nx, ++n_offset) {
+            const int margin_left  = nx < 0 ? -nx : 0;
+            const int margin_right = nx > 0 ?  nx : 0;
+            const float f = kernel[-ny] * kernel[abs(nx)];
+
+            // square distances
+            OMP_PARALLEL_FOR_SIMD
+            for (int y = -ny; y < height; ++y) {
+                const int x0 = y * width;
+
+                for (int x = margin_left; x < width - margin_right; ++x) {
+                    const int pos0 = x0 + x;
+                    const int pos1 = pos0 + n_offset;
+                    ui[pos0] = SQR(ibuf_a[pos0] - ibuf_a[pos1])
+                             + SQR(ibuf_b[pos0] - ibuf_b[pos1]);
+                }
+            }
+
+            // sum in each patch
+            box_sum(ui, v, width, height, pr, pr);
+
+            // Update the output pixel values using the weight map
+            OMP_PARALLEL_FOR_SIMD // TODO: Is this safe?
+            for (int y = -ny; y < height; ++y) {
+                const int x0 = y * width;
+                for (int x = margin_left; x < width - margin_right; ++x) {
+                    const int pos0 = x0 + x;
+                    const int pos1 = pos0 + n_offset;
+                    const float w = f * fast_exp(v[pos0] * C_inv);
+
+                    obuf_a[pos0] += w * ibuf_a[pos1];
+                    obuf_a[pos1] += w * ibuf_a[pos0];
+                    obuf_b[pos0] += w * ibuf_b[pos1];
+                    obuf_b[pos1] += w * ibuf_b[pos0];
+
+                    w_sum[pos0] += w;
+                    w_sum[pos1] += w;
+                    if (w > w_max[pos0])
+                        w_max[pos0] = w;
+                    if (w > w_max[pos1])
+                        w_max[pos1] = w;
+                }
+            }
+        }
     }
+    delete [] v;
+    delete [] ui;
 
-    delete [] tbuf_a;
-    delete [] tbuf_b;
+    // The weight attached to current pixels (n_offset == 0) is maximum of
+    // all the weights. Add the contribution of the current pixels to their
+    // denoised versions, then normalize.
+    OMP_PARALLEL_FOR_SIMD
+    for (int pos = 0; pos < elems; ++pos) {
+        const float w_cur = w_max[pos] > FLT_EPSILON ? w_max[pos] : 1.0f;
+        w_sum[pos] += w_cur;
+
+        obuf_a[pos] += w_cur * ibuf_a[pos];
+        obuf_a[pos] /= w_sum[pos];
+        obuf_b[pos] += w_cur * ibuf_b[pos];
+        obuf_b[pos] /= w_sum[pos];
+    }
+    delete [] w_max;
+    delete [] w_sum;
+
+    std::copy(&obuf_a[0], &obuf_a[elems], ibuf_a);
+    delete [] obuf_a;
+    std::copy(&obuf_b[0], &obuf_b[elems], ibuf_b);
+    delete [] obuf_b;
 }
 
 /*******************************************************************************
- * JNI wrapper for separable_nlm_mono_tile() and separable_nlm_chroma_tile()
+ * JNI wrapper for nlm_mono_tile() and nlm_chroma_tile()
  *******************************************************************************/
 extern "C"
 JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_NonLocalMeansFilterOpImage_nonLocalMeansFilter
 (JNIEnv *env, jclass cls,
  jshortArray jsrcData, jshortArray jdestData,
- jint y_wr, jint c_wr, jint y_ws, jint c_ws, jfloat y_scale_r, jfloat c_scale_r,
- jfloatArray jy_kernel, jfloatArray jc_kernel, jfloatArray jrgb_to_yst, jfloatArray jyst_to_rgb,
+ jint y_search_radius, jint y_patch_radius,
+ jint c_search_radius, jint c_patch_radius,
+ jfloat y_h, jfloat c_h,
+ jfloatArray jy_kernel, jfloatArray jc_kernel,
+ jfloatArray jrgb_to_yst, jfloatArray jyst_to_rgb,
  jint width, jint height,
  jint srcROffset, jint srcGOffset, jint srcBOffset,
  jint destROffset, jint destGOffset, jint destBOffset,
@@ -242,10 +314,7 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_NonLocalMeansFilterOpIma
     float *rgb_to_yst = (float *) env->GetPrimitiveArrayCritical(jrgb_to_yst, 0);
     float *yst_to_rgb = (float *) env->GetPrimitiveArrayCritical(jyst_to_rgb, 0);
 
-    float y_sigma_r = (y_scale_r != 0 && y_wr != 0 && y_kernel != NULL) ? sqrt(1.0/(2*y_scale_r)) : 0.0;
-    float c_sigma_r = (c_scale_r != 0 && c_wr != 0 && c_kernel != NULL) ? sqrt(1.0/(2*c_scale_r)) : 0.0;
-
-    const int wr0 = y_wr > c_wr ? 2*y_wr : 2*c_wr;
+    const int wr0 = y_search_radius > c_search_radius ? 2*y_search_radius : 2*c_search_radius;
 
     float *buf_y = new float[width*height];
     float *buf_s = new float[width*height];
@@ -254,8 +323,12 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_NonLocalMeansFilterOpIma
     interleaved_RGB_to_planar_YST(srcData, srcLineStride, srcROffset, srcGOffset, srcBOffset,
                                   buf_y, buf_s, buf_t, width, height, rgb_to_yst);
 
-    separable_nlm_mono_tile(         buf_y, y_sigma_r, y_wr, y_kernel, width, height);
-    separable_nlm_chroma_tile(buf_s, buf_t, c_sigma_r, c_wr, c_kernel, width, height);
+    float *y_kernel_center;
+    y_kernel_center = y_kernel + y_search_radius;
+    float *c_kernel_center;
+    c_kernel_center = c_kernel + c_search_radius;
+    nlm_mono_tile(         buf_y, y_h, y_search_radius, y_patch_radius, y_kernel_center, width, height);
+    nlm_chroma_tile(buf_s, buf_t, c_h, c_search_radius, c_patch_radius, c_kernel_center, width, height);
 
     planar_YST_to_interleaved_RGB(destData, destLineStride, destROffset, destGOffset, destBOffset, wr0,
                                   buf_y, buf_s, buf_t, width, height, yst_to_rgb);
@@ -275,3 +348,5 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_NonLocalMeansFilterOpIma
     env->ReleasePrimitiveArrayCritical(jrgb_to_yst, rgb_to_yst, 0);
     env->ReleasePrimitiveArrayCritical(jyst_to_rgb, yst_to_rgb, 0);
 }
+
+/* vim:set sw=4 ts=4: */
