@@ -46,7 +46,7 @@ public class LCMS_Profile {
         Long handle = (Long) profileCache.get(iccProfile);
         if (handle == null) {
             byte data[] = iccProfile.getData();
-            cmsProfileHandle = LCMS.cmsOpenProfileFromMem(data, data.length);
+            cmsProfileHandle = LCMSNative.cmsOpenProfileFromMem(data, data.length);
             profileCache.put(iccProfile, new Long(cmsProfileHandle));
         } else
             cmsProfileHandle = handle.longValue();
@@ -54,7 +54,7 @@ public class LCMS_Profile {
 
     public void dispose() {
         if (cmsProfileHandle != 0) {
-            LCMS.cmsCloseProfile(cmsProfileHandle);
+            LCMSNative.cmsCloseProfile(cmsProfileHandle);
             cmsProfileHandle = 0;
         }
     }
