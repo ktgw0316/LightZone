@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2016 Masahiro Kitagawa */
 
 package com.lightcrafts.jai.opimage;
 
@@ -11,7 +12,6 @@ import com.lightcrafts.mediax.jai.BorderExtender;
 import com.lightcrafts.mediax.jai.ImageLayout;
 import com.lightcrafts.mediax.jai.RasterAccessor;
 import com.lightcrafts.mediax.jai.RasterFormatTag;
-import com.sun.imageio.plugins.common.BogusColorSpace;
 
 import java.util.Map;
 
@@ -31,9 +31,45 @@ public final class FastBilateralFilterOpImage extends AreaOpImage {
     }
 
     private static ImageLayout fblLayout(RenderedImage source) {
+
+        class TwoComponentsColorSpace extends ColorSpace {
+
+            TwoComponentsColorSpace() {
+                super(ColorSpace.TYPE_2CLR, 2);
+            }
+
+            @Override
+            public float[] toRGB(float[] colorvalue) {
+                if(colorvalue.length < 2)
+                    throw new ArrayIndexOutOfBoundsException("colorvalue.length < 2");
+                return colorvalue;
+            }
+
+            @Override
+            public float[] fromRGB(float[] rgbvalue) {
+                if(rgbvalue.length < 2)
+                    throw new ArrayIndexOutOfBoundsException("rgbvalue.length < 3");
+                return new float[] {rgbvalue[0], rgbvalue[1]};
+            }
+
+            @Override
+            public float[] toCIEXYZ(float[] colorvalue) {
+                if(colorvalue.length < 2)
+                    throw new ArrayIndexOutOfBoundsException("colorvalue.length < 2");
+                return colorvalue;
+            }
+
+            @Override
+            public float[] fromCIEXYZ(float[] xyzvalue) {
+                if(xyzvalue.length < 2)
+                    throw new ArrayIndexOutOfBoundsException("xyzvalue.length < 3");
+                return new float[] {xyzvalue[0], xyzvalue[1]};
+            }
+        }
+
         // SampleModel sm = new ComponentSampleModel(DataBuffer.TYPE_USHORT, source.getWidth(), source.getHeight(), 2, 2*source.getWidth(), new int[]{0, 2});
 
-        ColorModel cm = new ComponentColorModel(new BogusColorSpace(2),
+        ColorModel cm = new ComponentColorModel(new TwoComponentsColorSpace(),
                                                 false, false, Transparency.OPAQUE, DataBuffer.TYPE_USHORT);
         SampleModel sm = cm.createCompatibleSampleModel(source.getWidth(), source.getHeight());
 
