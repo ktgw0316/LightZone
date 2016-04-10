@@ -24,6 +24,7 @@ Building the LightZone source requires the following software:
 
 You need to install following packages using homebrew:
 - __clang-omp__ (to correctly compile OpenMP; it includes __clang-omp++__)
+- __ant__
 - __autoconf__
 - __jpeg-turbo__
 - __libtiff__
@@ -47,7 +48,7 @@ make sure you use this version consistently throughout the project settings.
 ## Build instructions for LightZone with Ant (if you're not using Eclipse)
 If you're using Eclipse, skip this section.
 
-- Make sure gcc, git, and ant are installed.
+- Make sure command-line tools, clang-omp, git, and ant are installed.
 - Make sure your default java version is set in the Java Preferences app.
 - Set the JAVA_HOME environment variable to /Library/Java/Home
 - cd to LightZone/macosx in the source folder.

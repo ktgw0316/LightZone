@@ -7,7 +7,7 @@
  * application and, if the version that crashed is older, forbid submitting
  * crash reports.
  */
-/*#define FORBID_OLD_VERSIONS /**/
+/* #define FORBID_OLD_VERSIONS */
 
 /**
  * A CrashController is the main class for this application.

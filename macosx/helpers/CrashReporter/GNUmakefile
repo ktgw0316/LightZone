@@ -12,6 +12,11 @@ include		$(COMMON_DIR)/mk/platform.mk
 # Uncomment to compile in debug mode.
 #DEBUG:=		true
 
+# Different compilers required for Objective-C sources.
+XCODE_BIN_DIR=	$(shell xcode-select -p)/usr/bin
+CC=	$(XCODE_BIN_DIR)/clang
+CXX=	$(XCODE_BIN_DIR)/clang++
+
 ifeq ($(UNIVERSAL),1)
   ##
   # We need to build the PowerPC part with gcc/g++ 3.3 so the launcher will run

@@ -171,21 +171,29 @@ JNIEXPORT jstring JNICALL
 MacOSXColorProfileManager_METHOD(getSystemDisplayProfilePath)
     ( JNIEnv *env, jclass )
 {
-    CMError err;
-    CMProfileRef profRef;
-    CMProfileLocation profLoc;
-    UInt32 locSize = cmCurrentProfileLocationSize;
+    CFUUIDRef displayUUID = CGDisplayCreateUUIDFromDisplayID(CGMainDisplayID());
+    if (!displayUUID)
+        return NULL;
+    CFDictionaryRef displayInfo =
+        ColorSyncDeviceCopyDeviceInfo(kColorSyncDisplayDeviceClass, displayUUID);
+    if (!displayInfo)
+        return NULL;
+    CFRelease(displayUUID);
+    CFDictionaryRef customProfileInfo =
+        (CFDictionaryRef)CFDictionaryGetValue(displayInfo, kColorSyncCustomProfiles);
+    if (!customProfileInfo)
+        return NULL;
 
-    CGDirectDisplayID const displayID = CGMainDisplayID();
-    err = CMGetProfileByAVID( (CMDisplayIDType)displayID, &profRef );
-    if ( err != noErr )
+    CFURLRef customProfileURLs[CFDictionaryGetCount(customProfileInfo)];
+    CFDictionaryGetKeysAndValues(customProfileInfo, NULL, (const void **)customProfileURLs);
+    if ((void*)customProfileURLs[0] == kCFNull)
         return NULL;
-    err = NCMGetProfileLocation( profRef, &profLoc, &locSize );
-    if ( err != noErr )
-        return NULL;
-    char const *const cPath = getProfilePath( profLoc );
-    CMCloseProfile( profRef );
-    if ( !cPath )
+
+    char *cPath;
+    Boolean result =
+        CFURLGetFileSystemRepresentation(customProfileURLs[0], true, (UInt8*)cPath, PATH_MAX);
+    CFRelease(displayInfo);
+    if (!result)
         return NULL;
     jstring const jPath = env->NewStringUTF( cPath );
     delete[] cPath;
@@ -208,10 +216,12 @@ MacOSXColorProfileManager_METHOD(searchProfilesForImpl)
     arg->m_profileClass = profileClassID;
 
     UInt32 seed = 0;
-    UInt32 count = 0;
-    CMError err = CMIterateColorSyncFolder( profIterProc, &seed, &count, arg );
+    // UInt32 count = 0;
+    // CMError err = CMIterateColorSyncFolder( profIterProc, &seed, &count, arg );
+    CFErrorRef err;
+    ColorSyncIterateInstalledProfiles((ColorSyncProfileIterateCallback)profIterProc, &seed, arg, &err);
     int const profileCount = [profileArray count];
-    if ( err != noErr || !profileCount )
+    if ( err || !profileCount )
         return NULL;
     //
     // Convert the array of ColorProfileInfo objects into a "flat" array of

@@ -12,7 +12,7 @@
  * Undefine to cause this application to crash immediately to test the Crash
  * Reporter application.
  */
-/*#define TEST_CRASH_REPORTER /**/
+/* #define TEST_CRASH_REPORTER */
 
 // standard
 #import <Cocoa/Cocoa.h>
