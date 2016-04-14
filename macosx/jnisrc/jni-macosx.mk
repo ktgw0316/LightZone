@@ -11,4 +11,9 @@ JNI_MACOSX_LDFLAGS+=	-framework Cocoa
 ##
 include 		$(ROOT)/lightcrafts/jnisrc/jni.mk
 
+# Different compilers required for Objective-C sources.
+XCODE_BIN_DIR=	$(shell xcode-select -p)/usr/bin
+CC=	$(XCODE_BIN_DIR)/clang
+CXX=	$(XCODE_BIN_DIR)/clang++
+
 # vim:set noet sw=8 ts=8:

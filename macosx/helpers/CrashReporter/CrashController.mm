@@ -510,7 +510,7 @@ int const   FetchLatestAppVersionTimeout    = 60;   // seconds
     static NSString *crashLog;
     if ( !crashLog ) {
         crashLog =
-            [[[[[NSString stringWithString:@"~/Library/Logs/CrashReporter"]
+            [[[[@"~/Library/Logs/CrashReporter"
                 stringByAppendingPathComponent:crashedAppName]
                 stringByAppendingString:@".crash.log"]
                 stringByExpandingTildeInPath] retain];
