@@ -8,6 +8,7 @@
  */
 
 #include <jni.h>
+#include <math.h>
 #include <omp.h>
 #include "../pixutils/HSB.h"
 
@@ -251,15 +252,23 @@ extern "C" JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_HighlightReco
             const int srcPixOffset = srcPixelStride * col + row * srcLineStride;
             
             float raw[3] = {
-                srcData[srcPixOffset + srcROffset],
-                srcData[srcPixOffset + srcGOffset],
-                srcData[srcPixOffset + srcBOffset]
+                static_cast<float>(srcData[srcPixOffset + srcROffset]),
+                static_cast<float>(srcData[srcPixOffset + srcGOffset]),
+                static_cast<float>(srcData[srcPixOffset + srcBOffset])
             };
             
-            float rgb[3] = {0, 0, 0};
-            for (int i = 0; i < 3; i++)
-                for (int j = 0; j < 3; j++)
-                    rgb[i] += csMatrix[i][j] * raw[j];
+            float rgb[3];
+            for (int i = 0; i < 3; i++) {
+#ifdef FP_FAST_FMAF
+                rgb[i] = fmaf(csMatrix[i][2], raw[2],
+                         fmaf(csMatrix[i][1], raw[1],
+                              csMatrix[i][0] * raw[0]));
+#else
+                rgb[i] = csMatrix[i][0] * raw[0] +
+                         csMatrix[i][1] * raw[1] +
+                         csMatrix[i][2] * raw[2];
+#endif
+            }
             
             float val_max = 0;
             float sum = 0;
@@ -282,15 +291,25 @@ extern "C" JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_HighlightReco
                 for (int i = 1; i < saturated; i++)
                     s *= s;
                 
-                float m = s * m2 + (1 - s) * m1;
+#ifdef FP_FAST_FMAF
+                const float m = fmaf(s, m2, fmaf(m1, -s, m1));
+#else
+                const float m = s * m2 + (1 - s) * m1;
+#endif
                 
                 if (m < 1.0f) {
                     // use Haeberli's saturation change: http://www.graficaobscura.com/interp/index.html
                     
                     float lum = (rgb[0] + rgb[1] + rgb[2]) / 3.0f;
+#ifdef FP_FAST_FMAF
+                    rgb[0] = fmaf(rgb[0], m, fmaf(lum, -m, lum));
+                    rgb[1] = fmaf(rgb[1], m, fmaf(lum, -m, lum));
+                    rgb[2] = fmaf(rgb[2], m, fmaf(lum, -m, lum));
+#else
                     rgb[0] = rgb[0] * m + lum * (1.0f - m);
                     rgb[1] = rgb[1] * m + lum * (1.0f - m);
                     rgb[2] = rgb[2] * m + lum * (1.0f - m);
+#endif
                 }
             }
             

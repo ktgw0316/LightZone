@@ -15,7 +15,6 @@ import java.io.File;
 import java.util.TooManyListenersException;
 import java.util.List;
 import java.util.LinkedList;
-import java.util.Enumeration;
 
 /**
  * A tree component representing folders in all file systems, with specialized
@@ -81,10 +80,10 @@ class FolderTree extends JTree {
 
         FolderTreeNode node = getRoot();
         for ( String component : components ) {
+            if (component.isEmpty())
+                continue;
             boolean matchedComponent = false;
-            for ( Enumeration<FolderTreeNode> e = node.children();
-                  e.hasMoreElements(); ) {
-                final FolderTreeNode child = e.nextElement();
+            for ( final FolderTreeNode child : node.getChildren() ) {
                 if ( child.toString().equals( component ) ) {
                     node = child;
                     matchedComponent = true;
@@ -117,8 +116,7 @@ class FolderTree extends JTree {
     FolderTreeNode getSelectedNode() {
         TreePath path = getSelectionPath();
         if (path != null) {
-            FolderTreeNode node = (FolderTreeNode) path.getLastPathComponent();
-            return node;
+            return (FolderTreeNode) path.getLastPathComponent();
         }
         return null;
     }
@@ -128,6 +126,7 @@ class FolderTree extends JTree {
         model.dispose();
     }
 
+    @Override
     protected void finalize() throws Throwable {
         dispose();
         super.finalize();

@@ -256,7 +256,7 @@ static void reset_denormals( csr_context oldJavaMode ) {
 #endif // defined(__ppc__) || defined(__ppc64__)
 #endif // defined(__SSE2__) || defined (__VEC__)
 
-#if 1
+#if USE_VECTOR
 void print_fvec(const vFloat x) {
     int i;
     vsFloat xx; xx.v = x;
@@ -867,9 +867,10 @@ static void filterMonochromeWrapSSE
     float k0 = kernel[0];
     
     const float norm = 1 / (float) 0x10000;
-    const vFloat vnorm = (vFloat) { norm, norm, norm, norm };
     
 #if USE_VECTOR
+    const vFloat vnorm = (vFloat) { norm, norm, norm, norm };
+
     const vFloat vk0 = loadAndSplatFloat(&k0);
     // scale_r /= CONST;
     const vFloat vscale_r = loadAndSplatFloat(&scale_r);

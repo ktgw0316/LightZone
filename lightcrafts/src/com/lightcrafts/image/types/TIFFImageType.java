@@ -630,7 +630,7 @@ public class TIFFImageType extends ImageType implements TrueImageTypeProvider {
      * case and the preferred one must be first.
      */
     private static final String EXTENSIONS[] = {
-        "tif", "tiff"
+        "tif", "tiff", "iiq"
     };
 
     /**

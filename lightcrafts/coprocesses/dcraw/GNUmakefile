@@ -6,7 +6,7 @@ TARGET_BASE:=		dcraw_lz
 # Uncomment to compile in debug mode.
 #DEBUG:=		true
 
-EXEC_EXTRA_CFLAGS:=	-fopenmp
+EXEC_EXTRA_CFLAGS:=	-fopenmp -Wno-unused-result
 EXEC_WINDOWS_CFLAGS:=	-static
 EXEC_EXTRA_DEFINES:=	-DNODEPS -DLIGHTZONE
 EXEC_LINUX_DEFINES:=	-Dfgetc=getc_unlocked

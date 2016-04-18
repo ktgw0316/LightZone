@@ -22,7 +22,7 @@ JNI_MACOSX_LDFLAGS:=	-L/usr/local/lib
 ##
 JNI_WINDOWS_DEFINES:=	-D__CONSOLE__
 
-JAVAH_CLASSES:=		com.lightcrafts.utils.LCMS
+JAVAH_CLASSES:=		com.lightcrafts.utils.LCMSNative
 
 include			../jni.mk
 

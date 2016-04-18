@@ -8,7 +8,7 @@
 #include "include/transpose.h"
 
 inline void separable_bf_mono_row(
-    float *ibuf,                            // pointer to source data buffer 
+    float *ibuf,                            // pointer to source data buffer
     const float sr,                         // the usual range sigma
     const int wr,                           // window radius in pixels
     const float *kernel,                    // half-kernel containing the exponents of the spatial Gaussian
@@ -37,8 +37,14 @@ inline void separable_bf_mono_row(
             for (int k = 0; k <= 2*wr; k++) {
                 const float I_s = rbuf[k-wr + x];
                 const float D_sq = SQR(I_s - I_s0);
+
+#ifdef FP_FAST_FMAF
+                const float f = fast_exp(fmaf(Ar, D_sq, -kernel[k]));
+                num = fmaf(f, I_s, num);
+#else
                 const float f = fast_exp(Ar * D_sq - kernel[k]);
                 num += f * I_s;
+#endif
                 denom += f;
             }
             
@@ -94,10 +100,17 @@ inline void separable_bf_chroma_row(
                 const float s_b = rbuf_b[idx];
 
                 const float D_sq = /* SQR(s_L - s0_L) + */ SQR(s_a - s0_a) + SQR(s_b - s0_b);
-                const float f = fast_exp(Ar * D_sq - kernel[k]);
 
+#ifdef FP_FAST_FMAF
+                const float f = fast_exp(fmaf(Ar, D_sq, -kernel[k]));
+                a_num = fmaf(f, s_a, a_num);
+                b_num = fmaf(f, s_b, b_num);
+#else
+                const float f = fast_exp(Ar * D_sq - kernel[k]);
                 a_num += f * s_a;
                 b_num += f * s_b;
+#endif
+
                 denom += f;
             }
 

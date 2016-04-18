@@ -1,20 +1,16 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2016 Masahiro Kitagawa */
 
 package com.lightcrafts.platform.macosx;
 
 import com.lightcrafts.app.Application;
-// import com.lightcrafts.app.CheckForUpdate;
-import com.lightcrafts.app.ExceptionDialog;
 import com.lightcrafts.app.other.MacApplication;
 import com.lightcrafts.app.other.OtherApplication;
 import com.lightcrafts.platform.AlertDialog;
+import com.lightcrafts.platform.Launcher;
 import com.lightcrafts.platform.Platform;
-import com.lightcrafts.splash.SplashImage;
-import com.lightcrafts.splash.SplashWindow;
-import com.lightcrafts.utils.ForkDaemon;
-import com.lightcrafts.utils.Version;
 
-import java.awt.*;
+import java.awt.EventQueue;
 import java.io.File;
 import java.io.IOException;
 
@@ -23,54 +19,13 @@ import static com.lightcrafts.platform.macosx.Locale.LOCALE;
 /**
  * Launch LightZone for Mac OS X.
  */
-public final class MacOSXLauncher {
+public final class MacOSXLauncher extends Launcher {
 
-    /**
-     * Does the following:
-     *  <ol>
-     *    <li>Check the Java version.
-     *    <li>Check for a valid license.
-     *    <li>Show the splash screen.
-     *    <li>Launches the application.
-     *    <li>Disposes of the splash screen.
-     *    <li>Check for a LightZone update.
-     *  </ol>
-     *
-     * @param args The command line arguments.
-     */
-    public static void main( final String[] args ) {
-        // java.util.Locale.setDefault( java.util.Locale.ENGLISH );
-        // System.setProperty("apple.awt.graphics.UseQuartz", "false");
+    ////////// public /////////////////////////////////////////////////////////
 
-        System.out.println(
-            "This is " + Version.getApplicationName() + ' '
-            + Version.getVersionName()
-            + " (" + Version.getRevisionNumber() + ')'
-        );
-
-        try {
-            checkJavaVersion();
-            final String licenseText = "Open Source";
-
-            final SplashImage image = new SplashImage(
-                SplashImage.getDefaultSplashText(licenseText)
-            );
-            SplashWindow.splash(image);
-            setColor();
-            // CheckForUpdate.start();
-            {
-                Application.setStartupProgress(
-                        image.getStartupProgress()
-                );
-                ForkDaemon.start();
-                Application.main(args);
-            }
-            SplashWindow.disposeSplash();
-            // CheckForUpdate.showAlertIfAvailable();
-        }
-        catch (Throwable t) {
-            (new ExceptionDialog()).handle(t);
-        }
+    public static void main(String[] args) {
+        final Launcher launcher = new MacOSXLauncher();
+        launcher.init(args);
     }
 
     /**
@@ -78,6 +33,45 @@ public final class MacOSXLauncher {
      * that the code for this native method is inside the native launcher.
      */
     public static native void readyToOpenFiles();
+
+    ////////// protected //////////////////////////////////////////////////////
+
+    @Override
+    protected void setSystemProperties() {
+        // System.setProperty("apple.awt.graphics.UseQuartz", "false");
+    }
+
+    @Override
+    protected void enableTextAntiAliasing() {
+        // Do nothing.
+    }
+
+    @Override
+    protected String showJavaVersion() {
+        String javaVersion = super.showJavaVersion();
+        checkJavaVersion(javaVersion);
+        return javaVersion;
+    }
+
+   /**
+     * Set the color back to the user's defaults
+     */
+    @Override
+    protected void setColor() {
+        try {
+            final Process p = Runtime.getRuntime().exec(
+                // "defaults write com.lightcrafts.LightZone AppleAquaColorVariant -int 6"
+                "defaults remove com.lightcrafts.LightZone AppleAquaColorVariant"
+            );
+            p.waitFor();
+        }
+        catch ( InterruptedException e ) {
+            e.printStackTrace();
+        }
+        catch ( IOException e ) {
+            e.printStackTrace();
+        }
+    }
 
     ////////// private ////////////////////////////////////////////////////////
 
@@ -93,9 +87,7 @@ public final class MacOSXLauncher {
      * Check that the currently running JVM meets our minimum required version.
      * If it doesn't, show an error dialog and quit.
      */
-    private static void checkJavaVersion() {
-        final String javaVersion = System.getProperty( "java.version" );
-        System.out.println( "Running Java version " + javaVersion );
+    private static void checkJavaVersion(String javaVersion) {
         try {
             final String[] parts1 = javaVersion.split( "\\." );
 
@@ -168,25 +160,6 @@ public final class MacOSXLauncher {
                 }
             }
         );
-    }
-
-   /**
-     * Set the color back to the user's defaults
-     */
-    private static void setColor() {
-        try {
-            final Process p = Runtime.getRuntime().exec(
-                // "defaults write com.lightcrafts.LightZone AppleAquaColorVariant -int 6"
-                "defaults remove com.lightcrafts.LightZone AppleAquaColorVariant"
-            );
-            p.waitFor();
-        }
-        catch ( InterruptedException e ) {
-            e.printStackTrace();
-        }
-        catch ( IOException e ) {
-            e.printStackTrace();
-        }
     }
 
     /**

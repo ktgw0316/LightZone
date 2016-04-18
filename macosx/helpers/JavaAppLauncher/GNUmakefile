@@ -19,6 +19,12 @@ JARS:=		$(COMMON_DIR)/products/lightcrafts.jar \
 export MACOSX_DEPLOYMENT_TARGET:=	$(shell sw_vers -productVersion | cut -d. -f-2)
 
 SDKROOT:=	$(shell xcodebuild -version -sdk macosx${MACOSX_DEPLOYMENT_TARGET} | sed -n '/^Path:/p' | sed 's/^Path: //')
+
+# Different compilers required for Objective-C sources.
+XCODE_BIN_DIR=	$(shell xcode-select -p)/usr/bin
+CC=	$(XCODE_BIN_DIR)/clang
+CXX=	$(XCODE_BIN_DIR)/clang++
+
 ifeq ($(UNIVERSAL),1)
   ##
   # We need to build the PowerPC part with gcc/g++ 3.3 so the launcher will run

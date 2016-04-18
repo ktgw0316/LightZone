@@ -4,7 +4,6 @@ package com.lightcrafts.jai.opimage;
 
 import com.lightcrafts.jai.operator.LCMSColorConvertDescriptor;
 import com.lightcrafts.utils.LCMS;
-import com.lightcrafts.utils.LCMS_LabColorSpace;
 import com.lightcrafts.utils.LCMS_ColorSpace;
 
 import com.lightcrafts.mediax.jai.PointOpImage;
@@ -62,6 +61,7 @@ public class LCMSColorConvertOpImage extends PointOpImage {
         }
     }
 
+    @Override
     protected void computeRect(Raster[] sources, WritableRaster dest, Rectangle destRect) {
         synchronized (this) {
             if (transform == null) {

@@ -48,7 +48,7 @@ public final class LRUCacheObjectMap implements CacheObjectMap {
     public LRUCacheObjectMap( ByteBufferAllocator bufAlloc, long maxSize,
                               int initialCapacity, float loadFactor ) {
         m_bufAlloc = bufAlloc;
-        m_lruMap = new LRUHashMap( initialCapacity, loadFactor );
+        m_lruMap = new LRUHashMap<Object, ByteBuffer>( initialCapacity, loadFactor );
         m_maxSize = maxSize;
     }
 
@@ -160,8 +160,7 @@ public final class LRUCacheObjectMap implements CacheObjectMap {
      * {@link #removeEldestEntry(Map.Entry)} to define a policy for removing
      * objects from the map.
      */
-    @SuppressWarnings({"CloneableClassWithoutClone"})
-    private final class LRUHashMap extends LinkedHashMap<Object,ByteBuffer> {
+    private final class LRUHashMap<K, V extends ByteBuffer> extends LinkedHashMap<K,V> {
 
         /**
          * Construct an <code>LRUHashMap</code> passing <code>true</code> for
@@ -184,17 +183,16 @@ public final class LRUCacheObjectMap implements CacheObjectMap {
          * @return Always returns <code>false</code> since we remove entries
          * ourselves.
          */
+        @Override
         protected boolean removeEldestEntry( Map.Entry notUsed ) {
             synchronized ( LRUCacheObjectMap.this ) {
                 if ( m_curSize <= m_maxSize )
                     return false;
-                for ( Iterator<Map.Entry<Object,ByteBuffer>>
-                      i = entrySet().iterator(); i.hasNext(); ) {
-                    final Map.Entry<Object,ByteBuffer> me = i.next();
+                for ( Iterator<Map.Entry<K,V>> i = entrySet().iterator();
+                      i.hasNext() && m_curSize > m_maxSize; ) {
+                    final Map.Entry<K,V> me = i.next();
                     spill( me.getKey(), me.getValue() );
                     i.remove();
-                    if ( m_curSize <= m_maxSize )
-                        break;
                 }
             }
             return false;

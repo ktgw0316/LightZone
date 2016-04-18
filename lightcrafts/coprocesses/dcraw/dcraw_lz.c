@@ -4541,7 +4541,7 @@ void CLASS vng_interpolate()
   for (row = start_row; row < end_row; row++) {	/* Do VNG interpolation */
 
     for (g = 0; g < 4; g++)
-      brow[g] = &rowtmp[(row + g - 2) % 4][0];
+      brow[g] = &rowtmp[(row + g - 2) % 4];
 
     for (col=2; col < width-2; col++) {
       pix = image[row*width+col];
@@ -6958,7 +6958,7 @@ void CLASS parse_fuji (int offset)
     } else if (tag == 0xc000) {
       c = order;
       order = 0x4949;
-      if ((tag = get4()) > 10000) tag = get4();
+      while ((tag = get4()) > 10000);
       width = tag;
       height = get4();
       order = c;

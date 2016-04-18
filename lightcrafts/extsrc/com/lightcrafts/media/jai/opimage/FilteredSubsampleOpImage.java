@@ -238,6 +238,7 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
      */
     protected float [] vKernel;
 
+    static final int numProc = Runtime.getRuntime().availableProcessors();
 
     /** <p> <code>convolveFullKernels</code> -- convolve two kernels and return the
      * result in a floating array.
@@ -256,7 +257,6 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
                 c[k] += a[j] * b[k - j];
 
         return c;
-
     } // convolveFullKernels
 
     /** <p> <code>convolveSymmetricKernels</code> uses a symmetric representation
@@ -312,7 +312,7 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
         tmpC = convolveFullKernels(tmpA,tmpB);
 
         // Carve out and return the portion of c that holds
-	int cParity = tmpC.length%2;
+        int cParity = tmpC.length%2;
         for (int k=0 ; k<c.length ; k++)
             c[k] = tmpC[lenTmpC - c.length - k - 1 + cParity];
 
@@ -332,34 +332,34 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
      */
     private static float [] combineFilters(int scaleFactor,
                                            int resampleType,
-					   float [] qsFilter) {
+                                           float [] qsFilter) {
 
         // Odd scale factors imply no resample filter is required
         // return pointer to the qsFilter
-        if ((scaleFactor%2) == 1) return (float [])qsFilter.clone();
+        if ((scaleFactor%2) == 1) return qsFilter.clone();
 
         int qsParity = 1;
-	int resampParity = 0; // Unless nearest neighbor case is selected (ignored)
+        int resampParity = 0; // Unless nearest neighbor case is selected (ignored)
 
         switch (resampleType) {
-	   case Interpolation.INTERP_NEAREST: // Return a copy of the qsFilter
-               return (float [])qsFilter.clone();
-	   case Interpolation.INTERP_BILINEAR: // 2 by 2 resample filter
+            case Interpolation.INTERP_NEAREST: // Return a copy of the qsFilter
+               return qsFilter.clone();
+            case Interpolation.INTERP_BILINEAR: // 2 by 2 resample filter
                float [] bilinearKernel = { 1.0F/2.0F };
-	       return convolveSymmetricKernels(
-	           qsParity, resampParity, qsFilter, bilinearKernel);
-	   case Interpolation.INTERP_BICUBIC: // 4 by 4 resample filter
+                return convolveSymmetricKernels(
+                        qsParity, resampParity, qsFilter, bilinearKernel);
+            case Interpolation.INTERP_BICUBIC: // 4 by 4 resample filter
                float [] bicubicKernel = { 9.0F/16.0F, -1.0F/16.0F };
                return convolveSymmetricKernels(
-	           qsParity, resampParity, qsFilter, bicubicKernel);
-	   case Interpolation.INTERP_BICUBIC_2: // alternate 4 by 4 resample filter
+                       qsParity, resampParity, qsFilter, bicubicKernel);
+            case Interpolation.INTERP_BICUBIC_2: // alternate 4 by 4 resample filter
                float [] bicubic2Kernel = { 5.0F/8.0F, -1.0F/8.0F };
                return convolveSymmetricKernels(
-	           qsParity, resampParity, qsFilter, bicubic2Kernel);
+                       qsParity, resampParity, qsFilter, bicubic2Kernel);
            default:
-	     throw new IllegalArgumentException(
-	         JaiI18N.getString("FilteredSubsample0"));
-	}
+               throw new IllegalArgumentException(
+                       JaiI18N.getString("FilteredSubsample0"));
+        }
 
 
     } // combineFilters
@@ -378,10 +378,10 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
 
         // Test scale factor for oddness or nearest neighbor resampling
         if ((scaleFactor%2 == 1) ||
-	    (resampleType == Interpolation.INTERP_NEAREST)) return 1;
+                (resampleType == Interpolation.INTERP_NEAREST)) return 1;
 
         // for all other cases we will be convolving an odd filter with an even
-	// filter, thus producing an even filter
+        // filter, thus producing an even filter
         return 0;
 
     } // filterParity
@@ -398,21 +398,21 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
      * @param il an ImageLayout object.
      * @return validated ImageLayout object.
      */
-    private static final ImageLayout layoutHelper(RenderedImage source,
-                                           Interpolation interp,
-                                           int scaleX,
-                                           int scaleY,
-                                           int filterSize,
-                                           ImageLayout il) {
+    private static ImageLayout layoutHelper(RenderedImage source,
+                                            Interpolation interp,
+                                            int scaleX,
+                                            int scaleY,
+                                            int filterSize,
+                                            ImageLayout il) {
 
         if (scaleX < 1 || scaleY < 1 ) {
-	    throw new IllegalArgumentException(
-	        JaiI18N.getString("FilteredSubsample1"));
+            throw new IllegalArgumentException(
+                    JaiI18N.getString("FilteredSubsample1"));
         }
-	if (filterSize < 1) {
-	    throw new IllegalArgumentException(
-	        JaiI18N.getString("FilteredSubsample2"));
-	}
+        if (filterSize < 1) {
+            throw new IllegalArgumentException(
+                    JaiI18N.getString("FilteredSubsample2"));
+        }
 
         // Set the bounds to the scaled source bounds.
         Rectangle bounds =
@@ -445,7 +445,7 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
      * @param extender a BorderExtender, or null.
      * @param config a Map object possibly holding tile cache information
      * @param layout an ImageLayout optionally containing the tile grid layout,
-     *	  SampleModel, and ColorModel, or null.
+     *         SampleModel, and ColorModel, or null.
      * @param interp a Interpolation object to use for resampling.
      * @param scaleX downsample factor along x axis.
      * @param scaleY downsample factor along y axis.
@@ -454,48 +454,47 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
      *    INTERP_NEAREST, INTERP_BILINEAR, INTERP_BICUBIC, or INTERP_BICUBIC_2
      */
     public FilteredSubsampleOpImage(RenderedImage source,
-    				    BorderExtender extender,
-				    Map config,
-				    ImageLayout layout,
+                                    BorderExtender extender,
+                                    Map config,
+                                    ImageLayout layout,
                                     int scaleX,
-				    int scaleY,
-				    float [] qsFilter,
-				    Interpolation interp) {
+                                    int scaleY,
+                                    float [] qsFilter,
+                                    Interpolation interp) {
 
         // Propagate to GeometricOpImage constructor
         super(vectorize(source),
-              layoutHelper(source, interp, scaleX, scaleY, qsFilter.length, layout),
-              config,   // Map object
-              true,     // cobbleSources,
-	      extender, // extender
-              interp,    // Interpolation object
-	      null);
+                layoutHelper(source, interp, scaleX, scaleY, qsFilter.length, layout),
+                config,   // Map object
+                true,     // cobbleSources,
+                extender, // extender
+                interp,    // Interpolation object
+                null);
 
         int resampleType;
 
         // Determine the interpolation type, if not supported throw exception
-	if (interp instanceof InterpolationNearest) {
-	    resampleType = Interpolation.INTERP_NEAREST;
-	} else if (interp instanceof InterpolationBilinear) {
+        if (interp instanceof InterpolationNearest) {
+            resampleType = Interpolation.INTERP_NEAREST;
+        } else if (interp instanceof InterpolationBilinear) {
             resampleType = Interpolation.INTERP_BILINEAR;
-	} else if (interp instanceof InterpolationBicubic) {
+        } else if (interp instanceof InterpolationBicubic) {
             resampleType = Interpolation.INTERP_BICUBIC;
-	} else if (interp instanceof InterpolationBicubic2) {
+        } else if (interp instanceof InterpolationBicubic2) {
             resampleType = Interpolation.INTERP_BICUBIC_2;
         } else {
             throw new IllegalArgumentException(
-	        JaiI18N.getString("FilteredSubsample3"));
-	}
+                    JaiI18N.getString("FilteredSubsample3"));
+        }
 
         // Construct combined anti-alias and resample kernels.
         this.hParity = filterParity(scaleX,resampleType);
-	this.vParity = filterParity(scaleY,resampleType);
-	this.hKernel = combineFilters(scaleX,resampleType,qsFilter);
+        this.vParity = filterParity(scaleY,resampleType);
+        this.hKernel = combineFilters(scaleX,resampleType,qsFilter);
         this.vKernel = combineFilters(scaleY,resampleType,qsFilter);
 
-	this.scaleX = scaleX;
-	this.scaleY = scaleY;
-
+        this.scaleX = scaleX;
+        this.scaleY = scaleY;
 
     } // FilteredSubsampleOpImage
 
@@ -570,7 +569,7 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
      */
     public Rectangle mapSourceRect(Rectangle sourceRect,
                                    int sourceIndex) {
-        if (sourceIndex != 0) {	// this image only has one source
+        if (sourceIndex != 0) { // this image only has one source
             throw new IllegalArgumentException(JaiI18N.getString("FilteredSubsample4"));
         }
 
@@ -593,8 +592,8 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
      * @param scaleY downsample factor.
      * @return a <code>Rectangle</code> indicating the destination region.
      */
-    private static final Rectangle forwardMapRect(int x, int y, int w, int h,
-                                                  int scaleX, int scaleY) {
+    private static Rectangle forwardMapRect(int x, int y, int w, int h,
+                                            int scaleX, int scaleY) {
         float sx = 1.0F/scaleX;
         float sy = 1.0F/scaleY;
 
@@ -616,9 +615,9 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
     protected final Rectangle forwardMapRect(Rectangle srcRect,
                                              int srcIndex) {
         int x = srcRect.x;
-	int y = srcRect.y;
-	int w = srcRect.width;
-	int h = srcRect.height;
+        int y = srcRect.y;
+        int w = srcRect.width;
+        int h = srcRect.height;
         float sx = 1.0F/scaleX;
         float sy = 1.0F/scaleY;
 
@@ -637,11 +636,11 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
      * @return a <code>Rectangle</code> indicating the source region.
      */
     protected final Rectangle backwardMapRect(Rectangle destRect,
-                                              int srcIncex) {
+                                              int srcIndex) {
         int x = destRect.x;
-	int y = destRect.y;
-	int w = destRect.width;
-	int h = destRect.height;
+        int y = destRect.y;
+        int w = destRect.width;
+        int h = destRect.height;
 
         return new Rectangle(x*scaleX, y*scaleY,
                              (x + w)*scaleX - x,
@@ -666,9 +665,9 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
      */
     public Rectangle mapDestRect(Rectangle destRect,
                                  int sourceIndex) {
-        if (sourceIndex != 0) {	// this image only has one source
+        if (sourceIndex != 0) { // this image only has one source
             throw new IllegalArgumentException(
-	        JaiI18N.getString("FilteredSubsample4"));
+                    JaiI18N.getString("FilteredSubsample4"));
         }
         int xOffset = destRect.x*scaleX - hKernel.length + hParity + scaleX/2;
         int yOffset = destRect.y*scaleY - vKernel.length + vParity + scaleY/2;
@@ -726,7 +725,7 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
             break;
         default:
             throw new IllegalArgumentException(
-	        JaiI18N.getString("FilteredSubsample5"));
+                    JaiI18N.getString("FilteredSubsample5"));
         }
 
         // If the RasterAccessor set up a temporary write buffer for the
@@ -771,21 +770,22 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
         final float vCtr = vKernel[0];
         final float hCtr = hKernel[0];
 
-        ExecutorService threadPool = Executors.newFixedThreadPool(dnumBands);
+        ExecutorService threadPool = Executors.newFixedThreadPool(numProc);
         Collection<Callable<Void>> processes = new LinkedList<Callable<Void>>();
-        for (int dstBand = 0; dstBand < dnumBands; dstBand++) {
-            final int band = dstBand;
-            processes.add(new Callable<Void>() {
-                @Override
-                public Void call() {
-                    byte dstData[] = dstDataArrays[band];
-                    byte srcData[] = srcDataArrays[band];
-                    int srcScanlineOffset = srcBandOffsets[band];
-                    int dstScanlineOffset = dstBandOffsets[band];
+        for (int band = 0; band < dnumBands; band++) {
+            final byte dstData[] = dstDataArrays[band];
+            final byte srcData[] = srcDataArrays[band];
+            final int srcScanlineOffset = srcBandOffsets[band];
+            final int dstScanlineOffset = dstBandOffsets[band];
 
-                    // Step over source raster coordinates
-                    for (int ySrc = 0; ySrc < scaleY*dheight; ySrc += scaleY) {
-                        int dInd = dstScanlineOffset;
+            // Step over source raster coordinates
+            for (int h = 0; h < dheight; h++) {
+                final int y = h;
+                final int ySrc = h * scaleY;
+                processes.add(new Callable<Void>() {
+                    @Override
+                    public Void call() {
+                        int dInd = dstScanlineOffset + y * dstScanlineStride;
                         for (int xSrc = 0; xSrc < scaleX*dwidth; xSrc += scaleX) {
 
                             int upLeft0  = xSrc*srcPixelStride + ySrc*srcScanlineStride + srcScanlineOffset;
@@ -806,10 +806,10 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
                                 // Make the rectangle squeeze in the horizontal direction
                                 for (int ix = hKernel.length - 1; ix > hParity - 1; ix--) {
                                     float kk = hKernel[ix]*vKernel[iy];
-                                    sum += kk*((int)(srcData[upLeft] &0xff) +
-                                               (int)(srcData[upRight]&0xff) +
-                                               (int)(srcData[dnLeft] &0xff) +
-                                               (int)(srcData[dnRight]&0xff));
+                                    sum += kk*((srcData[upLeft] &0xff) +
+                                            (srcData[upRight]&0xff) +
+                                            (srcData[dnLeft] &0xff) +
+                                            (srcData[dnRight]&0xff));
                                     upLeft  += srcPixelStride;
                                     upRight -= srcPixelStride;
                                     dnLeft  += srcPixelStride;
@@ -831,8 +831,8 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
                                 int kInd = vKernel.length - 1;
                                 while (xUp < xDown) {
                                     float kk = hCtr*vKernel[kInd--];
-                                    sum += kk*((int)(srcData[xUp]&0xff) +
-                                               (int)(srcData[xDown]&0xff));
+                                    sum += kk*((srcData[xUp]&0xff) +
+                                            (srcData[xDown]&0xff));
                                     xUp   += srcScanlineStride;
                                     xDown -= srcScanlineStride;
                                 }
@@ -847,14 +847,14 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
                                 int kInd = hKernel.length - 1;
                                 while (xLeft < xRight) {
                                     float kk = vCtr*hKernel[kInd--];
-                                    sum += kk*((int)(srcData[xLeft]&0xff) +
-                                               (int)(srcData[xRight]&0xff));
+                                    sum += kk*((srcData[xLeft]&0xff) +
+                                            (srcData[xRight]&0xff));
                                     xLeft  += srcPixelStride;
                                     xRight -= srcPixelStride;
                                 } // while xLeft
 
                                 // Grab the center pixel if hParity was odd also
-                                if (hParity == 1) sum += vCtr*hCtr*(int)(srcData[xLeft]&0xff);
+                                if (hParity == 1) sum += vCtr*hCtr* (srcData[xLeft]&0xff);
 
                             } // if vParity
 
@@ -867,12 +867,10 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
                             dInd += dstPixelStride;
                         } // for xSrc
 
-                        dstScanlineOffset += dstScanlineStride;
-                    } // for ySrc
-
-                    return null;
-                }
-            });
+                        return null;
+                    }
+                });
+            } // for ySrc
         }
         try {
             threadPool.invokeAll(processes);
@@ -916,21 +914,22 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
         final float vCtr = vKernel[0];
         final float hCtr = hKernel[0];
 
-        ExecutorService threadPool = Executors.newFixedThreadPool(dnumBands);
+        ExecutorService threadPool = Executors.newFixedThreadPool(numProc);
         Collection<Callable<Void>> processes = new LinkedList<Callable<Void>>();
-        for (int dstBand = 0; dstBand < dnumBands; dstBand++) {
-            final int band = dstBand;
-            processes.add(new Callable<Void>() {
-                @Override
-                public Void call() {
-                    short dstData[] = dstDataArrays[band];
-                    short srcData[] = srcDataArrays[band];
-                    int srcScanlineOffset = srcBandOffsets[band];
-                    int dstScanlineOffset = dstBandOffsets[band];
+        for (int band = 0; band < dnumBands; band++) {
+            final short dstData[] = dstDataArrays[band];
+            final short srcData[] = srcDataArrays[band];
+            final int srcScanlineOffset = srcBandOffsets[band];
+            final int dstScanlineOffset = dstBandOffsets[band];
 
-                    // Step over source raster coordinates
-                    for (int ySrc = 0; ySrc < scaleY*dheight; ySrc += scaleY) {
-                        int dInd = dstScanlineOffset;
+            // Step over source raster coordinates
+            for (int h = 0; h < dheight; h++) {
+                final int y = h;
+                final int ySrc = h * scaleY;
+                processes.add(new Callable<Void>() {
+                    @Override
+                    public Void call() {
+                        int dInd = dstScanlineOffset + y * dstScanlineStride;
                         for (int xSrc = 0; xSrc < scaleX*dwidth; xSrc += scaleX) {
 
                             int upLeft0  = xSrc*srcPixelStride + ySrc*srcScanlineStride + srcScanlineOffset;
@@ -951,10 +950,10 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
                                 // Make the rectangle squeeze in the horizontal direction
                                 for (int ix = hKernel.length - 1; ix > hParity - 1; ix--) {
                                     float kk = hKernel[ix]*vKernel[iy];
-                                    sum += kk*((int)(srcData[upLeft] &0xffff) +
-                                               (int)(srcData[upRight]&0xffff) +
-                                               (int)(srcData[dnLeft] &0xffff) +
-                                               (int)(srcData[dnRight]&0xffff));
+                                    sum += kk*((srcData[upLeft] &0xffff) +
+                                            (srcData[upRight]&0xffff) +
+                                            (srcData[dnLeft] &0xffff) +
+                                            (srcData[dnRight]&0xffff));
                                     upLeft  += srcPixelStride;
                                     upRight -= srcPixelStride;
                                     dnLeft  += srcPixelStride;
@@ -977,8 +976,8 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
                                 int kInd = vKernel.length - 1;
                                 while (xUp < xDown) {
                                     float kk = hCtr*vKernel[kInd--];
-                                    sum += kk*((int)(srcData[xUp]  &0xffff) +
-                                               (int)(srcData[xDown]&0xffff));
+                                    sum += kk*((srcData[xUp]  &0xffff) +
+                                            (srcData[xDown]&0xffff));
                                     xUp   += srcScanlineStride;
                                     xDown -= srcScanlineStride;
                                 }
@@ -993,14 +992,14 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
                                 int kInd = hKernel.length - 1;
                                 while (xLeft < xRight) {
                                     float kk = vCtr*hKernel[kInd--];
-                                    sum += kk*((int)(srcData[xLeft] &0xffff) +
-                                               (int)(srcData[xRight]&0xffff));
+                                    sum += kk*((srcData[xLeft] &0xffff) +
+                                            (srcData[xRight]&0xffff));
                                     xLeft  += srcPixelStride;
                                     xRight -= srcPixelStride;
                                 } // while xLeft
 
                                 // Grab the center pixel if hParity was odd also
-                                if (hParity == 1) sum += vCtr*hCtr*(int)(srcData[xLeft]&0xffff);
+                                if (hParity == 1) sum += vCtr*hCtr* (srcData[xLeft]&0xffff);
 
                             } // if vParity
                             int val = (int)(sum + 0.5);
@@ -1009,11 +1008,10 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
                             dInd += dstPixelStride;
                         } // for xSrc
 
-                        dstScanlineOffset += dstScanlineStride;
-                    } // for ySrc
-                    return null;
-                }
-            });
+                        return null;
+                    }
+                });
+            } // for ySrc
         }
         try {
             threadPool.invokeAll(processes);
@@ -1057,21 +1055,22 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
         final float vCtr = vKernel[0];
         final float hCtr = hKernel[0];
 
-        ExecutorService threadPool = Executors.newFixedThreadPool(dnumBands);
+        ExecutorService threadPool = Executors.newFixedThreadPool(numProc);
         Collection<Callable<Void>> processes = new LinkedList<Callable<Void>>();
-        for (int dstBand = 0; dstBand < dnumBands; dstBand++) {
-            final int band = dstBand;
-            processes.add(new Callable<Void>() {
-                @Override
-                public Void call() {
-                    short dstData[] = dstDataArrays[band];
-                    short srcData[] = srcDataArrays[band];
-                    int srcScanlineOffset = srcBandOffsets[band];
-                    int dstScanlineOffset = dstBandOffsets[band];
+        for (int band = 0; band < dnumBands; band++) {
+            final short dstData[] = dstDataArrays[band];
+            final short srcData[] = srcDataArrays[band];
+            final int srcScanlineOffset = srcBandOffsets[band];
+            final int dstScanlineOffset = dstBandOffsets[band];
 
-                    // Step over source raster coordinates
-                    for (int ySrc = 0 ; ySrc < scaleY*dheight ; ySrc += scaleY) {
-                        int dInd = dstScanlineOffset;
+            // Step over source raster coordinates
+            for (int h = 0; h < dheight; h++) {
+                final int y = h;
+                final int ySrc = h * scaleY;
+                processes.add(new Callable<Void>() {
+                    @Override
+                    public Void call() {
+                        int dInd = dstScanlineOffset + y * dstScanlineStride;
                         for (int xSrc = 0 ; xSrc < scaleX*dwidth ; xSrc += scaleX) {
 
                             int upLeft0 = xSrc*srcPixelStride + ySrc*srcScanlineStride + srcScanlineOffset;
@@ -1150,12 +1149,10 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
 
                         } // for xSrc
 
-                        dstScanlineOffset += dstScanlineStride;
-
-                    } // for ySrc
-                    return null;
-                }
-            });
+                        return null;
+                    }
+                });
+            } // for ySrc
         }
         try {
             threadPool.invokeAll(processes);
@@ -1199,21 +1196,22 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
         final double vCtr = (double)vKernel[0];
         final double hCtr = (double)hKernel[0];
 
-        ExecutorService threadPool = Executors.newFixedThreadPool(dnumBands);
+        ExecutorService threadPool = Executors.newFixedThreadPool(numProc);
         Collection<Callable<Void>> processes = new LinkedList<Callable<Void>>();
-        for (int dstBand = 0; dstBand < dnumBands; dstBand++) {
-            final int band = dstBand;
-            processes.add(new Callable<Void>() {
-                @Override
-                public Void call() {
-                    int dstData[] = dstDataArrays[band];
-                    int srcData[] = srcDataArrays[band];
-                    int srcScanlineOffset = srcBandOffsets[band];
-                    int dstScanlineOffset = dstBandOffsets[band];
+        for (int band = 0; band < dnumBands; band++) {
+            final int dstData[] = dstDataArrays[band];
+            final int srcData[] = srcDataArrays[band];
+            final int srcScanlineOffset = srcBandOffsets[band];
+            final int dstScanlineOffset = dstBandOffsets[band];
 
-                    // Step over source raster coordinates
-                    for (int ySrc = 0 ; ySrc < scaleY*dheight ; ySrc += scaleY) {
-                        int dInd = dstScanlineOffset;
+            // Step over source raster coordinates
+            for (int h = 0; h < dheight; h++) {
+                final int y = h;
+                final int ySrc = h * scaleY;
+                processes.add(new Callable<Void>() {
+                    @Override
+                    public Void call() {
+                        int dInd = dstScanlineOffset + y * dstScanlineStride;
                         for (int xSrc = 0 ; xSrc < scaleX*dwidth ; xSrc += scaleX) {
 
                             int upLeft0 = xSrc*srcPixelStride + ySrc*srcScanlineStride + srcScanlineOffset;
@@ -1288,12 +1286,10 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
                             dInd += dstPixelStride;
                         } // for xSrc
 
-                        dstScanlineOffset += dstScanlineStride;
-
-                    } // for ySrc
-                    return null;
-                }
-            });
+                        return null;
+                    }
+                });
+            } // for ySrc
         }
         try {
             threadPool.invokeAll(processes);
@@ -1337,21 +1333,22 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
         final double vCtr = (double)vKernel[0];
         final double hCtr = (double)hKernel[0];
 
-        ExecutorService threadPool = Executors.newFixedThreadPool(dnumBands);
+        ExecutorService threadPool = Executors.newFixedThreadPool(numProc);
         Collection<Callable<Void>> processes = new LinkedList<Callable<Void>>();
-        for (int dstBand = 0; dstBand < dnumBands; dstBand++) {
-            final int band = dstBand;
-            processes.add(new Callable<Void>() {
-                @Override
-                public Void call() {
-                    float dstData[] = dstDataArrays[band];
-                    float srcData[] = srcDataArrays[band];
-                    int srcScanlineOffset = srcBandOffsets[band];
-                    int dstScanlineOffset = dstBandOffsets[band];
+        for (int band = 0; band < dnumBands; band++) {
+            final float dstData[] = dstDataArrays[band];
+            final float srcData[] = srcDataArrays[band];
+            final int srcScanlineOffset = srcBandOffsets[band];
+            final int dstScanlineOffset = dstBandOffsets[band];
 
-                    // Step over source raster coordinates
-                    for (int ySrc = 0 ; ySrc < scaleY*dheight ; ySrc += scaleY) {
-                        int dInd = dstScanlineOffset;
+            // Step over source raster coordinates
+            for (int h = 0; h < dheight; h++) {
+                final int y = h;
+                final int ySrc = h * scaleY;
+                processes.add(new Callable<Void>() {
+                    @Override
+                    public Void call() {
+                        int dInd = dstScanlineOffset + y * dstScanlineStride;
                         for (int xSrc = 0 ; xSrc < scaleX*dwidth ; xSrc += scaleX) {
 
                             int upLeft0 = xSrc*srcPixelStride + ySrc*srcScanlineStride + srcScanlineOffset;
@@ -1426,12 +1423,10 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
                             dInd += dstPixelStride;
                         } // for xSrc
 
-                        dstScanlineOffset += dstScanlineStride;
-
-                    } // for ySrc
-                    return null;
-                }
-            });
+                        return null;
+                    }
+                });
+            } // for ySrc
         }
         try {
             threadPool.invokeAll(processes);
@@ -1474,22 +1469,23 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
 
         final double vCtr = (double)vKernel[0];
         final double hCtr = (double)hKernel[0];
- 
-        ExecutorService threadPool = Executors.newFixedThreadPool(dnumBands);
-        Collection<Callable<Void>> processes = new LinkedList<Callable<Void>>();
-        for (int dstBand = 0; dstBand < dnumBands; dstBand++) {
-            final int band = dstBand;
-            processes.add(new Callable<Void>() {
-                @Override
-                public Void call() {
-                    double dstData[] = dstDataArrays[band];
-                    double srcData[] = srcDataArrays[band];
-                    int srcScanlineOffset = srcBandOffsets[band];
-                    int dstScanlineOffset = dstBandOffsets[band];
 
-                    // Step over source raster coordinates
-                    for (int ySrc = 0 ; ySrc < scaleY*dheight ; ySrc += scaleY) {
-                        int dInd = dstScanlineOffset;
+        ExecutorService threadPool = Executors.newFixedThreadPool(numProc);
+        Collection<Callable<Void>> processes = new LinkedList<Callable<Void>>();
+        for (int band = 0; band < dnumBands; band++) {
+            final double dstData[] = dstDataArrays[band];
+            final double srcData[] = srcDataArrays[band];
+            final int srcScanlineOffset = srcBandOffsets[band];
+            final int dstScanlineOffset = dstBandOffsets[band];
+
+            // Step over source raster coordinates
+            for (int h = 0; h < dheight; h++) {
+                final int y = h;
+                final int ySrc = h * scaleY;
+                processes.add(new Callable<Void>() {
+                    @Override
+                    public Void call() {
+                        int dInd = dstScanlineOffset + y * dstScanlineStride;
                         for (int xSrc = 0 ; xSrc < scaleX*dwidth ; xSrc += scaleX) {
 
                             int upLeft0 = xSrc*srcPixelStride + ySrc*srcScanlineStride + srcScanlineOffset;
@@ -1564,12 +1560,10 @@ public class FilteredSubsampleOpImage extends GeometricOpImage {
                             dInd += dstPixelStride;
                         } // for xSrc
 
-                        dstScanlineOffset += dstScanlineStride;
-
-                    } // for ySrc
-                    return null;
-                }
-            });
+                        return null;
+                    }
+                });
+            } // for ySrc
         }
         try {
             threadPool.invokeAll(processes);
