@@ -21,7 +21,14 @@ export MACOSX_DEPLOYMENT_TARGET:=	$(shell sw_vers -productVersion | cut -d. -f-2
 SDKROOT:=	$(shell xcodebuild -version -sdk macosx${MACOSX_DEPLOYMENT_TARGET} | sed -n '/^Path:/p' | sed 's/^Path: //')
 
 # Different compilers required for Objective-C sources.
-XCODE_BIN_DIR=	$(shell xcode-select -p)/usr/bin
+XCODE_PATH:=	$(shell xcode-select -p)
+ifeq ($(findstring CommandLineTools,$(XCODE_PATH)),CommandLineTools)
+  # Use command line tools.
+  XCODE_BIN_DIR=	$(XCODE_PATH)/usr/bin
+else
+  # Use Xcode.
+  XCODE_BIN_DIR=	$(XCODE_PATH)/Toolchains/XcodeDefault.xctoolchain/usr/bin
+endif
 CC=	$(XCODE_BIN_DIR)/clang
 CXX=	$(XCODE_BIN_DIR)/clang++
 
