@@ -104,12 +104,10 @@ void rlm_separable_bf_mono_tile(
     int srcStep, int dstStep)               // length in elements (not bytes) of a single image row
 {
     float *fsrc = new float[width * height];
-    float *ibuf = new float[width * height];
 
-    if ( ibuf == NULL || fsrc == NULL ) {
+    if ( fsrc == NULL ) {
         fprintf(stderr, "can't allocate buffers\n");
         delete [] fsrc;
-        delete [] ibuf;
         return;
     }
 
@@ -143,140 +141,29 @@ void rlm_separable_bf_mono_tile(
             const int src_idx = x*srcPixelStride + y*srcStep;
             fsrc[idx] = src[src_idx] / (float) 0xffff;
         }
-
-        for (int x=0; x < width; x++) {
-            // Copy border region to buffer
-            if ((x < wr || x >= width-wr) || (y < wr || y >= height-wr)) {
-                const int idx = x + y*width;
-                ibuf[idx] = fsrc[idx];
-            }
-        }
     }
-
-    //--------------------------------------------------------------------------
-    // Filter Rows
-    //--------------------------------------------------------------------------
 
     for (int y=wr; y < height - wr; y++) {
         int x=wr;
 #ifdef __INTEL_COMPILER
-        for (/*int x=wr*/; x < width - wr-4; x+=4) {
-            const F32vec4 v_zero = _mm_setzero_ps();
-            const F32vec4 v_one = F32vec4(1.0f);
-            const F32vec4 v_ffff = F32vec4((float) 0xffff);
-
-            const int idx = x + y*width;
-
-            // compute adaptive kernel and convolve color channels
-            F32vec4 v_num = v_zero;
-            F32vec4 v_denom = v_zero;
-            const F32vec4 v_I_s0 = _mm_loadu_ps(&fsrc[idx]);
-            const F32vec4 v_Ar(Ar);
-
-            for (int k = 0; k <= 2*wr; k++) {
-                const F32vec4 v_I_s = _mm_loadu_ps(&fsrc[k-wr + idx]);
-                const F32vec4 v_D_sq = SQR(v_I_s - v_I_s0);
-                const F32vec4 v_f = v_fast_exp(v_Ar * v_D_sq - F32vec4(kernel[k]));
-                v_num += v_f * v_I_s;
-                v_denom += v_f;
-            }
-
-            // normalize
-            v_denom = select_eq(v_denom, v_zero, v_one, v_denom);
-
-            _mm_storeu_ps(&ibuf[idx], v_num / v_denom);
-        }
+        // TODO
 #endif
-        for (/*int x=wr*/; x < width - wr; x++) {
-
+        for (; x < width - wr; x++) {
             const int idx = x + y*width;
             const float I_s0 = fsrc[idx];
 
-            // compute adaptive kernel and convolve color channels
+            // compute adaptive kernel and convolve
             float num = 0;
             float denom = 0;
 
-            for (int k = 0; k <= 2*wr; k++) {
-                const float I_s = fsrc[k-wr + idx];
-                const float D_sq = SQR(I_s - I_s0);
-                const float f = fast_exp(Ar * D_sq - kernel[k]);
-                num += f * I_s;
-                denom += f;
-            }
-
-            // normalize
-            if (denom < FLT_EPSILON)
-                denom = 1.0;
-
-            ibuf[idx] = num / denom;
-        }
-    }
-
-    delete [] fsrc;
-
-    //--------------------------------------------------------------------------
-    // Filter Columns
-    //--------------------------------------------------------------------------
-
-    // Note: this looks weird because the outer loop is on y, but we're really
-    // iterating on columns (see the indexing in ibuf)
-
-    for (int y=wr; y < height - wr; y++) {
-        int x=wr;
-#ifdef __INTEL_COMPILER
-        for (/*int x=wr*/; x < width - wr-4; x+=4) {
-            const F32vec4 v_zero = _mm_setzero_ps();
-            const F32vec4 v_one = F32vec4(1.0f);
-            const F32vec4 v_ffff = F32vec4((float) 0xffff);
-
-            const int idx = x + y*width;
-
-            // compute adaptive kernel and convolve color channels
-            F32vec4 v_num = v_zero;
-            F32vec4 v_denom = v_zero;
-            const F32vec4 v_I_s0 = _mm_loadu_ps(&ibuf[idx]);
-            const F32vec4 v_Ar(Ar);
-
-            for (int k = 0; k <= 2*wr; k++) {
-                const F32vec4 v_I_s = _mm_loadu_ps(&ibuf[(k-wr)*width + idx]);
-                const F32vec4 v_D_sq = SQR(v_I_s - v_I_s0);
-                const F32vec4 v_f = v_fast_exp(v_Ar * v_D_sq - F32vec4(kernel[k]));
-                v_num += v_f * v_I_s;
-                v_denom += v_f;
-            }
-
-            // normalize
-            v_denom = select_eq(v_denom, v_zero, v_one, v_denom);
-
-            union {
-                __m128i v_result;
-                int     a_result[4];
-            };
-
-            v_result = _mm_cvttps_epi32(simd_max(v_zero, simd_min(v_ffff * v_num / v_denom, v_ffff)));
-
-            const int dst_idx = (x-wr)*dstPixelStride + (y-wr)*dstStep;
-
-            for (int i = 0; i < 4; i++)
-                dst[dst_idx + i] = a_result[i];
-        }
-#endif
-        for (/*int x=wr*/; x < width - wr; x++) {
-
-            const int idx = x + y*width;
-
-            const float I_s0 = ibuf[idx];
-
-            // compute adaptive kernel and convolve color channels
-            float num = 0;
-            float denom = 0;
-
-            for (int k = 0; k <= 2*wr; k++) {
-                const float I_s = ibuf[(k-wr)*width + idx];
-                const float D_sq = SQR(I_s - I_s0);
-                const float f = fast_exp(Ar * D_sq - kernel[k]);
-                num += f * I_s;
-                denom += f;
+            for (int ky = 0; ky <= 2*wr; ky++) {
+                for (int kx = 0; kx <= 2*wr; kx++) {
+                    const float I_s = fsrc[(ky-wr)*width + kx-wr + idx];
+                    const float D_sq = SQR(I_s - I_s0);
+                    const float f = fast_exp(Ar * D_sq - kernel[ky] - kernel[kx]);
+                    num += f * I_s;
+                    denom += f;
+                }
             }
 
             // normalize
@@ -287,7 +174,8 @@ void rlm_separable_bf_mono_tile(
             dst[dst_idx] = clampUShort(0xffff * num / denom);
         }
     }
-    delete [] ibuf;
+
+    delete [] fsrc;
 }
 
 #ifdef __INTEL_COMPILER
