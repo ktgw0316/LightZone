@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <jni.h>
+#include "../include/mathlz.h"
 
 #ifdef __INTEL_COMPILER
 #include <fvec.h>
@@ -46,42 +47,6 @@ static inline F32vec4 v_fast_exp(F32vec4 val)
 }
 
 #endif
-
-#if _OPENMP >= 201307
-#   pragma omp declare simd
-#endif
-template <typename T> static inline T SQR( T x )
-{
-    return x * x;
-}
-
-#if _OPENMP >= 201307
-#   pragma omp declare simd
-#endif
-static inline float fast_exp(float val)
-{
-    constexpr float fast_exp_a = (1 << 23)/M_LN2;
-    constexpr float fast_exp_b_c = 127.0f * (1 << 23) - 405000;
-
-    if (val < -16)
-        return 0;
-
-    union {
-        float f;
-        int i;
-    } result;
-
-    result.i = (int)(fast_exp_a * val + fast_exp_b_c);
-    return result.f;
-}
-
-#if _OPENMP >= 201307
-#   pragma omp declare simd
-#endif
-template <typename T>
-unsigned short clampUShort(T x) {
-    return x < 0 ? 0 : x > 0xffff ? 0xffff : (unsigned short) x;
-}
 
 /*******************************************************************************
  * rlm_separable_bf_mono_tile()

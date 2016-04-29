@@ -9,6 +9,8 @@ TARGET_BASE:=		fbf
 
 FW_DIR:=		/System/Library/Frameworks
 
+JNI_EXTRA_CFLAGS+=	-fopenmp -std=c++0x
+
 ifeq ($(PLATFORM),MacOSX)
   JNI_EXTRA_LINK:=      -lstdc++
 endif
