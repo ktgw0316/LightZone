@@ -1,5 +1,6 @@
 #include <float.h>
 #include <math.h>
+#include <omp.h>
 #include <stdlib.h>
 #include <string.h>
 #include <jni.h>
@@ -46,15 +47,21 @@ static inline F32vec4 v_fast_exp(F32vec4 val)
 
 #endif
 
+#if _OPENMP >= 201307
+#   pragma omp declare simd
+#endif
 template <typename T> static inline T SQR( T x )
 {
     return x * x;
 }
 
+#if _OPENMP >= 201307
+#   pragma omp declare simd
+#endif
 static inline float fast_exp(float val)
 {
-    const float fast_exp_a = (1 << 23)/M_LN2;
-    const float fast_exp_b_c = 127.0f * (1 << 23) - 405000;
+    constexpr float fast_exp_a = (1 << 23)/M_LN2;
+    constexpr float fast_exp_b_c = 127.0f * (1 << 23) - 405000;
 
     if (val < -16)
         return 0;
@@ -68,6 +75,9 @@ static inline float fast_exp(float val)
     return result.f;
 }
 
+#if _OPENMP >= 201307
+#   pragma omp declare simd
+#endif
 template <typename T>
 unsigned short clampUShort(T x) {
     return x < 0 ? 0 : x > 0xffff ? 0xffff : (unsigned short) x;
@@ -121,9 +131,12 @@ void rlm_separable_bf_mono_tile(
     const F32vec4 v_inv_norm(1.0f/0xffff);
 #endif
 
+#pragma omp parallel
+{
+#pragma omp for
     for (int y=0; y < height; y++) {
-        int x=0;
 #ifdef __INTEL_COMPILER
+        int x=0;
         for (; x < width-8; x+=8) {
             const int idx = x + y*width;
             const int src_idx = x*srcPixelStride + y*srcStep;
@@ -135,20 +148,33 @@ void rlm_separable_bf_mono_tile(
             _mm_storeu_ps(&fsrc[idx], v_inv_norm * src_low);
             _mm_storeu_ps(&fsrc[idx+4], v_inv_norm * src_high);
         }
+        for (; x < width; x++) {
+#else
+#  if _OPENMP >= 201307
+#    pragma omp simd
+#  endif
+        for (int x=0; x < width; x++) {
 #endif
-        for (/*int x=0*/; x < width; x++) {
             const int idx = x + y*width;
             const int src_idx = x*srcPixelStride + y*srcStep;
             fsrc[idx] = src[src_idx] / (float) 0xffff;
         }
     }
 
+#pragma omp for
     for (int y=wr; y < height - wr; y++) {
-        int x=wr;
 #ifdef __INTEL_COMPILER
-        // TODO
-#endif
+        int x=wr;
+        for (; x < width-wr-8; x+=8) {
+            // TODO
+        }
         for (; x < width - wr; x++) {
+#else
+#  if _OPENMP >= 201307
+#    pragma omp simd
+#  endif
+        for (int x=wr; x < width - wr; x++) {
+#endif
             const int idx = x + y*width;
             const float I_s0 = fsrc[idx];
 
@@ -174,6 +200,7 @@ void rlm_separable_bf_mono_tile(
             dst[dst_idx] = clampUShort(0xffff * num / denom);
         }
     }
+} // omp parallel
 
     delete [] fsrc;
 }
@@ -326,9 +353,12 @@ void rlm_separable_bf_chroma_tile(
     const F32vec4 v_inv_cnorm(inv_cnorm);
 #endif
 
+#pragma omp parallel
+{
+#pragma omp for
     for (int y=0; y < height; y++) {
-        int x=0;
 #ifdef __INTEL_COMPILER
+        int x=0;
         for (; x < width-8; x+=8) {
             const int src_idx = 3*x + y*srcStep;
             const int idx = x + y*width;
@@ -372,8 +402,13 @@ void rlm_separable_bf_chroma_tile(
             F32vec4 src4_b = _mm_cvtepi32_ps(I32vec4(src_b[src_idx+9], src_b[src_idx+6], src_b[src_idx+3], src_b[src_idx]));
             _mm_storeu_ps(&fsrc_b[idx], v_inv_cnorm * src4_b); */
         }
+        for (; x < width; x++) {
+#else
+#  if _OPENMP >= 201307
+#    pragma omp simd
+#  endif
+        for (int x=0; x < width; x++) {
 #endif
-        for (/*int x=0*/; x < width; x++) {
             const int src_idx = 3*x + y*srcStep;
             const int idx = x + y*width;
 
@@ -382,14 +417,37 @@ void rlm_separable_bf_chroma_tile(
             fsrc_b[idx] = inv_cnorm * (float)src_b[src_idx];
         }
 
-        for (int x=0; x < width; x++) {
-            // Copy border region to buffer
-            if ((x < wr || x >= width-wr) || (y < wr || y >= height-wr)) {
-                const int idx = x + y*width;
+        //
+        // Copy border region to buffer
+        //
+        const int idx0 = y*width;
+        if (y < wr || y >= height-wr) {
+#if _OPENMP >= 201307
+#   pragma omp simd
+#endif
+            for (int x=0; x < width; x++) {
+                // buf_L[idx0+x] = fsrc_L[idx0+x];
+                buf_a[idx0+x] = fsrc_a[idx0+x];
+                buf_b[idx0+x] = fsrc_b[idx0+x];
+            }
+        }
+        else {
+#if _OPENMP >= 201307
+#   pragma omp simd
+#endif
+            for (int x=0; x < wr; x++) {
+                // buf_L[idx0+x] = fsrc_L[idx0+x];
+                buf_a[idx0+x] = fsrc_a[idx0+x];
+                buf_b[idx0+x] = fsrc_b[idx0+x];
+            }
 
-                // buf_L[idx] = fsrc_L[idx];
-                buf_a[idx] = fsrc_a[idx];
-                buf_b[idx] = fsrc_b[idx];
+#if _OPENMP >= 201307
+#   pragma omp simd
+#endif
+            for (int x=width-wr; x < width; x++) {
+                // buf_L[idx0+x] = fsrc_L[idx0+x];
+                buf_a[idx0+x] = fsrc_a[idx0+x];
+                buf_b[idx0+x] = fsrc_b[idx0+x];
             }
         }
     }
@@ -398,13 +456,14 @@ void rlm_separable_bf_chroma_tile(
     // Filter Rows
     //--------------------------------------------------------------------------
 
+#pragma omp for
     for (int y=wr; y < height - wr; y++) {
-        int x=wr;
 #ifdef __INTEL_COMPILER
         const F32vec4 v_zero = _mm_setzero_ps();
         const F32vec4 v_one = F32vec4(1.0f);
 
-        for (/*int x=wr*/; x < width - wr-4; x+=4) {
+        int x=wr;
+        for (; x < width - wr-4; x+=4) {
             // initialize central pixel
             const int idx0 = x + y*width;
 
@@ -441,8 +500,13 @@ void rlm_separable_bf_chroma_tile(
             _mm_storeu_ps(&buf_a[idx0], a_num / denom);
             _mm_storeu_ps(&buf_b[idx0], b_num / denom);
         }
+        for (; x < width - wr; x++) {
+#else
+#  if _OPENMP >= 201307
+#    pragma omp simd
+#  endif
+        for (int x=wr; x < width - wr; x++) {
 #endif
-        for (/*int x=wr*/; x < width - wr; x++) {
             // initialize central pixel
             const int idx0 = x + y*width;
 
@@ -480,7 +544,6 @@ void rlm_separable_bf_chroma_tile(
             buf_b[idx0] = b_num / denom;
         }
     }
-    delete [] fsrc;
 
     //--------------------------------------------------------------------------
     // Filter Columns
@@ -488,6 +551,7 @@ void rlm_separable_bf_chroma_tile(
     float *cbuf_a = new float[height];
     float *cbuf_b = new float[height];
 
+#pragma omp for
     for (int x=wr; x < width - wr; x++) {
         for (int y=0; y < height; y++) {
             const int idx = x + y*width;
@@ -496,12 +560,12 @@ void rlm_separable_bf_chroma_tile(
             cbuf_a[y] = a;
             cbuf_b[y] = b;
         }
-        int y=wr;
 #ifdef __INTEL_COMPILER
         const F32vec4 v_zero(0.0f);
         const F32vec4 v_one(1.0f);
         const F32vec4 v_ffff((float) 0xffff);
 
+        int y=wr;
         for (; y < height - wr - 4; y+=4) {
             // initialize central pixel
             const int src_idx0 = 3*x + y*srcStep;
@@ -553,8 +617,13 @@ void rlm_separable_bf_chroma_tile(
             for (int i = 0; i < 4; i++)
                 dst_b[dst_idx0 + dstStep*i] = a_result[i];
         }
+        for (; y < height - wr; y++) {
+#else
+#  if _OPENMP >= 201307
+#    pragma omp simd
+#  endif
+        for (int y=wr; y < height - wr; y++) {
 #endif
-        for (/* int y=wr */; y < height - wr; y++) {
             // initialize central pixel
             const int src_idx0 = 3*x + y*srcStep;
             const int dst_idx0 = 3*(x-wr) + (y-wr)*dstStep;
@@ -596,7 +665,9 @@ void rlm_separable_bf_chroma_tile(
 
     delete [] cbuf_a;
     delete [] cbuf_b;
+} // omp parallel
 
+    delete [] fsrc;
     delete [] ibuf;
 }
 
