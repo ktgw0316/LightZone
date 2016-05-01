@@ -32,7 +32,7 @@ public class BilateralFilterDescriptor extends OperationDescriptorImpl {
     };
 
     private static final Object[] paramDefaults = {
-        new Float(2), new Float(4), Boolean.FALSE
+        2f, 4f, Boolean.FALSE
     };
 
     public BilateralFilterDescriptor() {
@@ -54,9 +54,9 @@ public class BilateralFilterDescriptor extends OperationDescriptorImpl {
 
         pb.setSource("source0", source);
 
-        pb.setParameter("sigma_d", new Float(sigma_d));
-        pb.setParameter("sigma_r", new Float(sigma_r));
-        pb.setParameter("luminosity", new Boolean(luminosity));
+        pb.setParameter("sigma_d", sigma_d);
+        pb.setParameter("sigma_r", sigma_r);
+        pb.setParameter("luminosity", luminosity);
 
         return JAI.create("BilateralFilter", pb, hints);
     }
