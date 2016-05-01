@@ -13,8 +13,6 @@ import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.awt.*;
 import java.awt.color.ICC_ProfileRGB;
-import java.awt.color.ICC_Profile;
-import java.awt.color.ColorSpace;
 import java.util.Map;
 
 import sun.awt.image.ShortInterleavedRaster;
@@ -48,29 +46,7 @@ public class FilteredGrayscaleOpImage extends PointOpImage {
         ushortLoop((ShortInterleavedRaster) sources[0], (ShortInterleavedRaster) dest);
     }
 
-    /*
-     * faster float arctan2 implementation.
-     * see: http://www.dspguru.com/comp.dsp/tricks/alg/fxdatan2.htm
-     */
-
-    static float arctan2(float y, float x) {
-        final float coeff_1 = (float) Math.PI / 4;
-        final float coeff_2 = 3 * coeff_1;
-        final float abs_y = Math.abs(y) + 1e-10f;      // kludge to prevent 0/0 condition
-        float angle;
-
-        if (x >= 0) {
-            float r = (x - abs_y) / (x + abs_y);
-            angle = coeff_1 - coeff_1 * r;
-        } else {
-            float r = (x + abs_y) / (abs_y - x);
-            angle = coeff_2 - coeff_1 * r;
-        }
-
-        return y < 0 ? -angle : angle;
-    }
-
-    static float angleDiff(float a, float b) {
+    private static float angleDiff(float a, float b) {
         float result = Math.abs(a - b);
         if (result > Math.PI)
             result = (float) (2 * Math.PI - result);

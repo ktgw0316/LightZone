@@ -7,7 +7,6 @@ import com.lightcrafts.media.jai.opimage.RIFUtil;
 import com.lightcrafts.mediax.jai.ImageLayout;
 import com.lightcrafts.mediax.jai.CRIFImpl;
 import com.lightcrafts.mediax.jai.ROI;
-import com.lightcrafts.model.ColorSelection;
 
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;

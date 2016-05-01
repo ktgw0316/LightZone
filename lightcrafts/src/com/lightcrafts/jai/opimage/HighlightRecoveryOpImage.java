@@ -69,9 +69,8 @@ public class HighlightRecoveryOpImage extends PointOpImage {
         float csArray[] = new float[9];
 
         for (int i = 0; i < 3; i++)
-            for (int j = 0; j < 3; j++)
-                csArray[3*i+j] = csMatrix[i][j];
-        
+            System.arraycopy(csMatrix[i], 0, csArray, 3*i, 3);
+
         floatNativeUshortLoop(srcData, dstData,
                               dstBandOffsets, srcBandOffsets,
                               dstLineStride, srcLineStride,

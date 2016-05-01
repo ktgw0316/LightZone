@@ -7,7 +7,6 @@ import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
 import com.lightcrafts.jai.opimage.FastBilateralFilterOpImage;
 import com.lightcrafts.jai.opimage.HDROpImage;
-import com.lightcrafts.jai.opimage.HDROpImage2;
 import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.JAIContext;
@@ -74,15 +73,15 @@ public class HDROperationV2 extends BlendedOperation {
     public void setSliderValue(String key, double value) {
         value = roundValue(key, value);
 
-        if (key == FUZZ && fuzz != value) {
+        if (key.equals(FUZZ) && fuzz != value) {
             fuzz = value;
-        } else if (key == DEPTH && depth != value) {
+        } else if (key.equals(DEPTH) && depth != value) {
             depth = value;
-        } else if (key == HIGHLIGHTS && highlights != value) {
+        } else if (key.equals(HIGHLIGHTS) && highlights != value) {
             highlights = value;
-        } else if (key == DETAIL && detail != value) {
+        } else if (key.equals(DETAIL) && detail != value) {
             detail = value;
-        } else if (key == SHADOWS && shadows != value) {
+        } else if (key.equals(SHADOWS) && shadows != value) {
             shadows = value;
         } else
             return;
@@ -97,8 +96,6 @@ public class HDROperationV2 extends BlendedOperation {
 
         SoftReference<PlanarImage> lastBack = new SoftReference<PlanarImage>(null);
         SoftReference<PlanarImage> mask = new SoftReference<PlanarImage>(null);
-
-        int mask_count = 0;
 
         private double last_radius = 0;
         private double last_fuzz = 0;

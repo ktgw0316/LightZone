@@ -19,11 +19,11 @@ import java.util.Map;
  * An OpImage class to perform separable convolve on a source image.
  */
 final class BilateralFilterOpImage2 extends AreaOpImage {
-    int wr; /* window radius */
-    int ws; /* window size */
-    float kernel[], scale_r, elut[];
+    private int wr; /* window radius */
+    private int ws; /* window size */
+    private float kernel[], scale_r, elut[];
 
-    static final double SQR(double x) {
+    private static double SQR(double x) {
         return x * x;
     }
 
@@ -78,7 +78,7 @@ final class BilateralFilterOpImage2 extends AreaOpImage {
 
         RasterAccessor srcAccessor =
                 new RasterAccessor(source, srcRect, formatTags[0],
-                                   getSource(0).getColorModel());
+                                   getSourceImage(0).getColorModel());
         RasterAccessor dstAccessor =
                 new RasterAccessor(dest, destRect, formatTags[1],
                                    this.getColorModel());

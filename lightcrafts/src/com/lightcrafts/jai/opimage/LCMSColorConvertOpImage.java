@@ -19,11 +19,11 @@ import sun.awt.image.ShortInterleavedRaster;
 import sun.awt.image.ByteInterleavedRaster;
 
 public class LCMSColorConvertOpImage extends PointOpImage {
-    final LCMSColorConvertDescriptor.RenderingIntent intent;
-    final LCMSColorConvertDescriptor.RenderingIntent proofIntent;
-    final ColorModel targetColorModel;
-    final ICC_Profile proof;
-    LCMS.Transform transform = null;
+    private final LCMSColorConvertDescriptor.RenderingIntent intent;
+    private final LCMSColorConvertDescriptor.RenderingIntent proofIntent;
+    private final ColorModel targetColorModel;
+    private final ICC_Profile proof;
+    private LCMS.Transform transform = null;
     final RenderedImage source;
 
     LCMSColorConvertOpImage(RenderedImage source,

@@ -29,8 +29,8 @@ public class IntVibranceOpImage extends PointOpImage {
     private final int toLinearsRGB[][] = new int[3][3];
     private final boolean saturationIncrease;
 
-    static final int sMath_scale = 0x8000;
-    static final int sMath_PI = (int) (sMath_scale * Math.PI);
+    private static final int sMath_scale = 0x8000;
+    private static final int sMath_PI = (int) (sMath_scale * Math.PI);
 
     /*
      * fast integer arctan2 implementation.

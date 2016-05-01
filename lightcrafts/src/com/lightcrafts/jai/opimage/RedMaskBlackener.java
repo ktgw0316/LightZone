@@ -6,7 +6,6 @@ import com.lightcrafts.mediax.jai.PointOpImage;
 import com.lightcrafts.mediax.jai.ImageLayout;
 
 import java.awt.image.*;
-import java.awt.color.ColorSpace;
 import java.awt.*;
 import java.util.Map;
 
@@ -55,7 +54,6 @@ public class RedMaskBlackener extends PointOpImage {
         byte maskData[] = mask.getDataStorage();
         int maskBandOffsets[] = mask.getDataOffsets();
         int maskLineStride = mask.getScanlineStride();
-        int maskPixelStride = mask.getPixelStride();
 
         int srcROffset = srcBandOffsets[0];
         int srcGOffset = srcBandOffsets[1];

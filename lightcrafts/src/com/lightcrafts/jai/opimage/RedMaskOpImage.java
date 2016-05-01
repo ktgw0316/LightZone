@@ -94,16 +94,16 @@ public class RedMaskOpImage extends PointOpImage {
         int rrbMax = (int) ((35 + 6.5 * 2) * 256);
 
         // Kinda Orange
-        int oaMin = (int) ((31 - 15 * 2) * 256);
-        int oaMax = (int) ((31 + 15 * 2) * 256);
-        int obMin = (int) ((56 - 5 * 2) * 256);
-        int obMax = (int) ((56 + 5 * 2) * 256);
+        int oaMin = (31 - 15 * 2) * 256;
+        int oaMax = (31 + 15 * 2) * 256;
+        int obMin = (56 -  5 * 2) * 256;
+        int obMax = (56 +  5 * 2) * 256;
 
         // Magenta
-        int maMin = (int) ((30 - 12 * 2) * 256);
-        int maMax = (int) ((30 + 12 * 2) * 256);
-        int mbMin = (int) ((-12 - 13 * 2) * 256);
-        int mbMax = (int) ((-12 + 13 * 2) * 256);
+        // int maMin = ( 30 - 12 * 2) * 256;
+        // int maMax = ( 30 + 12 * 2) * 256;
+        // int mbMin = (-12 - 13 * 2) * 256;
+        // int mbMax = (-12 + 13 * 2) * 256;
 
         // Skin
         int sLMin = (int) (43.3593 * 0xffff / 100);
