@@ -39,10 +39,11 @@ public class ColorBalanceOperationV2 extends BlendedOperation implements com.lig
         setSliderConfig(MIDPOINT, new SliderConfig(0.01, 1, midpoint, 0.01, true, format));
     }
 
+    @Override
     public void setSliderValue(String key, double value) {
         value = roundValue(key, value);
 
-        if (key == MIDPOINT && midpoint != value) {
+        if (key.equals(MIDPOINT) && midpoint != value) {
             midpoint = value;
         } else
             return;
@@ -50,12 +51,14 @@ public class ColorBalanceOperationV2 extends BlendedOperation implements com.lig
         super.setSliderValue(key, value);
     }
 
+    @Override
     public Map<String, Double> setColor(Point2D p) {
         this.p = p;
         settingsChanged();
         return Collections.singletonMap(MIDPOINT, midpoint);
     }
 
+    @Override
     public Map<String, Double> setColor(Color color) {
         this.color = color;
         this.p = null;
@@ -64,12 +67,13 @@ public class ColorBalanceOperationV2 extends BlendedOperation implements com.lig
         return Collections.emptyMap();
     }
 
+    @Override
     public Color getColor() {
         // System.out.println("getColor: " + color);
         return color;
     }
 
-    static int clipColor(int color) {
+    private static int clipColor(int color) {
         return color < 0 ? 0 : color > 255 ? 255 : color;
     }
 
@@ -78,6 +82,7 @@ public class ColorBalanceOperationV2 extends BlendedOperation implements com.lig
             super(source);
         }
 
+        @Override
         public PlanarImage setFront() {
             if (p != null || color != null) {
                 int[] pixel;
@@ -176,18 +181,22 @@ public class ColorBalanceOperationV2 extends BlendedOperation implements com.lig
         }
     }
 
+    @Override
     protected BlendedTransform createBlendedOp(PlanarImage source) {
         return new ColorBalanceV2(source);
     }
 
+    @Override
     public boolean neutralDefault() {
         return true;
     }
 
+    @Override
     protected void updateOp(Transform op) {
         op.update();
     }
 
+    @Override
     public OperationType getType() {
         return type;
     }

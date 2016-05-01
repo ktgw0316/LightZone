@@ -44,24 +44,27 @@ public class ContrastMaskOperation extends BlendedOperation {
         setSliderConfig("Gamma", new SliderConfig(0.2, 5, gamma, .1, false, format));
     }
 
+    @Override
     public boolean neutralDefault() {
         return false;
     }
 
     static final OperationType type = new OperationTypeImpl("Contrast Mask");
 
+    @Override
     public void setSliderValue(String key, double value) {
         value = roundValue(key, value);
-        
-        if (key == "Radius" && radius != value) {
+
+        if (key.equals("Radius") && radius != value) {
             radius = value;
             kernel = null;
-        } else if (key == "Gamma" && gamma != value) {
+        } else if (key.equals("Gamma") && gamma != value) {
             gamma = value;
             byteLut = null;
             ushortLut = null;
-        } else
+        } else {
             return;
+        }
 
         super.setSliderValue(key, value);
     }
@@ -91,6 +94,7 @@ public class ContrastMaskOperation extends BlendedOperation {
             super(source);
         }
 
+        @Override
         public PlanarImage setFront() {
             double[][] transform = {
                 { ColorScience.Wr, ColorScience.Wg, ColorScience.Wb, 0 }
@@ -128,8 +132,9 @@ public class ContrastMaskOperation extends BlendedOperation {
                 layoutHints.add(hints);
                 layoutHints.add(JAIContext.noCacheHint);
                 scaleDown = JAI.create("Affine", pb, layoutHints);
-            } else
+            } else {
                 scaleDown = back;
+            }
 
             if (scaleDown.getColorModel().getNumComponents() == 3) {
                 ParameterBlock pb = new ParameterBlock();
@@ -168,23 +173,28 @@ public class ContrastMaskOperation extends BlendedOperation {
                 resultLayoutHints.add(hints);
                 resultLayoutHints.add(JAIContext.noCacheHint);
                 return JAI.create("Affine", pb, resultLayoutHints);
-            } else
+            } else {
                 return blur;
+            }
         }
     }
 
+    @Override
     protected void updateOp(Transform op) {
         op.update();
     }
 
+    @Override
     protected BlendedTransform createBlendedOp(PlanarImage source) {
         return new ContrastMaskOperation.ContrastMask(source);
     }
 
+    @Override
     public OperationType getType() {
         return type;
     }
 
+    @Override
     public LayerConfig getDefaultLayerConfig() {
         return new LayerConfig(new LayerModeImpl("Soft Light"), .5);
     }

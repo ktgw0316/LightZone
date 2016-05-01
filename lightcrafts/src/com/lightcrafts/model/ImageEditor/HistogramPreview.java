@@ -25,24 +25,29 @@ public class HistogramPreview extends Preview implements PaintListener {
         this.engine = engine;
     }
 
+    @Override
     public String getName() {
         return LOCALE.get("Histogram_Name");
     }
 
+    @Override
     public void setDropper(Point p) {
 
     }
 
+    @Override
     public void setRegion(Region region) {
 
     }
 
+    @Override
     public void addNotify() {
         // This method gets called when this Preview is added.
         engine.update(null, false);
         super.addNotify();
     }
 
+    @Override
     public void removeNotify() {
         // This method gets called when this Preview is removed.
         super.removeNotify();
@@ -60,22 +65,24 @@ public class HistogramPreview extends Preview implements PaintListener {
 
     private int binmax() {
         int max = 0;
-        for (int c = 0; c < bins.length; c++) {
-            int numBins = bins[c].length;
+        for (int[] bin : bins) {
+            int numBins = bin.length;
             // Skip the first and last bins (pure black and pure white) from normalization
-            for (int i = 5; i < numBins-5; i++) {
-                if (bins[c][i] > max)
-                    max = bins[c][i];
+            for (int i = 5; i < numBins - 5; i++) {
+                if (bin[i] > max)
+                    max = bin[i];
             }
         }
         return (int) (1.1 * max);
     }
 
+    @Override
     public void setSelected(Boolean selected) {
         if (!selected)
             bins = null;
     }
 
+    @Override
     protected synchronized void paintComponent(Graphics gr) {
         Graphics2D g2d = (Graphics2D) gr;
 
@@ -101,7 +108,7 @@ public class HistogramPreview extends Preview implements PaintListener {
             final int max = binmax();
 
             class scaler {
-                int yscale(double y) {
+                private int yscale(double y) {
                     return (int) (height - (height - 4) * (y / (double) max) + 0.5 + miny);
                 }
             }
@@ -171,7 +178,7 @@ public class HistogramPreview extends Preview implements PaintListener {
         }
     }
 
-    static float logTable[] = new float[0x10000];
+    private static float logTable[] = new float[0x10000];
 
     static {
         for (int i = 0; i < 0x10000; i++)
@@ -185,31 +192,29 @@ public class HistogramPreview extends Preview implements PaintListener {
 
         bins = hist.getBins();
 
-        // Raster raster = image.getData(visibleRect);
-        Rectangle bounds = visibleRect; // image.getBounds();
-        int pixel[] = null;
+        int[] pixel = null;
 
         int maxPixels = 256;
-        int incX = bounds.width >= 2 * maxPixels ? bounds.width / maxPixels : 1;
-        int incY = bounds.height >= 2 * maxPixels ? bounds.height / maxPixels : 1;
+        int incX = visibleRect.width >= 2 * maxPixels ? visibleRect.width / maxPixels : 1;
+        int incY = visibleRect.height >= 2 * maxPixels ? visibleRect.height / maxPixels : 1;
 
         double log2 = Math.log(2);
 
-        int minTileX = image.XToTileX(bounds.x);
-        int maxTileX = image.XToTileX(bounds.x + bounds.width - 1);
-        int minTileY = image.YToTileY(bounds.y);
-        int maxTileY = image.YToTileY(bounds.y + bounds.height - 1);
+        int minTileX = image.XToTileX(visibleRect.x);
+        int maxTileX = image.XToTileX(visibleRect.x + visibleRect.width - 1);
+        int minTileY = image.YToTileY(visibleRect.y);
+        int maxTileY = image.YToTileY(visibleRect.y + visibleRect.height - 1);
 
-        for (int tx = minTileX; tx <= maxTileX; tx++)
+        for (int tx = minTileX; tx <= maxTileX; tx++) {
             for (int ty = minTileY; ty <= maxTileY; ty++) {
                 Raster raster = image.getTile(tx, ty);
 
-                int minX = Math.max(bounds.x, raster.getMinX());
-                int maxX = Math.min(bounds.x + bounds.width, raster.getMinX() + raster.getWidth());
-                int minY = Math.max(bounds.y, raster.getMinY());
-                int maxY = Math.min(bounds.y + bounds.height, raster.getMinY() + raster.getHeight());
+                int minX = Math.max(visibleRect.x, raster.getMinX());
+                int maxX = Math.min(visibleRect.x + visibleRect.width, raster.getMinX() + raster.getWidth());
+                int minY = Math.max(visibleRect.y, raster.getMinY());
+                int maxY = Math.min(visibleRect.y + visibleRect.height, raster.getMinY() + raster.getHeight());
 
-                for (int x = minX; x < maxX; x+=incX)
+                for (int x = minX; x < maxX; x+=incX) {
                     for (int y = minY; y < maxY; y+=incY) {
                         pixel = raster.getPixel(x, y, pixel);
                         for (int c = 0; c < channels; c++) {
@@ -220,12 +225,14 @@ public class HistogramPreview extends Preview implements PaintListener {
                                 bins[c][0]++;
                         }
                     }
+                }
             }
+        }
 
         bins = hist.getBins();
     }
 
-    class Histogrammer extends Thread {
+    private class Histogrammer extends Thread {
         PlanarImage image;
         PlanarImage nextImage = null;
         Rectangle visibleRect;
@@ -250,6 +257,7 @@ public class HistogramPreview extends Preview implements PaintListener {
                 return false;
         }
 
+        @Override
         public void run() {
             do {
                 if (getSize().width > 0 && getSize().height > 0) {
@@ -262,6 +270,7 @@ public class HistogramPreview extends Preview implements PaintListener {
 
     private Histogrammer histogrammer = null;
 
+    @Override
     public void paintDone(PlanarImage image, Rectangle visibleRect, boolean synchronous, long time) {
         Dimension previewDimension = getSize();
 

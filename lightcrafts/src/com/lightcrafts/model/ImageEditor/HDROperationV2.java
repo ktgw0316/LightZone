@@ -62,6 +62,7 @@ public class HDROperationV2 extends BlendedOperation {
         }
     }
 
+    @Override
     public boolean neutralDefault() {
         return false;
     }
@@ -70,6 +71,7 @@ public class HDROperationV2 extends BlendedOperation {
     static final OperationType typeV3 = new OperationTypeImpl("Tone Mapper V3");
     static final OperationType typeV4 = new OperationTypeImpl("Tone Mapper V4");
 
+    @Override
     public void setSliderValue(String key, double value) {
         value = roundValue(key, value);
 
@@ -100,6 +102,7 @@ public class HDROperationV2 extends BlendedOperation {
         private double last_radius = 0;
         private double last_fuzz = 0;
 
+        @Override
         public PlanarImage setFront() {
             if (lastBack.get() != back || mask.get() == null || depth != last_radius || fuzz != last_fuzz) {
                 RenderedImage singleChannel;
@@ -110,8 +113,9 @@ public class HDROperationV2 extends BlendedOperation {
                     pb.addSource( back );
                     pb.add( yChannel );
                     singleChannel = JAI.create("BandCombine", pb, null);
-                } else
+                } else {
                     singleChannel = back;
+                }
 
                 BorderExtender copyExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
                 RenderingHints extenderHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER, copyExtender);
@@ -144,14 +148,17 @@ public class HDROperationV2 extends BlendedOperation {
         }
     }
 
+    @Override
     protected void updateOp(Transform op) {
         op.update();
     }
 
+    @Override
     protected BlendedTransform createBlendedOp(PlanarImage source) {
         return new ToneMaperTransform(source);
     }
 
+    @Override
     public OperationType getType() {
         return type;
     }

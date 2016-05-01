@@ -13,5 +13,5 @@ import java.awt.*;
  * To change this template use File | Settings | File Templates.
  */
 interface PaintListener {
-    public void paintDone(PlanarImage image, Rectangle visibleRect, boolean synchronous, long time);
+    void paintDone(PlanarImage image, Rectangle visibleRect, boolean synchronous, long time);
 }

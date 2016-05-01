@@ -36,40 +36,46 @@ public class PassThroughPreview
         );
     }
 
+    @Override
     public String getName() {
         return "Pass Through";
     }
 
+    @Override
     public void setDropper(Point p) {
     }
 
+    @Override
     public void addNotify() {
         // This method gets called when this Preview is added.
         engine.update(null, false);
         super.addNotify();
     }
 
+    @Override
     public void removeNotify() {
         // This method gets called when this Preview is removed.
         super.removeNotify();
     }
 
+    @Override
     public void setRegion(Region region) {
         // Fabio: only draw yellow inside the region?
     }
 
-    private SoftReference<PlanarImage> currentImage =
-        new SoftReference<PlanarImage>(null);
+    private SoftReference<PlanarImage> currentImage = new SoftReference<PlanarImage>(null);
     private Rectangle visibleRect = null;
     private BufferedImage preview = null;
 
+    @Override
     public void setSelected(Boolean selected) {
         if (!selected) {
             preview = null;
             currentImage = new SoftReference<PlanarImage>(null);
         }
     }
-    
+
+    @Override
     protected void paintComponent(Graphics graphics) {
         // Fill in the background:
         Graphics2D g = (Graphics2D) graphics;
@@ -155,22 +161,24 @@ public class PassThroughPreview
         return Functions.toFastBufferedImage(image);
     }
 
+    @Override
     public void paintDone(
         PlanarImage image,
         Rectangle visibleRect,
         boolean synchronous,
         long time
     ) {
-        if (image != null) {
-            Dimension previewDimension = getSize();
-            if ((previewDimension.getHeight() > 1) &&
+        if (image == null)
+            return;
+
+        Dimension previewDimension = getSize();
+        if ((previewDimension.getHeight() > 1) &&
                 (previewDimension.getWidth() > 1)
-            ) {
-                this.visibleRect = visibleRect;
-                currentImage = new SoftReference<PlanarImage>(image);
-                preview = null;
-                repaint();
-            }
+                ) {
+            this.visibleRect = visibleRect;
+            currentImage = new SoftReference<PlanarImage>(image);
+            preview = null;
+            repaint();
         }
     }
 }

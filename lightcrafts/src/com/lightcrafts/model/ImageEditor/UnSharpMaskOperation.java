@@ -15,13 +15,14 @@ import java.awt.image.renderable.ParameterBlock;
 import java.awt.image.RenderedImage;
 import java.awt.*;
 import java.text.DecimalFormat;
+import java.text.StringCharacterIterator;
 import java.util.LinkedList;
 
 public class UnSharpMaskOperation extends BlendedOperation {
-    static final String AMOUNT = "Amount";
-    static final String RADIUS = "Radius";
-    static final String THRESHOLD = "Threshold";
-    static final String RGB = "RGB";
+    private static final String AMOUNT = "Amount";
+    private static final String RADIUS = "Radius";
+    private static final String THRESHOLD = "Threshold";
+    private static final String RGB = "RGB";
 
     static final OperationTypeImpl typeV1 = new OperationTypeImpl("UnSharp Mask");
     static final OperationTypeImpl typeV2 = new OperationTypeImpl("UnSharp Mask V2");
@@ -41,12 +42,13 @@ public class UnSharpMaskOperation extends BlendedOperation {
             setSliderConfig(THRESHOLD, new SliderConfig(0, 100, threshold, 1, false, new DecimalFormat("0")));
 
         if (type == typeV2) {
-            java.util.List cks = new LinkedList();
+            java.util.List<String> cks = new LinkedList<String>();
             cks.add(RGB);
             this.setCheckboxKeys(cks);
         }
     }
 
+    @Override
     public boolean neutralDefault() {
         return false;
     }
@@ -55,14 +57,15 @@ public class UnSharpMaskOperation extends BlendedOperation {
     private double radius = 1.0;
     private double threshold = type != typeV1 ? 20 : 0;
 
+    @Override
     public void setSliderValue(String key, double value) {
         value = roundValue(key, value);
-        
-        if (key == AMOUNT && amount != value) {
+
+        if (key.equals(AMOUNT) && amount != value) {
             amount = value;
-        } else if (key == RADIUS && radius != value) {
+        } else if (key.equals(RADIUS) && radius != value) {
             radius = value;
-        } else if (key == THRESHOLD && threshold != value) {
+        } else if (key.equals(THRESHOLD) && threshold != value) {
             threshold = value;
         } else
             return;
@@ -72,8 +75,9 @@ public class UnSharpMaskOperation extends BlendedOperation {
 
     private boolean rgb = false;
 
+    @Override
     public void setCheckboxValue(String key, boolean value) {
-        if (key == RGB) {
+        if (key.equals(RGB)) {
             rgb = value;
         }
         super.setCheckboxValue(key, value);
@@ -106,9 +110,9 @@ public class UnSharpMaskOperation extends BlendedOperation {
         while (low <= high) {
             int mid = (low + high) / 2;
 
-            if (x < (int) (0xFFFF & tableData[mid]))
+            if (x < (0xFFFF & tableData[mid]))
                 high = mid - 1;
-            else if (x > (int) (0xFFFF & tableData[mid]))
+            else if (x > (0xFFFF & tableData[mid]))
                 low = mid + 1;
             else
                 return mid;
@@ -131,6 +135,7 @@ public class UnSharpMaskOperation extends BlendedOperation {
     }
 
     static class GammaUSMProcessor implements ImageProcessor {
+        @Override
         public RenderedOp process(RenderedImage source) {
             ParameterBlock pb = new ParameterBlock();
             pb.addSource(source);
@@ -140,6 +145,7 @@ public class UnSharpMaskOperation extends BlendedOperation {
     }
 
     static class LuminanceUSMProcessor implements ImageProcessor {
+        @Override
         public RenderedOp process(RenderedImage source) {
             double[][] yChannel = new double[][]{{ColorScience.Wr, ColorScience.Wg, ColorScience.Wb, 0}};
 
@@ -177,8 +183,7 @@ public class UnSharpMaskOperation extends BlendedOperation {
             return JAI.create("LCUnSharpMask", pb, extenderHints);
         }
 
-        double lastBlurRadius = 0;
-
+        @Override
         public void dispose() {
             super.dispose();
             op = null;
@@ -248,7 +253,7 @@ public class UnSharpMaskOperation extends BlendedOperation {
             return JAI.create("BandCombine", pb, JAIContext.noCacheHint);
         }
 
-
+        @Override
         public PlanarImage setFront() {
             if (type != typeV1 && !rgb) {
                 return setFrontLuminance();
@@ -257,14 +262,17 @@ public class UnSharpMaskOperation extends BlendedOperation {
         }
     }
 
+    @Override
     protected void updateOp(Transform op) {
         op.update();
     }
 
+    @Override
     protected BlendedTransform createBlendedOp(PlanarImage source) {
         return new UnSharpMask(source, this);
     }
 
+    @Override
     public OperationType getType() {
         return type;
     }

@@ -101,6 +101,7 @@ public class ImageEditorEngine implements Engine {
         return metadata;
     }
 
+    @Override
     public AffineTransform getTransform() {
         return rendering.getTransform();
     }
@@ -113,10 +114,12 @@ public class ImageEditorEngine implements Engine {
         return sourceImage;
     }
 
+    @Override
     public Dimension getNaturalSize() {
         return rendering.getRenderingSize();
     }
 
+    @Override
     public synchronized Component getComponent() {
         if (canvas == null) {
             listeners = new LinkedList<EngineListener>();
@@ -142,14 +145,17 @@ public class ImageEditorEngine implements Engine {
         return canvas;
     }
 
+    @Override
     public List<Preview> getPreviews() {
         return previews;
     }
 
+    @Override
     public List getLayerModes() {
         return BlendedOperation.blendingModes;
     }
 
+    @Override
     public List getPreferredScales() {
         return Arrays.asList(scales);
     }
@@ -244,6 +250,7 @@ public class ImageEditorEngine implements Engine {
 
     private boolean disposed = false;
 
+    @Override
     public void dispose() {
         if (disposed)
             return;
@@ -290,7 +297,8 @@ public class ImageEditorEngine implements Engine {
         Operations definition
     */
 
-    private static Map<OperationType, Class> operationsSet = new HashMap<OperationType, Class>();
+    private static Map<OperationType, Class<? extends BlendedOperation>> operationsSet =
+            new HashMap<OperationType, Class<? extends BlendedOperation>>();
 
     static {
         operationsSet.put(UnSharpMaskOperation.typeV1, UnSharpMaskOperation.class);
@@ -327,12 +335,14 @@ public class ImageEditorEngine implements Engine {
         operationsSet.put(RawAdjustmentsOperation.typeV2, RawAdjustmentsOperation.class);
     }
 
+    @Override
     public Collection<OperationType> getGenericOperationTypes() {
         return operationsSet.keySet();
     }
 
+    @Override
     public com.lightcrafts.model.Operation insertOperation(OperationType type, int position) {
-        Class opClass = operationsSet.get(type);
+        Class<? extends BlendedOperation> opClass = operationsSet.get(type);
 
         if (opClass.equals(RawAdjustmentsOperation.class)) {
             if (! (getAuxInfo() instanceof RawImageInfo)) {
@@ -348,11 +358,11 @@ public class ImageEditorEngine implements Engine {
 
         try {
             try {
-                Constructor c = opClass.getConstructor(Rendering.class, OperationType.class);
-                op = (OperationImpl) c.newInstance(rendering, type);
+                Constructor<? extends BlendedOperation> c = opClass.getConstructor(Rendering.class, OperationType.class);
+                op = c.newInstance(rendering, type);
             } catch (NoSuchMethodException e) {
-                Constructor c = opClass.getConstructor(Rendering.class);
-                op = (OperationImpl) c.newInstance(rendering);
+                Constructor<? extends BlendedOperation> c = opClass.getConstructor(Rendering.class);
+                op = c.newInstance(rendering);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -372,38 +382,45 @@ public class ImageEditorEngine implements Engine {
         Pipeline Modification
     */
 
+    @Override
     public ZoneOperation insertZoneOperation(int position) {
         ZoneOperation op = new ZoneOperationImpl(rendering);
         rendering.addOperation(position, op);
         return op;
     }
 
+    @Override
     public CloneOperation insertCloneOperation(int position) {
         CloneOperation op = new CloneOperationImpl(rendering);
         rendering.addOperation(position, op);
         return op;
     }
 
+    @Override
     public SpotOperation insertSpotOperation(int position) {
         SpotOperation op = new SpotOperationImpl(rendering);
         rendering.addOperation(position, op);
         return op;
     }
 
+    @Override
     public WhitePointOperation insertWhitePointOperation(int position) {
         WhitePointOperation op = new WhitePointOperationImpl(rendering);
         rendering.addOperation(position, op);
         return op;
     }
 
+    @Override
     public OperationType getRawAdjustmentsOperationType() {
         return RawAdjustmentsOperation.typeV2;
     }
 
+    @Override
     public OperationType getGenericRawAdjustmentsOperationType() {
         return RawAdjustmentsOperation.typeV1;
     }
 
+    @Override
     public void removeOperation(int position) {
         Operation currentSelection = selectedOperation >= 0 ? rendering.getOperation(selectedOperation) : null;
 
@@ -416,6 +433,7 @@ public class ImageEditorEngine implements Engine {
         update(op, false);
     }
 
+    @Override
     public void swap(int position) {
         Operation currentSelection = selectedOperation >= 0 ? rendering.getOperation(selectedOperation) : null;
 
@@ -428,17 +446,20 @@ public class ImageEditorEngine implements Engine {
         update(op, false);
     }
 
+    @Override
     public void setCropBounds(CropBounds crop) {
         rendering.setCropBounds(crop);
         // canvas.setShowPreview(crop.equals(new CropBounds()));
         update(null, false);
     }
 
+    @Override
     public void setScale(Scale scale) {
         rendering.setScaleFactor(scale.getFactor());
         update(null, false);
     }
 
+    @Override
     public Scale setScale(Rectangle rect) {
         Dimension dimension = getNaturalSize();
 
@@ -457,23 +478,24 @@ public class ImageEditorEngine implements Engine {
     PlanarImage scaleFinal(PlanarImage image) {
         float scale = rendering.getScaleFactor() > 1 ? rendering.getScaleFactor() : 1;
 
-        if (scale != 1) {
-            float scaleX = (float) Math.floor(scale * image.getWidth()) / (float) image.getWidth();
-            float scaleY = (float) Math.floor(scale * image.getHeight()) / (float) image.getHeight();
+        if (scale == 1)
+            return image;
 
-            AffineTransform xform = AffineTransform.getScaleInstance(scaleX, scaleY);
+        float scaleX = (float) Math.floor(scale * image.getWidth()) / (float) image.getWidth();
+        float scaleY = (float) Math.floor(scale * image.getHeight()) / (float) image.getHeight();
 
-            RenderingHints formatHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
+        AffineTransform xform = AffineTransform.getScaleInstance(scaleX, scaleY);
 
-            Interpolation interp = Interpolation.getInstance(Interpolation.INTERP_NEAREST);
-            ParameterBlock params = new ParameterBlock();
-            params.addSource(image);
-            params.add(xform);
-            params.add(interp);
-            // NOTE: we cache this for the screen
-            return JAI.create("Affine", params, formatHints);
-        }
-        return image;
+        RenderingHints formatHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
+                BorderExtender.createInstance(BorderExtender.BORDER_COPY));
+
+        Interpolation interp = Interpolation.getInstance(Interpolation.INTERP_NEAREST);
+        ParameterBlock params = new ParameterBlock();
+        params.addSource(image);
+        params.add(xform);
+        params.add(interp);
+        // NOTE: we cache this for the screen
+        return JAI.create("Affine", params, formatHints);
     }
 
     /*
@@ -482,6 +504,7 @@ public class ImageEditorEngine implements Engine {
 
     private int selectedOperation = -1;
 
+    @Override
     public synchronized void setSelectedOperation(int position, boolean selected) {
         OperationImpl op = (OperationImpl) rendering.getOperation(position);
 
@@ -567,6 +590,7 @@ public class ImageEditorEngine implements Engine {
     private long tilesOnDisk = 0;
 
     class CanvasPaintListener implements PaintListener {
+        @Override
         public void paintDone(PlanarImage image, Rectangle visibleRect, boolean synchronous, long time) {
             if (synchronous) {
                 synchImageRepaintTime = (synchImageRepaintTime + time) / 2;
@@ -586,21 +610,22 @@ public class ImageEditorEngine implements Engine {
             }
 
             for (Preview preview : previews) {
-                if (preview.isShowing()) {
-                    if (preview instanceof PaintListener) {
-                        float renderingScale = rendering.getScaleFactor();
-                        Rectangle previewVisibleRect = visibleRect;
-                        if (renderingScale > 1)
-                            previewVisibleRect = new Rectangle((int) (visibleRect.x/renderingScale),
-                                                        (int) (visibleRect.y/renderingScale),
-                                                        (int) (visibleRect.width/renderingScale),
-                                                        (int) (visibleRect.height/renderingScale));
+                if (!preview.isShowing() || !(preview instanceof PaintListener))
+                    continue;
 
-                        ((PaintListener) preview).paintDone(preview instanceof ZoneFinder
-                                                            ? previewImage
-                                                            : processedImage, previewVisibleRect, synchronous, time);
-                    }
+                float renderingScale = rendering.getScaleFactor();
+                Rectangle previewVisibleRect = visibleRect;
+
+                if (renderingScale > 1) {
+                    previewVisibleRect = new Rectangle((int) (visibleRect.x/renderingScale),
+                                                       (int) (visibleRect.y/renderingScale),
+                                                       (int) (visibleRect.width/renderingScale),
+                                                       (int) (visibleRect.height/renderingScale));
                 }
+
+                ((PaintListener) preview).paintDone(preview instanceof ZoneFinder
+                                                    ? previewImage
+                                                    : processedImage, previewVisibleRect, synchronous, time);
             }
         }
     }
@@ -613,6 +638,7 @@ public class ImageEditorEngine implements Engine {
     */
 
     class UpdateActionListener implements ActionListener {
+        @Override
         public void actionPerformed(ActionEvent e) {
             update(null, true, this);
             // currentTask = null;
@@ -659,11 +685,11 @@ public class ImageEditorEngine implements Engine {
                     swingTimer.start();
                 }
                 return false;
-            } else {
-                swingTimer.removeActionListener(currentTask);
-                currentTask = null;
-                lastTime = -1;
             }
+
+            swingTimer.removeActionListener(currentTask);
+            currentTask = null;
+            lastTime = -1;
         } else {
             if (swingTimer != null && swingTimer.isRunning()) {
                 swingTimer.stop();
@@ -675,10 +701,12 @@ public class ImageEditorEngine implements Engine {
         return true;
     }
 
+    @Override
     public void print(ProgressThread thread, PageFormat format, PrintSettings settings) throws PrinterException {
         Platform.getPlatform().getPrinterLayer().print(this, thread, format, settings);
     }
 
+    @Override
     public void cancelPrint() {
         Platform.getPlatform().getPrinterLayer().cancelPrint();
     }
@@ -718,6 +746,7 @@ public class ImageEditorEngine implements Engine {
         return proofIntent;
     }
 
+    @Override
     public void preview(PrintSettings settings) {
         if (settings != null) {
             proofProfile = settings.getColorProfile();
@@ -729,6 +758,7 @@ public class ImageEditorEngine implements Engine {
         update(null, false);
     }
 
+    @Override
     public PlanarImage getRendering(Dimension bounds) {
         return getRendering(bounds, JAIContext.sRGBColorProfile, true);
     }
@@ -774,6 +804,7 @@ public class ImageEditorEngine implements Engine {
     }
 
     // Export an image rendering to a file
+    @Override
     public void write( ProgressThread thread,
                        ImageExportOptions exportOptions ) throws IOException {
         final ImageFileExportOptions fileOptions =
@@ -823,7 +854,7 @@ public class ImageEditorEngine implements Engine {
         if (fileOptions.resizeHeight.getValue() > exportImage.getHeight()) {
             fileOptions.resizeHeight.setValue(exportImage.getHeight());
         }
-        
+
         if ( exportImage instanceof RenderedOp ) {
             final RenderedOp rop = (RenderedOp) exportImage;
             rop.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
@@ -925,6 +956,7 @@ public class ImageEditorEngine implements Engine {
         }
     }
 
+    @Override
     public List getDebugItems() {
         ArrayList<JMenuItem> items = new ArrayList<JMenuItem>();
 
@@ -954,6 +986,7 @@ public class ImageEditorEngine implements Engine {
         return items;
     }
 
+    @Override
     public void setActive(boolean active) {
         if (engineActive != active) {
             engineActive = active;
@@ -961,10 +994,12 @@ public class ImageEditorEngine implements Engine {
         }
     }
 
+    @Override
     public void addEngineListener(EngineListener listener) {
         listeners.add(listener);
     }
 
+    @Override
     public void removeEngineListener(EngineListener listener) {
         listeners.remove(listener);
     }
@@ -975,7 +1010,7 @@ public class ImageEditorEngine implements Engine {
     }
 
     // Since Anton keeps forgetting to dispose documents, I add a finalizer
-
+    @Override
     public void finalize() throws Throwable {
         super.finalize();
         dispose();

@@ -58,16 +58,17 @@ public class ColorBalanceOperation extends BlendedOperation {
         setSliderConfig(MIDPOINT, new SliderConfig(0, 1, midpoint, 0.01, false, format));
     }
 
+    @Override
     public void setSliderValue(String key, double value) {
         value = roundValue(key, value);
 
-        if (key == RED && red != value) {
+        if (key.equals(RED) && red != value) {
             red = value;
-        } else if (key == GREEN && green != value) {
+        } else if (key.equals(GREEN) && green != value) {
             green = value;
-        } else if (key == BLUE && blue != value) {
+        } else if (key.equals(BLUE) && blue != value) {
             blue = value;
-        } else if (key == MIDPOINT && midpoint != value) {
+        } else if (key.equals(MIDPOINT) && midpoint != value) {
             midpoint = value;
         } else
             return;
@@ -76,13 +77,14 @@ public class ColorBalanceOperation extends BlendedOperation {
     }
 
     // TODO: get the right values for hilights and shadows
+    @Override
     public void setChoiceValue(String key, String value) {
-        if (key == MIDPOINT) {
-            if (value == HILIGHTS) {
+        if (key.equals(MIDPOINT)) {
+            if (value.equals(HILIGHTS)) {
                 midpoint = 0.62;
-            } else if (value == MIDTONES) {
+            } else if (value.equals(MIDTONES)) {
                 midpoint = 0.18;
-            } else if (value == SHADOWS) {
+            } else if (value.equals(SHADOWS)) {
                 midpoint = 0.04;
             }
         }
@@ -94,6 +96,7 @@ public class ColorBalanceOperation extends BlendedOperation {
             super(source);
         }
 
+        @Override
         public PlanarImage setFront() {
             double tred = red / 2 - blue / 4 - green / 4;
             double tgreen = green / 2 - red / 4 - blue / 4;
@@ -141,18 +144,22 @@ public class ColorBalanceOperation extends BlendedOperation {
         }
     }
 
+    @Override
     protected BlendedTransform createBlendedOp(PlanarImage source) {
         return new ColorBalance(source);
     }
 
+    @Override
     public boolean neutralDefault() {
         return true;
     }
 
+    @Override
     protected void updateOp(Transform op) {
         op.update();
     }
 
+    @Override
     public OperationType getType() {
         return type;
     }

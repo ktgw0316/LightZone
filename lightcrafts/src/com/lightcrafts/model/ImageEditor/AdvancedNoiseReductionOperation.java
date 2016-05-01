@@ -59,10 +59,12 @@ public class AdvancedNoiseReductionOperation extends BlendedOperation {
         }
     }
 
+    @Override
     public boolean neutralDefault() {
         return false;
     }
 
+    @Override
     public void setSliderValue(String key, double value) {
         value = roundValue(key, value);
 
@@ -91,6 +93,7 @@ public class AdvancedNoiseReductionOperation extends BlendedOperation {
             super(source);
         }
 
+        @Override
         public PlanarImage setFront() {
             if (chroma_domain == 0 && chroma_range == 0 && luma_domain == 0 && luma_range == 0)
                 return back;
@@ -152,14 +155,17 @@ public class AdvancedNoiseReductionOperation extends BlendedOperation {
         }
     }
 
+    @Override
     protected void updateOp(Transform op) {
         op.update();
     }
 
+    @Override
     protected BlendedTransform createBlendedOp(PlanarImage source) {
         return new NoiseReduction(source);
     }
 
+    @Override
     public OperationType getType() {
         return type;
     }

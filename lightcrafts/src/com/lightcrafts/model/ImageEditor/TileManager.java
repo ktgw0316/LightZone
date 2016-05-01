@@ -26,8 +26,8 @@ class PaintRequest implements PaintContext {
     private final TileHandler tileHandler;
     private TileRequest tileRequest = null;
     private int pendingTiles;
-    private Set tiles = new HashSet();
-    private Set handledTiles = new HashSet();
+    private Set<Point> tiles = new HashSet<Point>();
+    private Set<Point> handledTiles = new HashSet<Point>();
     private boolean cancelled = false;
 
     PaintRequest(PlanarImage image, int epoch, Point tileIndices[], boolean syncronous, boolean prefetch, TileHandler handler) {
@@ -39,28 +39,32 @@ class PaintRequest implements PaintContext {
         this.pendingTiles = tileIndices.length;
 
         this.tileRequest = image.queueTiles(tileIndices);
-        for (int i = 0; i < tileIndices.length; i++)
-            tiles.add(new Point(tileIndices[i].x, tileIndices[i].y));
+        for (Point tileIndice : tileIndices)
+            tiles.add(new Point(tileIndice.x, tileIndice.y));
     }
 
+    @Override
     public boolean isPrefetch() {
         return prefetch;
     }
 
+    @Override
     public boolean isSynchronous() {
         return synchronous;
     }
 
+    @Override
     public boolean isCancelled() {
         return cancelled;
     }
 
+    @Override
     public PlanarImage getImage() {
         return image;
     }
 
     void cancel() {
-        assert cancelled == false;
+        assert !cancelled;
         cancelled = true;
         image.cancelTiles(tileRequest, null);
     }
@@ -91,7 +95,7 @@ class PaintRequest implements PaintContext {
 }
 
 public class TileManager implements TileComputationListener {
-    private final List requests = new LinkedList();
+    private final List<PaintRequest> requests = new LinkedList<PaintRequest>();
     private PaintRequest prefetchRequest = null;
 
     private void cancelRequest(PaintRequest request) {
@@ -101,17 +105,18 @@ public class TileManager implements TileComputationListener {
     }
 
     private void cancelPrefetch() {
-        if (prefetchRequest != null) {
-            Iterator it = requests.iterator();
-            while (it.hasNext()) {
-                PaintRequest pr = (PaintRequest) it.next();
-                if (pr == prefetchRequest) {
-                    it.remove();
-                    cancelRequest(pr);
-                }
+        if (prefetchRequest == null)
+            return;
+
+        Iterator it = requests.iterator();
+        while (it.hasNext()) {
+            PaintRequest pr = (PaintRequest) it.next();
+            if (pr == prefetchRequest) {
+                it.remove();
+                cancelRequest(pr);
             }
-            prefetchRequest = null;
         }
+        prefetchRequest = null;
     }
 
     private void handleTile(TileRequest tileRequest, int tileX, int tileY) {
@@ -140,17 +145,15 @@ public class TileManager implements TileComputationListener {
     }
 
     public synchronized int pendingTiles(PlanarImage image, int epoch) {
-        Iterator it = requests.iterator();
         int pendingTiles = 0;
-        while (it.hasNext()) {
-            PaintRequest pr = (PaintRequest) it.next();
+        for (final PaintRequest pr : requests) {
             if (pr.image == image && pr.epoch == epoch)
                 pendingTiles += pr.getPendingTiles();
         }
         return pendingTiles;
     }
 
-    public synchronized int queueTiles(PlanarImage image, int epoch, List tiles, boolean syncronous, boolean prefetch, TileHandler handler) {
+    public synchronized int queueTiles(PlanarImage image, int epoch, List<Point> tiles, boolean syncronous, boolean prefetch, TileHandler handler) {
         cancelPrefetch();
 
         /*
@@ -165,11 +168,8 @@ public class TileManager implements TileComputationListener {
         next_tile:
         while (dtit.hasNext()) {
             Point tile = (Point) dtit.next();
-            Iterator prit = requests.iterator();
 
-            while (prit.hasNext()) {
-                PaintRequest pr = (PaintRequest) prit.next();
-
+            for (final PaintRequest pr : requests) {
                 if (!pr.isCancelled() && pr.image == image && pr.epoch == epoch && pr.hasTile(tile)) {
                     dtit.remove();
                     continue next_tile;
@@ -180,10 +180,9 @@ public class TileManager implements TileComputationListener {
         if (!tiles.isEmpty()) {
             Point tileIndices[] = new Point[tiles.size()];
 
-            Iterator it = tiles.iterator();
             int i = 0;
-            while (it.hasNext())
-                tileIndices[i++] = (Point) it.next();
+            for (final Point p : tiles)
+                tileIndices[i++] = p;
 
             PaintRequest pr = new PaintRequest(image, epoch, tileIndices, syncronous, prefetch, handler);
             requests.add(pr);
@@ -198,6 +197,7 @@ public class TileManager implements TileComputationListener {
         TileComputationListener implementation, called from the TileScheduler, synchronized
      */
 
+    @Override
     public synchronized void tileComputed(Object eventSource,
                              TileRequest[] tileRequests,
                              PlanarImage image, int tileX, int tileY,
@@ -206,6 +206,7 @@ public class TileManager implements TileComputationListener {
         handleTile(tileRequests[0], tileX, tileY);
     }
 
+    @Override
     public synchronized void tileCancelled(Object eventSource,
                               TileRequest[] tileRequests,
                               PlanarImage image, int tileX, int tileY) {
@@ -213,6 +214,7 @@ public class TileManager implements TileComputationListener {
         // System.err.println("cancelled tile " + tileX + ":" + tileY);
     }
 
+    @Override
     public synchronized void tileComputationFailure(Object eventSource,
                                        TileRequest[] tileRequests,
                                        PlanarImage image, int tileX, int tileY,

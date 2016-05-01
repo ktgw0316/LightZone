@@ -58,12 +58,14 @@ public class HDROperationV3 extends BlendedOperation {
         setSliderConfig(FUZZ, new SliderConfig(0.1, 1, fuzz, .05, false, format));
     }
 
+    @Override
     public boolean neutralDefault() {
         return false;
     }
 
     static final OperationType typeV5 = new OperationTypeImpl("Tone Mapper V5");
 
+    @Override
     public void setSliderValue(String key, double value) {
         value = roundValue(key, value);
 
@@ -94,6 +96,7 @@ public class HDROperationV3 extends BlendedOperation {
         private double last_radius = 0;
         private double last_fuzz = 0;
 
+        @Override
         public PlanarImage setFront() {
             if (lastBack.get() != back || mask.get() == null || depth != last_radius || fuzz != last_fuzz) {
                 RenderedImage singleChannel;
@@ -146,14 +149,17 @@ public class HDROperationV3 extends BlendedOperation {
         }
     }
 
+    @Override
     protected void updateOp(Transform op) {
         op.update();
     }
 
+    @Override
     protected BlendedTransform createBlendedOp(PlanarImage source) {
         return new ToneMaperTransform(source);
     }
 
+    @Override
     public OperationType getType() {
         return type;
     }

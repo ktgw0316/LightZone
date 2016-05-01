@@ -78,6 +78,7 @@ abstract class OperationImpl implements Operation {
 
     abstract public boolean neutralDefault();
 
+    @Override
     public EditorMode getPreferredMode() {
         return EditorMode.ARROW;
     }
@@ -94,6 +95,7 @@ abstract class OperationImpl implements Operation {
         return selected;
     }
 
+    @Override
     public void setActivated(boolean active) {
         this.active = active;
         settingsChanged();
@@ -105,10 +107,12 @@ abstract class OperationImpl implements Operation {
         return deactivatable;
     }
 
+    @Override
     public void setEngineDeActivatable(boolean deactivatable) {
         this.deactivatable = deactivatable;
     }
 
+    @Override
     public boolean isActive() {
         return active;
     }
@@ -117,10 +121,12 @@ abstract class OperationImpl implements Operation {
         return region;
     }
 
+    @Override
     public RGBColorSelection getColorSelection() {
         return colorSelection;
     }
 
+    @Override
     public void changeBatchStarted() {
         assert batch >= 0;
         batch++;
@@ -128,6 +134,7 @@ abstract class OperationImpl implements Operation {
 
     private boolean regionChanged = false;
 
+    @Override
     public void changeBatchEnded() {
         assert batch > 0;
         --batch;
@@ -140,6 +147,7 @@ abstract class OperationImpl implements Operation {
         }
     }
 
+    @Override
     public boolean isSingleton() {
         return false;
     }
@@ -150,6 +158,7 @@ abstract class OperationImpl implements Operation {
         rendering.update(this, batch != 0);
     }
 
+    @Override
     public void setRegion(Region newRegion) {
         region = newRegion;
         regionChanged = true;
@@ -160,6 +169,7 @@ abstract class OperationImpl implements Operation {
             settingsChanged();
     }
 
+    @Override
     public void setColorSelection(RGBColorSelection newColors) {
         if (newColors != null) {
             colorSelection = newColors;
@@ -174,6 +184,7 @@ abstract class OperationImpl implements Operation {
             settingsChanged();
     }
 
+    @Override
     public void setRegionInverted(boolean inverted) {
         invertedRegion = inverted;
         settingsChanged();
@@ -182,6 +193,7 @@ abstract class OperationImpl implements Operation {
     protected abstract void updateOp(Transform op);
     protected abstract Transform createOp(PlanarImage source);
 
+    @Override
     public void dispose() {
         if (operation != null)
             operation.dispose();
@@ -212,6 +224,7 @@ abstract class OperationImpl implements Operation {
         return null;
     }
 
+    @Override
     public boolean hasFooter() {
         return true;
     }
