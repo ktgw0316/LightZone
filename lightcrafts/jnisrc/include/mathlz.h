@@ -15,9 +15,9 @@ float fast_exp(float val)
 
     constexpr float fast_exp_a = (1 << 23)/M_LN2;
 #if defined(__i386__)
-    constexpr const float fast_exp_b_c = 127.0f * (1 << 23) - 405000;
+    constexpr float fast_exp_b_c = 127.0f * (1 << 23) - 405000;
 #else
-    constexpr const float fast_exp_b_c = 127.0f * (1 << 23) - 347000;
+    constexpr float fast_exp_b_c = 127.0f * (1 << 23) - 347000;
 #endif
 
     union {
