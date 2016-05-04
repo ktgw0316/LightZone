@@ -22,6 +22,10 @@ public class LensCorrectionsOperation extends BlendedOperation {
     private static final String TCA_R = "TCA_Red";
     private static final String TCA_B = "TCA_Blue";
 
+    private static final float distortion_k1_scale = 1e-3f;
+    private static final float distortion_k2_scale = 1e-3f;
+    private static final float tca_scale = 1e-3f;
+
     private boolean auto_correction = false;
     private float distortion_k1 = 0;
     private float distortion_k2 = 0;
@@ -105,7 +109,7 @@ public class LensCorrectionsOperation extends BlendedOperation {
             tca_b_offset = (float) value;
         else
             return;
-        
+
         super.setSliderValue(key, value);
     }
 
@@ -114,50 +118,49 @@ public class LensCorrectionsOperation extends BlendedOperation {
             super(source);
         }
 
+        @Override
         public PlanarImage setFront() {
+            ImageEditorEngine engine = rendering.getEngine();
+            if (engine == null)
+                return back;
+
             PlanarImage front = back;
 
-            ImageEditorEngine engine = rendering.getEngine();
+            PlanarImage sourceImage = engine.getSourceImage();
+            int fullWidth = sourceImage.getWidth();
+            int fullHeight = sourceImage.getHeight();
 
-            if (engine != null) {
-                PlanarImage sourceImage = engine.getSourceImage();
-                int fullWidth = sourceImage.getWidth();
-                int fullHeight = sourceImage.getHeight();
+            AffineTransform transform = rendering.getTransform();
+            final float scaleFactor = rendering.getScaleFactor();
+            if (scaleFactor < 1) {
+                // Append pyramid ratio
+                fullWidth *= scaleFactor;
+                fullHeight *= scaleFactor;
 
-                final float scaleFactor = rendering.getScaleFactor();
-                if (scaleFactor < 1) {
-                    // Append pyramid ratio
-                    fullWidth *= scaleFactor;
-                    fullHeight *= scaleFactor;
-                }
-
-                AffineTransform transform = rendering.getTransform();
-                transform.preConcatenate(AffineTransform.getScaleInstance(1 / scaleFactor, 1 / scaleFactor));
-                Point2D center = transform.transform(new Point2D.Double(fullWidth / 2, fullHeight / 2), null);
-
-                if (auto_correction) {
-                    BorderExtender borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
-                    front = new DistortionOpImage(front, JAIContext.fileCacheHint, borderExtender,
-                            fullWidth, fullHeight, center,
-                                                  cameraMaker, cameraModel, lensName, focal, aperture);
-                    front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
-                }
-                else if (Math.abs(distortion_k1) > 1e-3 || Math.abs(distortion_k2) > 1e-3 ||
-                         Math.abs(tca_r_offset)  > 1e-3 || Math.abs(tca_b_offset)  > 1e-3) {
-                    BorderExtender borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
-                    float tca_scale = 1e-3f;
-                    float distortion_k2_scale = 1e-3f;
-                    float distortion_k1_scale = 1e-3f;
-                    front = new DistortionOpImage(front, JAIContext.fileCacheHint, borderExtender,
-                            fullWidth, fullHeight, center,
-                                                  distortion_k1_scale * distortion_k1,
-                                                  distortion_k2_scale * distortion_k2,
-                                                  1 + tca_scale * tca_r_offset,
-                                                  1 + tca_scale * tca_b_offset);
-                    front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
-                }
+                transform.concatenate(AffineTransform.getScaleInstance(1 / scaleFactor, 1 / scaleFactor));
             }
+            else {
+                transform.preConcatenate(AffineTransform.getScaleInstance(1 / scaleFactor, 1 / scaleFactor));
+            }
+            final Point2D center = transform.transform(new Point2D.Double(fullWidth / 2, fullHeight / 2), null);
 
+            if (auto_correction) {
+                BorderExtender borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
+                front = new DistortionOpImage(front, JAIContext.fileCacheHint, borderExtender,
+                        fullWidth, fullHeight, center,
+                        cameraMaker, cameraModel, lensName, focal, aperture);
+            }
+            else if (Math.abs(distortion_k1) > 1e-3 || Math.abs(distortion_k2) > 1e-3 ||
+                    Math.abs(tca_r_offset)  > 1e-3 || Math.abs(tca_b_offset)  > 1e-3) {
+                BorderExtender borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
+                front = new DistortionOpImage(front, JAIContext.fileCacheHint, borderExtender,
+                        fullWidth, fullHeight, center,
+                        distortion_k1_scale * distortion_k1,
+                        distortion_k2_scale * distortion_k2,
+                        1 + tca_scale * tca_r_offset,
+                        1 + tca_scale * tca_b_offset);
+            }
+            front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
             return front;
         }
     }
