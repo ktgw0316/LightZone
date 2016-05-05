@@ -4,6 +4,7 @@ package com.lightcrafts.ui.crop;
 
 import com.lightcrafts.model.CropBounds;
 import com.lightcrafts.ui.mode.AbstractMode;
+import com.lightcrafts.ui.crop.CropOverlay;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputListener;
@@ -59,6 +60,16 @@ public class CropMode extends AbstractMode {
             KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
             JComponent.WHEN_IN_FOCUSED_WINDOW
         );
+        overlay.registerKeyboardAction(
+            new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    overlay.changeOrientation();
+                }
+            },
+            KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0),
+            JComponent.WHEN_IN_FOCUSED_WINDOW
+        );
+
     }
 
     public void enter() {

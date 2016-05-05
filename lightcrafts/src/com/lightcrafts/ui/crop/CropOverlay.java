@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2016 Marinna Cole */
 
 package com.lightcrafts.ui.crop;
 
@@ -25,6 +26,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.LinkedList;
 import java.util.List;
+import java.lang.*;
 
 // This is a translucent white overlay in the shape of the complement of
 // a rectangle that can be dragged, turned, and resized with the mouse.
@@ -98,6 +100,10 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
     private boolean hasHighlight;
 
     private boolean isRotateOnly;           // only allow rotations
+
+	enum GridStyle { THIRD, TRIANGLE, GOLDEN, FIBONACCI, DIAGONAL}
+	static GridStyle CropGridStyle = GridStyle.THIRD;
+    static int GridOrientation = 0;
 
     CropOverlay(boolean isRotateOnly) {
         this.isRotateOnly = isRotateOnly;
@@ -197,6 +203,7 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
             g.fill(complement);
 
             g.setColor(GridColor);
+            g.setStroke(new BasicStroke(3));
             paintGrid(g);
 
             Stroke borderStroke = new BasicStroke(hasHighlight ? 2f : 1f);
@@ -219,24 +226,244 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
         }
     }
 
+    protected void changeOrientation() {
+        GridOrientation++;
+        GridOrientation %= 4;
+        repaint();
+    }
+
     private void paintCropGrid(Graphics2D g) {
         Point2D ul = crop.getUpperLeft();
         Point2D ur = crop.getUpperRight();
         Point2D ll = crop.getLowerLeft();
         Point2D lr = crop.getLowerRight();
 
-        for (int x=1; x<GridCount; x++) {
-            Point2D p = new Point2D.Double(
-                (x * ul.getX() + (GridCount - x) * lr.getX()) / GridCount,
-                (x * ul.getY() + (GridCount - x) * lr.getY()) / GridCount
-            );
-            Line2D hLine = new Line2D.Double(ul, ur);
-            hLine = getSegmentThroughPoint(hLine, p);
-            g.draw(hLine);
+		switch (CropGridStyle) {
+			case THIRD:
+                {     
+                    for (int x=1; x<GridCount; x++) {
+                        Point2D p = new Point2D.Double(
+                            (x * ul.getX() + (GridCount - x) * lr.getX()) / GridCount,
+                            (x * ul.getY() + (GridCount - x) * lr.getY()) / GridCount
+                        );
+                        Line2D hLine = new Line2D.Double(ul, ur);
+                        hLine = getSegmentThroughPoint(hLine, p);
+                        g.draw(hLine);
 
-            Line2D vLine = new Line2D.Double(ul, ll);
-            vLine = getSegmentThroughPoint(vLine, p);
-            g.draw(vLine);
+                        Line2D vLine = new Line2D.Double(ul, ll);
+                        vLine = getSegmentThroughPoint(vLine, p);
+                        g.draw(vLine);
+                    }    
+	        	}
+			    break;
+            case TRIANGLE:
+                {
+                    final double DeltaX = ur.getX() - ll.getX();
+                    final double DeltaY = ur.getY() - ll.getY();
+                    final double u = ((lr.getX() - ll.getX()) * DeltaX + (lr.getY() - ll.getY()) * DeltaY) / (DeltaX * DeltaX + DeltaY * DeltaY);
+
+                    if ( (GridOrientation % 2) == 0 ) {
+					    g.draw( new Line2D.Double(ur.getX(), ur.getY(), ll.getX(), ll.getY()) );
+                        g.draw( new Line2D.Double(ll.getX() + u * DeltaX, ll.getY() + u * DeltaY, lr.getX(), lr.getY()) );
+                        g.draw( new Line2D.Double(ur.getX() - u * DeltaX, ur.getY() - u * DeltaY, ul.getX(), ul.getY()) );
+					}
+                    else {
+                        g.draw( new Line2D.Double(ul.getX(), ul.getY(), lr.getX(), lr.getY()) );
+                        g.draw( new Line2D.Double(lr.getX() - u * DeltaX, lr.getY() + u * DeltaY, ll.getX(), ll.getY()) );
+                        g.draw( new Line2D.Double(ul.getX() + u * DeltaX, ul.getY() - u * DeltaY, ur.getX(), ur.getY()) );
+                    }
+                }
+                break;
+			case GOLDEN:
+				{
+                    final double GoldenUnitX = Math.abs( ur.getX() - ll.getX() ) / 2.618;
+                    final double GoldenUnitY = Math.abs( ur.getY() - ll.getY() ) / 2.618;
+
+                    Line2D hLine = new Line2D.Double(ul, ur);
+                    Line2D vLine = new Line2D.Double(ul, ll);
+
+                    Point2D p = new Point2D.Double(
+                        ul.getX() + GoldenUnitX,
+                        ul.getY() + GoldenUnitY
+                    );
+                    hLine = getSegmentThroughPoint(hLine, p);
+                    g.draw(hLine);
+                    vLine = getSegmentThroughPoint(vLine, p);
+                    g.draw(vLine);
+
+                    p = new Point2D.Double(
+                        lr.getX() - GoldenUnitX,
+                        lr.getY() - GoldenUnitY
+                    );
+                    hLine = getSegmentThroughPoint(hLine, p);
+                    g.draw(hLine);     
+                    vLine = getSegmentThroughPoint(vLine, p);
+                    g.draw(vLine);
+				}
+				break;
+            case FIBONACCI:
+                paintGridFibonacci(g);
+                break;
+            case DIAGONAL:
+                {
+                    final double Width = Math.abs( ur.getX() - ll.getX() );
+                    final double Height = Math.abs( ur.getY() - ll.getY() );
+
+                    boolean ShorterSide;
+
+                    ShorterSide = (Width > Height ) ? true : false;
+
+                    if (ShorterSide) {
+                        g.draw( new Line2D.Double(ul.getX(), ul.getY(), ll.getX()+Height, ll.getY()) );
+                        g.draw( new Line2D.Double(ur.getX(), ur.getY(), lr.getX()-Height, lr.getY()) );
+                        g.draw( new Line2D.Double(ll.getX(), ll.getY(), ul.getX()+Height, ul.getY()) );
+                        g.draw( new Line2D.Double(lr.getX(), lr.getY(), ur.getX()-Height, ur.getY()) );
+                    }
+                    else {
+                        g.draw( new Line2D.Double(ul.getX(), ul.getY(), ur.getX(), ur.getY()+Width) );
+                        g.draw( new Line2D.Double(ur.getX(), ur.getY(), ul.getX(), ul.getY()+Width) );
+                        g.draw( new Line2D.Double(ll.getX(), ll.getY(), lr.getX(), lr.getY()-Width) );
+                        g.draw( new Line2D.Double(lr.getX(), lr.getY(), ll.getX(), ll.getY()-Width) );
+                    }
+                }
+                break;
+        }
+    }
+
+    private void paintGridFibonacci(Graphics2D g) {
+        Point2D ul = crop.getUpperLeft();
+        Point2D ur = crop.getUpperRight();
+        Point2D ll = crop.getLowerLeft();
+        Point2D lr = crop.getLowerRight();
+
+        final double Width = Math.abs( ur.getX() - ll.getX() );
+        final double Height = Math.abs( ur.getY() - ll.getY() );
+
+        int angle;
+        double arcWidth = Width / 1.618;
+        double arcHeight = Height;
+
+        switch (GridOrientation) {
+        case 0:
+            {
+                angle = 180;
+                Point2D Center = new Point2D.Double(ul.getX()+arcWidth, ul.getY()+arcHeight);
+
+                g.drawArc(
+                (int)( Center.getX() - arcWidth),
+                (int)( Center.getY() - arcHeight),
+                (int)arcWidth*2,
+                (int)arcHeight*2,
+                angle,
+                -90
+                );
+
+                for(int i=0; i<10; i++) {
+                    angle -= 90;
+                    arcWidth = arcWidth / 1.618;
+                    arcHeight = arcHeight / 1.618;
+                    Center.setLocation( Center.getX() + Math.sin( Math.toRadians( 90 - angle ) ) * arcWidth / 1.618 , Center.getY() - Math.sin( Math.toRadians( 180 - angle ) ) * arcHeight / 1.618 );
+                    g.drawArc(
+                        (int)( Center.getX() - arcWidth),
+                        (int)( Center.getY() - arcHeight),
+                        (int)arcWidth*2,
+                        (int)arcHeight*2,
+                        angle,
+                        -90
+                    );
+                }
+            }
+            break;
+        case 1:
+            {
+                angle = 180;
+                Point2D Center = new Point2D.Double(ul.getX()+arcWidth, ul.getY());
+
+                g.drawArc(
+                    (int)( Center.getX() - arcWidth),
+                    (int)( Center.getY() - arcHeight),
+                    (int)arcWidth*2,
+                    (int)arcHeight*2,
+                    angle,
+                    90
+                );
+
+                for(int i=0; i<10; i++) {
+                    angle += 90;
+                    arcWidth = arcWidth / 1.618;
+                    arcHeight = arcHeight / 1.618;
+                    Center.setLocation( Center.getX() - Math.sin( Math.toRadians( -90 + angle ) ) * arcWidth / 1.618 , Center.getY() + Math.sin( Math.toRadians( -180 + angle ) ) * arcHeight / 1.618 );
+                    g.drawArc(
+                        (int)( Center.getX() - arcWidth),
+                        (int)( Center.getY() - arcHeight),
+                        (int)arcWidth*2,
+                        (int)arcHeight*2,
+                        angle,
+                        90
+                    );
+                }
+            }
+            break;
+        case 2:
+            {
+                angle = 0;
+                Point2D Center = new Point2D.Double(ur.getX()-arcWidth, ur.getY()+arcHeight);
+
+                g.drawArc(
+                    (int)( Center.getX() - arcWidth),
+                    (int)( Center.getY() - arcHeight),
+                    (int)arcWidth*2,
+                    (int)arcHeight*2,
+                    angle,
+                    90
+                );
+
+                for(int i=0; i<10; i++) {
+                    angle += 90;
+                    arcWidth = arcWidth / 1.618;
+                    arcHeight = arcHeight / 1.618;
+                    Center.setLocation( Center.getX() + Math.sin( Math.toRadians( 90 + angle ) ) * arcWidth / 1.618 , Center.getY() - Math.sin( Math.toRadians( 0 + angle ) ) * arcHeight / 1.618 );
+                    g.drawArc(
+                        (int)( Center.getX() - arcWidth),
+                        (int)( Center.getY() - arcHeight),
+                        (int)arcWidth*2,
+                        (int)arcHeight*2,
+                        angle,
+                        90
+                    );
+                }
+            }
+            break;
+        case 3:
+            {
+                angle = 0;
+                Point2D Center = new Point2D.Double(ur.getX()-arcWidth, ur.getY());
+
+                g.drawArc(
+                    (int)( Center.getX() - arcWidth),
+                    (int)( Center.getY() - arcHeight),
+                    (int)arcWidth*2,
+                    (int)arcHeight*2,
+                    angle,
+                    -90
+                );
+
+                for(int i=0; i<10; i++) {
+                    angle -= 90;
+                    arcWidth = arcWidth / 1.618;
+                    arcHeight = arcHeight / 1.618;
+                    Center.setLocation( Center.getX() + Math.sin( Math.toRadians( 90 - angle ) ) * arcWidth / 1.618 , Center.getY() + Math.sin( Math.toRadians( 0 - angle ) ) * arcHeight / 1.618 );
+                    g.drawArc( 
+                        (int)( Center.getX() - arcWidth),
+                        (int)( Center.getY() - arcHeight),
+                        (int)arcWidth*2,
+                        (int)arcHeight*2,
+                        angle,
+                        -90
+                    );
+                }
+            }
+            break;
         }
     }
 
@@ -300,8 +527,36 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
 
     public void mouseClicked(MouseEvent e) {
         Point p = e.getPoint();
-        if (isInRect(p))
+        Point2D ul = crop.getUpperLeft();
+        Point2D ur = crop.getUpperRight();
+
+        if (isInRect(p)) {
             poll = p;
+
+            // Cycle through different overlays when the crop hasn't been rotated. Does it make sense to expand this for the rotated case?
+            if ( ul.getY() == ur.getY() )  {
+                switch (CropGridStyle) {
+                    case THIRD:
+                         CropGridStyle = GridStyle.TRIANGLE;
+                         break;
+                    case TRIANGLE:
+                         CropGridStyle = GridStyle.GOLDEN;
+                         break;
+                    case GOLDEN:
+                         CropGridStyle = GridStyle.FIBONACCI;
+                         break;
+                    case FIBONACCI:
+                         CropGridStyle = GridStyle.DIAGONAL;
+                         break;
+                    case DIAGONAL:
+                         CropGridStyle = GridStyle.THIRD;
+                         break;
+                }
+            }
+            else {
+                CropGridStyle = GridStyle.THIRD;
+            }
+        }
     }
 
     public void mouseEntered(MouseEvent e) {
@@ -474,6 +729,9 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
             if (newCrop != null) {
                 setCrop(newCrop);
             }
+
+            CropGridStyle = GridStyle.THIRD;
+
             return;
         }
         else if ((crop != null) && (! crop.isAngleOnly())) {
