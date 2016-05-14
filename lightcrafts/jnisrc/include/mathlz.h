@@ -68,7 +68,6 @@ static inline float fast_log2 (float val)
     x += 127 << 23;
     *exp_ptr = x;
 
-    return (val + log_2);
     // increases accuracy
 #ifdef FP_FAST_FMAF
     val = fmaf((fmaf(-1.0f/3), n.f, 2), n.f, -2.0f/3);
