@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="it-IT" xml:lang="it-IT">
+
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <title>Modalità fusione di LightZone</title>
+    <meta name="description" content="Descrizione delle varie modalità fusione."/>
+    <link rel="stylesheet" type="text/css" href="Help.css" media="all"/>
+    <link rel="stylesheet" type="text/css" href="Platform.css" media="all"/>
+    <!--[if lt IE 7]>
+    <script defer type="text/javascript" src="IE_PNG.js"></script>
+    <link rel="stylesheet" type="text/css" href="IE.css" media="all"/>
+    <![endif]-->
+  </head>
+
+  <body>
+    <div id="banner">
+      <div id="banner_left">
+        <a href="index.html">Aiuto di LightZone</a>
+      </div>
+      <div id="banner_right">
+        <a href="index/index.html">Indice</a>
+      </div>
+    </div>
+
+    <!-- LC_Index: blending modes > description -->
+    <!-- LC_Index: tool > blending modes for -->
+    <a name="Blending_Modes"/>
+    <img src="images/app_icon-32.png" width="32" height="32" class="title_icon"/>
+    <h1>Modalità fusione</h1>
+
+    <p>La maggioranza degli strumenti dispongono di una <em>modalità fusione</em> specifica. Le modalità fusione consentono all'utente di controllare il modo in cui gli effetti degli strumenti nella <a href="Tool_Stack.html">pila strumenti</a> si uniscono nella foto finale. Per poter comprendere le modalità fusione, è necessario conoscere alcuni termini:<dl>
+
+        <dt>Colore base</dt>
+        <dd>È il colore di un pixel prima che l'effetto di uno strumento sia applicato alla foto.</dd>
+
+        <dt>Colore applicato</dt>
+        <dd>È il colore di un pixel dopo che l'effetto di uno strumento è stato applicato alla foto.</dd>
+
+        <dt>Colore risultante</dt>
+        <dd>È il colore di un pixel dopo che il colore base e quello applicato sono stati fusi con la modalità fusione.</dd>
+
+      </dl>Vedere quanto illustrato nella figura sottostante. Come mostrano frecce verdi, l'effetto di uno strumento viene prima applicato ai colori base di una foto producendo i colori applicati. Poi, come mostrano le frecce rosse, il colore di base e quello applicato sono fusi con la modalità fusione producendo il colore risultante.</p>
+    <p>
+      <div class="figure">
+        <img src="images/Blend_Modes_Illustration-en.png" width="416" height="139"/>
+      </div>
+    </p>
+
+    <p>L'utente può scegliere tra più modalità fusione. Di seguito è presente la descrizione di ognuna ma si consiglia di testarle personalmente.</p>
+
+    <dl>
+
+      <dt><a name="Blend_Normal"/>Normale</dt>
+      <dd>L'effetto di questa modalità di fusione è nullo poiché il colore applicato e quello risultante coincidono.</dd>
+
+      <dt><a name="Blend_Average"/>Medio</dt>
+      <dd>Funziona come la modalità fusione Normale ma viene applicato un 50% di opacità.</dd>
+
+      <dt><a name="Blend_Color_Burn"/>Brucia colore</dt>
+      <dd>Consente di scurire il colore base per riflettere il colore applicato aumentando il contrasto. Opposto di Scherma colore. Vedere anche: Brucia poco.</dd>
+
+      <dt><a name="Blend_Color_Dodge"/>Scherma colore </dt>
+      <dd>Consente di schiarire il colore base per riflettere il colore applicato diminuendo il contrasto. Opposto di Brucia colore.</dd>
+
+      <dt><a name="Blend_Darken"/>Scurisci</dt>
+      <dd>Il colore più scuro tra il colore base e quello applicato sarà il colore risultante.  Opposto di Illumina.</dd>
+
+      <dt><a name="Blend_Difference"/>Differenza</dt>
+      <dd>Consente di sottrarre il colore più chiaro, sia questo il colore applicato o il colore di base. Vedere anche: Esclusione.</dd>
+
+      <dt><a name="Blend_Exclusion"/>Esclusione</dt>
+      <dd>Consente di creare un effetto simile alla modalità fusione Differenza ma con un contrasto minore. Vedere anche: Sottrai.</dd>
+
+      <dt><a name="Blend_Hard_Light"/>Luce forte</dt>
+      <dd>Questa modalità fusione consente di moltiplicare o schiarire i colori in base al colore applicato. Se il colore applicato è il 50% più chiaro del grigio, il colore è illuminato (schiarito); se il colore applicato è il 50% più scuro del grigio, viene scurito (moltiplicato).  Questo strumento è utile per aggiungere luci od ombre a un'immagine.</dd>
+
+      <dt><a name="Blend_Lighten"/>Illumina</dt>
+      <dd>Il colore più chiaro tra il colore base e quello applicato sarà il colore risultante. Opposto di Scurisci.</dd>
+
+      <dt><a name="Blend_Midtones"/>Toni medi</dt>
+      <dd>Questa modalità fusione funziona come la modalità fusione Normale ma il suo effetto è limitato ai toni medi.</dd>
+
+      <dt><a name="Blend_Mid_Hilights"/>Luci alte+medie</dt>
+      <dd>Questa modalità fusione funziona come la modalità fusione Normale ma il suo effetto è limitato ai toni medi e le luci.</dd>
+
+      <dt><a name="Blend_Multiply"/>Moltiplica</dt>
+      <dd>Questa modalità fusione consente di moltiplicare i colori base e applicato. Il colore risultante è sempre più scuro. L'effetto è simile a quello che si ottiene colorando l'immagine con più pennarelli.  Vedere anche: Schiarisci.</dd>
+
+      <dt><a name="Blend_Negation"/>Sottrai</dt>
+      <dd>Questa modalità fusione è simile alla modalità fusione Esclusione ma consente di rendere più vividi e brillanti i colori. </dd>
+
+      <dt><a name="Blend_Overlay"/>Sovrapponi</dt>
+      <dd>Consente di moltiplicare o schiarire i colori in base al colore base. I pattern o i colori sono sovrapposti ai pixel esistenti per preservare le luci e le ombre del colore base. Il colore base non è sosituito ma miscelato con il colore applicato per riflettere la chiarezza o l'oscurità del colore originale.</dd>
+
+      <dt><a name="Blend_Screen"/>Schiarisci</dt>
+      <dd>Questa modalità fusione è simile alla modalità fusione Moltiplica ma consente di moltiplicare i colori opposti al colore base e applicato. Il colore risultante è sempre più chiaro. L'effetto è simile a quello che si ottiene proiettando di più diapositive su un unico schermo.</dd>
+
+      <dt><a name="Blend_Shadows"/>Ombre</dt>
+      <dd>Questa modalità fusione consente di agire solo sulle ombre.</dd>
+
+      <dt><a name="Blend_Soft_Burn"/>Brucia poco</dt>
+      <dd>Questa modalità fusione è simile alla modalità fusione Brucia colore ma la saturazione e il contrasto sono minori.</dd>
+
+      <dt><a name="Blend_Soft_Dodge"/>Scherma poco</dt>
+      <dd>Questa modalità fusione è una combinazione di Scherma colore e dell'opposto della modalità Brucia colore ma molto più tenue. Consente di scurire lievemente i colori base e scherma i colori applicati più chiari.</dd>
+
+      <dt><a name="Blend_Soft_Light"/>Luci morbide</dt>
+      <dd>Questa modalità fusione consente di scurire o illuminare i colori in base al colore applicato. L'effetto è simile a quello che si ottiene posizionando un faretto a luce diffusa sull'immagine. Se il colore applicato è più chiaro, l'immagine è illuminata come se fosse schermata; se il colore applicato è più scuro, l'immagine è scurita come se fosse bruciata.</dd>
+
+    </dl>
+
+  </body>
+</html><!-- vim:set et sw=2 ts=2: -->

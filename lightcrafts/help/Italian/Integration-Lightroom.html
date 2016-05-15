@@ -1,0 +1,187 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="it-IT" xml:lang="it-IT">
+
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Integrazione del Flusso di lavoro di LightZone con Lightroom</title>
+    <meta name="description" content="Come utilizzare LightZone con Lightroom."/>
+    <link rel="stylesheet" type="text/css" href="Help.css" media="all"/>
+    <link rel="stylesheet" type="text/css" href="Platform.css" media="all"/>
+    <style type="text/css">
+      <!--
+      .boxed_text {
+        background: #DEE7F8;
+        border: 1px solid #A4BDEC;
+        padding: 0 1em 0 1em;
+      }
+      -->
+    </style><!--[if lt IE 7]>
+    <script defer type="text/javascript" src="IE_PNG.js"></script>
+    <link rel="stylesheet" type="text/css" href="IE.css" media="all"/>
+    <![endif]-->
+    
+  </head>
+
+  <body>
+    <div id="banner">
+      <div id="banner_left">
+        <a href="index.html">Aiuto di LightZone</a>
+      </div>
+      <div id="banner_right">
+        <a href="index/index.html">Indice</a>
+      </div>
+    </div><!-- LC_Index: workflow integration > with Lightroom --><!-- LC_Index: Lightroom workflow integration -->
+
+    
+    
+    <a name="Integration-Lightroom"></a>
+    <img src="images/app_icon-32.png" width="32" height="32"
+      class="title_icon"/>
+    <h1>Integrazione del flusso di lavoro con Lightroom di Adobe Systems</h1>
+
+    <p>
+      Photoshop Lightroom, di Adobe Systems, consente all'utente di selezionare un'altra applicazione come "editor esterno" per modificare le foto. È possibile configurare LightZone come editor esterno. Inoltre, LightZone si integra facilmente con Lightroom grazie alla preferenza <a href="Preferences.html#Preferences-Direct_Save">Salvataggio diretto</a>.
+    </p>
+    <p>
+      <b>Nota:</b> seguono informazioni dettagliate per la versione 5.2 Lightroom ma nelle successive versioni potrebbero esserci delle modifiche.
+    </p>
+
+    <div class="task_box">
+      <h2>Per configurare Lightroom a lavorare con LightZone:</h2>
+      <ol>
+        <li>
+          Selezionare <span class="Mac_only">Lightroom</span> <span class="Windows_only">Modifica</span> &gt; Preferenze...
+        </li>
+        <li>
+          Fare clic su Editor esterno.
+        </li>
+        <li>
+          Sotto a Editor esterno aggiuntivo, fare clic su Scegli...
+        </li>
+        <li>
+          Cercare e selezionare LightZone.
+        </li>
+        <li>
+          Selezionare TIFF come Formato file.
+        </li>
+        <li>
+          Selezionare 16 bit/componente come Profondità di Bit.
+        </li>
+        <li>
+          Sotto a Rinomina file modificato esternamente, fare clic su Elenco modelli e selezionare Modifica...
+        </li>
+        <li>
+          Inserire il {Nome del file &gt;&gt;}nell'area di testo di Editor modello nome file.
+        </li><li>
+          Verificare che Esempio: IMG_0002-Edit.psd venga visualizzato e fare clic su Fine.
+        </li>
+        <li>
+        </li>
+        <li>
+          Chiudere la finestra delle Preferenze.
+        </li>
+      </ol>
+      <p class="Mac_only">
+        <a href="help:runscript='LightZone_Help/scripts/Set_Lightroom_Prefs.scpt'">
+        <img src="images/AppleScriptAppIcon.png" width="32" height="32"
+          class="inline_left"/></a>
+        In alternativa, è possibile eseguire la configurazione automatica di Lightroom facendo clic sull'icona di AppleScript a sinistra. Prima è necessario chiudere Lightroom.
+        <br clear="all"/>
+      </p>
+    </div>
+
+    <p>
+      Quando si usa un'applicazione esterna, Lightroom offre tre opzioni:
+      <ul>
+        <li>
+          Modifica originale
+        </li>
+        <li>
+          Modifica una copia
+        </li>
+        <li>
+          Modifica una copia con le regolazioni di Lightroom
+        </li>
+      </ul>
+      Per le foto in raw, Lightroom offre solo la terza opzione. Per non modificare l'originale delle foto in JPEG o TIFF, selezionare "Modifica una copia con le regolazioni di Lightroom". In questo caso Lightroom:
+      <ol>
+        <li>
+          Crea una copia TIFF della foto.
+        </li>
+        <li>
+          Aggiunge la copia TIFF alla libreria corrente di Lightroom.
+        </li>
+        <li>
+          Invia la copia TIFF all'editor esterno per modificarla.
+        </li>
+      </ol>
+    </p>
+
+    <div class="task_box">
+      <h2>Per configurare LightZone a lavorare con Lightroom:</h2>
+      <ol>
+        <li>
+          Selezionare <span class="Mac_only">LightZone</span> <span class="Not_Mac">Modifica</span> &gt; Preferenze...
+        </li>
+        <li>
+          Verificare che la casella <a href="Preferences.html#Preferences-Direct_Save">Salvataggio diretto</a> sia selezionata.
+        </li>
+        <li>
+          Chiudere la finestra Preferenze.
+        </li>
+      </ol>
+    </div>
+
+    Al termine della configurazione sarà possibile selezionare una delle foto su Lightroom e modificarla con LightZone.
+
+    <div class="task_box">
+      <h2>Per modificare le foto con LightZone da Lightroom:</h2>
+      <ol>
+        <li>
+          Selezionare su Lightroom la foto che si desidera modificare.
+        </li>
+        <li>
+          Selezionare Foto &gt; Modifica. Su Lightroom sarà visualizzata la finestra di dialogo Modifica foto che offrirà tre opzioni.
+        </li>
+        <li>
+          Se è stata scelta una foto originale, selezionare "Modifica una copia con le regolazioni di Lightroom". Se è stata scelta una copia TIFF creata in precedenza, selezionare "Modifica originale". LightZone aprirà la foto.
+        </li>
+        <li>
+          Modificare la foto a proprio piacimento con LightZone.
+        </li>
+        <li>
+          Selezionare File &gt; Salva in Lightroom. LightZone salverà la foto modificata sovrascrivendo la copia in TIFF<span class="Mac_only"> e la invierà nuovamente a Lightroom che adesso mostrerà la copia TIFF modificata della foto.</span> <span class="Not_Mac"> </span>
+        </li>
+        <li class="Not_Mac">
+          Tornare su Lightroom: sarà caricata la versione modificata della foto.
+        </li>
+      </ol>
+    </div>
+
+    <p>
+      <b>Nota:</b> su Lightroom, in base alle preferenze del programma, potrebbe esservi un punto esclamativo sulla miniatura della copia TIFF della foto modificata con LightZone. Dopo aver fatto clic sul punto esclamativo, Lightroom informerà l'utente che i metadati della foto sono stati cambiati da un'altra applicazione e chiederà come sincronizzare i dati. L'opzione più sicura da selezionare è Sovrascrivi impostazioni.
+    </p>
+
+    <div>
+      <h3>Vedere anche:</h3>
+      <ul>
+        <li>
+          <a href="Multipage_TIFF.html">Immagini TIFF multipagina</a>
+        </li>
+        <li class="Mac_only">
+          <a href="Integration-Aperture.html">Integrazione del flusso di lavoro con Aperture di Apple</a>
+        </li>
+        <li class="Mac_only">
+          <a href="Integration-iPhoto.html">Integrazione del flusso di lavoro con iPhoto di Apple</a>
+        </li>
+        <li class="Not_Linux">
+          <a href="Integration-iView_MediaPro.html">Integrazione del flusso di lavoro con iView MediaPro di Microsoft</a>
+        </li>
+      </ul>
+    </div>
+
+  </body>
+</html><!-- vim:set et sw=2 ts=2: -->
+
