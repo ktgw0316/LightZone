@@ -145,9 +145,13 @@ public final class ColorProfileInfo implements Comparable {
     public static ICC_Profile getExportICCProfileFor( String name ) {
         final Collection<ColorProfileInfo> exportProfiles =
             Platform.getPlatform().getExportProfiles();
-        for ( ColorProfileInfo cpi : exportProfiles )
-            if ( cpi.getName().equals( name ) )
-                return cpi.getICCProfile();
+        if (exportProfiles != null) {
+            for ( ColorProfileInfo cpi : exportProfiles ) {
+                if ( cpi.getName().equals( name ) ) {
+                    return cpi.getICCProfile();
+                }
+            }
+        }
         return null;
    }
 
