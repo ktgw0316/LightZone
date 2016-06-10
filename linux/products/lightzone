@@ -36,7 +36,25 @@ else
   pkglibexecdir=${usrdir}/lib/lightzone
 fi
 
-classdir='/usr/share/java/javahelp/*:/usr/share/java/*:/usr/share/javahelp/lib/*:/usr/local/share/java/classes/*'
+if [ -d ${usrdir}/share/java/ ]; then
+  if [ -d ${usrdir}/share/java/javahelp ]; then
+    if  [ -d ${usrdir}/share/java/javahelp/lib ]; then
+      jhpath=${usrdir}/share/java/javahelp/lib/jh.jar
+    else
+      jhpath=${usrdir}/share/java/javahelp/jh.jar
+    fi
+  else
+   jhpath=${usrdir}/share/java/jh.jar
+  fi
+elif [ -d ${usrdir}/local/share/java/classes ]; then
+   jhpath=${usrdir}/local/share/java/classes/jh.jar
+fi
+
+if [ -z "$jhpath" ]; then
+  echo "jh.jar was not found."
+elif [ ! -e $jhpath ]; then
+  echo "jh.jar was not found in ${jhpath}"
+fi
 
 if [ $totalmem -ge 1048576 ]; then
   maxmem=$(( $totalmem / 2 ))
@@ -59,4 +77,4 @@ for i in "$@"; do
   fi
 done
 
-(cd $pkgjavadir && LD_LIBRARY_PATH=$pkglibexecdir exec java -Xmx${maxmem}k -Djava.library.path=$pkglibexecdir -Dfile.encoding=UTF8 -classpath ".:$pkgjavadir/*:$classdir" com.lightcrafts.platform.linux.LinuxLauncher ${file} ${@} )
+(cd $pkgjavadir && LD_LIBRARY_PATH=$pkglibexecdir exec java -Xmx${maxmem}k -Djava.library.path=$pkglibexecdir -Dfile.encoding=UTF8 -classpath ".:${pkgjavadir}/*:${jhpath}" com.lightcrafts.platform.linux.LinuxLauncher ${file} ${@} )
