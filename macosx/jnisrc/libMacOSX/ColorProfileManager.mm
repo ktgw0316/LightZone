@@ -171,6 +171,7 @@ JNIEXPORT jstring JNICALL
 MacOSXColorProfileManager_METHOD(getSystemDisplayProfilePath)
     ( JNIEnv *env, jclass )
 {
+#ifdef MAC_OS_X_VERSION_10_7
     CGDirectDisplayID displayID = CGMainDisplayID();
     CFUUIDRef displayUUID = CGDisplayCreateUUIDFromDisplayID(displayID);
     if (!displayUUID) {
@@ -254,6 +255,24 @@ MacOSXColorProfileManager_METHOD(getSystemDisplayProfilePath)
         return NULL;
     }
     char const *cPath = new_strdup( path );
+#else // for Snow Leopard or older
+    CMError err;
+    CMProfileRef profRef;
+    CMProfileLocation profLoc;
+    UInt32 locSize = cmCurrentProfileLocationSize;
+
+    CGDirectDisplayID const displayID = CGMainDisplayID();
+    err = CMGetProfileByAVID( (CMDisplayIDType)displayID, &profRef );
+    if ( err != noErr )
+        return NULL;
+    err = NCMGetProfileLocation( profRef, &profLoc, &locSize );
+    if ( err != noErr )
+        return NULL;
+    char const *const cPath = getProfilePath( profLoc );
+    CMCloseProfile( profRef );
+    if ( !cPath )
+        return NULL;
+#endif
     jstring const jPath = env->NewStringUTF( cPath );
     delete[] cPath;
     return jPath;
