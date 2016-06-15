@@ -4,6 +4,8 @@
 #include <string.h>
 #include <jni.h>
 
+#include "../include/mathlz.h"
+
 #ifdef __INTEL_COMPILER
 #include <fvec.h>
 #include <dvec.h>
@@ -50,56 +52,6 @@ static inline F32vec4 v_fast_exp(F32vec4 val)
 }
 
 #endif
-
-template <typename T> static inline T SQR( T x )
-{
-    return x * x;
-}
-
-static inline float fast_exp(float val)
-{
-    const float fast_exp_a = (1 << 23)/M_LN2;	
-    const float fast_exp_b_c = 127.0f * (1 << 23) - 405000;
-    
-    if (val < -16)
-        return 0;
-    
-    union {
-        float f;
-        int i;
-    } result;
-    
-#ifdef FP_FAST_FMAF
-    result.i = int(fmaf(fast_exp_a, val, fast_exp_b_c));
-#else
-    result.i = int(fast_exp_a * val + fast_exp_b_c);
-#endif
-    return result.f;
-}
-
-static inline float inv_sqrt(float x) 
-{ 
-    float xhalf = 0.5f * x; 
-    union {
-        float f;
-        unsigned int i;
-    } n;
-    
-    n.f = x;                          // get bits for floating value 
-    n.i = 0x5f375a86 - (n.i>>1);      // gives initial guess y0 
-    x = n.f;                          // convert bits back to float 
-    x = x*(1.5f-xhalf*x*x);           // Newton step, repeating increases accuracy 
-    //    x = x*(1.5f-xhalf*x*x);           // Newton step, repeating increases accuracy 
-    //    x = x*(1.5f-xhalf*x*x);           // Newton step, repeating increases accuracy 
-    //    x = x*(1.5f-xhalf*x*x);           // Newton step, repeating increases accuracy 
-    return x; 
-}
-
-
-template <typename T>
-unsigned short clampUShort(T x) {
-    return x < 0 ? 0 : x > 0xffff ? 0xffff : (unsigned short) x;
-}
 
 /*******************************************************************************
  * separable_bf_mono_tile()

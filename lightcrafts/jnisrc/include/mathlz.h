@@ -2,6 +2,14 @@
 #include <math.h>
 #include <omp.h>
 
+#ifndef M_LN2
+#define M_LN2		0.69314718055994530942
+#endif
+
+#ifndef M_PI
+#define M_PI		3.14159265358979323846
+#endif
+
 // Very fast approximation of exp, faster than lookup table!
 // See paper of Nicol N. Schraudolph, adapted here to single precision floats.
 #if _OPENMP >= 201307

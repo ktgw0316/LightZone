@@ -8,11 +8,6 @@
 #include <iostream>
 #include <sstream>
 
-#ifndef M_LN2
-#define M_LN2		0.69314718055994530942
-#define M_PI		3.14159265358979323846
-#endif
-
 #define NO_XML
 // #define CHRONO
 #include "../include/mathlz.h"
