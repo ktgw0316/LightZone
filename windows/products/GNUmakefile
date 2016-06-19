@@ -5,7 +5,7 @@ include			$(COMMON_DIR)/mk/platform.mk
 COMMON_PRODUCTS:=	$(wildcard $(COMMON_DIR)/products/*)
 DEST_COMMON_PRODUCTS:=	$(filter-out GNUmakefile,$(notdir $(COMMON_PRODUCTS)))
 
-WINDOWS_LIBS:=		$(wildcard ../lib/*.dll) $(wildcard ../lib/*.jar)
+WINDOWS_LIBS:=		$(wildcard ../lib/*.jar)
 DEST_WINDOWS_LIBS:=	$(notdir $(WINDOWS_LIBS))
 
 WINDOWS_PROC_LIBS:=		$(wildcard ../lib/$(PROCESSOR)/*.dll)
