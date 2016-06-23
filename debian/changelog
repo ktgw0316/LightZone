@@ -2,6 +2,12 @@ lightzone (4.1.5-0obs1) unstable; urgency=medium
 
   * Upstream sync
 
+ -- Masahiro Kitagawa <arctica0316@gmail.com>  Thu, 23 Jun 2016 23:19:00 +0900
+
+lightzone (4.1.5-0obs1) unstable; urgency=medium
+
+  * Upstream sync
+
  -- Masahiro Kitagawa <arctica0316@gmail.com>  Sat, 09 Jan 2016 18:17:11 +0900
 
 lightzone (4.1.4-0obs1) unstable; urgency=medium
