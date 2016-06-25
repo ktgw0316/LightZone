@@ -171,7 +171,7 @@ JNIEXPORT jstring JNICALL
 MacOSXColorProfileManager_METHOD(getSystemDisplayProfilePath)
     ( JNIEnv *env, jclass )
 {
-#ifdef MAC_OS_X_VERSION_10_7
+#ifdef MAC_OS_X_VERSION_10_11
     CGDirectDisplayID displayID = CGMainDisplayID();
     CFUUIDRef displayUUID = CGDisplayCreateUUIDFromDisplayID(displayID);
     if (!displayUUID) {
