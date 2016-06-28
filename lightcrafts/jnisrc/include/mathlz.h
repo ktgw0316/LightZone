@@ -78,7 +78,7 @@ static inline float fast_log2 (float val)
 
     // increases accuracy
 #ifdef FP_FAST_FMAF
-    val = fmaf((fmaf(-1.0f/3), n.f, 2), n.f, -2.0f/3);
+    val = fmaf(fmaf(-1.0f/3, n.f, 2), n.f, -2.0f/3);
 #else
     val = ((-1.0f/3) * n.f + 2) * n.f - 2.0f/3;
 #endif
