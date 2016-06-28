@@ -36,24 +36,20 @@ else
   pkglibexecdir=${usrdir}/lib/lightzone
 fi
 
-if [ -d ${usrdir}/share/java/ ]; then
-  if [ -d ${usrdir}/share/java/javahelp ]; then
-    if  [ -d ${usrdir}/share/java/javahelp/lib ]; then
-      jhpath=${usrdir}/share/java/javahelp/lib/jh.jar
-    else
-      jhpath=${usrdir}/share/java/javahelp/jh.jar
-    fi
-  else
-   jhpath=${usrdir}/share/java/jh.jar
-  fi
-elif [ -d ${usrdir}/local/share/java/classes ]; then
+if   [ -f ${usrdir}/share/java/jh.jar ]; then        # Debian, Ubuntu
+   jhpath=${usrdir}/share/java/jh.ja
+elif [ -f ${usrdir}/share/java/javahelp2.jar ]; then # Fedora, OpenSUSE, PCLinuxOS
+   jhpath=${usrdir}/share/java/javahelp2.jar
+elif [ -f ${usrdir}/share/java/javahelp/jh.jar ]; then      # Arch
+   jhpath=${usrdir}/share/java/javahelp/jh.jar
+elif [ -f ${usrdir}/share/java/javahelp/lib/jh.jar ]; then  # Gentoo
+   jhpath=${usrdir}/share/java/javahelp/lib/jh.jar
+elif [ -f ${usrdir}/local/share/java/classes/jh.jar ]; then # FreeBSD
    jhpath=${usrdir}/local/share/java/classes/jh.jar
-fi
-
-if [ -z "$jhpath" ]; then
+elif [ -f ${usrdir}/j2se/opt/javahelp/lib/jhall.jar ]; then # OpenIndiana
+   jhpath=${usrdir}/j2se/opt/javahelp/lib/jhall.jar
+else
   echo "jh.jar was not found."
-elif [ ! -e $jhpath ]; then
-  echo "jh.jar was not found in ${jhpath}"
 fi
 
 if [ $totalmem -ge 1048576 ]; then
