@@ -44,8 +44,8 @@ elif [ -f ${usrdir}/share/java/javahelp/jh.jar ]; then      # Arch
    jhpath=${usrdir}/share/java/javahelp/jh.jar
 elif [ -f ${usrdir}/share/java/javahelp/lib/jh.jar ]; then  # Gentoo
    jhpath=${usrdir}/share/java/javahelp/lib/jh.jar
-elif [ -f ${usrdir}/local/share/java/classes/jh.jar ]; then # FreeBSD
-   jhpath=${usrdir}/local/share/java/classes/jh.jar
+elif [ -f ${usrdir}/share/java/classes/jh.jar ]; then # FreeBSD
+   jhpath=${usrdir}/share/java/classes/jh.jar
 elif [ -f ${usrdir}/j2se/opt/javahelp/lib/jhall.jar ]; then # OpenIndiana
    jhpath=${usrdir}/j2se/opt/javahelp/lib/jhall.jar
 else
