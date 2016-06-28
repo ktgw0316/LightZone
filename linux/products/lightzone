@@ -37,7 +37,7 @@ else
 fi
 
 if   [ -f ${usrdir}/share/java/jh.jar ]; then        # Debian, Ubuntu
-   jhpath=${usrdir}/share/java/jh.ja
+   jhpath=${usrdir}/share/java/jh.jar
 elif [ -f ${usrdir}/share/java/javahelp2.jar ]; then # Fedora, OpenSUSE, PCLinuxOS
    jhpath=${usrdir}/share/java/javahelp2.jar
 elif [ -f ${usrdir}/share/java/javahelp/jh.jar ]; then      # Arch
