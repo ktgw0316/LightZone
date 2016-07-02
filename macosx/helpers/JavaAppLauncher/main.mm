@@ -26,7 +26,6 @@
 #import <mach-o/arch.h>                 /* for NXGetLocalArchInfo(3) */
 #import <signal.h>
 #import <sys/types.h>
-#import <sys/sysctl.h>
 #import <unistd.h>
 
 // local
@@ -91,26 +90,22 @@ extern "C" void catchSignal( int sigID ) {
  * Check the CPU type.
  */
 static void checkCPUType() {
-    size_t len = sizeof(lc_cpuType);
-    int err = sysctlbyname("sysctl.proc_cputype", &lc_cpuType, &len,
-                           nullptr, 0);
-    if (err) {
+    NXArchInfo const *const arch = NXGetLocalArchInfo();
+    if ( !arch ) {
+        //
+        // This should never return null (how can the info not be available?),
+        // but the manual page arch(3) says it's possible.  So err on the side
+        // of allowing the application to run and hope for the best.
+        //
         return;
     }
-
-    switch ( lc_cpuType ) {
-        case CPU_TYPE_X86_64:
-            cout << "CPU = x86_64" << endl;
-            return;
+    lc_cpuType = arch->cputype;
+    switch ( arch->cputype ) {
         case CPU_TYPE_I386:
             cout << "CPU = i386" << endl;
             return;
         case CPU_TYPE_POWERPC:
-            cpu_subtype_t lc_cpuSubType;
-            size_t len_s = sizeof(lc_cpuSubType);
-            int err_s = sysctlbyname("hw.cpusubtype", &lc_cpuSubType, &len_s,
-                                     nullptr, 0);
-            if ( !err_s && lc_cpuSubType >= CPU_SUBTYPE_POWERPC_7400 ) {
+            if ( arch->cpusubtype >= CPU_SUBTYPE_POWERPC_7400 ) {
                 cout << "CPU = ppc" << endl;
                 return;
             }
