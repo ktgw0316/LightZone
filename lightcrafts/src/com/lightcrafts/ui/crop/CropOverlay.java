@@ -304,8 +304,8 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
         }
         else {
             g.draw( new Line2D.Double(ul.getX(), ul.getY(), lr.getX(), lr.getY()) );
-            g.draw( new Line2D.Double(ur.getX() - d * Math.sin(DiagonalAngle-RotateAngle), ur.getY() + d * Math.cos(DiagonalAngle-RotateAngle), ur.getX(), ur.getY()) );
-            g.draw( new Line2D.Double(ll.getX() + d * Math.sin(DiagonalAngle-RotateAngle), ll.getY() - d * Math.cos(DiagonalAngle-RotateAngle), ll.getX(), ll.getY()) );
+            g.draw( new Line2D.Double(ur.getX() - d * Math.sin(DiagonalAngle+RotateAngle), ur.getY() + d * Math.cos(DiagonalAngle+RotateAngle), ur.getX(), ur.getY()) );
+            g.draw( new Line2D.Double(ll.getX() + d * Math.sin(DiagonalAngle+RotateAngle), ll.getY() - d * Math.cos(DiagonalAngle+RotateAngle), ll.getX(), ll.getY()) );
         }
     }
 
