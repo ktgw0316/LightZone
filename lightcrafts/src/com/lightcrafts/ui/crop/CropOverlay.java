@@ -337,7 +337,8 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
     }
 
     private void paintGridFibonacci(Graphics2D g) {
-        int angle;
+        g.rotate(RotateAngle, center.getX(), center.getY());
+        double angle;
         double arcWidth = Width / 1.618;
         double arcHeight = Height;
 
@@ -345,14 +346,15 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
         case 0:
             {
                 angle = 180;
-                Point2D Center = new Point2D.Double(ul.getX()+arcWidth, ul.getY()+arcHeight);
+
+                Point2D Center = new Point2D.Double(center.getX()+0.118*Width, center.getY()+Height/2);
 
                 g.drawArc(
                 (int)( Center.getX() - arcWidth),
                 (int)( Center.getY() - arcHeight),
                 (int)arcWidth*2,
                 (int)arcHeight*2,
-                angle,
+                (int)angle,
                 -90
                 );
 
@@ -366,7 +368,7 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
                         (int)( Center.getY() - arcHeight),
                         (int)arcWidth*2,
                         (int)arcHeight*2,
-                        angle,
+                        (int)angle,
                         -90
                     );
                 }
@@ -375,14 +377,15 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
         case 1:
             {
                 angle = 180;
-                Point2D Center = new Point2D.Double(ul.getX()+arcWidth, ul.getY());
+
+                Point2D Center = new Point2D.Double(center.getX()+0.118*Width, center.getY()-Height/2);
 
                 g.drawArc(
                     (int)( Center.getX() - arcWidth),
                     (int)( Center.getY() - arcHeight),
                     (int)arcWidth*2,
                     (int)arcHeight*2,
-                    angle,
+                    (int)angle,
                     90
                 );
 
@@ -396,7 +399,7 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
                         (int)( Center.getY() - arcHeight),
                         (int)arcWidth*2,
                         (int)arcHeight*2,
-                        angle,
+                        (int)angle,
                         90
                     );
                 }
@@ -405,14 +408,15 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
         case 2:
             {
                 angle = 0;
-                Point2D Center = new Point2D.Double(ur.getX()-arcWidth, ur.getY()+arcHeight);
+
+                Point2D Center = new Point2D.Double(center.getX()-0.118*Width, center.getY()+Height/2);
 
                 g.drawArc(
                     (int)( Center.getX() - arcWidth),
                     (int)( Center.getY() - arcHeight),
                     (int)arcWidth*2,
                     (int)arcHeight*2,
-                    angle,
+                    (int)angle,
                     90
                 );
 
@@ -426,7 +430,7 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
                         (int)( Center.getY() - arcHeight),
                         (int)arcWidth*2,
                         (int)arcHeight*2,
-                        angle,
+                        (int)angle,
                         90
                     );
                 }
@@ -435,14 +439,15 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
         case 3:
             {
                 angle = 0;
-                Point2D Center = new Point2D.Double(ur.getX()-arcWidth, ur.getY());
+
+                Point2D Center = new Point2D.Double(center.getX()-0.118*Width, center.getY()-Height/2);
 
                 g.drawArc(
                     (int)( Center.getX() - arcWidth),
                     (int)( Center.getY() - arcHeight),
                     (int)arcWidth*2,
                     (int)arcHeight*2,
-                    angle,
+                    (int)angle,
                     -90
                 );
 
@@ -456,13 +461,14 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
                         (int)( Center.getY() - arcHeight),
                         (int)arcWidth*2,
                         (int)arcHeight*2,
-                        angle,
+                        (int)angle,
                         -90
                     );
                 }
             }
             break;
         }
+        g.rotate(-1*RotateAngle, center.getX(), center.getY());
     }
 
     private void paintGridDiagonal(Graphics2D g) {
@@ -503,6 +509,9 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
                 break;
             case GOLDEN:
                 paintGridGolden(g);
+                break;
+            case FIBONACCI:
+                paintGridFibonacci(g);
                 break;
             case DIAGONAL:
                 paintGridDiagonal(g);
