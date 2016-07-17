@@ -1,5 +1,6 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
 /* Copyright (C) 2016 Marinna Cole */
+/* Copyright (C) 2016 Masahiro Kitagawa */
 
 package com.lightcrafts.ui.crop;
 
@@ -19,6 +20,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.*;
+import java.awt.geom.Ellipse2D.Double;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
@@ -75,14 +77,14 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
     private static int GridCount = 3;
     private static int GridSpacing = 30;
 
-    private Point2D poll;
+    // Rotation poll position normalized with underlayRect
+    private Point2D relativePoll;
 
     private Cursor cursor;
 
     private Point dragStart;
 
     private boolean isRotating;
-    private boolean isRotated;
     private double rotateAngleStart;
     private Point rotateMouseStart;
     private double rotateWidthLimit;
@@ -231,7 +233,13 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
     }
 
     private void paintGrid(Graphics2D g) {
-        if (isRotated) {
+        ul = crop.getUpperLeft();
+        ur = crop.getUpperRight();
+        ll = crop.getLowerLeft();
+        lr = crop.getLowerRight();
+        center = crop.getCenter();
+
+        if (isRotateOnly) {
             paintRotateGrid(g);
         }
         else {
@@ -246,11 +254,6 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
     }
 
     private void paintCropGrid(Graphics2D g) {
-        ul = crop.getUpperLeft();
-        ur = crop.getUpperRight();
-        ll = crop.getLowerLeft();
-        lr = crop.getLowerRight();
-        center = crop.getCenter();
         Width = crop.getWidth();
         Height = crop.getHeight();
         DiagonalDistance = Math.sqrt(Height*Height+Width*Width);
@@ -489,35 +492,36 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
     }
 
     private void paintRotateGrid(Graphics2D g) {
-        ul = crop.getUpperLeft();
-        ur = crop.getUpperRight();
-        ll = crop.getLowerLeft();
-        lr = crop.getLowerRight();
-        center = crop.getCenter();
-        Width = crop.getWidth();
-        Height = crop.getHeight();
-        DiagonalDistance = Math.sqrt(Height*Height+Width*Width);
-        RotateAngle = crop.getAngle();
-        DiagonalAngle = Math.atan(Height/Width);
+        Point2D midLeft   = getMidPoint(ul, ll);
+        Point2D midTop    = getMidPoint(ul, ur);
+        Point2D midRight  = getMidPoint(ur, lr);
+        Point2D midBottom = getMidPoint(ll, lr);
 
-        switch (CropGridStyle) {
-            case THIRD:
-                paintGridThird(g);
-                break;
-            case TRIANGLE:
-                paintGridTriangle(g);
-                break;
-            case GOLDEN:
-                paintGridGolden(g);
-                break;
-            case FIBONACCI:
-                paintGridFibonacci(g);
-                break;
-            case DIAGONAL:
-                paintGridDiagonal(g);
-                break;
+        Line2D hMidLine = new Line2D.Double(midLeft, midRight);
+        Line2D vMidLine = new Line2D.Double(midTop, midBottom);
+
+        Point2D poll = updatePoll();
+        Line2D hPollLine = getSegmentThroughPoint(hMidLine, poll);
+        Line2D vPollLine = getSegmentThroughPoint(vMidLine, poll);
+        Point2D hMidPoint = getMidPoint(hPollLine.getP1(), hPollLine.getP2());
+        Point2D vMidPoint = getMidPoint(vPollLine.getP1(), vPollLine.getP2());
+
+        List<Point2D> upPts    = getPointsBetween(hMidPoint, midTop,    GridSpacing);
+        List<Point2D> downPts  = getPointsBetween(hMidPoint, midBottom, GridSpacing);
+        List<Point2D> rightPts = getPointsBetween(vMidPoint, midRight,  GridSpacing);
+        List<Point2D> leftPts  = getPointsBetween(vMidPoint, midLeft,   GridSpacing);
+
+        if (isInRect(poll)) {
+            g.draw(hPollLine);
+            g.draw(vPollLine);
+            final double r = GridSpacing / 3;
+            g.draw(new Ellipse2D.Double(poll.getX() - r, poll.getY() - r,
+                                        2 * r, 2 * r));
         }
-
+        paintLines(g, hMidLine,    upPts);
+        paintLines(g, hMidLine,  downPts);
+        paintLines(g, vMidLine, rightPts);
+        paintLines(g, vMidLine,  leftPts);
     }
 
     private void paintLines(Graphics2D g, Line2D refLine, List<Point2D> Pts) {
@@ -543,11 +547,12 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
 
     public void mouseClicked(MouseEvent e) {
         Point p = e.getPoint();
-        Point2D ul = crop.getUpperLeft();
-        Point2D ur = crop.getUpperRight();
 
         if (isInRect(p)) {
-            poll = p;
+            if (isRotateOnly) {
+                setPoll(p);
+                return;
+            }
 
             // Cycle through different overlays when the crop hasn't been rotated. Does it make sense to expand this for the rotated case?
             switch (CropGridStyle) {
@@ -663,17 +668,6 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
         adjustingWest = false;
         updateCursor(e);
         repaint();
-
-        // Update the boolean flag isRotated otherwise paintRotateGrid will never be invoked.
-        Point2D ul = crop.getUpperLeft();
-        Point2D ur = crop.getUpperRight();
-
-        if ( ul.getY() == ur.getY() )  {
-            isRotated = false;
-        }
-        else {
-            isRotated = true;
-        }
     }
 
     public void mouseDragged(MouseEvent e) {
@@ -732,8 +726,7 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
             }
         }
         else if (isRotating) {
-            if (poll == null)
-                poll = crop.getCenter();
+            Point2D poll = updatePoll();
             Line2D start = new Line2D.Double(poll, rotateMouseStart);
             Line2D end = new Line2D.Double(poll, p);
             double startAngle = Math.atan2(
@@ -1465,4 +1458,25 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
                 return false;   // these key events have other interpretations
             }
         };
+
+    private Point2D updatePoll() {
+        if (relativePoll == null) {
+            Point2D p = crop.getCenter();
+            setPoll(p);
+            return p;
+        }
+
+        return new Point2D.Double(
+                relativePoll.getX() * underlayRect.getWidth()  + underlayRect.getX(),
+                relativePoll.getY() * underlayRect.getHeight() + underlayRect.getY());
+    }
+
+    private void setPoll(Point2D p) {
+        if (p == null) {
+            p = crop.getCenter();
+        }
+        relativePoll = new Point2D.Double(
+                (p.getX() - underlayRect.getX()) / underlayRect.getWidth(),
+                (p.getY() - underlayRect.getY()) / underlayRect.getHeight());
+    }
 }
