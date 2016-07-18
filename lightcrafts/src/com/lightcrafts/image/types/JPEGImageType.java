@@ -34,6 +34,8 @@ import com.lightcrafts.utils.ColorProfileInfo;
 import com.lightcrafts.utils.thread.ProgressThread;
 import com.lightcrafts.utils.UserCanceledException;
 import com.lightcrafts.utils.file.FileUtil;
+import com.lightcrafts.utils.xml.XmlNode;
+import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XMLUtil;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.opimage.CachedImage;
@@ -103,6 +105,24 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
         protected ExportOptions( ImageType instance ) {
             super( instance );
             quality = new QualityOption( 85, this );
+        }
+
+        /**
+         * @deprecated
+         */
+        @Override
+        protected void save(XmlNode node) {
+            super.save( node );
+            quality.save( node );
+        }
+
+        /**
+         * @deprecated
+         */
+        @Override
+        protected void restore( XmlNode node ) throws XMLException {
+            super.restore( node );
+            quality.restore( node );
         }
     }
 
