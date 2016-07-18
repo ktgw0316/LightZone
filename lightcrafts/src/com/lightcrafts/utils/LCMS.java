@@ -13,6 +13,9 @@ import java.awt.*;
 import java.util.Map;
 import java.util.Arrays;
 
+import com.lightcrafts.media.jai.util.ImageUtil;
+import com.lightcrafts.mediax.jai.RasterAccessor;
+import com.lightcrafts.mediax.jai.RasterFormatTag;
 import sun.awt.image.ShortInterleavedRaster;
 import sun.awt.image.ByteInterleavedRaster;
 import com.lightcrafts.jai.utils.Functions;
@@ -385,7 +388,7 @@ public class LCMS {
 
         public Profile(ICC_Profile iccProfile) {
             RCHandle handle = profileCache.get(iccProfile);
-            
+
             if (handle != null && handle.increment() > 1)
                 cmsProfile = handle;
             else {
@@ -439,6 +442,34 @@ public class LCMS {
         public void dispose() { }
     }
 
+    private static RasterAccessor normalizeRaster(RasterAccessor src, RasterFormatTag rft, ColorModel cm) {
+        boolean reallocBuffer = false;
+        final int dataOffsets[] = src.getBandOffsets();
+        for (int i = 0; i < dataOffsets.length; i++) {
+            if (dataOffsets[i] != i) {
+                reallocBuffer = true;
+                break;
+            }
+        }
+        final int bands = src.getNumBands();
+        final int scanLineStride = src.getScanlineStride();
+        if (reallocBuffer || src.getPixelStride() != bands || scanLineStride != src.getWidth() * bands) {
+            final int[] offsets = bands == 1 ? new int[] {0} : new int[] {0, 1, 2};
+            WritableRaster newRaster = Raster.createInterleavedRaster(
+                    src.getDataType(),
+                    src.getWidth(), src.getHeight(),
+                    src.getWidth() * bands, bands, offsets,
+                    new Point(src.getX(), src.getY())
+            );
+            RasterAccessor newSrc = new RasterAccessor(newRaster, newRaster.getBounds(), rft, cm);
+
+            ImageUtil.copyRaster(src, newSrc);
+            src = newSrc;
+        }
+        return src;
+    }
+
+    @Deprecated
     private static ShortInterleavedRaster normalizeRaster(ShortInterleavedRaster raster) {
         boolean reallocBuffer = false;
         int scanLineStride = raster.getScanlineStride();
@@ -470,6 +501,7 @@ public class LCMS {
         return raster;
     }
 
+    @Deprecated
     private static ByteInterleavedRaster normalizeRaster(ByteInterleavedRaster raster) {
         boolean reallocBuffer = false;
         int scanLineStride = raster.getScanlineStride();
@@ -612,6 +644,49 @@ public class LCMS {
             }
         }
 
+        public void doTransform(RasterAccessor src, RasterFormatTag srcRft, ColorModel srcCm,
+                                RasterAccessor dst, RasterFormatTag dstRft, ColorModel dstCm) {
+            if (cmsTransform == null) {
+                return;
+            }
+            RasterAccessor ri = normalizeRaster(src, srcRft, srcCm);
+            RasterAccessor ro;
+            final int bands = dst.getNumBands();
+
+            if (src.getX() != dst.getX() || src.getY() != dst.getY() ||
+                    src.getWidth() != dst.getWidth() || src.getHeight() != dst.getHeight()) {
+                int[] offsets = bands == 1 ? new int[] {0} : new int[] {0, 1, 2};
+                WritableRaster output = Raster.createInterleavedRaster(
+                        ri.getDataType(),
+                        ri.getWidth(), ri.getHeight(),
+                        ri.getWidth() * bands, bands, offsets,
+                        new Point(ri.getX(), ri.getY())
+                );
+                ro = new RasterAccessor(output, output.getBounds(), dstRft, dstCm);
+                System.out.println("*** A");
+            }
+            else {
+                ro = normalizeRaster(dst, dstRft, dstCm);
+            }
+            switch (ro.getDataType()) {
+                case DataBuffer.TYPE_BYTE: {
+                    final int pixels = ro.getByteDataArray(0).length / bands;
+                    LCMSNative.cmsDoTransform(cmsTransform.handle, ri.getByteDataArray(0), ro.getByteDataArray(0), pixels);
+                    break;
+                }
+                case DataBuffer.TYPE_USHORT: {
+                    final int pixels = ro.getShortDataArray(0).length / bands;
+                    LCMSNative.cmsDoTransform(cmsTransform.handle, ri.getShortDataArray(0), ro.getShortDataArray(0), pixels);
+                    break;
+                }
+                default:
+            }
+            if (ro != dst) {
+                ImageUtil.copyRaster(ro, dst);
+            }
+        }
+
+        @Deprecated
         public void doTransform(ByteInterleavedRaster input, ByteInterleavedRaster output) {
             if (cmsTransform != null) {
                 ByteInterleavedRaster ri = normalizeRaster(input);
@@ -641,6 +716,7 @@ public class LCMS {
             LCMSNative.cmsDoTransform(cmsTransform.handle, input, output, 1);
         }
 
+        @Deprecated
         public void doTransform(ShortInterleavedRaster input, ShortInterleavedRaster output) {
             if (cmsTransform != null) {
                 ShortInterleavedRaster ri = normalizeRaster(input);

@@ -2,10 +2,6 @@
 
 package com.lightcrafts.ui.toolkit;
 
-import sun.java2d.SunGraphics2D;
-import sun.print.PeekGraphics;
-import sun.print.ProxyGraphics2D;
-
 import javax.swing.plaf.basic.BasicSliderUI;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.*;
@@ -120,9 +116,7 @@ public class LCSliderUI extends BasicSliderUI {
         final boolean isEnabled = slider.isEnabled();
         final boolean isHorizontal =
             slider.getOrientation() == JSlider.HORIZONTAL;
-        final SunGraphics2D g2d = Utils.getGraphics2D(
-            g, trackRect.x, trackRect.y, trackRect.width, trackRect.height
-        );
+        final Graphics2D g2d = (Graphics2D) g;
         if ( g2d == null )
             return;
 
@@ -200,12 +194,10 @@ public class LCSliderUI extends BasicSliderUI {
     }
 
     public void paintThumb( Graphics g ) {
-        final SunGraphics2D g2d = Utils.getGraphics2D(
-            g, thumbRect.x, thumbRect.y, thumbRect.width, thumbRect.height
-        );
-        if ( g2d != null ) {
-            g2d.drawImage(triangleThumb, null, thumbRect.x-1, thumbRect.y);
-        }
+        final Graphics2D g2d = (Graphics2D) g;
+        if ( g2d == null )
+            return;
+        g2d.drawImage(triangleThumb, null, thumbRect.x-1, thumbRect.y);
     }
 
     ////////// protected //////////////////////////////////////////////////////
@@ -324,21 +316,6 @@ public class LCSliderUI extends BasicSliderUI {
             g2d.setRenderingHint(
                 RenderingHints.KEY_TEXT_ANTIALIASING, hint
             );
-        }
-
-        static SunGraphics2D getGraphics2D( Graphics g, int x, int y, int w,
-                                            int h ) {
-            if ( g instanceof SunGraphics2D )
-                return (SunGraphics2D)g;
-            if ( g instanceof PeekGraphics)
-                g.fillRect( x, y, w, h );
-            else if ( g instanceof ProxyGraphics2D) {
-                final ProxyGraphics2D pg2d = (ProxyGraphics2D)g;
-                final Graphics2D g2d = pg2d.getDelegate();
-                if ( g2d instanceof SunGraphics2D )
-                    return (SunGraphics2D)g2d;
-            }
-            return null;
         }
 
         static boolean isLeftToRight(Component component) {
