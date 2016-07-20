@@ -9,8 +9,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 
-import sun.nio.ch.DirectBuffer;
-
 import com.lightcrafts.utils.CloseableManager;
 
 /**
@@ -102,15 +100,16 @@ public final class LCReopenableMappedByteBuffer extends LCByteBuffer
      * at any time to conserve resources.  It will automatically reopen itself
      * if necessary.
      */
+    @Override
     public synchronized void close() {
-        if ( m_buf instanceof DirectBuffer )
-            ((DirectBuffer)m_buf).cleaner().clean();
+        ByteBufferUtil.clean(m_buf);
         m_buf = null;
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public byte get( int pos ) throws IOException {
         synchronized ( this ) {
             return getBuf().get( initialOffset() + pos );
@@ -120,6 +119,7 @@ public final class LCReopenableMappedByteBuffer extends LCByteBuffer
     /**
      * {@inheritDoc}
      */
+    @Override
     public LCByteBuffer get( byte[] dest, int offset, int length )
         throws IOException
     {
@@ -145,6 +145,7 @@ public final class LCReopenableMappedByteBuffer extends LCByteBuffer
     /**
      * {@inheritDoc}
      */
+    @Override
     public double getDouble( int pos ) throws IOException {
         synchronized ( this ) {
             return getBuf().getDouble( initialOffset() + pos );
@@ -154,6 +155,7 @@ public final class LCReopenableMappedByteBuffer extends LCByteBuffer
     /**
      * {@inheritDoc}
      */
+    @Override
     public float getFloat( int pos ) throws IOException {
         synchronized ( this ) {
             return getBuf().getFloat( initialOffset() + pos );
@@ -163,6 +165,7 @@ public final class LCReopenableMappedByteBuffer extends LCByteBuffer
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getInt( int pos ) throws IOException {
         synchronized ( this ) {
             return getBuf().getInt( initialOffset() + pos );
@@ -172,6 +175,7 @@ public final class LCReopenableMappedByteBuffer extends LCByteBuffer
     /**
      * {@inheritDoc}
      */
+    @Override
     public long getLong( int pos ) throws IOException {
         synchronized ( this ) {
             return getBuf().getLong( initialOffset() + pos );
@@ -181,6 +185,7 @@ public final class LCReopenableMappedByteBuffer extends LCByteBuffer
     /**
      * {@inheritDoc}
      */
+    @Override
     public short getShort( int pos ) throws IOException {
         synchronized ( this ) {
             return getBuf().getShort( initialOffset() + pos );
@@ -190,6 +195,7 @@ public final class LCReopenableMappedByteBuffer extends LCByteBuffer
     /**
      * {@inheritDoc}
      */
+    @Override
     public ByteOrder order() {
         return m_order;
     }
@@ -197,6 +203,7 @@ public final class LCReopenableMappedByteBuffer extends LCByteBuffer
     /**
      * {@inheritDoc}
      */
+    @Override
     public synchronized LCByteBuffer order( ByteOrder order ) {
         m_order = order;
         if ( m_buf != null )
@@ -207,6 +214,7 @@ public final class LCReopenableMappedByteBuffer extends LCByteBuffer
     /**
      * {@inheritDoc}
      */
+    @Override
     public LCReopenableMappedByteBuffer put( int pos, byte value )
         throws IOException
     {
@@ -219,6 +227,7 @@ public final class LCReopenableMappedByteBuffer extends LCByteBuffer
     /**
      * {@inheritDoc}
      */
+    @Override
     public LCReopenableMappedByteBuffer putDouble( int pos, double value )
         throws IOException
     {
@@ -231,6 +240,7 @@ public final class LCReopenableMappedByteBuffer extends LCByteBuffer
     /**
      * {@inheritDoc}
      */
+    @Override
     public LCReopenableMappedByteBuffer putFloat( int pos, float value )
         throws IOException
     {
@@ -243,6 +253,7 @@ public final class LCReopenableMappedByteBuffer extends LCByteBuffer
     /**
      * {@inheritDoc}
      */
+    @Override
     public LCReopenableMappedByteBuffer putInt( int pos, int value )
         throws IOException
     {
@@ -255,6 +266,7 @@ public final class LCReopenableMappedByteBuffer extends LCByteBuffer
     /**
      * {@inheritDoc}
      */
+    @Override
     public LCReopenableMappedByteBuffer putLong( int pos, long value )
         throws IOException
     {
@@ -267,6 +279,7 @@ public final class LCReopenableMappedByteBuffer extends LCByteBuffer
     /**
      * {@inheritDoc}
      */
+    @Override
     public LCReopenableMappedByteBuffer putShort( int pos, short value )
         throws IOException
     {
@@ -278,6 +291,7 @@ public final class LCReopenableMappedByteBuffer extends LCByteBuffer
 
     ////////// protected //////////////////////////////////////////////////////
 
+    @Override
     protected void finalize() throws Throwable {
         close();
         super.finalize();

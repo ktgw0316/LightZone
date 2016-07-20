@@ -6,9 +6,6 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-import java.nio.ByteBuffer;
-
-import sun.nio.ch.DirectBuffer;
 
 /**
  * An <code>LCMappedByteBuffer</code> is-an {@link ArrayByteBuffer} that uses
@@ -60,14 +57,14 @@ public final class LCMappedByteBuffer extends ArrayByteBuffer
     /**
      * Closes this <code>LCMapperByteBuffer</code>.
      */
+    @Override
     public void close() {
-        final ByteBuffer buf = getByteBuffer();
-        if ( buf instanceof DirectBuffer )
-            ((DirectBuffer)buf).cleaner().clean();
+        ByteBufferUtil.clean(getByteBuffer());
     }
 
     ////////// protected //////////////////////////////////////////////////////
 
+    @Override
     protected void finalize() throws Throwable {
         close();
         super.finalize();

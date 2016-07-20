@@ -9,6 +9,7 @@ import com.lightcrafts.image.libs.LCTIFFReader;
 import com.lightcrafts.image.metadata.providers.*;
 import com.lightcrafts.image.metadata.MetadataUtil;
 import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.utils.bytebuffer.ByteBufferUtil;
 
 import java.awt.*;
 import java.awt.color.ColorSpace;
@@ -21,8 +22,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
-
-import sun.nio.ch.DirectBuffer;
 
 /**
  * Get raw image data by inrerfacing with dcraw as a coprocess.
@@ -73,6 +72,7 @@ public final class DCRaw implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public float getAperture() {
         return m_aperture;
     }
@@ -80,6 +80,7 @@ public final class DCRaw implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getCameraMake( boolean includeModel ) {
         String make = getMake();
         final String model = getModel();
@@ -122,6 +123,7 @@ public final class DCRaw implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public Date getCaptureDateTime() {
         return  m_captureDateTime > 0 ?
                 new Date( m_captureDateTime * 1000 ) : null;
@@ -134,6 +136,7 @@ public final class DCRaw implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public float getFocalLength() {
         return m_focalLength;
     }
@@ -141,6 +144,7 @@ public final class DCRaw implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getImageHeight() {
         return m_height;
     }
@@ -148,6 +152,7 @@ public final class DCRaw implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getImageWidth() {
         return m_width;
     }
@@ -197,6 +202,7 @@ public final class DCRaw implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getISO() {
         return m_iso;
     }
@@ -522,8 +528,7 @@ public final class DCRaw implements
                 bb.get((byte[]) imageData.data);
             }
 
-            if (bb instanceof DirectBuffer)
-                ((DirectBuffer) bb).cleaner().clean();
+            ByteBufferUtil.clean(bb);
 
             c.close();
         } catch (Exception e) {
@@ -757,6 +762,7 @@ public final class DCRaw implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public float getShutterSpeed() {
         return m_shutterSpeed;
     }
