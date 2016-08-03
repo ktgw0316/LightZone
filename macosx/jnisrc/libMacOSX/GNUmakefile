@@ -4,6 +4,9 @@
 # Paul J. Lucas [paul@lightcrafts.com]
 ##
 
+ROOT:=                  ../../..
+COMMON_DIR:=            $(ROOT)/lightcrafts
+
 TARGET_BASE:=		MacOSX
 
 # Uncomment to compile in debug mode.
@@ -11,7 +14,7 @@ TARGET_BASE:=		MacOSX
 
 #JNI_MACOSX_INCLUDES+=	-I/System/Library/Frameworks/AppKit.framework/Versions/C/Headers
 JNI_MACOSX_LDFLAGS+=	-framework SystemConfiguration
-JNI_MACOSX_LINK:= 	-lLCJNI
+JNI_MACOSX_LINK:=	$(COMMON_DIR)/jnisrc/jniutils/libLCJNI.a
 
 JAVAH_CLASSES:=	com.lightcrafts.platform.macosx.AppleScript \
 		com.lightcrafts.platform.macosx.CocoaMainThreadRunner \

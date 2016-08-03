@@ -3,7 +3,9 @@ TARGET_BASE:=	LCArrays
 # Uncomment to compile in debug mode.
 #DEBUG:=		true
 
-JNI_EXTRA_LINK:=	-lLCJNI
+JNI_WINDOWS_LINK:=	-lLCJNI
+JNI_LINUX_LINK:=	$(JNI_WINDOWS_LINK)
+JNI_MACOSX_LINK:=	../jniutils/libLCJNI.a
 
 JAVAH_CLASSES:=	com.lightcrafts.utils.LCArrays
 
