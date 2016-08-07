@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2016      Masahiro Kitagawa */
 
 package com.lightcrafts.ui.swing;
 
@@ -235,6 +236,7 @@ public class RangeSelector extends JComponent {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Dimension getMaximumSize() {
         final Insets in = getInsets();
         return new Dimension(
@@ -266,6 +268,7 @@ public class RangeSelector extends JComponent {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Dimension getMinimumSize() {
         final Insets in = getInsets();
         return new Dimension(
@@ -297,6 +300,7 @@ public class RangeSelector extends JComponent {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Dimension getPreferredSize() {
         final int modelWidth =
             m_model.getMaximumThumbValue() - m_model.getMinimumThumbValue();
@@ -545,6 +549,7 @@ public class RangeSelector extends JComponent {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected void paintComponent( Graphics g ) {
         if ( m_polygons == null ) {
             positionPolygons();
@@ -593,14 +598,31 @@ public class RangeSelector extends JComponent {
         }
 
         //
-        // Highlight the polygon the mouse is hovering over, if any.
+        // If the mouse is hovering over a polygon, highlight the polygon and
+        // its partners.
         //
-        for ( Shape s : m_polygons )
-            if ( s == m_hoverPolygon ) {
-                g2d.setColor( HOVER_COLOR );
-                g2d.draw( s );
-                break;
+        if (m_hoverPolygon != null) {
+            for (final Shape s : m_polygons) {
+                if (s == m_hoverPolygon) {
+                    g2d.setColor(HOVER_COLOR);
+                    if (s == m_polygons[TRACK]) {
+                        // Do not highlight the track
+                        g2d.fill(m_polygons[LOWER_FEATHERING_THUMB]);
+                        g2d.fill(m_polygons[LOWER_THUMB]);
+                        g2d.fill(m_polygons[UPPER_THUMB]);
+                        g2d.fill(m_polygons[UPPER_FEATHERING_THUMB]);
+                    } else {
+                        g2d.fill(s);
+                        if (s == m_polygons[LOWER_THUMB]) {
+                            g2d.fill(m_polygons[LOWER_FEATHERING_THUMB]);
+                        } else if (s == m_polygons[UPPER_THUMB]) {
+                            g2d.fill(m_polygons[UPPER_FEATHERING_THUMB]);
+                        }
+                    }
+                    break;
+                }
             }
+        }
     }
 
     /**
@@ -630,6 +652,7 @@ public class RangeSelector extends JComponent {
          *
          * @param me The {@link MouseEvent}.
          */
+        @Override
         public void mousePressed( MouseEvent me ) {
             if ( me.isPopupTrigger() || ignoreMouseEvent() )
                 return;
@@ -650,6 +673,7 @@ public class RangeSelector extends JComponent {
          *
          * @param me The {@link MouseEvent}.
          */
+       @Override
         public void mouseReleased( MouseEvent me ) {
             killScrollTimer();
         }
@@ -659,11 +683,12 @@ public class RangeSelector extends JComponent {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void mouseDragged( MouseEvent me ) {
             if ( ignoreMouseEvent() || m_foundPolygonIndex == -1 )
                 return;
             final int newDragPointX = me.getPoint().x;
-            m_inDrag = true;
+            // m_inDrag = true;
             try {
                 switch ( m_foundPolygonIndex ) {
                     case LOWER_SCROLL_ARROW:
@@ -680,7 +705,7 @@ public class RangeSelector extends JComponent {
             catch ( IllegalArgumentException e ) {
                 // ignore
             }
-            m_inDrag = false;
+            // m_inDrag = false;
 /*
             if ( m_stateChanged )
                 fireStateChanged();
@@ -690,6 +715,7 @@ public class RangeSelector extends JComponent {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void mouseExited( MouseEvent me ) {
             if ( m_hoverPolygon != null ) {
                 m_hoverPolygon = null;
@@ -700,6 +726,7 @@ public class RangeSelector extends JComponent {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void mouseMoved( MouseEvent me ) {
             if ( ignoreMouseEvent() )
                 return;
@@ -1072,6 +1099,7 @@ public class RangeSelector extends JComponent {
         private void startScrollTimer( final int polygonIndex ) {
             final ActionListener listener = new ActionListener() {
                 boolean m_firstTime = true;
+                @Override
                 public void actionPerformed( ActionEvent ae ) {
                     if ( m_firstTime )
                         m_firstTime = false;
@@ -1440,8 +1468,8 @@ public class RangeSelector extends JComponent {
     /**
      * TODO
      */
-    private boolean m_inDrag;
-    private boolean m_stateChanged;
+    // private boolean m_inDrag;
+    // private boolean m_stateChanged;
 
     /**
      * The {@link RangeSelectorModel} in use.
@@ -1472,7 +1500,7 @@ public class RangeSelector extends JComponent {
     /**
      * The height of an arrow.
      */
-    private static final int ARROW_HEIGHT = 9;
+    private static final int ARROW_HEIGHT = 11;
 
     /**
      * The width of an arrow.
@@ -1484,9 +1512,9 @@ public class RangeSelector extends JComponent {
      * hovering over.
      */
     private static final Color HOVER_COLOR = new Color(
-        Color.LIGHT_GRAY.getRed(),
-        Color.LIGHT_GRAY.getGreen(),
-        Color.LIGHT_GRAY.getBlue(),
+        Color.WHITE.getRed(),
+        Color.WHITE.getGreen(),
+        Color.WHITE.getBlue(),
         128
     );
 
@@ -1500,20 +1528,20 @@ public class RangeSelector extends JComponent {
     /**
      * The height of a thumb.
      */
-    private static final int THUMB_HEIGHT = 9;
+    private static final int THUMB_HEIGHT = 11;
 
     /**
      * This is the combined width of both halves of a thumb, e.g., the lower
      * feathering thumb and the lower thumb together; therefore, it should
      * always be an even number.
      */
-    private static final int THUMB_WIDTH = 14;
+    private static final int THUMB_WIDTH = 16;
 
     private static final int THUMB_INDEX_START = 0;
     private static final int THUMB_INDEX_END = 3;
 
     //
-    // Indicies into the m_polygons array.
+    // Indices into the m_polygons array.
     //
     private static final int LOWER_FEATHERING_THUMB = 0;
     private static final int LOWER_THUMB = 1;
@@ -1543,10 +1571,12 @@ public class RangeSelector extends JComponent {
         //rs.setTrack( new RangeSelectorZoneTrack() );
 
         final JPanel customLayout = new JPanel( null ) {
+            @Override
             public Dimension getPreferredSize() {
                 return rs.getPreferredSize();
             }
 
+            @Override
             public void doLayout() {
                 final Dimension size = getSize();
                 final int midY = size.height / 2;
