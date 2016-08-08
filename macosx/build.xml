@@ -217,9 +217,10 @@
     classpath="lib/appbundler-1.0.jar"/>
 
   <target name="bundle"
-    depends="jar, crash-reporter, delete-bundle, resources">
+    depends="jar, delete-bundle">
     <copy todir="${app-dir}">
       <fileset dir="products" excludes=".git">
+        <exclude name="**/appbundler*.jar"/>
         <include name="dcraw_lz"/>
         <include name="LightZone-forkd"/>
         <include name="**/*.dylib"/>
@@ -248,6 +249,24 @@
       <option value="-Dapple.awt.graphics.UseQuartz=false"/>
       <option value="-Dfile.encoding=utf-8"/>
     </bundleapp>
+
+    <move file="${bundle-contents}/MacOS/JavaAppLauncher"
+          tofile="${bundle-contents}/MacOS/${app-name}"/>
+    <chmod file="${bundle-contents}/MacOS/${app-name}" perm="775"/>
+    <copy todir="${bundle-contents}">
+      <fileset dir="resources" excludes=".git"/>
+    </copy>
+    <copy todir="${bundle-contents}/Resources">
+      <fileset dir="helpers/JavaAppLauncher/Resources" excludes=".git"/>
+    </copy>
+
+    <exec executable="./postprocess.sh" dir="." failonerror="true" vmlauncher="false">
+      <arg value="${bundle-contents}/MacOS"/>
+    </exec>
+
+    <exec executable="make" dir="help" failonerror="true" vmlauncher="false">
+      <arg value="APP_NAME=${app-name}"/>
+    </exec>
   </target>
 
   <!--===== Make a dmg file ================================================-->

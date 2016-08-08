@@ -54,7 +54,10 @@ MKDIR:=			mkdir -p
 .PHONY: all copy search_indexes index_page
 all: copy search_indexes index_page
 
-copy:
+$(TARGET_HELP_DIR):
+	-$(MKDIR) $(@D)
+
+copy: $(TARGET_HELP_DIR)
 	$(call COPY,$(COMMON_DIR)/help/neutral)
 	$(call COPY,$(COMMON_DIR)/help/$(LANG))
 	$(call COPY,$(SOURCE_HELP_DIR))
