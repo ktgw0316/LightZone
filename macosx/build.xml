@@ -214,10 +214,12 @@
   <taskdef
     name="bundleapp"
     classname="com.oracle.appbundler.AppBundlerTask"
-    classpath="lib/appbundler-1.0.jar"/>
+    classpath="lib/appbundler-1.0ea.jar"/>
 
   <target name="bundle"
     depends="jar, delete-bundle">
+    <exec executable="${common-dir}/tools/bin/lc-git-revision"
+          outputproperty="git-revision" vmlauncher="false" failonerror="true"/>
     <copy todir="${app-dir}">
       <fileset dir="products" excludes=".git">
         <exclude name="**/appbundler*.jar"/>
@@ -234,25 +236,30 @@
       outputdirectory="${app-dir}"
       name="${app-name}"
       displayname="${app-name}"
+      executableName="${app-name}"
       identifier="com.lightcrafts.${app-name}"
       shortversion="${app-version}"
+      version="${git-revision}"
       signature="LCLZ"
+      icon="resources/Resources/${app-name}.icns"
       applicationCategory="public.app-category.photography"
       mainclassname="com.lightcrafts.platform.macosx.MacOSXLauncher">
+
       <runtime dir="${env.JAVA_HOME}"/>
       <librarypath file="${app-dir}/dcraw_lz"/>
       <librarypath file="${app-dir}/LightZone-forkd"/>
       <librarypath file="${app-dir}/*.dylib"/>
       <librarypath file="${app-dir}/*.jnilib"/>
       <classpath file="${app-dir}/*.jar"/>
+
+      <option value="-Xdock:name=${app-name}"/>
       <option value="-Dapple.laf.useScreenMenuBar=true"/>
+      <option value="-Dcom.apple.macos.use-file-dialog-packages=true"/>
+      <option value="-Dcom.apple.macos.useScreenMenuBar=true"/>
       <option value="-Dapple.awt.graphics.UseQuartz=false"/>
       <option value="-Dfile.encoding=utf-8"/>
     </bundleapp>
 
-    <move file="${bundle-contents}/MacOS/JavaAppLauncher"
-          tofile="${bundle-contents}/MacOS/${app-name}"/>
-    <chmod file="${bundle-contents}/MacOS/${app-name}" perm="775"/>
     <copy todir="${bundle-contents}">
       <fileset dir="resources" excludes=".git"/>
     </copy>
