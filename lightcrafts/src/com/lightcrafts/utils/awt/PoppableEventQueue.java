@@ -26,9 +26,10 @@ public class PoppableEventQueue extends EventQueue {
     // are dequeued.  This helps prevent tasks from running after the pop().
     public static void drain() {
         if (EventQueue.isDispatchThread()) {
-            throw new IllegalThreadStateException(
-                "Can't drain the event queue from the event thread."
-            );
+            String msg = "Can't drain the event queue from the event thread.";
+            // throw new IllegalThreadStateException(msg);
+            System.err.println(msg);
+            return;
         }
         try {
             EventQueue.invokeAndWait(
