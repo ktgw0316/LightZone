@@ -278,7 +278,7 @@
 
   <!--===== Make a dmg file ================================================-->
 
-  <target name="dmg" depends="build-bundle">
+  <target name="dmg">
     <exec executable="make" dir="dmg" failonerror="true" vmlauncher="false">
       <arg value="APP_NAME=${app-name}"/>
       <arg value="USE_ICC=${USE_ICC}"/>
