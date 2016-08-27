@@ -84,11 +84,6 @@ public final class MacOSXPlatform extends Platform {
     }
 
     @Override
-    public FileChooser getFileChooser() {
-        return MacOSXFileChooser.getFileChooser();
-    }
-
-    @Override
     public FileSystemView getFileSystemView() {
         return QuaquaFileSystemView.getQuaquaFileSystemView();
     }

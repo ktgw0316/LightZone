@@ -20,15 +20,13 @@ JAVAH_CLASSES:=	com.lightcrafts.platform.macosx.AppleScript \
 		com.lightcrafts.platform.macosx.CocoaMainThreadRunner \
 		com.lightcrafts.platform.macosx.MacOSXAlertDialog \
 		com.lightcrafts.platform.macosx.MacOSXColorProfileManager \
-		com.lightcrafts.platform.macosx.MacOSXFileChooser \
 		com.lightcrafts.platform.macosx.MacOSXFileUtil \
 		com.lightcrafts.platform.macosx.MacOSXHelp \
 		com.lightcrafts.platform.macosx.MacOSXInternetConnection \
 		com.lightcrafts.platform.macosx.MacOSXMemory \
 		com.lightcrafts.platform.macosx.MacOSXPrinter \
 		com.lightcrafts.platform.macosx.MacOSXProgressDialog \
-		com.lightcrafts.platform.macosx.MacOSXSmartFolder \
-		com.lightcrafts.platform.macosx.sheets.SaveExportSheet
+		com.lightcrafts.platform.macosx.MacOSXSmartFolder
 
 ROOT:=		../../..
 include		../jni-macosx.mk
