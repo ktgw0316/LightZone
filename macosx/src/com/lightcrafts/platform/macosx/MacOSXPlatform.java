@@ -109,7 +109,6 @@ public final class MacOSXPlatform extends Platform {
             Object[] quaquaKeys = quaquaDefaults.keySet().toArray();
 
             String[] fromQuaqua = new String[] {
-                    "FileChooser",
                     "FileView",
                     "Tree",
                     "MenuBar",
