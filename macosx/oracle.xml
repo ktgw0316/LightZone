@@ -33,6 +33,7 @@
       shortversion="${app-version}"
       version="${git-revision}"
       signature="LCLZ"
+      copyright="${app-name} ${app-version} (${git-revision}), Copyright 2005-20011 Light Crafts, Inc. All Rights Reserved. Copyright 2013- The LightZone Project. All Rights Reserved."
       icon="resources/Resources/${app-name}.icns"
       applicationCategory="public.app-category.photography"
       mainclassname="com.lightcrafts.platform.macosx.MacOSXLauncher">
