@@ -54,6 +54,45 @@
       <option value="-Dcom.apple.macos.useScreenMenuBar=true"/>
       <option value="-Dapple.awt.graphics.UseQuartz=false"/>
       <option value="-Dfile.encoding=utf-8"/>
+
+      <bundledocument
+        extensions="jpe,jpg,jpeg"
+        name="JPEG Image"
+        role="editor"
+        handlerRank="owner"
+        />
+      <bundledocument
+        extensions="tif,tiff"
+        name="TIFF Image"
+        role="editor"
+        handlerRank="owner"
+        />
+      <bundledocument
+        extensions="ARW,CR2,CRW,DCR,dng,KDC,MOS,MRW,NEF,ORF,PEF,RAF,RAW,RW2,SR2"
+        name="Camera Raw Image"
+        icon="LightZoneFile.icns"
+        role="editor"
+        handlerRank="alternate"
+        />
+      <bundledocument
+        contentTypes="com.lightcrafts.lzt"
+        name="${app-name} Transform Format"
+        role="editor"
+        handlerRank="owner"
+        />
+
+      <typedeclaration
+        identifier="com.lightcrafts.lzn"
+        description="${app-name} Transform Format"
+        icon="LightZoneFile.icns"
+        extensions="lzn"
+        />
+      <typedeclaration
+        identifier="com.lightcrafts.lzt"
+        description="${app-name} Transform Format"
+        icon="LightZoneFile.icns"
+        extensions="lzt"
+        />
     </bundleapp>
 
     <copy todir="${bundle-contents}">
