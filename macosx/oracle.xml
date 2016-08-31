@@ -44,6 +44,9 @@
       <librarypath file="${app-dir}/*.jnilib"/>
       <classpath file="${app-dir}/*.jar"/>
 
+      <plistentry key="CFBundleHelpBookFolder" value="${app-name}_Help"/>
+      <plistentry key="CFBundleHelpBookName" value="${app-name} Help"/>
+
       <option value="-Xdock:name=${app-name}"/>
       <option value="-Dapple.laf.useScreenMenuBar=true"/>
       <option value="-Dcom.apple.macos.use-file-dialog-packages=true"/>
