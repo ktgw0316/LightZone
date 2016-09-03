@@ -40,8 +40,14 @@ class DisabledImages extends JPanel implements Scrollable {
         setBackground(LightZoneSkin.Colors.EditorBackground);
         componentMap = new LinkedHashMap<Object, DisabledImageComponent>();
         mouseListener = new MouseAdapter() {
-            public void mouseClicked(MouseEvent event) {
+            // Don't use mouseClicked() here because it doesn't work
+            // on Oracle's Java 8 on Mac OS X
+            @Override
+            public void mouseReleased(MouseEvent event) {
                 Component comp = event.getComponent();
+                if (!comp.contains(event.getPoint())) {
+                    return;
+                }
                 Object key = getKeyForComponent(comp);
                 if (key != null) {
                     listener.imageClicked(key);
