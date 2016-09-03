@@ -37,6 +37,7 @@
     <mkdir dir="build"/>
     <javac destdir="build" source="1.6" target="1.6" debug="true">
       <src path="src"/>
+      <compilerarg value="-XDignore.symbol.file"/>
       <classpath>
         <pathelement location="/System/Library/Java/"/>
         <fileset dir="${common-dir}/products">

@@ -13,6 +13,19 @@ import com.lightcrafts.platform.Platform;
 import java.awt.EventQueue;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+
+import com.apple.eawt.AboutHandler;
+import com.apple.eawt.AppReOpenedListener;
+import com.apple.eawt.PreferencesHandler;
+import com.apple.eawt.OpenFilesHandler;
+import com.apple.eawt.QuitHandler;
+import com.apple.eawt.QuitResponse;
+import com.apple.eawt.AppEvent.AboutEvent;
+import com.apple.eawt.AppEvent.AppReOpenedEvent;
+import com.apple.eawt.AppEvent.PreferencesEvent;
+import com.apple.eawt.AppEvent.OpenFilesEvent;
+import com.apple.eawt.AppEvent.QuitEvent;
 
 import static com.lightcrafts.platform.macosx.Locale.LOCALE;
 
@@ -137,24 +150,65 @@ public final class MacOSXLauncher extends Launcher {
     @SuppressWarnings( { "UnusedDeclaration" } )
     private static synchronized void openFile( final String pathName,
                                                String senderSig ) {
+        openFile(new File( pathName ), senderSig);
+    }
+
+    /**
+     * Open a file passed via an AppleEvent.
+     *
+     * @param files The list of files to open.
+     * @param senderSig The 4-character signature of the application that sent
+     * the AppleEvent to open the given file.
+     */
+    private static synchronized void openFile( final List<File> files,
+                                               String senderSig ) {
+        for (final File file : files) {
+            openFile(file, senderSig);
+        }
+    }
+
+    /**
+     * Open a file passed via an AppleEvent.
+     *
+     * @param file The file to open.
+     * @param senderSig The 4-character signature of the application that sent
+     * the AppleEvent to open the given file.
+     */
+    private static synchronized void openFile( final File file,
+                                               String senderSig ) {
         final OtherApplication app =
             MacApplication.getAppForSignature( senderSig );
         EventQueue.invokeLater(
             new Runnable() {
+                @Override
                 public void run() {
-                    Application.openFrom( new File( pathName ), app );
+                    Application.openFrom( file, app );
                 }
             }
         );
     }
 
     /**
-     * Quit the application.  This method is called only from native code.
+     * Re-open the application.
      */
-    @SuppressWarnings( { "UnusedDeclaration" } )
+    private static void reOpen() {
+        EventQueue.invokeLater(
+            new Runnable() {
+                @Override
+                public void run() {
+                    Application.reOpen(null);
+                }
+            }
+        );
+    }
+
+    /**
+     * Quit the application.
+     */
     private static void quit() {
         EventQueue.invokeLater(
             new Runnable() {
+                @Override
                 public void run() {
                     Application.quit();
                 }
@@ -163,12 +217,12 @@ public final class MacOSXLauncher extends Launcher {
     }
 
     /**
-     * Show the "About" box.  This method is called only from native code.
+     * Show the "About" box.
      */
-    @SuppressWarnings( { "UnusedDeclaration" } )
     private static void showAbout() {
         EventQueue.invokeLater(
             new Runnable() {
+                @Override
                 public void run() {
                     Application.showAbout();
                 }
@@ -177,13 +231,12 @@ public final class MacOSXLauncher extends Launcher {
     }
 
     /**
-     * Show the Preferences dialog.  This method is called only from native
-     * code.
+     * Show the Preferences dialog.
      */
-    @SuppressWarnings( { "UnusedDeclaration" } )
     private static void showPreferences() {
         EventQueue.invokeLater(
             new Runnable() {
+                @Override
                 public void run() {
                     Application.showPreferences();
                 }
@@ -212,6 +265,40 @@ public final class MacOSXLauncher extends Launcher {
         // System.setProperty( "apple.awt.antialiasing"    , "false" );
         System.setProperty( "swing.aatext", "true" );
         System.setProperty( "apple.awt.graphics.UseQuartz", "false" );
+
+        com.apple.eawt.Application app =
+            com.apple.eawt.Application.getApplication(); 
+        app.setAboutHandler(new AboutHandler() {
+            @Override
+            public void handleAbout(AboutEvent e) {
+                showAbout();
+            }
+        });
+        app.setOpenFileHandler(new OpenFilesHandler() {
+            @Override
+            public void openFiles(OpenFilesEvent e) {
+                openFile(e.getFiles(), null); // TODO: get senderSig
+            }
+        });
+        app.setPreferencesHandler(new PreferencesHandler() {
+            @Override
+            public void handlePreferences(PreferencesEvent e) {
+                showPreferences();
+            }
+        });
+        app.setQuitHandler(new QuitHandler() {
+            @Override
+            public void handleQuitRequestWith(QuitEvent e, QuitResponse qr) {
+                quit();
+                qr.cancelQuit();
+            }
+        });
+        app.addAppEventListener(new AppReOpenedListener() {
+            @Override
+            public void appReOpened(AppReOpenedEvent e) {
+                reOpen();
+            }
+        });
     }
 }
 /* vim:set et sw=4 ts=4: */
