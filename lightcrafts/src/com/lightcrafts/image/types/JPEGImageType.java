@@ -122,7 +122,13 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
         @Override
         protected void restore( XmlNode node ) throws XMLException {
             super.restore( node );
-            quality.restore( node );
+            try {
+                quality.restore(node);
+            }
+            catch (XMLException e) {
+                // Files saved with v4.1.6 cause this, just ignore it.
+                System.err.println("Failed to restore JPEG quality");
+            }
         }
     }
 
