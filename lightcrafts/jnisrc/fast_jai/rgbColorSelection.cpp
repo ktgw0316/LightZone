@@ -14,14 +14,15 @@ typedef unsigned short ushort;
 #include "javah/com_lightcrafts_jai_opimage_RGBColorSelectionMaskOpImage.h"
 #endif
 
-JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_RGBColorSelectionMaskOpImage_nativeUshortLoop
-(JNIEnv *env, jobject cls, jshortArray jsrcData, jbyteArray jdstData,
+template <typename T1, typename T2, typename T1j, typename T2j>
+void loop
+(JNIEnv *env, T1j jsrcData, T2j jdstData,
  jint width, jint height, jintArray jsrcBandOffsets,
  jint dstOffset, jint srcLineStride, jint dstLineStride,
  jfloatArray jcolorSelection, jboolean inverted)
 {
-    ushort *srcData = (ushort *) env->GetPrimitiveArrayCritical(jsrcData, 0);
-    byte *dstData = (byte *) env->GetPrimitiveArrayCritical(jdstData, 0);
+    T1 *srcData = (T1 *) env->GetPrimitiveArrayCritical(jsrcData, 0);
+    T2 *dstData = (T2 *) env->GetPrimitiveArrayCritical(jdstData, 0);
     int *srcBandOffsets = (int *) env->GetPrimitiveArrayCritical(jsrcBandOffsets, 0);
     float *colorSelection = (float *) env->GetPrimitiveArrayCritical(jcolorSelection, 0);
 
@@ -92,7 +93,7 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_RGBColorSelectionMaskOpI
             if (inverted)
                 colorMask = 1-colorMask;
 
-            dstData[col + row * dstLineStride + dstOffset] = (byte) (0xff * colorMask);
+            dstData[col + row * dstLineStride + dstOffset] = (T2) (0xff * colorMask);
         }
     }
 
@@ -101,3 +102,28 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_RGBColorSelectionMaskOpI
     env->ReleasePrimitiveArrayCritical(jsrcBandOffsets, srcBandOffsets, 0);
     env->ReleasePrimitiveArrayCritical(jcolorSelection, colorSelection, 0);
 }
+
+JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_RGBColorSelectionMaskOpImage_nativeIntLoop
+(JNIEnv *env, jobject cls, jintArray jsrcData, jintArray jdstData,
+ jint width, jint height, jintArray jsrcBandOffsets,
+ jint dstOffset, jint srcLineStride, jint dstLineStride,
+ jfloatArray jcolorSelection, jboolean inverted)
+{
+    loop<int, int>(env, jsrcData, jdstData,
+            width, height, jsrcBandOffsets,
+            dstOffset, srcLineStride, dstLineStride,
+            jcolorSelection, inverted);
+}
+
+JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_RGBColorSelectionMaskOpImage_nativeUshortLoop
+(JNIEnv *env, jobject cls, jshortArray jsrcData, jbyteArray jdstData,
+ jint width, jint height, jintArray jsrcBandOffsets,
+ jint dstOffset, jint srcLineStride, jint dstLineStride,
+ jfloatArray jcolorSelection, jboolean inverted)
+{
+    loop<ushort, byte>(env, jsrcData, jdstData,
+            width, height, jsrcBandOffsets,
+            dstOffset, srcLineStride, dstLineStride,
+            jcolorSelection, inverted);
+}
+

@@ -36,19 +36,19 @@ import com.lightcrafts.media.jai.util.ImageUtil;
  * possible without forcing the <code>OpImage</code> writer to cover more
  * than one case per non-binary data type.
  *
- * <p>When constructing a <code>RasterAccessor</code> with a source(s) that 
- * has an IndexColorModel and a destination that has a 
- * non-<code>IndexColorModel</code>, <code>RasterAccessor</code> will 
- * perform expansion of the source pixels. If the source(s) and the 
+ * <p>When constructing a <code>RasterAccessor</code> with a source(s) that
+ * has an IndexColorModel and a destination that has a
+ * non-<code>IndexColorModel</code>, <code>RasterAccessor</code> will
+ * perform expansion of the source pixels. If the source(s) and the
  * destination have an IndexColorModel, then <code>RasterAccessor</code>
  * will assume that the operation can correctly process an IndexColorModel
- * source and will not expand the source pixels (colormap indices) into 
- * color components. Refer to {@link JAI#KEY_REPLACE_INDEX_COLOR_MODEL} 
+ * source and will not expand the source pixels (colormap indices) into
+ * color components. Refer to {@link JAI#KEY_REPLACE_INDEX_COLOR_MODEL}
  * for a mechanism by which the destination image's <code>ColorModel</code>
- * is set to a non-<code>IndexColorModel</code> to cause 
- * <code>RasterAccessor</code> to expand the source's 
- * <code>IndexColorModel</code>. 
- * 
+ * is set to a non-<code>IndexColorModel</code> to cause
+ * <code>RasterAccessor</code> to expand the source's
+ * <code>IndexColorModel</code>.
+ *
  * <p> Binary data are handled as a special case.  In general image data
  * are considered to be binary when the image has a single-banded
  * <code>MultiPixelPackedSampleModel</code> with one bit per pixel.  This
@@ -63,8 +63,8 @@ import com.lightcrafts.media.jai.util.ImageUtil;
  */
 public class RasterAccessor {
 
-    /** 
-     * Value indicating how far COPY_MASK info is shifted to avoid 
+    /**
+     * Value indicating how far COPY_MASK info is shifted to avoid
      * interfering with the data type info.
      */
     private static final int COPY_MASK_SHIFT = 7;
@@ -73,7 +73,7 @@ public class RasterAccessor {
     private static final int COPY_MASK_SIZE = 2;
 
     /** The bits of a FormatTag associated with how dataArrays are obtained. */
-    public static final int COPY_MASK = 
+    public static final int COPY_MASK =
         ((1 << COPY_MASK_SIZE) - 1) << COPY_MASK_SHIFT;
 
     /** Flag indicating data is raster's data. */
@@ -86,7 +86,7 @@ public class RasterAccessor {
      * Value indicating how far EXPANSION_MASK info is shifted to avoid
      * interfering with the data type info.
      */
-    private static final int EXPANSION_MASK_SHIFT = 
+    private static final int EXPANSION_MASK_SHIFT =
         COPY_MASK_SHIFT+COPY_MASK_SIZE;
 
     /** Value indicating how many bits the EXPANSION_MASK is */
@@ -109,31 +109,31 @@ public class RasterAccessor {
     public static final int DATATYPE_MASK = (0x1 << COPY_MASK_SHIFT) - 1;
 
     /** FormatTagID indicating data in byte arrays and uncopied. */
-    public static final int 
+    public static final int
         TAG_BYTE_UNCOPIED = DataBuffer.TYPE_BYTE | UNCOPIED;
 
     /** FormatTagID indicating data in unsigned short arrays and uncopied. */
-    public static final int 
+    public static final int
         TAG_USHORT_UNCOPIED = DataBuffer.TYPE_USHORT | UNCOPIED;
 
     /** FormatTagID indicating data in short arrays and uncopied. */
-    public static final int 
+    public static final int
         TAG_SHORT_UNCOPIED = DataBuffer.TYPE_SHORT | UNCOPIED;
 
     /** FormatTagID indicating data in int arrays and uncopied. */
-    public static final int 
+    public static final int
         TAG_INT_UNCOPIED = DataBuffer.TYPE_INT | UNCOPIED;
 
     /** FormatTagID indicating data in float arrays and uncopied. */
-    public static final int 
+    public static final int
         TAG_FLOAT_UNCOPIED = DataBuffer.TYPE_FLOAT | UNCOPIED;
 
     /** FormatTagID indicating data in double arrays and uncopied. */
-    public static final int 
+    public static final int
         TAG_DOUBLE_UNCOPIED = DataBuffer.TYPE_DOUBLE | UNCOPIED;
 
     /** FormatTagID indicating data in int arrays and copied. */
-    public static final int 
+    public static final int
         TAG_INT_COPIED = DataBuffer.TYPE_INT | COPIED;
 
     /** FormatTagID indicating data in float arrays and copied. */
@@ -155,9 +155,9 @@ public class RasterAccessor {
      */
     private static final int TAG_BINARY =
         DataBuffer.TYPE_BYTE | COPIED | UNEXPANDED;
- 
+
     /** The raster that is the source of pixel data. */
-    protected Raster raster;  
+    protected Raster raster;
 
     /** The width of the rectangle this RasterAccessor addresses. */
     protected int rectWidth;
@@ -165,7 +165,7 @@ public class RasterAccessor {
     /** The height of the rectangle this RasterAccessor addresses. */
     protected int rectHeight;
 
-    /** The x coordinate of upper-left corner of the rectangle this 
+    /** The x coordinate of upper-left corner of the rectangle this
      *  RasterAccessor addresses.
      */
     protected int rectX;
@@ -190,9 +190,9 @@ public class RasterAccessor {
      */
     protected byte binaryDataArray[] = null;
 
-    /** 
-     *  The image data in a two-dimensional byte array.  This 
-     *  value will be non-null only if getDataType() returns 
+    /**
+     *  The image data in a two-dimensional byte array.  This
+     *  value will be non-null only if getDataType() returns
      *  DataBuffer.TYPE_BYTE.  byteDataArrays.length will equal
      *  numBands.  Note that often the numBands subArrays will all
      *  point to the same place in memory.
@@ -205,7 +205,7 @@ public class RasterAccessor {
 
     /**
      *  The image data in a two-dimensional short array.  This
-     *  value will be non-null only if getDataType() returns 
+     *  value will be non-null only if getDataType() returns
      *  DataBuffer.TYPE_USHORT or DataBuffer.TYPE_SHORT.
      *  shortDataArrays.length will equal
      *  numBands.  Note that often the numBands subArrays will all
@@ -215,7 +215,7 @@ public class RasterAccessor {
 
     /**
      *  The image data in a two-dimensional int array.  This
-     *  value will be non-null only if getDataType() returns 
+     *  value will be non-null only if getDataType() returns
      *  DataBuffer.TYPE_INT.  intDataArrays.length will equal
      *  numBands.  Note that often the numBands subArrays will all
      *  point to the same place in memory.
@@ -224,7 +224,7 @@ public class RasterAccessor {
 
     /**
      *  The image data in a two-dimensional float array.  This
-     *  value will be non-null only if getDataType() returns 
+     *  value will be non-null only if getDataType() returns
      *  DataBuffer.TYPE_FLOAT.  floatDataArrays.length will equal
      *  numBands.  Note that often the numBand subArrays will all
      *  point to the same place in memory.
@@ -233,7 +233,7 @@ public class RasterAccessor {
 
     /**
      *  The image data in a two-dimensional double array.  This
-     *  value will be non-null only if getDataType() returns 
+     *  value will be non-null only if getDataType() returns
      *  DataBuffer.TYPE_DOUBLE.  doubleDataArrays.length will equal
      *  numBands.  Note that often the numBand subArrays will all
      *  point to the same place in memory.
@@ -270,9 +270,9 @@ public class RasterAccessor {
      * <code>RasterFormatTag</code> for the destination in the last element.
      * @throws NullPointerException if <code>dst</code> is <code>null</code>.
      */
-    public static 
-    RasterFormatTag[] findCompatibleTags(RenderedImage srcs[], 
-                                         RenderedImage dst) { 
+    public static
+    RasterFormatTag[] findCompatibleTags(RenderedImage srcs[],
+                                         RenderedImage dst) {
         int tagIDs[];
         if (srcs != null) {
            tagIDs = new int[srcs.length + 1];
@@ -282,7 +282,7 @@ public class RasterAccessor {
         SampleModel dstSampleModel = dst.getSampleModel();
         int dstDataType = dstSampleModel.getTransferType();
 
-        int defaultDataType = dstDataType; 
+        int defaultDataType = dstDataType;
         boolean binaryDst = ImageUtil.isBinary(dstSampleModel);
         if (binaryDst) {
             defaultDataType = DataBuffer.TYPE_BYTE;
@@ -309,7 +309,7 @@ public class RasterAccessor {
         // Set the tag. For binary data at this point this should
         // equal DataBuffer.TYPE_BYTE | COPIED.
         int tagID = defaultDataType | COPIED;
- 
+
         if (dstSampleModel instanceof ComponentSampleModel) {
             if (srcs != null) {
                int numSources = srcs.length;
@@ -355,11 +355,11 @@ public class RasterAccessor {
             tagIDs[srcs.length] = tagID | UNEXPANDED;
 
             for (int i = 0; i < srcs.length; i++) {
-                rft[i] = 
+                rft[i] =
                    new RasterFormatTag(srcs[i].getSampleModel(), tagIDs[i]);
             }
             // get the dest
-            rft[srcs.length] =  
+            rft[srcs.length] =
                    new RasterFormatTag(dstSampleModel,tagIDs[srcs.length]);
         } else {	// no sources, dest only
             rft[0] = new RasterFormatTag(dstSampleModel, tagID | UNEXPANDED);
@@ -411,7 +411,7 @@ public class RasterAccessor {
                                   // so never expand
     }
 
-    
+
     /**
      * Constructs a RasterAccessor object out of a Raster, Rectangle
      * and formatTagID returned from RasterFormat.findCompatibleTag().
@@ -434,9 +434,9 @@ public class RasterAccessor {
      * @throws IllegalArgumentException if the <code>Rectangle</code>
      *         is not contained within <code>Raster</code>'s bounds.
      */
-    public RasterAccessor(Raster raster, 
-                          Rectangle rect, 
-                          RasterFormatTag rft, 
+    public RasterAccessor(Raster raster,
+                          Rectangle rect,
+                          RasterFormatTag rft,
                           ColorModel theColorModel) {
 
         if(raster == null || rect == null || rft == null) {
@@ -461,7 +461,7 @@ public class RasterAccessor {
             this.numBands = rft.getNumBands();
             this.pixelStride = rft.getPixelStride();
 
-            ComponentSampleModel csm = 
+            ComponentSampleModel csm =
                 (ComponentSampleModel)raster.getSampleModel();
             this.scanlineStride = csm.getScanlineStride();
 
@@ -470,7 +470,7 @@ public class RasterAccessor {
             // if the rft isPixelSequential we can rely on it's
             // version of bandOffsets and bankIndicies.  If it's
             // not the SampleModel passed in might not completely
-            // match the one that was passed to the the 
+            // match the one that was passed to the the
             // RasterFormatTag constructor so we have to get them
             // from the passed in Raster/SampleModel
             if (rft.isPixelSequential()) {
@@ -485,19 +485,19 @@ public class RasterAccessor {
 
 	    int dataBufferOffsets[] = raster.getDataBuffer().getOffsets();
 
-            int subRasterOffset = 
+            int subRasterOffset =
              (rectY-raster.getSampleModelTranslateY())*scanlineStride+
              (rectX-raster.getSampleModelTranslateX())*pixelStride;
 
             if (dataBufferOffsets.length == 1) {
                 int theDataBufferOffset = dataBufferOffsets[0];
                 for (int i = 0; i < numBands; i++) {
-                    bandDataOffsets[i] = bandOffsets[i] + 
+                    bandDataOffsets[i] = bandOffsets[i] +
                           theDataBufferOffset + subRasterOffset;
                 }
             } else if (dataBufferOffsets.length == bandDataOffsets.length) {
                 for (int i = 0; i < numBands; i++) {
-                    bandDataOffsets[i] = bandOffsets[i] + 
+                    bandDataOffsets[i] = bandOffsets[i] +
                         dataBufferOffsets[i] + subRasterOffset;
                 }
             } else {
@@ -552,7 +552,7 @@ public class RasterAccessor {
                 doubleDataArrays = new double[numBands][];
                 for (int i = 0; i < numBands; i++) {
                     doubleDataArrays[i] =
-                        DataBufferUtils.getDataDouble(dbd, bankIndices[i]); 
+                        DataBufferUtils.getDataDouble(dbd, bankIndices[i]);
                 }
                 break;
             }
@@ -560,35 +560,35 @@ public class RasterAccessor {
             if ((formatTagID & EXPANSION_MASK) == EXPANDED &&
                 theColorModel instanceof IndexColorModel) {
                 IndexColorModel icm = (IndexColorModel)theColorModel;
-    
+
                 int newNumBands = icm.getNumComponents();
-    
+
                 int mapSize = icm.getMapSize();
                 int newBandDataOffsets[] = new int[newNumBands];
                 int newScanlineStride = rectWidth*newNumBands;
                 int newPixelStride = newNumBands;
                 byte ctable[][] = new byte[newNumBands][mapSize];
-    
+
                 icm.getReds(ctable[0]);
                 icm.getGreens(ctable[1]);
                 icm.getBlues(ctable[2]);
                 byte rtable[] = ctable[0];
                 byte gtable[] = ctable[1];
                 byte btable[] = ctable[2];
-    
+
                 byte atable[] = null;
                 if (newNumBands == 4) {
                     icm.getAlphas(ctable[3]);
                     atable = ctable[3];
                 }
-    
+
                 for (int i = 0; i < newNumBands; i++) {
                     newBandDataOffsets[i] = i;
                 }
-    
+
                 switch (formatTagID & DATATYPE_MASK) {
                 case DataBuffer.TYPE_BYTE: {
-                    byte newBArray[] = 
+                    byte newBArray[] =
                         new byte[rectWidth*rectHeight*newNumBands];
                     byte byteDataArray[] = byteDataArrays[0];
                     int scanlineOffset = bandDataOffsets[0];
@@ -599,7 +599,7 @@ public class RasterAccessor {
                         for (int i = 0; i < rectWidth; i++)  {
                             int index = byteDataArray[pixelOffset] & 0xff;
                             for (int k = 0; k < newNumBands; k++) {
-                            newBArray[newPixelOffset+k] = 
+                            newBArray[newPixelOffset+k] =
                                         ctable[k][index];
                             }
                             pixelOffset += pixelStride;
@@ -636,10 +636,10 @@ public class RasterAccessor {
                         scanlineOffset += scanlineStride;
                         newScanlineOffset += newScanlineStride;
                     }
-    
+
                     shortDataArrays = new short[newNumBands][];
                     for (int i = 0; i < newNumBands; i++) {
-                        shortDataArrays[i] = newIArray; 
+                        shortDataArrays[i] = newIArray;
                     }
                     }
                     break;
@@ -665,7 +665,7 @@ public class RasterAccessor {
                         scanlineOffset += scanlineStride;
                         newScanlineOffset += newScanlineStride;
                     }
-     
+
                     shortDataArrays = new short[newNumBands][];
                     for (int i = 0; i < newNumBands; i++) {
                         shortDataArrays[i] = newIArray;
@@ -694,10 +694,10 @@ public class RasterAccessor {
                         scanlineOffset += scanlineStride;
                         newScanlineOffset += newScanlineStride;
                     }
-    
+
                     intDataArrays = new int[newNumBands][];
                     for (int i = 0; i < newNumBands; i++) {
-                        intDataArrays[i] = newIArray; 
+                        intDataArrays[i] = newIArray;
                     }
                     }
                     break;
@@ -770,7 +770,7 @@ public class RasterAccessor {
             this.numBands = theColorModel instanceof IndexColorModel ?
                             theColorModel.getNumComponents() :
                             raster.getSampleModel().getNumBands();
-            this.pixelStride = this.numBands; 
+            this.pixelStride = this.numBands;
             this.scanlineStride = rectWidth*numBands;
             this.bandOffsets = new int[numBands];
 
@@ -785,8 +785,8 @@ public class RasterAccessor {
             int[] components = new int[theColorModel.getNumComponents()];
 
             switch (formatTagID & DATATYPE_MASK) {
-                
-            case DataBuffer.TYPE_INT: 
+
+            case DataBuffer.TYPE_INT:
                 int idata[] = new int[rectWidth*rectHeight*numBands];
                 intDataArrays = new int[numBands][];
                 for (int i = 0; i < numBands; i++) {
@@ -796,19 +796,9 @@ public class RasterAccessor {
                 odata = raster.getDataElements(rectX, rectY, null);
                 offset = 0;
 
-                // Workaround for bug in BytePackedRaster
-                byte[] bdata = null;
-                if (raster instanceof sun.awt.image.BytePackedRaster) {
-                    bdata = (byte[])odata;
-                }
-
                 for (int j = rectY; j < rectY+rectHeight; j++) {
                     for (int i = rectX; i < rectX+rectWidth; i++) {
-                        if (bdata != null) {
-                            bdata[0] = (byte)raster.getSample(i, j, 0);
-                        } else {
-                            raster.getDataElements(i,j,odata);
-                        }
+                        raster.getDataElements(i,j,odata);
 
                         theColorModel.getComponents(odata, components, 0);
 
@@ -921,15 +911,15 @@ public class RasterAccessor {
         }
     }
 
-    /** 
-     * Returns the x coordinate of the upper-left corner of the 
+    /**
+     * Returns the x coordinate of the upper-left corner of the
      * RasterAccessor's accessible area.
      */
     public int getX() {
        return rectX;
     }
 
-    /** 
+    /**
      * Returns the y coordinate of the upper-left corner of the
      * RasterAccessor's accessible area.
      */
@@ -944,7 +934,7 @@ public class RasterAccessor {
        return rectWidth;
     }
 
-    /** Returns the height of the 
+    /** Returns the height of the
      * RasterAccessor's accessible area.
      */
     public int getHeight() {
@@ -994,8 +984,8 @@ public class RasterAccessor {
         return binaryDataArray;
     }
 
-    /** 
-     *  Returns the image data as a byte array.  Non-null only if 
+    /**
+     *  Returns the image data as a byte array.  Non-null only if
      *  getDataType = DataBuffer.TYPE_BYTE.
      *
      *  <p> For the case of binary data the corresponding instance variable
@@ -1015,7 +1005,7 @@ public class RasterAccessor {
         return byteDataArrays;
     }
 
-    /** 
+    /**
      *  Returns the image data as a byte array for a specific band.
      *  Non-null only if getDataType = DataBuffer.TYPE_BYTE.
      */
@@ -1024,15 +1014,15 @@ public class RasterAccessor {
         return (bda == null ? null : bda[b]);
     }
 
-    /** 
-     *  Returns the image data as a short array.  Non-null only if 
+    /**
+     *  Returns the image data as a short array.  Non-null only if
      *  getDataType = DataBuffer.TYPE_USHORT or DataBuffer.TYPE_SHORT.
      */
     public short[][] getShortDataArrays() {
         return shortDataArrays;
     }
 
-    /** 
+    /**
      *  Returns the image data as a short array for a specific band.
      *  Non-null only if getDataType = DataBuffer.TYPE_USHORT or
      *  DataBuffer.TYPE_SHORT.
@@ -1041,15 +1031,15 @@ public class RasterAccessor {
         return (shortDataArrays == null ? null : shortDataArrays[b]);
     }
 
-    /** 
-     *  Returns the image data as an int array.  Non-null only if 
+    /**
+     *  Returns the image data as an int array.  Non-null only if
      *  getDataType = DataBuffer.TYPE_INT.
      */
     public int[][] getIntDataArrays() {
         return intDataArrays;
     }
 
-    /** 
+    /**
      *  Returns the image data as an int array for a specific band.
      *  Non-null only if getDataType = DataBuffer.TYPE_INT.
      */
@@ -1057,15 +1047,15 @@ public class RasterAccessor {
         return (intDataArrays == null ? null : intDataArrays[b]);
     }
 
-    /** 
-     *  Returns the image data as a float array.  Non-null only if 
+    /**
+     *  Returns the image data as a float array.  Non-null only if
      *  getDataType = DataBuffer.TYPE_FLOAT.
      */
     public float[][] getFloatDataArrays() {
         return floatDataArrays;
     }
 
-    /** 
+    /**
      *  Returns the image data as a float array for a specific band.
      *  Non-null only if getDataType = DataBuffer.TYPE_FLOAT.
      */
@@ -1073,15 +1063,15 @@ public class RasterAccessor {
         return (floatDataArrays == null ? null : floatDataArrays[b]);
     }
 
-    /** 
-     *  Returns the image data as a double array.  Non-null only if 
+    /**
+     *  Returns the image data as a double array.  Non-null only if
      *  getDataType = DataBuffer.TYPE_DOUBLE
      */
     public double[][] getDoubleDataArrays() {
         return doubleDataArrays;
     }
 
-    /** 
+    /**
      *  Returns the image data as a double array for a specific band.
      *  Non-null only if getDataType = DataBuffer.TYPE_DOUBLE
      */
@@ -1089,7 +1079,7 @@ public class RasterAccessor {
         return (doubleDataArrays == null ? null : doubleDataArrays[b]);
     }
 
-    /** 
+    /**
      *  Returns the image data as an Object for a specific band.
      *
      *  @param b The index of the image band of interest.
@@ -1119,7 +1109,7 @@ public class RasterAccessor {
             break;
 
         default:
-            dataArray = null; 
+            dataArray = null;
         }
 
         return dataArray;
@@ -1130,15 +1120,15 @@ public class RasterAccessor {
         return bandDataOffsets;
     }
 
-    /**  
-     * Returns the offset of all band's samples from any 
+    /**
+     * Returns the offset of all band's samples from any
      * pixel offset.
      */
     public int[] getOffsetsForBands() {
 	return bandOffsets;
     }
-    
-    /**  
+
+    /**
      * Returns the offset of a specific band's first sample into the
      * DataBuffer including the DataBuffer's offset.
      */
@@ -1146,14 +1136,14 @@ public class RasterAccessor {
         return bandDataOffsets[b];
     }
 
-    /**  
-     * Returns the offset of a specified band's sample from any 
+    /**
+     * Returns the offset of a specified band's sample from any
      * pixel offset.
      */
     public int getOffsetForBand(int b) {
 	return bandOffsets[b];
     }
-    
+
     /**
      * Returns the scanlineStride for the image data.
      *
@@ -1172,18 +1162,18 @@ public class RasterAccessor {
         return pixelStride;
     }
 
-    /** 
-     *  Returns the data type of the RasterAccessor object. Note that 
-     *  this datatype is not necessarily the same data type as the 
+    /**
+     *  Returns the data type of the RasterAccessor object. Note that
+     *  this datatype is not necessarily the same data type as the
      *  underlying raster.
      */
     public int getDataType() {
         return formatTagID & DATATYPE_MASK;
     }
 
-    /** 
-     *  Returns true if the RasterAccessors's data is copied from it's 
-     *  raster. 
+    /**
+     *  Returns true if the RasterAccessors's data is copied from it's
+     *  raster.
      */
     public boolean isDataCopy() {
         return ((formatTagID & COPY_MASK) == COPIED);
@@ -1212,11 +1202,11 @@ public class RasterAccessor {
                                                     rectWidth, rectHeight));
     }
 
-    /** 
-     *  Copies data back into the RasterAccessor's raster.  Note that 
-     *  the data is cast from the intermediate data format to 
+    /**
+     *  Copies data back into the RasterAccessor's raster.  Note that
+     *  the data is cast from the intermediate data format to
      *  the raster's format.  If clamping is needed, the call
-     *  clampDataArrays() method needs to be called before 
+     *  clampDataArrays() method needs to be called before
      *  calling the copyDataToRaster() method.
      *  Note: the raster is expected to be writable - typically a
      *  destination raster - otherwise, a run-time exception will occur.
@@ -1279,13 +1269,13 @@ public class RasterAccessor {
      */
     public boolean needsClamping() {
         int bits[] = raster.getSampleModel().getSampleSize();
- 
+
         // Do we even need a clamp?  We do if there's any band
         // of the source image stored in that's less than 32 bits
         // and is stored in a byte, short or int format.  (The automatic
         // casts between floats/doubles and 32-bit ints in setPixel()
         // do what we want.)
- 
+
         for (int i = 0; i < bits.length; i++) {
 	    if (bits[i] < 32) {
 	      return true;

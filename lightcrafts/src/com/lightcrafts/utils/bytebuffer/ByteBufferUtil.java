@@ -1,8 +1,11 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2016 Masahiro Kitagawa */
 
 package com.lightcrafts.utils.bytebuffer;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.BufferOverflowException;
 import java.nio.BufferUnderflowException;
@@ -481,6 +484,41 @@ public final class ByteBufferUtil {
      */
     public static void skipBytes( ByteBuffer buf, int count ) {
         buf.position( buf.position() + count );
+    }
+
+    public static void clean( ByteBuffer buf ) {
+        try {
+            final Class<?> directByteBufferClass = Class.forName("java.nio.DirectByteBuffer");
+            Method cleanerMethod = directByteBufferClass.getDeclaredMethod("cleaner");
+            final Class<?> cleanerClass = Class.forName("sun.misc.Cleaner");
+            Method cleanMethod = cleanerClass.getDeclaredMethod("clean");
+
+            if (cleanerMethod != null && cleanMethod != null) {
+                final boolean wasCleanerMethodAccessible = cleanerMethod.isAccessible();
+                final boolean wasCleanMethodAccessible = cleanMethod.isAccessible();
+
+                try {
+                    cleanerMethod.setAccessible(true);
+                    Object cleaner = cleanerMethod.invoke(buf);
+                    cleanMethod.setAccessible(true);
+                    cleanMethod.invoke(cleaner);
+                    cleanerMethod.setAccessible(wasCleanerMethodAccessible);
+                    cleanMethod.setAccessible(wasCleanMethodAccessible);
+                }
+                catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+                catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        catch (ClassNotFoundException e) {
+            // ignore
+        }
+        catch (NoSuchMethodException e) {
+            // ignore
+        }
     }
 }
 /* vim:set et sw=4 ts=4: */
