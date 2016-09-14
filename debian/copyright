@@ -1,0 +1,71 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: LightZone
+Upstream-Contact: Masahiro Kitagawa <arctica0316@gmail.com>
+Source: https://github.com/ktgw0316/LightZone
+
+Files-Excluded: Splash.xcf freebsd-ports macosx windows
+
+Files: lightcrafts/src/com/*
+       lightcrafts/jnisrc/*
+       lightcrafts/help/*
+       lightcrafts/tools/*
+       lightcrafts/coprocess/dcraw/patches/*
+       lightcrafts/coprocess/forkdaemon/*
+       linux/*
+       debian/*
+Copyright: 2005-2011 Fabio Riccardi; Lightcrafts, Inc.
+           2013-2016 The LightZone Project
+License: BSD
+
+Files: lightcrafts/coprocess/dcraw/dcraw_lz.c
+Copyright: 1997-2015 Dave Coffin
+License: GPL-2+ with restriction
+ No license is required to download and use dcraw.c.  However,
+ to lawfully redistribute dcraw, you must either (a) offer, at
+ no extra charge, full source code* for all executable files
+ containing RESTRICTED functions, (b) distribute this code under
+ the GPL Version 2 or later, (c) remove all RESTRICTED functions,
+ re-implement them, or copy them from an earlier, unrestricted
+ Revision of dcraw.c, or (d) purchase a license from the author.
+ .
+ The functions that process Foveon images have been RESTRICTED
+ since Revision 1.237.  All other code remains free for all uses.
+            
+Files: lightcrafts/jnisrc/EDISON/*
+Copyright: 2001-2002 Christopher M. Christoudias & Bogdan Georgescu
+License: permissive
+ This software is provided 'as-is' without any express or implied warranty.
+ In no event will the authors be held liable for any damages arising from
+ the use of this software.
+
+Files: lightcrafts/extsrc/com/lightcrafts/*
+       linux/lib/mlibwrapper_jai.jar
+Copyright: 2005 Sun Microsystems, Inc.
+License: Java Research License or Java Distribution License
+ https://java.net/projects/jai-core/sources/svn/content/trunk/LICENSE-JRL.txt
+ https://java.net/projects/jai-core/sources/svn/content/trunk/LICENSE-JDL.txt
+
+Files: lightcrafts/extsrc/com/sun/image/codec/jpeg/*
+Copyright: 2007 Free Software Foundation, Inc.
+           2007 Matthew Flaschen
+           2011 Red Hat, Inc.
+License: GPL-2+
+
+Files: lightcrafts/extsrc/sun/awt/image/codec/JPEG*.java
+Copyright: 2011 Red Hat, Inc.
+License: GPL-2+
+
+Files: lightcrafts/lib/asm*.jar
+Copyright: 2000-2011 INRIA, France Télécom
+License: BSD
+
+Files: lightcrafts/lib/substance-lite.jar
+       lightcrafts/lib/laf-widget.jar
+Copyright: 2005-2010 Kirill Grouchnikov
+License: BSD
+
+License: BSD
+ [LICENSE TEXT]
+
+License: GPL-2+
+ [LICENSE TEXT]

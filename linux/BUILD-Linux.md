@@ -55,42 +55,8 @@ To check if it works fine before installing:
 
     ant -f linux/build.xml run
 
-## Create a tarball and install
-To create a tarball (.tar.gz) of LightZone, you need Install4J.
-Download and install its debian package from
-http://www.ej-technologies.com/download/install4j/files
-, or:
-
-    wget http://download-aws.ej-technologies.com/install4j/install4j_linux_5_1_4.deb
-    sudo dpkg -i install4j_linux_5_1_4.deb
-
-If you have already installed Install4J, this will create linux/LightZone.tar.gz:
-
-    ant -f linux/build.xml archive
-
-To install LightZone, just extract the archive on a directory where you want to place it.
-For example:
-
-    mv linux/LightZone.tar.gz ~
-    cd
-    tar zxf LightZone.tar.gz
-    ./LightZone/LightZone &
-
-## Miscellaneous
-### If you prefer Oracle Java to OpenJDK
-You can use __Oracle Java JRE version 6, 7, or 8__ instead of openjdk-7-jdk.
-
-Easiest way to setup one of these on Ubuntu is, for example:
-
-    sudo add-apt-repository ppa:webupd8team/java
-    sudo apt-get update
-    sudo apt-get install oracle-java7-installer
-
-Set your JAVA_HOME variable to point to installed JDK, e.g.
-
-    export JAVA_HOME=/usr/lib/jvm/java-7-oracle
-
-### <a name="packaging_deb"/>Packaging on Debian or Ubuntu
+## Create a package and install
+### <a name="packaging_deb"/>.deb package (Debian or Ubuntu)
     debuild -uc -us
 
 will create lightzone-*.deb package in parent directory,
@@ -98,6 +64,7 @@ To install the package:
 
     sudo dpkg -i ../lightzone-*.deb
 
+### .rpm package (Fedora, OpenSUSE, CentOS etc.)
 ### Re-packaging rpm from a source rpm
 If you already have a .src.rpm for other distro, you can create .rpm for your distro
 from the .src.rpm by yourself.
@@ -119,3 +86,49 @@ then execute the rpmbuild command again. Your .rpm package will be created in
 
     rpm -ivh ~/rpmbuild/RPMS/x86_64/lightzone-*.rpm
 
+## Build from upstream source and install
+### ebuild (Gentoo Linux)
+Install Lightzone in a local overlay. First you need _app-portage/layman_:
+
+    USE=git emerge app-portage/layman
+
+There is a howto for the local overlay on Gentoo Wiki:
+[Overlay/Local overlay](https://wiki.gentoo.org/wiki/Overlay/Local_overlay)
+
+In the local overlay use the portage groups:
+
+    mkdir media-gfx/lightroom
+
+Put _linux/lightzone_9999.ebuild_ in the local overlay.
+If you need to build specific version, replace the _9999_ in the filename with the version number such as _4.1.5_.
+
+Move into the new directory _media-gfx/lightroom_ and do:
+
+    repoman manifest
+    popd
+
+Now you are ready to 
+
+    emerge media-gfx/lightzone
+
+In my case I had to keyword lightzone....
+
+### PKGBUILD (Arch Linux)
+There is a build script: _linux/PKGBUILD_
+
+### Ports (FreeBSD etc.)
+There are build scripts in _freebsd-ports/graphics/lightzone/_ directory.
+
+## Miscellaneous
+### If you prefer Oracle Java to OpenJDK
+You can use _Oracle Java JRE version 6, 7, 8 or 9_ instead of openjdk-7-jdk.
+
+Easiest way to setup one of these on Ubuntu is, for example:
+
+    sudo add-apt-repository ppa:webupd8team/java
+    sudo apt-get update
+    sudo apt-get install oracle-java8-installer
+
+Set your JAVA_HOME variable to point to installed JDK, e.g.
+
+    export JAVA_HOME=/usr/lib/jvm/java-8-oracle

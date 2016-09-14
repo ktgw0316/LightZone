@@ -10,10 +10,12 @@ import java.awt.color.ColorSpace;
 import java.awt.color.ICC_ColorSpace;
 import java.awt.image.*;
 import java.awt.*;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Arrays;
 
+import com.lightcrafts.media.jai.util.ImageUtil;
+import com.lightcrafts.mediax.jai.RasterAccessor;
+import com.lightcrafts.mediax.jai.RasterFormatTag;
 import sun.awt.image.ShortInterleavedRaster;
 import sun.awt.image.ByteInterleavedRaster;
 import com.lightcrafts.jai.utils.Functions;
@@ -41,15 +43,15 @@ public class LCMS {
 //            B: Bytes per sample
 //            Y: Swap first - changes ABGR to BGRA and KCMY to CMYK
 
-    private static final int COLORSPACE_SH(int s)       { return ((s) << 16); }
-    private static final int SWAPFIRST_SH(int s)        { return ((s) << 14); }
-    private static final int FLAVOR_SH(int s)           { return ((s) << 13); }
-    private static final int PLANAR_SH(int p)           { return ((p) << 12); }
-    private static final int ENDIAN16_SH(int e)         { return ((e) << 11); }
-    private static final int DOSWAP_SH(int e)           { return ((e) << 10); }
-    private static final int EXTRA_SH(int e)            { return ((e) << 7); }
-    private static final int CHANNELS_SH(int c)         { return ((c) << 3); }
-    private static final int BYTES_SH(int b)            { return (b); }
+    private static int COLORSPACE_SH(int s)       { return ((s) << 16); }
+    private static int SWAPFIRST_SH(int s)        { return ((s) << 14); }
+    private static int FLAVOR_SH(int s)           { return ((s) << 13); }
+    private static int PLANAR_SH(int p)           { return ((p) << 12); }
+    private static int ENDIAN16_SH(int e)         { return ((e) << 11); }
+    private static int DOSWAP_SH(int e)           { return ((e) << 10); }
+    private static int EXTRA_SH(int e)            { return ((e) << 7); }
+    private static int CHANNELS_SH(int c)         { return ((c) << 3); }
+    private static int BYTES_SH(int b)            { return (b); }
 
 // Pixel types
 
@@ -161,7 +163,7 @@ public class LCMS {
     public static final int TYPE_CMYKcm_16_PLANAR= (CHANNELS_SH(6)|BYTES_SH(2)|PLANAR_SH(1));
     public static final int TYPE_CMYKcm_16_SE    = (CHANNELS_SH(6)|BYTES_SH(2)|ENDIAN16_SH(1));
 
-// Separations with more than 6 channels aren't very standarized,
+// Separations with more than 6 channels aren't very standardized,
 // Except most start with CMYK and add other colors, so I just used
 // then total number of channels after CMYK i.e CMYK8_8
 
@@ -301,64 +303,22 @@ public class LCMS {
 
 // Gridpoints
 
-    private static final int cmsFLAGS_GRIDPOINTS(int n)       { return (((n) & 0xFF) << 16); }
-
-// Native LCMS API Functions
-
-    // NOTE: LCMS doesn't seem to be properly reentrant, make all native calls synchronized
-
-    protected synchronized native static long cmsCreateLab2Profile();
-
-    protected synchronized native static long cmsOpenProfileFromMem(byte data[], int size);
-
-    protected synchronized native static long cmsCreateRGBProfile(double WhitePoint[],
-                                                                  double Primaries[],
-                                                                  double gamma);
-
-    protected synchronized native static boolean cmsCloseProfile(long hProfile);
-
-    private synchronized native static long cmsCreateTransform(long inputProfile, int inputFormat,
-                                                               long outputProfile, int outputFormat,
-                                                               int intent, int flags);
-
-    private synchronized native static long cmsCreateProofingTransform(long inputProfile, int inputFormat,
-                                                                       long outputProfile, int outputFormat,
-                                                                       long proofingProfile,
-                                                                       int Intent, int ProofingIntent, int dwFlags);
-
-    private synchronized native static void cmsDeleteTransform(long hTransform);
-
-    private native static void cmsDoTransform(long hTransform, byte[] InputBuffer, byte[] OutputBuffer, int size);
-
-    private native static void cmsDoTransform(long hTransform, short[] InputBuffer, short[] OutputBuffer, int size);
-
-    private native static void cmsDoTransform(long hTransform, double[] InputBuffer, double[] OutputBuffer, int size);
+    private static int cmsFLAGS_GRIDPOINTS(int n)       { return (((n) & 0xFF) << 16); }
 
 // Public Interface
 
     // TODO: exception handling
 
-    private final static class LRUHashMap extends LinkedHashMap {
-        LRUHashMap(int initialCapacity, float loadFactor, int max_entries) {
-            super(initialCapacity, loadFactor, true);
-            this.max_entries = max_entries;
+    private final static class RCHandleHashMap<K,V extends RCHandle> extends LRUHashMap<K,V> {
+
+        public RCHandleHashMap(int max_entries) {
+            super(max_entries);
         }
 
-        public LRUHashMap(int initialCapacity, int max_entries) {
-            super(initialCapacity);
-            this.max_entries = max_entries;
-        }
-
-        public LRUHashMap(int max_entries) {
-            super();
-            this.max_entries = max_entries;
-        }
-
-        private final int max_entries;
-
-        protected boolean removeEldestEntry(Map.Entry eldest) {
-            if (size() > max_entries) {
-                ((RCHandle) eldest.getValue()).decrement();
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<K,V> eldest) {
+            if (size() > m_maxEntries) {
+                eldest.getValue().decrement();
                 return true;
             }
             return false;
@@ -395,19 +355,19 @@ public class LCMS {
             this.gamma = gamma;
         }
 
+        @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
 
             RGBProfileComponents that = (RGBProfileComponents) o;
 
-            if (Double.compare(that.gamma, gamma) != 0) return false;
-            if (!Arrays.equals(primaries, that.primaries)) return false;
-            if (!Arrays.equals(whitePoint, that.whitePoint)) return false;
-
-            return true;
+            return (Double.compare(that.gamma, gamma) == 0
+                    && Arrays.equals(primaries, that.primaries)
+                    && Arrays.equals(whitePoint, that.whitePoint));
         }
 
+        @Override
         public int hashCode() {
             int result;
             long temp;
@@ -420,20 +380,20 @@ public class LCMS {
     }
 
     public static class Profile {
-        private static Map profileCache = new LRUHashMap(20);
+        private static Map<Object, RCHandle> profileCache = new RCHandleHashMap<Object, RCHandle>(20);
 
         protected RCHandle cmsProfile = null;
 
         protected Profile() { }
 
         public Profile(ICC_Profile iccProfile) {
-            RCHandle handle = (RCHandle) profileCache.get(iccProfile);
-            
+            RCHandle handle = profileCache.get(iccProfile);
+
             if (handle != null && handle.increment() > 1)
                 cmsProfile = handle;
             else {
                 byte data[] = iccProfile.getData();
-                cmsProfile = new RCHandle(cmsOpenProfileFromMem(data, data.length));
+                cmsProfile = new RCHandle(LCMSNative.cmsOpenProfileFromMem(data, data.length));
                 profileCache.put(iccProfile, cmsProfile);
                 cmsProfile.increment(); // for the cache reference
             }
@@ -441,12 +401,12 @@ public class LCMS {
 
         public Profile(double whitePoint[], double primaries[], double gamma) {
             RGBProfileComponents components = new RGBProfileComponents(whitePoint, primaries, gamma);
-            RCHandle handle = (RCHandle) profileCache.get(components);
+            RCHandle handle = profileCache.get(components);
 
             if (handle != null && handle.increment() > 1)
                 cmsProfile = handle;
             else {
-                cmsProfile = new RCHandle(cmsCreateRGBProfile(whitePoint, primaries, gamma));
+                cmsProfile = new RCHandle(LCMSNative.cmsCreateRGBProfile(whitePoint, primaries, gamma));
                 profileCache.put(components, cmsProfile);
                 cmsProfile.increment(); // for the cache reference
             }
@@ -454,11 +414,12 @@ public class LCMS {
 
         public void dispose() {
             if (cmsProfile != null && cmsProfile.decrement() == 0) {
-                cmsCloseProfile(cmsProfile.handle);
+                LCMSNative.cmsCloseProfile(cmsProfile.handle);
             }
             cmsProfile = null;
         }
 
+        @Override
         public void finalize() {
             dispose();
         }
@@ -470,16 +431,45 @@ public class LCMS {
 
         public LABProfile() {
             if (labProfileHandle == -1) {
-                labProfileHandle = cmsCreateLab2Profile();
+                labProfileHandle = LCMSNative.cmsCreateLab2Profile();
                 cmsProfile = handle = new RCHandle(labProfileHandle);
             } else {
                 cmsProfile = handle;
             }
         }
 
+        @Override
         public void dispose() { }
     }
 
+    private static RasterAccessor normalizeRaster(RasterAccessor src, RasterFormatTag rft, ColorModel cm) {
+        boolean reallocBuffer = false;
+        final int dataOffsets[] = src.getBandOffsets();
+        for (int i = 0; i < dataOffsets.length; i++) {
+            if (dataOffsets[i] != i) {
+                reallocBuffer = true;
+                break;
+            }
+        }
+        final int bands = src.getNumBands();
+        final int scanLineStride = src.getScanlineStride();
+        if (reallocBuffer || src.getPixelStride() != bands || scanLineStride != src.getWidth() * bands) {
+            final int[] offsets = bands == 1 ? new int[] {0} : new int[] {0, 1, 2};
+            WritableRaster newRaster = Raster.createInterleavedRaster(
+                    src.getDataType(),
+                    src.getWidth(), src.getHeight(),
+                    src.getWidth() * bands, bands, offsets,
+                    new Point(src.getX(), src.getY())
+            );
+            RasterAccessor newSrc = new RasterAccessor(newRaster, newRaster.getBounds(), rft, cm);
+
+            ImageUtil.copyRaster(src, newSrc);
+            src = newSrc;
+        }
+        return src;
+    }
+
+    @Deprecated
     private static ShortInterleavedRaster normalizeRaster(ShortInterleavedRaster raster) {
         boolean reallocBuffer = false;
         int scanLineStride = raster.getScanlineStride();
@@ -511,6 +501,7 @@ public class LCMS {
         return raster;
     }
 
+    @Deprecated
     private static ByteInterleavedRaster normalizeRaster(ByteInterleavedRaster raster) {
         boolean reallocBuffer = false;
         int scanLineStride = raster.getScanlineStride();
@@ -543,7 +534,7 @@ public class LCMS {
     }
 
     public static class Transform {
-        private static Map transformCache = new LRUHashMap(20);
+        private static Map<Object, RCHandle> transformCache = new RCHandleHashMap<Object, RCHandle>(20);
 
         private RCHandle cmsTransform = null;
 
@@ -580,24 +571,24 @@ public class LCMS {
                 this.flags = flags;
             }
 
+            @Override
             public boolean equals(Object o) {
                 if (this == o) return true;
                 if (o == null || getClass() != o.getClass()) return false;
 
                 TransformData that = (TransformData) o;
 
-                if (flags != that.flags) return false;
-                if (inputProfileHandle != that.inputProfileHandle) return false;
-                if (inputType != that.inputType) return false;
-                if (intent != that.intent) return false;
-                if (outputProfileHandle != that.outputProfileHandle) return false;
-                if (outputType != that.outputType) return false;
-                if (proofIntent != that.proofIntent) return false;
-                if (proofProfileHandle != that.proofProfileHandle) return false;
-
-                return true;
+                return ((flags == that.flags)
+                        && (inputProfileHandle == that.inputProfileHandle)
+                        && (inputType == that.inputType)
+                        && (intent == that.intent)
+                        && (outputProfileHandle == that.outputProfileHandle)
+                        && (outputType == that.outputType)
+                        && (proofIntent == that.proofIntent)
+                        && (proofProfileHandle == that.proofProfileHandle));
             }
 
+            @Override
             public int hashCode() {
                 int result;
                 result = (int) (inputProfileHandle ^ (inputProfileHandle >>> 32));
@@ -614,7 +605,7 @@ public class LCMS {
 
         public Transform(Profile input, int inputType, Profile output, int outputType, int intent, int flags) {
             TransformData td = new TransformData(input, inputType, output, outputType, intent, flags);
-            RCHandle transformHandle = (RCHandle) transformCache.get(td);
+            RCHandle transformHandle = transformCache.get(td);
 
             if (transformHandle != null && transformHandle.increment() > 1)
                 cmsTransform = transformHandle;
@@ -623,9 +614,9 @@ public class LCMS {
                 if (inputType != TYPE_RGB_8 || outputType != TYPE_RGB_8)
                     flags |= cmsFLAGS_HIGHRESPRECALC;
 
-                cmsTransform = new RCHandle(cmsCreateTransform(input.cmsProfile.handle, inputType,
-                                                               output.cmsProfile.handle, outputType,
-                                                               intent, flags));
+                cmsTransform = new RCHandle(LCMSNative.cmsCreateTransform(input.cmsProfile.handle, inputType,
+                        output.cmsProfile.handle, outputType,
+                        intent, flags));
 
                 transformCache.put(td, cmsTransform);
                 cmsTransform.increment(); // for the cache reference
@@ -635,24 +626,67 @@ public class LCMS {
         public Transform(Profile input, int inputType, Profile output, int outputType, Profile proof,
                          int intent, int proofIntent, int flags) {
             TransformData td = new TransformData(input, inputType, output, outputType, proof, intent, proofIntent, flags);
-            RCHandle transformHandle = (RCHandle) transformCache.get(td);
+            RCHandle transformHandle = transformCache.get(td);
 
             if (transformHandle != null && transformHandle.increment() > 1)
                 cmsTransform = transformHandle;
             else {
-                cmsTransform = new RCHandle(cmsCreateProofingTransform(input.cmsProfile.handle, inputType,
-                                                                       output.cmsProfile.handle, outputType,
-                                                                       proof.cmsProfile.handle,
-                                                                       intent, proofIntent,
-                                                                       flags
-                                                                       | cmsFLAGS_NOTPRECALC
-                                                                       | cmsFLAGS_SOFTPROOFING));
+                cmsTransform = new RCHandle(LCMSNative.cmsCreateProofingTransform(input.cmsProfile.handle, inputType,
+                        output.cmsProfile.handle, outputType,
+                        proof.cmsProfile.handle,
+                        intent, proofIntent,
+                        flags
+                                | cmsFLAGS_NOTPRECALC
+                                | cmsFLAGS_SOFTPROOFING));
 
                 transformCache.put(td, cmsTransform);
                 cmsTransform.increment(); // for the cache reference
             }
         }
 
+        public void doTransform(RasterAccessor src, RasterFormatTag srcRft, ColorModel srcCm,
+                                RasterAccessor dst, RasterFormatTag dstRft, ColorModel dstCm) {
+            if (cmsTransform == null) {
+                return;
+            }
+            RasterAccessor ri = normalizeRaster(src, srcRft, srcCm);
+            RasterAccessor ro;
+            final int bands = dst.getNumBands();
+
+            if (src.getX() != dst.getX() || src.getY() != dst.getY() ||
+                    src.getWidth() != dst.getWidth() || src.getHeight() != dst.getHeight()) {
+                int[] offsets = bands == 1 ? new int[] {0} : new int[] {0, 1, 2};
+                WritableRaster output = Raster.createInterleavedRaster(
+                        ri.getDataType(),
+                        ri.getWidth(), ri.getHeight(),
+                        ri.getWidth() * bands, bands, offsets,
+                        new Point(ri.getX(), ri.getY())
+                );
+                ro = new RasterAccessor(output, output.getBounds(), dstRft, dstCm);
+                System.out.println("*** A");
+            }
+            else {
+                ro = normalizeRaster(dst, dstRft, dstCm);
+            }
+            switch (ro.getDataType()) {
+                case DataBuffer.TYPE_BYTE: {
+                    final int pixels = ro.getByteDataArray(0).length / bands;
+                    LCMSNative.cmsDoTransform(cmsTransform.handle, ri.getByteDataArray(0), ro.getByteDataArray(0), pixels);
+                    break;
+                }
+                case DataBuffer.TYPE_USHORT: {
+                    final int pixels = ro.getShortDataArray(0).length / bands;
+                    LCMSNative.cmsDoTransform(cmsTransform.handle, ri.getShortDataArray(0), ro.getShortDataArray(0), pixels);
+                    break;
+                }
+                default:
+            }
+            if (ro != dst) {
+                ImageUtil.copyRaster(ro, dst);
+            }
+        }
+
+        @Deprecated
         public void doTransform(ByteInterleavedRaster input, ByteInterleavedRaster output) {
             if (cmsTransform != null) {
                 ByteInterleavedRaster ri = normalizeRaster(input);
@@ -668,20 +702,21 @@ public class LCMS {
                 } else
                     ro = normalizeRaster(output);
                 int pixels = outBands == 1 ? ro.getDataStorage().length : ro.getDataStorage().length / outBands;
-                cmsDoTransform(cmsTransform.handle, ri.getDataStorage(), ro.getDataStorage(), pixels);
+                LCMSNative.cmsDoTransform(cmsTransform.handle, ri.getDataStorage(), ro.getDataStorage(), pixels);
                 if (ro != output)
                     Functions.copyData(output, ro);
             }
         }
 
         public void doTransform(byte[] input, byte[] output) {
-            cmsDoTransform(cmsTransform.handle, input, output, 1);
+            LCMSNative.cmsDoTransform(cmsTransform.handle, input, output, 1);
         }
 
         public void doTransform(double[] input, double[] output) {
-            cmsDoTransform(cmsTransform.handle, input, output, 1);
+            LCMSNative.cmsDoTransform(cmsTransform.handle, input, output, 1);
         }
 
+        @Deprecated
         public void doTransform(ShortInterleavedRaster input, ShortInterleavedRaster output) {
             if (cmsTransform != null) {
                 ShortInterleavedRaster ri = normalizeRaster(input);
@@ -697,30 +732,27 @@ public class LCMS {
                 } else
                     ro = normalizeRaster(output);
                 int pixels = outBands == 1 ? ro.getDataStorage().length : ro.getDataStorage().length / outBands;
-                cmsDoTransform(cmsTransform.handle, ri.getDataStorage(), ro.getDataStorage(), pixels);
+                LCMSNative.cmsDoTransform(cmsTransform.handle, ri.getDataStorage(), ro.getDataStorage(), pixels);
                 if (ro != output)
                     Functions.copyData(output, ro);
             }
         }
 
         public void doTransform(short[] input, short[] output) {
-            cmsDoTransform(cmsTransform.handle, input, output, 1);
+            LCMSNative.cmsDoTransform(cmsTransform.handle, input, output, 1);
         }
 
         public void dispose() {
             if (cmsTransform != null && cmsTransform.decrement() == 0) {
-                cmsDeleteTransform(cmsTransform.handle);
+                LCMSNative.cmsDeleteTransform(cmsTransform.handle);
             }
             cmsTransform = null;
         }
 
+        @Override
         public void finalize() {
             dispose();
         }
-    }
-
-    static {
-        System.loadLibrary("LCLCMS");
     }
 
     public static void main(String args[]) {

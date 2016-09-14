@@ -4,7 +4,7 @@
 # Paul J. Lucs [paul@lightcrafts.com]
 ##
 
-LANGUAGES:=	English Danish Dutch French Japanese Spanish
+LANGUAGES:=	English Danish Dutch French Italian Japanese Spanish
 
 ##
 # Build rules

@@ -38,6 +38,7 @@ public class WhiteBalance extends BlendedOperation {
         // setSliderConfig(TARGET, new SliderConfig(1000, 20000, target, true, format));
     }
 
+    @Override
     public boolean neutralDefault() {
         return false;
     }
@@ -48,10 +49,11 @@ public class WhiteBalance extends BlendedOperation {
     private float target = 6500;
     private float Wt[] = null;
 
+    @Override
     public void setSliderValue(String key, double value) {
         value = roundValue(key, value);
-        
-        if (key == ORIGINAL && original != value) {
+
+        if (key.equals(ORIGINAL) && original != value) {
             original = (float) value;
             Wt = null;
         } /* else if (key == TARGET) {
@@ -75,6 +77,7 @@ public class WhiteBalance extends BlendedOperation {
             super(source);
         }
 
+        @Override
         public PlanarImage setFront() {
             Wt = W(original, target);
             ParameterBlock pb = new ParameterBlock();
@@ -84,14 +87,17 @@ public class WhiteBalance extends BlendedOperation {
         }
     }
 
+    @Override
     protected void updateOp(Transform op) {
         op.update();
     }
 
+    @Override
     protected BlendedTransform createBlendedOp(PlanarImage source) {
         return new WhiteBalanceTransform(source);
     }
 
+    @Override
     public OperationType getType() {
         return type;
     }

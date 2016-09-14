@@ -10,16 +10,16 @@
 #include <stdint.h>
 
 #ifndef AUTO_DEP
-#include "javah/com_lightcrafts_utils_LCMS.h"
+#include "javah/com_lightcrafts_utils_LCMSNative.h"
 #endif
 
 #include "LC_JNIUtils.h"
 #include "lcms2.h"
 
 #define DCRaw_METHOD(method) \
-name4(Java_,com_lightcrafts_utils_LCMS,_,method)
+name4(Java_,com_lightcrafts_utils_LCMSNative,_,method)
 
-JNIEXPORT jlong JNICALL Java_com_lightcrafts_utils_LCMS_cmsOpenProfileFromMem
+JNIEXPORT jlong JNICALL Java_com_lightcrafts_utils_LCMSNative_cmsOpenProfileFromMem
   (JNIEnv *env, jclass clazz, jbyteArray jdata, jint size)
 {
     char *data = (char *) (*env)->GetPrimitiveArrayCritical(env, jdata, 0);
@@ -31,7 +31,7 @@ JNIEXPORT jlong JNICALL Java_com_lightcrafts_utils_LCMS_cmsOpenProfileFromMem
     return (jlong)(intptr_t) result;
 }
 
-JNIEXPORT jlong JNICALL Java_com_lightcrafts_utils_LCMS_cmsCreateRGBProfile
+JNIEXPORT jlong JNICALL Java_com_lightcrafts_utils_LCMSNative_cmsCreateRGBProfile
   (JNIEnv *env, jclass clazz, jdoubleArray jWhitePoint, jdoubleArray jPrimaries, jdouble gamma)
 {
       double *WhitePoint = (double *) (*env)->GetPrimitiveArrayCritical(env, jWhitePoint, 0);
@@ -64,20 +64,20 @@ JNIEXPORT jlong JNICALL Java_com_lightcrafts_utils_LCMS_cmsCreateRGBProfile
       return (jlong)(intptr_t) result;
 }
 
-JNIEXPORT jlong JNICALL Java_com_lightcrafts_utils_LCMS_cmsCreateLab2Profile
+JNIEXPORT jlong JNICALL Java_com_lightcrafts_utils_LCMSNative_cmsCreateLab2Profile
   (JNIEnv *env, jclass clazz)
 {
     return (jlong)(intptr_t) cmsCreateLab2Profile(NULL);
 }
 
-JNIEXPORT jboolean JNICALL Java_com_lightcrafts_utils_LCMS_cmsCloseProfile
+JNIEXPORT jboolean JNICALL Java_com_lightcrafts_utils_LCMSNative_cmsCloseProfile
   (JNIEnv *env, jclass clazz, jlong jhProfile)
 {
     cmsHPROFILE hProfile = (cmsHPROFILE)(intptr_t) jhProfile;
     return cmsCloseProfile(hProfile);
 }
 
-JNIEXPORT jlong JNICALL Java_com_lightcrafts_utils_LCMS_cmsCreateTransform
+JNIEXPORT jlong JNICALL Java_com_lightcrafts_utils_LCMSNative_cmsCreateTransform
   (JNIEnv *env, jclass clazz, jlong inputProfile, jint inputFormat,
    jlong outputProfile, jint outputFormat, jint intent, jint flags)
 {
@@ -86,7 +86,7 @@ JNIEXPORT jlong JNICALL Java_com_lightcrafts_utils_LCMS_cmsCreateTransform
                                       intent, flags);
 }
 
-JNIEXPORT jlong JNICALL Java_com_lightcrafts_utils_LCMS_cmsCreateProofingTransform
+JNIEXPORT jlong JNICALL Java_com_lightcrafts_utils_LCMSNative_cmsCreateProofingTransform
   (JNIEnv *env, jclass clazz, jlong inputProfile, jint inputFormat,
    jlong outputProfile, jint outputFormat, jlong proofingProfile,
    jint intent, jint proofingIntent, jint flags)
@@ -98,7 +98,7 @@ JNIEXPORT jlong JNICALL Java_com_lightcrafts_utils_LCMS_cmsCreateProofingTransfo
 }
 
 
-JNIEXPORT void JNICALL Java_com_lightcrafts_utils_LCMS_cmsDeleteTransform
+JNIEXPORT void JNICALL Java_com_lightcrafts_utils_LCMSNative_cmsDeleteTransform
   (JNIEnv *env, jclass clazz, jlong hTransform)
 {
     cmsDeleteTransform((cmsHTRANSFORM)(intptr_t) hTransform);
@@ -117,19 +117,19 @@ void cmsDoTransformGeneric
     (*env)->ReleasePrimitiveArrayCritical(env, joutputBuffer, outputBuffer, 0);
 }
 
-JNIEXPORT void JNICALL Java_com_lightcrafts_utils_LCMS_cmsDoTransform__J_3B_3BI
+JNIEXPORT void JNICALL Java_com_lightcrafts_utils_LCMSNative_cmsDoTransform__J_3B_3BI
   (JNIEnv *env, jclass clazz, jlong hTransform, jbyteArray jinputBuffer, jbyteArray joutputBuffer, jint size)
 {
     cmsDoTransformGeneric(env, clazz, hTransform, jinputBuffer, joutputBuffer, size);
 }
 
-JNIEXPORT void JNICALL Java_com_lightcrafts_utils_LCMS_cmsDoTransform__J_3S_3SI
+JNIEXPORT void JNICALL Java_com_lightcrafts_utils_LCMSNative_cmsDoTransform__J_3S_3SI
   (JNIEnv *env, jclass clazz, jlong hTransform, jbyteArray jinputBuffer, jbyteArray joutputBuffer, jint size)
 {
     cmsDoTransformGeneric(env, clazz, hTransform, jinputBuffer, joutputBuffer, size);
 }
 
-JNIEXPORT void JNICALL Java_com_lightcrafts_utils_LCMS_cmsDoTransform__J_3D_3DI
+JNIEXPORT void JNICALL Java_com_lightcrafts_utils_LCMSNative_cmsDoTransform__J_3D_3DI
   (JNIEnv *env, jclass clazz, jlong hTransform, jbyteArray jinputBuffer, jbyteArray joutputBuffer, jint size)
 {
     cmsDoTransformGeneric(env, clazz, hTransform, jinputBuffer, joutputBuffer, size);

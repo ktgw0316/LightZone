@@ -5,7 +5,6 @@ package com.lightcrafts.jai.operator;
 import com.lightcrafts.mediax.jai.*;
 import com.lightcrafts.mediax.jai.registry.RenderedRegistryMode;
 import com.lightcrafts.mediax.jai.registry.RenderableRegistryMode;
-import com.lightcrafts.model.ColorSelection;
 
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.RenderableImage;
@@ -35,7 +34,7 @@ public class BlendDescriptor extends OperationDescriptorImpl {
 
     private static Class[] paramClasses = { String.class, Double.class, ROIShape.class, RenderedImage.class };
     private static String[] paramNames = { "blendingMode", "opacity", "mask", "colorSelection" };
-    private static Object[] paramDefaults = { "Overlay", new Double(1.0), null, null };
+    private static Object[] paramDefaults = { "Overlay", 1.0, null, null };
 
     /** Constructor. */
     public BlendDescriptor() {

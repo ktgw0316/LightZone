@@ -28,33 +28,40 @@ public class ZoneFinder extends Preview implements PaintListener {
     final boolean colorMode;
     final ImageEditorEngine engine;
 
+    @Override
     public String getName() {
         return LOCALE.get( colorMode ? "ColorZones_Name" : "Zones_Name" );
     }
 
+    @Override
     public void setDropper(Point p) {
     }
 
+    @Override
     public void addNotify() {
         // This method gets called when this Preview is added.
         engine.update(null, false);
         super.addNotify();
     }
 
+    @Override
     public void removeNotify() {
         // This method gets called when this Preview is removed.
         super.removeNotify();
     }
 
+    @Override
     public void setRegion(Region region) {
         // Fabio: only draw yellow inside the region?
     }
 
+    @Override
     public void setSelected(Boolean selected) {
         if (!selected)
             zones = null;
     }
 
+    @Override
     protected void paintComponent(Graphics graphics) {
         if (zones == null)
             engine.update(null, false);
@@ -110,6 +117,7 @@ public class ZoneFinder extends Preview implements PaintListener {
 
         addComponentListener(
             new ComponentAdapter() {
+                @Override
                 public void componentResized(ComponentEvent event) {
                     if (isShowing()) {
                         engine.update(null, false);
@@ -136,9 +144,8 @@ public class ZoneFinder extends Preview implements PaintListener {
 
         Dimension previewSize = getSize();
 
-        float scale = 1;
         if (visibleRect.width > previewSize.width || visibleRect.height > previewSize.height) {
-            scale = Math.min(previewSize.width / (float) visibleRect.width, previewSize.height / (float) visibleRect.height);
+            final float scale = Math.min(previewSize.width / (float) visibleRect.width, previewSize.height / (float) visibleRect.height);
 
             ParameterBlock pb = new ParameterBlock();
             pb.addSource(image);
@@ -277,7 +284,7 @@ public class ZoneFinder extends Preview implements PaintListener {
                                                  DataBuffer.TYPE_BYTE);
         }
 
-        RenderedImage result = lastPreview = new BufferedImage(colorModel, (WritableRaster) raster, false, null);
+        RenderedImage result = lastPreview = new BufferedImage(colorModel, raster, false, null);
 
         // requantize the segmented image to match the same lightness scale used in the zone mapper
         if (!colorMode && ADJUST_GRAYSCALE)
@@ -309,6 +316,7 @@ public class ZoneFinder extends Preview implements PaintListener {
                 return false;
         }
 
+        @Override
         public void run() {
             do {
                 if (getSize().width > 0 && getSize().height > 0) {
@@ -330,6 +338,7 @@ public class ZoneFinder extends Preview implements PaintListener {
         This code sets the pipeline on the main thread but performs the actual computation on a worker thread
     */
 
+    @Override
     public void paintDone(PlanarImage image, Rectangle visibleRect, boolean synchronous, long time) {
         Dimension previewDimension = getSize();
 

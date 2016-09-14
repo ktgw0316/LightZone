@@ -14,9 +14,9 @@ import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
 
 public class ChannelMixer extends BlendedOperation {
-    static final String Red = "Red";
-    static final String Green = "Green";
-    static final String Blue = "Blue";
+    private static final String Red = "Red";
+    private static final String Green = "Green";
+    private static final String Blue = "Blue";
 
     public ChannelMixer(Rendering rendering) {
         super(rendering, type);
@@ -34,6 +34,7 @@ public class ChannelMixer extends BlendedOperation {
         setSliderConfig(Blue, new SliderConfig(-2, 2, blue, .01, false, format));
     }
 
+    @Override
     public boolean neutralDefault() {
         return false;
     }
@@ -44,18 +45,19 @@ public class ChannelMixer extends BlendedOperation {
     private double green = ColorScience.Wg;
     private double blue = ColorScience.Wb;
 
+    @Override
     public void setSliderValue(String key, double value) {
         value = roundValue(key, value);
 
-        if (key == Red && red != value) {
+        if (key.equals(Red) && red != value) {
             red = value;
-        } else if (key == Green && green != value) {
+        } else if (key.equals(Green) && green != value) {
             green = value;
-        } else if (key == Blue && blue != value) {
+        } else if (key.equals(Blue) && blue != value) {
             blue = value;
         } else
             return;
-        
+
         super.setSliderValue(key, value);
     }
 
@@ -64,6 +66,7 @@ public class ChannelMixer extends BlendedOperation {
             super(source);
         }
 
+        @Override
         public PlanarImage setFront() {
             double[][] transform = {
                 { red, green, blue, 0 },
@@ -78,14 +81,17 @@ public class ChannelMixer extends BlendedOperation {
         }
     }
 
+    @Override
     protected void updateOp(Transform op) {
         op.update();
     }
 
+    @Override
     protected BlendedTransform createBlendedOp(PlanarImage source) {
         return new ChannelMixerTransform(source);
     }
 
+    @Override
     public OperationType getType() {
         return type;
     }

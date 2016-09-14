@@ -79,6 +79,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void readFrom( ImageExportOptionReader r ) throws IOException {
             super.readFrom( r );
             quality.readFrom( r );
@@ -87,6 +88,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void writeTo( ImageExportOptionWriter w ) throws IOException {
             super.writeTo( w );
             quality.writeTo( w );
@@ -108,6 +110,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
         /**
          * @deprecated
          */
+        @Override
         protected void save(XmlNode node) {
             super.save( node );
             quality.save( node );
@@ -116,9 +119,16 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
         /**
          * @deprecated
          */
+        @Override
         protected void restore( XmlNode node ) throws XMLException {
             super.restore( node );
-            quality.restore( node );
+            try {
+                quality.restore(node);
+            }
+            catch (XMLException e) {
+                // Files saved with v4.1.6 cause this, just ignore it.
+                System.err.println("Failed to restore JPEG quality");
+            }
         }
     }
 
@@ -127,6 +137,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
      *
      * @return Always returns <code>true</code>.
      */
+    @Override
     public boolean canExport() {
         return true;
     }
@@ -181,6 +192,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String[] getExtensions() {
         return EXTENSIONS;
     }
@@ -231,6 +243,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Dimension getDimension( ImageInfo imageInfo )
         throws BadImageFileException, IOException, UnknownImageTypeException
     {
@@ -256,6 +269,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ICC_Profile getICCProfile( ImageInfo imageInfo )
         throws BadImageFileException, ColorProfileException, IOException,
                UnknownImageTypeException
@@ -301,6 +315,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
     /**
      * {@inheritDoc}
      */
+    @Override
     public PlanarImage getImage( ImageInfo imageInfo, ProgressThread thread )
         throws BadImageFileException, IOException, UserCanceledException,
                UnknownImageTypeException
@@ -523,6 +538,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getName() {
         return "JPEG";
     }
@@ -530,6 +546,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
     /**
      * {@inheritDoc}
      */
+    @Override
     public RenderedImage getPreviewImage( ImageInfo imageInfo, int maxWidth,
                                           int maxHeight )
         throws BadImageFileException, ColorProfileException, IOException,
@@ -548,6 +565,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
     /**
      * {@inheritDoc}
      */
+    @Override
     public RenderedImage getThumbnailImage( ImageInfo imageInfo )
         throws BadImageFileException, ColorProfileException, IOException,
                UnknownImageTypeException
@@ -580,16 +598,27 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
     /**
      * {@inheritDoc}
      */
+    @Override
     public final ImageType getTrueImageTypeOf( ImageInfo imageInfo )
         throws BadImageFileException, IOException
     {
         try {
-            // TODO: this should do some sanity checking on the contents
-            if ( getFirstSegment( imageInfo, JPEG_APP4_MARKER ) != null )
-                return SidecarJPEGImageType.INSTANCE;
+            ByteBuffer buf = getFirstSegment( imageInfo, JPEG_APP4_MARKER );
+            if ( buf != null ) {
+                SidecarJPEGImageType sidecar = SidecarJPEGImageType.INSTANCE;
+
+                // sanity checking on the contents
+                try {
+                    if ( sidecar.getLZNDocument(buf) != null )
+                        return sidecar;
+                }
+                catch ( IOException e ) {
+                    // not lzn APP4 contents
+                }
+            }
         }
         catch ( UnknownImageTypeException e ) {
-            // should never hapen at this stage
+            // should never happen at this stage
         }
         return null;
     }
@@ -597,6 +626,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Document getXMP( ImageInfo imageInfo )
         throws BadImageFileException, IOException, UnknownImageTypeException
     {
@@ -623,6 +653,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean hasFastPreview() {
         return true;
     }
@@ -630,6 +661,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
     /**
      * {@inheritDoc}
      */
+    @Override
     public JPEGImageInfo newAuxiliaryInfo( ImageInfo imageInfo )
         throws BadImageFileException, IOException
     {
@@ -646,6 +678,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ExportOptions newExportOptions() {
         return new ExportOptions();
     }
@@ -653,6 +686,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void putImage( ImageInfo imageInfo, PlanarImage image,
                           ImageExportOptions options, Document lznDoc,
                           ProgressThread thread ) throws IOException {
@@ -714,6 +748,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
      *
      * @param imageInfo The image to read the metadata from.
      */
+    @Override
     public void readMetadata( ImageInfo imageInfo )
         throws BadImageFileException, IOException, UnknownImageTypeException
     {
@@ -779,6 +814,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
      *
      * @param imageInfo The image to write the metadata for.
      */
+    @Override
     public void writeMetadata( ImageInfo imageInfo )
         throws BadImageFileException, IOException, UnknownImageTypeException
     {
@@ -897,6 +933,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean gotSegment( byte segID, int segLength, File jpegFile,
                                    LCByteBuffer buf ) throws IOException {
             if ( segID == JPEG_APP1_MARKER &&
@@ -962,6 +999,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
          * @param buf The {@link LCByteBuffer} the raw metadata is in.
          * @param dir Not used.
          */
+        @Override
         public void gotTag( int tagID, int fieldType, int numValues,
                             int byteCount, int valueOffset,
                             int valueOffsetAdjustment, int subdirOffset,
@@ -1046,6 +1084,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
         /**
          * {@inheritDoc}
          */
+        @Override
         public boolean gotSegment( byte segID, int segLength, File jpegFile,
                                    LCByteBuffer buf ) throws IOException {
             if ( segID == JPEG_SOS_MARKER ) {
@@ -1078,7 +1117,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
             }
 
             //
-            // Insert the segment(s) if we havne't already done so.
+            // Insert the segment(s) if we haven't already done so.
             //
             if ( m_segInfo != null )
                 insertSegments();
@@ -1316,7 +1355,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
         }
 
         //
-        // The harder case of a profile being split across multple segments.
+        // The harder case of a profile being split across multiple segments.
         //
         final ByteBuffer firstBuf = list.get( 0 );
         final int numSegments = firstBuf.get( 13 );
@@ -1342,7 +1381,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
         //
         final byte[] iccProfileData = new byte[ totalProfileSize ];
         int dataOffset = 0;
-        for ( ByteBuffer buf : list ) {
+        for ( ByteBuffer buf : sortedList ) {
             final int chunkSize = buf.limit() - ICC_PROFILE_HEADER_SIZE;
             ByteBufferUtil.getBytes(
                 buf, ICC_PROFILE_HEADER_SIZE, iccProfileData, dataOffset,

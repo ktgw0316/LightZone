@@ -30,7 +30,7 @@ class RepaintThrasher extends JFrame implements ChangeListener {
 
         counter = new JTextField();
         counter.setColumns(4);
-        
+
         JPanel panel = new JPanel();
         panel.add(button);
         panel.add(counter);
@@ -50,6 +50,7 @@ class RepaintThrasher extends JFrame implements ChangeListener {
         if (run) {
             EventQueue.invokeLater(
                 new Runnable() {
+                    @Override
                     public void run() {
                         comp.repaint();
                         increment();
@@ -68,6 +69,7 @@ class RepaintThrasher extends JFrame implements ChangeListener {
 
     // JButton ChangeListener:
 
+    @Override
     public void stateChanged(ChangeEvent event) {
         boolean pressed = button.getModel().isPressed();
         if (pressed && ! run) {

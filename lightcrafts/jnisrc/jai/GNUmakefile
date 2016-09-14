@@ -11,6 +11,7 @@ FW_DIR:=		/System/Library/Frameworks
 
 JNI_WINDOWS_LINK:=	-lLCJNI
 JNI_LINUX_LINK:=	$(JNI_WINDOWS_LINK)
+JNI_MACOSX_LINK:=	../jniutils/libLCJNI.a
 
 ##
 # Altivec stuff is specified in JNI_PPC_DEFINES rather than JNI_PPC_CFLAGS

@@ -22,24 +22,29 @@ public class ColorSelectionPreview extends Preview implements PaintListener {
     static final boolean ADJUST_GRAYSCALE = true;
     final ImageEditorEngine engine;
 
+    @Override
     public String getName() {
         return LOCALE.get("ColorMask_Name");
     }
 
+    @Override
     public void setDropper(Point p) {
     }
 
+    @Override
     public void addNotify() {
         // This method gets called when this Preview is added.
         engine.update(null, false);
         super.addNotify();
     }
 
+    @Override
     public void removeNotify() {
         // This method gets called when this Preview is removed.
         super.removeNotify();
     }
 
+    @Override
     public void setRegion(Region region) {
         // Fabio: only draw yellow inside the region?
     }
@@ -48,13 +53,15 @@ public class ColorSelectionPreview extends Preview implements PaintListener {
     private Rectangle visibleRect = null;
     private BufferedImage preview = null;
 
+    @Override
     public void setSelected(Boolean selected) {
         if (!selected) {
             preview = null;
             currentImage = new SoftReference<PlanarImage>(null);
         }
     }
-    
+
+    @Override
     protected void paintComponent(Graphics graphics) {
         // Fill in the background:
         Graphics2D g = (Graphics2D) graphics;
@@ -71,23 +78,24 @@ public class ColorSelectionPreview extends Preview implements PaintListener {
                 preview = cropScaleGrayscale(visibleRect, image);
         }
 
-        if (preview != null) {
-            int dx, dy;
-            AffineTransform transform = new AffineTransform();
-            if (getSize().width > preview.getWidth())
-                dx = (getSize().width - preview.getWidth()) / 2;
-            else
-                dx = 0;
-            if (getSize().height > preview.getHeight())
-                dy = (getSize().height - preview.getHeight()) / 2;
-            else
-                dy = 0;
-            transform.setToTranslation(dx, dy);
-            try {
-                g.drawRenderedImage(preview, transform);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        if (preview == null)
+            return;
+
+        int dx, dy;
+        AffineTransform transform = new AffineTransform();
+        if (getSize().width > preview.getWidth())
+            dx = (getSize().width - preview.getWidth()) / 2;
+        else
+            dx = 0;
+        if (getSize().height > preview.getHeight())
+            dy = (getSize().height - preview.getHeight()) / 2;
+        else
+            dy = 0;
+        transform.setToTranslation(dx, dy);
+        try {
+            g.drawRenderedImage(preview, transform);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -96,6 +104,7 @@ public class ColorSelectionPreview extends Preview implements PaintListener {
 
         addComponentListener(
             new ComponentAdapter() {
+                @Override
                 public void componentResized(ComponentEvent event) {
                     if (isShowing()) {
                         engine.update(null, false);
@@ -140,28 +149,31 @@ public class ColorSelectionPreview extends Preview implements PaintListener {
         return Functions.toFastBufferedImage(image);
     }
 
+    @Override
     public void paintDone(PlanarImage image, Rectangle visibleRect, boolean synchronous, long time) {
-        if (image != null) {
-            Dimension previewDimension = getSize();
+        if (image == null)
+            return;
+
+        Dimension previewDimension = getSize();
 
 /*
-            assert (image.getColorModel().getColorSpace().isCS_sRGB()
-                    || image.getColorModel().getColorSpace() == JAIContext.systemColorSpace)
-                   && image.getSampleModel().getDataType() == DataBuffer.TYPE_BYTE;
+        assert(image.getColorModel().getColorSpace().isCS_sRGB()
+              || image.getColorModel().getColorSpace() == JAIContext.systemColorSpace)
+              && image.getSampleModel().getDataType() == DataBuffer.TYPE_BYTE;
 */
 
-            if (previewDimension.getHeight() > 1 && previewDimension.getWidth() > 1) {
-                Operation op = engine.getSelectedOperation();
-                if (op != null && op instanceof BlendedOperation && op.isActive() && !op.getColorSelection().isAllSelected()) {
-                    PlanarImage selectionMask = ((BlendedOperation) op).getColorSelectionMask();
-                    if (selectionMask != null)
-                        image = selectionMask;
-                }
-                this.visibleRect = visibleRect;
-                currentImage = new SoftReference<PlanarImage>(image);
-                preview = null;
-                repaint();
-            }
+        if (previewDimension.getHeight() <= 1 || previewDimension.getWidth() <= 1)
+            return;
+
+        Operation op = engine.getSelectedOperation();
+        if (op != null && op instanceof BlendedOperation && op.isActive() && !op.getColorSelection().isAllSelected()) {
+            PlanarImage selectionMask = ((BlendedOperation) op).getColorSelectionMask();
+            if (selectionMask != null)
+                image = selectionMask;
         }
+        this.visibleRect = visibleRect;
+        currentImage = new SoftReference<PlanarImage>(image);
+        preview = null;
+        repaint();
     }
 }

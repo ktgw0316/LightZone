@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="it-IT" xml:lang="it-IT">
+
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <title>Integrazione del Flusso di lavoro di LightZone con Aperture</title>
+    <meta name="description" content="Come utilizzare LightZone con Aperture."/>
+    <link rel="stylesheet" type="text/css" href="Help.css" media="all"/>
+    <link rel="stylesheet" type="text/css" href="Platform.css" media="all"/>
+    <!--[if lt IE 7]>
+    <script defer type="text/javascript" src="IE_PNG.js"></script>
+    <link rel="stylesheet" type="text/css" href="IE.css" media="all"/>
+    <![endif]-->
+  </head>
+
+  <body>
+    <div id="banner">
+      <div id="banner_left">
+        <a href="index.html">Aiuto di LightZone</a>
+      </div>
+      <div id="banner_right">
+        <a href="index/index.html">Indice</a>
+      </div>
+    </div>
+
+    <!-- LC_Index: workflow integration > with Aperture -->
+    <!-- LC_Index: Aperture workflow integration -->
+    <a name="Integration-Aperture"/>
+    <img src="images/app_icon-32.png" width="32" height="32" class="title_icon"/>
+    <h1>Integrazione del flusso di lavoro con Aperture di Apple</h1>
+
+    <p>Aperture, di Apple, consente all'utente di selezionare un'altra applicazione come &quot;editor esterno&quot; per modificare le foto. È possibile configurare LightZone come editor esterno. Inoltre, LightZone si integra facilmente con Aperture grazie alla preferenza <a href="Preferences.html#Preferences-Direct_Save">Salvataggio diretto</a>.</p>
+    <p>
+      <b>Nota:</b> seguono informazioni dettagliate per la versione 1.5.3 di Aperture ma nelle successive versioni potrebbero esserci delle modifiche.</p>
+
+    <div class="task_box">
+      <h2>Per configurare Aperture a lavorare con LightZone:</h2>
+      <ol>
+        <li>Selezionare Aperture &gt; Preferenze... Sarà visualizzata la finestra di dialogo delle Preferenze; andare nella sezione Output.</li>
+        <li>Sotto Editor immagine esterno, fare clic su Scegli...</li>
+        <li>Cercare e selezionare LightZone.</li>
+        <li>Selezionare TIFF come Formato file editor esterno.</li>
+        <li>Chiudere la finestra Preferenze.</li>
+      </ol>
+      <p>
+        <a href="help:runscript='LightZone_Help/scripts/Set_Aperture_Prefs.scpt'">
+        <img src="images/AppleScriptAppIcon.png" width="32" height="32" class="inline_left"/></a>In alternativa, è possibile eseguire la configurazione automatica di Aperture facendo clic sull'icona di AppleScript a sinistra. Prima è necessario chiudere Aperture.<br clear="all"/>
+      </p>
+    </div>
+
+    <p>Quando si usa un editor esterno, Aperture:<ol>
+        <li>Crea una copia TIFF della foto con le correzioni effettuate.</li>
+        <li>Aggiunge la copia TIFF alla libreria corrente di Aperture come una versione dell'originale.</li>
+        <li>Invia la copia TIFF all'editor esterno per modificarla.</li>
+      </ol>
+    </p>
+
+    <div class="task_box">
+      <h2>Per configurare LightZone a lavorare con Aperture:</h2>
+      <ol>
+        <li>Selezionare LightZone &gt; Preferenze... Sarà visualizza la finestra di dialogo delle Preferenze.</li>
+        <li>Verificare che la casella <a href="Preferences.html#Preferences-Direct_Save">Salvataggio diretto</a> sia selezionata.</li>
+        <li>Chiudere la finestra Preferenze.</li>
+      </ol>
+    </div>Al termine della configurazione sarà possibile selezionare una delle foto su Aperture e modificarla con LightZone.<div class="task_box">
+      <h2>Per modificare le foto con LightZone da Aperture:</h2>
+      <ol>
+        <li>Selezionare su Aperture la foto che si desidera modificare.</li>
+        <li>Selezionare Immagini &gt; Apri con editor esterno. LightZone aprirà la copia in TIFF della foto.</li>
+        <li>Modificare la copia TIFF della foto a proprio piacimento con LightZone.</li>
+        <li>Selezionare File &gt; Salva in Aperture. LightZone salverà la foto modificata sovrascrivendo la copia in TIFF e la invierà nuovamente ad Aperture che adesso mostrerà la copia TIFF modificata della foto.</li>
+      </ol>
+    </div>
+
+    <div>
+      <h3>Vedere anche:</h3>
+      <ul>
+        <li>
+          <a href="Multipage_TIFF.html">Immagini TIFF multipagina</a>
+        </li>
+        <li class="Mac_only">
+          <a href="Integration-iPhoto.html">Integrazione del flusso di lavoro con iPhoto di Apple</a>
+        </li>
+        <li class="Not_Linux">
+          <a href="Integration-iView_MediaPro.html">Integrazione del flusso di lavoro con iView MediaPro di Microsoft</a>
+        </li>
+        <li class="Not_Linux">
+          <a href="Integration-Lightroom.html">Integrazione del flusso di lavoro con Lightroom di Adobe Systems</a>
+        </li>
+      </ul>
+    </div>
+
+  </body>
+</html><!-- vim:set et sw=2 ts=2: -->

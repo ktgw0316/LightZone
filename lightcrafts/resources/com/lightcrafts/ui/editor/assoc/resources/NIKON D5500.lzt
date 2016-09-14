@@ -2,7 +2,7 @@
   <Scale Factor="0.2548291"/>
   <Image path=""/>
   <Controls>
-    <ZoneOperation Locked="true" Active="true" Collapsed="true" Mode="Normal" Name="RAW Tone Curve" Opacity="100" regionsInverted="false" scale="0">
+    <ZoneOperation Locked="true" Active="true" Collapsed="true" Mode="Normal" Name="RAW Tone Curve" Opacity="100" regionsInverted="false" scale="1">
       <Points Size="16">
         <Point X="1" Y="0.08118"/>
         <Point X="2" Y="0.16237"/>

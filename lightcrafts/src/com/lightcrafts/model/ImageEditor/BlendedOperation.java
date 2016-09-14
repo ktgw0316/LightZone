@@ -61,6 +61,7 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
         return mask != null;
     }
 
+    @Override
     public void setRegion(Region region) {
         if (validRegion(region)) {
             mask = new LCROIShape(region, rendering.getInputTransform());
@@ -70,6 +71,7 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
         super.setRegion(region);
     }
 
+    @Override
     public void setRegionInverted(boolean inverted) {
         super.setRegionInverted(inverted);
     }
@@ -117,6 +119,7 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
         return arctan2(y, x) + (float) Math.PI;
     }
 
+    @Override
     public void setColorSelection(RGBColorSelection selection) {
         super.setColorSelection(selection);
     }
@@ -125,6 +128,7 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
         return colorSelectionMask;
     }
 
+    @Override
     public RGBColorSelection getColorSelectionAt(Point2D p) {
         System.out.println("setColorSelection(): " + p);
         this.clickPoint = p;
@@ -164,56 +168,59 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
         SoftReference<PlanarImage> softResult = new SoftReference<PlanarImage>(null);
 
         int[] pointToPixel(Point2D p) {
-            if (p != null) {
-                Point2D pp = rendering.getTransform().transform(p, null);
+            if (p == null)
+                return null;
 
-                int x = (int) pp.getX();
-                int y = (int) pp.getY();
+            Point2D pp = rendering.getTransform().transform(p, null);
 
-                if (rendering.getScaleFactor() > 1) {
-                    x /= rendering.getScaleFactor();
-                    y /= rendering.getScaleFactor();
-                }
+            int x = (int) pp.getX();
+            int y = (int) pp.getY();
 
-                if (back.getBounds().contains(x, y)) {
-                    int tx = back.XToTileX(x);
-                    int ty = back.YToTileY(y);
+            if (rendering.getScaleFactor() > 1) {
+                x /= rendering.getScaleFactor();
+                y /= rendering.getScaleFactor();
+            }
 
-                    Raster tile = back.getTile(tx, ty);
+            if (!back.getBounds().contains(x, y))
+                return null;
 
-                    int[] pixel = null;
+            int tx = back.XToTileX(x);
+            int ty = back.YToTileY(y);
 
-                    int averagePixels = 3;
+            Raster tile = back.getTile(tx, ty);
 
-                    if (averagePixels > 1) {
-                        Rectangle tileBounds = tile.getBounds();
-                        Rectangle sampleRect = new Rectangle(x - averagePixels / 2,
-                                                             y - averagePixels / 2,
-                                                             averagePixels,
-                                                             averagePixels);
+            int[] pixel;
 
-                        Rectangle intersection = tileBounds.intersection(sampleRect);
+            final int averagePixels = 3;
 
-                        pixel = new int[]{0, 0, 0};
-                        int currentPixel[] = new int[3];
+            // if (averagePixels <= 1)
+            //     return tile.getPixel(x, y, pixel);
 
-                        for (int i = intersection.x; i < intersection.x + intersection.width; i++)
-                            for (int j = intersection.y; j < intersection.y + intersection.height; j++) {
-                                currentPixel = tile.getPixel(i, j, currentPixel);
-                                for (int k = 0; k < 3; k++)
-                                    pixel[k] = (pixel[k] + currentPixel[k]) / 2;
-                            }
-                    } else
-                        pixel = tile.getPixel(x, y, pixel);
+            Rectangle tileBounds = tile.getBounds();
+            Rectangle sampleRect = new Rectangle(x - averagePixels / 2,
+                    y - averagePixels / 2,
+                    averagePixels,
+                    averagePixels);
 
-                    return pixel;
+            Rectangle intersection = tileBounds.intersection(sampleRect);
+
+            pixel = new int[]{0, 0, 0};
+            int currentPixel[] = new int[3];
+
+            for (int i = intersection.x; i < intersection.x + intersection.width; i++) {
+                for (int j = intersection.y; j < intersection.y + intersection.height; j++) {
+                    currentPixel = tile.getPixel(i, j, currentPixel);
+                    for (int k = 0; k < 3; k++)
+                        pixel[k] = (pixel[k] + currentPixel[k]) / 2;
                 }
             }
-            return null;
+
+            return pixel;
         }
 
         abstract public PlanarImage setFront();
 
+        @Override
         public void dispose() {
             back.removeSinks();
             back.dispose();
@@ -243,6 +250,7 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
             back = source;
         }
 
+        @Override
         public void setSource(Object source) {
             if (source != back) {
                 back.removeSinks();
@@ -254,6 +262,7 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
 
         private CachedImage cachedImage = null;
 
+        @Override
         public PlanarImage render() {
             /*
                 we have to update before any render, this is necessary otherwise
@@ -289,6 +298,7 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
                 return softRendering != null ? softRendering.get() : null;
             }
 
+            @Override
             public Raster getTile(int tileX, int tileY) {
                 Raster tile = cache.getTile(this, tileX, tileY);
 
@@ -314,6 +324,7 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
             just rebuild everything from scratch
         */
 
+        @Override
         public PlanarImage update() {
             if (clickPoint != null) {
                 int pixel[] = pointToPixel(clickPoint);
@@ -327,116 +338,121 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
                 clickPoint = null;
             }
 
-            if (!colorInputOnly || back.getColorModel().getNumComponents() == 3) {
-                boolean newFront = false;
-
-                PlanarImage front = softFront.get();
-
-                if (front == null || changed) {
-                    front = setFront();
-                    softFront = new SoftReference<PlanarImage>(front);
-                    newFront = true;
-                }
-
-                PlanarImage result = softResult.get();
-
-                if (newFront || result == null) {
-                    RGBColorSelection colorSelection = getColorSelection();
-
-                    if (opacity != 1 || blendingMode != "Normal" || validRegion(getRegion())
-                        || (colorSelection != null && !colorSelection.isAllSelected())) {
-                        RenderedOp blender = (RenderedOp) softBlender.get();
-
-                        if (validRegion(getRegion())
-                            && (!rendering.getInputTransform().equals(lastTransform)
-                                || (blender != null && blender.getParameters().get(2) != mask))) {
-                            mask = new LCROIShape(getRegion(), rendering.getInputTransform());
-                            blender = null;
-                        } else if (getRegion() == null)
-                            mask = null;
-
-                        if (colorSelection != null && !colorSelection.isAllSelected()
-                            && (newFront
-                                || !colorSelection.equals(lastColorSelection)
-                                || !rendering.getInputTransform().equals(lastTransform)
-                                || (blender != null && blender.getParameters().get(3) != colorSelectionMask))) {
-
-                            PlanarImage labImage = Functions.toColorSpace(back, new LCMS_ColorSpace(new LCMS.LABProfile()),
-                                                              LCMSColorConvertDescriptor.RELATIVE_COLORIMETRIC, null);
-                            ParameterBlock pb = new ParameterBlock();
-                            pb.addSource(labImage);
-                            pb.add(new int[]{1, 2});
-                            RenderedOp abImage = JAI.create("bandselect", pb, null);
-
-                            pb = new ParameterBlock();
-                            pb.addSource(back);
-                            pb.add(new double[][]{{ColorScience.Wr, ColorScience.Wg, ColorScience.Wb, 0}});
-                            PlanarImage monochrome = JAI.create("BandCombine", pb, null);
-
-                            RenderingHints layoutHints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, Functions.getImageLayout(labImage));
-                            // layoutHints.add(JAIContext.noCacheHint);
-                            pb = new ParameterBlock();
-                            pb.addSource(monochrome);
-                            pb.addSource(abImage);
-                            PlanarImage maskImage = JAI.create("BandMerge", pb, layoutHints);
-
-                            colorSelectionMask = new RGBColorSelectionMaskOpImage(maskImage, getColorSelection(), null);
-
-                            ParameterBlock maskPB;
-
-//                            KernelJAI morph = new KernelJAI(3, 3, new float[]{1, 1, 1, 1, 1, 1, 1, 1, 1});
-//
-//                            maskPB = new ParameterBlock();
-//                            maskPB.addSource(colorSelectionMask);
-//                            maskPB.add(morph);
-//                            colorSelectionMask = JAI.create("Erode", maskPB, null);
-//
-//                            maskPB = new ParameterBlock();
-//                            maskPB.addSource(colorSelectionMask);
-//                            maskPB.add(morph);
-//                            colorSelectionMask = JAI.create("Dilate", maskPB, null);
-
-                            RenderingHints extenderHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
-                                                                              BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-                            KernelJAI kernel = Functions.getGaussKernel(0.5 * scale);
-                            maskPB = new ParameterBlock();
-                            maskPB.addSource(colorSelectionMask);
-                            maskPB.add(kernel);
-                            colorSelectionMask = JAI.create("Convolve", maskPB, extenderHints);
-
-                            lastColorSelection = colorSelection;
-                        } else if (colorSelection == null || colorSelection.isAllSelected())
-                            colorSelectionMask = null;
-
-                        lastTransform = rendering.getInputTransform();
-
-                        softResult = softBlender = new SoftReference<PlanarImage>(blender = createBlender(front));
-                        return blender;
-                    } else {
-                        softResult = softFront;
-                        return front;
-                    }
-                } else
-                    return result;
-            } else
+            if (colorInputOnly && back.getColorModel().getNumComponents() != 3)
                 return back;
+
+            boolean newFront = false;
+
+            PlanarImage front = softFront.get();
+
+            if (front == null || changed) {
+                front = setFront();
+                softFront = new SoftReference<PlanarImage>(front);
+                newFront = true;
+            }
+
+            PlanarImage result = softResult.get();
+
+            if (!newFront && result != null)
+                return result;
+
+            RGBColorSelection colorSelection = getColorSelection();
+
+            if (opacity == 1 && blendingMode.equals("Normal") && !validRegion(getRegion())
+                    && (colorSelection == null || colorSelection.isAllSelected())) {
+                softResult = softFront;
+                return front;
+            }
+
+            RenderedOp blender = (RenderedOp) softBlender.get();
+
+            if (validRegion(getRegion())
+                    && (!rendering.getInputTransform().equals(lastTransform)
+                    || (blender != null && blender.getParameters().get(2) != mask))) {
+                mask = new LCROIShape(getRegion(), rendering.getInputTransform());
+                blender = null;
+            } else if (getRegion() == null) {
+                mask = null;
+            }
+
+            if (colorSelection != null && !colorSelection.isAllSelected()
+                    && (newFront
+                    || !colorSelection.equals(lastColorSelection)
+                    || !rendering.getInputTransform().equals(lastTransform)
+                    || (blender != null && blender.getParameters().get(3) != colorSelectionMask))) {
+
+                PlanarImage labImage = Functions.toColorSpace(back, new LCMS_ColorSpace(new LCMS.LABProfile()),
+                        LCMSColorConvertDescriptor.RELATIVE_COLORIMETRIC, null);
+                ParameterBlock pb = new ParameterBlock();
+                pb.addSource(labImage);
+                pb.add(new int[]{1, 2});
+                RenderedOp abImage = JAI.create("bandselect", pb, null);
+
+                pb = new ParameterBlock();
+                pb.addSource(back);
+                pb.add(new double[][]{{ColorScience.Wr, ColorScience.Wg, ColorScience.Wb, 0}});
+                PlanarImage monochrome = JAI.create("BandCombine", pb, null);
+
+                RenderingHints layoutHints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, Functions.getImageLayout(labImage));
+                // layoutHints.add(JAIContext.noCacheHint);
+                pb = new ParameterBlock();
+                pb.addSource(monochrome);
+                pb.addSource(abImage);
+                PlanarImage maskImage = JAI.create("BandMerge", pb, layoutHints);
+
+                colorSelectionMask = new RGBColorSelectionMaskOpImage(maskImage, getColorSelection(), null);
+
+                ParameterBlock maskPB;
+
+//              KernelJAI morph = new KernelJAI(3, 3, new float[]{1, 1, 1, 1, 1, 1, 1, 1, 1});
+//
+//              maskPB = new ParameterBlock();
+//              maskPB.addSource(colorSelectionMask);
+//              maskPB.add(morph);
+//              colorSelectionMask = JAI.create("Erode", maskPB, null);
+//
+//              maskPB = new ParameterBlock();
+//              maskPB.addSource(colorSelectionMask);
+//              maskPB.add(morph);
+//              colorSelectionMask = JAI.create("Dilate", maskPB, null);
+
+                RenderingHints extenderHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
+                        BorderExtender.createInstance(BorderExtender.BORDER_COPY));
+                KernelJAI kernel = Functions.getGaussKernel(0.5 * scale);
+                maskPB = new ParameterBlock();
+                maskPB.addSource(colorSelectionMask);
+                maskPB.add(kernel);
+                colorSelectionMask = JAI.create("Convolve", maskPB, extenderHints);
+
+                lastColorSelection = colorSelection;
+            } else if (colorSelection == null || colorSelection.isAllSelected()) {
+                colorSelectionMask = null;
+            }
+
+            lastTransform = rendering.getInputTransform();
+
+            softResult = softBlender = new SoftReference<PlanarImage>(blender = createBlender(front));
+            return blender;
         }
     }
 
     abstract protected BlendedTransform createBlendedOp(PlanarImage source);
 
+    @Override
     protected Transform createOp(PlanarImage source) {
         return createBlendedOp(source);
     }
 
+    @Override
     public void setLayerConfig(LayerConfig layer) {
-        if (blendingMode != layer.getMode().getName() || opacity != layer.getOpacity()) {
+        if (!blendingMode.equals(layer.getMode().getName()) || opacity != layer.getOpacity()) {
             blendingMode = layer.getMode().getName();
             opacity = layer.getOpacity();
             settingsChanged();
         }
     }
 
+    @Override
     public LayerConfig getDefaultLayerConfig() {
         return new LayerConfig(new LayerModeImpl("Normal"), 1.);
     }

@@ -1,4 +1,6 @@
-inline void transpose(float* srcBuf, float* dstBuf, const int width, const int height) {
+#pragma once
+
+static inline void transpose(float* srcBuf, float* dstBuf, const int width, const int height) {
 #if _OPENMP < 201307
 #   pragma omp for
 #else

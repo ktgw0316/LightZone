@@ -1,81 +1,26 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2016 Masahiro Kitagawa */
 
 package com.lightcrafts.platform.windows;
 
 import com.lightcrafts.app.Application;
-// import com.lightcrafts.app.CheckForUpdate;
-import com.lightcrafts.app.ExceptionDialog;
 import com.lightcrafts.app.other.OtherApplication;
 import com.lightcrafts.app.other.WindowsApplication;
-import com.lightcrafts.splash.SplashImage;
-import com.lightcrafts.splash.SplashWindow;
-import com.lightcrafts.utils.Version;
+import com.lightcrafts.platform.Launcher;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.EventQueue;
 import java.io.File;
 
 /**
  * Launch LightZone for Windows.
  */
-public final class WindowsLauncher {
+public final class WindowsLauncher extends Launcher {
 
     ////////// public /////////////////////////////////////////////////////////
 
-    /**
-     * Does the following:
-     *  <ol>
-     *    <li>Sets the Swing pluggable look and feel.
-     *    <li>Checks for a valid license.
-     *    <li>Shows the splash screen.
-     *    <li>Launches the application.
-     *    <li>Disposes of the splash screen.
-     *    <li>Check for a LightZone update.
-     *  </ol>
-     *
-     * @param args The command line arguments.
-     */
-    public static void main( String[] args ) {
-        System.setProperty("awt.useSystemAAFontSettings", "on");
-        if (System.getProperty("os.arch").endsWith("64")) {
-            System.setProperty("com.sun.media.jai.disableMediaLib", "true");
-        }
-
-        final boolean lafCond = sun.swing.SwingUtilities2.isLocalDisplay();
-        Object aaTextInfo = sun.swing.SwingUtilities2.AATextInfo.getAATextInfo(lafCond);
-        UIManager.getDefaults().put(sun.swing.SwingUtilities2.AA_TEXT_PROPERTY_KEY, aaTextInfo);
-
-        System.out.println(
-            "This is " + Version.getApplicationName() + ' '
-            + Version.getVersionName()
-            + " (" + Version.getRevisionNumber() + ')'
-        );
-
-        final String javaVersion = System.getProperty( "java.version" );
-        System.out.println( "Running Java version " + javaVersion );
-
-        try {
-            /* Application.setLookAndFeel(
-                "net.java.plaf.windows.WindowsLookAndFeel"
-            ); */
-
-            final String licenseText = "Open Source";
-
-            // CheckForUpdate.start();
-            {
-                final SplashImage image = new SplashImage(
-                    SplashImage.getDefaultSplashText( licenseText )
-                );
-                SplashWindow.splash( image );
-                Application.setStartupProgress( image.getStartupProgress() );
-                Application.main( args );
-                SplashWindow.disposeSplash();
-            }
-            // CheckForUpdate.showAlertIfAvailable();
-        }
-        catch ( Throwable t ) {
-            (new ExceptionDialog()).handle( t );
-        }
+    public static void main(String[] args) {
+        final Launcher launcher = new WindowsLauncher();
+        launcher.init(args);
     }
 
     /**
@@ -85,6 +30,21 @@ public final class WindowsLauncher {
      * @noinspection UNUSED_SYMBOL
      */
     public static native void readyToOpenFiles();
+
+    ////////// protected //////////////////////////////////////////////////////
+
+    @Override
+    protected void setSystemProperties() {
+        System.setProperty("awt.useSystemAAFontSettings", "on");
+        if (System.getProperty("os.arch").endsWith("64")) {
+            System.setProperty("com.sun.media.jai.disableMediaLib", "true");
+        }
+    }
+
+    @Override
+    protected void startForkDaemon() {
+        // Do nothing.
+    }
 
     ////////// private ////////////////////////////////////////////////////////
 
@@ -104,13 +64,8 @@ public final class WindowsLauncher {
             WindowsApplication.getAppForExe( parentExe );
         System.out.println( "Parent process: " + parentExe );
         System.out.println( "File path: " + pathToFile );
-        EventQueue.invokeLater(
-            new Runnable() {
-                public void run() {
-                    Application.openFrom( file, app );
-                }
-            }
-        );
+        EventQueue.invokeLater( () -> Application.openFrom( file, app ) );
     }
+
 }
 /* vim:set et sw=4 ts=4: */

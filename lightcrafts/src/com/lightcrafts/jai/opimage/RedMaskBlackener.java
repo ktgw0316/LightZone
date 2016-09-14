@@ -4,14 +4,12 @@ package com.lightcrafts.jai.opimage;
 
 import com.lightcrafts.mediax.jai.PointOpImage;
 import com.lightcrafts.mediax.jai.ImageLayout;
+import com.lightcrafts.mediax.jai.RasterAccessor;
+import com.lightcrafts.mediax.jai.RasterFormatTag;
 
 import java.awt.image.*;
-import java.awt.color.ColorSpace;
 import java.awt.*;
 import java.util.Map;
-
-import sun.awt.image.ShortInterleavedRaster;
-import sun.awt.image.ByteInterleavedRaster;
 
 /**
  * Copyright (C) 2007 Light Crafts, Inc.
@@ -32,30 +30,48 @@ public class RedMaskBlackener extends PointOpImage {
         permitInPlaceOperation();
     }
 
+    @Override
     protected void computeRect(Raster[] sources,
                                WritableRaster dest,
                                Rectangle destRect) {
-        ushortLoop((ShortInterleavedRaster) sources[0], (ByteInterleavedRaster) sources[1], (ShortInterleavedRaster) dest);
+        // Retrieve format tags.
+        RasterFormatTag[] formatTags = getFormatTags();
+
+        RasterAccessor src = new RasterAccessor(sources[0], destRect,
+                formatTags[0],
+                getSourceImage(0).getColorModel());
+        RasterAccessor mask = new RasterAccessor(sources[1], destRect,
+                formatTags[1],
+                getSourceImage(1).getColorModel());
+        RasterAccessor dst = new RasterAccessor(dest, destRect,
+                formatTags[2], getColorModel());
+
+        switch (dst.getDataType()) {
+            case DataBuffer.TYPE_USHORT:
+                ushortLoop(src, mask, dst);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unsupported data type: " + dst.getDataType());
+        }
     }
 
-    protected void ushortLoop(ShortInterleavedRaster src, ByteInterleavedRaster mask, ShortInterleavedRaster dst) {
+    protected void ushortLoop(RasterAccessor src, RasterAccessor mask, RasterAccessor dst) {
         int width = src.getWidth();
         int height = src.getHeight();
 
-        short dstData[] = dst.getDataStorage();
-        int dstBandOffsets[] = dst.getDataOffsets();
+        short dstData[] = dst.getShortDataArray(0);
+        int dstBandOffsets[] = dst.getBandOffsets();
         int dstLineStride = dst.getScanlineStride();
         int dstPixelStride = dst.getPixelStride();
 
-        short srcData[] = src.getDataStorage();
-        int srcBandOffsets[] = src.getDataOffsets();
+        short srcData[] = src.getShortDataArray(0);
+        int srcBandOffsets[] = src.getBandOffsets();
         int srcLineStride = src.getScanlineStride();
         int srcPixelStride = src.getPixelStride();
 
-        byte maskData[] = mask.getDataStorage();
-        int maskBandOffsets[] = mask.getDataOffsets();
+        byte maskData[] = mask.getByteDataArray(0);
+        int maskBandOffsets[] = mask.getBandOffsets();
         int maskLineStride = mask.getScanlineStride();
-        int maskPixelStride = mask.getPixelStride();
 
         int srcROffset = srcBandOffsets[0];
         int srcGOffset = srcBandOffsets[1];

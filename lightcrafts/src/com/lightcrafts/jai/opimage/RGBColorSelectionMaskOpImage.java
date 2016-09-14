@@ -4,8 +4,9 @@ package com.lightcrafts.jai.opimage;
 
 import com.lightcrafts.mediax.jai.PointOpImage;
 import com.lightcrafts.mediax.jai.ImageLayout;
+import com.lightcrafts.mediax.jai.RasterAccessor;
+import com.lightcrafts.mediax.jai.RasterFormatTag;
 import com.lightcrafts.model.RGBColorSelection;
-import com.lightcrafts.utils.ColorScience;
 import com.lightcrafts.utils.LCMS;
 import com.lightcrafts.jai.JAIContext;
 
@@ -13,9 +14,6 @@ import java.awt.image.*;
 import java.awt.color.ColorSpace;
 import java.awt.*;
 import java.util.Map;
-
-import sun.awt.image.ShortInterleavedRaster;
-import sun.awt.image.ByteInterleavedRaster;
 
 public class RGBColorSelectionMaskOpImage extends PointOpImage {
     private static LCMS.Transform ts = new LCMS.Transform(new LCMS.Profile(JAIContext.linearProfile), LCMS.TYPE_RGB_16,
@@ -52,25 +50,25 @@ public class RGBColorSelectionMaskOpImage extends PointOpImage {
         // System.out.println("RGBColorSelectionMaskOpImage - L:" + L + ", a:" + a + ", b: " + b + ", radius: " + colorSelection.radius);
     }
 
+    @Override
     protected void computeRect(Raster[] sources, WritableRaster dest, Rectangle destRect) {
-        ShortInterleavedRaster src = (ShortInterleavedRaster) sources[0];
-        ByteInterleavedRaster dst = (ByteInterleavedRaster) dest;
+        RasterFormatTag[] formatTags = getFormatTags();
 
-        dst = (ByteInterleavedRaster) dst.createChild(destRect.x, destRect.y, destRect.width, destRect.height,
-                                                      destRect.x, destRect.y, null);
+        Raster source = sources[0];
+        Rectangle srcRect = mapDestRect(destRect, 0);
+
+        RasterAccessor src = new RasterAccessor(source, srcRect, formatTags[0],
+                getSourceImage(0).getColorModel());
+        RasterAccessor dst = new RasterAccessor(dest, destRect, formatTags[1], getColorModel());
 
         int width = dst.getWidth();
         int height = dst.getHeight();
 
-        byte dstData[] = dst.getDataStorage();
-        int dstBandOffsets[] = dst.getDataOffsets();
+        int dstBandOffsets[] = dst.getBandOffsets();
         int dstLineStride = dst.getScanlineStride();
-        // int dstPixelStride = dst.getPixelStride();
 
-        short srcData[] = src.getDataStorage();
-        int srcBandOffsets[] = src.getDataOffsets();
+        int srcBandOffsets[] = src.getBandOffsets();
         int srcLineStride = src.getScanlineStride();
-        // int srcPixelStride = src.getPixelStride();
 
         int dstOffset = dstBandOffsets[0];
 
@@ -83,11 +81,34 @@ public class RGBColorSelectionMaskOpImage extends PointOpImage {
             colorSelection.isLuminosityEnabled ? colorSelection.luminosityUpperFeather : 0
         };
 
-        nativeUshortLoop(srcData, dstData, width, height,
-                         srcBandOffsets, dstOffset,
-                         srcLineStride, dstLineStride,
-                         colorSelectionArray, colorSelection.isInverted);
+        if (src.getDataType() == DataBuffer.TYPE_INT && dst.getDataType() == DataBuffer.TYPE_INT) {
+            int srcData[] = src.getIntDataArray(0);
+            int dstData[] = dst.getIntDataArray(0);
+            nativeIntLoop(srcData, dstData, width, height,
+                    srcBandOffsets, dstOffset,
+                    srcLineStride, dstLineStride,
+                    colorSelectionArray, colorSelection.isInverted);
+        }
+        else if (src.getDataType() == DataBuffer.TYPE_USHORT && dst.getDataType() == DataBuffer.TYPE_BYTE) {
+            short srcData[] = src.getShortDataArray(0);
+            byte dstData[] = dst.getByteDataArray(0);
+            nativeUshortLoop(srcData, dstData, width, height,
+                    srcBandOffsets, dstOffset,
+                    srcLineStride, dstLineStride,
+                    colorSelectionArray, colorSelection.isInverted);
+        }
+        else {
+            throw new UnsupportedOperationException(
+                    "Unsupported data type pair: " + src.getDataType() + ", " + dst.getDataType());
+        }
+        dst.copyDataToRaster();
     }
+
+    private native void nativeIntLoop(int[] srcData, int[] dstData,
+                                      int width, int height,
+                                      int[] srcBandOffsets, int dstOffset,
+                                      int srcLineStride, int dstLineStride,
+                                      float[] colorSelection, boolean invert);
 
     private native void nativeUshortLoop(short srcData[], byte dstData[],
                                          int width, int height,
@@ -151,7 +172,7 @@ public class RGBColorSelectionMaskOpImage extends PointOpImage {
 
                     colorMask *= brightnessMask;
                 }
-                
+
                 dstData[col + row * dstLineStride + dstOffset] = (byte) (0xff * colorMask);
             }
         }

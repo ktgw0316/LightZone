@@ -3,12 +3,14 @@
 package com.lightcrafts.jai.opimage;
 
 import com.lightcrafts.jai.operator.LCMSColorConvertDescriptor;
+import com.lightcrafts.mediax.jai.RasterAccessor;
+import com.lightcrafts.mediax.jai.RasterFormatTag;
 import com.lightcrafts.utils.LCMS;
-import com.lightcrafts.utils.LCMS_LabColorSpace;
 import com.lightcrafts.utils.LCMS_ColorSpace;
 
 import com.lightcrafts.mediax.jai.PointOpImage;
 import com.lightcrafts.mediax.jai.ImageLayout;
+
 import java.awt.image.*;
 import java.awt.*;
 import java.awt.color.ICC_ColorSpace;
@@ -16,15 +18,12 @@ import java.awt.color.ColorSpace;
 import java.awt.color.ICC_Profile;
 import java.util.Map;
 
-import sun.awt.image.ShortInterleavedRaster;
-import sun.awt.image.ByteInterleavedRaster;
-
 public class LCMSColorConvertOpImage extends PointOpImage {
-    final LCMSColorConvertDescriptor.RenderingIntent intent;
-    final LCMSColorConvertDescriptor.RenderingIntent proofIntent;
-    final ColorModel targetColorModel;
-    final ICC_Profile proof;
-    LCMS.Transform transform = null;
+    private final LCMSColorConvertDescriptor.RenderingIntent intent;
+    private final LCMSColorConvertDescriptor.RenderingIntent proofIntent;
+    private final ColorModel targetColorModel;
+    private final ICC_Profile proof;
+    private LCMS.Transform transform = null;
     final RenderedImage source;
 
     LCMSColorConvertOpImage(RenderedImage source,
@@ -62,6 +61,7 @@ public class LCMSColorConvertOpImage extends PointOpImage {
         }
     }
 
+    @Override
     protected void computeRect(Raster[] sources, WritableRaster dest, Rectangle destRect) {
         synchronized (this) {
             if (transform == null) {
@@ -92,17 +92,18 @@ public class LCMSColorConvertOpImage extends PointOpImage {
                             : new LCMS.Transform(sourceProfile, inType, targetProfile, outType, lcms_intent, lcms_flags);
             }
         }
-        if (sources[0] instanceof ByteInterleavedRaster && dest instanceof ByteInterleavedRaster) {
-            ByteInterleavedRaster source = (ByteInterleavedRaster) sources[0];
-            ByteInterleavedRaster destination = (ByteInterleavedRaster) dest;
 
-            transform.doTransform(source, destination);
-        } else if (sources[0] instanceof ShortInterleavedRaster && dest instanceof ShortInterleavedRaster) {
-            ShortInterleavedRaster source = (ShortInterleavedRaster) sources[0];
-            ShortInterleavedRaster destination = (ShortInterleavedRaster) dest;
+        RasterFormatTag[] formatTags = getFormatTags();
+        Rectangle srcRect = mapDestRect(destRect, 0);
+        RasterAccessor src = new RasterAccessor(sources[0], srcRect, formatTags[0], getSourceImage(0).getColorModel());
+        RasterAccessor dst = new RasterAccessor(dest, destRect, formatTags[1], this.getColorModel());
 
-            transform.doTransform(source, destination);
-        } else
-            throw new IllegalArgumentException( "Input and output rasters don't match!" );
+        if (src.getDataType() == dst.getDataType()) {
+            transform.doTransform(src, formatTags[0], getSourceImage(0).getColorModel(),
+                                  dst, formatTags[1], this.getColorModel());
+        }
+        else {
+            throw new IllegalArgumentException("Input and output rasters don't match!");
+        }
     }
 }

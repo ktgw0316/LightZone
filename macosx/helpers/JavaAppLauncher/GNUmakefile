@@ -16,9 +16,28 @@ JARS:=		$(COMMON_DIR)/products/lightcrafts.jar \
 # Uncomment to compile in debug mode.
 #DEBUG:=		true
 
-export MACOSX_DEPLOYMENT_TARGET:=	$(shell sw_vers -productVersion | cut -d. -f-2)
+MACOSX_MINOR_VERSION:=	$(shell sw_vers -productVersion | cut -d. -f2-2)
 
-SDKROOT:=	$(shell xcodebuild -version -sdk macosx${MACOSX_DEPLOYMENT_TARGET} | sed -n '/^Path:/p' | sed 's/^Path: //')
+# Different compilers required for Objective-C sources.
+ifeq ($(MACOSX_MINOR_VERSION),6) # Snow Leopard
+  CC=	gcc
+  CXX=	g++
+else
+  MACOSX_DEPLOYMENT_TARGET:=	$(shell sw_vers -productVersion | cut -d. -f-2)
+  SDKROOT:=	$(shell xcodebuild -version -sdk macosx${MACOSX_DEPLOYMENT_TARGET} | sed -n '/^Path:/p' | sed 's/^Path: //')
+
+  XCODE_PATH:=	$(shell xcode-select -p)
+  ifeq ($(findstring CommandLineTools,$(XCODE_PATH)),CommandLineTools)
+    # Use command line tools.
+    XCODE_BIN_DIR=	$(XCODE_PATH)/usr/bin
+  else
+    # Use Xcode.
+    XCODE_BIN_DIR=	$(XCODE_PATH)/Toolchains/XcodeDefault.xctoolchain/usr/bin
+  endif
+  CC=	$(XCODE_BIN_DIR)/clang
+  CXX=	$(XCODE_BIN_DIR)/clang++
+endif
+
 ifeq ($(UNIVERSAL),1)
   ##
   # We need to build the PowerPC part with gcc/g++ 3.3 so the launcher will run

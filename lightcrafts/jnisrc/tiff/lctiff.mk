@@ -12,11 +12,9 @@ TARGET_BASE:=		LCTIFF
 # Uncomment to compile in debug mode.
 #DEBUG:=		true
 
-ifeq ($(PLATFORM),Windows)
-  JNI_EXTRA_LINK:=	-Wl,-Bdynamic -lLCJNI -ltiff.dll -Wl,-Bstatic -lstdc++ 
-else
-  JNI_EXTRA_LINK:=	-lLCJNI -ltiff -lstdc++ 
-endif
+JNI_WINDOWS_LINK:=	-Wl,-Bdynamic -lLCJNI -ltiff.dll -Wl,-Bstatic -lstdc++
+JNI_LINUX_LINK:=	-lLCJNI -ltiff -lstdc++
+JNI_MACOSX_LINK:=	../jniutils/libLCJNI.a -ltiff
 JNI_MACOSX_INCLUDES:=	-I/usr/local/include
 JNI_MACOSX_LDFLAGS:=	-L/usr/local/lib
 

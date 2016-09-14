@@ -16,21 +16,22 @@ class LayerModeImpl implements LayerMode {
         this.name = name;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public String toString() {
         return getName();
     }
 
+    @Override
     public boolean equals(Object o) {
-        if (! (o instanceof LayerMode)) {
-            return false;
-        }
-        return name.equals(((LayerMode) o).getName());
+        return (o instanceof LayerMode) && name.equals(((LayerMode) o).getName());
     }
 
+    @Override
     public int hashCode() {
         return name.hashCode();
     }

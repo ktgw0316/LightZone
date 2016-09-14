@@ -3,7 +3,6 @@
 package com.lightcrafts.model.ImageEditor;
 
 import Jama.Matrix;
-import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
@@ -343,6 +342,7 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
             super(source);
         }
 
+        @Override
         public PlanarImage setFront() {
             float lightness = 0.18f;
 
@@ -364,14 +364,17 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
         }
     }
 
+    @Override
     protected void updateOp(Transform op) {
         op.update();
     }
 
+    @Override
     protected BlendedTransform createBlendedOp(PlanarImage source) {
         return new WhiteBalanceTransform(source);
     }
 
+    @Override
     public OperationType getType() {
         return type;
     }

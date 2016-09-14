@@ -5,7 +5,6 @@ package com.lightcrafts.model.ImageEditor;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.jai.JAIContext;
-import com.lightcrafts.jai.opimage.HDROpImage;
 import com.lightcrafts.model.LayerConfig;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
@@ -54,26 +53,28 @@ public class HDROperation extends BlendedOperation {
         setSliderConfig(DETAIL, new SliderConfig(0, 1, detail, .1, false, format));
     }
 
+    @Override
     public boolean neutralDefault() {
         return false;
     }
 
     static final OperationType type = new OperationTypeImpl("Tone Mapper");
 
+    @Override
     public void setSliderValue(String key, double value) {
         value = roundValue(key, value);
-        
-        if (key == RADIUS && radius != value) {
+
+        if (key.equals(RADIUS) && radius != value) {
             radius = value;
-        } else if (key == GAMMA && gamma != value) {
+        } else if (key.equals(GAMMA) && gamma != value) {
             gamma = value;
             byteLut = null;
             ushortLut = null;
-        } else if (key == DETAIL && detail != value) {
+        } else if (key.equals(DETAIL) && detail != value) {
             detail = value;
         } else
             return;
-        
+
         super.setSliderValue(key, value);
     }
 
@@ -95,7 +96,8 @@ public class HDROperation extends BlendedOperation {
         }
     }
 
-    class DesaturateInvertProcessor implements ImageProcessor {
+    private class DesaturateInvertProcessor implements ImageProcessor {
+        @Override
         public RenderedOp process(RenderedImage source) {
             RenderedImage singleChannel;
             if (source.getColorModel().getNumComponents() == 3) {
@@ -105,8 +107,9 @@ public class HDROperation extends BlendedOperation {
                 pb.addSource( source );
                 pb.add( yChannel );
                 singleChannel = JAI.create("BandCombine", pb, null);
-            } else
+            } else {
                 singleChannel = source;
+            }
 
             RenderedOp invert = JAI.create("Not", singleChannel, JAIContext.noCacheHint);       // Invert
             LookupTableJAI table = computeGammaTable(invert.getColorModel().getTransferType());
@@ -128,6 +131,7 @@ public class HDROperation extends BlendedOperation {
             this.op = op;
         }
 
+        @Override
         public PlanarImage setFront() {
             // Calculate a blurred desautuated inverted version of the source as a mask
             PlanarImage front = Functions.gaussianBlur(back, rendering, op, desaturateInvert, radius * scale);
@@ -141,8 +145,9 @@ public class HDROperation extends BlendedOperation {
                     pb.addSource( back );
                     pb.add( yChannel );
                     singleChannel = JAI.create("BandCombine", pb, null);
-                } else
+                } else {
                     singleChannel = back;
+                }
 
                 ParameterBlock pb = new ParameterBlock();
                 pb.addSource( singleChannel );
@@ -164,18 +169,22 @@ public class HDROperation extends BlendedOperation {
         }
     }
 
+    @Override
     protected void updateOp(Transform op) {
         op.update();
     }
 
+    @Override
     protected BlendedTransform createBlendedOp(PlanarImage source) {
         return new HDROperation.ToneMaperTransform(source, this);
     }
 
+    @Override
     public OperationType getType() {
         return type;
     }
 
+    @Override
     public LayerConfig getDefaultLayerConfig() {
         return new LayerConfig(new LayerModeImpl("Soft Light"), .75);
     }

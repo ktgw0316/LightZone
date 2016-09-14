@@ -6,7 +6,6 @@ import com.lightcrafts.mediax.jai.*;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
 import com.lightcrafts.jai.opimage.FastBilateralFilterOpImage;
-import com.lightcrafts.jai.opimage.HDROpImage;
 import com.lightcrafts.jai.opimage.HDROpImage2;
 import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.jai.utils.Functions;
@@ -54,29 +53,31 @@ public class HDROperationV3 extends BlendedOperation {
 
         addSliderKey(DEPTH);
         setSliderConfig(DEPTH, new SliderConfig(8, 64, depth, .05, false, format));
-        
+
         addSliderKey(FUZZ);
         setSliderConfig(FUZZ, new SliderConfig(0.1, 1, fuzz, .05, false, format));
     }
 
+    @Override
     public boolean neutralDefault() {
         return false;
     }
 
     static final OperationType typeV5 = new OperationTypeImpl("Tone Mapper V5");
 
+    @Override
     public void setSliderValue(String key, double value) {
         value = roundValue(key, value);
 
-        if (key == FUZZ && fuzz != value) {
+        if (key.equals(FUZZ) && fuzz != value) {
             fuzz = value;
-        } else if (key == DEPTH && depth != value) {
+        } else if (key.equals(DEPTH) && depth != value) {
             depth = value;
-        } else if (key == HIGHLIGHTS && highlights != value) {
+        } else if (key.equals(HIGHLIGHTS) && highlights != value) {
             highlights = value;
-        } else if (key == DETAIL && detail != value) {
+        } else if (key.equals(DETAIL) && detail != value) {
             detail = value;
-        } else if (key == SHADOWS && shadows != value) {
+        } else if (key.equals(SHADOWS) && shadows != value) {
             shadows = value;
         } else
             return;
@@ -92,11 +93,10 @@ public class HDROperationV3 extends BlendedOperation {
         SoftReference<PlanarImage> lastBack = new SoftReference<PlanarImage>(null);
         SoftReference<PlanarImage> mask = new SoftReference<PlanarImage>(null);
 
-        int mask_count = 0;
-
         private double last_radius = 0;
         private double last_fuzz = 0;
 
+        @Override
         public PlanarImage setFront() {
             if (lastBack.get() != back || mask.get() == null || depth != last_radius || fuzz != last_fuzz) {
                 RenderedImage singleChannel;
@@ -122,34 +122,21 @@ public class HDROperationV3 extends BlendedOperation {
 //                pb.add(new int[]{1});
 //                maskImage = JAI.create("bandselect", pb, null);
 
-                if (true) {
-                    ParameterBlock pb = new ParameterBlock();
-                    pb.addSource(maskImage);
-                    pb.add(new int[]{0});
-                    RenderedOp bfMask = JAI.create("bandselect", pb, null);
+                ParameterBlock pb = new ParameterBlock();
+                pb.addSource(maskImage);
+                pb.add(new int[]{0});
+                RenderedOp bfMask = JAI.create("bandselect", pb, null);
 
-                    KernelJAI kernel = Functions.getGaussKernel(10 * fuzz * scale);
-                    pb = new ParameterBlock();
-                    pb.addSource(bfMask);
-                    pb.add(kernel);
-                    RenderedOp blurredMask = JAI.create("LCSeparableConvolve", pb, extenderHints);
+                KernelJAI kernel = Functions.getGaussKernel(10 * fuzz * scale);
+                pb = new ParameterBlock();
+                pb.addSource(bfMask);
+                pb.add(kernel);
+                RenderedOp blurredMask = JAI.create("LCSeparableConvolve", pb, extenderHints);
 
-                    pb = new ParameterBlock();
-                    pb.addSource( maskImage );
-                    pb.addSource( blurredMask );
-                    maskImage = JAI.create("BandMerge", pb, null);
-                } else {
-                    ParameterBlock pb = new ParameterBlock();
-                    pb.addSource(maskImage);
-                    pb.add(new int[]{0});
-                    maskImage = JAI.create("bandselect", pb, null);
-
-                    KernelJAI kernel = Functions.getGaussKernel(10 * fuzz * scale);
-                    pb = new ParameterBlock();
-                    pb.addSource(maskImage);
-                    pb.add(kernel);
-                    maskImage = JAI.create("LCSeparableConvolve", pb, extenderHints);
-                }
+                pb = new ParameterBlock();
+                pb.addSource( maskImage );
+                pb.addSource( blurredMask );
+                maskImage = JAI.create("BandMerge", pb, null);
 
                 last_radius = fuzz;
                 last_fuzz = detail;
@@ -162,14 +149,17 @@ public class HDROperationV3 extends BlendedOperation {
         }
     }
 
+    @Override
     protected void updateOp(Transform op) {
         op.update();
     }
 
+    @Override
     protected BlendedTransform createBlendedOp(PlanarImage source) {
         return new ToneMaperTransform(source);
     }
 
+    @Override
     public OperationType getType() {
         return type;
     }

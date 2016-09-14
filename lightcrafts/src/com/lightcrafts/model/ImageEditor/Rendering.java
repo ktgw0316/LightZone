@@ -27,7 +27,7 @@ public class Rendering implements Cloneable {
     private final PlanarImage sourceImage;
     private PlanarImage xformedSourceImage;
     private ImageEditorEngine engine;
-    private LinkedList<OperationImpl> pipeline = new LinkedList<OperationImpl>();
+    private LinkedList<Operation> pipeline = new LinkedList<Operation>();
     private ImagePyramid pyramid;
 
     public boolean cheapScale = false;
@@ -44,8 +44,8 @@ public class Rendering implements Cloneable {
             object.transform = buildTransform(false);
             object.xformedSourceImage = null;
 
-            object.pipeline = new LinkedList<OperationImpl>();
-            for ( OperationImpl op : pipeline )
+            object.pipeline = new LinkedList<Operation>();
+            for ( Operation op : pipeline )
                 object.pipeline.add(((BlendedOperation) op).clone(object));
             return object;
         } catch (CloneNotSupportedException e) {
@@ -63,7 +63,7 @@ public class Rendering implements Cloneable {
     }
 
     void addOperation(int position, Operation op) {
-        pipeline.add(position, (OperationImpl) op);
+        pipeline.add(position, op);
     }
 
     Operation removeOperation(int position) {
@@ -233,58 +233,63 @@ public class Rendering implements Cloneable {
     public PlanarImage getRendering(boolean inactive, int stopBefore) {
         PlanarImage processedImage = getXformedSourceImage();
 
-        if (pipeline != null) {
-            int index = 0;
-            for (OperationImpl operation : pipeline) {
-                if (index == stopBefore)
-                    break;
-
-                if (operation.isActive() && !(inactive && operation.isDeactivatable())) {
-                    PlanarImage result = operation.render(processedImage, scaleFactor < 1 ? scaleFactor : 1);
-                    if (result != null)
-                        processedImage = result;
-                }
-
-                index++;
-            }
-        } else
+        if (pipeline == null) {
             System.out.println("Rendering.renderPipeline: null pipeline?");
+            return processedImage;
+        }
+
+        int index = 0;
+        for (Operation op : pipeline) {
+            OperationImpl operation = (OperationImpl) op;
+            if (index == stopBefore)
+                break;
+
+            if (operation.isActive() && !(inactive && operation.isDeactivatable())) {
+                PlanarImage result = operation.render(processedImage, scaleFactor < 1 ? scaleFactor : 1);
+                if (result != null)
+                    processedImage = result;
+            }
+
+            index++;
+        }
 
         return processedImage;
     }
 
     public void prefetch(Rectangle area) {
+        if (pipeline == null) {
+            System.out.println("Rendering.renderPipeline: null pipeline?");
+            return;
+        }
+
         PlanarImage processedImage = getXformedSourceImage();
 
-        if (pipeline != null) {
-            int index = 0;
-            for (OperationImpl operation : pipeline) {
-                if (operation.isActive() /* && !(inactive && operation.isDeactivatable()) */) {
-                    PlanarImage result = operation.render(processedImage, scaleFactor < 1 ? scaleFactor : 1);
-                    if (result != null) {
-                        Point[] indices = result.getTileIndices(area);
-                        if (indices != null) {
-                            CachedImage cachedResult = new CachedImage(new ImageLayout(result), JAIContext.fileCache);
+        int index = 0;
+        for (Operation operation : pipeline) {
+            if (operation.isActive() /* && !(inactive && operation.isDeactivatable()) */) {
+                PlanarImage result = ((OperationImpl)operation).render(processedImage, scaleFactor < 1 ? scaleFactor : 1);
+                if (result != null) {
+                    Point[] indices = result.getTileIndices(area);
+                    if (indices != null) {
+                        CachedImage cachedResult = new CachedImage(new ImageLayout(result), JAIContext.fileCache);
 
-                            result.prefetchTiles(indices);
-                            for (Point tile : indices) {
-                                Raster newTile = result.getTile(tile.x, tile.y);
-                                WritableRaster cachedTile = cachedResult.getWritableTile(tile.x, tile.y);
-                                Functions.copyData(cachedTile, newTile);
-                            }
-
-                            result = cachedResult;
+                        result.prefetchTiles(indices);
+                        for (Point tile : indices) {
+                            Raster newTile = result.getTile(tile.x, tile.y);
+                            WritableRaster cachedTile = cachedResult.getWritableTile(tile.x, tile.y);
+                            Functions.copyData(cachedTile, newTile);
                         }
-                        System.out.println("Rendered layer " + index);
 
-                        processedImage = result;
+                        result = cachedResult;
                     }
-                }
+                    System.out.println("Rendered layer " + index);
 
-                index++;
+                    processedImage = result;
+                }
             }
-        } else
-            System.out.println("Rendering.renderPipeline: null pipeline?");
+
+            index++;
+        }
     }
 
     public PlanarImage getRendering() {
@@ -314,9 +319,10 @@ public class Rendering implements Cloneable {
 
             return new Dimension(sourceBounds.width,
                                  sourceBounds.height);
-        } else
-            return new Dimension((int) cropBounds.getWidth(),
-                                 (int) cropBounds.getHeight());
+        }
+
+        return new Dimension((int) cropBounds.getWidth(),
+                             (int) cropBounds.getHeight());
     }
 
     private AffineTransform buildTransform(boolean isInputTransform) {

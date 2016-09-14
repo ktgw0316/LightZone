@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.regex.Pattern;
 
 /**
  * This interface defines all platform-specific or platform-customized
@@ -209,7 +210,8 @@ public class Platform {
      * filesystem).
      */
     public String[] getPathComponentsToPicturesFolder() {
-        return new String[]{ Version.getApplicationName() };
+        final String sep = Pattern.quote(File.separator);
+        return getDefaultImageDirectory().toString().split(sep);
     }
 
     /**

@@ -17,13 +17,11 @@ import java.util.Map;
 
 public final class BilateralFilterOpImage extends AreaOpImage {
 
-    int wr; /* window radius */
-    int ws; /* window size */
-    float kernel[], scale_r;
-    final float sigma_d;
-    final float sigma_r;
+    private int wr; /* window radius */
+    private int ws; /* window size */
+    private float kernel[], scale_r;
 
-    static float SQR(float x) { return x * x; }
+    private static float SQR(float x) { return x * x; }
 
     public BilateralFilterOpImage(RenderedImage source,
                                   BorderExtender extender,
@@ -47,9 +45,6 @@ public final class BilateralFilterOpImage extends AreaOpImage {
         for (int i = -wr; i <= wr; i++)
             kernel[wr+i] = (float) (1 / (2 * SQR(sigma_d)) * i * i + 0.25);
         scale_r = 1 / (2 * SQR(sigma_r));
-
-        this.sigma_d = sigma_d;
-        this.sigma_r = sigma_r; 
     }
 
     /**
@@ -72,7 +67,7 @@ public final class BilateralFilterOpImage extends AreaOpImage {
 
         RasterAccessor srcAccessor =
                 new RasterAccessor(source, srcRect, formatTags[0],
-                                   getSource(0).getColorModel());
+                                   getSourceImage(0).getColorModel());
         RasterAccessor dstAccessor =
                 new RasterAccessor(dest, destRect, formatTags[1],
                                    this.getColorModel());

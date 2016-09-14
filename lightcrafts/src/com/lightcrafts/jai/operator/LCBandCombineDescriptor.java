@@ -155,15 +155,17 @@ public class LCBandCombineDescriptor extends OperationDescriptorImpl {
         int rowLength = sm.getNumBands() + 1;
 
         if (matrix.length < 1) {
-            message.append(getName() + ": " +
-                           "bad matrix dimensions");
+            message.append(getName())
+                   .append(": ")
+                   .append("bad matrix dimensions");
             return false;
         }
 
-        for (int i = 0; i < matrix.length; i++) {
-            if (matrix[i].length != rowLength) {
-                message.append(getName() + ": " +
-                               "bad matrix dimensions");
+        for (double[] aMatrix : matrix) {
+            if (aMatrix.length != rowLength) {
+                message.append(getName())
+                       .append(": ")
+                       .append("bad matrix dimensions");
                 return false;
             }
         }

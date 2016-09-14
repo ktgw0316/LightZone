@@ -18,16 +18,14 @@ import java.util.Map;
 
 public final class BilateralFilterRGBOpImage extends AreaOpImage {
 
-    final int y_wr, c_wr; /* window radius */
-    final int y_ws, c_ws; /* window size */
-    final float y_kernel[], c_kernel[], y_scale_r, c_scale_r;
-    final float y_sigma_d, c_sigma_d;
-    final float y_sigma_r, c_sigma_r;
-    final float rgb_to_yst[], yst_to_rgb[];
+    private final int y_wr, c_wr; /* window radius */
+    private final int y_ws, c_ws; /* window size */
+    private final float y_kernel[], c_kernel[], y_scale_r, c_scale_r;
+    private final float rgb_to_yst[], yst_to_rgb[];
 
-    static float SQR(float x) { return x * x; }
+    private static float SQR(float s) { return s * s; }
 
-    static int border(float y_sigma_d, float c_sigma_d) {
+    private static int border(float y_sigma_d, float c_sigma_d) {
         return (int) Math.max(Math.ceil(y_sigma_d), Math.ceil(c_sigma_d));
     }
 
@@ -61,11 +59,6 @@ public final class BilateralFilterRGBOpImage extends AreaOpImage {
         for (int i = -c_wr; i <= c_wr; i++)
             c_kernel[c_wr+i] = (float) (1 / (2 * SQR(c_sigma_d)) * i * i + 0.25);
         c_scale_r = 1 / (2 * SQR(c_sigma_r));
-
-        this.y_sigma_d = y_sigma_d;
-        this.y_sigma_r = y_sigma_r;
-        this.c_sigma_d = c_sigma_d;
-        this.c_sigma_r = c_sigma_r;
 
         ColorScience.LinearTransform transform = new ColorScience.YST();
 
@@ -102,7 +95,7 @@ public final class BilateralFilterRGBOpImage extends AreaOpImage {
 
         RasterAccessor srcAccessor =
                 new RasterAccessor(source, srcRect, formatTags[0],
-                                   getSource(0).getColorModel());
+                                   getSourceImage(0).getColorModel());
         RasterAccessor dstAccessor =
                 new RasterAccessor(dest, destRect, formatTags[1],
                                    this.getColorModel());

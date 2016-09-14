@@ -29,6 +29,7 @@ class ZoneOperationImpl extends BlendedOperation implements ZoneOperation {
         super(rendering, type);
     }
 
+    @Override
     public boolean neutralDefault() {
         return true;
     }
@@ -39,6 +40,7 @@ class ZoneOperationImpl extends BlendedOperation implements ZoneOperation {
 
     double[] lastPoints = null;
 
+    @Override
     public void setScale(int scale) {
         if ((scale != RgbScale) && (scale != LuminosityScale)) {
             throw new IllegalArgumentException(
@@ -52,6 +54,7 @@ class ZoneOperationImpl extends BlendedOperation implements ZoneOperation {
         }
     }
 
+    @Override
     public void setControlPoints(double[] points) {
         if (lastPoints != null) {
             if (points.length == lastPoints.length) {
@@ -107,10 +110,11 @@ class ZoneOperationImpl extends BlendedOperation implements ZoneOperation {
         return Math.log1p(255.0 * y) / (8 * Math.log(2));
     }
 
+    @Override
     public double getControlPoint(int index) {
         final double x = (Math.pow(2, index * 8.0 / 16.0) - 1) / 255.0f;
         final double y;
-        
+
         if (controlPoints == null) {
             y = x;
         } else {
@@ -139,6 +143,7 @@ class ZoneOperationImpl extends BlendedOperation implements ZoneOperation {
         return fy(y);
     }
 
+    @Override
     public void setFocusPoint(int index) {
         // System.out.println("ZoneOperation focus at: " + index);
         int zoneIndex = index >= 0 ? (int) (16 * getControlPoint(index) + 0.5) : -1;
@@ -180,9 +185,10 @@ class ZoneOperationImpl extends BlendedOperation implements ZoneOperation {
     private byte[] tableDataByte = new byte[0x100];
     private LookupTableJAI byteLut = null;
     private LookupTableJAI ushortLut = null;
-    private double gamma = 2.2;
 
     private LookupTableJAI computeGammaTable(int dataType) {
+        final double gamma = 2.2;
+
         if (dataType == DataBuffer.TYPE_BYTE) {
             if (byteLut != null)
                 return byteLut;
@@ -205,6 +211,7 @@ class ZoneOperationImpl extends BlendedOperation implements ZoneOperation {
             super(source);
         }
 
+        @Override
         public PlanarImage setFront() {
             LookupTableJAI table = computeTable(back);
             ParameterBlock pb = new ParameterBlock();
@@ -221,10 +228,12 @@ class ZoneOperationImpl extends BlendedOperation implements ZoneOperation {
         }
     }
 
+    @Override
     protected void updateOp(Transform op) {
         op.update();
     }
 
+    @Override
     protected BlendedTransform createBlendedOp(PlanarImage source) {
         return new ZoneMapper(source);
     }

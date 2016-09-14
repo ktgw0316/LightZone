@@ -8,14 +8,10 @@ import java.awt.image.*;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 
 import org.w3c.dom.Document;
-
-import sun.awt.image.ByteInterleavedRaster;
-import sun.awt.image.ShortInterleavedRaster;
 
 import com.lightcrafts.image.metadata.*;
 import com.lightcrafts.image.metadata.values.ImageMetaValue;
@@ -133,7 +129,7 @@ public final class LCTIFFWriter extends LCTIFFCommon {
      * @param thread The thread that's doing the putting.
      */
     public void putImageTiled( RenderedImage image, ProgressThread thread )
-        throws IOException, LCImageLibException, UnsupportedEncodingException
+        throws IOException, LCImageLibException
     {
         try {
             writeImageTiled( image, thread );
@@ -156,7 +152,7 @@ public final class LCTIFFWriter extends LCTIFFCommon {
      * @param thread The thread that's doing the putting.
      */
     public void putImageStriped( RenderedImage image, ProgressThread thread )
-        throws IOException, LCImageLibException, UnsupportedEncodingException
+        throws IOException, LCImageLibException
     {
         try {
             writeImageStriped( image, thread );
@@ -372,7 +368,7 @@ public final class LCTIFFWriter extends LCTIFFCommon {
      * @return Returns <code>true</code> only if the append succeeded.
      */
     private boolean append( String fileName )
-        throws IOException, UnsupportedEncodingException
+        throws IOException
     {
         byte[] fileNameUtf8 = ( fileName + '\000' ).getBytes( "UTF-8" );
         return append( fileNameUtf8 );
@@ -431,7 +427,12 @@ public final class LCTIFFWriter extends LCTIFFCommon {
             }
         }
         finally {
-            file.close();
+            try {
+                file.close();
+            }
+            catch (Exception e) {
+                // do nothing
+            }
         }
     }
 
@@ -536,15 +537,21 @@ public final class LCTIFFWriter extends LCTIFFCommon {
             indicator = null;
 
         // Allocate the output buffer only once
-        final SampleModel sm =
-            image.getSampleModel().createCompatibleSampleModel(
-                imageWidth, stripHeight
-            );
-        final WritableRaster outBuffer;
-        if (dataType == DataBuffer.TYPE_BYTE)
-            outBuffer = new ByteInterleavedRaster(sm, new Point(0, 0));
-        else
-            outBuffer = new ShortInterleavedRaster(sm, new Point(0, 0));
+        final int type;
+        if (dataType == DataBuffer.TYPE_BYTE) {
+            type = DataBuffer.TYPE_BYTE;
+        }
+        else {
+            type = DataBuffer.TYPE_USHORT;
+        }
+        final WritableRaster outBuffer =
+                Raster.createInterleavedRaster(
+                        type, imageWidth, stripHeight, bands * imageWidth, bands,
+                        bands == 1 ? new int[]{ 0 } :
+                        bands == 3 ? new int[]{ 0, 1, 2 } :
+                                     new int[]{ 0, 1, 2, 3 },
+                        new Point(0, 0)
+                );
 
         int stripIndex = 0;
         for ( int y = 0; y < imageHeight; y += stripHeight ) {
@@ -562,16 +569,13 @@ public final class LCTIFFWriter extends LCTIFFCommon {
 
             image.copyData(raster);
 
-            int offset;
-            if (raster instanceof ByteInterleavedRaster) {
-                final ByteInterleavedRaster interleaved =
-                    (ByteInterleavedRaster) raster;
+            final ComponentSampleModel csm = (ComponentSampleModel)raster.getSampleModel();
+            final int[] offsets = csm.getBandOffsets();
+            int offset = offsets[0];
+            for (int i = 1; i < offsets.length; i++)
+                offset = Math.min(offset, offsets[i]);
 
-                final int[] offsets = interleaved.getDataOffsets();
-                offset = offsets[0];
-                for (int i = 1; i < offsets.length; i++)
-                    offset = Math.min(offset, offsets[i]);
-
+            if (dataType == DataBuffer.TYPE_BYTE) {
                 final DataBufferByte db = (DataBufferByte)raster.getDataBuffer();
 
                 final int written = writeStripByte( stripIndex, db.getData(), offset, bands * imageWidth * currentStripHeight );
@@ -582,14 +586,6 @@ public final class LCTIFFWriter extends LCTIFFCommon {
                         (bands * imageWidth * currentStripHeight)
                     );
             } else {
-                final ShortInterleavedRaster interleaved =
-                    (ShortInterleavedRaster) raster;
-
-                final int[] offsets = interleaved.getDataOffsets();
-                offset = offsets[0];
-                for (int i = 1; i < offsets.length; i++)
-                    offset = Math.min(offset, offsets[i]);
-
                 final DataBufferUShort db = (DataBufferUShort) raster.getDataBuffer();
 
                 final int written = writeStripShort( stripIndex, db.getData(), offset, 2 * bands * imageWidth * currentStripHeight );

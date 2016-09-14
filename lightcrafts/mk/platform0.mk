@@ -4,50 +4,28 @@
 # Paul J. Lucas [paul@lightcrafts.com]
 ##
 
-PLATFORM:=		$(shell uname)
+PLATFORM:=		$(shell uname -s)
 
-##
 # Mac OS X
-##
 ifeq ($(PLATFORM),Darwin)
   PLATFORM:=		MacOSX
-endif
 
-##
 # Windows
-##
-ifeq ($(findstring CYGWIN,$(PLATFORM)),CYGWIN)
+else ifeq ($(findstring CYGWIN,$(PLATFORM)),CYGWIN)
   PLATFORM:=		Windows
-endif
+else ifeq ($(findstring MINGW,$(PLATFORM)),MINGW)
+  PLATFORM:=		Windows
+else ifeq ($(findstring MSYS,$(PLATFORM)),MSYS)
+  PLATFORM:=		Windows
 
-##
-# Linux
-##
-ifeq ($(PLATFORM),Linux)
-  # PLATFORM is OK as-is
-endif
-
-##
-# GNU/kFreeBSD
-##
-ifeq ($(PLATFORM),GNU/kFreeBSD)
+# Debian GNU/kFreeBSD
+else ifeq ($(PLATFORM),GNU/kFreeBSD)
   PLATFORM:=		Linux
-endif
 
-##
-# FreeBSD
-##
-ifeq ($(PLATFORM),FreeBSD)
-  # PLATFORM is OK as-is
+# Linux, SunOS, and other BSDs
+else
+  # Keep PLATFORM as-is.
   PLATFORM_DIR:=	${ROOT}/linux
-endif
-
-##
-# OpenIndiana
-##
-ifeq ($(PLATFORM),SunOS)
-  # PLATFORM is OK as-is
-  PLATFORM_DIR:=		$(ROOT)/linux
 endif
 
 ##

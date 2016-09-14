@@ -8,8 +8,8 @@
     <string>US</string>
     <key>CFBundleExecutable</key>
     <string>@APPNAME@</string>
-    <key>CFBundleGetInfoString</key>
-    <string>@APPNAME@ @VERSION@ (@BUILD@), Copyright 2005-2007 Light Crafts, Inc. All Rights Reserved.</string>
+    <key>NSHumanReadableCopyright</key>
+    <string>@APPNAME@ @VERSION@ (@BUILD@), Copyright 2005-2011 Light Crafts, Inc. All Rights Reserved. Copyright 2013- The LightZone Project. All Rights Reserved.</string>
     <key>CFBundleHelpBookFolder</key>
     <string>LightZone_Help</string>
     <key>CFBundleHelpBookName</key>

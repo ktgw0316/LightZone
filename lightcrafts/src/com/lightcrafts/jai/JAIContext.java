@@ -83,15 +83,16 @@ public class JAIContext {
         byte[] data = profile.getData(tag);
         if (data != null) {
             System.out.print(name + " (" + data.length + ") :");
-            for (int i = 0; i < data.length; i++)
-                System.out.print(" " + (int) (data[i] & 0xFF));
+            for (byte aData : data)
+                System.out.print(" " + (aData & 0xFF));
             System.out.println();
 
-            for (int i = 0; i < data.length; i++)
-                System.out.print((char) (data[i] & 0xFF));
+            for (byte aData : data)
+                System.out.print((char) (aData & 0xFF));
             System.out.println();
-        } else
+        } else {
             System.out.println("no " + name + " info");
+        }
     }
 
     /**
@@ -276,8 +277,17 @@ public class JAIContext {
 
         JAI.setDefaultTileSize(new Dimension(JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT));
 
-        systemProfiles = new ArrayList<ColorProfileInfo>(Platform.getPlatform().getExportProfiles());
-        systemProfiles.addAll(Platform.getPlatform().getPrinterProfiles());
+        systemProfiles = new ArrayList<ColorProfileInfo>();
+        final Collection<ColorProfileInfo> exportProfiles =
+            Platform.getPlatform().getExportProfiles();
+        if (exportProfiles != null) {
+            systemProfiles.addAll(exportProfiles);
+        }
+        final Collection<ColorProfileInfo> printerProfiles =
+            Platform.getPlatform().getPrinterProfiles();
+        if (printerProfiles != null) {
+            systemProfiles.addAll(printerProfiles);
+        }
 
         ICC_Profile _sRGBColorProfile = null;
         for (ColorProfileInfo cpi : systemProfiles) {
@@ -388,8 +398,9 @@ public class JAIContext {
             _systemProfile = _sRGBColorProfile;
 
             try {
-                if (Platform.getPlatform().getDisplayProfile() != null) {
-                    _systemProfile = Platform.getPlatform().getDisplayProfile();
+                final ICC_Profile displayProfile = Platform.getPlatform().getDisplayProfile();
+                if (displayProfile != null) {
+                    _systemProfile = displayProfile;
                     _systemColorSpace = new ICC_ColorSpace(_systemProfile);
                     _systemColorModel = RasterFactory.createComponentColorModel(DataBuffer.TYPE_BYTE,
                                                                                 _systemColorSpace,

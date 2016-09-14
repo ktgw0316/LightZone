@@ -1,76 +1,44 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2016 Masahiro Kitagawa */
 
 package com.lightcrafts.platform.macosx;
 
 import com.lightcrafts.app.Application;
-// import com.lightcrafts.app.CheckForUpdate;
-import com.lightcrafts.app.ExceptionDialog;
 import com.lightcrafts.app.other.MacApplication;
 import com.lightcrafts.app.other.OtherApplication;
 import com.lightcrafts.platform.AlertDialog;
+import com.lightcrafts.platform.Launcher;
 import com.lightcrafts.platform.Platform;
-import com.lightcrafts.splash.SplashImage;
-import com.lightcrafts.splash.SplashWindow;
-import com.lightcrafts.utils.ForkDaemon;
-import com.lightcrafts.utils.Version;
 
-import java.awt.*;
+import java.awt.EventQueue;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+
+import com.apple.eawt.AboutHandler;
+import com.apple.eawt.AppReOpenedListener;
+import com.apple.eawt.PreferencesHandler;
+import com.apple.eawt.OpenFilesHandler;
+import com.apple.eawt.QuitHandler;
+import com.apple.eawt.QuitResponse;
+import com.apple.eawt.AppEvent.AboutEvent;
+import com.apple.eawt.AppEvent.AppReOpenedEvent;
+import com.apple.eawt.AppEvent.PreferencesEvent;
+import com.apple.eawt.AppEvent.OpenFilesEvent;
+import com.apple.eawt.AppEvent.QuitEvent;
 
 import static com.lightcrafts.platform.macosx.Locale.LOCALE;
 
 /**
  * Launch LightZone for Mac OS X.
  */
-public final class MacOSXLauncher {
+public final class MacOSXLauncher extends Launcher {
 
-    /**
-     * Does the following:
-     *  <ol>
-     *    <li>Check the Java version.
-     *    <li>Check for a valid license.
-     *    <li>Show the splash screen.
-     *    <li>Launches the application.
-     *    <li>Disposes of the splash screen.
-     *    <li>Check for a LightZone update.
-     *  </ol>
-     *
-     * @param args The command line arguments.
-     */
-    public static void main( final String[] args ) {
-        // java.util.Locale.setDefault( java.util.Locale.ENGLISH );
-        // System.setProperty("apple.awt.graphics.UseQuartz", "false");
+    ////////// public /////////////////////////////////////////////////////////
 
-        System.out.println(
-            "This is " + Version.getApplicationName() + ' '
-            + Version.getVersionName()
-            + " (" + Version.getRevisionNumber() + ')'
-        );
-
-        try {
-            checkJavaVersion();
-            final String licenseText = "Open Source";
-
-            final SplashImage image = new SplashImage(
-                SplashImage.getDefaultSplashText(licenseText)
-            );
-            SplashWindow.splash(image);
-            setColor();
-            // CheckForUpdate.start();
-            {
-                Application.setStartupProgress(
-                        image.getStartupProgress()
-                );
-                ForkDaemon.start();
-                Application.main(args);
-            }
-            SplashWindow.disposeSplash();
-            // CheckForUpdate.showAlertIfAvailable();
-        }
-        catch (Throwable t) {
-            (new ExceptionDialog()).handle(t);
-        }
+    public static void main(String[] args) {
+        final Launcher launcher = new MacOSXLauncher();
+        launcher.init(args);
     }
 
     /**
@@ -78,6 +46,45 @@ public final class MacOSXLauncher {
      * that the code for this native method is inside the native launcher.
      */
     public static native void readyToOpenFiles();
+
+    ////////// protected //////////////////////////////////////////////////////
+
+    @Override
+    protected void setSystemProperties() {
+        // System.setProperty("apple.awt.graphics.UseQuartz", "false");
+    }
+
+    @Override
+    protected void enableTextAntiAliasing() {
+        // Do nothing.
+    }
+
+    @Override
+    protected String showJavaVersion() {
+        String javaVersion = super.showJavaVersion();
+        checkJavaVersion(javaVersion);
+        return javaVersion;
+    }
+
+   /**
+     * Set the color back to the user's defaults
+     */
+    @Override
+    protected void setColor() {
+        try {
+            final Process p = Runtime.getRuntime().exec(
+                // "defaults write com.lightcrafts.LightZone AppleAquaColorVariant -int 6"
+                "defaults remove com.lightcrafts.LightZone AppleAquaColorVariant"
+            );
+            p.waitFor();
+        }
+        catch ( InterruptedException e ) {
+            e.printStackTrace();
+        }
+        catch ( IOException e ) {
+            e.printStackTrace();
+        }
+    }
 
     ////////// private ////////////////////////////////////////////////////////
 
@@ -93,9 +100,7 @@ public final class MacOSXLauncher {
      * Check that the currently running JVM meets our minimum required version.
      * If it doesn't, show an error dialog and quit.
      */
-    private static void checkJavaVersion() {
-        final String javaVersion = System.getProperty( "java.version" );
-        System.out.println( "Running Java version " + javaVersion );
+    private static void checkJavaVersion(String javaVersion) {
         try {
             final String[] parts1 = javaVersion.split( "\\." );
 
@@ -145,24 +150,65 @@ public final class MacOSXLauncher {
     @SuppressWarnings( { "UnusedDeclaration" } )
     private static synchronized void openFile( final String pathName,
                                                String senderSig ) {
+        openFile(new File( pathName ), senderSig);
+    }
+
+    /**
+     * Open a file passed via an AppleEvent.
+     *
+     * @param files The list of files to open.
+     * @param senderSig The 4-character signature of the application that sent
+     * the AppleEvent to open the given file.
+     */
+    private static synchronized void openFile( final List<File> files,
+                                               String senderSig ) {
+        for (final File file : files) {
+            openFile(file, senderSig);
+        }
+    }
+
+    /**
+     * Open a file passed via an AppleEvent.
+     *
+     * @param file The file to open.
+     * @param senderSig The 4-character signature of the application that sent
+     * the AppleEvent to open the given file.
+     */
+    private static synchronized void openFile( final File file,
+                                               String senderSig ) {
         final OtherApplication app =
             MacApplication.getAppForSignature( senderSig );
         EventQueue.invokeLater(
             new Runnable() {
+                @Override
                 public void run() {
-                    Application.openFrom( new File( pathName ), app );
+                    Application.openFrom( file, app );
                 }
             }
         );
     }
 
     /**
-     * Quit the application.  This method is called only from native code.
+     * Re-open the application.
      */
-    @SuppressWarnings( { "UnusedDeclaration" } )
+    private static void reOpen() {
+        EventQueue.invokeLater(
+            new Runnable() {
+                @Override
+                public void run() {
+                    Application.reOpen(null);
+                }
+            }
+        );
+    }
+
+    /**
+     * Quit the application.
+     */
     private static void quit() {
         EventQueue.invokeLater(
             new Runnable() {
+                @Override
                 public void run() {
                     Application.quit();
                 }
@@ -170,32 +216,13 @@ public final class MacOSXLauncher {
         );
     }
 
-   /**
-     * Set the color back to the user's defaults
-     */
-    private static void setColor() {
-        try {
-            final Process p = Runtime.getRuntime().exec(
-                // "defaults write com.lightcrafts.LightZone AppleAquaColorVariant -int 6"
-                "defaults remove com.lightcrafts.LightZone AppleAquaColorVariant"
-            );
-            p.waitFor();
-        }
-        catch ( InterruptedException e ) {
-            e.printStackTrace();
-        }
-        catch ( IOException e ) {
-            e.printStackTrace();
-        }
-    }
-
     /**
-     * Show the "About" box.  This method is called only from native code.
+     * Show the "About" box.
      */
-    @SuppressWarnings( { "UnusedDeclaration" } )
     private static void showAbout() {
         EventQueue.invokeLater(
             new Runnable() {
+                @Override
                 public void run() {
                     Application.showAbout();
                 }
@@ -204,13 +231,12 @@ public final class MacOSXLauncher {
     }
 
     /**
-     * Show the Preferences dialog.  This method is called only from native
-     * code.
+     * Show the Preferences dialog.
      */
-    @SuppressWarnings( { "UnusedDeclaration" } )
     private static void showPreferences() {
         EventQueue.invokeLater(
             new Runnable() {
+                @Override
                 public void run() {
                     Application.showPreferences();
                 }
@@ -239,6 +265,40 @@ public final class MacOSXLauncher {
         // System.setProperty( "apple.awt.antialiasing"    , "false" );
         System.setProperty( "swing.aatext", "true" );
         System.setProperty( "apple.awt.graphics.UseQuartz", "false" );
+
+        com.apple.eawt.Application app =
+            com.apple.eawt.Application.getApplication(); 
+        app.setAboutHandler(new AboutHandler() {
+            @Override
+            public void handleAbout(AboutEvent e) {
+                showAbout();
+            }
+        });
+        app.setOpenFileHandler(new OpenFilesHandler() {
+            @Override
+            public void openFiles(OpenFilesEvent e) {
+                openFile(e.getFiles(), null); // TODO: get senderSig
+            }
+        });
+        app.setPreferencesHandler(new PreferencesHandler() {
+            @Override
+            public void handlePreferences(PreferencesEvent e) {
+                showPreferences();
+            }
+        });
+        app.setQuitHandler(new QuitHandler() {
+            @Override
+            public void handleQuitRequestWith(QuitEvent e, QuitResponse qr) {
+                quit();
+                qr.cancelQuit();
+            }
+        });
+        app.addAppEventListener(new AppReOpenedListener() {
+            @Override
+            public void appReOpened(AppReOpenedEvent e) {
+                reOpen();
+            }
+        });
     }
 }
 /* vim:set et sw=4 ts=4: */

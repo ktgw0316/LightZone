@@ -16,6 +16,7 @@ class RawSettings extends JPanel {
         FloatSlider(final double min, final double max) {
             addChangeListener(
                 new ChangeListener() {
+                    @Override
                     public void stateChanged(ChangeEvent e) {
                         int value = getValue();
                         double floatValue = min + (max - min) * (value / 100d);
@@ -27,18 +28,20 @@ class RawSettings extends JPanel {
         abstract void sliderMoved(double value);
         abstract String getSliderName();
     }
-    JFrame frame;   // save this so we can dispose it
+    private JFrame frame;   // save this so we can dispose it
 
-    int count;      // the number of sliders
+    private int count;      // the number of sliders
 
     RawSettings(final Engine engine) {
         super(new GridBagLayout());
 
         addSlider(
             new FloatSlider(1000, 10000) {
+                @Override
                 String getSliderName() {
                     return "Temperature";
                 }
+                @Override
                 void sliderMoved(double value) {
 //                    engine.setTemperature(value);
                     System.out.println("set RAW temperature to " + value);
@@ -48,9 +51,11 @@ class RawSettings extends JPanel {
 
         addSlider(
             new FloatSlider(1, 100) {
+                @Override
                 String getSliderName() {
                     return "Noise Reduction";
                 }
+                @Override
                 void sliderMoved(double value) {
 //                    engine.setNoiseReduction(value);
                     System.out.println("set RAW noise reduction to " + value);
@@ -59,9 +64,11 @@ class RawSettings extends JPanel {
         );
         addSlider(
             new FloatSlider(5, 25) {
+                @Override
                 String getSliderName() {
                     return "Exposure";
                 }
+                @Override
                 void sliderMoved(double value) {
 //                    engine.setExposure(value);
                     System.out.println("set RAW exposure to " + value);

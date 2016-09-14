@@ -211,7 +211,7 @@ final class UnSharpMaskOpImage extends PointOpImage {
 
                 for (int w = 0; w < dwidth; w++) {
                     int src = s1[s1PixelOffset] & 0xFF;
-                    d[dPixelOffset] = ImageUtil.clampByte(src + c * (src - (int) (s2[s2PixelOffset] & 0xFF)) / 0x100);
+                    d[dPixelOffset] = ImageUtil.clampByte(src + c * (src - (s2[s2PixelOffset] & 0xFF)) / 0x100);
 
                     s1PixelOffset += s1PixelStride;
                     s2PixelOffset += s2PixelStride;
@@ -437,7 +437,7 @@ final class UnSharpMaskOpImage extends PointOpImage {
 
                     for (int w = 0; w < dwidth; w++) {
                         int src = s1[s1PixelOffset] & 0xFF;
-                        d[dPixelOffset] = ImageUtil.clampRoundByte(src + c * (src - (int) (s2[s2PixelOffset] & 0xFF)) / 0x100);
+                        d[dPixelOffset] = ImageUtil.clampRoundByte(src + c * (src - (s2[s2PixelOffset] & 0xFF)) / 0x100);
 
                         s1PixelOffset += s1PixelStride;
                         s2PixelOffset += s2PixelStride;
@@ -470,7 +470,7 @@ final class UnSharpMaskOpImage extends PointOpImage {
 
                     for (int w = 0; w < dwidth; w++) {
                         int src = s1[s1PixelOffset] & 0xFFFF;
-                        d[dPixelOffset] = ImageUtil.clampRoundUShort(src + c * (src - (int) (s2[s2PixelOffset] & 0xFFFF)) / 0x10000);
+                        d[dPixelOffset] = ImageUtil.clampRoundUShort(src + c * (src - (s2[s2PixelOffset] & 0xFFFF)) / 0x10000);
 
                         s1PixelOffset += s1PixelStride;
                         s2PixelOffset += s2PixelStride;

@@ -17,12 +17,17 @@ public class LRUHashMap<K,V> extends LinkedHashMap<K,V> {
     ////////// public /////////////////////////////////////////////////////////
 
     public LRUHashMap( int maxEntries ) {
+        super();
         m_maxEntries = maxEntries;
     }
 
     public LRUHashMap( int initialCapacity, int maxEntries ) {
         super( initialCapacity );
         m_maxEntries = maxEntries;
+    }
+
+    public LRUHashMap(int initialCapacity, float loadFactor, int max_entries) {
+        this(initialCapacity, loadFactor, true, max_entries);
     }
 
     public LRUHashMap( int initialCapacity, float loadFactor,
@@ -33,12 +38,11 @@ public class LRUHashMap<K,V> extends LinkedHashMap<K,V> {
 
     ////////// protected //////////////////////////////////////////////////////
 
+    @Override
     protected boolean removeEldestEntry( Map.Entry<K,V> eldest ) {
         return size() > m_maxEntries;
     }
 
-    ////////// private ////////////////////////////////////////////////////////
-
-    private final int m_maxEntries;
+    protected final int m_maxEntries;
 }
 /* vim:set et sw=4 ts=4: */

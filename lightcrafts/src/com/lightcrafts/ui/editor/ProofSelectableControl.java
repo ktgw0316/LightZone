@@ -82,21 +82,23 @@ final class ProofSelectableControl extends SelectableControl {
     private void initPrinterProfile() {
         printerProfile = new WidePopupComboBox();
 
-        final List<ColorProfileInfo> profiles =
-            ColorProfileInfo.arrangeForMenu(PrinterProfiles);
-        for (ColorProfileInfo profile : profiles) {
-            printerProfile.addItem(profile);
-        }
-        // Initialize the printerProfile selection from Preferences:
-        final String initProfile = Prefs.get(ProofProfileKey, null);
-        if (initProfile != null) {
+        if (PrinterProfiles != null) {
+            final List<ColorProfileInfo> profiles =
+                ColorProfileInfo.arrangeForMenu(PrinterProfiles);
             for (ColorProfileInfo profile : profiles) {
-                if (profile != null) {
-                    // Don't require strict equality for ColorProfileInfo's.
-                    // Just ask that the names match:
-                    if (profile.getName().equals(initProfile)) {
-                        printerProfile.setSelectedItem(profile);
-                        settings.setColorProfile(profile.getICCProfile());
+                printerProfile.addItem(profile);
+            }
+            // Initialize the printerProfile selection from Preferences:
+            final String initProfile = Prefs.get(ProofProfileKey, null);
+            if (initProfile != null) {
+                for (ColorProfileInfo profile : profiles) {
+                    if (profile != null) {
+                        // Don't require strict equality for ColorProfileInfo's.
+                        // Just ask that the names match:
+                        if (profile.getName().equals(initProfile)) {
+                            printerProfile.setSelectedItem(profile);
+                            settings.setColorProfile(profile.getICCProfile());
+                        }
                     }
                 }
             }

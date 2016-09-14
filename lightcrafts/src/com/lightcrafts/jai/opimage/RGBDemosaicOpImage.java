@@ -18,7 +18,7 @@ import java.util.Arrays;
  * Time: 11:18:24 AM
  */
 public class RGBDemosaicOpImage extends AreaOpImage {
-    static final BorderExtender copyExtender = BorderExtender.createInstance(BorderExtender.BORDER_ZERO);
+    private static final BorderExtender copyExtender = BorderExtender.createInstance(BorderExtender.BORDER_ZERO);
 
     private final int rx, ry, gx, gy, bx, by;
 
@@ -89,7 +89,7 @@ public class RGBDemosaicOpImage extends AreaOpImage {
                 new RasterAccessor(tmp, tmpRect, formatTags[1],
                                    getColorModel());
 
-        assert (dstAccessor.getDataType() == DataBuffer.TYPE_USHORT);        
+        assert (dstAccessor.getDataType() == DataBuffer.TYPE_USHORT);
 
         ushortLoop(srcAccessor, tmpAccessor);
         Functions.copyData(dest, tmp);
