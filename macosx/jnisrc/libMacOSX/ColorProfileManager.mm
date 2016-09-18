@@ -247,7 +247,6 @@ MacOSXColorProfileManager_METHOD(getSystemDisplayProfilePath)
     bool const result =
         CFURLGetFileSystemRepresentation(profileURL, true, (UInt8*)path, PATH_MAX);
     CFRelease(profileURL);
-    CFRelease(displayInfo);
     if (!result) {
 #ifdef DEBUG
         cerr << "Cannot get display profile path." << endl;
