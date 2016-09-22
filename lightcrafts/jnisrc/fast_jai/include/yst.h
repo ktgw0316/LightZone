@@ -1,16 +1,16 @@
 #pragma once
 #include "../../include/mathlz.h"
+#include "omp_util.h"
 
 inline void planar_YST_to_interleaved_RGB(unsigned short * const dstData, int dstStep,
                                    int r_offset, int g_offset, int b_offset, int wr,
-                                   const float * const buf_y, const float * const buf_s, const float * const buf_t,
+                                   const float * const buf_y,
+                                   const float * const buf_s,
+                                   const float * const buf_t,
                                    int width, int height,
-                                   float *yst_to_rgb) {
-#if _OPENMP < 201307
-#   pragma omp for
-#else
-#   pragma omp for simd
-#endif
+                                   float *yst_to_rgb)
+{
+    OMP_FOR_SIMD
     for (int y=wr; y < height-wr; y++) {
         for (int x=wr; x < width-wr; x++) {
             const int dst_idx = 3*(x-wr) + (y-wr)*dstStep + r_offset;
@@ -38,15 +38,12 @@ inline void interleaved_RGB_to_planar_YST(const unsigned short * const srcData, 
                                    int r_offset, int g_offset, int b_offset,
                                    float *buf_y, float *buf_s, float *buf_t,
                                    int width, int height,
-                                   float *rgb_to_yst) {
+                                   float *rgb_to_yst)
+{
     const float norm = (float)0x10000;
     const float inv_norm = 1.0f/norm;
 
-#if _OPENMP < 201307
-#   pragma omp for
-#else
-#   pragma omp for simd
-#endif
+    OMP_FOR_SIMD
     for (int y=0; y < height; y++) {
         for (int x=0; x < width; x++) {
             const int src_idx = 3*x + y*srcStep;
