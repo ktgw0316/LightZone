@@ -24,14 +24,14 @@ void box_sum_horizontal_and_transpose(
         // Calculate the head (x = r) elements in original coordinate
 #pragma omp for nowait
         for (int y = 0; y < sheight; ++y) {
-            const int x0 = y * swidth;
+            const int pos0 = y * swidth;
 
             const int pos = r * dwidth + y; // transeposed
             dst[pos] = 0.0;
 
             OMP_SIMD
             for (int x = 0; x < 2 * r + 1; ++x) {
-                dst[pos] += src[x0 + x];
+                dst[pos] += src[pos0 + x];
             }
         }
 
@@ -39,13 +39,12 @@ void box_sum_horizontal_and_transpose(
         transpose(src, srct, swidth, sheight);
 
         // Calculate the other elements in transposed coordinate
-#pragma omp for ordered
-        for (int y = r + 1; y < dheight - r; ++y) {
-            const int x0 = y * dwidth;
-
-#pragma omp ordered
-            OMP_SIMD
-            for (int pos = x0; pos < x0 + dwidth; ++pos) {
+        for (int y = r + 1, pos0 = (r + 1) * dwidth;
+                y < dheight - r;
+                ++y, pos0 += dwidth) {
+            OMP_FOR_SIMD
+            for (int x = 0; x < dwidth; ++x) {
+                const int pos = pos0 + x;
                 dst[pos] = dst[pos - dwidth]
                         - srct[pos - (r + 1) * dwidth]
                         + srct[pos + r * dwidth];
