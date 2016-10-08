@@ -45,5 +45,6 @@ $(DEST_LINUX_LIBS):
 
 clean distclean mostlyclean:
 	$(RM) *.jar
+	find -L . -type l -delete # Delete dead symlinks
 
 # vim:set noet sw=8 ts=8:
