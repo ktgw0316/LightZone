@@ -81,8 +81,10 @@ ifeq ($(PLATFORM),MacOSX)
   ifdef JNI_MACOSX_DYLIB
     JNILIB_EXT:=	$(DYLIB_EXT)
     LINK+=		-install_name $(DYLIB_PREFIX)$(TARGET_BASE)$(DYLIB_EXT)
-  else ifdef JNI_MACOSX_SHAREDLIB
-    JNILIB_EXT:=	.a
+  else
+    ifdef JNI_MACOSX_SHAREDLIB
+      JNILIB_EXT:=	.a
+    endif
   endif
   ifeq ($(UNIVERSAL),1)
     CFLAGS_PPC+=	$(JNI_MACOSX_CFLAGS) $(JNI_PPC_CFLAGS)

@@ -102,7 +102,7 @@ public final class ForkDaemon {
     }
 
     private static final String FORKDAEMON_NAME = "LightZone-forkd";
-    private static String FORKDAEMON_PATH;
+    private static String[] FORKDAEMON_PATH;
 
     private static final String CMDSTART = "CMDSTART";
     private static final String CMDEND = "CMDEND";
@@ -113,12 +113,15 @@ public final class ForkDaemon {
     private final InputStream stderr;
 
     static {
-        FORKDAEMON_PATH = System.getProperty( "java.library.path" ) + File.separatorChar + FORKDAEMON_NAME;
-        if (! new File(FORKDAEMON_PATH).canExecute()) {
+        FORKDAEMON_PATH = new String[] {
+                System.getProperty( "java.library.path" )
+                + File.separatorChar + FORKDAEMON_NAME };
+        if (! new File(FORKDAEMON_PATH[0]).canExecute()) {
             String dir = System.getProperty( "install4j.appDir" );
             if ( dir == null )
                 dir = ".";
-            FORKDAEMON_PATH = dir + File.separatorChar + FORKDAEMON_NAME;
+            FORKDAEMON_PATH = new String[] {
+                    dir + File.separatorChar + FORKDAEMON_NAME };
         }
     }
 
