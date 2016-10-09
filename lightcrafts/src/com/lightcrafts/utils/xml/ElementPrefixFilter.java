@@ -2,6 +2,8 @@
 
 package com.lightcrafts.utils.xml;
 
+import lombok.Getter;
+import lombok.val;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -11,9 +13,11 @@ import org.w3c.dom.Node;
  *
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */
+@Getter
 public class ElementPrefixFilter extends NodeTypeFilter {
 
-    ////////// public /////////////////////////////////////////////////////////
+    // The prefix that's being used to filter on.
+    private final String prefix;
 
     /**
      * Construct an <code>ElementPrefixFilter</code>.
@@ -22,7 +26,7 @@ public class ElementPrefixFilter extends NodeTypeFilter {
      */
     public ElementPrefixFilter( String prefix ) {
         super( Node.ELEMENT_NODE );
-        m_prefix = prefix;
+        this.prefix = prefix;
     }
 
     /**
@@ -31,25 +35,12 @@ public class ElementPrefixFilter extends NodeTypeFilter {
     public boolean accept( Node node ) {
         if ( !super.accept( node ) )
             return false;
-        final Element element = (Element)node;
+        val element = (Element)node;
         //
         // Use getTagName() since getPrefix() always returns null.
         //
         // return m_prefix.equals( element.getPrefix() );
-        return m_prefix.equals( element.getTagName().replaceAll( ":.*", "" ) );
+        return prefix.equals( element.getTagName().replaceAll( ":.*", "" ) );
     }
-
-    /**
-     * Gets the prefix that's being used to filter on.
-     *
-     * @return Returns said prefix.
-     */
-    public String getPrefix() {
-        return m_prefix;
-    }
-
-    ////////// private ////////////////////////////////////////////////////////
-
-    private final String m_prefix;
 }
 /* vim:set et sw=4 ts=4: */

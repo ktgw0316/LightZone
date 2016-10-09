@@ -1,0 +1,13 @@
+<Template version="7">
+  <Scale Factor="0.54933333"/>
+  <Image path=""/>
+  <Controls>
+    <GenericOperation Active="true" Collapsed="false" Locked="false" Mode="Normal" Name="Hard Look" Opacity="100" OperationType="Tone Mapper V4" regionsInverted="false">
+      <Slider Depth="16.0" Detail="1.72" Fuzz="0.2" Highlights="2.51" Shadows="0.0"/>
+      <Checkbox/>
+      <Choice/>
+    </GenericOperation>
+    <Region/>
+    <Crop Angle="0.0"/>
+  </Controls>
+</Template>
