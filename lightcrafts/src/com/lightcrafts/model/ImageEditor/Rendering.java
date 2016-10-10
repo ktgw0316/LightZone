@@ -1,5 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
-/* Copyright (C) 2017-     Masahiro Kitagawa */
+/* Copyright (C) 2016-     Masahiro Kitagawa */
 
 package com.lightcrafts.model.ImageEditor;
 
@@ -254,7 +254,7 @@ public class Rendering implements Cloneable {
             index++;
         }
 
-        return processedImage;
+        return cropSourceImage(processedImage);
     }
 
     public void prefetch(Rectangle area) {
@@ -263,7 +263,7 @@ public class Rendering implements Cloneable {
             return;
         }
 
-        PlanarImage processedImage = getXformedSourceImage();
+        PlanarImage processedImage = cropSourceImage(getXformedSourceImage());
 
         int index = 0;
         for (Operation operation : pipeline) {
@@ -409,16 +409,26 @@ public class Rendering implements Cloneable {
                 xformedSourceImage = image;
         }
 
+        // We explicitly cache this
+        xformedSourceImage = Functions.toUShortLinear(xformedSourceImage, null);
+
+        if (xformedSourceImage instanceof RenderedOp)
+            xformedSourceImage.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
+
+        return xformedSourceImage;
+    }
+
+    private PlanarImage cropSourceImage(PlanarImage xformedSourceImage) {
         if (!cropBounds.isAngleOnly()) {
-            final CropBounds actualCropBounds = CropBounds.transform(completeInputTransform, cropBounds);
-            final Rectangle bounds = new Rectangle(xformedSourceImage.getMinX(), xformedSourceImage.getMinY(),
-                                                   xformedSourceImage.getWidth(), xformedSourceImage.getHeight());
+            final CropBounds actualCropBounds = CropBounds.transform(inputTransform, cropBounds);
+            final Rectangle bounds = new Rectangle(
+                    xformedSourceImage.getMinX(), xformedSourceImage.getMinY(),
+                    xformedSourceImage.getWidth(), xformedSourceImage.getHeight());
 
             // Calculate inner width and height for actualCropBounds,
             // while keeping the actualCropBound's aspect ratio as precisely as possible.
             final double actualWidth  = actualCropBounds.getWidth();
             final double actualHeight = actualCropBounds.getHeight();
-            final double ratio = actualWidth / actualHeight;
             int intWidth  = (int) Math.round(actualWidth);
             int intHeight = (int) Math.round(actualHeight);
 
@@ -427,6 +437,7 @@ public class Rendering implements Cloneable {
             final Rectangle finalBounds = bounds.intersection(rect);
 
             if (finalBounds.width > 0 && finalBounds.height > 0) {
+                final double ratio = actualWidth / actualHeight;
                 if (intWidth > finalBounds.width) {
                     finalBounds.height = (int) (finalBounds.width / ratio);
                 }
@@ -434,17 +445,10 @@ public class Rendering implements Cloneable {
                     finalBounds.width = (int) (finalBounds.height * ratio);
                 }
                 xformedSourceImage = Functions.crop(xformedSourceImage,
-                                                    finalBounds.x, finalBounds.y,
-                                                    finalBounds.width, finalBounds.height, null);
+                        finalBounds.x, finalBounds.y,
+                        finalBounds.width, finalBounds.height, null);
             }
         }
-
-        // We explicitly cache this
-        xformedSourceImage = Functions.toUShortLinear(xformedSourceImage, null);
-
-        if (xformedSourceImage instanceof RenderedOp)
-            xformedSourceImage.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
-
         return xformedSourceImage;
     }
 
