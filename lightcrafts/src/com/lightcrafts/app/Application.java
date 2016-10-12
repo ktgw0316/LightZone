@@ -796,9 +796,6 @@ public class Application {
     }
 
     public static void quit() {
-        // In case the 20 second wait before setting the startup flag has
-        // not elapsed, set it here.
-        StartupCrash.startupEnded();
         // Persist open documents in preferences.
         ArrayList<ComboFrame> frames = new ArrayList<ComboFrame>(Current);
         IsQuitting = true;
@@ -811,7 +808,6 @@ public class Application {
             // The last one closing will trigger exit().
         }
         // Unless there are no active ComboFrames.
-        savePrefs();
         System.exit(0);
     }
 
@@ -2153,7 +2149,24 @@ public class Application {
         );
     }
 
+    private static void addShutdownHook() {
+        final String threadName = "LightZone.shutdownHook";
+        Runtime.getRuntime().addShutdownHook(
+                new Thread( threadName ) {
+                    @Override
+                    public void run() {
+                        // In case the 20 second wait before setting
+                        // the startup flag has not elapsed, set it here.
+                        StartupCrash.startupEnded();
+                        savePrefs();
+                    }
+                }
+        );
+    }
+
     public static void main(final String[] args) {
+        addShutdownHook();
+
         // Catch startup crashes that prevent launching:
         StartupCrash.checkLastStartupSuccessful();
         StartupCrash.startupStarted();
