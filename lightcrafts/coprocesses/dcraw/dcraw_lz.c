@@ -4832,13 +4832,6 @@ void CLASS xtrans_interpolate (int passes)
   {
   cielab3 (0,0);
   border_interpolate(6);
-  ndir = 4 << (passes > 1);
-  buffer = (char *) malloc (TS*TS*(ndir*11+6));
-  merror (buffer, "xtrans_interpolate()");
-  rgb  = (ushort(*)[TS][TS][3]) buffer;
-  lab  = (short (*)    [TS][3])(buffer + TS*TS*(ndir*6));
-  drv  = (float (*)[TS][TS])   (buffer + TS*TS*(ndir*6+6));
-  homo = (char  (*)[TS][TS])   (buffer + TS*TS*(ndir*10+6));
 
 /* Map a green hexagon around each non-green pixel and vice versa:	*/
 #ifdef _OPENMP
