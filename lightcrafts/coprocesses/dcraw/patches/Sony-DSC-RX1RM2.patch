@@ -2,7 +2,7 @@ Index: dcraw/dcraw_lz.c
 ===================================================================
 --- dcraw.orig/dcraw_lz.c
 +++ dcraw/dcraw_lz.c
-@@ -9440,11 +9440,14 @@ konica_400z:
+@@ -9433,11 +9433,14 @@ konica_400z:
      width -= 30;
    } else if (!strcmp(make,"Sony") && raw_width == 8000) {
      width -= 32;
