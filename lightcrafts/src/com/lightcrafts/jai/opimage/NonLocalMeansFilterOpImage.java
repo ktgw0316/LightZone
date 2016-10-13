@@ -13,68 +13,68 @@ import java.util.Map;
 
 public final class NonLocalMeansFilterOpImage extends AreaOpImage {
 
-    final int y_wr, c_wr; /* window radius */
-    final int y_ws, c_ws; /* window size */
-    final float y_kernel[], c_kernel[], y_scale_r, c_scale_r;
-    final float y_sigma_d, c_sigma_d;
-    final float y_sigma_r, c_sigma_r;
+    final float y_kernel[], c_kernel[]; // negated exponents of the spatial gaussian function
+    final int y_search_radius, c_search_radius;
+    final int y_patch_radius, c_patch_radius;
+    final float y_h, c_h; // intensities
     final float rgb_to_yst[], yst_to_rgb[];
 
     static float SQR(float x) { return x * x; }
 
-    static int border(float y_sigma_d, float c_sigma_d) {
-        return (int) Math.max(Math.ceil(y_sigma_d), Math.ceil(c_sigma_d));
+    static int border(int b1, int b2) {
+        return (int) Math.max(Math.ceil(b1), Math.ceil(b2));
     }
 
     public NonLocalMeansFilterOpImage(RenderedImage source,
                                      BorderExtender extender,
                                      Map config,
                                      ImageLayout layout,
-                                     float y_sigma_d, float y_sigma_r, float c_sigma_d, float c_sigma_r) {
+                                     int y_search_radius, int y_patch_radius, float y_h,
+                                     int c_search_radius, int c_patch_radius, float c_h) {
         super(source,
               layout,
               config,
               true,
               extender,
-              2 * border(y_sigma_d, c_sigma_d),
-              2 * border(y_sigma_d, c_sigma_d),
-              2 * border(y_sigma_d, c_sigma_d),
-              2 * border(y_sigma_d, c_sigma_d));
+              border(2 * y_search_radius, 2 * c_search_radius),
+              border(2 * y_search_radius, 2 * c_search_radius),
+              border(2 * y_search_radius, 2 * c_search_radius),
+              border(2 * y_search_radius, 2 * c_search_radius));
 
-        y_wr = (int) Math.ceil(y_sigma_d);   /* window radius */
-        y_ws = 2 * y_wr + 1;		 /* window size */
+        this.y_search_radius = y_search_radius;
+        this.y_patch_radius = y_patch_radius;
+        this.y_h = y_h;
+        this.c_search_radius = c_search_radius;
+        this.c_patch_radius = c_patch_radius;
+        this.c_h = c_h;
 
-        y_kernel = new float[y_ws];
-        for (int i = -y_wr; i <= y_wr; i++)
-            y_kernel[y_wr+i] = (float) (1 / (2 * SQR(y_sigma_d)) * i * i + 0.25);
-        y_scale_r = 1 / (2 * SQR(y_sigma_r));
+        y_kernel = new float[2 * y_search_radius + 1];
+        for (int i = -y_search_radius; i <= y_search_radius; i++) {
+            y_kernel[y_search_radius + i] = (float) (1 / (2 * SQR(y_search_radius)) * i * i + 0.25);
+        }
 
-        c_wr = (int) Math.ceil(c_sigma_d);   /* window radius */
-        c_ws = 2 * c_wr + 1;		 /* window size */
-
-        c_kernel = new float[c_ws];
-        for (int i = -c_wr; i <= c_wr; i++)
-            c_kernel[c_wr+i] = (float) (1 / (2 * SQR(c_sigma_d)) * i * i + 0.25);
-        c_scale_r = 1 / (2 * SQR(c_sigma_r));
-
-        this.y_sigma_d = y_sigma_d;
-        this.y_sigma_r = y_sigma_r;
-        this.c_sigma_d = c_sigma_d;
-        this.c_sigma_r = c_sigma_r;
+        c_kernel = new float[2 * c_search_radius + 1];
+        for (int i = -c_search_radius; i <= c_search_radius; i++) {
+            c_kernel[c_search_radius + i] = (float) (1 / (2 * SQR(c_search_radius)) * i * i + 0.25);
+        }
 
         ColorScience.LinearTransform transform = new ColorScience.YST();
 
         double[][] rgb2yst = transform.fromRGB(DataBuffer.TYPE_FLOAT);
         rgb_to_yst = new float[9];
-        for (int i = 0; i < 3; i++)
-            for (int j = 0; j < 3; j++)
-                rgb_to_yst[3*i+j] = (float) rgb2yst[i][j];
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                rgb_to_yst[3 * i + j] = (float) rgb2yst[i][j];
+            }
+        }
 
         double[][] yst2rgb = transform.toRGB(DataBuffer.TYPE_FLOAT);
         yst_to_rgb = new float[9];
-        for (int i = 0; i < 3; i++)
-            for (int j = 0; j < 3; j++)
-                yst_to_rgb[3*i+j] = (float) yst2rgb[i][j];
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                yst_to_rgb[3 * i + j] = (float) yst2rgb[i][j];
+            }
+        }
     }
 
     /**
@@ -135,8 +135,9 @@ public final class NonLocalMeansFilterOpImage extends AreaOpImage {
 
         if (src.getNumBands() == 3)
             nonLocalMeansFilter(srcData, dstData,
-                    y_wr, c_wr, y_ws, c_ws,
-                    4 * y_scale_r, 4 * c_scale_r,
+                    y_search_radius, y_patch_radius,
+                    c_search_radius, c_patch_radius,
+                    y_h, c_h,
                     y_kernel, c_kernel,
                     rgb_to_yst, yst_to_rgb,
                     swidth, sheight,
@@ -146,12 +147,13 @@ public final class NonLocalMeansFilterOpImage extends AreaOpImage {
     }
 
     static native void nonLocalMeansFilter(short srcData[], short destData[],
-                                    int y_wr, int c_wr, int y_ws, int c_ws,
-                                    float y_scale_r, float c_scale_r,
-                                    float y_kernel[], float c_kernel[],
-                                    float rgb_to_yst[], float yst_to_rgb[],
-                                    int width, int height,
-                                    int srcROffset, int srcGOffset, int srcBOffset,
-                                    int destROffset, int destGOffset, int destBOffset,
-                                    int srcLineStride, int destLineStride);
+                                           int y_search_radius, int y_patch_radius,
+                                           int c_search_radius, int c_patch_radius,
+                                           float y_h, float c_h,
+                                           float y_kernel[], float c_kernel[],
+                                           float rgb_to_yst[], float yst_to_rgb[],
+                                           int width, int height,
+                                           int srcROffset, int srcGOffset, int srcBOffset,
+                                           int destROffset, int destGOffset, int destBOffset,
+                                           int srcLineStride, int destLineStride);
 }

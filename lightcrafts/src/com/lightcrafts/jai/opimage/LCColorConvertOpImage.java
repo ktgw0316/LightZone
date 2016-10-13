@@ -46,7 +46,7 @@ final class LCColorConvertOpImage extends PointOpImage {
     private static final ColorSpace rgbColorSpace
 	= ColorSpace.getInstance(ColorSpace.CS_sRGB);
 
-    private static SoftReference softRef = null;
+    private static SoftReference<Map<ArrayList<?>, ColorConvertOp>> softRef = null;
 
     /** The source image parameters */
     private ImageParameters srcParam = null;
@@ -63,7 +63,7 @@ final class LCColorConvertOpImage extends PointOpImage {
     /** case number */
     private int caseNumber;
 
-    static int intFromBigEndian(byte[] array, int index) {
+    private static int intFromBigEndian(byte[] array, int index) {
         return (((array[index]   & 0xff) << 24) |
                 ((array[index+1] & 0xff) << 16) |
                 ((array[index+2] & 0xff) <<  8) |
@@ -71,7 +71,7 @@ final class LCColorConvertOpImage extends PointOpImage {
     }
 
 
-    static void intToBigEndian(int value, byte[] array, int index) {
+    private static void intToBigEndian(int value, byte[] array, int index) {
             array[index]   = (byte) (value >> 24);
             array[index+1] = (byte) (value >> 16);
             array[index+2] = (byte) (value >>  8);
@@ -83,7 +83,7 @@ final class LCColorConvertOpImage extends PointOpImage {
      * This is used to select the proper transform from a profile that
      * has multiple transforms.
      */
-    static void setRenderingIntent(ICC_Profile profile, int renderingIntent) {
+    private static void setRenderingIntent(ICC_Profile profile, int renderingIntent) {
         byte[] theHeader = profile.getData(ICC_Profile.icSigHead); /* getData will activate deferred
                                                                       profiles if necessary */
         intToBigEndian (renderingIntent, theHeader, ICC_Profile.icHdrRenderingIntent);
@@ -97,7 +97,7 @@ final class LCColorConvertOpImage extends PointOpImage {
      * has multiple transforms.  It is typically set in a source profile
      * to select a transform from an output profile.
      */
-    static int getRenderingIntent(ICC_Profile profile) {
+    private static int getRenderingIntent(ICC_Profile profile) {
         byte[] theHeader = profile.getData(ICC_Profile.icSigHead); /* getData will activate deferred
                                                                       profiles if necessary */
         int renderingIntent = intFromBigEndian(theHeader, ICC_Profile.icHdrRenderingIntent);
@@ -116,22 +116,20 @@ final class LCColorConvertOpImage extends PointOpImage {
      *	       the destination color space.
      */
     private static synchronized ColorConvertOp
-        getColorConvertOp(ColorSpace src, ColorSpace dst, LCColorConvertDescriptor.RenderingIntent renderingIntent) {
-	HashMap colorConvertOpBuf = null;
+    getColorConvertOp(ColorSpace src, ColorSpace dst, LCColorConvertDescriptor.RenderingIntent renderingIntent) {
+        Map<ArrayList<?>, ColorConvertOp> colorConvertOpBuf;
 
-	if (softRef == null ||
-            ((colorConvertOpBuf = (HashMap)softRef.get()) == null)) {
+        if (softRef == null || ((colorConvertOpBuf = softRef.get()) == null)) {
+            colorConvertOpBuf = new HashMap<ArrayList<?>, ColorConvertOp>();
+            softRef = new SoftReference<Map<ArrayList<?>, ColorConvertOp>>(colorConvertOpBuf);
+        }
 
-	    colorConvertOpBuf = new HashMap();
-	    softRef = new SoftReference(colorConvertOpBuf);
-	}
+        ArrayList<Object> hashcode = new ArrayList<Object>(2);
+        hashcode.add(0, src);
+        hashcode.add(1, dst);
+        ColorConvertOp op = colorConvertOpBuf.get(hashcode);
 
-	ArrayList hashcode = new ArrayList(2);
-	hashcode.add(0, src);
-	hashcode.add(1, dst);
-	ColorConvertOp op = (ColorConvertOp) colorConvertOpBuf.get(hashcode);
-
-	if (op == null) {
+        if (op == null) {
             if (src instanceof ICC_ColorSpace && dst instanceof ICC_ColorSpace) {
                 // ICC_Profile srcProfile = ((ICC_ColorSpace) src).getProfile();
                 ICC_Profile dstProfile = ((ICC_ColorSpace) dst).getProfile();
@@ -146,7 +144,7 @@ final class LCColorConvertOpImage extends PointOpImage {
                 }*/
 
                 if (renderingIntent != LCColorConvertDescriptor.DEFAULT
-                    && getRenderingIntent(dstProfile) != renderingIntent.getValue())
+                        && getRenderingIntent(dstProfile) != renderingIntent.getValue())
                 {
                     dstProfile = ICC_Profile.getInstance(dstProfile.getData());
                     setRenderingIntent(dstProfile, renderingIntent.getValue());
@@ -155,11 +153,10 @@ final class LCColorConvertOpImage extends PointOpImage {
             }
 
             op = new ColorConvertOp(src, dst, null);
-
             colorConvertOpBuf.put(hashcode, op);
-	}
+        }
 
-	return op;
+        return op;
     }
 
     /**
@@ -169,7 +166,7 @@ final class LCColorConvertOpImage extends PointOpImage {
      * @return The minimum value of the specified data type.
      */
     private static float getMinValue(int dataType) {
-        float minValue = 0;
+        final float minValue;
         switch (dataType) {
         case DataBuffer.TYPE_BYTE:
             minValue = 0;
@@ -197,7 +194,7 @@ final class LCColorConvertOpImage extends PointOpImage {
      * @return The range of the specified data type.
      */
     private static float getRange(int dataType) {
-        float range = 1;
+        final float range;
         switch (dataType) {
         case DataBuffer.TYPE_BYTE:
             range = 255;
@@ -236,48 +233,50 @@ final class LCColorConvertOpImage extends PointOpImage {
                                 ColorModel colorModel,
                                 LCColorConvertDescriptor.RenderingIntent renderingIntent) {
         super(source, layout, config, true);
-	this.colorModel = colorModel;
+        this.colorModel = colorModel;
 
         // Cache the ColorModels.
         srcParam = new ImageParameters(source.getColorModel(), source.getSampleModel());
-	dstParam = new ImageParameters(colorModel, sampleModel);
+        dstParam = new ImageParameters(colorModel, sampleModel);
 
         ColorSpace srcColorSpace = srcParam.getColorModel().getColorSpace();
         ColorSpace dstColorSpace = dstParam.getColorModel().getColorSpace();
 
-	// for each case, define the case number; create tempParam
-	// and/or ColorConvertOp if necessary
+        // for each case, define the case number; create tempParam
+        // and/or ColorConvertOp if necessary
         if (srcColorSpace instanceof ColorSpaceJAI &&
-            dstColorSpace instanceof ColorSpaceJAI) {
+                dstColorSpace instanceof ColorSpaceJAI) {
 
-	    // when both are ColorSpaceJAI, convert via RGB
-	    caseNumber = 1;
+            // when both are ColorSpaceJAI, convert via RGB
+            caseNumber = 1;
             tempParam = createTempParam();
         } else if (srcColorSpace instanceof ColorSpaceJAI) {
 
-	    // when source is ColorSpaceJAI, 1. convert via RGB if
-	    // the dest isn't RGB; 2. convert to RGB
+            // when source is ColorSpaceJAI, 1. convert via RGB if
+            // the dest isn't RGB; 2. convert to RGB
             if (dstColorSpace != rgbColorSpace) {
-	        caseNumber = 2;
+                caseNumber = 2;
                 tempParam = createTempParam();
-		colorConvertOp = getColorConvertOp(rgbColorSpace, dstColorSpace, renderingIntent);
+                colorConvertOp = getColorConvertOp(rgbColorSpace, dstColorSpace, renderingIntent);
+            } else {
+                caseNumber = 3;
             }
-	    else caseNumber = 3;
         } else if (dstColorSpace instanceof ColorSpaceJAI) {
 
-	    // when destination is ColorSpaceJAI, 1. convert via RGB if
-	    // source isn't RGB; 2. convert from RGB
+            // when destination is ColorSpaceJAI, 1. convert via RGB if
+            // source isn't RGB; 2. convert from RGB
             if (srcColorSpace != rgbColorSpace) {
-		caseNumber = 4;
+                caseNumber = 4;
                 tempParam = createTempParam();
-		colorConvertOp = getColorConvertOp(srcColorSpace, rgbColorSpace, renderingIntent);
-            } else caseNumber = 5;
+                colorConvertOp = getColorConvertOp(srcColorSpace, rgbColorSpace, renderingIntent);
+            } else {
+                caseNumber = 5;
+            }
         } else {
-
             // if all the color space are not ColorSpaceJAI
-	    caseNumber = 6;
+            caseNumber = 6;
             colorConvertOp = getColorConvertOp(srcColorSpace, dstColorSpace, renderingIntent);
-	}
+        }
 
         // Set flag to permit in-place operation.
         permitInPlaceOperation();
@@ -294,51 +293,51 @@ final class LCColorConvertOpImage extends PointOpImage {
     protected void computeRect(Raster[] sources,
                                WritableRaster dest,
                                Rectangle destRect) {
-	WritableRaster tempRas = null;
+        WritableRaster tempRas;
 
-	switch (caseNumber) {
-	// 1. When source and destination color spaces are all ColorSpaceJAI,
-	// convert via RGB color space
-	case 1:
-            tempRas = computeRectColorSpaceJAIToRGB(sources[0], srcParam,
-						    null, tempParam);
-            computeRectColorSpaceJAIFromRGB(tempRas, tempParam,
-					    dest, dstParam);
-	    break;
-	// when only the source color space is ColorSpaceJAI,
-	// 2. if the destination is not RGB, convert to RGB using
-	//    ColorSpaceJAI; then convert RGB to the destination
-	// 3. if the destination is RGB, convert using ColorSpaceJAI
-	case 2:
-	    tempRas = computeRectColorSpaceJAIToRGB(sources[0], srcParam,
-						    null, tempParam);
-	    computeRectNonColorSpaceJAI(tempRas, tempParam,
-					    dest, dstParam, destRect);
-	    break;
-	case 3:
-	    computeRectColorSpaceJAIToRGB(sources[0], srcParam,
-					      dest, dstParam);
-	    break;
-	// 4, 5. When only the destination color space is ColorSpaceJAI,
-	// similar to the case above.
-	case 4:
-	    tempRas =createTempWritableRaster(sources[0]);
-	    computeRectNonColorSpaceJAI(sources[0], srcParam,
-					tempRas, tempParam, destRect);
-	    computeRectColorSpaceJAIFromRGB(tempRas, tempParam,
-					    dest, dstParam);
-	    break;
-	case 5:
-	    computeRectColorSpaceJAIFromRGB(sources[0], srcParam,
-					    dest, dstParam);
-	    break;
-	// 6. If all the color space are not ColorSpaceJAI
-	case 6:
-	    computeRectNonColorSpaceJAI(sources[0], srcParam,
-					dest, dstParam, destRect);
-	default :
-	    break;
-	}
+        switch (caseNumber) {
+            // 1. When source and destination color spaces are all ColorSpaceJAI,
+            // convert via RGB color space
+            case 1:
+                tempRas = computeRectColorSpaceJAIToRGB(sources[0], srcParam,
+                        null, tempParam);
+                computeRectColorSpaceJAIFromRGB(tempRas, tempParam,
+                        dest, dstParam);
+                break;
+            // when only the source color space is ColorSpaceJAI,
+            // 2. if the destination is not RGB, convert to RGB using
+            //    ColorSpaceJAI; then convert RGB to the destination
+            // 3. if the destination is RGB, convert using ColorSpaceJAI
+            case 2:
+                tempRas = computeRectColorSpaceJAIToRGB(sources[0], srcParam,
+                        null, tempParam);
+                computeRectNonColorSpaceJAI(tempRas, tempParam,
+                        dest, dstParam, destRect);
+                break;
+            case 3:
+                computeRectColorSpaceJAIToRGB(sources[0], srcParam,
+                        dest, dstParam);
+                break;
+            // 4, 5. When only the destination color space is ColorSpaceJAI,
+            // similar to the case above.
+            case 4:
+                tempRas =createTempWritableRaster(sources[0]);
+                computeRectNonColorSpaceJAI(sources[0], srcParam,
+                        tempRas, tempParam, destRect);
+                computeRectColorSpaceJAIFromRGB(tempRas, tempParam,
+                        dest, dstParam);
+                break;
+            case 5:
+                computeRectColorSpaceJAIFromRGB(sources[0], srcParam,
+                        dest, dstParam);
+                break;
+            // 6. If all the color space are not ColorSpaceJAI
+            case 6:
+                computeRectNonColorSpaceJAI(sources[0], srcParam,
+                        dest, dstParam, destRect);
+            default :
+                break;
+        }
     }
 
     // when the source color space is ColorSpaceJAI, convert it to RGB.
@@ -467,24 +466,24 @@ final class LCColorConvertOpImage extends PointOpImage {
     // Back up the destination parameters. Set the destination to the
     // bridge color space RGB.
     private ImageParameters createTempParam() {
-	ColorModel cm = null;
-	SampleModel sm = null;
+        ColorModel cm;
+        SampleModel sm;
 
-	if (srcParam.getDataType() > dstParam.getDataType()) {
-	    cm = srcParam.getColorModel();
-	    sm = srcParam.getSampleModel();
-	} else {
-	    cm = dstParam.getColorModel();
-	    sm = dstParam.getSampleModel();
-	}
+        if (srcParam.getDataType() > dstParam.getDataType()) {
+            cm = srcParam.getColorModel();
+            sm = srcParam.getSampleModel();
+        } else {
+            cm = dstParam.getColorModel();
+            sm = dstParam.getSampleModel();
+        }
 
-	cm  = new ComponentColorModel(rgbColorSpace,
-				      cm.getComponentSize(),
-				      cm.hasAlpha() ,
-				      cm.isAlphaPremultiplied(),
-				      cm.getTransparency(),
-				      sm.getDataType());
-	return new ImageParameters(cm, sm);
+        cm  = new ComponentColorModel(rgbColorSpace,
+                cm.getComponentSize(),
+                cm.hasAlpha() ,
+                cm.isAlphaPremultiplied(),
+                cm.getTransparency(),
+                sm.getDataType());
+        return new ImageParameters(cm, sm);
     }
 
     // Create an WritableRaster with the same SampleModel and location
@@ -498,7 +497,6 @@ final class LCColorConvertOpImage extends PointOpImage {
     // Shift the sample value to [0, MAX-MIN]
     private Raster convertRasterToUnsigned(Raster ras) {
         int type = ras.getSampleModel().getDataType();
-        WritableRaster tempRas = null;
 
         if ((type == DataBuffer.TYPE_INT
             || type == DataBuffer.TYPE_SHORT)) {
@@ -508,49 +506,43 @@ final class LCColorConvertOpImage extends PointOpImage {
             int[] buf = ras.getPixels(minX, minY, w, h, (int[])null);
             convertBufferToUnsigned(buf, type);
 
-            tempRas = createTempWritableRaster(ras);
+            WritableRaster tempRas = createTempWritableRaster(ras);
             tempRas.setPixels(minX, minY, w, h, buf);
-	    return tempRas;
+            return tempRas;
         }
         return ras;
     }
 
     // Shift the sample value back to [MIN, MAX]
     private WritableRaster convertRasterToSigned(WritableRaster ras) {
-	int type = ras.getSampleModel().getDataType();
-	WritableRaster tempRas = null;
+        int type = ras.getSampleModel().getDataType();
 
         if ((type == DataBuffer.TYPE_INT
             || type == DataBuffer.TYPE_SHORT)) {
-	    int minX = ras.getMinX(), minY = ras.getMinY();
-	    int w = ras.getWidth() , h = ras.getHeight();
+            int minX = ras.getMinX(), minY = ras.getMinY();
+            int w = ras.getWidth() , h = ras.getHeight();
 
             int[] buf = ras.getPixels(minX, minY, w, h, (int[])null);
             convertBufferToSigned(buf, type);
 
-            if (ras instanceof WritableRaster)
-                tempRas = (WritableRaster) ras;
-            else
-                tempRas = createTempWritableRaster(ras);
-            tempRas.setPixels(minX, minY, w, h, buf);
-	    return tempRas;
+            ras.setPixels(minX, minY, w, h, buf);
         }
-	return ras;
+        return ras;
     }
 
     // Shift the value to [MIN, MAX]
     private void convertBufferToSigned(int[] buf, int type) {
-	if (buf == null) return;
+        if (buf == null) return;
 
-	if (type == DataBuffer.TYPE_SHORT)
-	    for (int i=0; i < buf.length; i++) {
-	        buf[i] += Short.MIN_VALUE;
-	    }
-	else if (type == DataBuffer.TYPE_INT) {
-	    for (int i=0; i < buf.length; i++) {
-		buf[i] = (int) ((buf[i] & 0xFFFFFFFFl) + Integer.MIN_VALUE);
-	    }
-	}
+        if (type == DataBuffer.TYPE_SHORT)
+            for (int i=0; i < buf.length; i++) {
+                buf[i] += Short.MIN_VALUE;
+            }
+        else if (type == DataBuffer.TYPE_INT) {
+            for (int i=0; i < buf.length; i++) {
+                buf[i] = (int) ((buf[i] & 0xFFFFFFFFL) + Integer.MIN_VALUE);
+            }
+        }
     }
 
     // Shift the value to [0, MAX-MIN]
@@ -563,7 +555,7 @@ final class LCColorConvertOpImage extends PointOpImage {
             }
         else if (type == DataBuffer.TYPE_INT) {
             for (int i = 0; i < buf.length; i++) {
-                buf[i] = (int) ((buf[i] & 0xFFFFFFFFl) - Integer.MIN_VALUE);
+                buf[i] = (int) ((buf[i] & 0xFFFFFFFFL) - Integer.MIN_VALUE);
             }
         }
     }

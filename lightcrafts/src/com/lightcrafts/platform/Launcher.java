@@ -86,7 +86,9 @@ public class Launcher {
 
     protected String showJavaVersion() {
         final String javaVersion = System.getProperty( "java.version" );
-        System.out.println( "Running Java version " + javaVersion );
+        final String javaArch = System.getProperty( "os.arch" );
+        System.out.println( "Running Java version " + javaVersion + ' '
+                + '(' + javaArch + ')' );
         return javaVersion;
     }
 

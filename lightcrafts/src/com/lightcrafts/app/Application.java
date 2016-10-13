@@ -171,6 +171,10 @@ public class Application {
     }
 
     public static void reOpen(ComboFrame frame) {
+        if (frame == null) {
+            openEmpty();
+	    return;
+        }
         Document doc = frame.getDocument();
         File file = doc.getFile();
         ImageMetadata meta = doc.getMetadata();

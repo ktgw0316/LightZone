@@ -2,6 +2,8 @@
 
 package com.lightcrafts.utils.xml;
 
+import lombok.Getter;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -61,8 +63,10 @@ public class XmlDocument {
     }
 
     private Document doc;
-    private XmlNode root;
     private Transformer xform;
+
+    @Getter
+    private XmlNode root;
 
     /**
      * Create a new XmlDocument containing a root XmlNode with the given tag,
@@ -115,10 +119,6 @@ public class XmlDocument {
         root = new XmlNode(e);
     }
 
-    public XmlNode getRoot() {
-        return root;
-    }
-
     public void write(OutputStream out) throws IOException {
         DOMSource source = new DOMSource(doc);
         Writer writer = new OutputStreamWriter(out, "UTF-8");
@@ -155,11 +155,13 @@ public class XmlDocument {
         catch (TransformerConfigurationException e) {
             e.printStackTrace();
         }
-        xform.setOutputProperty(OutputKeys.INDENT, "yes");
-        xform.setOutputProperty(
-            "{http://xml.apache.org/xalan}indent-amount", "2"
-        );
-        xform.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        if (xform != null) {
+            xform.setOutputProperty(OutputKeys.INDENT, "yes");
+            xform.setOutputProperty(
+                    "{http://xml.apache.org/xalan}indent-amount", "2"
+            );
+            xform.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        }
         return xform;
     }
 

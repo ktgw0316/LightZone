@@ -2,7 +2,6 @@ language: java
 
 os:
   - linux
-  - osx
 
 jdk:
   - oraclejdk8
@@ -15,7 +14,6 @@ addons:
       - autoconf
       - javahelp2
       - tidy
-      - lensfun-dev
       - liblcms2-dev
       - libtiff4-dev
 

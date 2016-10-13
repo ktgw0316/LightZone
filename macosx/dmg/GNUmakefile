@@ -29,18 +29,18 @@ DMG_DOC_FOLDER:=	$(APP_NAME) Documentation
 DMG_FS:=	HFS+
 
 # This is a temporary size, not the final .dmg size, so just make it big.
-DMG_SIZE:=	80m
+DMG_SIZE:=	256m
 
 ASR:=		/usr/sbin/asr
 MKDIR:=		mkdir -p
 RM:=		rm -fr
-SETFILE:=	/Developer/Tools/SetFile
+SETFILE:=	SetFile
 
 HDIUTIL:=	hdiutil
 DMGCREATE:=	$(HDIUTIL) create -ov
 DMGATTACH:=	$(HDIUTIL) attach
 DMGDETACH:=	$(HDIUTIL) detach
-DMGCOMPRESS:=	$(HDIUTIL) convert -format UDZO -imagekey zlib-level=9 -ov
+DMGCOMPRESS:=	$(HDIUTIL) convert -format UDBZ -imagekey zlib-level=9 -ov
 HYBRIDCREATE:=	$(HDIUTIL) makehybrid
 
 PROTOTYPE:=	$(APP_NAME)-prototype

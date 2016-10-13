@@ -12,6 +12,7 @@ class OperationTypeImpl implements OperationType {
         this.name = name;
     }
 
+    @Override
     public String getName() {
         return name;
     }

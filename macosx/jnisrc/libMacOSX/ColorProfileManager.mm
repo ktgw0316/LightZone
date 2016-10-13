@@ -171,30 +171,107 @@ JNIEXPORT jstring JNICALL
 MacOSXColorProfileManager_METHOD(getSystemDisplayProfilePath)
     ( JNIEnv *env, jclass )
 {
-    CFUUIDRef displayUUID = CGDisplayCreateUUIDFromDisplayID(CGMainDisplayID());
-    if (!displayUUID)
+#ifdef MAC_OS_X_VERSION_10_11
+    CGDirectDisplayID displayID = CGMainDisplayID();
+    CFUUIDRef displayUUID = CGDisplayCreateUUIDFromDisplayID(displayID);
+    if (!displayUUID) {
+#ifdef DEBUG
+        cerr << "Cannot get display UUID." << endl;
+#endif
         return NULL;
+    }
+
     CFDictionaryRef displayInfo =
         ColorSyncDeviceCopyDeviceInfo(kColorSyncDisplayDeviceClass, displayUUID);
-    if (!displayInfo)
-        return NULL;
     CFRelease(displayUUID);
+    if (!displayInfo) {
+#ifdef DEBUG
+        cerr << "Cannot get display info." << endl;
+#endif
+        return NULL;
+    }
+
+    CFDictionaryRef factoryInfo =
+        (CFDictionaryRef)CFDictionaryGetValue(displayInfo, kColorSyncFactoryProfiles);
+    if (!factoryInfo) {
+#ifdef DEBUG
+        cerr << "Cannot get display factory info." << endl;
+#endif
+        return NULL;
+    }
+
+    CFStringRef defaultProfileID =
+        (CFStringRef)CFDictionaryGetValue(factoryInfo, kColorSyncDeviceDefaultProfileID);
+    if (!defaultProfileID) {
+#ifdef DEBUG
+        cerr << "Cannot get display default profile ID." << endl;
+#endif
+        return NULL;
+    }
+
+    CFURLRef profileURL;
     CFDictionaryRef customProfileInfo =
         (CFDictionaryRef)CFDictionaryGetValue(displayInfo, kColorSyncCustomProfiles);
-    if (!customProfileInfo)
-        return NULL;
+    if (customProfileInfo) {
+        profileURL =
+            (CFURLRef)CFDictionaryGetValue(customProfileInfo, defaultProfileID);
+        if (!profileURL) {
+#ifdef DEBUG
+            cerr << "Cannot get display custom profile URL." << endl;
+#endif
+            return NULL;
+        }
+    }
+    else {
+        // try to use factoryInfo
+        CFDictionaryRef factoryProfileInfo =
+            (CFDictionaryRef)CFDictionaryGetValue(factoryInfo, defaultProfileID);
+        if (!factoryProfileInfo) {
+#ifdef DEBUG
+            cerr << "Cannot get display factory profile info." << endl;
+#endif
+            return NULL;
+        }
 
-    CFURLRef customProfileURLs[CFDictionaryGetCount(customProfileInfo)];
-    CFDictionaryGetKeysAndValues(customProfileInfo, NULL, (const void **)customProfileURLs);
-    if ((void*)customProfileURLs[0] == kCFNull)
-        return NULL;
+        profileURL =
+            (CFURLRef)CFDictionaryGetValue(factoryProfileInfo, kColorSyncDeviceProfileURL);
+        if (!profileURL) {
+#ifdef DEBUG
+            cerr << "Cannot get display factory profile URL." << endl;
+#endif
+            return NULL;
+        }
+    }
 
-    char *cPath;
-    Boolean result =
-        CFURLGetFileSystemRepresentation(customProfileURLs[0], true, (UInt8*)cPath, PATH_MAX);
-    CFRelease(displayInfo);
-    if (!result)
+    char path[ PATH_MAX ];
+    bool const result =
+        CFURLGetFileSystemRepresentation(profileURL, true, (UInt8*)path, PATH_MAX);
+    CFRelease(profileURL);
+    if (!result) {
+#ifdef DEBUG
+        cerr << "Cannot get display profile path." << endl;
+#endif
         return NULL;
+    }
+    char const *cPath = new_strdup( path );
+#else // for Snow Leopard or older
+    CMError err;
+    CMProfileRef profRef;
+    CMProfileLocation profLoc;
+    UInt32 locSize = cmCurrentProfileLocationSize;
+
+    CGDirectDisplayID const displayID = CGMainDisplayID();
+    err = CMGetProfileByAVID( (CMDisplayIDType)displayID, &profRef );
+    if ( err != noErr )
+        return NULL;
+    err = NCMGetProfileLocation( profRef, &profLoc, &locSize );
+    if ( err != noErr )
+        return NULL;
+    char const *const cPath = getProfilePath( profLoc );
+    CMCloseProfile( profRef );
+    if ( !cPath )
+        return NULL;
+#endif
     jstring const jPath = env->NewStringUTF( cPath );
     delete[] cPath;
     return jPath;

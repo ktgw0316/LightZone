@@ -16,12 +16,12 @@ import com.lightcrafts.mediax.jai.RasterFormatTag;
 import java.util.Map;
 
 public final class FastBilateralFilterOpImage extends AreaOpImage {
-    final float sigma_d;
-    final float sigma_r;
+    private final float sigma_d;
+    private final float sigma_r;
 
-    static final BorderExtender copyExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
+    private static final BorderExtender copyExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
 
-    static final float transform[] = new float[0x10000];
+    private static final float transform[] = new float[0x10000];
 
     static {
         for (int i = 0; i < 0x10000; i++) {
@@ -34,7 +34,7 @@ public final class FastBilateralFilterOpImage extends AreaOpImage {
 
         class TwoComponentsColorSpace extends ColorSpace {
 
-            TwoComponentsColorSpace() {
+            private TwoComponentsColorSpace() {
                 super(ColorSpace.TYPE_2CLR, 2);
             }
 
@@ -106,7 +106,7 @@ public final class FastBilateralFilterOpImage extends AreaOpImage {
 
         RasterAccessor srcAccessor =
                 new RasterAccessor(source, srcRect, formatTags[0],
-                                   getSource(0).getColorModel());
+                                   getSourceImage(0).getColorModel());
         RasterAccessor dstAccessor =
                 new RasterAccessor(dest, destRect, formatTags[1],
                                    this.getColorModel());

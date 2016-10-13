@@ -7,11 +7,8 @@ import java.awt.color.ICC_Profile;
 import java.awt.image.*;
 import java.io.*;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 import org.w3c.dom.Document;
-
-import sun.awt.image.ByteInterleavedRaster;
 
 import com.lightcrafts.image.metadata.*;
 import com.lightcrafts.image.types.JPEGImageType;
@@ -59,7 +56,7 @@ public final class LCJPEGWriter {
     public LCJPEGWriter( String fileName, int width, int height,
                          int colorsPerPixel, int colorSpace, int quality,
                          int resolution, int resolutionUnit )
-        throws IOException, LCImageLibException, UnsupportedEncodingException
+        throws IOException, LCImageLibException
     {
         m_exportWidth = width;
         m_exportHeight = height;
@@ -322,7 +319,7 @@ public final class LCJPEGWriter {
     private void openForWriting( String fileName, int width, int height,
                                         int colorsPerPixel, int colorSpace,
                                         int quality )
-        throws IOException, LCImageLibException, UnsupportedEncodingException
+        throws IOException, LCImageLibException
     {
         byte[] fileNameUtf8 = ( fileName + '\000' ).getBytes( "UTF-8" );
         openForWriting(
@@ -431,16 +428,16 @@ public final class LCJPEGWriter {
             indicator.setMaximum( imageHeight );
 
         final int bands = image.getSampleModel().getNumBands();
-        final SampleModel sm =
-            new PixelInterleavedSampleModel(
-                DataBuffer.TYPE_BYTE,
-                imageWidth, stripHeight, bands, bands * imageWidth,
-                bands == 1 ? new int[]{ 0 } :
-                    bands == 3 ? new int[]{ 0, 1, 2 } :
-                        new int[]{ 0, 1, 2, 3 }
-            );
 
-        final ByteInterleavedRaster rasterBuffer = new ByteInterleavedRaster(sm, new Point(0, 0));
+        final WritableRaster rasterBuffer =
+                Raster.createInterleavedRaster(
+                        DataBuffer.TYPE_BYTE,
+                        imageWidth, stripHeight, bands * imageWidth, bands,
+                        bands == 1 ? new int[]{ 0 } :
+                        bands == 3 ? new int[]{ 0, 1, 2 } :
+                                     new int[]{ 0, 1, 2, 3 },
+                        new Point(0, 0)
+                );
 
         for ( int y = 0; y < imageHeight; y += stripHeight ) {
             if ( thread != null && thread.isCanceled() )
@@ -448,7 +445,7 @@ public final class LCJPEGWriter {
             stripHeight = Math.min( stripHeight, imageHeight - y );
             stripRect.setBounds( 0, y, imageWidth, stripHeight );
 
-            final ByteInterleavedRaster raster = (ByteInterleavedRaster) rasterBuffer.createTranslatedChild(0, y);
+            final WritableRaster raster = (WritableRaster) rasterBuffer.createTranslatedChild(0, y);
 
             // Prefetch tiles, uses all CPUs
             if (image instanceof PlanarImage)
@@ -458,7 +455,9 @@ public final class LCJPEGWriter {
 
             final DataBufferByte db = (DataBufferByte)raster.getDataBuffer();
 
-            final int[] offsets = raster.getDataOffsets();
+            final ComponentSampleModel csm = (ComponentSampleModel)raster.getSampleModel();
+
+            final int[] offsets = csm.getBandOffsets();
             int offset = offsets[0];
             for (int i = 1; i < offsets.length; i++)
                 offset = Math.min(offset, offsets[i]);
@@ -474,7 +473,7 @@ public final class LCJPEGWriter {
                     data[i] = (byte)~data[i];
             }
 
-            final int lineStride = raster.getScanlineStride();
+            final int lineStride = csm.getScanlineStride();
             final int written = writeScanLines( db.getData(), offset, stripHeight, lineStride );
 
             if ( written != stripHeight )

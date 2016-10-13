@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 
 JAVA_HOME=/usr/lib/jvm/default-java
-ANT_OPTIONS=-f linux/build.xml
+ANT_OPTIONS=-f $(CURDIR)/linux/build.xml
 
 configure: configure-stamp
 configure-stamp:
@@ -51,6 +51,7 @@ binary-arch: build-arch install
 
 clean:
 	JAVA_HOME=$(JAVA_HOME) ant $(ANT_OPTIONS) clean
+	-$(RM) -rf $(CURDIR)/debian/lightzone/
 	-$(RM) configure-stamp build-stamp
 
 binary: binary-arch binary-indep

@@ -30,7 +30,7 @@ Download and install (or unpack) following:
     -    __mingw64-i686-lcms2__ (32-bit) or __mingw64-x86_64-lcms2__ (64-bit)
     -    __mingw64-i686-tiff__ (32-bit) or __mingw64-x86_64-tiff__ (64-bit)
     -    __mingw64-i686-libjpeg-turbo__ (32-bit) or __mingw64-x86_64-libjpeg-turbo__ (64-bit)
--   __Oracle JDK SE 7__ (Java Development Kit)
+-   __Oracle JDK SE 8__ (Java Development Kit)
 -   __Microsoft Windows SDK__
     Pick the right version based on your Windows version. Information and download links are available at
     http://en.wikipedia.org/wiki/Microsoft_Windows_SDK#Versions
@@ -54,7 +54,7 @@ Few points for Cygwin beginners
 If you haven't changed anything, your default shell is Bash. Open `~/.bashrc` with an editor (nano or vim) and enter
 following environmental variables. (Modify the paths to match your environment.):
 
-    export JAVA_HOME="/cygdrive/c/Program Files/Java/jdk1.7.0_60";
+    export JAVA_HOME="/cygdrive/c/Program Files/Java/jdk1.8.0_60";
     export ANT_HOME="/cygdrive/c/Program Files/apache-ant-1.9.1";
     export PKG_CONFIG_PATH=/usr/lib/pkgconfig/;
     export MSSDK_HOME="/cygdrive/c/Program Files (x86)/Windows Kits/8.0";

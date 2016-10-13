@@ -6,9 +6,10 @@
 #include <omp.h>
 #include "include/yst.h"
 #include "include/transpose.h"
+#include "include/omp_util.h"
 
 inline void separable_bf_mono_row(
-    float *ibuf,                            // pointer to source data buffer
+    float *ibuf,                            // pointer to source data buffer 
     const float sr,                         // the usual range sigma
     const int wr,                           // window radius in pixels
     const float *kernel,                    // half-kernel containing the exponents of the spatial Gaussian
@@ -17,11 +18,7 @@ inline void separable_bf_mono_row(
 {
     float *rbuf = new float[width];
     
-#if _OPENMP < 201307
-#   pragma omp for
-#else
-#   pragma omp for simd
-#endif
+    OMP_FOR_SIMD
     for (int y=wr; y < height - wr; y++) {
         
         memcpy(rbuf, &ibuf[y * width], width * sizeof(float));
@@ -72,11 +69,7 @@ inline void separable_bf_chroma_row(
     float *rbuf_a = new float[width];
     float *rbuf_b = new float[width];
 
-#if _OPENMP < 201307
-#   pragma omp for
-#else
-#   pragma omp for simd
-#endif
+    OMP_FOR_SIMD
     for (int y=wr; y < height - wr; y++) {
         memcpy(rbuf_a, &buf_a[y * width], width * sizeof(float));
         memcpy(rbuf_b, &buf_b[y * width], width * sizeof(float));
@@ -110,7 +103,6 @@ inline void separable_bf_chroma_row(
                 a_num += f * s_a;
                 b_num += f * s_b;
 #endif
-
                 denom += f;
             }
 

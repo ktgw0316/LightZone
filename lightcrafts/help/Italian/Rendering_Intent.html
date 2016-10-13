@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="it-IT" xml:lang="it-IT">
+
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <title>Intento rendering di LightZone</title>
+    <meta name="description" content="Descrizione degli intenti rendering."/>
+    <link rel="stylesheet" type="text/css" href="Help.css" media="all"/>
+    <link rel="stylesheet" type="text/css" href="Platform.css" media="all"/>
+    <!--[if lt IE 7]>
+    <script defer type="text/javascript" src="IE_PNG.js"></script>
+    <link rel="stylesheet" type="text/css" href="IE.css" media="all"/>
+    <![endif]-->
+  </head>
+
+  <body>
+    <div id="banner">
+      <div id="banner_left">
+        <a href="index.html">Aiuto di LightZone</a>
+      </div>
+      <div id="banner_right">
+        <a href="index/index.html">Indice</a>
+      </div>
+    </div>
+
+    <!-- LC_Index: converting images > rendering intent and -->
+    <!-- LC_Index: printing > rendering intent and -->
+    <!-- LC_Index: rendering intent -->
+    <a name="Rendering_Intent"/>
+    <img src="images/app_icon-32.png" width="32" height="32" class="title_icon"/>
+    <h1>Intento rendering</h1>
+
+    <p>Durante la <a href="Converting.html">conversione di un'immagine</a> o la <a href="Printing.html">stampa</a> di una foto con la gestione dei colori tramite l'applicazione, è possibile scegliere quale <em>intento rendering</em> usare. Di seguito sono descritti gli intenti rendering tra cui l'utente può scegliere.</p>
+
+    <dl>
+
+      <dt>Colorimetrico assoluto</dt>
+      <dd>Consente di lasciare invariati i colori che sono compresi all’interno del gamut di destinazione. I colori che non rientrano nel gamut vengono tagliati. Non viene effettuato alcun adeguamento dei colori al punto bianco di destinazione. Questo intento rendering è volto al mantenimento dell'accuratezza cromatica a scapito del rapporto tra i colori; è adatto alle prove di stampa, per testare la resa di un determinato dispositivo. Questo intento rendering è molto utile anche per visualizzare in anteprima il modo in cui il colore della carta influirà sui colori stampati.</dd>
+
+      <dt>Colorimetrico relativo</dt>
+      <dd>Esegue un confronto tra la luce più estrema dello spazio di colore di origine e quella dello spazio di colore di destinazione; tutti i colori sono adattati di conseguenza. I colori fuori dal gamut sono convertiti nel colore più prossimo riproducibile nello spazio di colore di destinazione. La conservazione dei colori originali di questo intento rendering è maggiore rispetto a quella dell'intento Percettivo. Vedere anche <a href="Black_Point_Compensation.html">Compensazione del punto nero</a>.</dd>
+
+      <dt>Percettivo</dt>
+      <dd>Il rapporto visivo tra i colori viene conservato in modo che l'occhio umano li percepisca come naturali benché i valori cromatici possano cambiare. Questo intento rendering è adatto alle foto con molti colori fuori dal gamut.</dd>
+
+      <dt>Saturazione</dt>
+      <dd>Consente di aumentare la vividezza dei colori della foto a scapito dell'accuratezza cromatica. Questo intento rendering è adatto alle grafiche commerciali, come schemi o grafici, in cui i colori brillanti e saturati sono più importanti del giusto rapporto fra i colori.</dd>
+
+    </dl>
+
+  </body>
+</html><!-- vim:set et sw=2 ts=2: -->

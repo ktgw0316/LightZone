@@ -17,10 +17,11 @@ public class AdvancedNoiseReductionOperationV5 extends BlendedOperation {
     static final String GRAIN_RADIUS = "Grain_Radius";
     static final String GRAIN_INTENSITY = "Grain_Intensity";
     static final OperationType type = new OperationTypeImpl("Advanced Noise Reduction V5");
-    private float chroma_domain = 2;
-    private float chroma_range = 3;
-    private float luma_domain = 2;
-    private float luma_range = 3;
+
+    private int chroma_radius = 2;
+    private float chroma_intensity = 3;
+    private int luma_radius = 2;
+    private float luma_intensity = 3;
 
     public AdvancedNoiseReductionOperationV5(Rendering rendering, OperationType type) {
         super(rendering, type);
@@ -29,16 +30,16 @@ public class AdvancedNoiseReductionOperationV5 extends BlendedOperation {
         DecimalFormat format = new DecimalFormat("0.0");
 
         this.addSliderKey(COLOR_RADIUS);
-        this.setSliderConfig(COLOR_RADIUS, new SliderConfig(0, 5, chroma_domain, 1, false, format));
+        this.setSliderConfig(COLOR_RADIUS, new SliderConfig(0, 5,  chroma_radius, 1, false, format));
 
         this.addSliderKey(COLOR_INTENSITY);
-        this.setSliderConfig(COLOR_INTENSITY, new SliderConfig(0, 10, chroma_range, 0.1, false, format));
+        this.setSliderConfig(COLOR_INTENSITY, new SliderConfig(0, 10, chroma_intensity, 0.1, false, format));
 
         this.addSliderKey(GRAIN_RADIUS);
-        this.setSliderConfig(GRAIN_RADIUS, new SliderConfig(0, 5, luma_domain, 1, false, format));
+        this.setSliderConfig(GRAIN_RADIUS, new SliderConfig(0, 5, luma_radius, 1, false, format));
 
         this.addSliderKey(GRAIN_INTENSITY);
-        this.setSliderConfig(GRAIN_INTENSITY, new SliderConfig(0, 10, luma_range, 0.1, false, format));
+        this.setSliderConfig(GRAIN_INTENSITY, new SliderConfig(0, 10, luma_intensity, 0.1, false, format));
     }
 
     public boolean neutralDefault() {
@@ -48,14 +49,14 @@ public class AdvancedNoiseReductionOperationV5 extends BlendedOperation {
     public void setSliderValue(String key, double value) {
         value = roundValue(key, value);
 
-        if (key == COLOR_RADIUS && chroma_domain != value) {
-            chroma_domain = (float) value;
-        } else if (key == COLOR_INTENSITY && chroma_range != value) {
-            chroma_range = (float) value;
-        } else if (key == GRAIN_RADIUS && luma_domain != value) {
-            luma_domain = (float) value;
-        } else if (key == GRAIN_INTENSITY && luma_range != value) {
-            luma_range = (float) value;
+        if (COLOR_RADIUS.equals(key) && chroma_radius != value) {
+             chroma_radius = (int) value;
+        } else if (COLOR_INTENSITY.equals(key) && chroma_intensity != value) {
+            chroma_intensity = (float) value;
+        } else if (GRAIN_RADIUS.equals(key) && luma_radius != value) {
+            luma_radius = (int) value;
+        } else if (GRAIN_INTENSITY.equals(key) && luma_intensity != value) {
+            luma_intensity = (float) value;
         } else
             return;
 
@@ -68,14 +69,20 @@ public class AdvancedNoiseReductionOperationV5 extends BlendedOperation {
         }
 
         public PlanarImage setFront() {
-            if (chroma_domain == 0 && chroma_range == 0 && luma_domain == 0 && luma_range == 0)
+            if ( chroma_radius == 0 && chroma_intensity == 0 && luma_radius == 0 && luma_intensity == 0)
                 return back;
 
-            PlanarImage front = back;
+            final int luma_patch_radius   =  (int) (luma_radius * scale);
+            final int chroma_patch_radius =  (int) (chroma_radius * scale);
+            final int luma_search_radius   = 2 * luma_patch_radius;
+            final int chroma_search_radius = 2 * chroma_patch_radius;
+            final float luma_h   = 0.01f * luma_intensity; // * scale;
+            final float chroma_h = 0.01f * chroma_intensity; // * scale;
+
             BorderExtender borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_REFLECT);
-            front = new NonLocalMeansFilterOpImage(back, borderExtender, null, null,
-                    luma_domain * scale, luma_range * scale * 0.02f,
-                    chroma_domain * scale, chroma_range * scale * 0.02f);
+            PlanarImage  front = new NonLocalMeansFilterOpImage(back, borderExtender, null, null,
+                    luma_search_radius, luma_patch_radius, luma_h,
+                    chroma_search_radius, chroma_patch_radius, chroma_h);
             front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
             return front;
         }

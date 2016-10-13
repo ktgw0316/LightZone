@@ -1,8 +1,8 @@
 Index: dcraw/dcraw_lz.c
 ===================================================================
---- dcraw.orig/dcraw_lz.c	2015-09-26 20:47:50.652178067 +0900
-+++ dcraw/dcraw_lz.c	2015-09-27 12:34:02.434153649 +0900
-@@ -9790,6 +9790,13 @@
+--- dcraw.orig/dcraw_lz.c
++++ dcraw/dcraw_lz.c
+@@ -9907,6 +9907,13 @@ struct tiff_hdr {
    char desc[512], make[64], model[64], soft[32], date[20], artist[64];
  };
  

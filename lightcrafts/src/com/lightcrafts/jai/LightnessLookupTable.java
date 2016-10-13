@@ -11,10 +11,8 @@ import com.lightcrafts.mediax.jai.RasterFormatTag;
 import java.awt.image.WritableRaster;
 import java.awt.image.Raster;
 import java.awt.image.SampleModel;
-import java.awt.image.RenderedImage;
 import java.awt.*;
 
-import sun.awt.image.ShortInterleavedRaster;
 
 /**
  * Special case of LookupTableJAI to apply the lookup on the lightness of the image.
@@ -26,15 +24,15 @@ public class LightnessLookupTable extends LookupTableJAI {
         super(shorts, b);
     }
 
+    @Override
     public WritableRaster lookup(Raster src, WritableRaster dst, Rectangle rect) {
-        if (src.getNumBands() != 3)
-            return super.lookup(src, dst, rect);
-
         // Validate source.
         if (src == null) {
-            throw
-              new IllegalArgumentException("Null Source");
+            throw new IllegalArgumentException("Null Source");
         }
+
+        if (src.getNumBands() != 3)
+            return super.lookup(src, dst, rect);
 
         SampleModel srcSampleModel = src.getSampleModel();
         if (!isIntegralDataType(srcSampleModel)) {

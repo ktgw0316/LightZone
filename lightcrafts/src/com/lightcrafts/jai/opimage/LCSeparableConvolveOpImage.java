@@ -40,8 +40,8 @@ final class LCSeparableConvolveOpImage extends AreaOpImage {
     protected KernelJAI kernel;
     protected int kw, kh, kx, ky;
 
-    protected float hValues[];
-    protected float vValues[];
+    private float hValues[];
+    private float vValues[];
 
     /**
      * Creates a SeparableConvoveOpImage on the source
@@ -103,7 +103,7 @@ final class LCSeparableConvolveOpImage extends AreaOpImage {
 
         RasterAccessor srcAccessor =
             new RasterAccessor(source, srcRect, formatTags[0],
-                               getSource(0).getColorModel());
+                               getSourceImage(0).getColorModel());
         RasterAccessor dstAccessor =
             new RasterAccessor(dest, destRect, formatTags[1],
                                this.getColorModel());
@@ -140,7 +140,7 @@ final class LCSeparableConvolveOpImage extends AreaOpImage {
         }
     }
 
-    final boolean INTERLEAVED3OPT = true;
+    private final boolean INTERLEAVED3OPT = true;
 
     protected void byteLoop(RasterAccessor src,
                             RasterAccessor dst) {

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0">
+  <info organisation="lightcrafts" module="lightcrafts"/>
+  <dependencies>
+    <dependency org="org.projectlombok" name="lombok" rev="1.16.10"/>
+  </dependencies>
+</ivy-module>
+

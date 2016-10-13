@@ -12,31 +12,37 @@ import com.lightcrafts.image.ImageInfo;
 
 class ExposureMetadataEntry extends MetadataEntry {
 
+    @Override
     public String getLabel(ImageMetadata meta) {
         return LOCALE.get("ExposureLabel");
     }
 
+    @Override
     public String getValue(ImageMetadata meta) {
         ImageMetadataDirectory dir = meta.getDirectoryFor(CoreDirectory.class);
         ImageMetaValue apertureValue = dir.getValue(CoreTags.CORE_APERTURE);
         ImageMetaValue speedValue = dir.getValue(CoreTags.CORE_SHUTTER_SPEED);
-        if ((apertureValue != null) && (speedValue != null)) {
-            String value = LOCALE.get(
-                "ExposureValue", speedValue.toString(), apertureValue.toString()
-            );
-            return value;
+        if (apertureValue == null && speedValue == null) {
+            return "";
         }
-        return "";
+        final String speed    = (speedValue    == null) ? "?" : speedValue.toString();
+        final String aperture = (apertureValue == null) ? "?" : apertureValue.toString();
+        return LOCALE.get(
+            "ExposureValue", speed, aperture
+        );
     }
 
+    @Override
     public boolean isEditable(ImageInfo info) {
         return false;
     }
 
+    @Override
     public boolean isValidValue(ImageMetadata meta, String value) {
         return true;
     }
 
+    @Override
     public void setValue(ImageMetadata meta, String value) {
         // readonly
     }

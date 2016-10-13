@@ -46,16 +46,16 @@ public class ImageEditorDisplay extends JPanel {
 
     private RenderedImage backgroundImage;
 
-    SoftValueHashMap<CacheKey, BufferedImage> backgroundCache = null;
+    private SoftValueHashMap<CacheKey, BufferedImage> backgroundCache = null;
 
     // Workaround for unreliable ComponentListener.componentResized() callbacks.
-    ConcurrentLinkedQueue<ComponentListener> compListeners =
+    private ConcurrentLinkedQueue<ComponentListener> compListeners =
         new ConcurrentLinkedQueue<ComponentListener>();
 
     @SuppressWarnings("deprecation")
     @Override
     public void reshape(int x, int y, int w, int h) {
-        super.reshape(x, y, w, h);        
+        super.reshape(x, y, w, h);
 
         // COMPONENT_RESIZED events are not reliably forwarded to listeners,
         // so we do so manually.
@@ -151,8 +151,6 @@ public class ImageEditorDisplay extends JPanel {
         progressNotifyer = null;
     }
 
-    RenderedImage lastPreview = null;
-
     public synchronized void set(PlanarImage image, boolean synchronous) {
         if (image == null)
             throw new IllegalArgumentException("cannot set a null image!");
@@ -198,6 +196,7 @@ public class ImageEditorDisplay extends JPanel {
     }
 
     class LCTileHandler implements TileHandler {
+        @Override
         public void handle(int tileX, int tileY, PaintContext ctx) {
             EventQueue.invokeLater(new AsynchronousRepainter(tileX, tileY, ctx));
         }
@@ -314,7 +313,7 @@ public class ImageEditorDisplay extends JPanel {
 
     BufferedImage getBackgroundTile(WritableRaster tile, int x, int y) {
         CacheKey key = new CacheKey(x, y);
-        BufferedImage image = (BufferedImage) backgroundCache.get(key);
+        BufferedImage image = backgroundCache.get(key);
         BufferedImage tileImage = new BufferedImage(sRGBColorModel,
                                                     (WritableRaster) tile.createTranslatedChild(0, 0),
                                                     false, null);
@@ -325,7 +324,7 @@ public class ImageEditorDisplay extends JPanel {
             big.drawRenderedImage(tileImage, new AffineTransform());
             big.dispose();
         } else {
-            image = (BufferedImage) Functions.toFastBufferedImage(tileImage);
+            image = Functions.toFastBufferedImage(tileImage);
             backgroundCache.put(key, image);
         }
         return image;
@@ -333,7 +332,7 @@ public class ImageEditorDisplay extends JPanel {
 
     private boolean firstTime;
 
-    final Timer paintTimer = new Timer(300, new ActionListener() {
+    private final Timer paintTimer = new Timer(300, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
             firstTime = false;
@@ -409,7 +408,7 @@ public class ImageEditorDisplay extends JPanel {
 
                 // if we don't have a fresh tile, try and see if we have an old one around
                 final BufferedImage backgroundTile =
-                        (BufferedImage) backgroundCache.get(new CacheKey(tileIndex.x, tileIndex.y));
+                        backgroundCache.get(new CacheKey(tileIndex.x, tileIndex.y));
 
                 if (backgroundTile != null) {
                     final int xOffset = source.tileXToX(tileIndex.x);
@@ -461,18 +460,16 @@ public class ImageEditorDisplay extends JPanel {
 
             computingTiles = true;
             tileManager.queueTiles(source, epoch, dirtyTiles, synchronizedImage, false, tileHandler);
-        } else {
-            if (tileManager.pendingTiles(source, epoch) == 0) {
-                final long endGetTiles = System.currentTimeMillis();
-                final long time = (computingTiles && synchronizedImage && startGetTiles > 0) ?
-                        endGetTiles - startGetTiles : 0;
+        } else if (tileManager.pendingTiles(source, epoch) == 0) {
+            final long endGetTiles = System.currentTimeMillis();
+            final long time = (computingTiles && synchronizedImage && startGetTiles > 0) ?
+                    endGetTiles - startGetTiles : 0;
 
-                if (paintListener != null) {
-                    paintListener.paintDone(source, getVisibleRect(), synchronizedImage, time);
-                }
-                startGetTiles = -1;
-                computingTiles = false;
+            if (paintListener != null) {
+                paintListener.paintDone(source, getVisibleRect(), synchronizedImage, time);
             }
+            startGetTiles = -1;
+            computingTiles = false;
         }
         progressNotifyer.setTiles(tileManager.pendingTiles(source, epoch));
     }

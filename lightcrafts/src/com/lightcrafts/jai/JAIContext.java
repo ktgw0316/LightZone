@@ -83,15 +83,16 @@ public class JAIContext {
         byte[] data = profile.getData(tag);
         if (data != null) {
             System.out.print(name + " (" + data.length + ") :");
-            for (int i = 0; i < data.length; i++)
-                System.out.print(" " + (int) (data[i] & 0xFF));
+            for (byte aData : data)
+                System.out.print(" " + (aData & 0xFF));
             System.out.println();
 
-            for (int i = 0; i < data.length; i++)
-                System.out.print((char) (data[i] & 0xFF));
+            for (byte aData : data)
+                System.out.print((char) (aData & 0xFF));
             System.out.println();
-        } else
+        } else {
             System.out.println("no " + name + " info");
+        }
     }
 
     /**

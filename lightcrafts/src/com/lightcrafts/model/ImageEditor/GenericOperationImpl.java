@@ -37,6 +37,7 @@ abstract class GenericOperationImpl extends OperationImpl implements GenericOper
         sliderConfigs = new HashMap<String, SliderConfig>();
     }
 
+    @Override
     public OperationType getType() {
         return type;
     }
@@ -63,18 +64,22 @@ abstract class GenericOperationImpl extends OperationImpl implements GenericOper
         checkboxKeys = keys;
     }
 
+    @Override
     public List<String> getSliderKeys() {
         return new ArrayList<String>(sliderKeys);
     }
 
+    @Override
     public List<String> getCheckboxKeys() {
         return new ArrayList<String>(checkboxKeys);
     }
 
+    @Override
     public List<String> getChoiceKeys() {
         return new ArrayList<String>(choiceKeys);
     }
 
+    @Override
     public List<String> getChoiceValues(String key) {
         return new ArrayList<String>(choiceValues.get(key));
     }
@@ -85,16 +90,19 @@ abstract class GenericOperationImpl extends OperationImpl implements GenericOper
         return Math.round(value / increment) * increment;
     }
 
+    @Override
     public void setSliderValue(String key, double value) {
         // System.out.println(getName() + " updated: " + key + " = " + value);
         settingsChanged();
     }
 
+    @Override
     public void setCheckboxValue(String key, boolean value) {
         // System.out.println(getName() + " updated: " + key + " = " + value);
         settingsChanged();
     }
 
+    @Override
     public void setChoiceValue(String key, String value) {
         // System.out.println(getName() + " updated: " + key + " = " + value);
         settingsChanged();
@@ -104,11 +112,14 @@ abstract class GenericOperationImpl extends OperationImpl implements GenericOper
         sliderConfigs.put(key, config);
     }
 
+    @Override
     public SliderConfig getSliderConfig(String key) {
         return sliderConfigs.get(key);
     }
 
+    @Override
     abstract protected void updateOp(Transform op);
 
+    @Override
     abstract protected Transform createOp(PlanarImage source);
 }

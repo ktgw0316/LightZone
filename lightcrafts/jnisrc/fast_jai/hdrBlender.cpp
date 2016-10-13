@@ -11,59 +11,10 @@ extern "C" {
 typedef unsigned char byte;
 typedef unsigned short ushort;
 
+#include <algorithm>
 #include <math.h>
 #include <omp.h>
-
-namespace hdr {
-    template <typename T>
-    T min(T a, T b) {
-        return a < b ? a : b;
-    }
-    
-    template <typename T>
-    ushort clampUShort(T x) {
-        return x < 0 ? 0 : x > 0xffff ? 0xffff : (ushort) x;
-    }
-
-#if 0 // !defined(__ppc__)
-    float shift23=(1<<23);
-    float OOshift23=1.0/(1<<23);
-
-    float log2(float i) {
-        float LogBodge=0.346607f;
-        float x;
-        float y;
-        x=*(int *)&i;
-        x*= OOshift23; //1/pow(2,23);
-        x=x-127;
-        
-        y=x-floorf(x);
-        y=(y-y*y)*LogBodge;
-        return x+y;
-	}
-    
-    float pow2(float i) {
-        float PowBodge=0.33971f;
-        float x;
-        float y=i-floorf(i);
-        y=(y-y*y)*PowBodge;
-        
-        x=i+127-y;
-        x*= shift23; //pow(2,23);
-        *(int*)&x=(int)x;
-        return x;
-	}
-    float pow(float a, float b)
-	{
-        return pow2(b*log2(a));
-	}
-#else
-    float pow(float a, float b)
-	{
-        return ::powf(a, b);
-	}
-#endif
-}
+#include "../include/mathlz.h"
 
 static double softLightBlendPixels(double front, double back) {
     double m = front * back;
@@ -84,7 +35,7 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_HDROpImage2_cBlendLoop
     int *srcBandOffsets = (int *) env->GetPrimitiveArrayCritical(jsrcBandOffsets, 0);
     int *maskBandOffsets = (int *) env->GetPrimitiveArrayCritical(jmaskBandOffsets, 0);
     int *dstBandOffsets = (int *) env->GetPrimitiveArrayCritical(jdstBandOffsets, 0);
-  
+
     int srcROffset = srcBandOffsets[0];
     int srcGOffset = srcBandOffsets[1];
     int srcBOffset = srcBandOffsets[2];
@@ -116,7 +67,7 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_HDROpImage2_cBlendLoop
             float m = maskData[maskPixelStride * col + row * maskLineStride + maskOffset1] / (float) 0xffff;
             // if (maskBandOffsets.length == 3) {
                 float um = maskData[maskPixelStride * col + row * maskLineStride + maskOffset2] / (float) 0xffff;
-                um = hdr::min(um*um, 1.0f);
+                um = std::min(um*um, 1.0f);
 
                 float bm = maskData[maskPixelStride * col + row * maskLineStride + maskOffset3] / (float) 0xffff;
                 m = um * m + (1-um) * bm;
@@ -124,7 +75,7 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_HDROpImage2_cBlendLoop
 
             float y = (wr * r + wg * g + wb * b) / 0xffff;
 
-            float mm = hdr::pow(m, 1/shadows) * hdr::pow(y/m, detail);
+            float mm = powf(m, 1/shadows) * powf(y/m, detail);
 
             float compressedHilights = softLightBlendPixels(1 - m, y);
 
@@ -134,9 +85,9 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_HDROpImage2_cBlendLoop
             g *= ratio;
             b *= ratio;
 
-            dstData[dstPixelStride * col + row * dstLineStride + dstROffset] = hdr::clampUShort(r);
-            dstData[dstPixelStride * col + row * dstLineStride + dstGOffset] = hdr::clampUShort(g);
-            dstData[dstPixelStride * col + row * dstLineStride + dstBOffset] = hdr::clampUShort(b);
+            dstData[dstPixelStride * col + row * dstLineStride + dstROffset] = clampUShort(r);
+            dstData[dstPixelStride * col + row * dstLineStride + dstGOffset] = clampUShort(g);
+            dstData[dstPixelStride * col + row * dstLineStride + dstBOffset] = clampUShort(b);
         }
     }
 

@@ -7,7 +7,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
 import java.util.*;
-import java.util.List;
+import java.util.stream.Stream;
 
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.*;
@@ -25,6 +25,7 @@ import com.lightcrafts.utils.file.ICC_ProfileFileFilter;
 import com.lightcrafts.utils.Version;
 
 import static com.lightcrafts.platform.windows.WindowsFileUtil.*;
+
 import com.lightcrafts.ui.LightZoneSkin;
 import com.sun.java.swing.plaf.windows.WindowsLookAndFeel;
 
@@ -121,21 +122,21 @@ public final class WindowsPlatform extends Platform {
             WindowsLookAndFeel quaqua = new WindowsLookAndFeel();
 
             UIDefaults quaquaDefaults = quaqua.getDefaults();
-            Set quaquaKeys = quaquaDefaults.keySet();
+            Set<Object> quaquaKeys = quaquaDefaults.keySet();
 
             String[] fromQuaqua = new String[] {
                     "FileChooser",
             };
 
-            for (Object key : quaquaKeys) {
-                for (String qk : fromQuaqua)
-                    if (key instanceof String && ((String) key).startsWith(qk)) {
+            Stream.of(fromQuaqua).forEach(qk -> {
+                quaquaKeys.stream()
+                    .filter(key -> key instanceof String &&
+                            ((String) key).startsWith(qk))
+                    .forEach(key -> {
                         Object value = quaquaDefaults.get(key);
                         UIManager.put(key, value);
-                        break;
-                    }
-
-            }
+                    });
+            });
         }
 
         return laf;

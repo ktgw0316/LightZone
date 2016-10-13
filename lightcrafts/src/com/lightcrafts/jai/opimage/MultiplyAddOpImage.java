@@ -138,7 +138,7 @@ final class MultiplyAddOpImage extends PointOpImage {
                         this.constants[i] = constants[0];
                     }
                 } else {
-                    this.constants = (double[]) constants.clone();
+                    this.constants = constants.clone();
                 }
 
                 // Set the source band increments.

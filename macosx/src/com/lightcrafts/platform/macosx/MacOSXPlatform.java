@@ -84,11 +84,6 @@ public final class MacOSXPlatform extends Platform {
     }
 
     @Override
-    public FileChooser getFileChooser() {
-        return MacOSXFileChooser.getFileChooser();
-    }
-
-    @Override
     public FileSystemView getFileSystemView() {
         return QuaquaFileSystemView.getQuaquaFileSystemView();
     }
@@ -114,7 +109,6 @@ public final class MacOSXPlatform extends Platform {
             Object[] quaquaKeys = quaquaDefaults.keySet().toArray();
 
             String[] fromQuaqua = new String[] {
-                    "FileChooser",
                     "FileView",
                     "Tree",
                     "MenuBar",

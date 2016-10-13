@@ -14,6 +14,7 @@ public class SpotOperationImpl extends BlendedOperation implements SpotOperation
         super(rendering, type);
     }
 
+    @Override
     public boolean neutralDefault() {
         return true;
     }
@@ -30,6 +31,7 @@ public class SpotOperationImpl extends BlendedOperation implements SpotOperation
             super(source);
         }
 
+        @Override
         public PlanarImage setFront() {
             if (getRegion() != null)
                 return CloneOperationImpl.buildCloner(getRegion(), rendering, back);
@@ -38,18 +40,22 @@ public class SpotOperationImpl extends BlendedOperation implements SpotOperation
         }
     }
 
+    @Override
     public EditorMode getPreferredMode() {
         return EditorMode.REGION;
     }
 
+    @Override
     protected void updateOp(Transform op) {
         op.update();
     }
 
+    @Override
     protected BlendedTransform createBlendedOp(PlanarImage source) {
         return new Cloner(source);
     }
 
+    @Override
     public OperationType getType() {
         return type;
     }

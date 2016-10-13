@@ -77,7 +77,7 @@ public class BlendOpImage extends PointOpImage {
         public String getName() { return name; }
     }
 
-    static Map<String, BlendingMode> modes = new HashMap<String, BlendingMode>();
+    private static Map<String, BlendingMode> modes = new HashMap<String, BlendingMode>();
 
     static {
         for (BlendingMode b : BlendingMode.values())

@@ -4,20 +4,20 @@ package com.lightcrafts.jai.opimage;
 
 import com.lightcrafts.mediax.jai.PointOpImage;
 import com.lightcrafts.mediax.jai.ImageLayout;
+import com.lightcrafts.mediax.jai.RasterAccessor;
+import com.lightcrafts.mediax.jai.RasterFormatTag;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.utils.ColorScience;
 import com.lightcrafts.utils.HSB;
 
+import java.awt.image.DataBuffer;
 import java.awt.image.RenderedImage;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.awt.*;
 import java.awt.color.ICC_ProfileRGB;
-import java.awt.color.ICC_Profile;
-import java.awt.color.ColorSpace;
 import java.util.Map;
 
-import sun.awt.image.ShortInterleavedRaster;
 import Jama.Matrix;
 
 /**
@@ -31,7 +31,7 @@ public class FilteredGrayscaleOpImage extends PointOpImage {
     private final float[] filter;
     private final float angle;
 
-    public FilteredGrayscaleOpImage(RenderedImage source, float filter[], float angle, float strenght, Map config) {
+    public FilteredGrayscaleOpImage(RenderedImage source, float filter[], float angle, float strength, Map config) {
         super(source, new ImageLayout(source), config, true);
         permitInPlaceOperation();
         ICC_ProfileRGB sRGB = (ICC_ProfileRGB) JAIContext.sRGBColorProfile;
@@ -42,52 +42,49 @@ public class FilteredGrayscaleOpImage extends PointOpImage {
         this.angle = angle;
     }
 
+    @Override
     protected void computeRect(Raster[] sources,
                                WritableRaster dest,
                                Rectangle destRect) {
-        ushortLoop((ShortInterleavedRaster) sources[0], (ShortInterleavedRaster) dest);
-    }
+        // Retrieve format tags.
+        RasterFormatTag[] formatTags = getFormatTags();
 
-    /*
-     * faster float arctan2 implementation.
-     * see: http://www.dspguru.com/comp.dsp/tricks/alg/fxdatan2.htm
-     */
+        RasterAccessor src = new RasterAccessor(sources[0], destRect, formatTags[0],
+                                                getSourceImage(0).getColorModel());
+        RasterAccessor dst = new RasterAccessor(dest, destRect, formatTags[1], getColorModel());
 
-    static float arctan2(float y, float x) {
-        final float coeff_1 = (float) Math.PI / 4;
-        final float coeff_2 = 3 * coeff_1;
-        final float abs_y = Math.abs(y) + 1e-10f;      // kludge to prevent 0/0 condition
-        float angle;
-
-        if (x >= 0) {
-            float r = (x - abs_y) / (x + abs_y);
-            angle = coeff_1 - coeff_1 * r;
-        } else {
-            float r = (x + abs_y) / (abs_y - x);
-            angle = coeff_2 - coeff_1 * r;
+        switch (dst.getDataType()) {
+            case DataBuffer.TYPE_USHORT:
+                ushortLoop(src, dst);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unsupported data type: " + dst.getDataType());
         }
 
-        return y < 0 ? -angle : angle;
+        if (dst.needsClamping()) {
+            dst.clampDataArrays();
+        }
+        dst.copyDataToRaster();
     }
 
-    static float angleDiff(float a, float b) {
+    private static float angleDiff(float a, float b) {
         float result = Math.abs(a - b);
         if (result > Math.PI)
             result = (float) (2 * Math.PI - result);
         return result;
     }
 
-    protected void ushortLoop(ShortInterleavedRaster src, ShortInterleavedRaster dst) {
+    protected void ushortLoop(RasterAccessor src, RasterAccessor dst) {
         int width = src.getWidth();
         int height = src.getHeight();
 
-        short dstData[] = dst.getDataStorage();
-        int dstBandOffsets[] = dst.getDataOffsets();
+        short dstData[] = dst.getShortDataArray(0);
+        int dstBandOffsets[] = dst.getBandOffsets();
         int dstLineStride = dst.getScanlineStride();
         int dstPixelStride = dst.getPixelStride();
 
-        short srcData[] = src.getDataStorage();
-        int srcBandOffsets[] = src.getDataOffsets();
+        short srcData[] = src.getShortDataArray(0);
+        int srcBandOffsets[] = src.getBandOffsets();
         int srcLineStride = src.getScanlineStride();
         int srcPixelStride = src.getPixelStride();
 

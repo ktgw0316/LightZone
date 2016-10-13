@@ -2,7 +2,7 @@
 #
 # LightZone startscript
 #
-echo Starting LightZone version 4.1.5 ...
+echo Starting LightZone version 4.1.7 ...
 echo with options : ${@}
 java -version
 
@@ -36,7 +36,21 @@ else
   pkglibexecdir=${usrdir}/lib/lightzone
 fi
 
-classdir='/usr/share/java/javahelp/*:/usr/share/java/*:/usr/share/javahelp/lib/*:/usr/local/share/java/classes/*'
+if   [ -f ${usrdir}/share/java/jh.jar ]; then        # Debian, Ubuntu
+   jhpath=${usrdir}/share/java/jh.jar
+elif [ -f ${usrdir}/share/java/javahelp2.jar ]; then # Fedora, OpenSUSE, PCLinuxOS
+   jhpath=${usrdir}/share/java/javahelp2.jar
+elif [ -f ${usrdir}/share/java/javahelp/jh.jar ]; then      # Arch
+   jhpath=${usrdir}/share/java/javahelp/jh.jar
+elif [ -f ${usrdir}/share/java/javahelp/lib/jh.jar ]; then  # Gentoo
+   jhpath=${usrdir}/share/java/javahelp/lib/jh.jar
+elif [ -f ${usrdir}/share/java/classes/jh.jar ]; then # FreeBSD
+   jhpath=${usrdir}/share/java/classes/jh.jar
+elif [ -f ${usrdir}/j2se/opt/javahelp/lib/jhall.jar ]; then # OpenIndiana
+   jhpath=${usrdir}/j2se/opt/javahelp/lib/jhall.jar
+else
+  echo "jh.jar was not found."
+fi
 
 if [ $totalmem -ge 1048576 ]; then
   maxmem=$(( $totalmem / 2 ))
@@ -59,4 +73,4 @@ for i in "$@"; do
   fi
 done
 
-(cd $pkgjavadir && LD_LIBRARY_PATH=$pkglibexecdir exec java -Xmx${maxmem}k -Djava.library.path=$pkglibexecdir -Dfile.encoding=UTF8 -classpath ".:$pkgjavadir/*:$classdir" com.lightcrafts.platform.linux.LinuxLauncher ${file} ${@} )
+(cd $pkgjavadir && LD_LIBRARY_PATH=$pkglibexecdir exec java -Xmx${maxmem}k -Djava.library.path=$pkglibexecdir -Dfile.encoding=UTF8 -classpath ".:${pkgjavadir}/*:${jhpath}" com.lightcrafts.platform.linux.LinuxLauncher ${file} ${@} )

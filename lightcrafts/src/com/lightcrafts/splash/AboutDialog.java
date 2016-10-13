@@ -2,6 +2,8 @@
 
 package com.lightcrafts.splash;
 
+import com.lightcrafts.platform.Platform;
+
 import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.awt.*;
@@ -19,10 +21,12 @@ public class AboutDialog extends JDialog {
             image = new SplashImage(text);
         }
 
+        @Override
         public Dimension getPreferredSize() {
             return new Dimension(image.getWidth(), image.getHeight());
         }
 
+        @Override
         protected void paintComponent(Graphics graphics) {
             graphics.drawImage(image, 0, 0, null);
         }
@@ -34,10 +38,16 @@ public class AboutDialog extends JDialog {
         getContentPane().add(comp);
         setModal(true);
         setResizable(false);
-        setUndecorated(true);
+
+        // OS X 10.11 does not detect mouse click,
+        // so we need a close button
+        if (Platform.getType() != Platform.MacOSX) {
+            setUndecorated(true);
+        }
 
         comp.addMouseListener(
             new MouseAdapter() {
+                @Override
                 public void mouseClicked(MouseEvent event) {
                     dispose();
                 }

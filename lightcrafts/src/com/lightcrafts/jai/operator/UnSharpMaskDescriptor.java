@@ -110,7 +110,7 @@ public class UnSharpMaskDescriptor extends OperationDescriptorImpl {
      * The parameter default value list for this operation.
      */
     private static final Object[] paramDefaults = {
-        new Double(1.0), new Integer(0)
+         1.0, 0
     };
 
     /** Constructor. */

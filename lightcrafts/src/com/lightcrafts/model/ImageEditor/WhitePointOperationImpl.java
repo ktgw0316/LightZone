@@ -30,21 +30,25 @@ class WhitePointOperationImpl extends BlendedOperation implements WhitePointOper
         colorInputOnly = true;
     }
 
+    @Override
     public boolean neutralDefault() {
         return true;
     }
 
+    @Override
     public void setWhitePoint(Point2D p) {
         this.p = p;
         settingsChanged();
     }
 
+    @Override
     public void setWhitePoint(Color color) {
         this.color = color;
         this.p = null;
         settingsChanged();
     }
 
+    @Override
     public Color getWhitePoint() {
         return color;
     }
@@ -54,6 +58,7 @@ class WhitePointOperationImpl extends BlendedOperation implements WhitePointOper
             super(source);
         }
 
+        @Override
         public PlanarImage setFront() {
             if (p != null || color != null) {
                 int[] pixel = null;
@@ -76,7 +81,9 @@ class WhitePointOperationImpl extends BlendedOperation implements WhitePointOper
 
                         int averagePixels = 3;
 
-                        if (averagePixels > 1) {
+                        // if (averagePixels <= 1) {
+                        //     pixel = tile.getPixel(x, y, pixel);
+                        // } else {
                             Rectangle tileBounds = tile.getBounds();
                             Rectangle sampleRect = new Rectangle(x-averagePixels/2,
                                                                  y-averagePixels/2,
@@ -94,8 +101,7 @@ class WhitePointOperationImpl extends BlendedOperation implements WhitePointOper
                                     for (int k = 0; k < 3; k++)
                                         pixel[k] = (pixel[k] + currentPixel[k]) / 2;
                                 }
-                        } else
-                            pixel = tile.getPixel(x, y, pixel);
+                        // }
 
                         color = new Color(pixel[0] / 256, pixel[1] / 256, pixel[2] / 256);
                         p = null; // Set the point to null, from now on we just remember the color...
@@ -158,14 +164,17 @@ class WhitePointOperationImpl extends BlendedOperation implements WhitePointOper
         }
     }
 
+    @Override
     protected void updateOp(Transform op) {
         op.update();
     }
 
+    @Override
     protected BlendedTransform createBlendedOp(PlanarImage source) {
         return new WhiteBalance(source);
     }
 
+    @Override
     public OperationType getType() {
         return type;
     }

@@ -46,6 +46,9 @@ public final class ColorProfileInfo implements Comparable {
      */
     public static List<ColorProfileInfo>
     arrangeForMenu( Collection<ColorProfileInfo> profiles ) {
+        if ( profiles == null ) {
+            return new ArrayList<ColorProfileInfo>(); // empty list
+        }
         //
         // Must sort the profiles by path first.
         //
@@ -145,9 +148,13 @@ public final class ColorProfileInfo implements Comparable {
     public static ICC_Profile getExportICCProfileFor( String name ) {
         final Collection<ColorProfileInfo> exportProfiles =
             Platform.getPlatform().getExportProfiles();
-        for ( ColorProfileInfo cpi : exportProfiles )
-            if ( cpi.getName().equals( name ) )
-                return cpi.getICCProfile();
+        if (exportProfiles != null) {
+            for ( ColorProfileInfo cpi : exportProfiles ) {
+                if ( cpi.getName().equals( name ) ) {
+                    return cpi.getICCProfile();
+                }
+            }
+        }
         return null;
    }
 

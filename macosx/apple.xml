@@ -1,0 +1,86 @@
+<project name="apple">
+
+  <!--===== Crash Reporter bundle build ====================================-->
+
+  <target name="crash-reporter" depends="helpers">
+    <exec executable="make" dir="helpers/CrashReporter" failonerror="true"
+          vmlauncher="false">
+      <arg value="UNIVERSAL=${UNIVERSAL}"/>
+      <arg value="bundle"/>
+    </exec>
+  </target>
+
+  <!--===== Make Mac OS X application bundles ==============================-->
+
+  <target name="resources">
+    <copy todir="${bundle-contents}">
+      <fileset dir="resources" excludes=".git"/>
+    </copy>
+  </target>
+
+  <target name="build-bundle"
+    depends="jar, crash-reporter, delete-bundle, resources">
+
+    <exec executable="${common-dir}/tools/bin/lc-git-revision"
+          outputproperty="git-revision" vmlauncher="false" failonerror="true"/>
+    <copy file="resources/Info.plist" todir="${bundle-contents}"
+          overwrite="true">
+      <filterset>
+        <filter token="APPNAME" value="${app-name}"/>
+        <filter token="BUILD" value="${git-revision}"/>
+        <filter token="BUNDLEID" value="com.lightcrafts.${app-name}"/>
+        <filter token="LICENSETYPE" value="${licensetype}"/>
+        <filter token="VERSION" value="${app-version}"/>
+      </filterset>
+    </copy>
+    <copy file="resources/lc_version.plist"
+          todir="${bundle-contents}" overwrite="true">
+      <filterset>
+        <filter token="APPNAME" value="${app-name}"/>
+        <filter token="VERSION" value="${app-version}"/>
+        <filter token="BUILD" value="${git-revision}"/>
+      </filterset>
+    </copy>
+
+    <!-- The JavaAppLauncher is copied to LightZone so "LightZone" appears in
+         the output of the "ps" command. -->
+    <copy file="helpers/JavaAppLauncher/JavaAppLauncher"
+          tofile="${bundle-contents}/MacOS/${app-name}"/>
+    <chmod file="${bundle-contents}/MacOS/${app-name}" perm="775"/>
+    <copy todir="${bundle-contents}/Resources">
+      <fileset dir="helpers/JavaAppLauncher/Resources" excludes=".git"/>
+    </copy>
+
+    <copy todir="${bundle-resources}/Java">
+      <fileset dir="products" excludes=".git">
+        <include name="dcraw_lz"/>
+        <include name="LightZone-forkd"/>
+        <include name="**/*.dylib"/>
+        <include name="**/*.jar"/>
+        <include name="**/*.jnilib"/>
+      </fileset>
+    </copy>
+    <chmod file="${bundle-resources}/Java/dcraw_lz" perm="775"/>
+    <chmod file="${bundle-resources}/Java/LightZone-forkd" perm="775"/>
+
+    <exec executable="./postprocess.sh" dir="." failonerror="true" vmlauncher="false">
+      <arg value="${bundle-resources}/Java"/>
+    </exec>
+
+    <exec executable="make" dir="help" failonerror="true" vmlauncher="false">
+      <arg value="APP_NAME=${app-name}"/>
+    </exec>
+
+    <copy todir="${bundle-resources}/CrashReporter.app">
+      <fileset dir="helpers/CrashReporter/CrashReporter.app"/>
+    </copy>
+    <chmod file="${bundle-resources}/CrashReporter.app/Contents/MacOS/CrashReporter"
+           perm="775"/>
+
+    <exec executable="./postprocess.sh" dir="." failonerror="true" vmlauncher="false">
+      <arg value="${bundle-resources}/CrashReporter.app/Contents/MacOS"/>
+    </exec>
+  </target>
+
+</project>
+<!-- vim:set et sw=2 ts=2: -->

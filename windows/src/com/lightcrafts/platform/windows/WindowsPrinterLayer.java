@@ -90,7 +90,7 @@ public class WindowsPrinterLayer implements PrinterLayer {
                                              settings.getColorProfile() != null
                                              ? settings.getColorProfile()
                                              : JAIContext.sRGBColorProfile,
-                                             engine.getLCMSIntent(settings.getRenderingIntent()),
+                                             ImageEditorEngine.getLCMSIntent(settings.getRenderingIntent()),
                                              true);
 
         if (xMagnification > 1 || yMagnification > 1) {

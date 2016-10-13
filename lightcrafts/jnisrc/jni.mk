@@ -81,6 +81,10 @@ ifeq ($(PLATFORM),MacOSX)
   ifdef JNI_MACOSX_DYLIB
     JNILIB_EXT:=	$(DYLIB_EXT)
     LINK+=		-install_name $(DYLIB_PREFIX)$(TARGET_BASE)$(DYLIB_EXT)
+  else
+    ifdef JNI_MACOSX_SHAREDLIB
+      JNILIB_EXT:=	.a
+    endif
   endif
   ifeq ($(UNIVERSAL),1)
     CFLAGS_PPC+=	$(JNI_MACOSX_CFLAGS) $(JNI_PPC_CFLAGS)
@@ -213,21 +217,40 @@ ifeq ($(PLATFORM),MacOSX)
 endif
 
 ifndef JNI_MANUAL_TARGET
+ifdef JNI_MACOSX_SHAREDLIB
+$(TARGET_PPC): $(OBJECTS_PPC) $(BUILT_LIBS)
+	ar -rc $@ *-ppc.o
+	-ranlib $@
+else
 $(TARGET_PPC): $(OBJECTS_PPC) $(LOCAL_RANLIBS) $(BUILT_LIBS)
 	$(CC_LINK) $(CFLAGS_PPC) $(LDFLAGS) -o $@ *-ppc.o $(LINK)
+endif
 
+ifdef JNI_MACOSX_SHAREDLIB
+$(TARGET_X86): $(OBJECTS_X86) $(BUILT_LIBS)
+	ar -rc $@ *-x86.o
+	-ranlib $@
+else
 $(TARGET_X86): $(OBJECTS_X86) $(LOCAL_RANLIBS) $(BUILT_LIBS)
 	$(CC_LINK) $(CFLAGS_X86) $(LDFLAGS) -o $@ *-x86.o $(LINK)
+endif
 endif
 
 else	# UNIVERSAL
 
 ifndef JNI_MANUAL_TARGET
+ifdef JNI_MACOSX_SHAREDLIB
+$(TARGET): $(OBJECTS) $(RC_OBJECTS) $(BUILT_LIBS)
+	-$(MKDIR) $(TARGET_DIR)
+	ar -rc $@ *.o
+	-ranlib $@
+else
 $(TARGET): $(OBJECTS) $(RC_OBJECTS) $(LOCAL_RANLIBS) $(BUILT_LIBS)
 	-$(MKDIR) $(TARGET_DIR)
 	$(CC_LINK) $(CFLAGS) $(LDFLAGS) $(RC_OBJECTS) -o $@ *.o $(LINK)
 ifeq ($(PLATFORM),MacOSX)
 	cp -p $@ $(TARGET_DIR)
+endif
 endif
 endif
 

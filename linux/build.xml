@@ -15,9 +15,12 @@
   </exec>
 
   <!-- Workaround for Java9. -->
+  <!--
   <condition property="JVMARG" value="-XaddExports:java.desktop/sun.awt.image=ALL-UNNAMED,java.desktop/sun.java2d=ALL-UNNAMED,java.desktop/sun.print=ALL-UNNAMED,java.base/sun.nio.ch=ALL-UNNAMED,java.base/jdk.internal.ref=ALL-UNNAMED" else="">
     <equals arg1="${ant.java.version}" arg2="1.9" />
   </condition>
+  -->
+  <property name="JVMARG" value=""/>
 
   <!--===== Application build ==============================================-->
 
@@ -106,8 +109,8 @@
           <include name="*.jar"/>
         </fileset>
         <fileset dir="/usr">
-          <include name="share/java*/**/*.jar"/>
-          <include name="local/share/java/classes/*.jar"/>
+          <include name="share/java*/**/jh.jar"/>
+          <include name="local/share/java/classes/jh.jar"/>
           <include name="jdk/packages/lib/ext/*.jar"/>
         </fileset>
       </classpath>

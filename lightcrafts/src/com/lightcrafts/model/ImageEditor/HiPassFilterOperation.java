@@ -35,6 +35,7 @@ public class HiPassFilterOperation extends BlendedOperation {
         setSliderConfig("Radius", new SliderConfig(0.2, 5, radius, .001, true, format));
     }
 
+    @Override
     public boolean neutralDefault() {
         return false;
     }
@@ -46,13 +47,14 @@ public class HiPassFilterOperation extends BlendedOperation {
 
     private KernelJAI kernel = null;
 
+    @Override
     public void setSliderValue(String key, double value) {
         value = roundValue(key, value);
-        
-        if (key == "Gain" && gain != value) {
+
+        if (key.equals("Gain") && gain != value) {
             gain = value;
             kernel = null;
-        } else if (key == "Radius" && radius != value) {
+        } else if (key.equals("Radius") && radius != value) {
             radius = value;
             kernel = null;
         } else
@@ -65,25 +67,31 @@ public class HiPassFilterOperation extends BlendedOperation {
         HiPassFilter(PlanarImage source) {
             super(source);
         }
+
+        @Override
         public PlanarImage setFront() {
             kernel = Functions.LoGSharpenKernel(radius * scale, gain);
             ParameterBlock pb = new ParameterBlock();
             pb.addSource(back);
             pb.add(kernel);
-            RenderingHints hints = new RenderingHints(JAI.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
+            RenderingHints hints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
+                    BorderExtender.createInstance(BorderExtender.BORDER_COPY));
             hints.add(JAIContext.noCacheHint);
             return JAI.create("convolve", pb, hints);
         }
     }
 
+    @Override
     protected void updateOp(Transform op) {
         op.update();
     }
 
+    @Override
     protected BlendedTransform createBlendedOp(PlanarImage source) {
         return new HiPassFilter(source);
     }
 
+    @Override
     public OperationType getType() {
         return type;
     }

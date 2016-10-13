@@ -25,6 +25,7 @@ class TestMenuSlider extends JMenu {
         add(slider);
         slider.addChangeListener(
             new ChangeListener() {
+                @Override
                 public void stateChanged(ChangeEvent event) {
                     int value = slider.getValue();
                     listener.sliderChanged(value);

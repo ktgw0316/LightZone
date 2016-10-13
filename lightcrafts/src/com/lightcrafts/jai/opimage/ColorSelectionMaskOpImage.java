@@ -4,6 +4,8 @@ package com.lightcrafts.jai.opimage;
 
 import com.lightcrafts.mediax.jai.PointOpImage;
 import com.lightcrafts.mediax.jai.ImageLayout;
+import com.lightcrafts.mediax.jai.RasterAccessor;
+import com.lightcrafts.mediax.jai.RasterFormatTag;
 import com.lightcrafts.model.ColorSelection;
 import com.lightcrafts.utils.ColorScience;
 
@@ -11,9 +13,6 @@ import java.awt.image.*;
 import java.awt.color.ColorSpace;
 import java.awt.*;
 import java.util.Map;
-
-import sun.awt.image.ShortInterleavedRaster;
-import sun.awt.image.ByteInterleavedRaster;
 
 public class ColorSelectionMaskOpImage extends PointOpImage {
     private final ColorSelection colorSelection;
@@ -34,25 +33,28 @@ public class ColorSelectionMaskOpImage extends PointOpImage {
         this.colorSelection = colorSelection;
     }
 
+    @Override
     protected void computeRect(Raster[] sources, WritableRaster dest, Rectangle destRect) {
-        ShortInterleavedRaster src = (ShortInterleavedRaster) sources[0];
-        ByteInterleavedRaster dst = (ByteInterleavedRaster) dest;
+        // Retrieve format tags.
+        RasterFormatTag[] formatTags = getFormatTags();
 
-        dst = (ByteInterleavedRaster) dst.createChild(destRect.x, destRect.y, destRect.width, destRect.height,
-                                                      destRect.x, destRect.y, null);
+        Raster source = sources[0];
+        Rectangle srcRect = mapDestRect(destRect, 0);
+
+        RasterAccessor src = new RasterAccessor(source, srcRect, formatTags[0],
+                getSourceImage(0).getColorModel());
+        RasterAccessor dst = new RasterAccessor(dest, destRect, formatTags[1], getColorModel());
 
         int width = dst.getWidth();
         int height = dst.getHeight();
 
-        byte dstData[] = dst.getDataStorage();
-        int dstBandOffsets[] = dst.getDataOffsets();
+        byte dstData[] = dst.getByteDataArray(0);
+        int dstBandOffsets[] = dst.getBandOffsets();
         int dstLineStride = dst.getScanlineStride();
-        // int dstPixelStride = dst.getPixelStride();
 
-        short srcData[] = src.getDataStorage();
-        int srcBandOffsets[] = src.getDataOffsets();
+        short srcData[] = src.getShortDataArray(0);
+        int srcBandOffsets[] = src.getBandOffsets();
         int srcLineStride = src.getScanlineStride();
-        // int srcPixelStride = src.getPixelStride();
 
         int dstOffset = dstBandOffsets[0];
 

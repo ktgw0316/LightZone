@@ -16,7 +16,7 @@ import java.awt.*;
 import java.text.DecimalFormat;
 
 public class NoiseReductionOperation extends BlendedOperation {
-    static final String DENOISE = "Amount";
+    private static final String DENOISE = "Amount";
     static final OperationType type = new OperationTypeImpl("Noise Reduction");
     private int denoiseLevel = 3;
 
@@ -29,14 +29,16 @@ public class NoiseReductionOperation extends BlendedOperation {
         this.setSliderConfig(DENOISE, new SliderConfig(1, 10, denoiseLevel, 1, false, format));
     }
 
+    @Override
     public boolean neutralDefault() {
         return false;
     }
 
+    @Override
     public void setSliderValue(String key, double value) {
         value = roundValue(key, value);
 
-        if (key == DENOISE && denoiseLevel != value) {
+        if (key.equals(DENOISE) && denoiseLevel != value) {
             denoiseLevel = (int) value;
         } else
             return;
@@ -51,12 +53,7 @@ public class NoiseReductionOperation extends BlendedOperation {
 
         RenderedOp denoiser;
 
-        public PlanarImage setFront1() {
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource( back );
-            return JAI.create("BilateralFilter", pb, null);
-        }
-
+        @Override
         public PlanarImage setFront() {
             ColorScience.YST yst = new ColorScience.YST();
 
@@ -101,14 +98,17 @@ public class NoiseReductionOperation extends BlendedOperation {
         }
     }
 
+    @Override
     protected void updateOp(Transform op) {
         op.update();
     }
 
+    @Override
     protected BlendedTransform createBlendedOp(PlanarImage source) {
         return new NoiseReduction(source);
     }
 
+    @Override
     public OperationType getType() {
         return type;
     }

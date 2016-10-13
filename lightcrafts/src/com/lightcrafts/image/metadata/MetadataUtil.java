@@ -381,6 +381,7 @@ public final class MetadataUtil {
     }
 
     private static final float[] FSTOPS = {
+          0.0F, // if the value is unknown or brighter than f/1.
           1.0F,
           1.1F,
           1.2F,
@@ -426,6 +427,7 @@ public final class MetadataUtil {
      * 1/25 second.
      */
     private static final float[] SHUTTER_SPEED = {
+           0.0F, // if the value is unknown or longer than 1 second.
            1.0F,
            2.0F,
            2.5F,

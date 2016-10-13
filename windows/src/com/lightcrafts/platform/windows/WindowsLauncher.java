@@ -64,13 +64,7 @@ public final class WindowsLauncher extends Launcher {
             WindowsApplication.getAppForExe( parentExe );
         System.out.println( "Parent process: " + parentExe );
         System.out.println( "File path: " + pathToFile );
-        EventQueue.invokeLater(
-            new Runnable() {
-                public void run() {
-                    Application.openFrom( file, app );
-                }
-            }
-        );
+        EventQueue.invokeLater( () -> Application.openFrom( file, app ) );
     }
 
 }

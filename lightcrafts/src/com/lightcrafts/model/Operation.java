@@ -126,4 +126,6 @@ public interface Operation {
      * @return if it takes a footer or not
      */
     boolean hasFooter();
+
+    void dispose();
 }

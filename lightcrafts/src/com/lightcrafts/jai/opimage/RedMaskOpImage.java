@@ -4,14 +4,13 @@ package com.lightcrafts.jai.opimage;
 
 import com.lightcrafts.mediax.jai.PointOpImage;
 import com.lightcrafts.mediax.jai.ImageLayout;
+import com.lightcrafts.mediax.jai.RasterAccessor;
+import com.lightcrafts.mediax.jai.RasterFormatTag;
 
 import java.awt.image.*;
 import java.awt.color.ColorSpace;
 import java.awt.*;
 import java.util.Map;
-
-import sun.awt.image.ShortInterleavedRaster;
-import sun.awt.image.ByteInterleavedRaster;
 
 /**
  * Created by IntelliJ IDEA.
@@ -39,23 +38,40 @@ public class RedMaskOpImage extends PointOpImage {
         this.tolerance = tolerance;
     }
 
+    @Override
     protected void computeRect(Raster[] sources,
                                WritableRaster dest,
                                Rectangle destRect) {
-        ushortLoop((ShortInterleavedRaster) sources[0], (ByteInterleavedRaster) dest);
+        // Retrieve format tags.
+        RasterFormatTag[] formatTags = getFormatTags();
+
+        Raster source = sources[0];
+        Rectangle srcRect = mapDestRect(destRect, 0);
+
+        RasterAccessor src = new RasterAccessor(source, srcRect, formatTags[0],
+                                                getSourceImage(0).getColorModel());
+        RasterAccessor dst = new RasterAccessor(dest, destRect, formatTags[1], getColorModel());
+
+        switch (dst.getDataType()) {
+            case DataBuffer.TYPE_BYTE:
+                ushortLoop(src, dst);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unsupported data type: " + dst.getDataType());
+        }
     }
 
-    protected void ushortLoop(ShortInterleavedRaster src, ByteInterleavedRaster dst) {
+    protected void ushortLoop(RasterAccessor src, RasterAccessor dst) {
         int width = src.getWidth();
         int height = src.getHeight();
 
-        byte dstData[] = dst.getDataStorage();
-        int dstBandOffsets[] = dst.getDataOffsets();
+        byte dstData[] = dst.getByteDataArray(0);
+        int dstBandOffsets[] = dst.getBandOffsets();
         int dstLineStride = dst.getScanlineStride();
         int dstPixelStride = dst.getPixelStride();
 
-        short srcData[] = src.getDataStorage();
-        int srcBandOffsets[] = src.getDataOffsets();
+        short srcData[] = src.getShortDataArray(0);
+        int srcBandOffsets[] = src.getBandOffsets();
         int srcLineStride = src.getScanlineStride();
         int srcPixelStride = src.getPixelStride();
 
@@ -94,16 +110,16 @@ public class RedMaskOpImage extends PointOpImage {
         int rrbMax = (int) ((35 + 6.5 * 2) * 256);
 
         // Kinda Orange
-        int oaMin = (int) ((31 - 15 * 2) * 256);
-        int oaMax = (int) ((31 + 15 * 2) * 256);
-        int obMin = (int) ((56 - 5 * 2) * 256);
-        int obMax = (int) ((56 + 5 * 2) * 256);
+        int oaMin = (31 - 15 * 2) * 256;
+        int oaMax = (31 + 15 * 2) * 256;
+        int obMin = (56 -  5 * 2) * 256;
+        int obMax = (56 +  5 * 2) * 256;
 
         // Magenta
-        int maMin = (int) ((30 - 12 * 2) * 256);
-        int maMax = (int) ((30 + 12 * 2) * 256);
-        int mbMin = (int) ((-12 - 13 * 2) * 256);
-        int mbMax = (int) ((-12 + 13 * 2) * 256);
+        // int maMin = ( 30 - 12 * 2) * 256;
+        // int maMax = ( 30 + 12 * 2) * 256;
+        // int mbMin = (-12 - 13 * 2) * 256;
+        // int mbMax = (-12 + 13 * 2) * 256;
 
         // Skin
         int sLMin = (int) (43.3593 * 0xffff / 100);

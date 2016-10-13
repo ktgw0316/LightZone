@@ -1,6 +1,10 @@
 // standard
 #import <Cocoa/Cocoa.h>
+#ifdef LC_USE_JAWT
 #import <JavaVM/jawt_md.h>
+#else
+#import <AppKit/AppKit.h>
+#endif
 
 // local
 #import "LC_CocoaUtils.h"
@@ -16,6 +20,7 @@ NSWindow* LC_getNSWindowFromAWTComponent( JNIEnv *env, jobject awtComponent ) {
     if ( !awtComponent )
         return nil;
 
+#ifdef LC_USE_JAWT
     JAWT awt;
     awt.version = JAWT_VERSION_1_4;
     if ( !JAWT_GetAWT( env, &awt ) )
@@ -50,6 +55,9 @@ error_2:
 error_1:
     awt.FreeDrawingSurface( ds );
     return nsWindow;
+#else
+    return  [[NSApplication sharedApplication] keyWindow];
+#endif /* LC_USE_JAWT */
 }
 
 /* vim:set et sw=4 ts=4: */

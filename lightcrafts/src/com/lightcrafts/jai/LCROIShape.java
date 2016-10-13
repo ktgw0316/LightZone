@@ -40,12 +40,14 @@ public class LCROIShape extends ROIShape {
         return region;
     }
 
+    @Override
     public boolean intersects(Rectangle rect) {
         return intersects(new Rectangle2D.Double(rect.x, rect.y, rect.width, rect.height));
     }
 
+    @Override
     public boolean intersects(Rectangle2D rect) {
-        for (Contour c : region.getContours()) {
+        for (final Contour c : region.getContours()) {
             AffineTransform combined = transform;
             if (c.getTranslation() != null) {
                 combined = AffineTransform.getTranslateInstance(c.getTranslation().getX(), c.getTranslation().getY());
@@ -75,12 +77,11 @@ public class LCROIShape extends ROIShape {
         return ShapedMask.getOuterBounds(region, transform);
     }
 
-    List<Object> contours = new LinkedList<Object>();
+    private List<Object> contours = new LinkedList<Object>();
 
     private synchronized boolean somethingChanged() {
-
         int i = 0;
-        for (Contour c : region.getContours()) {
+        for (final Contour c : region.getContours()) {
             if (c != contours.get(i))
                 return true;
 
@@ -94,10 +95,7 @@ public class LCROIShape extends ROIShape {
             }
         }
 
-        if (contours.size() != i)
-            return true;
-
-        return false;
+        return contours.size() != i;
     }
 
     private ShapedMask theMask = null;
@@ -108,7 +106,7 @@ public class LCROIShape extends ROIShape {
                 We keep the current configuration around
                 to check if something changes in this region.
             */
-            for (Contour c : region.getContours()) {
+            for (final Contour c : region.getContours()) {
                 contours.add(c);
 
                 // if  a contour has a translation

@@ -1,0 +1,115 @@
+<project name="oracle">
+
+  <!--===== Oracle appbundler ==============================================-->
+  <property environment="env"/>
+
+  <taskdef
+    name="bundleapp"
+    classname="com.oracle.appbundler.AppBundlerTask"
+    classpath="lib/appbundler-1.0ea.jar"/>
+
+  <target name="build-bundle"
+    depends="jar, delete-bundle">
+    <exec executable="${common-dir}/tools/bin/lc-git-revision"
+          outputproperty="git-revision" vmlauncher="false" failonerror="true"/>
+    <copy todir="${app-dir}">
+      <fileset dir="products" excludes=".git">
+        <exclude name="**/appbundler*.jar"/>
+        <include name="dcraw_lz"/>
+        <include name="LightZone-forkd"/>
+        <include name="**/*.dylib"/>
+        <include name="**/*.jar"/>
+        <include name="**/*.jnilib"/>
+      </fileset>
+    </copy>
+    <chmod file="${app-dir}/dcraw_lz" perm="775"/>
+    <chmod file="${app-dir}/LightZone-forkd" perm="775"/>
+    <bundleapp
+      outputdirectory="${app-dir}"
+      name="${app-name}"
+      displayname="${app-name}"
+      executableName="${app-name}"
+      identifier="com.lightcrafts.${app-name}"
+      shortversion="${app-version}"
+      version="${git-revision}"
+      signature="LCLZ"
+      copyright="${app-name} ${app-version} (${git-revision}), Copyright 2005-20011 Light Crafts, Inc. All Rights Reserved. Copyright 2013- The LightZone Project. All Rights Reserved."
+      icon="resources/Resources/${app-name}.icns"
+      applicationCategory="public.app-category.photography"
+      mainclassname="com.lightcrafts.platform.macosx.MacOSXLauncher">
+
+      <runtime dir="${env.JAVA_HOME}"/>
+      <librarypath file="${app-dir}/dcraw_lz"/>
+      <librarypath file="${app-dir}/LightZone-forkd"/>
+      <librarypath file="${app-dir}/*.dylib"/>
+      <librarypath file="${app-dir}/*.jnilib"/>
+      <classpath file="${app-dir}/*.jar"/>
+
+      <plistentry key="CFBundleHelpBookFolder" value="${app-name}_Help"/>
+      <plistentry key="CFBundleHelpBookName" value="${app-name} Help"/>
+
+      <option value="-Xdock:name=${app-name}"/>
+      <option value="-Dapple.laf.useScreenMenuBar=true"/>
+      <option value="-Dcom.apple.macos.use-file-dialog-packages=true"/>
+      <option value="-Dcom.apple.macos.useScreenMenuBar=true"/>
+      <option value="-Dapple.awt.graphics.UseQuartz=false"/>
+      <option value="-Dfile.encoding=utf-8"/>
+
+      <bundledocument
+        extensions="jpe,jpg,jpeg"
+        name="JPEG Image"
+        role="editor"
+        handlerRank="owner"
+        />
+      <bundledocument
+        extensions="tif,tiff"
+        name="TIFF Image"
+        role="editor"
+        handlerRank="owner"
+        />
+      <bundledocument
+        extensions="ARW,CR2,CRW,DCR,dng,KDC,MOS,MRW,NEF,ORF,PEF,RAF,RAW,RW2,SR2"
+        name="Camera Raw Image"
+        icon="LightZoneFile.icns"
+        role="editor"
+        handlerRank="alternate"
+        />
+      <bundledocument
+        contentTypes="com.lightcrafts.lzt"
+        name="${app-name} Transform Format"
+        role="editor"
+        handlerRank="owner"
+        />
+
+      <typedeclaration
+        identifier="com.lightcrafts.lzn"
+        description="${app-name} Transform Format"
+        icon="LightZoneFile.icns"
+        extensions="lzn"
+        />
+      <typedeclaration
+        identifier="com.lightcrafts.lzt"
+        description="${app-name} Transform Format"
+        icon="LightZoneFile.icns"
+        extensions="lzt"
+        />
+    </bundleapp>
+
+    <copy todir="${bundle-contents}">
+      <fileset dir="resources" excludes=".git"/>
+    </copy>
+    <copy todir="${bundle-contents}/Resources">
+      <fileset dir="helpers/JavaAppLauncher/Resources" excludes=".git"/>
+    </copy>
+
+    <exec executable="./postprocess.sh" dir="." failonerror="true" vmlauncher="false">
+      <arg value="${bundle-contents}/MacOS"/>
+    </exec>
+
+    <exec executable="make" dir="help" failonerror="true" vmlauncher="false">
+      <arg value="APP_NAME=${app-name}"/>
+    </exec>
+  </target>
+
+</project>
+<!-- vim:set et sw=2 ts=2: -->

@@ -5,6 +5,7 @@ package com.lightcrafts.platform.windows;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.stream.Stream;
 
 import com.lightcrafts.utils.file.SmartFolder;
 
@@ -140,9 +141,7 @@ public final class WindowsSavedSearch extends SmartFolder {
         if ( !isSmartFolder() )
             return super.listFiles();
         final String[] contents = savedSearch( getAbsolutePath() );
-        final File[] files = new File[ contents.length ];
-        for ( int i = 0; i < contents.length; ++i )
-            files[i] = new File( contents[i] );
+        final File[] files = Stream.of(contents).toArray(File[]::new);
         return files;
     }
 
@@ -233,8 +232,7 @@ public final class WindowsSavedSearch extends SmartFolder {
             new WindowsSavedSearch( args[0] );
         final String[] contents = savedSearch.list();
         if ( contents != null )
-            for ( String file : contents )
-                System.out.println( file );
+            Stream.of(contents).forEach(System.out::println);
     }
 }
 /* vim:set et sw=4 ts=4: */
