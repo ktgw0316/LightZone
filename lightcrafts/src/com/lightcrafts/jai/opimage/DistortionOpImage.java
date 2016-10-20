@@ -6,6 +6,7 @@ import com.lightcrafts.mediax.jai.BorderExtender;
 import com.lightcrafts.mediax.jai.GeometricOpImage;
 import com.lightcrafts.mediax.jai.RasterFormatTag;
 import com.lightcrafts.mediax.jai.RasterAccessor;
+import lombok.val;
 
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
@@ -190,43 +191,42 @@ public class DistortionOpImage extends GeometricOpImage {
         final float smallestMagnitude = Math.min(Math.min(kr, kb), 1);
         final float biggestMagnitude  = Math.max(Math.max(kr, kb), 1);
 
-        // Find minimum of top edge and maximum of bottom edge
-        float top    = (int) distModel.coeff((rx0 * rx0 + ry0 * ry0) / rMaxSq) * ry0;
-        float bottom = (int) distModel.coeff((rx0 * rx0 + ry1 * ry1) / rMaxSq) * ry1;
+        // Find minimum of top edge and maximum of bottom edge.
+        val horizontalEdge = findInscribedRectangleEdge(rx0, ry0, rx1, ry1,
+                rMaxSq, smallestMagnitude, biggestMagnitude);
+        val top    = horizontalEdge[0];
+        val bottom = horizontalEdge[1];
+        val h = (int) (bottom - top + 1);
+
+        // Find minimum of left edge and maximum of right edge.
+        // Note that rx and ry are swapped here.
+        val verticalEdge = findInscribedRectangleEdge(ry0, rx0, ry1, rx1,
+                rMaxSq, smallestMagnitude, biggestMagnitude);
+        val left  = verticalEdge[0];
+        val right = verticalEdge[1];
+        val w = (int) (right - left + 1);
+
+        return new Rectangle((int) (centerX + left), (int) (centerY + top), w, h);
+    }
+
+    private float[] findInscribedRectangleEdge(float rx0, float ry0, float rx1, float ry1,
+                                           float rMaxSq, float smallestMagnitude, float biggestMagnitude) {
+        // Find minimum of upper edge and maximum of lower edge
+        float upper = (int) distModel.coeff((rx0 * rx0 + ry0 * ry0) / rMaxSq) * ry0;
+        float lower = (int) distModel.coeff((rx0 * rx0 + ry1 * ry1) / rMaxSq) * ry1;
         for (int rx = (int) rx0; rx <= rx1; rx++) {
-            float topTmp = distModel.coeff((rx * rx + ry0 * ry0) / rMaxSq) * ry0;
-            topTmp *= (topTmp < 0) ? biggestMagnitude : smallestMagnitude;
-            if (topTmp < top) {
-                top = topTmp;
+            float upperTmp = distModel.coeff((rx * rx + ry0 * ry0) / rMaxSq) * ry0;
+            upperTmp *= (upperTmp < 0) ? biggestMagnitude : smallestMagnitude;
+            if (upperTmp < upper) {
+                upper = upperTmp;
             }
-            float bottomTmp = distModel.coeff((rx * rx + ry1 * ry1) / rMaxSq) * ry1;
-            bottomTmp *= (bottomTmp > 0) ? biggestMagnitude : smallestMagnitude;
-            if (bottomTmp > bottom) {
-                bottom = bottomTmp;
-            }
-        }
-        final int h = (int) (bottom - top + 1);
-        top += centerY;
-
-        // Find minimum of left edge and maximum of right edge
-        float left  = (int) distModel.coeff((rx0 * rx0 + ry0 * ry0) / rMaxSq) * rx0;
-        float right = (int) distModel.coeff((rx1 * rx1 + ry0 * ry0) / rMaxSq) * rx1;
-        for (int ry = (int) ry0; ry <= ry1; ry++) {
-            float leftTmp = distModel.coeff((rx0 * rx0 + ry * ry) / rMaxSq) * rx0;
-            leftTmp *= (leftTmp < 0) ? biggestMagnitude : smallestMagnitude;
-            if (leftTmp < left) {
-                left = leftTmp;
-            }
-            float rightTmp = distModel.coeff((rx1 * rx1 + ry * ry) / rMaxSq) * rx1;
-            rightTmp *= (rightTmp > 0) ? biggestMagnitude : smallestMagnitude;
-            if (rightTmp > right) {
-                right = rightTmp;
+            float lowerTmp = distModel.coeff((rx * rx + ry1 * ry1) / rMaxSq) * ry1;
+            lowerTmp *= (lowerTmp > 0) ? biggestMagnitude : smallestMagnitude;
+            if (lowerTmp > lower) {
+                lower = lowerTmp;
             }
         }
-        final int w = (int) (right - left + 1);
-        left += centerX;
-
-        return new Rectangle((int) left, (int) top, w, h);
+        return new float[] {upper, lower};
     }
 
     @Override
