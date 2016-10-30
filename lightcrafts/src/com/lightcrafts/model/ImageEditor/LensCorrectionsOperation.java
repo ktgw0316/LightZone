@@ -52,8 +52,8 @@ public class LensCorrectionsOperation extends BlendedOperation {
         DecimalFormat format  = new DecimalFormat("0.0");
 
         setCheckboxValue(AUTO_CORRECTION, false);
-        setSliderConfig(DISTORTION_K1, new SliderConfig(-100, 100, distortion_k1, 1, false, format));
-        setSliderConfig(DISTORTION_K2, new SliderConfig(-100, 100, distortion_k2, 1, false, format));
+        setSliderConfig(DISTORTION_K1, new SliderConfig(-200, 200, distortion_k1, 1, false, format));
+        setSliderConfig(DISTORTION_K2, new SliderConfig(-200, 200, distortion_k2, 1, false, format));
         setSliderConfig(TCA_R, new SliderConfig(-2, 2, tca_r_offset, 0.1, false, format));
         setSliderConfig(TCA_B, new SliderConfig(-2, 2, tca_b_offset, 0.1, false, format));
 
@@ -62,8 +62,7 @@ public class LensCorrectionsOperation extends BlendedOperation {
         if (engine != null) {
             ImageMetadata meta = engine.getMetadata();
             cameraMaker = meta.getCameraMake(false);
-            cameraModel = cameraMaker == null ? ""
-                        : meta.getCameraMake(true).substring(cameraMaker.length() + 1);
+            cameraModel = cameraMaker == null ? "" : meta.getCameraMake(true);
             lensName = meta.getLens() == null ? "" : meta.getLens();
             focal    = meta.getFocalLength();
             aperture = meta.getAperture();
