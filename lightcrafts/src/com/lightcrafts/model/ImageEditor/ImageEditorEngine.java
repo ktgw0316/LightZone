@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2016-     Masahiro Kitagawa */
 
 package com.lightcrafts.model.ImageEditor;
 
@@ -12,7 +13,6 @@ import com.lightcrafts.image.export.ImageFileExportOptions;
 import com.lightcrafts.image.metadata.ImageMetadata;
 import com.lightcrafts.image.metadata.ImageOrientation;
 import com.lightcrafts.image.types.AuxiliaryImageInfo;
-import com.lightcrafts.image.types.ImageType;
 import com.lightcrafts.image.types.JPEGImageType;
 import com.lightcrafts.image.types.RawImageInfo;
 import com.lightcrafts.jai.JAIContext;
@@ -21,7 +21,6 @@ import com.lightcrafts.jai.opimage.CachedImage;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.utils.LCTileCache;
 import com.lightcrafts.mediax.jai.*;
-import com.lightcrafts.mediax.jai.operator.TransposeType;
 import com.lightcrafts.model.*;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.utils.ColorProfileInfo;
@@ -35,71 +34,67 @@ import java.awt.color.ICC_Profile;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
 import java.awt.image.*;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.util.*;
 import java.util.List;
+
+import com.lightcrafts.utils.xml.XMLUtil;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.val;
 
 public class ImageEditorEngine implements Engine {
     private ImageInfo m_imageInfo;
     private ImageInfo m_exportInfo;
+
+    @Getter(AccessLevel.PACKAGE)
     private PlanarImage sourceImage;
+
     private PlanarImage processedImage;
 
+    @Getter
     private Rendering rendering;
 
     private ImageEditorDisplay canvas = null;
 
     private boolean engineActive = true;
 
-    private LinkedList<Preview> previews = new LinkedList<Preview>();
+    @Getter
+    private List<Preview> previews = new LinkedList<Preview>();
 
-    private static final Scale[] scales = new Scale[] {
-        new Scale(1, 40),
-        new Scale(1, 20),
-        new Scale(1, 10),
-        new Scale(1, 8),
-        new Scale(1, 6),
-        new Scale(1, 4),
-        new Scale(1, 3),
-        new Scale(1, 2),
-        new Scale(2, 3),
-        new Scale(1, 1),
-        new Scale(2, 1),
-        new Scale(3, 1),
-        new Scale(4, 1)
-    };
+    private static final List<Scale> preferredScales = Arrays.asList(
+            new Scale(1, 40),
+            new Scale(1, 20),
+            new Scale(1, 10),
+            new Scale(1, 8),
+            new Scale(1, 6),
+            new Scale(1, 4),
+            new Scale(1, 3),
+            new Scale(1, 2),
+            new Scale(2, 3),
+            new Scale(1, 1),
+            new Scale(2, 1),
+            new Scale(3, 1),
+            new Scale(4, 1)
+    );
 
     private LinkedList<EngineListener> listeners = null;
 
-    private static boolean DEBUG = false;
-
+    @Getter
     private ImageMetadata metadata = null;
-    private AuxiliaryImageInfo auxInfo = null;
 
-    private TransposeType transposeAngle = null;
+    @Getter
+    private AuxiliaryImageInfo auxInfo = null;
 
     private RenderedImage backgroundImage;
 
     private boolean addFirstPaintLatency;
-
-    public Rendering getRendering() {
-        return rendering;
-    }
-
-    public AuxiliaryImageInfo getAuxInfo() {
-        return auxInfo;
-    }
-
-    public ImageMetadata getMetadata() {
-        return metadata;
-    }
 
     @Override
     public AffineTransform getTransform() {
@@ -108,10 +103,6 @@ public class ImageEditorEngine implements Engine {
 
     CropBounds getCropBounds() {
         return rendering.getCropBounds();
-    }
-
-    PlanarImage getSourceImage() {
-        return sourceImage;
     }
 
     @Override
@@ -146,18 +137,13 @@ public class ImageEditorEngine implements Engine {
     }
 
     @Override
-    public List<Preview> getPreviews() {
-        return previews;
-    }
-
-    @Override
-    public List getLayerModes() {
+    public List<LayerMode> getLayerModes() {
         return BlendedOperation.blendingModes;
     }
 
     @Override
-    public List getPreferredScales() {
-        return Arrays.asList(scales);
+    public List<Scale> getPreferredScales() {
+        return preferredScales;
     }
 
     public void setFocusedZone(int index, double[][] controlPoints) {
@@ -182,60 +168,62 @@ public class ImageEditorEngine implements Engine {
         throws BadImageFileException, ColorProfileException, IOException,
                UnknownImageTypeException, UserCanceledException
     {
-        String imagePath = imageMetadata.getPath();
-        File imageFile = new File(imagePath).getCanonicalFile();
+        val imagePath = imageMetadata.getPath();
+        val imageFile = new File(imagePath).getCanonicalFile();
         m_imageInfo = ImageInfo.getInstanceFor(imageFile);
-
-        m_exportInfo = exportInfo;
-
         System.out.println("Opening " + imageFile);
 
+        m_exportInfo = exportInfo;
         metadata = imageMetadata; // imageInfo.getMetadata();
-
         sourceImage = m_imageInfo.getImage( thread, true );
-
         auxInfo = m_imageInfo.getAuxiliaryInfo();
 
         if (sourceImage == null)
             throw new IOException("Something wrong with opening " + metadata.getFile().getName());
 
-        ImageOrientation orientation = metadata.getOrientation();
+        val orientation = metadata.getOrientation();
         if (orientation != null) {
-            transposeAngle = orientation.getCorrection();
+            val transposeAngle = orientation.getCorrection();
             if (transposeAngle != null) {
-                ParameterBlock pb = new ParameterBlock();
+                val pb = new ParameterBlock();
                 pb.addSource(sourceImage);
                 pb.add(transposeAngle);
-                RenderedOp transposed = JAI.create("Transpose", pb, null);
+                val transposed = JAI.create("Transpose", pb, null);
                 transposed.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
                 // sourceImage = transposed;
 
-                CachedImage cache = new CachedImage(new ImageLayout(transposed), JAIContext.fileCache);
+                val cache = new CachedImage(new ImageLayout(transposed), JAIContext.fileCache);
 
-                // Fast hack for daya copy, assumes that images have identical layout
-                for (int x = 0; x <= cache.getMaxTileX(); x++)
-                    for (int y = 0; y <= cache.getMaxTileY(); y++) {
-                        if (transposed.getSampleModel().getDataType() == DataBuffer.TYPE_USHORT) {
+                // Fast hack for data copy, assumes that images have identical layout
+                switch (transposed.getSampleModel().getDataType()) {
+                case DataBuffer.TYPE_USHORT:
+                    for (int x = 0; x <= cache.getMaxTileX(); x++) {
+                        for (int y = 0; y <= cache.getMaxTileY(); y++) {
                             short[] srcData = ((DataBufferUShort) transposed.getTile(x, y).getDataBuffer()).getData();
                             short[] dstData = ((DataBufferUShort) cache.getWritableTile(x, y).getDataBuffer()).getData();
                             System.arraycopy(srcData, 0, dstData, 0, srcData.length);
-                        } else if (transposed.getSampleModel().getDataType() == DataBuffer.TYPE_BYTE) {
+                        }
+                    }
+                    break;
+                case DataBuffer.TYPE_BYTE:
+                    for (int x = 0; x <= cache.getMaxTileX(); x++) {
+                        for (int y = 0; y <= cache.getMaxTileY(); y++) {
                             byte[] srcData = ((DataBufferByte) transposed.getTile(x, y).getDataBuffer()).getData();
                             byte[] dstData = ((DataBufferByte) cache.getWritableTile(x, y).getDataBuffer()).getData();
                             System.arraycopy(srcData, 0, dstData, 0, srcData.length);
-                        } else
-                            throw new IllegalArgumentException("Unknown image data type: " + transposed.getSampleModel().getDataType());
-                        // transposed.copyData(cache.getWritableTile(x, y));
+                        }
                     }
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unknown image data type: " + transposed.getSampleModel().getDataType());
+                }
 
                 sourceImage = cache;
-
                 transposed.dispose();
             }
         }
 
         rendering = new Rendering(sourceImage, this);
-
         addFirstPaintLatency = true;
     }
 
@@ -343,7 +331,7 @@ public class ImageEditorEngine implements Engine {
 
     @Override
     public com.lightcrafts.model.Operation insertOperation(OperationType type, int position) {
-        Class<? extends BlendedOperation> opClass = operationsSet.get(type);
+        val opClass = operationsSet.get(type);
 
         if (opClass.equals(RawAdjustmentsOperation.class)) {
             if (! (getAuxInfo() instanceof RawImageInfo)) {
@@ -359,10 +347,10 @@ public class ImageEditorEngine implements Engine {
 
         try {
             try {
-                Constructor<? extends BlendedOperation> c = opClass.getConstructor(Rendering.class, OperationType.class);
+                val c = opClass.getConstructor(Rendering.class, OperationType.class);
                 op = c.newInstance(rendering, type);
             } catch (NoSuchMethodException e) {
-                Constructor<? extends BlendedOperation> c = opClass.getConstructor(Rendering.class);
+                val c = opClass.getConstructor(Rendering.class);
                 op = c.newInstance(rendering);
             }
         } catch (Exception e) {
@@ -423,9 +411,11 @@ public class ImageEditorEngine implements Engine {
 
     @Override
     public void removeOperation(int position) {
-        Operation currentSelection = selectedOperation >= 0 ? rendering.getOperation(selectedOperation) : null;
+        val currentSelection = selectedOperation >= 0
+                ? rendering.getOperation(selectedOperation)
+                : null;
 
-        OperationImpl op = (OperationImpl) rendering.removeOperation(position);
+        val op = (OperationImpl) rendering.removeOperation(position);
         op.dispose();
 
         if (currentSelection != null)
@@ -436,9 +426,11 @@ public class ImageEditorEngine implements Engine {
 
     @Override
     public void swap(int position) {
-        Operation currentSelection = selectedOperation >= 0 ? rendering.getOperation(selectedOperation) : null;
+        val currentSelection = selectedOperation >= 0
+                ? rendering.getOperation(selectedOperation)
+                : null;
 
-        OperationImpl op = (OperationImpl) rendering.removeOperation(position);
+        val op = (OperationImpl) rendering.removeOperation(position);
         rendering.addOperation(position + 1, op);
 
         if (currentSelection != null)
@@ -462,36 +454,32 @@ public class ImageEditorEngine implements Engine {
 
     @Override
     public Scale setScale(Rectangle rect) {
-        Dimension dimension = getNaturalSize();
+        val dimension = getNaturalSize();
 
-        double hScale = rect.height / (double) dimension.height;
-        double wScale = rect.width / (double) dimension.width;
+        val hScale = rect.height / (float) dimension.height;
+        val wScale = rect.width  / (float) dimension.width;
 
-        rendering.setScaleFactor((float) Math.min(hScale, wScale));
+        rendering.setScaleFactor(Math.min(hScale, wScale));
         update(null, false);
         return new Scale(rendering.getScaleFactor());
     }
 
-    public void update(OperationImpl op, boolean isLive) {
-        update(op, isLive, null);
-    }
-
     PlanarImage scaleFinal(PlanarImage image) {
-        float scale = rendering.getScaleFactor() > 1 ? rendering.getScaleFactor() : 1;
+        val scale = rendering.getScaleFactor() > 1 ? rendering.getScaleFactor() : 1f;
 
         if (scale == 1)
             return image;
 
-        float scaleX = (float) Math.floor(scale * image.getWidth()) / (float) image.getWidth();
-        float scaleY = (float) Math.floor(scale * image.getHeight()) / (float) image.getHeight();
+        val scaleX = (float) Math.floor(scale * image.getWidth())  / image.getWidth();
+        val scaleY = (float) Math.floor(scale * image.getHeight()) / image.getHeight();
 
-        AffineTransform xform = AffineTransform.getScaleInstance(scaleX, scaleY);
+        val xform = AffineTransform.getScaleInstance(scaleX, scaleY);
 
-        RenderingHints formatHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
+        val formatHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
                 BorderExtender.createInstance(BorderExtender.BORDER_COPY));
 
-        Interpolation interp = Interpolation.getInstance(Interpolation.INTERP_NEAREST);
-        ParameterBlock params = new ParameterBlock();
+        val interp = Interpolation.getInstance(Interpolation.INTERP_NEAREST);
+        val params = new ParameterBlock();
         params.addSource(image);
         params.add(xform);
         params.add(interp);
@@ -507,7 +495,7 @@ public class ImageEditorEngine implements Engine {
 
     @Override
     public synchronized void setSelectedOperation(int position, boolean selected) {
-        OperationImpl op = (OperationImpl) rendering.getOperation(position);
+        val op = (OperationImpl) rendering.getOperation(position);
 
         if (op != null)
             op.setSelected(selected);
@@ -519,14 +507,14 @@ public class ImageEditorEngine implements Engine {
         // System.out.println((selected ? "selecting " : "unselecting ") + "operation " + position + ", current: " + selectedOperation);
     }
 
-    public synchronized Operation getSelectedOperation() {
+    synchronized Operation getSelectedOperation() {
         if (selectedOperation >= 0)
             return rendering.getOperation(selectedOperation);
         else
             return null;
     }
 
-    public synchronized int getSelectedOperationIndex() {
+    synchronized int getSelectedOperationIndex() {
         return selectedOperation;
     }
 
@@ -535,6 +523,10 @@ public class ImageEditorEngine implements Engine {
             return rendering.getRendering(stopBefore);
         }
         return null;
+    }
+
+    public void update(OperationImpl op, boolean isLive) {
+        update(op, isLive, null);
     }
 
     /*
@@ -596,12 +588,13 @@ public class ImageEditorEngine implements Engine {
             if (synchronous) {
                 synchImageRepaintTime = (synchImageRepaintTime + time) / 2;
                 // System.out.println("fast repaint done in " + time + "ms, average: " + synchImageRepaintTime + "ms");
-            } else {
-                // System.out.println("slow repaint done");
             }
-            TileCache tileCache = JAI.getDefaultInstance().getTileCache();
+            // else
+            //     System.out.println("slow repaint done");
+
+            val tileCache = JAI.getDefaultInstance().getTileCache();
             if (tileCache instanceof LCTileCache) {
-                LCTileCache tc = (LCTileCache) tileCache;
+                val tc = (LCTileCache) tileCache;
                 if (tilesRead != tc.tilesRead() || tilesWritten != tc.tilesWritten() || tilesOnDisk != tc.tilesOnDisk()) {
                     tilesRead = tc.tilesRead();
                     tilesWritten = tc.tilesWritten();
@@ -610,11 +603,11 @@ public class ImageEditorEngine implements Engine {
                 }
             }
 
-            for (Preview preview : previews) {
+            for (val preview : previews) {
                 if (!preview.isShowing() || !(preview instanceof PaintListener))
                     continue;
 
-                float renderingScale = rendering.getScaleFactor();
+                val renderingScale = rendering.getScaleFactor();
                 Rectangle previewVisibleRect = visibleRect;
 
                 if (renderingScale > 1) {
@@ -624,9 +617,9 @@ public class ImageEditorEngine implements Engine {
                                                        (int) (visibleRect.height/renderingScale));
                 }
 
-                ((PaintListener) preview).paintDone(preview instanceof ZoneFinder
-                                                    ? previewImage
-                                                    : processedImage, previewVisibleRect, synchronous, time);
+                ((PaintListener) preview).paintDone(
+                        preview instanceof ZoneFinder ? previewImage : processedImage,
+                        previewVisibleRect, synchronous, time);
             }
         }
     }
@@ -655,50 +648,49 @@ public class ImageEditorEngine implements Engine {
         if (updater != null && updater != currentTask)
             return false; // obsolete update operation
 
-        if (isLive) {
-            // During live updates wait until the user stays put for at least the current average repaint time
-
-            long timeNow = System.currentTimeMillis();
-
-            long timeDiff = lastTime == -1 ? 0 : timeNow - lastTime;
-
-            lastTime = timeNow;
-
-            final long delay = Math.min(Math.max(synchImageRepaintTime, 300), 1000);
-
-            if (timeDiff < delay) {
-                if (swingTimer != null) {
-                    if (currentTask != null)
-                        swingTimer.removeActionListener(currentTask);
-
-                    currentTask = new UpdateActionListener();
-                    swingTimer.addActionListener(currentTask);
-                    swingTimer.setInitialDelay((int) delay);
-
-                    if (swingTimer.isRunning())
-                        swingTimer.restart();
-                    else
-                        swingTimer.start();
-                } else {
-                    currentTask = new UpdateActionListener();
-                    swingTimer = new javax.swing.Timer((int) delay, currentTask);
-                    swingTimer.setRepeats(false);
-                    swingTimer.start();
-                }
-                return false;
-            }
-
-            swingTimer.removeActionListener(currentTask);
-            currentTask = null;
-            lastTime = -1;
-        } else {
+        if (!isLive) {
             if (swingTimer != null && swingTimer.isRunning()) {
                 swingTimer.stop();
                 swingTimer.removeActionListener(currentTask);
                 currentTask = null;
             }
             lastTime = -1;
+            return true;
         }
+
+        // During live updates wait until the user stays put for at least the current average repaint time
+        val timeNow = System.currentTimeMillis();
+        val timeDiff = (lastTime == -1) ? 0 : timeNow - lastTime;
+        lastTime = timeNow;
+
+        val delay = Math.min(Math.max(synchImageRepaintTime, 300), 1000);
+
+        if (timeDiff < delay) {
+            if (swingTimer != null) {
+                if (currentTask != null)
+                    swingTimer.removeActionListener(currentTask);
+
+                currentTask = new UpdateActionListener();
+                swingTimer.addActionListener(currentTask);
+                swingTimer.setInitialDelay((int) delay);
+
+                if (swingTimer.isRunning())
+                    swingTimer.restart();
+                else
+                    swingTimer.start();
+            }
+            else {
+                currentTask = new UpdateActionListener();
+                swingTimer = new javax.swing.Timer((int) delay, currentTask);
+                swingTimer.setRepeats(false);
+                swingTimer.start();
+            }
+            return false;
+        }
+
+        swingTimer.removeActionListener(currentTask);
+        currentTask = null;
+        lastTime = -1;
         return true;
     }
 
@@ -716,36 +708,31 @@ public class ImageEditorEngine implements Engine {
             new HashMap<RenderingIntent, LCMSColorConvertDescriptor.RenderingIntent>();
 
     static {
-        renderingIntentMap.put( RenderingIntent.RELATIVE_COLORIMETRIC,
-                               LCMSColorConvertDescriptor.RELATIVE_COLORIMETRIC);
+        renderingIntentMap.put(RenderingIntent.RELATIVE_COLORIMETRIC,
+                    LCMSColorConvertDescriptor.RELATIVE_COLORIMETRIC);
 
-        renderingIntentMap.put( RenderingIntent.PERCEPTUAL,
-                               LCMSColorConvertDescriptor.PERCEPTUAL);
+        renderingIntentMap.put(RenderingIntent.PERCEPTUAL,
+                    LCMSColorConvertDescriptor.PERCEPTUAL);
 
-        renderingIntentMap.put( RenderingIntent.SATURATION,
-                               LCMSColorConvertDescriptor.SATURATION);
+        renderingIntentMap.put(RenderingIntent.SATURATION,
+                    LCMSColorConvertDescriptor.SATURATION);
 
-        renderingIntentMap.put( RenderingIntent.ABSOLUTE_COLORIMETRIC,
-                               LCMSColorConvertDescriptor.ABSOLUTE_COLORIMETRIC);
+        renderingIntentMap.put(RenderingIntent.ABSOLUTE_COLORIMETRIC,
+                    LCMSColorConvertDescriptor.ABSOLUTE_COLORIMETRIC);
 
-        renderingIntentMap.put( RenderingIntent.RELATIVE_COLORIMETRIC_BP,
-                               LCMSColorConvertDescriptor.RELATIVE_COLORIMETRIC_BP);
+        renderingIntentMap.put(RenderingIntent.RELATIVE_COLORIMETRIC_BP,
+                    LCMSColorConvertDescriptor.RELATIVE_COLORIMETRIC_BP);
     }
 
     public static LCMSColorConvertDescriptor.RenderingIntent getLCMSIntent(RenderingIntent intent) {
         return renderingIntentMap.get(intent);
     }
 
+    @Getter
     private ICC_Profile proofProfile = null;
+
+    @Getter
     private LCMSColorConvertDescriptor.RenderingIntent proofIntent = null;
-
-    public ICC_Profile getProofProfile() {
-        return proofProfile;
-    }
-
-    public LCMSColorConvertDescriptor.RenderingIntent getProofIntent() {
-        return proofIntent;
-    }
 
     @Override
     public void preview(PrintSettings settings) {
@@ -772,26 +759,25 @@ public class ImageEditorEngine implements Engine {
                                     LCMSColorConvertDescriptor.RenderingIntent intent, boolean eightBits) {
         Dimension dimension = getNaturalSize();
 
-        float scale = bounds != null
-                      ? Math.min(bounds.width / (float) dimension.getWidth(),
-                                 bounds.height / (float) dimension.getHeight())
-                      : 1;
+        // TODO: scale method
+        val scale = bounds != null
+                ? Math.min(bounds.width / (float) dimension.getWidth(),
+                           bounds.height / (float) dimension.getHeight())
+                : 1;
 
-        Rendering newRendering = canvas != null ? rendering.clone() : rendering;
+        val newRendering = canvas != null ? rendering.clone() : rendering;
 
         newRendering.setCropAndScale(getCropBounds(), scale);
 
         PlanarImage image = newRendering.getRendering();
 
         if (profile != null) {
-            final ICC_ColorSpace exportColorSpace =
-                profile == JAIContext.sRGBColorProfile
-                ? JAIContext.sRGBColorSpace
-                : new ICC_ColorSpace(profile);
-            if (intent != null)
-                image = Functions.toColorSpace(image, exportColorSpace, intent, null);
-            else
-                image = Functions.toColorSpace(image, exportColorSpace, null);
+            val exportColorSpace = (profile == JAIContext.sRGBColorProfile)
+                    ? JAIContext.sRGBColorSpace
+                    : new ICC_ColorSpace(profile);
+            image = (intent != null)
+                    ? Functions.toColorSpace(image, exportColorSpace, intent, null)
+                    : Functions.toColorSpace(image, exportColorSpace, null);
         }
 
         if (eightBits)
@@ -808,20 +794,16 @@ public class ImageEditorEngine implements Engine {
     @Override
     public void write( ProgressThread thread,
                        ImageExportOptions exportOptions ) throws IOException {
-        final ImageFileExportOptions fileOptions =
-            (ImageFileExportOptions)exportOptions;
-        final ImageType exportType = exportOptions.getImageType();
-        final int exportWidth = fileOptions.resizeWidth.getValue();
-        final int exportHeight = fileOptions.resizeHeight.getValue();
+        val fileOptions = (ImageFileExportOptions)exportOptions;
+        val exportType = exportOptions.getImageType();
+        val exportWidth  = fileOptions.resizeWidth.getValue();
+        val exportHeight = fileOptions.resizeHeight.getValue();
 
-        final String exportProfileName = fileOptions.colorProfile.getValue();
+        val exportProfileName = fileOptions.colorProfile.getValue();
         ICC_Profile profile =
             ColorProfileInfo.getExportICCProfileFor( exportProfileName );
         if ( profile == null )
             profile = JAIContext.sRGBExportColorProfile;
-
-        // LZN editor state data
-        final byte[] lzn = exportOptions.getAuxData();
 
         PlanarImage exportImage = getRendering(
             new Dimension( exportWidth, exportHeight ), profile,
@@ -831,13 +813,14 @@ public class ImageEditorEngine implements Engine {
 
         // Uprez output images
 
-        double scale = Math.min(exportWidth / (double) exportImage.getWidth(),
-                                exportHeight / (double) exportImage.getHeight());
+        // TODO: scale method
+        val scale = Math.min(exportWidth  / (double) exportImage.getWidth(),
+                             exportHeight / (double) exportImage.getHeight());
 
         if (scale > 1) {
-            AffineTransform xform = AffineTransform.getScaleInstance(scale, scale);
-
-            RenderingHints formatHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
+            val xform = AffineTransform.getScaleInstance(scale, scale);
+            val formatHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
+                    BorderExtender.createInstance(BorderExtender.BORDER_COPY));
 
             Interpolation interp = Interpolation.getInstance(Interpolation.INTERP_BICUBIC_2);
             ParameterBlock params = new ParameterBlock();
@@ -861,105 +844,76 @@ public class ImageEditorEngine implements Engine {
             rop.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
         }
 
-        if (m_exportInfo != null) {
-            exportType.putImage(
-                m_exportInfo, exportImage, exportOptions, lzn, thread
-            );
-        }
-        else {
-            exportType.putImage(
-                m_imageInfo, exportImage, exportOptions, lzn, thread
-            );
-        }
+        // LZN editor state data
+        val lzn = exportOptions.getAuxData();
+        val doc = XMLUtil.readDocumentFrom(new ByteArrayInputStream(lzn));
+        val imageInfo = (m_exportInfo != null) ? m_exportInfo : m_imageInfo;
+        exportType.putImage(imageInfo, exportImage, exportOptions, doc, thread);
     }
 
     public Color getPixelValue(int x, int y) {
         // destUShortScaled.getData().getPixel(x, y, rgb);
 
-        //Take a 3x3 sample centered at pointer location, and average the samples.
-        int rgb[] = new int[3];
-        int numSamples = 0;
-        int red = 0;
-        int green = 0;
-        int blue = 0;
-
-        //max and min (x,y) coordinates of the bounds
-        int minX, maxX, minY, maxY;
-        int sampleX, sampleY;
-
-        Point2D p = rendering.getInputTransform().transform(new Point(x, y), null);
-
+        val p = rendering.getInputTransform().transform(new Point(x, y), null);
         x = (int) p.getX();
         y = (int) p.getY();
 
         Rectangle bounds = processedImage.getBounds();
-
         if (!bounds.contains(x, y))
             return null;
 
+        //Take a 3x3 sample centered at pointer location, and average the samples.
+        int[] rgb = new int[3];
+        int red = 0;
+        int green = 0;
+        int blue = 0;
+
         if (true) {
-            Raster tile = processedImage.getTile(processedImage.XToTileX(x), processedImage.YToTileY(y));
+            val tile = processedImage.getTile(processedImage.XToTileX(x),
+                                              processedImage.YToTileY(y));
             rgb = tile.getPixel(x, y, rgb);
-            return new Color(rgb[0] / (float) 0xffff, rgb[1] / (float) 0xffff, rgb[2] / (float) 0xffff);
-        } else {
+            red   = rgb[0];
+            green = rgb[1];
+            blue  = rgb[2];
+        }
+        else {
+            int numSamples = 0;
             for (int i = -1; i <= 1; ++i) {
                 for (int j = -1; j <= 1; ++j) {
-                    sampleX = x + i;
-                    sampleY = y + j;
+                    val sampleX = x + i;
+                    val sampleY = y + j;
                     Raster tile = processedImage.getTile(processedImage.XToTileX(x), processedImage.YToTileY(y));
                     bounds = tile.getBounds();
-                    minX = bounds.x;
-                    maxX = bounds.x + bounds.width - 1;
-                    minY = bounds.y;
-                    maxY = bounds.y + bounds.height - 1;
+
+                    //max and min (x,y) coordinates of the bounds
+                    val minX = bounds.x;
+                    val maxX = bounds.x + bounds.width - 1;
+                    val minY = bounds.y;
+                    val maxY = bounds.y + bounds.height - 1;
+
                     // Check bounds, if in bounds take sample and increment numSamples, else do nothing
                     if (sampleX >= minX && sampleX <= maxX && sampleY >= minY && sampleY <= maxY) {
                         tile.getPixel(sampleX, sampleY, rgb);
-                        red += rgb[0];
+                        red   += rgb[0];
                         green += rgb[1];
-                        blue += rgb[2];
+                        blue  += rgb[2];
                         numSamples++;
                     }
                 }
             }
 
-            red /= numSamples;
-            green /= numSamples;
-            blue /= numSamples;
-
-            return new Color(red / (float) 0xffff, green / (float) 0xffff, blue / (float) 0xffff);
-        }
-    }
-
-    class GrayPatchesImage extends BufferedImage {
-        static final int height = 512;
-        static final int width = 256;
-
-        GrayPatchesImage(int steps) {
-            super(JAIContext.colorModel_sRGB8,
-                  JAIContext.colorModel_sRGB8.createCompatibleWritableRaster(width, height),
-                  false, null);
-
-            Graphics g = this.getGraphics();
-
-            if (DEBUG) System.out.print("Colors: ");
-            for (int i = 0; i < steps; i++) {
-                float color = (float) (Math.pow(2, i * 8.0 / (steps - 1)) - 1) / 255.0f;
-
-                float[] srgbColor = Functions.fromLinearToCS(JAIContext.systemColorSpace, new float[] {color, color, color});
-
-                if (DEBUG) System.out.print(", " + i + ":" + (int) (255 * color) + " -> " + (int) (255 * srgbColor[0]));
-
-                g.setColor(new Color((int) (255 * srgbColor[0]), (int) (255 * srgbColor[1]), (int) (255 * srgbColor[2])));
-                g.fillRect(0, i * height / steps, width, (i + 1) * height / steps - i * height / steps);
+            if (numSamples > 0) {
+                red   /= numSamples;
+                green /= numSamples;
+                blue  /= numSamples;
             }
-            if (DEBUG) System.out.println();
         }
+        return new Color(red / (float) 0xffff, green / (float) 0xffff, blue / (float) 0xffff);
     }
 
     @Override
-    public List getDebugItems() {
-        ArrayList<JMenuItem> items = new ArrayList<JMenuItem>();
+    public List<JMenuItem> getDebugItems() {
+        val items = new ArrayList<JMenuItem>();
 
         /* JMenuItem tctool = new JMenuItem("TCTool");
         tctool.addActionListener(
