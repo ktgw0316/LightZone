@@ -32,7 +32,7 @@ import static com.lightcrafts.image.types.TIFFConstants.*;
  * @author Paul J. Lucas [paul@lightcrafts.com]
  * @see <a href="http://www.remotesensing.org/libtiff/">LibTIFF</a>
  */
-public final class LCTIFFReader extends LCTIFFCommon {
+public final class LCTIFFReader extends LCTIFFCommon implements LCImageReader {
 
     ////////// public /////////////////////////////////////////////////////////
 
@@ -82,6 +82,16 @@ public final class LCTIFFReader extends LCTIFFCommon {
         catch ( IllegalArgumentException e ) {
             throw new BadColorProfileException( null );
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public PlanarImage getImage()
+            throws LCImageLibException, UserCanceledException
+    {
+        return getImage(null);
     }
 
     /**
