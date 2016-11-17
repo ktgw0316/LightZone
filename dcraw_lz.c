@@ -46,7 +46,7 @@
 #include <time.h>
 #include <sys/types.h>
 
-#if defined(DJGPP) || defined(__MINGW32__)
+#if defined(DJGPP) || defined(__MINGW32__) || _MSC_VER <= 1900
 #define fseeko fseek
 #define ftello ftell
 #else
@@ -4375,7 +4375,8 @@ void CLASS pre_interpolate()
 
 void CLASS border_interpolate (int border)
 {
-  unsigned row, col, y, x, f, c, sum[8];
+  int row;
+  unsigned col, y, x, f, c, sum[8];
 
 #ifdef _OPENMP
         #pragma omp for
@@ -4538,7 +4539,8 @@ void CLASS vng_interpolate()
     private(row,col,g,brow,pix,ip,gval,diff,gmin,gmax,thold,sum,color,num,c,t)
 #endif
 {
-  ushort rowtmp[4][width*4];
+  ushort (*rowtmp)[4];
+  rowtmp = (ushort*)malloc(4 * width * 4 * sizeof(ushort));
   int slice = (height - 4) / uf_omp_get_num_threads();
   int start_row = 2 + slice * uf_omp_get_thread_num();
   int end_row = MIN(start_row + slice, height - 2);
