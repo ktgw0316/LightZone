@@ -78,10 +78,10 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
 
     // Define the List of LayerModes statically so they can be vended
     // by ImageEditorEngine:
-    static List<LayerModeImpl> blendingModes;
+    static List<LayerMode> blendingModes;
 
     static {
-        blendingModes = new ArrayList<LayerModeImpl>();
+        blendingModes = new ArrayList<LayerMode>();
 
         for (BlendOpImage.BlendingMode b : BlendOpImage.BlendingMode.values())
             blendingModes.add(new LayerModeImpl(b.getName()));
