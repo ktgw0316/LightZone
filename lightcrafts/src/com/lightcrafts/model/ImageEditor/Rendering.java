@@ -55,7 +55,7 @@ public class Rendering implements Cloneable {
             object.transform = buildTransform(false);
             object.xformedSourceImage = null;
             object.pipeline = new LinkedList<Operation>();
-            for (Operation op : pipeline) {
+            for (val op : pipeline) {
                 object.pipeline.add(((BlendedOperation) op).clone(object));
             }
             return object;
@@ -153,13 +153,13 @@ public class Rendering implements Cloneable {
             return processedImage;
         }
 
-        for (Operation op : pipeline) {
+        for (val op : pipeline) {
             val operation = (OperationImpl) op;
             if (stopBefore-- == 0)
                 break;
 
             if (operation.isActive() && !(inactive && operation.isDeactivatable())) {
-                PlanarImage result = operation.render(processedImage, scaleFactor < 1 ? scaleFactor : 1);
+                val result = operation.render(processedImage, scaleFactor < 1 ? scaleFactor : 1);
                 if (result != null)
                     processedImage = result;
             }
@@ -212,10 +212,14 @@ public class Rendering implements Cloneable {
         return getRendering(false, stopBefore);
     }
 
+    public Rectangle getSourceBounds() {
+        // NOTE: we must clone PlanarImage.getBounds() since it returns a reference to an object
+        return new Rectangle(sourceImage.getBounds());
+    }
+
     public Dimension getRenderingSize() {
         if (cropBounds.isAngleOnly()) {
-            // NOTE: we must clone PlanarImage.getBounds() since it returns a reference to an object
-            Rectangle sourceBounds = new Rectangle(sourceImage.getBounds());
+            Rectangle sourceBounds = getSourceBounds();
 
             if (cropBounds.getAngle() != 0) {
                 val center = new Point2D.Double(sourceBounds.getCenterX(), sourceBounds.getCenterY());
@@ -231,10 +235,8 @@ public class Rendering implements Cloneable {
     }
 
     private AffineTransform buildTransform(boolean isInputTransform) {
-        // NOTE: we must clone PlanarImage.getBounds() since it returns a reference to an object
-        Rectangle sourceBounds = new Rectangle(sourceImage.getBounds());
-
-        AffineTransform transform = new AffineTransform();
+        val sourceBounds = getSourceBounds();
+        val transform = new AffineTransform();
 
         // Scale
         if (scaleFactor < 1 || !isInputTransform) {

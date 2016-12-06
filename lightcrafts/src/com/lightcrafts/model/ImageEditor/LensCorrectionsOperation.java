@@ -15,6 +15,8 @@ import com.lightcrafts.mediax.jai.PlanarImage;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
 
+import lombok.val;
+
 public class LensCorrectionsOperation extends BlendedOperation {
     private static final String AUTO_CORRECTION = "Auto_Correction";
     private static final String DISTORTION_K1 = "Main";
@@ -40,7 +42,7 @@ public class LensCorrectionsOperation extends BlendedOperation {
 
     static final OperationType type = new OperationTypeImpl("Lens Corrections");
 
-    public LensCorrectionsOperation(Rendering rendering, OperationType type) {
+    public LensCorrectionsOperation(Rendering rendering, OperationType type, ImageMetadata meta) {
         super(rendering, type);
 
         addCheckboxKey(AUTO_CORRECTION);
@@ -49,7 +51,7 @@ public class LensCorrectionsOperation extends BlendedOperation {
         addSliderKey(TCA_R);
         addSliderKey(TCA_B);
 
-        DecimalFormat format  = new DecimalFormat("0.0");
+        DecimalFormat format = new DecimalFormat("0.0");
 
         setCheckboxValue(AUTO_CORRECTION, false);
         setSliderConfig(DISTORTION_K1, new SliderConfig(-200, 200, distortion_k1, 1, false, format));
@@ -57,10 +59,7 @@ public class LensCorrectionsOperation extends BlendedOperation {
         setSliderConfig(TCA_R, new SliderConfig(-2, 2, tca_r_offset, 0.1, false, format));
         setSliderConfig(TCA_B, new SliderConfig(-2, 2, tca_b_offset, 0.1, false, format));
 
-        ImageEditorEngine engine = rendering.getEngine();
-
-        if (engine != null) {
-            ImageMetadata meta = engine.getMetadata();
+        if (meta != null) {
             cameraMaker = meta.getCameraMake(false);
             cameraModel = cameraMaker == null ? "" : meta.getCameraMake(true);
             lensName = meta.getLens() == null ? "" : meta.getLens();
@@ -119,21 +118,15 @@ public class LensCorrectionsOperation extends BlendedOperation {
 
         @Override
         public PlanarImage setFront() {
-            ImageEditorEngine engine = rendering.getEngine();
-            if (engine == null)
-                return back;
+            val sourceBounds = rendering.getSourceBounds();
+            int fullWidth  = sourceBounds.width;
+            int fullHeight = sourceBounds.height;
 
-            PlanarImage front = back;
-
-            PlanarImage sourceImage = engine.getSourceImage();
-            int fullWidth = sourceImage.getWidth();
-            int fullHeight = sourceImage.getHeight();
-
-            AffineTransform transform = rendering.getTransform();
-            final float scaleFactor = rendering.getScaleFactor();
+            val transform = rendering.getTransform();
+            val scaleFactor = rendering.getScaleFactor();
             if (scaleFactor < 1) {
                 // Append pyramid ratio
-                fullWidth *= scaleFactor;
+                fullWidth  *= scaleFactor;
                 fullHeight *= scaleFactor;
 
                 transform.concatenate(AffineTransform.getScaleInstance(1 / scaleFactor, 1 / scaleFactor));
@@ -141,17 +134,18 @@ public class LensCorrectionsOperation extends BlendedOperation {
             else {
                 transform.preConcatenate(AffineTransform.getScaleInstance(1 / scaleFactor, 1 / scaleFactor));
             }
-            final Point2D center = transform.transform(new Point2D.Double(fullWidth / 2, fullHeight / 2), null);
+            val center = transform.transform(new Point2D.Double(fullWidth / 2, fullHeight / 2), null);
 
+            PlanarImage front = back;
             if (auto_correction) {
-                BorderExtender borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
+                val borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
                 front = new DistortionOpImage(front, JAIContext.fileCacheHint, borderExtender,
                         fullWidth, fullHeight, center,
                         cameraMaker, cameraModel, lensName, focal, aperture);
             }
             else if (Math.abs(distortion_k1) > 1e-3 || Math.abs(distortion_k2) > 1e-3 ||
                     Math.abs(tca_r_offset)  > 1e-3 || Math.abs(tca_b_offset)  > 1e-3) {
-                BorderExtender borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
+                val borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
                 front = new DistortionOpImage(front, JAIContext.fileCacheHint, borderExtender,
                         fullWidth, fullHeight, center,
                         distortion_k1_scale * distortion_k1,

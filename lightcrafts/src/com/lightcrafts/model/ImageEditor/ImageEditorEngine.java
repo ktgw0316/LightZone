@@ -355,11 +355,16 @@ public class ImageEditorEngine implements Engine {
 
         try {
             try {
-                val c = opClass.getConstructor(Rendering.class, OperationType.class);
-                op = c.newInstance(rendering, type);
-            } catch (NoSuchMethodException e) {
-                val c = opClass.getConstructor(Rendering.class);
-                op = c.newInstance(rendering);
+                val c = opClass.getConstructor(Rendering.class, OperationType.class, ImageMetadata.class);
+                op = c.newInstance(rendering, type, metadata);
+            } catch (NoSuchMethodException e3) {
+                try {
+                    val c = opClass.getConstructor(Rendering.class, OperationType.class);
+                    op = c.newInstance(rendering, type);
+                } catch (NoSuchMethodException e2) {
+                    val c = opClass.getConstructor(Rendering.class);
+                    op = c.newInstance(rendering);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
