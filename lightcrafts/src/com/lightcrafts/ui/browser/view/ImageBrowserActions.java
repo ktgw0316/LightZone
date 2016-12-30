@@ -1,11 +1,10 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2016-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.browser.view;
 
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.ui.action.ToggleAction;
-import com.lightcrafts.ui.browser.model.ImageDatum;
-import com.lightcrafts.ui.browser.model.ImageDatumType;
 import static com.lightcrafts.ui.browser.view.Locale.LOCALE;
 import com.lightcrafts.utils.file.FileUtil;
 
@@ -14,6 +13,9 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import lombok.Getter;
+import lombok.val;
 
 /**
  * This class defines all the actions the browser wants to export.  They are
@@ -26,52 +28,80 @@ public class ImageBrowserActions {
 
     private AbstractImageBrowser browser;
 
+    @Getter
     private LeadSelectionAction editAction;
+
+    @Getter
     private LeadSelectionAction copyAction;
+
+    @Getter
     private SelectionAction pasteAction;
+
+    @Getter
     private SelectionAction refreshAction;
+
+    @Getter
     private SelectionAction leftAction;
+
+    @Getter
     private SelectionAction rightAction;
 
+    @Getter
     private LeadSelectionAction renameAction;
 
+    @Getter
     private Action selectLatestAction;
+
+    @Getter
     private Action selectAllAction;
+
+    @Getter
     private SelectionAction selectNoneAction;
 
     private List<SelectionAction> ratingActions;
+
+    // @Getter
     // private List<SelectionAction> ratingAdvanceActions;
+
+    @Getter
     private SelectionAction clearRatingAction;
+
+    // @Getter
     // private SelectionAction clearRatingAdvanceAction;
 
+    @Getter
     private ToggleAction showHideTypesAction;
 
-    private Action showAction;
+    @Getter
+    private Action showFileInFolderAction;
 
+    @Getter
     private SelectionAction trashAction;
 
     ImageBrowserActions(AbstractImageBrowser b) {
         this.browser = b;
 
         editAction = new LeadSelectionAction("EditMenuItem", browser, true) {
+            @Override
             public void actionPerformed(ActionEvent event) {
-                ImageDatum lead = getLeadDatum();
+                val lead = getLeadDatum();
                 browser.notifyDoubleClicked(lead);
             }
         };
-        copyAction = new LeadSelectionAction(
-            "CopyMenuItem", browser, true
-        ) {
+
+        copyAction = new LeadSelectionAction("CopyMenuItem", browser, true) {
+            @Override
             public void actionPerformed(ActionEvent event) {
-                ImageDatum datum = getLeadDatum();
+                val datum = getLeadDatum();
                 TemplateClipboard = datum.getFile();
             }
+            @Override
             void update() {
                 super.update();
                 if (isEnabled()) {
-                    ImageDatum lead = getLeadDatum();
-                    ImageDatumType type = lead.getType();
-                    boolean hasLzn = type.hasLznData();
+                    val lead = getLeadDatum();
+                    val type = lead.getType();
+                    val hasLzn = type.hasLznData();
                     copyAction.setEnabled(hasLzn);
                 }
             }
@@ -79,26 +109,28 @@ public class ImageBrowserActions {
         pasteAction = new SelectionAction(
             LOCALE.get("PasteMenuItem"), browser, null, true, true
         ) {
+            @Override
             public void actionPerformed(ActionEvent event) {
-                List<ImageDatum> selection = getSelection();
-                List<File> files = new ArrayList<File>();
-                for (ImageDatum datum : selection) {
-                    File file = datum.getFile();
+                val selection = getSelection();
+                val files = new ArrayList<File>();
+                for (val datum : selection) {
+                    val file = datum.getFile();
                     files.add(file);
                 }
-                TemplateProvider templates = browser.getTemplateProvider();
+                val templates = browser.getTemplateProvider();
                 templates.applyTemplate(
                     TemplateClipboard, files.toArray(new File[0])
                 );
             }
+            @Override
             void update() {
                 super.update();
                 if (isEnabled()) {
-                    TemplateProvider templates = browser.getTemplateProvider();
-                    List<ImageDatum> selection = getSelection();
-                    boolean hasTemplates = (templates != null);
-                    boolean hasSelection = ! selection.isEmpty();
-                    boolean hasClipboard = (TemplateClipboard != null);
+                    val templates = browser.getTemplateProvider();
+                    val selection = getSelection();
+                    val hasTemplates = (templates != null);
+                    val hasSelection = ! selection.isEmpty();
+                    val hasClipboard = (TemplateClipboard != null);
                     setEnabled(hasTemplates && hasSelection && hasClipboard);
                 }
             }
@@ -106,47 +138,41 @@ public class ImageBrowserActions {
         refreshAction = new SelectionAction(
             LOCALE.get("RefreshMenuItem"), browser, null, true, true
         ) {
+            @Override
             public void actionPerformed(ActionEvent e) {
-                List<ImageDatum> selection = getSelection();
-                for (ImageDatum datum : selection) {
+                val selection = getSelection();
+                for (val datum : selection) {
                     datum.refresh(false);   // don't use caches
                 }
             }
         };
-        ratingActions =
-            RatingActions.createRatingActions(browser, true);
-//        ratingAdvanceActions =
-//            RatingActions.createRatingAdvanceActions(browser, true);
-        clearRatingAction =
-            RatingActions.createClearRatingAction(browser, true);
-//        clearRatingAdvanceAction =
-//            RatingActions.createClearRatingAdvanceAction(browser, true);
+        ratingActions = RatingActions.createRatingActions(browser, true);
+//        ratingAdvanceActions = RatingActions.createRatingAdvanceActions(browser, true);
+        clearRatingAction = RatingActions.createClearRatingAction(browser, true);
+//        clearRatingAdvanceAction = RatingActions.createClearRatingAdvanceAction(browser, true);
 
         leftAction = RotateActions.createRotateLeftAction(browser, true);
         rightAction = RotateActions.createRotateRightAction(browser, true);
 
-        renameAction = new LeadSelectionAction(
-            "RenameMenuItem", browser, true
-        ) {
+        renameAction = new LeadSelectionAction("RenameMenuItem", browser, true) {
+            @Override
             public void actionPerformed(ActionEvent event) {
-                ImageDatum datum = browser.getLeadSelectedDatum();
+                val datum = browser.getLeadSelectedDatum();
                 FileActions.renameFile(
                     datum.getFile(), browser
                 );
             }
         };
-        selectLatestAction = new AbstractAction(
-            LOCALE.get("SelectLatestActionName")
-        ) {
+        selectLatestAction = new AbstractAction(LOCALE.get("SelectLatestActionName")) {
+            @Override
             public void actionPerformed(ActionEvent event) {
                 browser.selectLatest();
             }
         };
         selectLatestAction.setEnabled(true);
 
-        selectAllAction = new AbstractAction(
-            LOCALE.get("SelectAllActionName")
-        ) {
+        selectAllAction = new AbstractAction(LOCALE.get("SelectAllActionName")) {
+            @Override
             public void actionPerformed(ActionEvent event) {
                 browser.selectAll();
             }
@@ -155,16 +181,14 @@ public class ImageBrowserActions {
 
         // This accelerator key setup should be localized and maybe unified
         // with the centralized menu configuration in MenuFactory.
-        String modifier =
-            Platform.getType() == Platform.MacOSX ? "meta" : "ctrl";
-        selectAllAction.putValue(
-            Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
+        val modifier = Platform.getType() == Platform.MacOSX ? "meta" : "ctrl";
+        selectAllAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
                 modifier + " " + "A"
-            )
-        );
+        ));
         selectNoneAction = new SelectionAction(
             LOCALE.get("SelectNoneActionName"), browser, null, true, true
         ) {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 browser.clearSelection();
             }
@@ -173,6 +197,7 @@ public class ImageBrowserActions {
             LOCALE.get("HideImageTypeMenuItem"),
             LOCALE.get("ShowImageTypeMenuItem")
         ) {
+            @Override
             protected void onActionPerformed(ActionEvent event) {
                 ImageDatumRenderer.setShowImageTypes(true);
                 browser.repaint();
@@ -189,101 +214,39 @@ public class ImageBrowserActions {
         trashAction = new SelectionAction(
             LOCALE.get("TrashMenuItem"), browser, null, true, true
         ) {
+            @Override
             public void actionPerformed(ActionEvent event) {
-                List<ImageDatum> datums = browser.getSelectedDatums();
-                List<File> files = new ArrayList<File>();
-                for (ImageDatum datum : datums) {
-                    File file = datum.getFile();
+                val datums = browser.getSelectedDatums();
+                val files = new ArrayList<File>();
+                for (val datum : datums) {
+                    val file = datum.getFile();
                     files.add(file);
                 }
                 FileActions.deleteFiles(files.toArray(new File[0]), browser);
             }
         };
-        showAction = new SelectionAction(
+        showFileInFolderAction = new SelectionAction(
             LOCALE.get("ShowMenuItem"), browser, null, true, true
         ) {
+            @Override
             public void actionPerformed(ActionEvent event) {
-                List<ImageDatum> datums = browser.getSelectedDatums();
-                List<File> files = new ArrayList<File>();
-                for (ImageDatum datum : datums) {
-                    File file = datum.getFile();
+                val datums = browser.getSelectedDatums();
+                val files = new ArrayList<File>();
+                for (val datum : datums) {
+                    val file = datum.getFile();
                     files.add(file);
                 }
-                Platform platform = Platform.getPlatform();
-                for (File file : files) {
-                    file = FileUtil.resolveAliasFile(file);
-                    String path = file.getAbsolutePath();
+                val platform = Platform.getPlatform();
+                for (val f : files) {
+                    val file = FileUtil.resolveAliasFile(f);
+                    val path = file.getAbsolutePath();
                     platform.showFileInFolder(path);
                 }
             }
         };
     }
 
-    public Action getEditAction() {
-        return editAction;
-    }
-
-    public Action getCopyAction() {
-        return copyAction;
-    }
-
-    public Action getShowFileInFolderAction() {
-        return showAction;
-    }
-
-    public Action getPasteAction() {
-        return pasteAction;
-    }
-
-    public Action getRefreshAction() {
-        return refreshAction;
-    }
-
     public List<Action> getRatingActions() {
         return new ArrayList<Action>(ratingActions);
-    }
-
-//    public List<Action> getRatingAdvanceActions() {
-//        return new ArrayList<Action>(ratingAdvanceActions);
-//    }
-
-    public Action getClearRatingAction() {
-        return clearRatingAction;
-    }
-
-//    public Action getClearRatingAdvanceAction() {
-//        return clearRatingAdvanceAction;
-//    }
-
-    public Action getLeftAction() {
-        return leftAction;
-    }
-
-    public Action getRightAction() {
-        return rightAction;
-    }
-
-    public Action getRenameAction() {
-        return renameAction;
-    }
-
-    public Action getSelectLatestAction() {
-        return selectLatestAction;
-    }
-
-    public Action getSelectAllAction() {
-        return selectAllAction;
-    }
-
-    public Action getSelectNoneAction() {
-        return selectNoneAction;
-    }
-
-    public ToggleAction getShowHideTypesAction() {
-        return showHideTypesAction;
-    }
-
-    public Action getTrashAction() {
-        return trashAction;
     }
 }
