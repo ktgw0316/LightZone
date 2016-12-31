@@ -47,6 +47,12 @@ public class ImageBrowserActions {
     private SelectionAction rightAction;
 
     @Getter
+    private SelectionAction horizontalAction;
+
+    @Getter
+    private SelectionAction verticalAction;
+
+    @Getter
     private LeadSelectionAction renameAction;
 
     @Getter
@@ -153,6 +159,9 @@ public class ImageBrowserActions {
 
         leftAction = RotateActions.createRotateLeftAction(browser, true);
         rightAction = RotateActions.createRotateRightAction(browser, true);
+
+        horizontalAction = FlipActions.createFlipHorizontalAction(browser, true);
+        verticalAction = FlipActions.createFlipVerticalAction(browser, true);
 
         renameAction = new LeadSelectionAction("RenameMenuItem", browser, true) {
             @Override

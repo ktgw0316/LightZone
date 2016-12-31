@@ -92,33 +92,42 @@ class Thumbnailer {
         return image;
     }
 
-    // Rotate the given image by 90 degrees times the given multiplier.
-    // Used for the rotate-right and rotate-left actions in ImageDatum.
-    static RenderedImage rotateNinetyTimes(RenderedImage image, int multiple) {
+    // Rotate the given image clockwise by 90 degrees times the given multiplier,
+    // then flip it horizontally and vertically.
+    static RenderedImage rotateNinetyTimesThenFlip(
+            RenderedImage image, int multiple,
+            boolean horizontal, boolean vertical) {
         while (multiple < 0) {
             multiple += 4;
         }
-        TransposeType transpose;
+        // Get the counter-clockwise rotated orientation,
+        // then get the correction for the orientation.
+        ImageOrientation reversed;
         switch (multiple % 4) {
             case 1:
-                transpose = TransposeDescriptor.ROTATE_90;
+                reversed = ImageOrientation.ORIENTATION_90CCW;
                 break;
             case 2:
-                transpose = TransposeDescriptor.ROTATE_180;
+                reversed = ImageOrientation.ORIENTATION_180;
                 break;
             case 3:
-                transpose = TransposeDescriptor.ROTATE_270;
+                reversed = ImageOrientation.ORIENTATION_90CW;
                 break;
             default:
-                transpose = null;
+                reversed = ImageOrientation.ORIENTATION_LANDSCAPE;
         }
+        if (horizontal) {
+            reversed = reversed.getHFlip();
+        }
+        if (vertical) {
+            reversed = reversed.getVFlip();
+        }
+        final TransposeType transpose = reversed.getCorrection();
         if (transpose != null) {
-            ParameterBlock pb = new ParameterBlock();
+            final ParameterBlock pb = new ParameterBlock();
             pb.addSource(image);
             pb.add(transpose);
-            image = JAI.create(
-                "Transpose", pb, null
-            );
+            image = JAI.create("Transpose", pb, null);
         }
         return image;
     }

@@ -19,6 +19,8 @@ import java.lang.ref.SoftReference;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import lombok.val;
+
 /**
  * A holder for all data that are derived from an image for browser purposes,
  * such as metadata, thumbnails, and a cache for ImageTasks.
@@ -142,6 +144,38 @@ public class ImageDatum {
         ImageMetadata meta = info.getMetadata();
         meta.setOrientation(meta.getOrientation().get90CW());
         commitRotate(info, 1);
+    }
+
+    /**
+     * Flip the image horizontally, unless this image
+     * has LZN data, in which case throw an IOException.
+     */
+    public void flipHorizontal()
+            throws IOException, BadImageFileException, UnknownImageTypeException
+    {
+        if ((type == null) || type.hasLznData()) {
+            throw new IOException(/* TODO: LOCALE.get("CantFlipLzn") */);
+        }
+        val info = ImageInfo.getInstanceFor(file);
+        val meta = info.getMetadata();
+        meta.setOrientation(meta.getOrientation().getHFlip());
+        commitFlip(info, true, false);
+    }
+
+    /**
+     * Flip the image vertically, unless this image
+     * has LZN data, in which case throw an IOException.
+     */
+    public void flipVertical()
+            throws IOException, BadImageFileException, UnknownImageTypeException
+    {
+        if ((type == null) || type.hasLznData()) {
+            throw new IOException(/* TODO: LOCALE.get("CantFlipLzn") */);
+        }
+        val info = ImageInfo.getInstanceFor(file);
+        val meta = info.getMetadata();
+        meta.setOrientation(meta.getOrientation().getVFlip());
+        commitFlip(info, false, true);
     }
 
     /**
@@ -391,49 +425,64 @@ public class ImageDatum {
         }
     }
 
-    // Perform the operations common to rotateLeft() and rotateRight():
-    // rotate the in-memory thumbnail; notify observers, so the display will
-    // update; and write the modified metadata to XMP.
-    private synchronized void commitRotate(ImageInfo info, int multiple)
-        throws IOException, BadImageFileException, UnknownImageTypeException
+    // Perform the operations common to rotateLeft() and rotateRight().
+    private void commitRotate(ImageInfo info, int multiple)
+            throws IOException, BadImageFileException, UnknownImageTypeException {
+        commitRotateFlip(info, multiple, false, false);
+    }
+
+    // Perform the operations common to flipHorizontal() and flipVertical().
+    private void commitFlip(ImageInfo info, boolean horizontal, boolean vertical)
+            throws IOException, BadImageFileException, UnknownImageTypeException {
+        commitRotateFlip(info, 0, horizontal, vertical);
+    }
+
+    // Rotate and flip the in-memory thumbnail; notify observers, so the display
+    // will update; and write the modified metadata to XMP.
+    private synchronized void commitRotateFlip(ImageInfo info, int multiple,
+                                           boolean horizontal, boolean vertical)
+            throws IOException, BadImageFileException, UnknownImageTypeException
     {
         // Update the in-memory image immediately, for interactive response.
-        rotateInMemory(multiple);
+        rotateFlipInMemory(multiple, horizontal, vertical);
         // This triggers a refresh through the file modification polling
         try {
             writeToXmp(info);
         }
         // If the XMP write didn't work out, we better undo the rotation:
+        // TODO: Java7 multi-catch
         catch (IOException e) {
-            rotateInMemory(- multiple);
+            rotateFlipInMemory(-multiple, horizontal, vertical);
             throw e;
         }
         catch (BadImageFileException e) {
-            rotateInMemory(- multiple);
+            rotateFlipInMemory(-multiple, horizontal, vertical);
             throw e;
         }
         catch (UnknownImageTypeException e) {
-            rotateInMemory(- multiple);
+            rotateFlipInMemory(-multiple, horizontal, vertical);
             throw e;
         }
     }
 
-    // Rotate the in-memory thumbnail image directly.  This is called from
-    // commitRotate() to update the painted image quickly, until the polling
+    // Rotate and flip the in-memory thumbnail image directly. This is called from
+    // commitRotateFlip() to update the painted image quickly, until the polling
     // can catch up with an authoritative image.
-    private void rotateInMemory(int multiple) {
-        RenderedImage image = (this.image != null) ? this.image.get() : null;
-        if (image != null) {
-            image = Thumbnailer.rotateNinetyTimes(image, multiple);
-            this.image = new SoftReference<RenderedImage>(image);
-            EventQueue.invokeLater(
-                new Runnable() {
-                    public void run() {
-                        notifyImageObservers();
-                    }
-                }
-            );
+    private void rotateFlipInMemory(int multiple,
+                                    boolean horizontal, boolean vertical) {
+        if (this.image == null) {
+            return;
         }
+
+        final RenderedImage image = Thumbnailer.rotateNinetyTimesThenFlip(
+                this.image.get(), multiple, horizontal, vertical);
+        this.image = new SoftReference<RenderedImage>(image);
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                notifyImageObservers();
+            }
+        });
     }
 
     // Set the in-memory rating value directly.  This is called from

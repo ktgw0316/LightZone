@@ -44,6 +44,7 @@ public class BrowserControls extends Box {
         AbstractImageBrowser browser = browserScroll.getBrowser();
 
         BoxedButton rotator   = new BoxedButton(LOCALE.get("RotateBorderTitle"),    new RotateButtons(browser));
+        BoxedButton flipper   = new BoxedButton("Flip" /* TODO: LOCALE.get("FlipBorderTitle") */ ,    new FlipButtons(browser));
         BoxedButton rater     = new BoxedButton(LOCALE.get("RateBorderTitle"),      new RatingButton(browser));
         BoxedButton copyPaste = new BoxedButton(LOCALE.get("CopyToolsBorderTitle"), new CopyPasteButtons(browser));
 
@@ -98,6 +99,8 @@ public class BrowserControls extends Box {
         // add(Box.createHorizontalGlue());
         add(Box.createHorizontalStrut(space));
         add(rotator.box);
+        add(Box.createHorizontalStrut(space));
+        add(flipper.box);
         add(Box.createHorizontalStrut(space));
         add(rater.box);
         add(Box.createHorizontalStrut(space));
