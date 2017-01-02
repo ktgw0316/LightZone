@@ -154,7 +154,7 @@ public class ImageDatum {
             throws IOException, BadImageFileException, UnknownImageTypeException
     {
         if ((type == null) || type.hasLznData()) {
-            throw new IOException(/* TODO: LOCALE.get("CantFlipLzn") */);
+            throw new IOException(LOCALE.get("CantFlipLzn"));
         }
         val info = ImageInfo.getInstanceFor(file);
         val meta = info.getMetadata();
@@ -170,7 +170,7 @@ public class ImageDatum {
             throws IOException, BadImageFileException, UnknownImageTypeException
     {
         if ((type == null) || type.hasLznData()) {
-            throw new IOException(/* TODO: LOCALE.get("CantFlipLzn") */);
+            throw new IOException(LOCALE.get("CantFlipLzn"));
         }
         val info = ImageInfo.getInstanceFor(file);
         val meta = info.getMetadata();

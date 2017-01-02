@@ -17,8 +17,8 @@ public class RotateButtons extends Box {
 
     private final static String LeftToolTip = LOCALE.get("RotateLeftToolTip");
     private final static String RightToolTip = LOCALE.get("RotateRightToolTip");
-    private final static String HorizontalToolTip = "Horizontal"; // TODO: LOCALE.get("FlipHorizontalToolTip");
-    private final static String VerticalToolTip = "Vertical"; // TODO: LOCALE.get("FlipVerticalToolTip");
+    private final static String HorizontalToolTip = LOCALE.get("FlipHorizontalToolTip");
+    private final static String VerticalToolTip = LOCALE.get("FlipVerticalToolTip");
 
     public RotateButtons(AbstractImageBrowser browser) {
         super(BoxLayout.X_AXIS);

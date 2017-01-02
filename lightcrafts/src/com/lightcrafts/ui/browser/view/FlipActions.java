@@ -20,7 +20,7 @@ class FlipActions {
         final AbstractImageBrowser browser, boolean dynamic
     ) {
         return new SelectionAction(
-            "Horizontal", // TODO: LOCALE.get("HorizontalMenuItem"),
+            LOCALE.get("HorizontalMenuItem"),
             browser,
             KeyStroke.getKeyStroke('[', 0),
             dynamic, true
@@ -40,7 +40,7 @@ class FlipActions {
         final AbstractImageBrowser browser, boolean dynamic
     ) {
         return new SelectionAction(
-            "Vertical", // TODO: LOCALE.get("VerticalMenuItem"),
+            LOCALE.get("VerticalMenuItem"),
             browser,
             KeyStroke.getKeyStroke(']', 0),
             dynamic, true
