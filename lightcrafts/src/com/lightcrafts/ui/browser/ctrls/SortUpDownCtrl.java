@@ -1,8 +1,10 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2017-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.browser.ctrls;
 
 import com.lightcrafts.ui.browser.view.AbstractImageBrowser;
+import com.lightcrafts.ui.toolkit.IconFontFactory;
 import com.lightcrafts.ui.toolkit.ImageOnlyButton;
 
 import static com.lightcrafts.ui.browser.ctrls.Locale.LOCALE;
@@ -20,12 +22,8 @@ class SortUpDownCtrl extends JToggleButton implements ItemListener {
     );
     private final static String InvertedKey = "SortInverted";
 
-    private final static Icon UpIcon;
-    private final static Icon DownIcon;
-    static {
-        UpIcon = ButtonFactory.getIconByName("sort_up");
-        DownIcon = ButtonFactory.getIconByName("sort_down");
-    }
+    private final static Icon UpIcon = IconFontFactory.buildIcon("sort_up");
+    private final static Icon DownIcon = IconFontFactory.buildIcon("sort_down");
 
     private AbstractImageBrowser images;
 

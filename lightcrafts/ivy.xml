@@ -3,6 +3,9 @@
   <info organisation="lightcrafts" module="lightcrafts"/>
   <dependencies>
     <dependency org="org.projectlombok" name="lombok" rev="1.16.10"/>
+    <dependency org="com.github.jiconfont" name="jiconfont-swing" rev="1.0.0"/>
+    <dependency org="com.github.jiconfont" name="jiconfont-font_awesome" rev="4.5.0.3"/>
+    <dependency org="com.github.jiconfont" name="jiconfont-google_material_design_icons" rev="2.2.0.1"/>
   </dependencies>
 </ivy-module>
 

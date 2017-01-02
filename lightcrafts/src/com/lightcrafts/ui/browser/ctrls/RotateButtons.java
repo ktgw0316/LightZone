@@ -7,6 +7,7 @@ import com.lightcrafts.ui.browser.view.AbstractImageBrowser;
 import com.lightcrafts.ui.browser.view.ImageBrowserActions;
 import static com.lightcrafts.ui.browser.ctrls.Locale.LOCALE;
 import com.lightcrafts.ui.toolkit.CoolButton;
+import com.lightcrafts.ui.toolkit.IconFontFactory;
 
 import javax.swing.*;
 
@@ -28,25 +29,25 @@ public class RotateButtons extends Box {
         Action leftAction = actions.getLeftAction();
         JButton left = new CoolButton(/*CoolButton.ButtonStyle.LEFT*/);
         left.setAction(leftAction);
-        left.setIcon(ButtonFactory.getIconByName("rotateLeft"));
+        left.setIcon(IconFontFactory.buildIcon("rotateLeft"));
         left.setToolTipText(LeftToolTip);
 
         Action rightAction = actions.getRightAction();
         JButton right = new CoolButton(/*CoolButton.ButtonStyle.CENTER*/);
         right.setAction(rightAction);
-        right.setIcon(ButtonFactory.getIconByName("rotateRight"));
+        right.setIcon(IconFontFactory.buildIcon("rotateRight"));
         right.setToolTipText(RightToolTip);
 
         Action horizontalAction = actions.getHorizontalAction();
         JButton horizontal = new CoolButton(/*CoolButton.ButtonStyle.CENTER*/);
         horizontal.setAction(horizontalAction);
-        horizontal.setIcon(ButtonFactory.getIconByName("rotateLeft" /* TODO: "flipHorizontal" */));
+        horizontal.setIcon(IconFontFactory.buildIcon("flipHoriz"));
         horizontal.setToolTipText(HorizontalToolTip);
 
         Action verticalAction = actions.getVerticalAction();
         JButton vertical = new CoolButton(/*CoolButton.ButtonStyle.RIGHT*/);
         vertical.setAction(verticalAction);
-        vertical.setIcon(ButtonFactory.getIconByName("rotateRight" /* TODO: "flipVertical" */));
+        vertical.setIcon(IconFontFactory.buildIcon("flipVert"));
         vertical.setToolTipText(VerticalToolTip);
 
         add(left);
