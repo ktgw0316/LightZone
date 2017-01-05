@@ -9,6 +9,12 @@ import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+import lombok.val;
+
 /**
  * A CropBounds is an immutable rectangular shape which may be at an
  * arbitrary angle.  It's used in <code>Engine.setCropBounds()</code>.  It
@@ -19,43 +25,38 @@ import java.awt.geom.Rectangle2D;
  * rotated, without specifying how the image bounds should update.
  */
 
-public class CropBounds {
+@EqualsAndHashCode
+public class CropBounds implements Cloneable {
 
     // The counter-clockwise angle to rotate the image:
-    double angle;
+    @Accessors(chain=true) @Getter @Setter
+    private double angle;
+
+    // True if the image is flipped:
+    @Getter
+    private boolean flippedHorizontally = false;
+    @Getter
+    private boolean flippedVertically = false;
 
     // Location of the center of the cropped image, or null if rotate-only:
-    Point2D center;
+    private Point2D center;
 
     // Width and height of the cropped image, or zero if rotate-only:
-    double width;
-    double height;
+    @Getter
+    private double width;
+    @Getter
+    private double height;
 
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof CropBounds)) return false;
-
-        final CropBounds cropBounds = (CropBounds) o;
-
-        if (angle != cropBounds.angle) return false;
-        if (height != cropBounds.height) return false;
-        if (width != cropBounds.width) return false;
-        if (center != null ? !center.equals(cropBounds.center) : cropBounds.center != null) return false;
-
-        return true;
-    }
-
-    public int hashCode() {
-        int result;
-        long temp;
-        temp = angle != +0.0d ? Double.doubleToLongBits(angle) : 0l;
-        result = (int) (temp ^ (temp >>> 32));
-        result = 29 * result + (center != null ? center.hashCode() : 0);
-        temp = width != +0.0d ? Double.doubleToLongBits(width) : 0l;
-        result = 29 * result + (int) (temp ^ (temp >>> 32));
-        temp = height != +0.0d ? Double.doubleToLongBits(height) : 0l;
-        result = 29 * result + (int) (temp ^ (temp >>> 32));
-        return result;
+    @Override
+    public CropBounds clone() {
+        CropBounds clone = null;
+        try {
+            clone = (CropBounds) super.clone();
+            clone.center = (center != null) ? (Point2D) center.clone() : null;
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return clone;
     }
 
     /**
@@ -103,13 +104,13 @@ public class CropBounds {
       * screen coordinates, as returned from Engine.getTransform().
       */
     public CropBounds(Rectangle2D screenRect, AffineTransform xform) {
-        Point2D ul = new Point2D.Double(
+        val ul = new Point2D.Double(
             screenRect.getX(), screenRect.getY()
         );
-        Point2D ll = new Point2D.Double(
+        val ll = new Point2D.Double(
             screenRect.getX(), screenRect.getY() + screenRect.getHeight()
         );
-        Point2D ur = new Point2D.Double(
+        val ur = new Point2D.Double(
             screenRect.getX() + screenRect.getWidth(), screenRect.getY()
         );
         if (xform != null) {
@@ -126,16 +127,14 @@ public class CropBounds {
         center = new Point2D.Double(
             (ur.getX() + ll.getX()) / 2, (ur.getY() + ll.getY()) / 2
         );
-        double topDx = ur.getX() - ul.getX();
-        double topDy = ur.getY() - ul.getY();
+        val topDx = ur.getX() - ul.getX();
+        val topDy = ur.getY() - ul.getY();
 
-        double leftDx = ll.getX() - ul.getX();
-        double leftDy = ll.getY() - ul.getY();
+        val leftDx = ll.getX() - ul.getX();
+        val leftDy = ll.getY() - ul.getY();
 
         angle = Math.atan2(topDy, topDx);
-
         width = Math.sqrt(topDx * topDx + topDy * topDy);
-
         height = Math.sqrt(leftDx * leftDx + leftDy * leftDy);
     }
 
@@ -171,74 +170,60 @@ public class CropBounds {
     public static CropBounds transform(
         AffineTransform xform, CropBounds oldBounds
     ) {
+        final CropBounds newBounds;
         if (oldBounds.isAngleOnly()) {
-            double angle = oldBounds.getAngle();
+            val angle = oldBounds.getAngle();
 
-            Point2D origin = new Point2D.Double(0, 0);
-            Point2D unit = new Point2D.Double(Math.cos(angle), Math.sin(angle));
+            val origin = new Point2D.Double(0, 0);
+            val unit = new Point2D.Double(Math.cos(angle), Math.sin(angle));
 
             xform.transform(origin, origin);
             xform.transform(unit, unit);
 
-            double dx = unit.getX() - origin.getX();
-            double dy = unit.getY() - origin.getY();
-            angle = Math.atan2(dy, dx);
+            val dx = unit.getX() - origin.getX();
+            val dy = unit.getY() - origin.getY();
 
-            return new CropBounds(angle);
+            newBounds = new CropBounds(Math.atan2(dy, dx));
         }
         else {
-            Point2D ul = oldBounds.getUpperLeft();
-            Point2D ur = oldBounds.getUpperRight();
-            Point2D ll = oldBounds.getLowerLeft();
-            Point2D lr = oldBounds.getLowerRight();
+            val ul = oldBounds.getUpperLeft();
+            val ur = oldBounds.getUpperRight();
+            val ll = oldBounds.getLowerLeft();
+            val lr = oldBounds.getLowerRight();
 
             xform.transform(ul, ul);
             xform.transform(ur, ur);
             xform.transform(ll, ll);
             xform.transform(lr, lr);
 
-            return new CropBounds(ul, ur, ll, lr);
+            newBounds = new CropBounds(ul, ur, ll, lr);
         }
-    }
-
-    /**
-     * The counter-clockwise angle to rotate the image by.
-     */
-    public double getAngle() {
-        return angle;
+        val hFlip = oldBounds.isFlippedHorizontally();
+        val vFlip = oldBounds.isFlippedVertically();
+        if (hFlip || vFlip) {
+            newBounds.flip(hFlip, vFlip);
+        }
+        return newBounds;
     }
 
     public boolean isAngleOnly() {
         return (center == null);
     }
 
-    public double getWidth() {
-        return width;
-    }
-
-    public double getHeight() {
-        return height;
-    }
-
     public Point2D getCenter() {
-        if (center != null) {
-            return (Point2D) center.clone();
-        }
-        else {
-            return null;
-        }
+        return isAngleOnly() ? null : (Point2D) center.clone();
     }
 
-    public CropBounds(Point2D ul, Point2D ur, Point2D ll, Point2D lr) {        
-        double topDx = ur.getX() - ul.getX();
-        double topDy = ur.getY() - ul.getY();
-//        double bottomDx = lr.getX() - ll.getX();
-//        double bottomDy = lr.getY() - ll.getY();
+    public CropBounds(Point2D ul, Point2D ur, Point2D ll, Point2D lr) {
+        val topDx = ur.getX() - ul.getX();
+        val topDy = ur.getY() - ul.getY();
+//        val bottomDx = lr.getX() - ll.getX();
+//        val bottomDy = lr.getY() - ll.getY();
 
-        double leftDx = ll.getX() - ul.getX();
-        double leftDy = ll.getY() - ul.getY();
-//        double rightDx = lr.getX() - ur.getX();
-//        double rightDy = lr.getY() - ur.getY();
+        val leftDx = ll.getX() - ul.getX();
+        val leftDy = ll.getY() - ul.getY();
+//        val rightDx = lr.getX() - ur.getX();
+//        val rightDy = lr.getY() - ur.getY();
 
         angle = Math.atan2(topDy, topDx);
 //        angle = Math.atan2(bottomDy, bottomDx);
@@ -251,16 +236,16 @@ public class CropBounds {
         height = Math.sqrt(leftDx * leftDx + leftDy * leftDy);
 //        height = Math.sqrt(rightDx * rightDx + rightDy * rightDy);
 
-        double x = (ul.getX() + lr.getX()) / 2;
-        double y = (ul.getY() + lr.getY()) / 2;
+        val x = (ul.getX() + lr.getX()) / 2;
+        val y = (ul.getY() + lr.getY()) / 2;
         center = new Point2D.Double(x, y);
     }
 
     public Point2D getUpperLeft() {
-        Point2D p = new Point2D.Double(
+        val p = new Point2D.Double(
             center.getX() - width / 2, center.getY() - height / 2
         );
-        AffineTransform xform = AffineTransform.getRotateInstance(
+        val xform = AffineTransform.getRotateInstance(
             angle, center.getX(), center.getY()
         );
         xform.transform(p, p);
@@ -268,10 +253,10 @@ public class CropBounds {
     }
 
     public Point2D getUpperRight() {
-        Point2D p = new Point2D.Double(
+        val p = new Point2D.Double(
             center.getX() + width / 2, center.getY() - height / 2
         );
-        AffineTransform xform = AffineTransform.getRotateInstance(
+        val xform = AffineTransform.getRotateInstance(
             angle, center.getX(), center.getY()
         );
         xform.transform(p, p);
@@ -279,11 +264,10 @@ public class CropBounds {
     }
 
     public Point2D getLowerLeft() {
-        Point2D p = new Point2D.Double(
+        val p = new Point2D.Double(
             center.getX() - width / 2, center.getY() + height / 2
-
         );
-        AffineTransform xform = AffineTransform.getRotateInstance(
+        val xform = AffineTransform.getRotateInstance(
             angle, center.getX(), center.getY()
         );
         xform.transform(p, p);
@@ -291,10 +275,10 @@ public class CropBounds {
     }
 
     public Point2D getLowerRight() {
-        Point2D p = new Point2D.Double(
+        val p = new Point2D.Double(
             center.getX() + width / 2, center.getY() + height / 2
         );
-        AffineTransform xform = AffineTransform.getRotateInstance(
+        val xform = AffineTransform.getRotateInstance(
             angle, center.getX(), center.getY()
         );
         xform.transform(p, p);
@@ -327,5 +311,13 @@ public class CropBounds {
         }
 
         return new Dimension(newWidth, newHeight);
+    }
+
+    public CropBounds flip(boolean horizontal, boolean vertical) {
+        if (horizontal)
+            flippedHorizontally = !flippedHorizontally;
+        if (vertical)
+            flippedVertically = !flippedVertically;
+        return this;
     }
 }

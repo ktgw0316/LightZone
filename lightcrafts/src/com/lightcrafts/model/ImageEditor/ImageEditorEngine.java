@@ -19,7 +19,6 @@ import com.lightcrafts.jai.operator.LCMSColorConvertDescriptor;
 import com.lightcrafts.jai.opimage.CachedImage;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.utils.LCTileCache;
-import javax.media.jai.*;
 import com.lightcrafts.model.*;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.image.color.ColorProfileInfo;
@@ -51,11 +50,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.*;
-
-import com.lightcrafts.utils.xml.XMLUtil;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.val;
 
 public class ImageEditorEngine implements Engine {
     private ImageInfo m_imageInfo;

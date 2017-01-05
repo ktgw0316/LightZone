@@ -376,6 +376,12 @@ public class Rendering implements Cloneable {
                         finalBounds.width, finalBounds.height, null);
             }
         }
+        val hFlip = cropBounds.isFlippedHorizontally();
+        val vFlip = cropBounds.isFlippedVertically();
+        if (hFlip || vFlip) {
+            xformedSourceImage = Functions.flip(
+                    xformedSourceImage, hFlip, vFlip, null);
+        }
         return xformedSourceImage;
     }
 }

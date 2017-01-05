@@ -313,8 +313,10 @@ public class Editor implements HorizontalMouseWheelSupport {
         // Orientation buttons:
         final Action leftAction = crop.getLeftAction();
         final Action rightAction = crop.getRightAction();
+        final Action horizontalAction = crop.getHorizontalAction();
+        final Action verticalAction = crop.getVerticalAction();
         BoxedButton rotors = new BoxedButton(LOCALE.get("RotateBorderTitle"),
-                new RotateButtons(leftAction, rightAction));
+                new RotateButtons(leftAction, rightAction, horizontalAction, verticalAction));
 
         // Stuff some Mode controls into a SelectableControl in EditorControls:
         ProofSelectableControl proofOp = new ProofSelectableControl(engine);

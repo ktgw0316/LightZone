@@ -19,6 +19,7 @@ import javax.swing.event.UndoableEditListener;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.UndoableEdit;
 import javax.swing.undo.UndoableEditSupport;
+import java.awt.event.ActionEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.*;
@@ -40,7 +41,10 @@ class CropRotateManager implements RotorListener {
 
     private UndoableEditSupport undo;
 
+    private Editor editor;
+
     public void setEditor( Editor editor ) {
+        this.editor = editor;
         hiddenRotorMode.setEditor( editor );
     }
 
@@ -102,13 +106,55 @@ class CropRotateManager implements RotorListener {
     }
 
     Action getLeftAction() {
-        RotorControl control = hiddenRotorMode.getControl();
-        return control.getLeftAction();
+        // RotorControl control = hiddenRotorMode.getControl();
+        // return control.getLeftAction();
+        return new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                final double increment =
+                        (bounds.isFlippedHorizontally() != bounds.isFlippedVertically())
+                        ? -Math.PI / 2 : Math.PI / 2;
+                final double newAngle = bounds.getAngle() + increment;
+                final CropBounds newBounds = getNewBounds(newAngle, true);
+                updateCropBounds(newBounds);
+            }
+        };
     }
 
     Action getRightAction() {
-        RotorControl control = hiddenRotorMode.getControl();
-        return control.getRightAction();
+        // RotorControl control = hiddenRotorMode.getControl();
+        // return  control.getRightAction();
+        return new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                final double increment =
+                        (bounds.isFlippedHorizontally() != bounds.isFlippedVertically())
+                                ? Math.PI / 2 : -Math.PI / 2;
+                final double newAngle = bounds.getAngle() + increment;
+                final CropBounds newBounds = getNewBounds(newAngle, true);
+                updateCropBounds(newBounds);
+            }
+        };
+    }
+
+    Action getHorizontalAction() {
+        return new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                final CropBounds newBounds = bounds.flip(true, false);
+                updateCropBounds(newBounds);
+            }
+        };
+    }
+
+    Action getVerticalAction() {
+        return new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                final CropBounds newBounds = bounds.flip(false, true);
+                updateCropBounds(newBounds);
+            }
+        };
     }
 
     void addUndoableEditListener(UndoableEditListener listener) {
@@ -129,14 +175,21 @@ class CropRotateManager implements RotorListener {
         // screen, which is the opposite of the convention in CropBounds.
 
         if (! isChanging) {
-            CropBounds newBounds = getNewBounds(angle, isNinetyDegrees);
-            engine.setCropBounds(newBounds);
-            if (! newBounds.isAngleOnly()) {
-                cropMode.setCrop(newBounds);
-            }
-            xform.update();
-            postEdit(newBounds, LOCALE.get("RotateEditName"), true );
+            final CropBounds newBounds = getNewBounds(angle, isNinetyDegrees);
+            updateCropBounds(newBounds);
         }
+    }
+
+    private void updateCropBounds(CropBounds newBounds) {
+        if (editor != null) {
+            editor.setMode(EditorMode.ARROW);
+        }
+        engine.setCropBounds(newBounds);
+        if (! newBounds.isAngleOnly()) {
+            cropMode.setCrop(newBounds);
+        }
+        xform.update();
+        postEdit(newBounds, LOCALE.get("RotateEditName"), true );
     }
 
     public void angleReset() {
@@ -144,17 +197,14 @@ class CropRotateManager implements RotorListener {
     }
 
     private CropBounds getNewBounds(double angle, boolean invertAspect) {
-        if (bounds.isAngleOnly()) {
-            return new CropBounds(angle);
-        }
-        else if (invertAspect) {
-            CropBounds inverted = bounds.createInvertedAspect();
+        final CropBounds newBounds;
+        if (invertAspect) {
             hasInvertedAspect = ! hasInvertedAspect;
-            return new CropBounds(inverted, angle);
+            newBounds = bounds.createInvertedAspect();
+        } else {
+            newBounds = bounds.clone();
         }
-        else {
-            return new CropBounds(bounds, angle);
-        }
+        return newBounds.setAngle(angle);
     }
 
     private void postEdit( final CropBounds newBounds, final String name,
@@ -246,6 +296,10 @@ class CropRotateManager implements RotorListener {
     private final static String Xtag = "X";
     private final static String Ytag = "Y";
 
+    private final static String FlipTag = "Flip";
+    private final static String Htag = "Horizontal";
+    private final static String Vtag = "Vertical";
+
     public void save(XmlNode node) {
         node = node.addChild(CropTag);
 
@@ -273,6 +327,14 @@ class CropRotateManager implements RotorListener {
             Point2D lr = bounds.getLowerRight();
             lrNode.setAttribute(Xtag, Double.toString(lr.getX()));
             lrNode.setAttribute(Ytag, Double.toString(lr.getY()));
+        }
+
+        final boolean hFlip = bounds.isFlippedHorizontally();
+        final boolean vFlip = bounds.isFlippedVertically();
+        if (hFlip || vFlip) {
+            XmlNode flipNode = node.addChild(FlipTag);
+            flipNode.setAttribute(Htag, Boolean.toString(hFlip));
+            flipNode.setAttribute(Vtag, Boolean.toString(vFlip));
         }
     }
 
@@ -325,6 +387,15 @@ class CropRotateManager implements RotorListener {
                     e1.getMessage() + ", " + e2.getMessage()
                 );
             }
+        }
+
+        try {
+            XmlNode flipNode = node.getChild(FlipTag);
+            boolean h = Boolean.parseBoolean(flipNode.getAttribute(Htag));
+            boolean v = Boolean.parseBoolean(flipNode.getAttribute(Vtag));
+            bounds.flip(h, v);
+        }
+        catch (XMLException ignored) {
         }
 
         engine.setCropBounds(bounds);
