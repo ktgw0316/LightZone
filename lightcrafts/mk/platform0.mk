@@ -13,6 +13,7 @@ ifeq ($(PLATFORM),Darwin)
 # Windows
 else ifeq ($(findstring CYGWIN,$(PLATFORM)),CYGWIN)
   PLATFORM:=		Windows
+  CYGWIN:=		1
 else ifeq ($(findstring MINGW,$(PLATFORM)),MINGW)
   PLATFORM:=		Windows
 else ifeq ($(findstring MSYS,$(PLATFORM)),MSYS)
