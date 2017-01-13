@@ -207,15 +207,18 @@ ifeq ($(PLATFORM),Windows)
     NUM_PROCESSORS:=	1
   endif
 
-  ifeq ($(PROCESSOR),x86_64)
-    MINGW:=		x86_64-w64-mingw32
-  else
-    MINGW:=		i686-w64-mingw32
+  ifeq ($(CYGWIN),1)
+    ifeq ($(PROCESSOR),x86_64)
+      MINGW:=		x86_64-w64-mingw32
+    else
+      MINGW:=		i686-w64-mingw32
+    endif
+    CC:=			$(MINGW)-gcc
+    CXX:=			$(MINGW)-g++
+    PKGCFG:=		$(MINGW)-pkg-config
+    PKG_CONFIG_PATH:=	/usr/$(MINGW)/sys-root/mingw/lib/pkgconfig/
   endif
-  CC:=			$(MINGW)-gcc
-  CXX:=			$(MINGW)-g++
-  PKGCFG:=		$(MINGW)-pkg-config
-  PKG_CONFIG_PATH:=	/usr/$(MINGW)/sys-root/mingw/lib/pkgconfig/
+
   PLATFORM_CFLAGS+=	$(SSE_FLAGS)
 
   ifdef HIGH_PERFORMANCE
