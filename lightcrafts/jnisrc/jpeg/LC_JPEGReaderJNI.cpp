@@ -3,7 +3,7 @@
 // standard
 #include <cstdlib>
 #include <jni.h>
-#include <memory>                       /* for auto_ptr */
+#include <memory>                       /* for unique_ptr */
 #ifdef  DEBUG
 #include <iostream>
 #endif
@@ -54,10 +54,10 @@ JNIEXPORT void JNICALL LCJPEGReader_METHOD(beginRead)
     cerr << "beginRead()" << endl;
 #endif
     //
-    // Here we use an auto_ptr to ensure that the LC_JPEGReader object will get
+    // Here we use an unique_ptr to ensure that the LC_JPEGReader object will get
     // deallocated if anything bad happens.
     //
-    auto_ptr<LC_JPEGReader> reader( new LC_JPEGReader );
+    unique_ptr<LC_JPEGReader> reader( new LC_JPEGReader );
     if ( !reader.get() ) {
         LC_throwOutOfMemoryError( env, "new LC_JPEGReader failed" );
         return;
@@ -77,7 +77,7 @@ JNIEXPORT void JNICALL LCJPEGReader_METHOD(beginRead)
     }
 
     //
-    // Since everything has worked so far, release the auto_ptr and store it
+    // Since everything has worked so far, release the unique_ptr and store it
     // on the Java side.
     //
     LC_setNativePtr( env, jLCJPEGReader, reader.release() );
@@ -109,10 +109,10 @@ JNIEXPORT void JNICALL LCJPEGReader_METHOD(openForReading)
     cerr << "openForReading()" << endl;
 #endif
     //
-    // Here we use an auto_ptr to ensure that the LC_JPEGReader object will get
+    // Here we use an unique_ptr to ensure that the LC_JPEGReader object will get
     // deallocated if anything bad happens.
     //
-    auto_ptr<LC_JPEGReader> reader( new LC_JPEGReader );
+    unique_ptr<LC_JPEGReader> reader( new LC_JPEGReader );
     if ( !reader.get() ) {
         LC_throwOutOfMemoryError( env, "new LC_JPEGReader failed" );
         return;
@@ -140,7 +140,7 @@ JNIEXPORT void JNICALL LCJPEGReader_METHOD(openForReading)
     }
 
     //
-    // Since everything has worked so far, release the auto_ptr and store it
+    // Since everything has worked so far, release the unique_ptr and store it
     // on the Java side.
     //
     LC_setNativePtr( env, jLCJPEGReader, reader.release() );
@@ -171,12 +171,8 @@ JNIEXPORT jint JNICALL LCJPEGReader_METHOD(readScanLines)
     // inside the buffer passed from Java.
     //
     int const rowSize = cinfo.output_width * cinfo.output_components;
+    unique_ptr<JSAMPROW[]> row( new JSAMPROW[ numLines ] );
 
-#ifdef __GNUC__
-    JSAMPROW row[ numLines ];
-#else
-    auto_vec<JSAMPROW> row( new JSAMPROW[ numLines ] );
-#endif
     for ( int i = 0; i < numLines; ++i )
         row[i] = (JSAMPLE*)cBuf + offset + i * rowSize;
 

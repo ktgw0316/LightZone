@@ -21,7 +21,6 @@
 #endif
 
 // local
-#include "LC_CPPUtils.h"
 #ifndef AUTO_DEP
 #include "javah/com_lightcrafts_utils_cache_NativeByteBufferAllocator.h"
 #endif

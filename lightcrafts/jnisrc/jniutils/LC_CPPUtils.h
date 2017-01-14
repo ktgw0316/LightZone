@@ -23,38 +23,6 @@ namespace LightCrafts {
     template<typename T> class auto_obj;
 
     /**
-     * An auto_vec<T> is like the standard auto_ptr<T> but works where T is a
-     * pointer to a T[] and so delete[] must be used.
-     */
-    template<typename T> class auto_vec {
-    public:
-        explicit auto_vec( T *p = 0 ) : m_p( p ) { }
-        ~auto_vec()                             { delete[] m_p; }
-
-        auto_vec<T>& operator=( T *p ) {
-            if ( p != m_p ) {
-                delete[] m_p;
-                m_p = p;
-            }
-            return *this;
-        }
-
-        T&          operator*()                 { return *m_p; }
-        T const&    operator*() const           { return *m_p; }
-
-        T&          operator[]( int i )         { return m_p[i]; }
-        T const&    operator[]( int i ) const   { return m_p[i]; }
-
-                    operator T*()               { return m_p; }
-                    operator T const*() const   { return m_p; }
-    private:
-        T *m_p;
-
-        auto_vec( auto_vec<T> const& );         // forbid copy
-        auto_vec& operator=( auto_vec< T >& );  // forbid assignment
-    };
-
-    /**
      * Does the same thing as strdup(3), but use C++'s "new" operator to
      * allocate storage.
      */
