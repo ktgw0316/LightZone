@@ -3,7 +3,7 @@
 // standard
 #include <cstdlib>
 #include <jni.h>
-#include <memory>                       /* for auto_ptr */
+#include <memory>                       /* for unique_ptr */
 #ifdef  DEBUG
 #include <iostream>
 #endif
@@ -60,10 +60,10 @@ JNIEXPORT void JNICALL LCJPEGWriter_METHOD(beginWrite)
          << endl;
 #endif
     //
-    // Here we use an auto_ptr to ensure that the LC_JPEGWriter object will get
+    // Here we use an unique_ptr to ensure that the LC_JPEGWriter object will get
     // deallocated if anything bad happens.
     //
-    auto_ptr<LC_JPEGWriter> writer( new LC_JPEGWriter );
+    unique_ptr<LC_JPEGWriter> writer( new LC_JPEGWriter );
     if ( !writer.get() ) {
         LC_throwOutOfMemoryError( env, "new LC_JPEGWriter failed" );
         return;
@@ -84,7 +84,7 @@ JNIEXPORT void JNICALL LCJPEGWriter_METHOD(beginWrite)
     }
 
     //
-    // Since everything has worked so far, release the auto_ptr and store it
+    // Since everything has worked so far, release the unique_ptr and store it
     // on the Java side.
     //
     LC_setNativePtr( env, jLCJPEGWriter, writer.release() );
@@ -118,10 +118,10 @@ JNIEXPORT void JNICALL LCJPEGWriter_METHOD(openForWriting)
          << endl;
 #endif
     //
-    // Here we use an auto_ptr to ensure that the LC_JPEGWriter object will get
+    // Here we use an unique_ptr to ensure that the LC_JPEGWriter object will get
     // deallocated if anything bad happens.
     //
-    auto_ptr<LC_JPEGWriter> writer( new LC_JPEGWriter );
+    unique_ptr<LC_JPEGWriter> writer( new LC_JPEGWriter );
     if ( !writer.get() ) {
         LC_throwOutOfMemoryError( env, "new LC_JPEGWriter failed" );
         return;
@@ -150,7 +150,7 @@ JNIEXPORT void JNICALL LCJPEGWriter_METHOD(openForWriting)
     }
 
     //
-    // Since everything has worked so far, release the auto_ptr and store it
+    // Since everything has worked so far, release the unique_ptr and store it
     // on the Java side.
     //
     LC_setNativePtr( env, jLCJPEGWriter, writer.release() );
@@ -206,11 +206,8 @@ JNIEXPORT jint JNICALL LCJPEGWriter_METHOD(writeScanLines)
     // create such an array and initialize each pointer to point to each "row"
     // inside the buffer passed from Java.
     //
-#ifdef __GNUC__
-    JSAMPROW row[ numLines ];
-#else
-    auto_vec<JSAMPROW> row( new JSAMPROW[ numLines ] );
-#endif
+    unique_ptr<JSAMPROW[]> row( new JSAMPROW[ numLines ] );
+
     for ( int i = 0; i < numLines; ++i )
         row[i] = cBuf + offset + i * lineStride;
 

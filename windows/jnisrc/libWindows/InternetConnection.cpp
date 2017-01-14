@@ -5,7 +5,6 @@
 #include <wininet.h>
 
 // local
-#include "LC_CPPUtils.h"
 #include "LC_JNIUtils.h"
 #ifndef AUTO_DEP
 #include "javah/com_lightcrafts_platform_windows_WindowsInternetConnection.h"

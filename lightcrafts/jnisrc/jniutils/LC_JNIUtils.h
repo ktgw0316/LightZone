@@ -165,9 +165,6 @@ JNIEXPORT void JNICALL LC_throwOutOfMemoryError( JNIEnv*, char const *msg );
 #ifdef  __cplusplus
 }
 
-// local
-#include <LC_CPPUtils.h>
-
 namespace LightCrafts {
 
     /**
