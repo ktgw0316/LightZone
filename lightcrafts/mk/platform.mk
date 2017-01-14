@@ -213,11 +213,21 @@ ifeq ($(PLATFORM),Windows)
     else
       MINGW:=		i686-w64-mingw32
     endif
-    CC:=			$(MINGW)-gcc
-    CXX:=			$(MINGW)-g++
+    CC:=		$(MINGW)-gcc
+    CXX:=		$(MINGW)-g++
     PKGCFG:=		$(MINGW)-pkg-config
-    PKG_CONFIG_PATH:=	/usr/$(MINGW)/sys-root/mingw/lib/pkgconfig/
+    MINGW_DIR:=		/usr/$(MINGW)/sys-root/mingw/
+  else
+    # MSYS2
+    ifeq ($(PROCESSOR),x86_64)
+      MINGW_DIR:=	/mingw64/
+    else
+      MINGW_DIR:=	/mingw32/
+    endif
   endif
+
+  PKG_CONFIG_PATH:=	$(MINGW_DIR)lib/pkgconfig/
+  DLL_DIR:=		$(MINGW_DIR)bin/
 
   PLATFORM_CFLAGS+=	$(SSE_FLAGS)
 
