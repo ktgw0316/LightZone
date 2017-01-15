@@ -12,6 +12,7 @@ TARGET_BASE:=	Windows
 JNI_WINDOWS_DEFINES:=	-DWINVER=0x0500 -D_WIN32_IE=0x0500 \
 			-D_WIN32_WINNT=0x0500 -DUNICODE
 
+JNI_WINDOWS_CFLAGS:=	-std=c++0x
 JNI_WINDOWS_LDFLAGS:=	-L.
 JNI_WINDOWS_LINK:= 	-lcomdlg32 -lgdi32 -lshlwapi -lole32 -luuid -lWininet \
 			-lhtmlhelp -lLCJNI
