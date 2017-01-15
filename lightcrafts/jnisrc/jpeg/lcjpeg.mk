@@ -9,7 +9,7 @@ TARGET_BASE:=		LCJPEG
 # Uncomment to compile in debug mode.
 #DEBUG:=		true
 
-JNI_EXTRA_CFLAGS:=	-fexceptions
+JNI_EXTRA_CFLAGS:=	-fexceptions -std=c++0x
 JNI_WINDOWS_LINK:=	-ljpeg.dll -lLCJNI
 JNI_LINUX_LINK:=	-ljpeg -lLCJNI
 JNI_MACOSX_LINK:=	-ljpeg ../jniutils/libLCJNI.a
