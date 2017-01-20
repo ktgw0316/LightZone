@@ -322,6 +322,7 @@ public class ImageEditorEngine implements Engine {
         operationsSet.put(RedEyesOperation.type, RedEyesOperation.class);
         operationsSet.put(RawAdjustmentsOperation.typeV1, RawAdjustmentsOperation.class);
         operationsSet.put(RawAdjustmentsOperation.typeV2, RawAdjustmentsOperation.class);
+        operationsSet.put(FilmGrainOperation.type, FilmGrainOperation.class);
     }
 
     @Override
