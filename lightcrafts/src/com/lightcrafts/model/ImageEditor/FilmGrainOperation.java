@@ -21,28 +21,27 @@ import lombok.val;
 public class FilmGrainOperation extends BlendedOperation {
     static final OperationType type = new OperationTypeImpl("Film Grain");
 
-    private static final String SIZE = "GrainSize"; // TODO: l10n
-    private double featureSize = 1;
+    private static final String SIZE = "Grain_Size";
+    private double featureSize = 1.0;
 
-    private static final String BLUR = "Blur"; // TODO: l10n
-    private double blur = 0.5;
+    private static final String SHARPNESS = "Sharpness";
+    private double sharpness = 0.5;
 
-    private static final String INTENSITY = "Intensity"; // TODO: l10n
+    private static final String COLOR = "Color";
+    private double color = 0.0;
+
+    private static final String INTENSITY = "Intensity";
     private double intensity = 0.5;
-
-    private static final String COLOR = "Color"; // TODO: l10n
-    private double color = 0;
 
     public FilmGrainOperation(Rendering rendering) {
         super(rendering, type);
-        colorInputOnly = true; // TODO:
 
         addSliderKey(SIZE);
         setSliderConfig(SIZE, new SliderConfig(0.1, 2, featureSize, 0.1, false,
                 new DecimalFormat("0.0")));
 
-        addSliderKey(BLUR);
-        setSliderConfig(BLUR, new SliderConfig(0.0, 1.0, blur, 0.1, false,
+        addSliderKey(SHARPNESS);
+        setSliderConfig(SHARPNESS, new SliderConfig(0.0, 1.0, sharpness, 0.1, false,
                 new DecimalFormat("0.0")));
 
         addSliderKey(COLOR);
@@ -61,8 +60,8 @@ public class FilmGrainOperation extends BlendedOperation {
         if (key.equals(SIZE) && featureSize != value) {
             featureSize = value;
         }
-        else if (key.equals(BLUR) && blur != value) {
-            blur = value;
+        else if (key.equals(SHARPNESS) && sharpness != value) {
+            sharpness = value;
         }
         else if (key.equals(COLOR) && color != value) {
             color = value;
@@ -132,7 +131,7 @@ public class FilmGrainOperation extends BlendedOperation {
             val cm = back.getColorModel();
             val front = new BufferedImage(cm, raster, cm.isAlphaPremultiplied(), null);
 
-            return Functions.gaussianBlur(front, rendering, op, blur * scale);
+            return Functions.gaussianBlur(front, rendering, op, (1.0 - sharpness) * scale);
         }
     }
     @Override
