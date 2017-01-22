@@ -1,6 +1,6 @@
 package com.lightcrafts.model.ImageEditor;
 
-import com.lightcrafts.jai.opimage.OpenSimplexNoise;
+import com.lightcrafts.utils.OpenSimplexNoise;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.mediax.jai.JAI;

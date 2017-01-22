@@ -30,7 +30,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.lightcrafts.jai.opimage;
+package com.lightcrafts.utils;
 
 public class OpenSimplexNoise {
 
