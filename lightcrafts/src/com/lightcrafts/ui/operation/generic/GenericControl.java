@@ -5,8 +5,6 @@ package com.lightcrafts.ui.operation.generic;
 
 import com.lightcrafts.model.GenericOperation;
 import com.lightcrafts.model.Operation;
-import com.lightcrafts.model.OperationType;
-import com.lightcrafts.ui.help.HelpConstants;
 import com.lightcrafts.ui.layout.Box;
 import com.lightcrafts.ui.operation.OpControl;
 import com.lightcrafts.ui.operation.OpStack;
@@ -283,55 +281,8 @@ public class GenericControl extends OpControl {
         undoSupport.restoreEnd();
     }
 
-    // This is a crude mapping from GenericOperation OperationType names
-    // (as found, for instance, in opActions.properties) into help topics
-    // (as defined in HelpConstants).
-    //
-    // This mapping needs maintenance, as tools come and go.
     @Override
     protected String getHelpTopic() {
-        OperationType type = op.getType();
-        String name = type.getName();
-        if (name.startsWith("ZoneMapper")) {
-            return HelpConstants.HELP_TOOL_ZONEMAPPER;
-        }
-        if (name.startsWith("UnSharp Mask")) {
-            return HelpConstants.HELP_TOOL_SHARPEN;
-        }
-        if (name.startsWith("Gaussian Blur")) {
-            return HelpConstants.HELP_TOOL_BLUR;
-        }
-        if (name.startsWith("Hue/Saturation")) {
-            return HelpConstants.HELP_TOOL_HUE_SATURATION;
-        }
-        if (name.startsWith("Color Balance")) {
-            return HelpConstants.HELP_TOOL_COLOR_BALANCE;
-        }
-        if (name.startsWith("White Point")) {
-            return HelpConstants.HELP_TOOL_WHITE_BALANCE;
-        }
-        if (name.startsWith("Channel Mixer")) {
-            return HelpConstants.HELP_TOOL_BLACK_AND_WHITE;
-        }
-        if (name.startsWith("Advanced Noise Reduction")) {
-            return HelpConstants.HELP_TOOL_NOISE_REDUCTION;
-        }
-        if (name.startsWith("Clone")) {
-            return HelpConstants.HELP_TOOL_CLONE;
-        }
-        if (name.startsWith("Spot")) {
-            return HelpConstants.HELP_TOOL_SPOT;
-        }
-        if (name.startsWith("RAW Adjustments")) {
-            return HelpConstants.HELP_TOOL_RAW_ADJUSTMENTS;
-        }
-        if (name.startsWith("Relight") || name.startsWith("Tone")) {
-            return HelpConstants.HELP_TOOL_RELIGHT;
-        }
-        if (name.startsWith("Red Eyes")) {
-            return HelpConstants.HELP_TOOL_RED_EYE;
-        }
-        // This null leads to the help home page.
-        return null;
+        return op.getHelpTopic();
     }
 }

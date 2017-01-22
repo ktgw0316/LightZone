@@ -8,10 +8,13 @@ import com.lightcrafts.model.*;
 import com.lightcrafts.mediax.jai.*;
 import com.lightcrafts.ui.editor.EditorMode;
 
+import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_SPOT;
+
 public class SpotOperationImpl extends BlendedOperation implements SpotOperation {
 
     public SpotOperationImpl(Rendering rendering) {
         super(rendering, type);
+        setHelpTopic(HELP_TOOL_SPOT);
     }
 
     @Override

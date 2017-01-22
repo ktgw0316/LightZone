@@ -15,6 +15,8 @@ import java.awt.image.renderable.ParameterBlock;
 import java.awt.*;
 import java.text.DecimalFormat;
 
+import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_NOISE_REDUCTION;
+
 public class AdvancedNoiseReductionOperation extends BlendedOperation {
     private static final String COLOR_RADIUS = "Color_Radius";
     private static final String COLOR_INTENSITY = "Color_Intensity";
@@ -33,6 +35,8 @@ public class AdvancedNoiseReductionOperation extends BlendedOperation {
     public AdvancedNoiseReductionOperation(Rendering rendering, OperationType type) {
         super(rendering, type);
         colorInputOnly = true;
+
+        setHelpTopic(HELP_TOOL_NOISE_REDUCTION);
 
         DecimalFormat format = new DecimalFormat("0.0");
 

@@ -70,4 +70,9 @@ public interface GenericOperation extends Operation {
       * default slider configuration is OK.
       */
     SliderConfig getSliderConfig(String key);
+
+    /**
+      * Get a help topic name, as defined in HelpConstants.
+      */
+    String getHelpTopic();
 }

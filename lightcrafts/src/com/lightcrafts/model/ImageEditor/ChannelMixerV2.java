@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.Collections;
 import java.text.DecimalFormat;
 
+import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_BLACK_AND_WHITE;
+
 public class ChannelMixerV2 extends BlendedOperation implements com.lightcrafts.model.ColorPickerOperation {
     private static final String Strenght = "Strength";
 
@@ -26,6 +28,8 @@ public class ChannelMixerV2 extends BlendedOperation implements com.lightcrafts.
     public ChannelMixerV2(Rendering rendering, OperationType type) {
         super(rendering, type);
         colorInputOnly = true;
+
+        setHelpTopic(HELP_TOOL_BLACK_AND_WHITE);
 
         if (type != typeV2)
             addSliderKey(Strenght);
@@ -89,7 +93,7 @@ public class ChannelMixerV2 extends BlendedOperation implements com.lightcrafts.
 //            return new FilteredGrayscaleOpImage(back, filter, (float) (Math.PI), (float) strenght, null);
 //        }
 
-        public PlanarImage setFrontV4() {
+        PlanarImage setFrontV4() {
             float filter[] = {color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f};
             filter = JAIContext.linearColorSpace.fromRGB(filter);
 
@@ -127,7 +131,7 @@ public class ChannelMixerV2 extends BlendedOperation implements com.lightcrafts.
             return JAI.create("BandCombine", pb, null);
         }
 
-        public PlanarImage setFrontV3() {
+        PlanarImage setFrontV3() {
             float red = color.getRed() / 255f;
             float green = color.getGreen() / 255f;
             float blue = color.getBlue() / 255f;

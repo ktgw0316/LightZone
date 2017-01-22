@@ -10,6 +10,8 @@ import com.lightcrafts.model.SliderConfig;
 
 import java.text.DecimalFormat;
 
+import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_NOISE_REDUCTION;
+
 /**
  * Copyright (C) 2010 Light Crafts, Inc.
  * Author: fabio
@@ -26,6 +28,8 @@ public class AdvancedNoiseReductionOperationV4 extends BlendedOperation {
     public AdvancedNoiseReductionOperationV4(Rendering rendering, OperationType type) {
         super(rendering, type);
         colorInputOnly = true;
+
+        setHelpTopic(HELP_TOOL_NOISE_REDUCTION);
 
         DecimalFormat format = new DecimalFormat("0.0");
 

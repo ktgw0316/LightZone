@@ -18,6 +18,8 @@ import java.awt.image.renderable.ParameterBlock;
 import java.awt.*;
 import java.lang.ref.SoftReference;
 
+import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_RELIGHT;
+
 /**
  * Copyryght (C) 2007 Light Crafts, Inc.
  * User: fabio
@@ -39,6 +41,8 @@ public class HDROperationV2 extends BlendedOperation {
 
     public HDROperationV2(Rendering rendering, OperationType type) {
         super(rendering, type);
+
+        setHelpTopic(HELP_TOOL_RELIGHT);
 
         DecimalFormat format = new DecimalFormat("0.00");
 

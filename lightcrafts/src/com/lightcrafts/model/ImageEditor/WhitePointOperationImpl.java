@@ -17,6 +17,8 @@ import java.awt.geom.Point2D;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.image.Raster;
 
+import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_WHITE_BALANCE;
+
 class WhitePointOperationImpl extends BlendedOperation implements WhitePointOperation  {
     private static final OperationType type = new OperationTypeImpl("White Dropper");
     private Color color = Color.gray;
@@ -26,6 +28,8 @@ class WhitePointOperationImpl extends BlendedOperation implements WhitePointOper
 
     WhitePointOperationImpl(Rendering rendering) {
         super(rendering, type);
+        setHelpTopic(HELP_TOOL_WHITE_BALANCE);
+
         this.rendering = rendering;
         colorInputOnly = true;
     }

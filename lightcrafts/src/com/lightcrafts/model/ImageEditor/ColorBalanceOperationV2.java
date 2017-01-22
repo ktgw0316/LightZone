@@ -20,6 +20,8 @@ import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.Map;
 
+import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_COLOR_BALANCE;
+
 public class ColorBalanceOperationV2 extends BlendedOperation implements com.lightcrafts.model.ColorPickerDropperOperation {
     static final OperationType typeV2 = new OperationTypeImpl("Color Balance V2");
     static final OperationType typeV3 = new OperationTypeImpl("Color Balance V3");
@@ -33,6 +35,8 @@ public class ColorBalanceOperationV2 extends BlendedOperation implements com.lig
     public ColorBalanceOperationV2(Rendering rendering, OperationType type) {
         super(rendering, type);
         colorInputOnly = true;
+
+        setHelpTopic(HELP_TOOL_COLOR_BALANCE);
 
         DecimalFormat format = new DecimalFormat("0.00");
         addSliderKey(MIDPOINT);

@@ -13,6 +13,8 @@ import com.lightcrafts.mediax.jai.PlanarImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
 
+import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_COLOR_BALANCE;
+
 /**
  * Created by IntelliJ IDEA.
  * User: fabio
@@ -40,6 +42,8 @@ public class ColorBalanceOperation extends BlendedOperation {
     public ColorBalanceOperation(Rendering rendering) {
         super(rendering, type);
         colorInputOnly = true;
+
+        setHelpTopic(HELP_TOOL_COLOR_BALANCE);
 
         DecimalFormat format = new DecimalFormat("0.0");
 

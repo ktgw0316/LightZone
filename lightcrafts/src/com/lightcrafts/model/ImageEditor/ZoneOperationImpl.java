@@ -13,6 +13,8 @@ import java.awt.*;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.image.DataBuffer;
 
+import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_ZONEMAPPER;
+
 class ZoneOperationImpl extends BlendedOperation implements ZoneOperation {
     static final OperationType type = new OperationTypeImpl("Zone Mapper");
 
@@ -27,6 +29,7 @@ class ZoneOperationImpl extends BlendedOperation implements ZoneOperation {
 
     ZoneOperationImpl(Rendering rendering) {
         super(rendering, type);
+        setHelpTopic(HELP_TOOL_ZONEMAPPER);
     }
 
     @Override
@@ -38,7 +41,7 @@ class ZoneOperationImpl extends BlendedOperation implements ZoneOperation {
         return new ZoneOperationImpl(rendering);
     }
 
-    double[] lastPoints = null;
+    private double[] lastPoints = null;
 
     @Override
     public void setScale(int scale) {
@@ -118,24 +121,29 @@ class ZoneOperationImpl extends BlendedOperation implements ZoneOperation {
         if (controlPoints == null) {
             y = x;
         } else {
-            double xmin = 0, xmax = 1;
-            double ymin = 0, ymax = 1;
-
-            for (double cp[] : controlPoints)
+            double xmin = 0;
+            double ymin = 0;
+            for (double cp[] : controlPoints) {
                 if (cp[0] == x) {
                     return fy(cp[1]);
                 } else if (x > cp[0]) {
                     xmin = cp[0];
                     ymin = cp[1];
-                } else
+                } else {
                     break;
+                }
+            }
 
-            for (int i = controlPoints.length - 1; i >= 0; i--)
+            double xmax = 1;
+            double ymax = 1;
+            for (int i = controlPoints.length - 1; i >= 0; i--) {
                 if (x <= controlPoints[i][0]) {
                     xmax = controlPoints[i][0];
                     ymax = controlPoints[i][1];
-                } else
+                } else {
                     break;
+                }
+            }
 
             y = ((x - xmin) / (xmax - xmin)) * (ymax - ymin) + ymin;
         }
