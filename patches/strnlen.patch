@@ -1,0 +1,18 @@
+Index: dcraw/dcraw_lz.c
+===================================================================
+--- dcraw.orig/dcraw_lz.c
++++ dcraw/dcraw_lz.c
+@@ -9902,6 +9902,13 @@ struct tiff_hdr {
+   char desc[512], make[64], model[64], soft[32], date[20], artist[64];
+ };
+ 
++#if defined(__MINGW32__) || defined(__sun) || defined(__APPLE__)
++size_t strnlen(const char *str, size_t maxlen) {
++    const char *end = memchr(str, 0, maxlen);
++    return end ? (size_t)(end - str) : maxlen;
++}
++#endif
++
+ void CLASS tiff_set (struct tiff_hdr *th, ushort *ntag,
+ 	ushort tag, ushort type, int count, int val)
+ {
