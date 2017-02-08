@@ -344,7 +344,7 @@ public class BatchProcessor {
             export.resizeWidth.setValue(size.width);
             export.resizeHeight.setValue(size.height);
         }
-        file = ExportNameUtility.setFileExtension(file, ext);
+        file = new File(ExportNameUtility.getBaseName(file) + "_lzn." + ext);
         file = ExportNameUtility.ensureNotExists(file);
         options.setFile(file);
 
