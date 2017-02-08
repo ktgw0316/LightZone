@@ -10,30 +10,32 @@ import java.io.File;
 
 public class ExportNameUtility {
 
-    // A Pattern to decompose a File's name into the form,
-    // "(name)-(number).(extension)".
-
+    /**
+     *  A Pattern to decompose a File's name into the form,
+     * "(name)-(number).(extension)".
+     */
     private final static Pattern FileNamePattern =
-        Pattern.compile("(?:_lzn-([0-9]*))?(?:\\.([^.]*))?$");
+        Pattern.compile("(?:_lzn(?:-([1-9]+[0-9]*))?)?(?:\\.([^.]*))?$");
 
-    // A Pattern to isolate a File's extension string.
-
+    /**
+     * A Pattern to isolate a File's extension string.
+     */
     private final static Pattern FileExtensionPattern =
         Pattern.compile("(?:\\.[^.]*)?$");
 
-    // Iterate through variant Files until we hit one that
-    // won't clobber an existing file:
-
+    /**
+     * Iterate through variant Files until we hit one that
+     * won't clobber an existing file/
+     */
     public static File ensureNotExists(File file) {
         if (! file.exists()) {
             return file;
         }
-        String base = getBaseName(file);
+        final String base = trimFileNumberAndExtension(file);
+        final String ext = getFileExtension(file);
         int num = getNumber(file);
-        String ext = getFileExtension(file);
-
         if (num < 0) {
-            num = 1;
+            num = 0;
         }
         do {
             String path = constructPath(base, num++, ext);
@@ -43,6 +45,18 @@ public class ExportNameUtility {
         return file;
     }
 
+    private static String trimFileNumberAndExtension(File file) {
+        String path = file.getPath();
+        final Matcher matcher = FileNamePattern.matcher(path);
+        if (matcher.find()) {
+            return matcher.replaceFirst("").concat("_lzn");
+        }
+        return trimFileExtension(path);
+    }
+
+    /**
+     * Remove "_lzn", number, and extension strings from the file path.
+     */
     public static String getBaseName(File file) {
         String path = file.getPath();
         Matcher matcher = FileNamePattern.matcher(path);
@@ -101,8 +115,8 @@ public class ExportNameUtility {
         String ext = getFileExtension(file);
         String[] typeExts = type.getExtensions();
         if (ext != null) {
-            for (int n=0; n<typeExts.length; n++) {
-                if (ext.equalsIgnoreCase(typeExts[n])) {
+            for (String typeExt : typeExts) {
+                if (ext.equalsIgnoreCase(typeExt)) {
                     return file;
                 }
             }
@@ -111,16 +125,15 @@ public class ExportNameUtility {
     }
 
     private static String constructPath(String base, int num, String ext) {
-        StringBuffer buffer = new StringBuffer();
+        final StringBuilder buffer = new StringBuilder();
         if (base != null) {
             buffer.append(base);
         }
-        buffer.append("-");
-        buffer.append(num);
-
+        if (num > 0) {
+            buffer.append("-").append(num);
+        }
         if (ext != null) {
-            buffer.append(".");
-            buffer.append(ext);
+            buffer.append(".").append(ext);
         }
         return buffer.toString();
     }
@@ -134,7 +147,7 @@ public class ExportNameUtility {
                 try {
                     return Integer.parseInt(num);
                 }
-                catch (NumberFormatException e) {
+                catch (NumberFormatException ignored) {
                 }
             }
         }
