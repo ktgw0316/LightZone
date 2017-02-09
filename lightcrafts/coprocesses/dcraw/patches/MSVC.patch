@@ -1,0 +1,13 @@
+Index: dcraw/dcraw_lz.c
+===================================================================
+--- dcraw.orig/dcraw_lz.c
++++ dcraw/dcraw_lz.c
+@@ -46,7 +46,7 @@
+ #include <time.h>
+ #include <sys/types.h>
+ 
+-#if defined(DJGPP) || defined(__MINGW32__)
++#if defined(DJGPP) || defined(__MINGW32__) || _MSC_VER <= 1900
+ #define fseeko fseek
+ #define ftello ftell
+ #else

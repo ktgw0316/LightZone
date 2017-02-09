@@ -1,10 +1,15 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2013-     Masahiro Kitagawa */
 
 package com.lightcrafts.utils.file;
 
-import java.io.*;
-import java.util.Collection;
-import java.util.ArrayList;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.nio.channels.FileChannel;
@@ -225,25 +230,47 @@ public final class FileUtil {
      * returns that file.
      */
     public static File getNoncollidingFileFor( File file ) {
-        while ( true ) {
-            if ( !file.exists() )
-                return file;
-            final String name = file.getName();
-            final Matcher m = NUMBERED_FILE_PATTERN.matcher( name );
-            final String newName;
-            if ( m.matches() ) {
-                final int next = Integer.parseInt( m.group(1) ) + 1;
-                newName =
-                    name.substring( 0, m.start(1) ) + '-' + next +
-                    name.substring( m.end(1) );
-            } else {
-                final int dot = name.lastIndexOf( '.' );
-                newName =
-                    name.substring( 0, dot ) + "-1" +
-                    name.substring( dot );
-            }
-            file = new File( file.getParentFile(), newName );
+        if ( !file.exists() )
+            return file;
+        final String name = file.getName();
+        final Matcher m = NUMBERED_FILE_PATTERN.matcher( name );
+
+        final String basename;
+        final int next;
+        if (m.matches()) {
+            next = Integer.parseInt(m.group(1)) + 1;
+            basename = name.substring(0, m.start(1));
+        } else {
+            next = 1;
+            basename = trimExtensionOf(name);
         }
+        return getNoncollidingFileFor(file.getParentFile(), basename, next, getExtensionOf(file));
+    }
+
+    /**
+     * Gets a {@link File} in the file's directory that doesn't collide with
+     * any existing files by appending a numbered suffix and a "temp" extension
+     * <p>
+     * For example, if the file <code>/tmp/foo.jpg</code> exists, returns
+     * <code>/tmp/foo.jpg-1.temp</code>; if <code>/tmp/foo.jpg-1.temp</code> exists,
+     * returns <code>/tmp/foo.jpg-2.temp</code>; and so on.
+     *
+     * @param file The {@link File} to start with.
+     * @return Returns said file.  Note that if the given file doesn't exist,
+     * returns that file.
+     */
+    private static File getNoncollidingTempFileFor(File file) {
+        return !file.exists()
+                ? file
+                : getNoncollidingFileFor(file.getParentFile(), file.getName(), 1, "temp");
+    }
+
+    private static File getNoncollidingFileFor(File parent, String basename,
+                                               int index, String extension) {
+        final File file = new File(parent, basename + "-" + index + "." + extension);
+        return !file.exists()
+                ? file
+                : getNoncollidingFileFor(parent, basename, ++index, extension);
     }
 
     /**
@@ -259,8 +286,9 @@ public final class FileUtil {
             return temp.getParentFile();
         }
         finally {
-            if ( temp != null )
-                temp.delete();
+            if ( temp != null && !temp.delete()) {
+                temp.deleteOnExit();
+            }
         }
     }
 
@@ -364,10 +392,12 @@ public final class FileUtil {
                                     boolean includeDirs ) {
         dir = Platform.getPlatform().isSpecialFile( dir );
         final File[] files = dir.listFiles(filter);
-        if (! includeDirs)
+        if (! includeDirs || files == null)
             return files;
 
         final File[] dirs = dir.listFiles(dirFilter);
+        if (dirs == null)
+            return null;
         File[] dirsAndFiles = new File[files.length + dirs.length];
         System.arraycopy(files, 0, dirsAndFiles, 0, files.length);
         System.arraycopy(dirs,  0, dirsAndFiles, files.length, dirs.length);
@@ -417,20 +447,32 @@ public final class FileUtil {
      * @throws IOException if the rename fails.
      */
     public static void renameFile( File from, File to ) throws IOException {
+        File backup = null;
         try {
-            //
-            // Windows doesn't allow renaming a file to an existing file, so we
-            // have to delete it first.
-            //
-            to.delete();
-
-            if ( !from.renameTo( to ) )
-                throw new IOException();
+            if (to.exists()) {
+                //
+                // Windows doesn't allow renaming a file to an existing file, so we
+                // have to move it first.
+                //
+                backup = getNoncollidingTempFileFor(to);
+                if (!to.renameTo(backup)) {
+                    throw new IOException("Failed to backup " + to.getName());
+                }
+            }
+            if (!from.renameTo(to)) {
+                String msg = "Failed to rename " + from.getName() + " to " + to.getName();
+                if (backup != null && !backup.renameTo(to)) {
+                    msg += ", and failed to recover the " + from.getName()
+                            + " from backup " + backup.getName();
+                }
+                throw new IOException(msg);
+            }
+            if (backup != null && !backup.delete()) {
+                backup.deleteOnExit();
+            }
         }
-        catch ( SecurityException e ) {
-            final IOException ioe = new IOException();
-            ioe.initCause( e );
-            throw ioe;
+        catch (SecurityException e) {
+            throw  new IOException(e);
         }
     }
 
@@ -493,8 +535,8 @@ public final class FileUtil {
      *
      * @param file The {@link File} to touch.
      */
-    public static void touch( File file ) {
-        file.setLastModified( System.currentTimeMillis() );
+    public static boolean touch( File file ) {
+        return file.setLastModified( System.currentTimeMillis() );
     }
 
     /**

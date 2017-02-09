@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2016-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.editor.assoc;
 
@@ -10,9 +11,9 @@ import com.lightcrafts.image.types.ImageType;
 import com.lightcrafts.image.types.RawImageType;
 import com.lightcrafts.utils.xml.XmlDocument;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
+import java.util.Properties;
 
 /**
  * A resolver from ImageMetadata objects to resource URL's for
@@ -35,9 +36,10 @@ class DefaultDocuments {
             // is available.
             String make = meta.getCameraMake(true);
             if (make != null) {
-                make = make.replace('*', '_'); // For the Pentax *ist
-                make = make.replace('/', '_');
-                make = make.replace(':', '_');
+                make = make.replace('*', '_') // For the Pentax *ist
+                           .replace('/', '_')
+                           .replace(':', '_');
+                make = getCompatibleCameraName(make);
 
                 URL url = DefaultDocuments.class.getResource(
                     "resources/" + make + ".lzn"
@@ -64,6 +66,36 @@ class DefaultDocuments {
         return null;
     }
 
+    private static String getCompatibleCameraName(final String name) {
+        final Properties properties = new Properties();
+
+        // TODO: Java7 try-with-resources, multi-catch
+        Reader reader = null;
+        try {
+            reader = new InputStreamReader(
+                    DefaultDocuments.class.getResourceAsStream(
+                            "resources/CompatibleCameras.properties"),
+                    "UTF-8");
+            properties.load(reader);
+        } catch (UnsupportedEncodingException e) {
+            return name;
+        } catch (FileNotFoundException e) {
+            return name;
+        } catch (IOException e) {
+            return name;
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
+
+        final String newName = properties.getProperty(name);
+        return newName != null ? newName : name;
+    }
+
     /**
      * Tell if the given ImageMetadata points to a File containing RAW
      * image data.  Only RAW files cna have default Documents.
@@ -82,7 +114,9 @@ class DefaultDocuments {
         URL url = getDefaultDocumentUrl(meta);
         if (url != null) {
             XmlDocument doc = DocumentDatabase.getDefaultDocument(meta);
-            doc.write(System.out);
+            if (doc != null) {
+                doc.write(System.out);
+            }
         }
         System.out.println(url);
     }
