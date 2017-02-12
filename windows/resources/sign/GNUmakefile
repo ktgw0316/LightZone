@@ -6,8 +6,6 @@ CERT_PASSWORD:=		photoshopsucks
 
 TIMESTAMP_URL:=		http://timestamp.comodoca.com/authenticode
 
-PATH:=			$(PATH):/cygdrive/c/Program\ Files/Microsoft\ SDKs/Windows/v6.0/Bin
-
 ########## You shouldn't have to change anything below this line. #############
 
 ##
@@ -34,8 +32,8 @@ all: $(UNIX_EXE_TO_SIGN)
 #/*	chmod -x $@*/
 
 $(UNIX_EXE_TO_SIGN): $(PFX_FILE) FORCE
-	signtool sign /f $(PFX_FILE) /p "$(CERT_PASSWORD)" \
-	/d "$(DESCRIPTION)" /du "$(DESCRIPTION_URL)" /t "$(TIMESTAMP_URL)" \
+	signtool sign -f $(PFX_FILE) -p "$(CERT_PASSWORD)" \
+	-d "$(DESCRIPTION)" -du "$(DESCRIPTION_URL)" -t "$(TIMESTAMP_URL)" \
 	"$(WIN_EXE_TO_SIGN)"
 
 .PHONY: FORCE
