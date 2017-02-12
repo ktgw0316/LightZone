@@ -8,13 +8,15 @@ DEST_COMMON_PRODUCTS:=	$(filter-out GNUmakefile,$(notdir $(COMMON_PRODUCTS)))
 WINDOWS_LIBS:=		$(wildcard ../lib/*.jar)
 DEST_WINDOWS_LIBS:=	$(notdir $(WINDOWS_LIBS))
 
-WINDOWS_PROC_LIBS:=	libgcc_s_seh-1.dll \
+WINDOWS_PROC_LIBS:=	$(wildcard $(DLL_DIR)/libgcc_s_*-1.dll) \
 			libjpeg-8.dll \
 			liblzma-5.dll \
 			libwinpthread-1.dll \
 			libgomp-1.dll \
 			liblcms2-2.dll \
-			libtiff-5.dll
+			libtiff-5.dll \
+			zlib1.dll
+
 DEST_WINDOWS_PROC_LIBS:=	$(notdir $(WINDOWS_PROC_LIBS))
 
 ##
