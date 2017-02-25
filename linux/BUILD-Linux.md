@@ -20,7 +20,7 @@ _For Debian (>= squeeze, i386/amd64) and Ubuntu (>= 10.04 lucid). See also [Pack
 
 Install required packages:
 
-    sudo apt-get install debhelper devscripts build-essential ant autoconf git-core javahelp2 default-jdk default-jre-headless libjpeg-turbo8-dev libtiff5-dev libx11-dev
+    sudo apt-get install debhelper devscripts build-essential ant autoconf git-core javahelp2 default-jdk default-jre-headless liblcms2-dev libjpeg-turbo8-dev libtiff5-dev libx11-dev pkg-config
 
 _(Note: gcc, g++, libc6-dev and make shall be installed with the build-essential.)_
 
@@ -31,7 +31,7 @@ Before start the build, you have to set JAVA_HOME environment variable, e.g.
 ### OpenSUSE (>= 12.2)
 Install required packages:
 
-    sudo zypper install ant autoconf gcc gcc-c++ make git javahelp2 libjpeg8-devel libtiff-devel libX11-devel java-1_7_0-openjdk-devel
+    sudo zypper install ant autoconf gcc gcc-c++ make git javahelp2 liblcms2-devel libjpeg8-devel libtiff-devel libX11-devel java-1_7_0-openjdk-devel pkg-config
 
 Set your JAVA_HOME variable to point to installed JDK, e.g.
 
