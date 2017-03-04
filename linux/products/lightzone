@@ -64,7 +64,7 @@ fi
 
 jvmopts=-XX:+UseG1GC \
 	-XX:MinHeapFreeRatio=30 \
-	-XX:MaxHeapFreeRatio=40 \
+	-XX:MaxHeapFreeRatio=30 \
 	-Xmx${maxmem}k \
 	-classpath ".:${pkgjavadir}/*:${jhpath}" \
 	-Djava.library.path=$pkglibexecdir \
