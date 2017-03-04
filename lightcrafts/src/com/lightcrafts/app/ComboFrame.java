@@ -951,6 +951,8 @@ public class ComboFrame
         if (images != null) {
             images.resume();
         }
+        // Encourage JVM to release free heap space
+        System.gc();
     }
 
     public void dispose() {
