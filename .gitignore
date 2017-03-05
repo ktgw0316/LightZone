@@ -24,11 +24,12 @@ out
 */build
 */jnisrc/*/javah
 */products/LightZone-forkd
-*/products/dcraw
+*/products/dcraw_lz*
 lightcrafts/extbuild
 lightcrafts/products
 lightcrafts/jnisrc/*/configure
-lightcrafts/jnisrc/*/*config.h
+lightcrafts/jnisrc/*/*config\.h
+lightcrafts/jnisrc/*/autom4te\.cache/
 lightcrafts/jnisrc/*/arch-*
 lightcrafts/jnisrc/*/*/arch-*
 lightcrafts/coprocesses/*/Release
