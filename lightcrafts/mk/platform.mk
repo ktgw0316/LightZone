@@ -162,7 +162,6 @@ ifeq ($(PLATFORM),MacOSX)
 
   JAVA_HOME=		/Library/Java/Home
   JAVA_INCLUDES=	-I$(SDKROOT)/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers
-  JAVA_LDFLAGS=		-L$(SDKROOT)/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Libraries
   JNILIB_PREFIX:=	lib
   JNILIB_EXT:=		.jnilib
   DYLIB_PREFIX:=	$(JNILIB_PREFIX)
