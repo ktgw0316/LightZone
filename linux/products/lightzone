@@ -62,14 +62,6 @@ else
     maxmem=524288
 fi
 
-jvmopts=-XX:+UseG1GC \
-	-XX:MinHeapFreeRatio=30 \
-	-XX:MaxHeapFreeRatio=30 \
-	-Xmx${maxmem}k \
-	-classpath ".:${pkgjavadir}/*:${jhpath}" \
-	-Djava.library.path=$pkglibexecdir \
-	-Dfile.encoding=UTF8
-
 # IFS should be \n to handle filenames that include space.
 IFS="
 "
@@ -81,4 +73,12 @@ for i in "$@"; do
   fi
 done
 
-(cd $pkgjavadir && LD_LIBRARY_PATH=$pkglibexecdir exec java ${jvmopts} com.lightcrafts.platform.linux.LinuxLauncher ${file} ${@} )
+(cd $pkgjavadir && LD_LIBRARY_PATH=$pkglibexecdir exec java \
+-classpath ".:${pkgjavadir}/*:${jhpath}" \
+-XX:+UseG1GC \
+-XX:MinHeapFreeRatio=30 \
+-XX:MaxHeapFreeRatio=30 \
+-Xmx${maxmem}k \
+-Djava.library.path=$pkglibexecdir \
+-Dfile.encoding=UTF8 \
+com.lightcrafts.platform.linux.LinuxLauncher ${file} ${@} )
