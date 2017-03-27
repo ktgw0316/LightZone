@@ -72,8 +72,7 @@ public final class ImageInfo {
         //
         // Therefore, under Windows, we don't do this check at all.
         //
-        if ( Platform.getType() != Platform.Windows &&
-             !m_imageFile.getParentFile().canWrite() )
+        if ( !Platform.isWindows() && !m_imageFile.getParentFile().canWrite() )
             return false;
         try {
             final ImageType t = getImageType();

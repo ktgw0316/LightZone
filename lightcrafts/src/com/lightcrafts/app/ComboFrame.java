@@ -155,7 +155,7 @@ public class ComboFrame
         }
 
         // Mac OS X 10.7 Lion Fullscreen Support
-        if (isMac()) {
+        if (Platform.isMac()) {
             enableFullScreenMode(this);
         }
 
@@ -1413,9 +1413,4 @@ public class ComboFrame
             System.err.println("Could not enable OS X fullscreen mode " + e);
         }
     }
-
-    private static boolean isMac() {
-        return Platform.getType() == Platform.MacOSX;
-    }
-
 }

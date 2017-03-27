@@ -37,8 +37,8 @@ public class ButtonIcon implements Icon {
     private static final boolean useResource = true; // Platform.getType() != Platform.MacOSX;
 
     private static boolean isJava14 = System.getProperty("java.version").startsWith("1.4");
-    private static boolean isOSXTiger = Platform.getType() == Platform.MacOSX && System.getProperty("os.version").startsWith("10.4");
-    private static boolean isOSXPanther = Platform.getType() == Platform.MacOSX && System.getProperty("os.version").startsWith("10.3");
+    private static boolean isOSXTiger = Platform.isMac() && System.getProperty("os.version").startsWith("10.4");
+    private static boolean isOSXPanther = Platform.isMac() && System.getProperty("os.version").startsWith("10.3");
 
     private static BufferedImage leftPieceNormal;
     private static BufferedImage centerPieceNormal;

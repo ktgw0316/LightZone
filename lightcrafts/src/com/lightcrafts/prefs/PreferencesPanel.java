@@ -26,7 +26,7 @@ public class PreferencesPanel extends JPanel {
         addItem(this, items, new HeapLimitItem(help));
         addItem(this, items, new UpdateInteractiveItem(help));
         addItem(this, items, new ScratchFileItem(help));
-        if (Platform.getType() == Platform.Linux) {
+        if (Platform.isLinux()) {
             addItem(this, items, new DisplayProfileItem(help));
         }
         addItem(this, items, new BrowserCacheItem(help));

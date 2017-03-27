@@ -46,7 +46,7 @@ class FolderTreeNode implements TreeNode {
         NodeFileIndex index = new NodeFileIndex();
         DirectoryMonitor monitor =
             Platform.getPlatform().getDirectoryMonitor();
-        if (Platform.getType() == Platform.MacOSX) {
+        if (Platform.isMac()) {
             return new MacOSXRootTreeNode(index, monitor);
         }
         else {

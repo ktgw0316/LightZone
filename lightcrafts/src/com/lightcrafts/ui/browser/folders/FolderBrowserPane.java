@@ -63,7 +63,7 @@ public class FolderBrowserPane
 
         getViewport().setView(tree);
         
-        if (Platform.getType() != Platform.MacOSX) {
+        if (!Platform.isMac()) {
             DataTipManager.get().register(tree);
         }
     }
@@ -76,7 +76,7 @@ public class FolderBrowserPane
      * Dispose of this <code>FolderBrowserPane</code>.
      */
     public synchronized void dispose() {
-        if (Platform.getType() != Platform.MacOSX) {
+        if (!Platform.isMac()) {
             DataTipManager.get().unregister(tree);
         }
         tree.dispose();

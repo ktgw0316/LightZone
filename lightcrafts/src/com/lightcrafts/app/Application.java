@@ -751,7 +751,7 @@ public class Application {
             savePrefs();
             removeFromCurrent(frame);
             frame.dispose();
-            if (Platform.getType() != Platform.MacOSX) {
+            if (!Platform.isMac()) {
                 maybeQuit();
             }
             return true;
@@ -1498,12 +1498,10 @@ public class Application {
                 public void windowClosing(WindowEvent event) {
                     ComboFrame frame = (ComboFrame) event.getWindow();
                     // On the Mac, we can close the last frame without quitting.
-                    if (Platform.getType() != Platform.MacOSX) {
-                        if (Current.size() == 1) {
-                            boolean confirmed = askConfirmQuit(frame);
-                            if (! confirmed) {
-                                return;
-                            }
+                    if (!Platform.isMac() && Current.size() == 1) {
+                        boolean confirmed = askConfirmQuit(frame);
+                        if (! confirmed) {
+                            return;
                         }
                     }
                     // Trigger the standard cleanup, which results in quit:
@@ -2196,7 +2194,7 @@ public class Application {
                 new Runnable() {
                     public void run() {
                         new LightZoneSkin();
-                        if (Platform.getType() == Platform.MacOSX) {
+                        if (Platform.isMac()) {
                             // Get a Mac menu bar before setting LaF, then restore.
                             Object menuBarUI = UIManager.get("MenuBarUI");
                             setLookAndFeel(LightZoneSkin.getLightZoneLookAndFeel());

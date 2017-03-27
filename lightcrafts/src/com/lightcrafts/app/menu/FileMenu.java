@@ -79,7 +79,7 @@ final class FileMenu
 
         add(new PrintMenuItem(frame));
 
-        if (Platform.getType() != Platform.MacOSX) {
+        if (!Platform.isMac()) {
             addSeparator();
             add(new ExitMenuItem(frame));
         }

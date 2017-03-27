@@ -16,7 +16,7 @@ public class EngineTest {
 
     public static void main(String[] args) throws Exception {
 
-        if ( Platform.getType() == Platform.MacOSX ) {
+        if ( Platform.isMac() ) {
             System.loadLibrary( "MacOSX" );
         }
 

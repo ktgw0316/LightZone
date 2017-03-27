@@ -138,7 +138,7 @@ final class EditMenu extends UpdatableDisposableMenu {
                 }
             }
         );
-        if (Platform.getType() != Platform.MacOSX) {
+        if (!Platform.isMac()) {
             // On the Mac, the "Preferences" item lies under the app menu.
             addSeparator();
             add(new PrefsMenuItem(frame));

@@ -84,11 +84,11 @@ public final class PerUserFileCacheKeyMapper implements FileCacheKeyMapper {
     private static boolean m_createSucceeded;
 
     static {
-        if ( Platform.getType() == Platform.MacOSX ) {
+        if ( Platform.isMac() ) {
             m_cacheDir = new File( System.getProperty( "user.home" ),
                 "Library/Caches/" + Version.getApplicationName() );
         }
-        else if ( Platform.getType() == Platform.Windows ) {
+        else if ( Platform.isWindows() ) {
             m_cacheDir = new File( System.getenv( "APPDATA" ),
                 Version.getApplicationName() + "\\Caches" );
         }
