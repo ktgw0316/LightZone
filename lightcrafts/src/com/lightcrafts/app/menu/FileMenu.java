@@ -104,14 +104,7 @@ final class FileMenu
             menuItem.addActionListener(
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        final ComboFrame frame = getComboFrame();
-                        if (frame != null) {
-                            final Editor editor = frame.getEditor();
-                            editor.setMode( EditorMode.ARROW );
-                        }
-                        else {
-                            Application.openEmpty();
-                        }
+                        final ComboFrame frame = frameForOpenRecent();
                         Application.open(frame, file);
                     }
                 }
@@ -151,14 +144,7 @@ final class FileMenu
             menuItem.addActionListener(
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        final ComboFrame frame = getComboFrame();
-                        if (frame != null) {
-                            final Editor editor = frame.getEditor();
-                            editor.setMode( EditorMode.ARROW );
-                        }
-                        else {
-                            Application.openEmpty();
-                        }
+                        final ComboFrame frame = frameForOpenRecent();
                         Application.openRecentFolder(frame, folder);
                     }
                 }
@@ -181,6 +167,16 @@ final class FileMenu
             }
         );
         recentMenu.add(clearItem);
+    }
+
+    private ComboFrame frameForOpenRecent() {
+        final ComboFrame frame = getComboFrame();
+        if (frame == null || ! frame.isBrowserVisible()) {
+            return Application.openEmpty();
+        }
+        final Editor editor = frame.getEditor();
+        editor.setMode( EditorMode.ARROW );
+        return frame;
     }
 
     // Update the "Browse Recent" submenu
