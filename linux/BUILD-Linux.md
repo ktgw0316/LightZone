@@ -57,12 +57,25 @@ To check if it works fine before installing:
 
 ## Create a package and install
 ### <a name="packaging_deb"/>.deb package (Debian or Ubuntu)
+You need to place an original source tarball in parent directory.
+For instance, if you want to build v4.1.7 in /tmp directory,
+
+    cd /tmp
+    mkdir lightzone
+    curl -L https://github.com/Aries85/LightZone/tarball/master > lightzone_4.1.7.orig.tar.gz
+    tar xf lightzone_4.1.7.orig.tar.gz -C lightzone --strip-components=1
+    cd lightzone
+
+(If you want to build a package including your modification, you need to create its source tarball by yourself and place the tarball in the parent directory of the source code.)
+
+Then
+
     debuild -uc -us
 
-will create lightzone-*.deb package in parent directory,
+will create lightzone-*.deb package in the parent directory,
 To install the package:
 
-    sudo dpkg -i ../lightzone-*.deb
+    sudo dpkg -i ../lightzone_*.deb
 
 ### .rpm package (Fedora, OpenSUSE, CentOS etc.)
 ### Re-packaging rpm from a source rpm
