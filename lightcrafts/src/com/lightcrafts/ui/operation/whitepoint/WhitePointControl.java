@@ -10,7 +10,6 @@ import java.awt.geom.Point2D;
 
 import com.lightcrafts.model.WhitePointOperation;
 import com.lightcrafts.ui.help.HelpConstants;
-import com.lightcrafts.ui.layout.Box;
 import com.lightcrafts.ui.operation.OpControl;
 import com.lightcrafts.ui.operation.OpStack;
 import com.lightcrafts.ui.toolkit.DropperButton;

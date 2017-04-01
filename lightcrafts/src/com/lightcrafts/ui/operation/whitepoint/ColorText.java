@@ -2,8 +2,6 @@
 
 package com.lightcrafts.ui.operation.whitepoint;
 
-import com.lightcrafts.ui.layout.Box;
-import com.lightcrafts.ui.layout.BoxLayout;
 import static com.lightcrafts.ui.operation.whitepoint.Locale.LOCALE;
 
 import javax.swing.*;

@@ -5,12 +5,12 @@ package com.lightcrafts.ui.operation.zone;
 import com.lightcrafts.model.Operation;
 import com.lightcrafts.model.ZoneOperation;
 import com.lightcrafts.ui.help.HelpConstants;
-import com.lightcrafts.ui.layout.Box;
 import com.lightcrafts.ui.operation.OpControl;
 import com.lightcrafts.ui.operation.OpStack;
 import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlNode;
 
+import javax.swing.Box;
 import java.awt.*;
 
 /** A OpControl widget to manipulate a linear scale in terms of Zone
