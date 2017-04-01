@@ -68,8 +68,7 @@ IFS="
 file=""
 for i in "$@"; do
   if [ -f $i ] ; then
-    file=$(cd $(dirname $i) && pwd)/$(basename $i)
-    break
+    file=file $(cd $(dirname $i) && pwd)/$(basename $i)
   fi
 done
 

@@ -28,6 +28,11 @@ public class FolderCtrl extends JPanel {
         return tree.getSelectedFile();
     }
 
+    public boolean goToFolder(File folder) {
+        return tree.goToFolder(folder);
+    }
+
+    @Deprecated
     public boolean goToPicturesFolder() {
         return tree.goToPicturesFolder();
     }

@@ -68,6 +68,11 @@ public class FolderBrowserPane
         }
     }
 
+    public boolean goToFolder(File folder) {
+        return tree.goToFolder(folder);
+    }
+
+    @Deprecated
     public boolean goToPicturesFolder() {
         return tree.goToPicturesFolder();
     }

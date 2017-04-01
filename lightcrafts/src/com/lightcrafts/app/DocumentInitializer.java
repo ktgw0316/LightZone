@@ -21,7 +21,7 @@ import java.io.File;
  */
 class DocumentInitializer {
 
-    private static Object Monitor = new Object();
+    private static final Object Monitor = new Object();
     private static ProgressThread Cancellable;
     private static boolean IsRunning;
 

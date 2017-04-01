@@ -201,9 +201,17 @@ public class Platform {
      * from the root folder shown in the folder tree (not the root of the
      * filesystem).
      */
+    @Deprecated
     public String[] getPathComponentsToPicturesFolder() {
+        return getPathComponentsTo(getDefaultImageDirectory());
+    }
+
+    public String[] getPathComponentsTo(File file) {
+        if (file == null || !file.exists()) {
+            return null;
+        }
         final String sep = Pattern.quote(File.separator);
-        return getDefaultImageDirectory().toString().split(sep);
+        return file.getAbsolutePath().split(sep);
     }
 
     /**

@@ -145,7 +145,7 @@ final class FileMenu
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         final ComboFrame frame = frameForOpenRecent();
-                        Application.openRecentFolder(frame, folder);
+                        Application.openFolder(frame, folder);
                     }
                 }
             );

@@ -2,7 +2,6 @@
 
 package com.lightcrafts.app;
 
-import static com.lightcrafts.app.Locale.LOCALE;
 import com.lightcrafts.app.batch.BatchConfig;
 import com.lightcrafts.app.batch.BatchConfigurator;
 import com.lightcrafts.app.batch.BatchProcessor;
@@ -34,10 +33,10 @@ import com.lightcrafts.ui.editor.assoc.DocumentInterpreter;
 import com.lightcrafts.ui.export.ExportLogic;
 import com.lightcrafts.ui.export.ExportNameUtility;
 import com.lightcrafts.ui.export.SaveOptions;
+import com.lightcrafts.ui.help.HelpConstants;
 import com.lightcrafts.ui.print.PrintLayoutDialog;
 import com.lightcrafts.ui.print.PrintLayoutModel;
 import com.lightcrafts.ui.templates.TemplateList;
-import com.lightcrafts.ui.help.HelpConstants;
 import com.lightcrafts.utils.TerseLoggingHandler;
 import com.lightcrafts.utils.UserCanceledException;
 import com.lightcrafts.utils.file.FileUtil;
@@ -66,6 +65,8 @@ import java.util.logging.Handler;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+
+import static com.lightcrafts.app.Locale.LOCALE;
 
 /** This class collects static methods and structures for top-level document
   * management.  These methods handle startup processing; window management;
@@ -573,7 +574,7 @@ public class Application {
         return frame;
     }
 
-    public static void openRecentFolder(ComboFrame frame, File folder) {
+    public static void openFolder(ComboFrame frame, File folder) {
         // This can be called from the no-frame menu on the Mac.
         if (frame == null) {
             // See if there's an active frame:
@@ -583,12 +584,11 @@ public class Application {
                 frame = openEmpty();
             }
         }
-        frame.showRecentFolder(folder);
-        addToRecentFolders(folder);
-        savePrefs();
+        frame.showFolder(folder);
+        notifyRecentFolder(folder);
     }
 
-    public static void notifyRecentFolder(File folder) {
+    static void notifyRecentFolder(File folder) {
         addToRecentFolders(folder);
         savePrefs();
     }
@@ -2205,13 +2205,22 @@ public class Application {
                         else {
                             setLookAndFeel(LightZoneSkin.getLightZoneLookAndFeel());
                         }
-                        ComboFrame frame = openEmpty();
-                        for (int i = 0; i < args.length; ++i) {
-                            File file = new File(args[i]);
-                            if (file.exists()) {
-                                open(file, frame, null);
-                                break;
+
+                        for (final String arg : args) {
+                            final File file = new File(arg);
+                            if (file.isDirectory()) {
+                                openFolder(openEmpty(), file);
                             }
+                            else /* if (file.isFile()) */ {
+                                final File parent = file.getParentFile();
+                                if (parent != null) {
+                                    notifyRecentFolder(parent);
+                                    open(file, openEmpty(), null);
+                                }
+                            }
+                        }
+                        if (Current.isEmpty()) {
+                            openEmpty();
                         }
                         Platform.getPlatform().readyToOpenFiles();
 
