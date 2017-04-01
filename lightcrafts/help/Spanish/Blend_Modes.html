@@ -4,16 +4,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es-ES" xml:lang="es-ES">
 
   <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <title>LightZone: Modos de Mezcla</title><!--[if lt IE 7]>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <title>LightZone: Modos de Mezcla</title>
+    <meta name="description" content="Descripcion de los distintos modos de mezcla."/>
+    <link rel="stylesheet" type="text/css" href="Help.css" media="all"/>
+    <link rel="stylesheet" type="text/css" href="Platform.css" media="all"/>
+    <!--[if lt IE 7]>
     <script defer type="text/javascript" src="IE_PNG.js"></script>
     <link rel="stylesheet" type="text/css" href="IE.css" media="all"/>
     <![endif]-->
-    <meta name="description"
-      content="Descripcion de los distintos modos de mezcla."/>
-    <link rel="stylesheet" type="text/css" href="Help.css" media="all"/>
-    <link rel="stylesheet" type="text/css" href="Platform.css" media="all"/>
-    
   </head>
 
   <body>
@@ -22,278 +21,96 @@
         <a href="index.html">Ayuda de LightZone</a>
       </div>
       <div id="banner_right">
-        <a href="index/index.html">Index</a>
+        <a href="index/index.html">Indice</a>
       </div>
-    </div><!-- LC_Index: blending modes > description --><!-- LC_Index: tool > blending modes for -->
+    </div>
 
-    
-    
-    <a name="Blending_Modes"></a>
-    <img src="images/app_icon-32.png" width="32" height="32"
-      class="title_icon"/>
+    <!-- LC_Index: blending modes > description -->
+    <!-- LC_Index: tool > blending modes for -->
+    <a name="Blending_Modes"/>
+    <img src="images/app_icon-32.png" width="32" height="32" class="title_icon"/>
     <h1>Modos de mezcla</h1>
 
-    <p>
-      
-      Most tools can have a <em>blending mode</em> specified for them.
-      A blending mode controls how the effects of tools in the
-      <a href="Tool_Stack.html">tool stack</a> blend together
-      to form the final photo.
+    <p>La mayor parte de las herramientas pueden tener un<em>modo de mezcla</em> especifico para ellas. Un modo de mezcla controla como los efectos de las herramientas en la <a href="Tool_Stack.html">pila de herramientas</a> se mezclan juntos para formar la foto final. Para entender los modos de mezcla, hay algunos terminos a conocer:<dl>
 
-      In order to understand blending modes,
-      there are a few terms to know:
-      
-      <dl>
+        <dt>Color base</dt>
+        <dd>Este es el color de un pixel antes de que una herramienta de efectos se haya aplicado a la foto.</dd>
 
-        <dt>Base color</dt>
-        <dd>
-          
-          This is the color of a pixel
-          before a tool's effect
-          has been applied to the photo.
-        
-        </dd>
+        <dt>Color mezclado</dt>
+        <dd>Este es el color de un pixel despues de que una herramineta de efectos se haya aplicado a la foto.</dd>
 
-        <dt>Blend color</dt>
-        <dd>
-          
-          This is the color of a pixel
-          after a tool's effect
-          has been applied to the photo.
-        
-        </dd>
+        <dt>Color resultante</dt>
+        <dd>Este es el color de un píxel después de que su base y los colores de la mezcla se hayan mezclado juntos usando un modo de fusión.</dd>
 
-        <dt>Result color</dt>
-        <dd>
-          
-          This is the color of a pixel
-          after its base and blend colors
-          have been blended together
-          using a blending mode.
-        
-        </dd>
-
-      </dl>
-
-      
-
-      This is illustrated in the figure below.
-      First, as shown by the green arrows,
-      the base colors of a photo
-      have a tool's effect applied to them
-      producing the blend colors.
-
-      Second, as shown by the red arrows,
-      the base and blend colors
-      are blended together
-      using a blending mode
-      producing the result colors.
-    
-    </p>
+      </dl>Esto se muestra en la figura de abajo. En primer lugar, como se muestra en las flechas verdes, los colores de base de una foto tienen un efecto de una herramienta aplicado a ellos produciendo los colores de mezcla. En segundo lugar, como se muestra en las flechas rojas, los colores de base y de mezcla se mezclan juntos usando un modo de mezcla que produce los colores resultantes.</p>
     <p>
       <div class="figure">
-        <img src="images/Blend_Modes_Illustration-en.png"
-          width="416" height="139"/>
+        <img src="images/Blend_Modes_Illustration-en.png" width="416" height="139"/>
       </div>
     </p>
 
-    <p>
-      
-      There are many blending modes to choose from.
-      While descriptions for each are below,
-      it's best to experiment.
-    
-    </p>
+    <p>Hay muchos modos de mezcla para escoger. Aunque las descripciones para cada uno estan debajo, es mejor experimentar.</p>
 
     <dl>
 
-      <dt><a name="Blend_Normal"></a>Normal</dt>
-      <dd>
-        
-        This blending mode has no effect;
-        therefore, the blend and result colors are the same.
-      
-      </dd>
+      <dt><a name="Blend_Normal"/>Normal</dt>
+      <dd>Este modo de mezcla no tiene efecto; por lo tanto la mezcla y los colores resultantes son los mismos.</dd>
 
-      <dt><a name="Blend_Average"></a>Average</dt>
-      <dd>
-        
-        This is the same as the Normal blending mode but at 50% opacity.
-      
-      </dd>
+      <dt><a name="Blend_Average"/>Promedio</dt>
+      <dd>Este es el mismo que el modo de mezcla Normal pero al 50% de opacidad.</dd>
 
-      <dt><a name="Blend_Color_Burn"></a>Color Burn</dt>
-      <dd>
-        
-        Darkens the base color to reflect the blend color
-        by increasing contrast.
-        (Opposite of Color Dodge.
-        See also: Soft Burn.)
-      
-      </dd>
+      <dt><a name="Blend_Color_Burn"/>Subexponer color</dt>
+      <dd>Oscurece el color base para reflejar el color de la mezcla aumentando el contraste. (Opuesto a sobreexponer color. Ver tambien: Subexponer suave.)</dd>
 
-      <dt><a name="Blend_Color_Dodge"></a>Color Dodge</dt>
-      <dd>
-        
-        Brightens the base color to reflect the blend color
-        by decreasing contrast.
-        (Opposite of Color Burn.)
-      
-      </dd>
+      <dt><a name="Blend_Color_Dodge"/>Sobreexponer color</dt>
+      <dd>Aclarar el color base para reflejar el color de la mezcla disminuyendo el contraste. (Opuesto a Subexponer Color.)</dd>
 
-      <dt><a name="Blend_Darken"></a>Darken</dt>
-      <dd>
-        
-        The result color is either the base or blend color,
-        whichever is darker.
-        (Opposite of Lighten.)
-      
-      </dd>
+      <dt><a name="Blend_Darken"/>Oscurecer</dt>
+      <dd>El color resultante es el color base o de mezcla, el que sea más oscuro. (Opuesto a Aclarar.)</dd>
 
-      <dt><a name="Blend_Difference"></a>Difference</dt>
-      <dd>
-        
-        Subtracts either the blend color from the base color
-        or the base color from the blend color
-        depending on whichever is brighter.
-        (See also: Exclusion.)
-      
-      </dd>
+      <dt><a name="Blend_Difference"/>Diferencia</dt>
+      <dd>Resta el color de la mezcla del color base o el color base del color de la mezcla dependiendo de cuál sea más claro. (Ver también: Exclusion.)</dd>
 
-      <dt><a name="Blend_Exclusion"></a>Exclusion</dt>
-      <dd>
-        
-        Creates an effect similar to,
-        but lower in contrast than,
-        the Difference blending mode.
-        (See also: Negation.)
-      
-      </dd>
+      <dt><a name="Blend_Exclusion"/>Exclusión</dt>
+      <dd>Crea un efecto similar, pero más bajo en contraste que, el modo de mezcla de Diferencia. (Ver también: Negación.)</dd>
 
-      <dt><a name="Blend_Hard_Light"></a>Hard Light</dt>
-      <dd>
-        
-        This blending mode multiplies or screens the colors,
-        depending on the blend color.
+      <dt><a name="Blend_Hard_Light"/>Luz fuerte</dt>
+      <dd>Este modo de fusión multiplica o mide los colores, dependiendo del color de la mezcla. Si el color de la mezcla es más claro que el 50% de gris, el color es aclarado (tramado); Si el color de la mezcla es más oscuro que el 50% de gris, el color se oscurece (multiplicado). Esto es útil para agregar altas luces o sombras a una imagen.</dd>
 
-        If the blend color is lighter than 50% gray,
-        the color is lightened (screened);
+      <dt><a name="Blend_Lighten"/>Aclarar</dt>
+      <dd>El color resultante es el color base o de mezcla, el que sea más claro. (Opuesto a Oscurecer.)</dd>
 
-        if the blend color is darker than 50% gray,
-        the color is darkened (multiplied).
+      <dt><a name="Blend_Midtones"/>Medios tonos</dt>
+      <dd>Este modo de fusión es el mismo que el modo de fusión Normal excepto que el efecto se aplica sólo a los medios tonos.</dd>
 
-        This is useful for adding highlights or shadows to an image.
-      
-      </dd>
+      <dt><a name="Blend_Mid_Hilights"/>Med+Altas Luces</dt>
+      <dd>Este modo de fusión es el mismo que el modo de fusión Normal excepto que el efecto se aplica sólo a los medios tonos y altas luces.</dd>
 
-      <dt><a name="Blend_Lighten"></a>Lighten</dt>
-      <dd>
-        
-        The result color is either the base or blend color,
-        whichever is lighter.
-        (Opposite of Darken.)
-      
-      </dd>
+      <dt><a name="Blend_Multiply"/>Multiplicar</dt>
+      <dd>Este modo de mezcla multiplica la base y los colores de la mezcla. El color resultante es siempre mas oscuro. El efecto es similar a dibujar en la imagen con múltiples rotuladores. (ver también: Trama.)</dd>
 
-      <dt><a name="Blend_Midtones"></a>Midtones</dt>
-      <dd>
-        
-        This blending mode is the same as the Normal blending mode
-        except that the effect is applied only to midtones. 
-       
-      </dd>
+      <dt><a name="Blend_Negation"/>Negacion</dt>
+      <dd>Este modo de fusión es similar al modo de fusión Exclusión excepto que muestra colores más claros y vibrantes.</dd>
 
-      <dt><a name="Blend_Mid_Hilights"></a>Mid+Hilights</dt>
-      <dd>
-        
-        This blending mode is the same as the Normal blending mode
-        except that the effect is applied only to midtones and highlights. 
-       
-      </dd>
+      <dt><a name="Blend_Overlay"/>Superponer</dt>
+      <dd>Multiplica o trama los colores según el color base. Los patrones o los colores superponen los píxeles existentes mientras se conservan los reflejos y las sombras del color base. El color base no se sustituye, sino que se mezcla con el color de la mezcla para reflejar la luminosidad u oscuridad relativa del color original.</dd>
 
-      <dt><a name="Blend_Multiply"></a>Multiply</dt>
-      <dd>
-        
-        This blending mode multiplies the base and blend colors.
-        The result color is always darker.
-        The effect is similar to projecting multiple photographic slides
-        onto the same screen.
-        (See also: Screen.)
-      
-      </dd>
+      <dt><a name="Blend_Screen"/>Trama</dt>
+      <dd>Este modo de fusión es similar al modo de fusión Multiplicar, excepto que multiplica la inversa de los colores de mezcla y base. El color resultante es siempre mas claro. El efecto es similar a proyectar múltiples diapositivas fotográficas en la misma pantalla.</dd>
 
-      <dt><a name="Blend_Negation"></a>Negation</dt>
-      <dd>
-        
-        This blending mode is similar to the Exclusion blending mode
-        except that it shows brighter and more vibrant colors.
-      
-      </dd>
+      <dt><a name="Blend_Shadows"/>Sombras</dt>
+      <dd>Este modo de fusión sólo hace que las sombras se vean afectadas.</dd>
 
-      <dt><a name="Blend_Overlay"></a>Overlay</dt>
-      <dd>
-        
-        Multiplies or screens the colors
-        depending on the base color.
-        Patterns or colors overlay existing pixels
-        while preserving the highlights and shadows of the base color.
-        The base color is not replaced, but is mixed with the blend color
-        to reflect the relative lightness or darkness of the original color.
-      
-      </dd>
+      <dt><a name="Blend_Soft_Burn"/>Subexposición suave</dt>
+      <dd>Este modo de fusión es similar al modo de fusión Subexponer Color, excepto que el efecto produce menos saturación y contraste.</dd>
 
-      <dt><a name="Blend_Screen"></a>Screen</dt>
-      <dd>
-        
-        This blending mode is similar to the Multiply blending mode
-        except that it multiplies the inverse of the blend and base colors.
-        The result color is always lighter.
-        The effect is similar to projecting multiple photographic slides
-        onto the same screen.
-      
-      </dd>
+      <dt><a name="Blend_Soft_Dodge"/>Sobreexposición suave</dt>
+      <dd>Este modo de mezcla es una combinación de los modos Sobreexponer Color y Color inverso, pero mucho más suave que cualquiera de ellos. Los colores de base se oscurecen ligeramente con colores de mezcla muy claros sobreexpuestos.</dd>
 
-      <dt><a name="Blend_Shadows"></a>Shadows</dt>
-      <dd>
-        
-        This blending mode causes only the shadows to be affected.
-      
-      </dd>
-
-      <dt><a name="Blend_Soft_Burn"></a>Soft Burn</dt>
-      <dd>
-        
-        This blending mode is similar to the Color Burn blending mode
-        except that the effect results in less saturation and contrast.
-      
-      </dd>
-
-      <dt><a name="Blend_Soft_Dodge"></a>Soft Dodge</dt>
-      <dd>
-        
-        This blending mode is a combination of both the Color Dodge
-        and inverse Color Burn modes,
-        but much smoother than either.
-        The base colors are darkened slightly
-        with very bright blend colors dodged in.
-      
-      </dd>
-
-      <dt><a name="Blend_Soft_Light"></a>Soft Light</dt>
-      <dd>
-        
-        This blending mode darkens or lightens the colors
-        depending on the blend color.
-        The effect is similar to shining a diffused spotlight on the image.
-        If the blend color is lighter,
-        the image is lightened as if it were dodged;
-        if the blend color is darker,
-        the image is darkened as if it were burned in.
-      
-      </dd>
+      <dt><a name="Blend_Soft_Light"/>Luz suave</dt>
+      <dd>Este modo de mezcla oscurece o aclara los colores dependiendo del color de la mezcla. El efecto es similar a aclarar con un foco difuso en la imagen. Si el color de la mezcla es más claro, la imagen se aclara como si fuera sobreexpuesta; Si el color de la mezcla es más oscuro, la imagen se oscurece como si estuviera subexpuesta.</dd>
 
     </dl>
 
   </body>
 </html><!-- vim:set et sw=2 ts=2: -->
-

@@ -4,16 +4,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es-ES" xml:lang="es-ES">
 
   <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <title>LightZone: New Features</title><!--[if lt IE 7]>
-    <script defer type="text/javascript" src="IE_PNG.js"></script>
-    <link rel="stylesheet" type="text/css" href="IE.css" media="all"/>
-    <![endif]-->
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <title>LightZone: New Features</title>
     <meta name="description" content="The new features in LightZone."/>
     <meta name="ROBOTS" content="NOINDEX"/>
     <link rel="stylesheet" type="text/css" href="Help.css" media="all"/>
     <link rel="stylesheet" type="text/css" href="Platform.css" media="all"/>
-    
+    <!--[if lt IE 7]>
+    <script defer type="text/javascript" src="IE_PNG.js"></script>
+    <link rel="stylesheet" type="text/css" href="IE.css" media="all"/>
+    <![endif]-->
   </head>
 
   <body>
@@ -22,7 +22,7 @@
         <a href="index.html">Ayuda de LightZone</a>
       </div>
       <div id="banner_right">
-        <a href="index/index.html">Index</a>
+        <a href="index/index.html">Indice</a>
       </div>
     </div>
 
@@ -31,33 +31,239 @@
       class="title_icon"/>
     <h1>What's new in LightZone?</h1>
     <p>
-      
       This page lists only the new features in LightZone.
       To learn about the key features,
       see the <a href="Discover.html">Discover LightZone</a> page.
-    
-    </p><!-- ================================================================== -->
+      To check all fixed bugs, see the
+      <a href="https://github.com/ktgw0316/LightZone/wiki/ChangeLog">
+        ChangeLog on github</a>.
+    </p>
 
     <a name="New_Features"></a>
 
-    
+    <!-- ================================================================== -->
 
     <table class="chapter_box" width="100%">
       <tr>
         <td class="chapter_box_header">
-          <h3>LightZone 3.8</h3>
+          LightZone 4.1.0
         </td>
       </tr>
       <tr>
         <td>
 
-          <h4>Camera Support</h4>
+          <h3>User Interface</h3>
           <ul>
             <li>
-              
+              You can now open an image via command line, OS context menu,
+              or drag &amp; drop on LightZone shortcut icon.
+            </li>
+            <li>
+              On Mac OS X:
+              <ul>
+                <li>
+                  Full-screen mode is now supported on 10.7 (Lion) or newer.
+                </li>
+                <li>
+                  HiDPI retina mode is now supported.
+                </li>
+              </ul>
+            </li>
+          </ul>
+
+          <h3>Photo Browser</h3>
+          <ul>
+            <li>
+              You can now select multiple thumbnails with Ctrl-Shift-Click. 
+            </li>
+          </ul>
+
+          <h3>Photo Editor</h3>
+          <ul>
+            <li>
+              You can now zoom in/out with Ctrl-wheel, and move the zoomed image
+              with Ctrl-drag.
+            </li>
+            <li>
+              In Crop/Rotate mode, you can now rotate the image with mouse wheel,
+              and change the rotation grid origin with a click.
+            </li>
+            <li>
+              "Info" tab is now also available in Editor mode.
+            </li>
+            <li>
+              AdvancedNoiseReduction is updated to V4.
+            </li>
+            <li>
+              Upresolution is now possible when converting an edited image.
+            </li>
+          </ul>
+
+          <h3>Localization</h3>
+          <ul>
+            <li>
+              UI messages are translated in Danish, Dutch, French, German,
+              Japanese, and Spanish.
+            </li>
+            <li>
+              Help files are translated in Danish, Dutch, French, Japanese,
+              and Spanish.
+            </li>
+          </ul>
+
+          <h3>Operating System Support</h3>
+          <ul>
+            <li>
+              Windows (64-bit), Mac OS X 10.10, FreeBSD, and OpenIndiana
+              are now supported.
+            </li>
+          </ul>
+
+          <h3>Camera Support</h3>
+          <ul>
+            <li>
               Raw files from the following cameras are now supported:
-              Olympus&nbsp;E-P1
-            
+              <ul>
+                <li>
+                  Canon:
+                  EOS&nbsp;1D-X,
+                  EOS&nbsp;6D,
+                  EOS&nbsp;7D&nbsp;Mark&nbsp;II,
+                  EOS&nbsp;70D,
+                  EOS&nbsp;100D&nbsp;/&nbsp;SL1&nbsp;/&nbsp;X7,
+                  EOS&nbsp;700D&nbsp;/&nbsp;T5i&nbsp;/&nbsp;X7i,
+                  EOS&nbsp;1200D&nbsp;/&nbsp;Rabel&nbsp;T5,
+                  Powershot&nbsp;G7&nbsp;X,
+                  Powershot&nbsp;G12,
+                  Powershot&nbsp;G16,
+                  Powershot&nbsp;S120
+                </li>
+                <li>
+                  Epson:
+                  R-D1
+                </li>
+                <li>
+                  Fujifilm:
+                  Finepix&nbsp;S1,
+                  X-A1,
+                  X-E2,
+                  X-M1,
+                  X-T1,
+                  X20,
+                  X30,
+                  X100s,
+                  X100T,
+                  XQ1
+                </li>
+                <li>
+                  Leica:
+                  M9,
+                  X&nbsp;VARIO&nbsp;(TYP&nbsp;107)
+                </li>
+                <li>
+                  Nikon:
+                  1&nbsp;AW1,
+                  1&nbsp;J3,
+                  1&nbsp;S1,
+                  1&nbsp;V2,
+                  1&nbsp;V3,
+                  Coolpix&nbsp;A,
+                  Coolpix&nbsp;P340,
+                  Coolpix&nbsp;P7800,
+                  D4S,
+                  D600,
+                  D810,
+                  D750,
+                  D800,
+                  D800E,
+                  D3300,
+                  D5300,
+                  D5200,
+                  D5500,
+                  D7100,
+                  D7200,
+                  DF
+                </li>
+                <li>
+                  Olympus:
+                  E-M10,
+                  E-M1,
+                  E-P3,
+                  E-P5,
+                  E-PL1S,
+                  E-PL2,
+                  E-PL3,
+                  E-PL7,
+                  E-PM1,
+                  STYLUS1,
+                  XZ-1,
+                  XZ-2
+                </li>
+                <li>
+                  Panasonic:
+                  DMC-FZ70,
+                  DMC-FZ200,
+                  DMC-FZ1000,
+                  DMC-G6,
+                  DMC-GF6,
+                  DMC-GM1,
+                  DMC-GX7,
+                  DMC-LF1,
+                  DMC-LX100
+                </li>
+                <li>
+                  Pentax:
+                  645D,
+                  GR,
+                  K100D&nbsp;Super,
+                  K-3,
+                  K-5&nbsp;II,
+                  K-5&nbsp;IIs,
+                  K-50,
+                  K-500,
+                  Q7
+                </li>
+                <li>
+                  Samsung:
+                  EK-GN120,
+                  EX2F,
+                  NX1,
+                  NX10,
+                  NX20,
+                  NX200,
+                  NX300,
+                  NX1000,
+                  NX&nbsp;Mini
+                </li>
+                <li>
+                  Sony:
+                  A99,
+                  DSC-RX1R,
+                  DSC-RX10,
+                  DSC-RX100M2,
+                  DSC-RX100M3,
+                  DSLR-A230,
+                  DSLR-A290,
+                  DSLR-A380,
+                  DSLR-A500,
+                  DSLR-A580,
+                  ILCE-7,
+                  ILCE-7R,
+                  ILCE-3000,
+                  ILCE-5000,
+                  ILCE-5100,
+                  ILCE-6000,
+                  ILCE-QX1,
+                  SLT-A58
+                  NEX-3,
+                  NEX-3N,
+                  NEX-5,
+                  NEX-5T,
+                  NEX-C3
+                </li>
+              </ul>
+            </li><li>
+              Raw processing is now multi-threaded with OpenMP.
             </li>
           </ul>
 
@@ -65,23 +271,72 @@
       </tr>
     </table>
 
-    <br/><!-- ================================================================== -->
+    <br/>
 
-    
+    <!-- ================================================================== -->
 
     <table class="chapter_box" width="100%">
       <tr>
         <td class="chapter_box_header">
-          <h3>LightZone 3.7</h3>
+          LightZone 4.0.0
         </td>
       </tr>
       <tr>
         <td>
 
-          <h4>Camera Support</h4>
+          <h3>License Change</h3>
           <ul>
             <li>
-              
+              LightZone is now released as a free and open source software under
+              New BSD License.
+            </li>
+          </ul>
+
+        </td>
+      </tr>
+    </table>
+
+    <br/>
+
+    <!-- ================================================================== -->
+
+    <table class="chapter_box" width="100%">
+      <tr>
+        <td class="chapter_box_header">
+          LightZone 3.8
+        </td>
+      </tr>
+      <tr>
+        <td>
+
+          <h3>Camera Support</h3>
+          <ul>
+            <li>
+              Raw files from the following cameras are now supported:
+              Olympus&nbsp;E-P1
+            </li>
+          </ul>
+
+        </td>
+      </tr>
+    </table>
+
+    <br/>
+
+    <!-- ================================================================== -->
+
+    <table class="chapter_box" width="100%">
+      <tr>
+        <td class="chapter_box_header">
+          LightZone 3.7
+        </td>
+      </tr>
+      <tr>
+        <td>
+
+          <h3>Camera Support</h3>
+          <ul>
+            <li>
               Raw files from the following cameras are now supported:
               Canon&nbsp;EOS&nbsp;5D&nbsp;Mark&nbsp;II,
               Canon&nbsp;EOS&nbsp;50D,
@@ -97,7 +352,6 @@
               Pentax&nbsp;K2000,
               Sony&nbsp;A300,
               Sony&nbsp;A900
-            
             </li>
           </ul>
 
@@ -105,23 +359,22 @@
       </tr>
     </table>
 
-    <br/><!-- ================================================================== -->
+    <br/>
 
-    
+    <!-- ================================================================== -->
 
     <table class="chapter_box" width="100%">
       <tr>
         <td class="chapter_box_header">
-          <h3>LightZone 3.6</h3>
+          LightZone 3.6
         </td>
       </tr>
       <tr>
         <td>
 
-          <h4>Camera Support</h4>
+          <h3>Camera Support</h3>
           <ul>
             <li>
-              
               Raw files from the following cameras are now supported:
               Canon&nbsp;EOS&nbsp;450D,
               Canon&nbsp;EOS&nbsp;1000D,
@@ -135,7 +388,6 @@
               Samsung&nbsp;GX20
               Sony&nbsp;A200,
               Sony&nbsp;A350.
-            
             </li>
           </ul>
 
@@ -143,37 +395,33 @@
       </tr>
     </table>
 
-    <br/><!-- ================================================================== -->
+    <br/>
 
-    
+    <!-- ================================================================== -->
 
     <table class="chapter_box" width="100%">
       <tr>
         <td class="chapter_box_header">
-          <h3>LightZone 3.5</h3>
+          LightZone 3.5
         </td>
       </tr>
       <tr>
         <td>
 
-          <h4>New Features</h4>
+          <h3>New Features</h3>
           <ul>
             <li>
-              
               There's a new Help menu item that takes you to the
               <a href="http://www.lightcrafts.com/learning/">Learning Center</a>.
-            
             </li>
           </ul>
 
-          <h4>Camera Support</h4>
+          <h3>Camera Support</h3>
           <ul>
             <li>
-              
               Raw files from the following cameras are now supported:
               Canon EOS 1Ds Mark III,
               Panasonic DMC-L10.
-            
             </li>
           </ul>
 
@@ -181,26 +429,24 @@
       </tr>
     </table>
 
-    <br/><!-- ================================================================== -->
+    <br/>
 
-    
+    <!-- ================================================================== -->
 
     <table class="chapter_box" width="100%">
       <tr>
         <td class="chapter_box_header">
-          <h3>LightZone 3.4</h3>
+          LightZone 3.4
         </td>
       </tr>
       <tr>
         <td>
 
-          <h4>Photo Editor</h4>
+          <h3>Photo Editor</h3>
           <ul>
             <li>
-              
               You can now preview <a href="Styles.html">styles</a>
               by moving the mouse over style names.
-            
             </li>
           </ul>
 
@@ -208,25 +454,23 @@
       </tr>
     </table>
 
-    <br/><!-- ================================================================== -->
+    <br/>
 
-    
+    <!-- ================================================================== -->
 
     <table class="chapter_box" width="100%">
       <tr>
         <td class="chapter_box_header">
-          <h3>LightZone 3.3</h3>
+          LightZone 3.3
         </td>
       </tr>
       <tr>
         <td>
 
-          <h4>Operating System Support</h4>
+          <h3>Operating System Support</h3>
           <ul>
             <li>
-              
               Linux is now supported.
-            
             </li>
           </ul>
 
@@ -234,32 +478,29 @@
       </tr>
     </table>
 
-    <br/><!-- ================================================================== -->
+    <br/>
 
-    
+    <!-- ================================================================== -->
 
     <table class="chapter_box" width="100%">
       <tr>
         <td class="chapter_box_header">
-          <h3>LightZone 3.2</h3>
+          LightZone 3.2
         </td>
       </tr>
       <tr>
         <td>
 
-          <h4>Operating System Support</h4>
+          <h3>Operating System Support</h3>
           <ul>
             <li>
-              
               Mac OS X 10.5 Leopard is now supported.
-            
             </li>
           </ul>
 
-          <h4>Camera Support</h4>
+          <h3>Camera Support</h3>
           <ul>
             <li>
-              
               Raw files from the following cameras are now supported:
               Canon Powershot G9,
               Leica V-Lux 1,
@@ -267,7 +508,6 @@
               Olympus E-3,
               Panasonic DMC-FZ18,
               Sony Alpha DSLR-A700.
-            
             </li>
           </ul>
 
@@ -275,50 +515,43 @@
       </tr>
     </table>
 
-    <br/><!-- ================================================================== -->
+    <br/>
 
-    
+    <!-- ================================================================== -->
 
     <table class="chapter_box" width="100%">
       <tr>
         <td class="chapter_box_header">
-          <h3>LightZone 3.1</h3>
+          LightZone 3.1
         </td>
       </tr>
       <tr>
         <td>
 
-          <h4>Photo Editor</h4>
+          <h3>Photo Editor</h3>
           <ul>
             <li>
-              
               You can now restrict every tools' effect to a
               <a href="Color_Luminosity_Selection.html">range of color or luminosity</a>.
-            
             </li>
             <li>
-              
               The <a href="Tool-Raw_Adjustments.html">Raw Adjustments</a> tool
               now automatically removes "hot pixels"
               from your raw photos.
-            
             </li>
             <li>
               <a href="Tool-Crop.html">Crop</a>
               and
               <a href="Tool-Rotate.html">rotate</a>
               have been improved.
-            
             </li>
           </ul>
 
-          <h4>Camera Support</h4>
+          <h3>Camera Support</h3>
           <ul>
             <li>
-              
               Raw files from the following cameras are now supported:
               Olympus E-400, E-410, E-510; Ricoh Caplio GX100.
-            
             </li>
           </ul>
 
@@ -326,115 +559,91 @@
       </tr>
     </table>
 
-    <br/><!-- ================================================================== -->
+    <br/>
 
-    
+    <!-- ================================================================== -->
 
     <table class="chapter_box" width="100%">
       <tr>
         <td class="chapter_box_header">
-          <h3>LightZone 3.0</h3>
+          LightZone 3.0
         </td>
       </tr>
       <tr>
         <td>
 
-          <h4>User Interface</h4>
+          <h3>User Interface</h3>
           <ul>
             <li>
-              
               LightZone now has distinct
               <a href="Anatomy-Browser.html">browse</a>
               and
               <a href="Anatomy-Editor.html">edit</a>
               modes.
-            
             </li>
             <li>
-              
               There is now context-sensitive help throughout LightZone.
-            
             </li>
           </ul>
 
-          <h4>Photo Browser</h4>
+          <h3>Photo Browser</h3>
           <ul>
             <li>
-              
               Related photos can now be <a href="Thumbnails.html">stacked</a>.
-            
             </li>
             <li>
-              
               You can now move photos via drag &amp; drop to folders in the
               <a href="Navigating_Folders.html">Folder Navigator</a>.
-            
             </li>
             <li>
-              
               You can now select only the most recent versions
               of your photos in a given folder.
-            
             </li>
             <li>
-              
               You can now <a href="Metadata.html">edit IPTC metadata</a>.
-            
             </li>
           </ul>
 
-          <h4>Photo Editor</h4>
+          <h3>Photo Editor</h3>
           <ul>
             <li>
-              
               LightZone now comes bundled with many ready-made
               <a href="Styles.html">Styles</a>.
-            
             </li>
             <li>
-              
               The <a href="Tool-Relight.html">Relight tool</a>
               (an improved ToneMapper tool)
               has new Depth and Fuzz sliders.
-            
             </li>
             <li>
-              
               There is now a <a href="History.html">History</a> tab
               that shows you all the edits you have make to your photo
               since opening it for the current editing session.
-            
             </li>
             <li>
-              
               The <a href="Tool-Raw_Adjustments.html">Raw Adjustments tool</a>
               has a new As Shot button.
-            
             </li>
             <li>
-              
               LightZone no longer uses LZN files
               and now always <a href="Saving.html">saves your work</a>
               as either JPEG or TIFF files
               for maximum interoperability with other applications.
-            
             </li>
           </ul>
 
-          <h4>Camera Support</h4>
+          <h3>Camera Support</h3>
           <ul>
             <li>
-              
               Canon EOS 1D Mark III raw files are now supported.
-            
             </li>
           </ul>
 
         </td>
       </tr>
-    </table><!-- ================================================================== -->
+    </table>
 
-    
+    <!-- ================================================================== -->
 
   </body>
 </html><!-- vim:set et sw=2 ts=2: -->
