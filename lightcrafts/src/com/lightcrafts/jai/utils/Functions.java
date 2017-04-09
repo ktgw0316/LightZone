@@ -58,9 +58,10 @@ public class Functions {
         double newRadius = radius;
         float rescale = 1;
 
-        int size = Math.min(image.getWidth(), image.getHeight());
+        final int size = Math.min(image.getWidth(), image.getHeight());
+        final int tileSize = Math.max( JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT);
 
-        if (size > 256) {
+        if (size > tileSize) {
             while (newRadius > 32) {
                 newRadius /= 2;
                 rescale /= 2;
