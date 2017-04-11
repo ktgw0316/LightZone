@@ -4,13 +4,10 @@ package com.lightcrafts.app.batch;
 
 import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.image.types.JPEGImageType;
-import com.lightcrafts.image.types.ImageType;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.ui.browser.model.ImageTask;
-import com.lightcrafts.mediax.jai.RenderedOp;
-import com.lightcrafts.mediax.jai.operator.AffineDescriptor;
 import com.lightcrafts.utils.filecache.FileCacheFactory;
 import com.lightcrafts.utils.filecache.FileCache;
 
@@ -56,10 +53,7 @@ class BatchImageComponent extends JComponent {
             );
         }
         else {
-            RenderedOp op = AffineDescriptor.create(
-                image, getTransform(), null, null, null
-            );
-            g.drawRenderedImage(op, new AffineTransform());
+            g.drawRenderedImage(image, getTransform());
         }
     }
 
