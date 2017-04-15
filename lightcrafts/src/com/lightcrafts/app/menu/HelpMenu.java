@@ -69,10 +69,8 @@ class HelpMenu extends UpdatableDisposableMenu {
         add(menuItem);
 */
 
-        if (Platform.getType() != Platform.MacOSX) {
-
+        if (!Platform.isMac()) {
             // On the Mac, the "About" item lies under the app menu.
-
             menuItem = MenuFactory.createMenuItem("About");
             menuItem.addActionListener(
                 new ActionListener() {

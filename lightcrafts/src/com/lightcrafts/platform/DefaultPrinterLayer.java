@@ -78,7 +78,7 @@ public class DefaultPrinterLayer implements PrinterLayer {
     }
 
     public static PageFormat fixPageFormat(PageFormat format) {
-        if (Platform.getType() == Platform.MacOSX) {
+        if (Platform.isMac()) {
             Paper paper = format.getPaper();
             paper.setImageableArea(0, 0, paper.getWidth(), paper.getHeight()); //no margins
             format.setPaper(paper);
@@ -120,7 +120,7 @@ public class DefaultPrinterLayer implements PrinterLayer {
              * NOTE: Mac OS X has a bug in the landscape printing, this hack rotates te image and prints portrait anyway
              */
             int orientation = format.getOrientation();
-            if (orientation != PageFormat.PORTRAIT && Platform.getType() == Platform.MacOSX)
+            if (orientation != PageFormat.PORTRAIT && Platform.isMac())
                 fakeLandscape = true;
 
             createRendering(settings, thread.getProgressIndicator());

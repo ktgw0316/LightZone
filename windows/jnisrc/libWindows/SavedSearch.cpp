@@ -9,7 +9,6 @@
 #include <shlwapi.h>
 
 // local
-#include "LC_CPPUtils.h"
 #include "LC_JNIUtils.h"
 #include "LC_WinError.h"
 #include "LC_WinUtils.h"

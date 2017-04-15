@@ -8,7 +8,8 @@
 
 // standard
 #include <cstdlib>
-#include <errno.h>
+#include <cstring>
+#include <cerrno>
 #include <iostream>
 #include <jni.h>
 

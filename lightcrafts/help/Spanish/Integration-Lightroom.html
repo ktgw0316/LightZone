@@ -17,11 +17,11 @@
         padding: 0 1em 0 1em;
       }
       -->
-    </style><!--[if lt IE 7]>
+    </style>
+    <!--[if lt IE 7]>
     <script defer type="text/javascript" src="IE_PNG.js"></script>
     <link rel="stylesheet" type="text/css" href="IE.css" media="all"/>
     <![endif]-->
-    
   </head>
 
   <body>
@@ -30,216 +30,167 @@
         <a href="index.html">Ayuda de LightZone</a>
       </div>
       <div id="banner_right">
-        <a href="index/index.html">Index</a>
+        <a href="index/index.html">Indice</a>
       </div>
-    </div><!-- LC_Index: workflow integration > with Lightroom --><!-- LC_Index: Lightroom workflow integration -->
+    </div>
 
-    
-    
+    <!-- LC_Index: workflow integration > with Lightroom -->
+    <!-- LC_Index: Lightroom workflow integration -->
     <a name="Integration-Lightroom"></a>
     <img src="images/app_icon-32.png" width="32" height="32"
       class="title_icon"/>
-    <h2>Workflow integration: Lightroom</h2>
+    <h1>Workflow integration: Lightroom</h1>
 
     <p>
-      
       Photoshop Lightroom (from Adobe Systems) allows you
       to select another application
-      as an "external editor" for editing your photos.
+      as an &quot;external editor&quot; for editing your photos.
       You can configure LightZone to be such an editor.
 
       Additionally, LightZone integrates seamlessly with Lightroom via the
       <a href="Preferences.html#Preferences-Direct_Save">Direct Save</a>
       preference.
-    
     </p>
     <p>
       <b>Note:</b>
-      The information provided here is accurate as of Lightroom version 1.1
+      The information provided here is accurate as of Lightroom version 5.2
       but may need to change for future versions.
-    
     </p>
 
     <div class="task_box">
-      <h3>To configure Lightroom to work with LightZone:</h3>
+      <h2>To configure Lightroom to work with LightZone:</h2>
       <ol>
         <li>
-          
           Select
           <span class="Mac_only">Lightroom</span>
           <span class="Windows_only">Edit</span>
           &gt; Preferences...
-        
         </li>
         <li>
-          
           Click the External Editors tab.
-        
         </li>
         <li>
-          
           Under Additional External Editor,
           click the Choose... button.
-        
         </li>
         <li>
-          
           Navigate to and select LightZone.
-        
         </li>
         <li>
-          
           For File Format, select TIFF.
-        
         </li>
         <li>
-          
           For Bit Depth, select 16 bits/component.
-        
         </li>
         <li>
-          
           Under Edit Externally File Naming,
-          the format must be the default setting of
-          <span class="boxed_text">Filename</span>-Edit.
-        
+          click Template list and select Edit...
         </li>
         <li>
-          
+          In Filename Template Editor, input {Filename &gt;&gt;}-Edit
+          in the text area.
+        </li><li>
+          Make sure that Example: IMG_0002-Edit.psd is shown, then click Done.
+        </li>
+        <li>
+        </li>
+        <li>
           Close the Preferences window.
-        
         </li>
       </ol>
       <p class="Mac_only">
         <a href="help:runscript='LightZone_Help/scripts/Set_Lightroom_Prefs.scpt'">
         <img src="images/AppleScriptAppIcon.png" width="32" height="32"
           class="inline_left"/></a>
-        
         Alternatively,
         you can click the AppleScript icon to the left
         to configure Lightroom automatically for you now.
         (If Lightroom is running, you must quit it first.)
-        
         <br clear="all"/>
       </p>
     </div>
 
     <p>
-      
       When using an external, Lightroom presents you with three choices:
-      
       <ul>
         <li>
-          
           Edit Original
-        
         </li>
         <li>
-          
           Edit a Copy
-        
         </li>
         <li>
-          
           Edit a Copy with Lightroom Adjustments
-        
         </li>
       </ul>
-      
       For raw photos, Lightroom only allows the third choice.
 
       For JPEG or TIFF photos, you should select
-      "Edit a Copy with Lightroom Adjustments"
+      &quot;Edit a Copy with Lightroom Adjustments&quot;
       to avoid modifying your original photo.
 
       In that case, Lightroom:
-      
       <ol>
         <li>
-          
           Creates a TIFF copy of your photo.
-        
         </li>
         <li>
-          
           Adds this TIFF copy to the current Lightroom library.
-        
         </li>
         <li>
-          
           Gives this TIFF copy to the external editor to edit.
-        
         </li>
       </ol>
     </p>
 
     <div class="task_box">
-      <h3>To configure LightZone to work with Lightroom:</h3>
+      <h2>To configure LightZone to work with Lightroom:</h2>
       <ol>
         <li>
-          
           Select
           <span class="Mac_only">LightZone</span>
           <span class="Not_Mac">Edit</span>
           &gt; Preferences...
-        
         </li>
         <li>
-          
           Make sure the
           <a href="Preferences.html#Preferences-Direct_Save">Direct Save</a>
           check-box is checked.
-        
         </li>
         <li>
-          
           Close the Preferences dialog.
-        
         </li>
       </ol>
     </div>
-
-    
 
     Now that everything has been configured,
     you can select one of your photos in Lightroom
     and edit it in LightZone.
 
-    
-
     <div class="task_box">
-      <h3>To edit your photo in LightZone from Lightroom:</h3>
+      <h2>To edit your photo in LightZone from Lightroom:</h2>
       <ol>
         <li>
-          
           In Lightroom, select the photo you want to edit.
-        
         </li>
         <li>
-          
           Select Photo &gt; Edit.
           (Lightroom will display its Edit Photo dialog
           offering you its three choices.)
-        
         </li>
         <li>
-          
           If this is an original photo,
-          select "Edit a Copy with Lightroom Adjustments."
+          select &quot;Edit a Copy with Lightroom Adjustments.&quot;
 
           If this is a TIFF copy that was created earlier,
-          select "Edit Original."
+          select &quot;Edit Original.&quot;
 
           (LightZone will launch and open your photo.)
-        
         </li>
         <li>
-          
           In LightZone, edit your photo to your liking as you would any photo.
-        
         </li>
         <li>
-          
           Select File &gt; Save to Lightroom.
           (LightZone will save your edited photo
           back to the TIFF copy overwriting
@@ -253,10 +204,8 @@
           </span>
         </li>
         <li class="Not_Mac">
-          
           Switch back to Lightroom:
           it will reload the now edited version of your photo.
-        
         </li>
       </ol>
     </div>
@@ -274,11 +223,10 @@
       and ask you how to synchronize the data.
 
       The safest option is to select Overwrite Settings.
-    
     </p>
 
     <div>
-      <h4>See also:</h4>
+      <h3>See also:</h3>
       <ul>
         <li>
           <a href="Multipage_TIFF.html">Multipage TIFF images</a>
@@ -296,5 +244,5 @@
     </div>
 
   </body>
-</html><!-- vim:set et sw=2 ts=2: -->
-
+</html>
+<!-- vim:set et sw=2 ts=2: -->

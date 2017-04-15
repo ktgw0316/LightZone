@@ -332,12 +332,15 @@ public class TemplateDatabase {
     // of "~/.local/share/LightZone/Templates".
     // This method copies templates from the old folder to the new one.
     private static void migrateTemplateFolders() {
-        val platform = Platform.getType();
-        val oldPath =
-                  (platform == Platform.Windows) ? "Application Data\\LightZone\\Templates"
-                : (platform == Platform.Linux)   ? "LightZone/Templates"
-                                                 : "";
-        if (oldPath.equals("")) {
+        final String oldPath;
+
+        if (Platform.isWindows()) {
+            oldPath = "Application Data\\LightZone\\Templates";
+        }
+        else if (Platform.isLinux()) {
+            oldPath = "LightZone/Templates";
+        }
+        else {
             // Only on Windows and Linux did we move the template folder.
             return;
         }

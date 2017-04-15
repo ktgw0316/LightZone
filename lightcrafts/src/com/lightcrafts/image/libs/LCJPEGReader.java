@@ -28,7 +28,7 @@ import static com.lightcrafts.image.types.JPEGConstants.*;
  * @author Paul J. Lucas [paul@lightcrafts.com]
  * @see <a href="http://www.ijg.org/">LibJPEG</a>
  */
-public final class LCJPEGReader {
+public final class LCJPEGReader implements LCImageReader {
 
     ////////// public /////////////////////////////////////////////////////////
 
@@ -164,10 +164,9 @@ public final class LCJPEGReader {
     }
 
     /**
-     * Gets the JPEG image.
-     *
-     * @return Returns said image.
+     * {@inheritDoc}
      */
+    @Override
     public PlanarImage getImage()
         throws LCImageLibException, UserCanceledException
     {

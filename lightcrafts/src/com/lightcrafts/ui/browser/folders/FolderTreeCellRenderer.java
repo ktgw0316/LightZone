@@ -17,7 +17,7 @@ import javax.swing.*;
 class FolderTreeCellRenderer extends DefaultTreeCellRenderer {
 
     static TreeCellRenderer createRenderer() {
-        return Platform.getType() == Platform.Windows ?
+        return Platform.isWindows() ?
             new WindowsFolderTreeCellRenderer() :
             new FolderTreeCellRenderer();
     }

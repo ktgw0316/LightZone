@@ -63,8 +63,8 @@ class ImageBrowserMouseListener implements MouseInputListener {
             // This is ctrl-click on windows/linux, command-click on
             // mac, filtering out synthetic command-clicks from multi-
             // button mice.
-            boolean isCtrlDown = ((! isMac()) && event.isControlDown()) ||
-                     (isMac() && event.isMetaDown() && ! event.isPopupTrigger());
+            boolean isCtrlDown = ((! Platform.isMac()) && event.isControlDown()) ||
+                     (Platform.isMac() && event.isMetaDown() && ! event.isPopupTrigger());
 
             // Figure out how to update the selection state:
             if (event.isShiftDown()) {
@@ -82,7 +82,7 @@ class ImageBrowserMouseListener implements MouseInputListener {
             else {
                 if (
                     event.isPopupTrigger() ||
-                    (isWindows() && (event.getButton() != MouseEvent.BUTTON1))
+                    (Platform.isWindows() && (event.getButton() != MouseEvent.BUTTON1))
                 ) {
                     // A popup trigger on a selected ImageDatum does nothing
                     // to selection, but a popup trigger on an unselected
@@ -131,13 +131,5 @@ class ImageBrowserMouseListener implements MouseInputListener {
         if (controller.isControllerEvent(event)) {
             controller.handleEvent(event);
         }
-    }
-
-    private static boolean isMac() {
-        return Platform.getType() == Platform.MacOSX;
-    }
-
-    private static boolean isWindows() {
-        return Platform.getType() == Platform.Windows;
     }
 }

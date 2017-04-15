@@ -23,6 +23,8 @@ import java.text.DecimalFormat;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.image.RenderedImage;
 
+import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_RED_EYE;
+
 /**
  * Copyright (C) 2007 Light Crafts, Inc.
  * User: fabio
@@ -35,6 +37,8 @@ public class RedEyesOperation extends BlendedOperation implements RedEyeOperatio
 
     public RedEyesOperation(Rendering rendering) {
         super(rendering, type);
+        setHelpTopic(HELP_TOOL_RED_EYE);
+
         addSliderKey(TOLERANCE);
 
         DecimalFormat format = new DecimalFormat("0.00");

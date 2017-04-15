@@ -2,6 +2,7 @@
 
 // standard
 #include <cstring>
+#include <memory>
 #include <string>
 
 // windows
@@ -13,7 +14,6 @@
 #endif
 
 // local
-#include "LC_CPPUtils.h"
 #include "LC_JNIUtils.h"
 #include "LC_WinError.h"
 #include "LC_WinUtils.h"
@@ -86,8 +86,8 @@ JNIEXPORT jboolean JNICALL WindowsFileUtil_METHOD(moveToRecycleBin)
     //
     // Build "from" string.
     //
-    auto_vec<WCHAR> fromBuf( new WCHAR[ fromBufSize ] );
-    WCHAR *p = fromBuf;
+    unique_ptr<WCHAR[]> fromBuf( new WCHAR[ fromBufSize ] );
+    WCHAR *p = fromBuf.get();
     for ( int i = 0; i < nFiles; ++i ) {
         jstring const jFile = (jstring)env->GetObjectArrayElement( jFiles, i );
         jstring_to_w const wFile( env, jFile );
@@ -101,7 +101,7 @@ JNIEXPORT jboolean JNICALL WindowsFileUtil_METHOD(moveToRecycleBin)
     SHFILEOPSTRUCT fop;
     ::memset( &fop, 0, sizeof fop );
     fop.wFunc = FO_DELETE;
-    fop.pFrom = fromBuf;
+    fop.pFrom = fromBuf.get();
     fop.fFlags =
         // Move to Recycle Bin instead of immediate deletion.
         FOF_ALLOWUNDO
@@ -175,8 +175,8 @@ JNIEXPORT jstring JNICALL WindowsFileUtil_METHOD(openFile)
     //
     // Build filter string.
     //
-    auto_vec<WCHAR> filterBuf( new WCHAR[ filterBufSize ] );
-    WCHAR *p = filterBuf;
+    unique_ptr<WCHAR[]> filterBuf( new WCHAR[ filterBufSize ] );
+    WCHAR *p = filterBuf.get();
     for ( int i = 0; i < nDisplayStrings; ++i ) {
         jstring const jDisplayString =
             (jstring)env->GetObjectArrayElement( jFilterDisplayStrings, i );
@@ -198,7 +198,7 @@ JNIEXPORT jstring JNICALL WindowsFileUtil_METHOD(openFile)
     ::memset( &ofn, 0, sizeof ofn );
     ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
     ofn.lpstrFile = wFileName;
-    ofn.lpstrFilter = filterBuf;
+    ofn.lpstrFilter = filterBuf.get();
     ofn.lpstrInitialDir = wInitialDir;
     ofn.lStructSize = sizeof ofn;
     ofn.nFilterIndex = 1;
@@ -231,7 +231,7 @@ JNIEXPORT jstring JNICALL WindowsFileUtil_METHOD(resolveShortcutImpl)
     jstring_to_w const wPath( env, jPath );
     DWORD flags_high, flags_low;
 
-    HRESULT result = NULL;
+    HRESULT result = 0;
     // Initialize the COM system.
     if ( FAILED( ::CoInitialize( NULL ) ) )
         goto error;

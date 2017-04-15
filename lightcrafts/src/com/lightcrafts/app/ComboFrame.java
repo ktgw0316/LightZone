@@ -155,7 +155,7 @@ public class ComboFrame
         }
 
         // Mac OS X 10.7 Lion Fullscreen Support
-        if (isMac()) {
+        if (Platform.isMac()) {
             enableFullScreenMode(this);
         }
 
@@ -349,7 +349,7 @@ public class ComboFrame
     // refresh().  Disposes the current browser, creates a new one, initializes
     // its selection, and replaces the old browser with the new one in the
     // layout.
-    private void showFolder(File folder, boolean useCache) {
+    void showFolder(File folder, boolean useCache) {
         unsetBrowser();
         if (images != null) {
             images.stop();
@@ -951,6 +951,8 @@ public class ComboFrame
         if (images != null) {
             images.resume();
         }
+        // Encourage JVM to release free heap space
+        System.gc();
     }
 
     public void dispose() {
@@ -1303,8 +1305,11 @@ public class ComboFrame
     //     This supports the "Recent Folders" mechanism in the File menu.
 
     // Trigger a folder navigation, starting with the folder tree.
-    // Called via the Recent Folders item and Application.openRecentFolder().
-    void showRecentFolder(File folder) {
+    // Called via the Recent Folders item and Application.openFolder().
+    void showFolder(File folder) {
+        if (!folders.goToFolder(folder)) {
+            return;
+        }
         String key = getKeyForFolder(folder);
         folders.restorePath(key);
         // This triggers the selection listener, which updates things.
@@ -1316,10 +1321,10 @@ public class ComboFrame
 
     // Save the currently selected folder tree path, for later access in
     // the Recent Folders item.
-    private void saveFolder(File folder) {
+    void saveFolder(File folder) {
         // Don't rely on folders.getSelection(), which isn't current during the
         // selection listener callback.
-        if (folder != null) {
+        if (folder != null && folders.goToFolder(folder)) {
             String key = getKeyForFolder(folder);
             folders.savePath(key);
         }
@@ -1411,9 +1416,4 @@ public class ComboFrame
             System.err.println("Could not enable OS X fullscreen mode " + e);
         }
     }
-
-    private static boolean isMac() {
-        return Platform.getType() == Platform.MacOSX;
-    }
-
 }

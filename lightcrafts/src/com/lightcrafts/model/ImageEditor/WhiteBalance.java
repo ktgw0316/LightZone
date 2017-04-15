@@ -22,7 +22,7 @@ import java.text.DecimalFormat;
  * To change this template use File | Settings | File Templates.
  */
 public class WhiteBalance extends BlendedOperation {
-    static final String ORIGINAL = "Temperature";
+    private static final String ORIGINAL = "Temperature";
     // static final String TARGET = "Target";
 
     public WhiteBalance(Rendering rendering) {
@@ -66,7 +66,7 @@ public class WhiteBalance extends BlendedOperation {
         super.setSliderValue(key, value);
     }
 
-    static float[] W(float original, float target) {
+    private static float[] W(float original, float target) {
         float[] originalW = ColorScience.W(original);
         float[] targetW = ColorScience.W(target);
         return new float[]{originalW[0] / targetW[0], originalW[1] / targetW[1], originalW[2] / targetW[2]};

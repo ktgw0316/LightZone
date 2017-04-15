@@ -24,8 +24,8 @@ import java.awt.image.renderable.ParameterBlock;
 import java.awt.geom.AffineTransform;
 
 public class ZoneFinder extends Preview implements PaintListener {
-    static final boolean ADJUST_GRAYSCALE = true;
-    final boolean colorMode;
+    private static final boolean ADJUST_GRAYSCALE = true;
+    private final boolean colorMode;
     final ImageEditorEngine engine;
 
     @Override
@@ -86,7 +86,7 @@ public class ZoneFinder extends Preview implements PaintListener {
             transform.setToTranslation(dx, dy);
             try {
                 g.drawRenderedImage(zones, transform);
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 e.printStackTrace();
             }
         }
@@ -96,7 +96,7 @@ public class ZoneFinder extends Preview implements PaintListener {
 
     private BufferedImage lastPreview = null;
 
-    public void setFocusedZone(int index) {
+    void setFocusedZone(int index) {
         currentFocusZone = index;
 
         if (!colorMode && ADJUST_GRAYSCALE && lastPreview != null) {
@@ -105,7 +105,7 @@ public class ZoneFinder extends Preview implements PaintListener {
         }
     }
 
-    RenderedImage zones;
+    private RenderedImage zones;
 
     ZoneFinder(ImageEditorEngine engine) {
         this(engine, false);

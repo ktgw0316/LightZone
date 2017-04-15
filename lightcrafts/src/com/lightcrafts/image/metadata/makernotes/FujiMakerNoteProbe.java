@@ -1,37 +1,23 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2016-     Masahiro Kitagawa */
 
 package com.lightcrafts.image.metadata.makernotes;
 
-import com.lightcrafts.image.metadata.ImageMetadata;
+import lombok.NoArgsConstructor;
 
 /**
  * <code>FujiMakerNoteProbe</code> is-a {@link MakerNoteProbe} for determining
  * whether a maker note is by Fuji.
  *
  * @author Paul J. Lucas [paul@lightcrafts.com]
+ * @author Masahiro Kitagawa [arctica0316@gmail.com]
  */
-final class FujiMakerNoteProbe extends MakerNoteProbe {
-
-    /** The singleton instance of <code>FujiMakerNoteProbe</code>. */
-    static final MakerNoteProbe INSTANCE = new FujiMakerNoteProbe();
-
-    ////////// protected //////////////////////////////////////////////////////
-
-    /**
-     * {@inheritDoc}
-     */
-    protected Class<? extends MakerNotesDirectory>
-    match( ImageMetadata metadata ) {
-        return matchUsingMake( metadata, "FUJIFILM", FujiDirectory.class );
-    }
-
-    ////////// private ////////////////////////////////////////////////////////
-
-    /**
-     * Construct the singleton instance of <code>FujiMakerNoteProbe</code>.
-     */
-    private FujiMakerNoteProbe() {
-        // do nothing
+@NoArgsConstructor(staticName = "create")
+final class FujiMakerNoteProbe extends MakerNoteProbe<FujiDirectory>
+{
+    @Override
+    protected Class<FujiDirectory> getDirClass() {
+        return FujiDirectory.class;
     }
 }
 /* vim:set et sw=4 ts=4: */

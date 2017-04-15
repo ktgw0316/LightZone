@@ -11,6 +11,8 @@ import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.mediax.jai.PlanarImage;
 import java.text.DecimalFormat;
 
+import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_BLUR;
+
 /**
  * Created by IntelliJ IDEA.
  * User: fabio
@@ -24,6 +26,8 @@ public class GaussianBlurOperation extends BlendedOperation {
     public GaussianBlurOperation(Rendering rendering) {
         super(rendering, type);
         addSliderKey("Radius");
+
+        setHelpTopic(HELP_TOOL_BLUR);
 
         DecimalFormat format = new DecimalFormat("0.0");
 

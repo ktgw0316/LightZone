@@ -37,11 +37,13 @@ import java.awt.image.*;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
+import com.lightcrafts.utils.xml.XMLUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.val;
@@ -50,7 +52,7 @@ public class ImageEditorEngine implements Engine {
     private ImageInfo m_imageInfo;
     private ImageInfo m_exportInfo;
 
-    @Getter (AccessLevel.PACKAGE)
+    @Getter(AccessLevel.PACKAGE)
     private PlanarImage sourceImage;
 
     private PlanarImage processedImage;
@@ -63,27 +65,25 @@ public class ImageEditorEngine implements Engine {
     private boolean engineActive = true;
 
     @Getter
-    private LinkedList<Preview> previews = new LinkedList<Preview>();
+    private List<Preview> previews = new LinkedList<Preview>();
 
-    private static final Scale[] scales = new Scale[] {
-        new Scale(1, 40),
-        new Scale(1, 20),
-        new Scale(1, 10),
-        new Scale(1, 8),
-        new Scale(1, 6),
-        new Scale(1, 4),
-        new Scale(1, 3),
-        new Scale(1, 2),
-        new Scale(2, 3),
-        new Scale(1, 1),
-        new Scale(2, 1),
-        new Scale(3, 1),
-        new Scale(4, 1)
-    };
+    private static final List<Scale> preferredScales = Arrays.asList(
+            new Scale(1, 40),
+            new Scale(1, 20),
+            new Scale(1, 10),
+            new Scale(1, 8),
+            new Scale(1, 6),
+            new Scale(1, 4),
+            new Scale(1, 3),
+            new Scale(1, 2),
+            new Scale(2, 3),
+            new Scale(1, 1),
+            new Scale(2, 1),
+            new Scale(3, 1),
+            new Scale(4, 1)
+    );
 
     private LinkedList<EngineListener> listeners = null;
-
-    private static final boolean DEBUG = false;
 
     @Getter
     private ImageMetadata metadata = null;
@@ -142,7 +142,7 @@ public class ImageEditorEngine implements Engine {
 
     @Override
     public List<Scale> getPreferredScales() {
-        return Arrays.asList(scales);
+        return preferredScales;
     }
 
     void setFocusedZone(int index, double[][] controlPoints) {
@@ -170,15 +170,11 @@ public class ImageEditorEngine implements Engine {
         val imagePath = imageMetadata.getPath();
         val imageFile = new File(imagePath).getCanonicalFile();
         m_imageInfo = ImageInfo.getInstanceFor(imageFile);
-
-        m_exportInfo = exportInfo;
-
         System.out.println("Opening " + imageFile);
 
+        m_exportInfo = exportInfo;
         metadata = imageMetadata; // imageInfo.getMetadata();
-
         sourceImage = m_imageInfo.getImage( thread, true );
-
         auxInfo = m_imageInfo.getAuxiliaryInfo();
 
         if (sourceImage == null)
@@ -329,6 +325,7 @@ public class ImageEditorEngine implements Engine {
         operationsSet.put(RedEyesOperation.type, RedEyesOperation.class);
         operationsSet.put(RawAdjustmentsOperation.typeV1, RawAdjustmentsOperation.class);
         operationsSet.put(RawAdjustmentsOperation.typeV2, RawAdjustmentsOperation.class);
+        operationsSet.put(FilmGrainOperation.type, FilmGrainOperation.class);
         operationsSet.put(LensCorrectionsOperation.type, LensCorrectionsOperation.class);
     }
 
@@ -339,7 +336,7 @@ public class ImageEditorEngine implements Engine {
 
     @Override
     public com.lightcrafts.model.Operation insertOperation(OperationType type, int position) {
-        Class<? extends BlendedOperation> opClass = operationsSet.get(type);
+        val opClass = operationsSet.get(type);
 
         if (opClass.equals(RawAdjustmentsOperation.class)) {
             if (! (getAuxInfo() instanceof RawImageInfo)) {
@@ -424,7 +421,9 @@ public class ImageEditorEngine implements Engine {
 
     @Override
     public void removeOperation(int position) {
-        val currentSelection = selectedOperation >= 0 ? rendering.getOperation(selectedOperation) : null;
+        val currentSelection = selectedOperation >= 0
+                ? rendering.getOperation(selectedOperation)
+                : null;
 
         val op = (OperationImpl) rendering.removeOperation(position);
         op.dispose();
@@ -437,7 +436,9 @@ public class ImageEditorEngine implements Engine {
 
     @Override
     public void swap(int position) {
-        val currentSelection = selectedOperation >= 0 ? rendering.getOperation(selectedOperation) : null;
+        val currentSelection = selectedOperation >= 0
+                ? rendering.getOperation(selectedOperation)
+                : null;
 
         val op = (OperationImpl) rendering.removeOperation(position);
         rendering.addOperation(position + 1, op);
@@ -465,26 +466,22 @@ public class ImageEditorEngine implements Engine {
     public Scale setScale(Rectangle rect) {
         val dimension = getNaturalSize();
 
-        val hScale = rect.height / (double) dimension.height;
-        val wScale = rect.width / (double) dimension.width;
+        val hScale = rect.height / (float) dimension.height;
+        val wScale = rect.width  / (float) dimension.width;
 
-        rendering.setScaleFactor((float) Math.min(hScale, wScale));
+        rendering.setScaleFactor(Math.min(hScale, wScale));
         update(null, false);
         return new Scale(rendering.getScaleFactor());
     }
 
-    public void update(OperationImpl op, boolean isLive) {
-        update(op, isLive, null);
-    }
-
     PlanarImage scaleFinal(PlanarImage image) {
-        val scale = rendering.getScaleFactor() > 1 ? rendering.getScaleFactor() : 1;
+        val scale = rendering.getScaleFactor() > 1 ? rendering.getScaleFactor() : 1f;
 
         if (scale == 1)
             return image;
 
-        val scaleX = (float) Math.floor(scale * image.getWidth()) / (float) image.getWidth();
-        val scaleY = (float) Math.floor(scale * image.getHeight()) / (float) image.getHeight();
+        val scaleX = (float) Math.floor(scale * image.getWidth())  / image.getWidth();
+        val scaleY = (float) Math.floor(scale * image.getHeight()) / image.getHeight();
 
         val xform = AffineTransform.getScaleInstance(scaleX, scaleY);
 
@@ -492,10 +489,10 @@ public class ImageEditorEngine implements Engine {
                 BorderExtender.createInstance(BorderExtender.BORDER_COPY));
 
         val interp = Interpolation.getInstance(Interpolation.INTERP_NEAREST);
-        val params = new ParameterBlock()
-                .addSource(image)
-                .add(xform)
-                .add(interp);
+        val params = new ParameterBlock();
+        params.addSource(image);
+        params.add(xform);
+        params.add(interp);
         // NOTE: we cache this for the screen
         return JAI.create("Affine", params, formatHints);
     }
@@ -524,12 +521,16 @@ public class ImageEditorEngine implements Engine {
         return (selectedOperation >= 0) ? rendering.getOperation(selectedOperation) : null;
     }
 
-    public synchronized int getSelectedOperationIndex() {
+    synchronized int getSelectedOperationIndex() {
         return selectedOperation;
     }
 
     public PlanarImage getRendering(int stopBefore) {
         return (stopBefore >= 0) ? rendering.getRendering(stopBefore) : null;
+    }
+
+    public void update(OperationImpl op, boolean isLive) {
+        update(op, isLive, null);
     }
 
     /*
@@ -626,9 +627,9 @@ public class ImageEditorEngine implements Engine {
                                         (int) (visibleRect.height / renderingScale))
                         : visibleRect;
 
-                ((PaintListener) preview).paintDone(preview instanceof ZoneFinder
-                                                    ? previewImage
-                                                    : processedImage, previewVisibleRect, synchronous, time);
+                ((PaintListener) preview).paintDone(
+                        preview instanceof ZoneFinder ? previewImage : processedImage,
+                        previewVisibleRect, synchronous, time);
             }
         }
     }
@@ -657,47 +658,49 @@ public class ImageEditorEngine implements Engine {
         if (updater != null && updater != currentTask)
             return false; // obsolete update operation
 
-        if (isLive) {
-            // During live updates wait until the user stays put for at least the current average repaint time
-
-            val timeNow = System.currentTimeMillis();
-            val timeDiff = lastTime == -1 ? 0 : timeNow - lastTime;
-            lastTime = timeNow;
-            val delay = Math.min(Math.max(synchImageRepaintTime, 300), 1000);
-
-            if (timeDiff < delay) {
-                if (swingTimer != null) {
-                    if (currentTask != null)
-                        swingTimer.removeActionListener(currentTask);
-
-                    currentTask = new UpdateActionListener();
-                    swingTimer.addActionListener(currentTask);
-                    swingTimer.setInitialDelay((int) delay);
-
-                    if (swingTimer.isRunning())
-                        swingTimer.restart();
-                    else
-                        swingTimer.start();
-                } else {
-                    currentTask = new UpdateActionListener();
-                    swingTimer = new javax.swing.Timer((int) delay, currentTask);
-                    swingTimer.setRepeats(false);
-                    swingTimer.start();
-                }
-                return false;
-            }
-
-            swingTimer.removeActionListener(currentTask);
-            currentTask = null;
-            lastTime = -1;
-        } else {
+        if (!isLive) {
             if (swingTimer != null && swingTimer.isRunning()) {
                 swingTimer.stop();
                 swingTimer.removeActionListener(currentTask);
                 currentTask = null;
             }
             lastTime = -1;
+            return true;
         }
+
+        // During live updates wait until the user stays put for at least the current average repaint time
+        val timeNow = System.currentTimeMillis();
+        val timeDiff = (lastTime == -1) ? 0 : timeNow - lastTime;
+        lastTime = timeNow;
+
+        val delay = Math.min(Math.max(synchImageRepaintTime, 300), 1000);
+
+        if (timeDiff < delay) {
+            if (swingTimer != null) {
+                if (currentTask != null)
+                    swingTimer.removeActionListener(currentTask);
+
+                currentTask = new UpdateActionListener();
+                swingTimer.addActionListener(currentTask);
+                swingTimer.setInitialDelay((int) delay);
+
+                if (swingTimer.isRunning())
+                    swingTimer.restart();
+                else
+                    swingTimer.start();
+            }
+            else {
+                currentTask = new UpdateActionListener();
+                swingTimer = new javax.swing.Timer((int) delay, currentTask);
+                swingTimer.setRepeats(false);
+                swingTimer.start();
+            }
+            return false;
+        }
+
+        swingTimer.removeActionListener(currentTask);
+        currentTask = null;
+        lastTime = -1;
         return true;
     }
 
@@ -715,20 +718,20 @@ public class ImageEditorEngine implements Engine {
             new HashMap<RenderingIntent, LCMSColorConvertDescriptor.RenderingIntent>();
 
     static {
-        renderingIntentMap.put( RenderingIntent.RELATIVE_COLORIMETRIC,
-                               LCMSColorConvertDescriptor.RELATIVE_COLORIMETRIC);
+        renderingIntentMap.put(RenderingIntent.RELATIVE_COLORIMETRIC,
+                    LCMSColorConvertDescriptor.RELATIVE_COLORIMETRIC);
 
-        renderingIntentMap.put( RenderingIntent.PERCEPTUAL,
-                               LCMSColorConvertDescriptor.PERCEPTUAL);
+        renderingIntentMap.put(RenderingIntent.PERCEPTUAL,
+                    LCMSColorConvertDescriptor.PERCEPTUAL);
 
-        renderingIntentMap.put( RenderingIntent.SATURATION,
-                               LCMSColorConvertDescriptor.SATURATION);
+        renderingIntentMap.put(RenderingIntent.SATURATION,
+                    LCMSColorConvertDescriptor.SATURATION);
 
-        renderingIntentMap.put( RenderingIntent.ABSOLUTE_COLORIMETRIC,
-                               LCMSColorConvertDescriptor.ABSOLUTE_COLORIMETRIC);
+        renderingIntentMap.put(RenderingIntent.ABSOLUTE_COLORIMETRIC,
+                    LCMSColorConvertDescriptor.ABSOLUTE_COLORIMETRIC);
 
-        renderingIntentMap.put( RenderingIntent.RELATIVE_COLORIMETRIC_BP,
-                               LCMSColorConvertDescriptor.RELATIVE_COLORIMETRIC_BP);
+        renderingIntentMap.put(RenderingIntent.RELATIVE_COLORIMETRIC_BP,
+                    LCMSColorConvertDescriptor.RELATIVE_COLORIMETRIC_BP);
     }
 
     public static LCMSColorConvertDescriptor.RenderingIntent getLCMSIntent(RenderingIntent intent) {
@@ -767,10 +770,11 @@ public class ImageEditorEngine implements Engine {
                                     boolean isEightBits) {
         val dimension = getNaturalSize();
 
+        // TODO: scale method
         val scale = bounds != null
-                  ? Math.min(bounds.width / (float) dimension.getWidth(),
-                             bounds.height / (float) dimension.getHeight())
-                  : 1;
+                ? Math.min(bounds.width / (float) dimension.getWidth(),
+                           bounds.height / (float) dimension.getHeight())
+                : 1;
 
         val newRendering = canvas != null ? rendering.clone() : rendering;
 
@@ -779,12 +783,12 @@ public class ImageEditorEngine implements Engine {
         PlanarImage image = newRendering.getRendering();
 
         if (profile != null) {
-            val exportColorSpace = profile == JAIContext.sRGBColorProfile
+            val exportColorSpace = (profile == JAIContext.sRGBColorProfile)
                     ? JAIContext.sRGBColorSpace
                     : new ICC_ColorSpace(profile);
             image = (intent != null)
-                ? Functions.toColorSpace(image, exportColorSpace, intent, null)
-                : Functions.toColorSpace(image, exportColorSpace, null);
+                    ? Functions.toColorSpace(image, exportColorSpace, intent, null)
+                    : Functions.toColorSpace(image, exportColorSpace, null);
         }
 
         return isEightBits ? Functions.fromUShortToByte(image, null) : image;
@@ -804,12 +808,10 @@ public class ImageEditorEngine implements Engine {
         val exportHeight = fileOptions.resizeHeight.getValue();
 
         val exportProfileName = fileOptions.colorProfile.getValue();
-        val profile = ColorProfileInfo.getExportICCProfileFor(exportProfileName) != null
-                ? ColorProfileInfo.getExportICCProfileFor(exportProfileName)
-                : JAIContext.sRGBExportColorProfile;
-
-        // LZN editor state data
-        val lzn = exportOptions.getAuxData();
+        ICC_Profile profile =
+            ColorProfileInfo.getExportICCProfileFor( exportProfileName );
+        if ( profile == null )
+            profile = JAIContext.sRGBExportColorProfile;
 
         PlanarImage exportImage = getRendering(
             new Dimension( exportWidth, exportHeight ), profile,
@@ -819,21 +821,20 @@ public class ImageEditorEngine implements Engine {
 
         // Uprez output images
 
+        // TODO: scale method
         val scale = Math.min(exportWidth  / (double) exportImage.getWidth(),
                              exportHeight / (double) exportImage.getHeight());
 
         if (scale > 1) {
             val xform = AffineTransform.getScaleInstance(scale, scale);
-
-            val formatHints = new RenderingHints(
-                    JAI.KEY_BORDER_EXTENDER,
+            val formatHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
                     BorderExtender.createInstance(BorderExtender.BORDER_COPY));
 
-            val interp = Interpolation.getInstance(Interpolation.INTERP_BICUBIC_2);
-            val params = new ParameterBlock()
-                    .addSource(exportImage)
-                    .add(xform)
-                    .add(interp);
+            Interpolation interp = Interpolation.getInstance(Interpolation.INTERP_BICUBIC_2);
+            ParameterBlock params = new ParameterBlock();
+            params.addSource(exportImage);
+            params.add(xform);
+            params.add(interp);
             exportImage = JAI.create("Affine", params, formatHints);
         }
 
@@ -851,16 +852,11 @@ public class ImageEditorEngine implements Engine {
             rop.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
         }
 
-        if (m_exportInfo != null) {
-            exportType.putImage(
-                m_exportInfo, exportImage, exportOptions, lzn, thread
-            );
-        }
-        else {
-            exportType.putImage(
-                m_imageInfo, exportImage, exportOptions, lzn, thread
-            );
-        }
+        // LZN editor state data
+        val lzn = exportOptions.getAuxData();
+        val doc = XMLUtil.readDocumentFrom(new ByteArrayInputStream(lzn));
+        val imageInfo = (m_exportInfo != null) ? m_exportInfo : m_imageInfo;
+        exportType.putImage(imageInfo, exportImage, exportOptions, doc, thread);
     }
 
     Color getPixelValue(final int x, final int y) {
@@ -931,7 +927,7 @@ public class ImageEditorEngine implements Engine {
 
     @Override
     public List<JMenuItem> getDebugItems() {
-        List<JMenuItem> items = new ArrayList<JMenuItem>();
+        val items = new ArrayList<JMenuItem>();
 
         /*
         JMenuItem tctool = new JMenuItem("TCTool");

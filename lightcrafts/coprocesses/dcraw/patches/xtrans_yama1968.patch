@@ -2,7 +2,7 @@ Index: dcraw/dcraw_lz.c
 ===================================================================
 --- dcraw.orig/dcraw_lz.c
 +++ dcraw/dcraw_lz.c
-@@ -4669,6 +4669,45 @@ void CLASS ppg_interpolate()
+@@ -4671,6 +4671,45 @@ void CLASS ppg_interpolate()
  } /* pragma omp parallel */
  }
  
@@ -48,7 +48,7 @@ Index: dcraw/dcraw_lz.c
  void CLASS cielab (ushort rgb[3], short lab[3])
  {
    int c, i, j, k;
-@@ -4712,13 +4751,38 @@ void CLASS cielab (ushort rgb[3], short
+@@ -4714,13 +4753,38 @@ void CLASS cielab (ushort rgb[3], short
  #define TS 512		/* Tile Size */
  #define fcol(row,col) xtrans[(row+6) % 6][(col+6) % 6]
  
@@ -88,7 +88,7 @@ Index: dcraw/dcraw_lz.c
    static const short orth[12] = { 1,0,0,1,-1,0,0,-1,1,0,0,1 },
  	patt[2][16] = { { 0,1,0,-1,2,0,-1,0,1,1,1,-1,0,0,0,0 },
  			{ 0,1,0,-2,1,0,-2,0,1,1,-2,-2,1,-1,-1,1 } },
-@@ -4728,21 +4792,48 @@ void CLASS xtrans_interpolate (int passe
+@@ -4730,21 +4794,48 @@ void CLASS xtrans_interpolate (int passe
    ushort (*rgb)[TS][TS][3], (*rix)[3], (*pix)[4];
     short (*lab)    [TS][3], (*lix)[3];
     float (*drv)[TS][TS], diff[6], tr;
@@ -146,7 +146,7 @@ Index: dcraw/dcraw_lz.c
    for (row=0; row < 3; row++)
      for (col=0; col < 3; col++)
        for (ng=d=0; d < 10; d+=2) {
-@@ -4757,7 +4848,11 @@ void CLASS xtrans_interpolate (int passe
+@@ -4759,7 +4850,11 @@ void CLASS xtrans_interpolate (int passe
  	}
        }
  
@@ -158,7 +158,7 @@ Index: dcraw/dcraw_lz.c
    for (row=2; row < height-2; row++)
      for (min=~(max=0), col=2; col < width-2; col++) {
        if (fcol(row,col) == 1 && (min=~(max=0))) continue;
-@@ -4776,20 +4871,46 @@ void CLASS xtrans_interpolate (int passe
+@@ -4778,20 +4873,46 @@ void CLASS xtrans_interpolate (int passe
        }
      }
  
@@ -206,7 +206,7 @@ Index: dcraw/dcraw_lz.c
  	  hex = allhex[row % 3][col % 3][0];
  	  color[1][0] = 174 * (pix[  hex[1]][1] + pix[  hex[0]][1]) -
  			 46 * (pix[2*hex[1]][1] + pix[2*hex[0]][1]);
-@@ -4811,7 +4932,11 @@ void CLASS xtrans_interpolate (int passe
+@@ -4813,7 +4934,11 @@ void CLASS xtrans_interpolate (int passe
  	  for (row=top+2; row < mrow-2; row++)
  	    for (col=left+2; col < mcol-2; col++) {
  	      if ((f = fcol(row,col)) == 1) continue;
@@ -218,7 +218,7 @@ Index: dcraw/dcraw_lz.c
  	      hex = allhex[row % 3][col % 3][1];
  	      for (d=3; d < 6; d++) {
  		rix = &rgb[(d-2)^!((row-sgrow) % 3)][row-top][col-left];
-@@ -4887,8 +5012,9 @@ void CLASS xtrans_interpolate (int passe
+@@ -4889,8 +5014,9 @@ void CLASS xtrans_interpolate (int passe
        for (d=0; d < ndir; d++) {
  	for (row=2; row < mrow-2; row++)
  	  for (col=2; col < mcol-2; col++)
@@ -230,7 +230,7 @@ Index: dcraw/dcraw_lz.c
  	  for (col=3; col < mcol-3; col++) {
  	    lix = &lab[row][col];
  	    g = 2*lix[0][0] - lix[f][0] - lix[-f][0];
-@@ -4903,14 +5029,12 @@ void CLASS xtrans_interpolate (int passe
+@@ -4905,14 +5031,12 @@ void CLASS xtrans_interpolate (int passe
        for (row=4; row < mrow-4; row++)
  	for (col=4; col < mcol-4; col++) {
  	  for (tr=FLT_MAX, d=0; d < ndir; d++)
@@ -247,7 +247,7 @@ Index: dcraw/dcraw_lz.c
  	}
  
  /* Average the most homogenous pixels for the final result:	*/
-@@ -4920,8 +5044,17 @@ void CLASS xtrans_interpolate (int passe
+@@ -4922,8 +5046,17 @@ void CLASS xtrans_interpolate (int passe
  	for (col = MIN(left,8); col < mcol-8; col++) {
  	  for (d=0; d < ndir; d++)
  	    for (hm[d]=0, v=-2; v <= 2; v++)
@@ -266,7 +266,7 @@ Index: dcraw/dcraw_lz.c
  	  for (d=0; d < ndir-4; d++)
  	    if (hm[d] < hm[d+4]) hm[d  ] = 0; else
  	    if (hm[d] > hm[d+4]) hm[d+4] = 0;
-@@ -4931,14 +5064,20 @@ void CLASS xtrans_interpolate (int passe
+@@ -4933,14 +5066,20 @@ void CLASS xtrans_interpolate (int passe
  	  memset (avg, 0, sizeof avg);
  	  for (d=0; d < ndir; d++)
  	    if (hm[d] >= max) {

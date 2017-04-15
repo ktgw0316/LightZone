@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2017-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.browser.ctrls;
 
@@ -9,6 +10,8 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.prefs.Preferences;
 
 public class SizeSlider extends Box {
@@ -50,6 +53,7 @@ public class SizeSlider extends Box {
         slider.setToolTipText(LOCALE.get("SizeToolTip"));
         slider.addChangeListener(
             new ChangeListener() {
+                @Override
                 public void stateChanged(ChangeEvent e) {
                     int size = slider.getValue();
                     boolean isAdjusting = slider.getValueIsAdjusting();
@@ -61,6 +65,15 @@ public class SizeSlider extends Box {
             }
         );
         slider.setFocusable(false);
+        slider.addMouseWheelListener(
+                new MouseWheelListener() {
+                    @Override
+                    public void mouseWheelMoved(MouseWheelEvent e) {
+                        slider.setValue(slider.getValue()
+                                + (e.getWheelRotation() < 0 ? 1 : -1));
+                    }
+                }
+        );
     }
 
     public int getValue() {

@@ -24,7 +24,7 @@ class RatingTableCellRenderer extends MetadataTableCellRenderer {
         Component comp = super.getTableCellRendererComponent(
             table, value, isSelected, hasFocus, row, column
         );
-        if (Platform.getType() == Platform.Windows) {
+        if (Platform.isWindows()) {
             if (column > 0) {
                 comp.setFont(RatingFont);
             }

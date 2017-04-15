@@ -16,9 +16,12 @@ import java.awt.image.renderable.ParameterBlock;
 import java.util.Collection;
 import java.util.Collections;
 
+import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_CLONE;
+
 public class CloneOperationImpl extends BlendedOperation implements CloneOperation {
-    public CloneOperationImpl(Rendering rendering) {
+    CloneOperationImpl(Rendering rendering) {
         super(rendering, type);
+        setHelpTopic(HELP_TOOL_CLONE);
     }
 
     public EditorMode getPreferredMode() {

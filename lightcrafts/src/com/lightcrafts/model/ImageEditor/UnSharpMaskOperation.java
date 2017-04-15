@@ -24,9 +24,9 @@ public class UnSharpMaskOperation extends BlendedOperation {
     private static final String THRESHOLD = "Threshold";
     private static final String RGB = "RGB";
 
-    static final OperationTypeImpl typeV1 = new OperationTypeImpl("UnSharp Mask");
-    static final OperationTypeImpl typeV2 = new OperationTypeImpl("UnSharp Mask V2");
-    static final OperationTypeImpl typeV3 = new OperationTypeImpl("UnSharp Mask V3");
+    static final OperationType typeV1 = new OperationTypeImpl("UnSharp Mask");
+    static final OperationType typeV2 = new OperationTypeImpl("UnSharp Mask V2");
+    static final OperationType typeV3 = new OperationTypeImpl("UnSharp Mask V3");
 
     public UnSharpMaskOperation(Rendering rendering, OperationType type) {
         super(rendering, type);

@@ -10,7 +10,6 @@ import java.util.Map;
 
 import com.lightcrafts.model.ColorDropperOperation;
 import com.lightcrafts.model.Operation;
-import com.lightcrafts.ui.layout.Box;
 import com.lightcrafts.ui.mode.DropperMode;
 import com.lightcrafts.ui.operation.OpStack;
 import com.lightcrafts.ui.operation.generic.GenericControl;

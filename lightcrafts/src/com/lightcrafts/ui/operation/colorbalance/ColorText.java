@@ -2,8 +2,6 @@
 
 package com.lightcrafts.ui.operation.colorbalance;
 
-import com.lightcrafts.ui.layout.Box;
-import com.lightcrafts.ui.layout.BoxLayout;
 import static com.lightcrafts.ui.operation.colorbalance.Locale.LOCALE;
 
 import javax.swing.*;

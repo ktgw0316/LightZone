@@ -72,12 +72,22 @@ class FolderTree extends JTree {
         return (FolderTreeNode) getModel().getRoot();
     }
 
+    boolean goToFolder(File folder) {
+        final String[] components =
+                Platform.getPlatform().getPathComponentsTo(folder.getAbsoluteFile());
+        return goToFolder(components);
+    }
+
+    @Deprecated
     boolean goToPicturesFolder() {
         final String[] components =
-            Platform.getPlatform().getPathComponentsToPicturesFolder();
-        if ( components == null || components.length == 0 )
-            return false;
+                Platform.getPlatform().getPathComponentsToPicturesFolder();
+        return goToFolder(components);
+    }
 
+    private boolean goToFolder(final String[] components) {
+        if (components == null || components.length == 0)
+            return false;
         FolderTreeNode node = getRoot();
         for ( String component : components ) {
             if (component.isEmpty())

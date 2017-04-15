@@ -13,6 +13,8 @@ import com.lightcrafts.mediax.jai.PlanarImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
 
+import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_BLACK_AND_WHITE;
+
 public class ChannelMixer extends BlendedOperation {
     private static final String Red = "Red";
     private static final String Green = "Green";
@@ -21,6 +23,8 @@ public class ChannelMixer extends BlendedOperation {
     public ChannelMixer(Rendering rendering) {
         super(rendering, type);
         colorInputOnly = true;
+
+        setHelpTopic(HELP_TOOL_BLACK_AND_WHITE);
 
         addSliderKey(Red);
         addSliderKey(Green);

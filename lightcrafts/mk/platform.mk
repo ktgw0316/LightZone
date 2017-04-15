@@ -162,7 +162,6 @@ ifeq ($(PLATFORM),MacOSX)
 
   JAVA_HOME=		/Library/Java/Home
   JAVA_INCLUDES=	-I$(SDKROOT)/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers
-  JAVA_LDFLAGS=		-L$(SDKROOT)/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Libraries
   JNILIB_PREFIX:=	lib
   JNILIB_EXT:=		.jnilib
   DYLIB_PREFIX:=	$(JNILIB_PREFIX)
@@ -208,15 +207,28 @@ ifeq ($(PLATFORM),Windows)
     NUM_PROCESSORS:=	1
   endif
 
-  ifeq ($(PROCESSOR),x86_64)
-    MINGW:=		x86_64-w64-mingw32
+  ifeq ($(CYGWIN),1)
+    ifeq ($(PROCESSOR),x86_64)
+      MINGW:=		x86_64-w64-mingw32
+    else
+      MINGW:=		i686-w64-mingw32
+    endif
+    CC:=		$(MINGW)-gcc
+    CXX:=		$(MINGW)-g++
+    PKGCFG:=		$(MINGW)-pkg-config
+    MINGW_DIR:=		/usr/$(MINGW)/sys-root/mingw/
   else
-    MINGW:=		i686-w64-mingw32
+    # MSYS2
+    ifeq ($(PROCESSOR),x86_64)
+      MINGW_DIR:=	/mingw64/
+    else
+      MINGW_DIR:=	/mingw32/
+    endif
   endif
-  CC:=			$(MINGW)-gcc
-  CXX:=			$(MINGW)-g++
-  PKGCFG:=		$(MINGW)-pkg-config
-  PKG_CONFIG_PATH:=	/usr/$(MINGW)/sys-root/mingw/lib/pkgconfig/
+
+  PKG_CONFIG_PATH:=	$(MINGW_DIR)lib/pkgconfig/
+  DLL_DIR:=		$(MINGW_DIR)bin/
+
   PLATFORM_CFLAGS+=	$(SSE_FLAGS)
 
   ifdef HIGH_PERFORMANCE

@@ -2,8 +2,6 @@
 
 package com.lightcrafts.ui.operation.generic;
 
-import com.lightcrafts.ui.layout.Box;
-
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;

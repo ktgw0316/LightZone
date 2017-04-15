@@ -19,6 +19,8 @@ import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
 
+import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_RELIGHT;
+
 /**
  * Created by IntelliJ IDEA.
  * User: fabio
@@ -41,6 +43,8 @@ public class HDROperation extends BlendedOperation {
 
     public HDROperation(Rendering rendering, OperationType type) {
         super(rendering, type);
+
+        setHelpTopic(HELP_TOOL_RELIGHT);
 
         DecimalFormat format = new DecimalFormat("0.00");
 

@@ -77,20 +77,12 @@ public class Platform {
          * @param implementationClassName The fully qualified name of the class
          * that extends {@link Platform} for the new type.
          */
-        private Type( String implementationClassName ) {
+        Type( String implementationClassName ) {
             m_implementationClassName = implementationClassName;
         }
 
         private final String m_implementationClassName;
     }
-
-    //
-    // These are declared for backwards compatibility.
-    //
-    public static final Type Linux   = Type.Linux;
-    public static final Type MacOSX  = Type.MacOSX;
-    public static final Type Windows = Type.Windows;
-    public static final Type Other   = Type.Other;
 
     /**
      * Bring the given application to the front.
@@ -209,9 +201,17 @@ public class Platform {
      * from the root folder shown in the folder tree (not the root of the
      * filesystem).
      */
+    @Deprecated
     public String[] getPathComponentsToPicturesFolder() {
+        return getPathComponentsTo(getDefaultImageDirectory());
+    }
+
+    public String[] getPathComponentsTo(File file) {
+        if (file == null || !file.exists()) {
+            return null;
+        }
         final String sep = Pattern.quote(File.separator);
-        return getDefaultImageDirectory().toString().split(sep);
+        return file.getAbsolutePath().split(sep);
     }
 
     /**
@@ -239,6 +239,33 @@ public class Platform {
      */
     public ProgressDialog getProgressDialog() {
         return new DefaultProgressDialog();
+    }
+
+    /**
+     * Check if the current platform is Linux.
+     *
+     * @return Returns <code>true</code> only if the current platform is Linux.
+     */
+    public static boolean isLinux() {
+        return m_type == Type.Linux;
+    }
+
+    /**
+     * Check if the current platform is macOS.
+     *
+     * @return Returns <code>true</code> only if the current platform is macOS.
+     */
+    public static boolean isMac() {
+        return m_type == Type.MacOSX;
+    }
+
+    /**
+     * Check if the current platform is Windows.
+     *
+     * @return Returns <code>true</code> only if the current platform is Windows.
+     */
+    public static boolean isWindows() {
+        return m_type == Type.Windows;
     }
 
     /**

@@ -14,6 +14,8 @@ import com.lightcrafts.mediax.jai.*;
 import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
 
+import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_HUE_SATURATION;
+
 /**
  * Copyright (C) 2007 Light Crafts, Inc.
  * User: fabio
@@ -29,6 +31,8 @@ public class HueSaturationOperation extends BlendedOperation {
     public HueSaturationOperation(Rendering rendering, OperationType type) {
         super(rendering, type);
         colorInputOnly = true;
+
+        setHelpTopic(HELP_TOOL_HUE_SATURATION);
 
         if (type != typeV2)
             addSliderKey(HUE);
@@ -147,7 +151,7 @@ public class HueSaturationOperation extends BlendedOperation {
                 image = new IntVibranceOpImage(image, computeVibranceTransform(), null);
 
             if (hue != 0.0)
-                image = new HueRotateOpImage(image, (float) (hue / 360), null);
+                image = new HueRotateOpImage(image, hue / 360, null);
 
             return image;
         }

@@ -33,7 +33,7 @@ import java.util.TreeMap;
  * To change this template use File | Settings | File Templates.
  */
 public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOperation {
-    static final String SOURCE = "Temperature";
+    private static final String SOURCE = "Temperature";
     private final String TINT = "Tint";
     private float tint = 0;
     private Point2D p = null;
@@ -170,16 +170,18 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
         setSliderConfig(TINT, new SliderConfig(-20, 20, tint, 0.1, false, new DecimalFormat("0.0")));
     }
 
+    @Override
     public boolean neutralDefault() {
         return false;
     }
 
+    @Override
     public void setSliderValue(String key, double value) {
         value = roundValue(key, value);
 
-        if (key == SOURCE && source != value) {
+        if (key.equals(SOURCE) && source != value) {
             source = (float) value;
-        } else if (key == TINT && tint != value) {
+        } else if (key.equals(TINT) && tint != value) {
             tint = (float) value;
         } else
             return;
@@ -187,12 +189,13 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
         super.setSliderValue(key, value);
     }
 
-    static float[] W(float original, float target) {
+    static private float[] W(float original, float target) {
         float[] originalW = ColorScience.W(original);
         float[] targetW = ColorScience.W(target);
         return new float[]{originalW[0] / targetW[0], originalW[1] / targetW[1], originalW[2] / targetW[2]};
     }
 
+    @Override
     public Map<String, Float> setColor(Point2D p) {
         this.p = p;
         settingsChanged();
@@ -204,8 +207,8 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
         return result;
     }
 
-    static Matrix RGBtoZYX = new Matrix(ColorScience.RGBtoZYX()).transpose();
-    static Matrix XYZtoRGB = RGBtoZYX.inverse();
+    private static Matrix RGBtoZYX = new Matrix(ColorScience.RGBtoZYX()).transpose();
+    private static Matrix XYZtoRGB = RGBtoZYX.inverse();
 
     static float[] neutralize(int pixel[], ColorScience.CAMethod caMethod, float source, float REF_T) {
         double r = pixel[0];

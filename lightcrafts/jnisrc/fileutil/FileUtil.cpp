@@ -21,7 +21,6 @@
 #endif
 
 // local
-#include "LC_CPPUtils.h"
 #include "LC_JNIUtils.h"
 #ifndef AUTO_DEP
 #include "javah/com_lightcrafts_utils_file_FileUtil.h"

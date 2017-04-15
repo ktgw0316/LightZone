@@ -26,6 +26,8 @@ import java.util.*;
 import Jama.Matrix;
 import java.lang.String;
 
+import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_RAW_ADJUSTMENTS;
+
 public class RawAdjustmentsOperation extends BlendedOperation implements ColorDropperOperation, RawAdjustmentOperation {
     private static final String SOURCE = "Temperature";
     private static final String TINT = "Tint";
@@ -77,8 +79,9 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
 
     public RawAdjustmentsOperation(Rendering rendering, OperationType type) {
         super(rendering, type);
-
         colorInputOnly = true;
+
+        setHelpTopic(HELP_TOOL_RAW_ADJUSTMENTS);
 
         AuxiliaryImageInfo auxInfo = rendering.getEngine().getAuxInfo();
 

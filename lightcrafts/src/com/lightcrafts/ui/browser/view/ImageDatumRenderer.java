@@ -29,8 +29,7 @@ class ImageDatumRenderer {
     // An empty border around every rendering: (Room for ImageGroup highlight)
     private final static Insets ImageInset = new Insets(8, 8, 8, 8);
 
-    private final static int TextHeight =
-        Platform.getType() == Platform.MacOSX ? 19 : 14;
+    private final static int TextHeight = Platform.isMac() ? 19 : 14;
 
     // Vertical space between the image area and the label text:
     private final static int TextGap = 4;

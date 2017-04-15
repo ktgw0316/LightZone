@@ -41,7 +41,7 @@ public class RatingButton extends CoolButton {
         for (Action rateAction : rateActions) {
             JMenuItem item = new JMenuItem(rateAction);
             // On Windogs only the core fonts seem to see stars
-            if (Platform.getType() == Platform.Windows)
+            if (Platform.isWindows())
                 item.setFont(new Font("Serif", Font.PLAIN, 14));
             item.setAccelerator(null);
             popup.add(item);
