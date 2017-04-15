@@ -22,9 +22,6 @@ public class UICompliance {
         pane.setComponentOrientation(((parentComponent == null) ?
 	    JOptionPane.getRootFrame() : parentComponent).getComponentOrientation());
 
-//        if (Platform.getType() == Platform.MacOSX && destructive > 0)
-//            pane.putClientProperty("Quaqua.OptionPane.destructiveOption", destructive);
-
         JDialog dialog = pane.createDialog(parentComponent, title);
 
         for (int i = 2; i < options.length; i++) {
@@ -35,7 +32,7 @@ public class UICompliance {
                 }
             };
             KeyStroke stroke = KeyStroke.getKeyStroke(((String)options[i]).charAt(0),
-                                                      Platform.getType() == Platform.MacOSX
+                                                      Platform.isMac()
                                                       ? InputEvent.META_MASK
                                                       : InputEvent.CTRL_MASK);
             dialog.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(stroke, action);

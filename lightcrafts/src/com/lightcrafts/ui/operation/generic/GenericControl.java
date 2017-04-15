@@ -5,7 +5,6 @@ package com.lightcrafts.ui.operation.generic;
 
 import com.lightcrafts.model.GenericOperation;
 import com.lightcrafts.model.Operation;
-import com.lightcrafts.ui.layout.Box;
 import com.lightcrafts.ui.operation.OpControl;
 import com.lightcrafts.ui.operation.OpStack;
 import com.lightcrafts.utils.xml.XMLException;

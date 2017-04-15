@@ -196,11 +196,6 @@ public final class MacOSXPlatform extends Platform {
         MacOSXHelp.showHelpTopic( topic );
     }
 
-    @Override
-    public PrinterLayer getPrinterLayer() {
-        return MacOSXPrinterLayer.INSTANCE;
-    }
-
 /*
     public static final int WHEEL_HORIZONTAL_SCROLLg = 2;
 

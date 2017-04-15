@@ -1,69 +1,69 @@
 /* general */
-"Corrupted" = "Corrupted application";
-"Unexpected" = "Unexpected failure";
+"Corrupted" = "Aplicacion corrupta";
+"Unexpected" = "Fallo inexperado";
 
 /* checkCPUType() */
-"Newer CPU required" = "Newer CPU required";
-"CPU requirements" = "LightZone requires a PowerPC G4, G5, or Intel processor.";
+"Newer CPU required" = "Nuevo tipo de CPU requerido";
+"CPU requirements" = "LightZone requiere un PowerPC G4, G5, o un procesador Intel.";
 
 /* checkJars */
-"Bad Jar" = "A jar file is corrupt.";
-"Missing Jar" = "A jar file is missing.";
+"Bad Jar" = "Un archivo jar esta corrupto.";
+"Missing Jar" = "Un archivo jar no se encuentra.";
 
 /* checkOSXVersion() */
-"Newer Mac OS X required" = "Newer Mac OS X required";
-"OS requirements" = "LightZone requires Mac OS X version 10.4.3 or later.";
+"Newer Mac OS X required" = "Nuevo Mac OS X requerido";
+"OS requirements" = "LightZone requiere Mac OS X version 10.4.3 o posterior.";
 
 /* convertMainArgs() */
-"Could not allocate main() string" = "Could not allocate main() argument string.";
-"Missing java.lang.String" = "Could not find java.lang.String class.";
+"Could not allocate main() string" = "No se puede asignar principal() argumento de cadena.";
+"Missing java.lang.String" = "No se encuentra java.lang.Argumento de clase.";
 
 /* getClassPath() */
-"Bad ClassPath" = "ClassPath in Info.plist is not a String or an Array.";
+"Bad ClassPath" = "ClassPath en Info.plist no es una cadena o matriz.";
 
 /* getCWD() */
-"Set CWD failed" = "Failed to set current working directory.";
+"Set CWD failed" = "Fallo al asignar directorio de trabajo actual.";
 
 /* getJVMOptions() */
-"Bad VMOptions" = "VMOptions in Info.plist is not String or Array.";
+"Bad VMOptions" = "VMOptions en Info.plist no es una Cadena o Matriz.";
 
 /* getMainArgs() */
-"Bad argument array" = "Element of argument array isn't a string.";
-"Bad Arguments" = "Arguments in Info.plist is not String or Array.";
-"Could not allocate main() array" = "Could not allocate main() argument array.";
+"Bad argument array" = "Elemento del argumento de matriz no es una cadena.";
+"Bad Arguments" = "Argumentos en Info.plist no es una Cadena o Matriz.";
+"Could not allocate main() array" = "No se puede asignar principal() argumento de matriz.";
 
 /* getMainClassName() */
-"Missing MainClass" = "MainClass not specified in Info.plist.";
+"Missing MainClass" = "MainClass no especificada en Info.plist.";
 
 /* getJVMVersion() */
-"Missing JVMVersion" = "JVMVersion not specified in Info.plist.";
+"Missing JVMVersion" = "JVMVersion no especificada en Info.plist.";
 
 /* initJavaParamBlock() */
-"Missing Java dictionary" = "Java dictionary not specified in Info.plist.";
+"Missing Java dictionary" = "Diccionario Java no especificado en Info.plist.";
 
 /* initMightyMouseJNI() */
-"Missing MightyMouse class" = "Could not find MightyMouse class.";
-"Missing handleEvent method" = "Could not find handleEvent method.";
+"Missing MightyMouse class" = "No se encuentra la clase MightyMouse.";
+"Missing handleEvent method" = "No se encuentra el metodo handleEvent.";
 
 /* LC_die() */
-"Quit" = "Quit";
+"Quit" = Salir
 
 /* new_strcpy() */
-"Could not allocate memory" = "Could not allocate memory.";
+"Could not allocate memory" = No se puede asignar suficiente memoria
 
 /* redirectOutput() */
-"Missing CFBundleName" = "CFBundleName not specified in Info.plist.";
+"Missing CFBundleName" = "CFBundleName no especificada en Info.plist.";
 
 /* setJVMVersion() */
-"Missing Java" = "Java appears not to be installed correctly on this computer.";
-"Couldn't read Versions directory" = "The Java Versions directory could not be read.";
-"Reuired Java version not found" = "Required Java version not found";
-"Couldn't match Java version" = "Couldn't find Java %s. Select Software Update to get the required Java version from Apple.";
+"Missing Java" = "Java parece no estar instalado correctamente en este ordenador.";
+"Couldn't read Versions directory" = "El directorio de la version de Java no se puede leer.";
+"Reuired Java version not found" = "La version Java requerida no se encuentra";
+"Couldn't match Java version" = "No se encuentra Java %s. Seleccionar Actualizacion de Software para obetener la version de Java requerida desde Apple.";
 
 /* startJava() */
-"Could not detach thread" = "Could not detach thread.";
-"Error starting JVM" = "Error starting Java virtual machine.";
-"Missing main()" = "Could not find main class.";
-"Missing main() method" = "Main class has no main() method.";
-"main() threw exception" = "The main() method threw an exception.";
-"RegisterNatives() failed" = "The RegisterNatives() method failed.";
+"Could not detach thread" = "No se puede separar el hilo.";
+"Error starting JVM" = "Error iniciando maquina virtual Java.";
+"Missing main()" = "No se encuentra la clase principal.";
+"Missing main() method" = "La clase principal no tiene metodo principal().";
+"main() threw exception" = "El metodo principal() arrojo una excepcion.";
+"RegisterNatives() failed" = "El metodo RegisterNatives() falló.";

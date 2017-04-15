@@ -20,7 +20,7 @@ class HelpArea extends JTextArea{
         // In Windows L&F, the default TextArea font is monospaced and
         // difficult to read:
         Font font;
-        if (Platform.getType() == Platform.MacOSX) {
+        if (Platform.isMac()) {
             font = getFont();
             font = font.deriveFont(11f);
         }

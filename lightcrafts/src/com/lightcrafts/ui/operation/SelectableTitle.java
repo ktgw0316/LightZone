@@ -2,7 +2,6 @@
 
 package com.lightcrafts.ui.operation;
 
-import com.lightcrafts.ui.layout.Box;
 import static com.lightcrafts.ui.operation.Locale.LOCALE;
 import com.lightcrafts.ui.toolkit.ImageOnlyButton;
 import com.lightcrafts.ui.toolkit.IconFactory;

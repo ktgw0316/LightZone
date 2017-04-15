@@ -155,8 +155,7 @@ public class ImageBrowserActions {
 
         // This accelerator key setup should be localized and maybe unified
         // with the centralized menu configuration in MenuFactory.
-        String modifier =
-            Platform.getType() == Platform.MacOSX ? "meta" : "ctrl";
+        final String modifier = Platform.isMac() ? "meta" : "ctrl";
         selectAllAction.putValue(
             Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
                 modifier + " " + "A"

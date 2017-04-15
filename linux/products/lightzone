@@ -76,9 +76,16 @@ IFS="
 file=""
 for i in "$@"; do
   if [ -f $i ] ; then
-    file=$(cd $(dirname $i) && pwd)/$(basename $i)
-    break
+    file=file $(cd $(dirname $i) && pwd)/$(basename $i)
   fi
 done
 
-(cd $pkgjavadir && LD_LIBRARY_PATH=$pkglibexecdir exec java ${jvmopts} com.lightcrafts.platform.linux.LinuxLauncher ${file} ${@} )
+(cd $pkgjavadir && LD_LIBRARY_PATH=$pkglibexecdir exec java \
+-classpath ".:${pkgjavadir}/*:${jhpath}" \
+-XX:+UseG1GC \
+-XX:MinHeapFreeRatio=30 \
+-XX:MaxHeapFreeRatio=30 \
+-Xmx${maxmem}k \
+-Djava.library.path=$pkglibexecdir \
+-Dfile.encoding=UTF8 \
+com.lightcrafts.platform.linux.LinuxLauncher ${file} ${@} )

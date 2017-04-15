@@ -4,7 +4,6 @@ package com.lightcrafts.ui.operation.whitebalance;
 
 import com.lightcrafts.model.Operation;
 import com.lightcrafts.model.RawAdjustmentOperation;
-import com.lightcrafts.ui.layout.Box;
 import com.lightcrafts.ui.operation.OpStack;
 import static com.lightcrafts.ui.operation.whitebalance.Locale.LOCALE;
 import com.lightcrafts.ui.toolkit.CoolButton;

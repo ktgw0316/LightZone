@@ -1394,7 +1394,7 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
         // the most recent angle within roundoff, then send back the recent
         // cursor.
 
-        if (Platform.getType() == Platform.Windows) {
+        if (Platform.isWindows()) {
             int cursorType = Cursor.DEFAULT_CURSOR;
             double a = Math.PI/4;
             if (Math.abs(angle) < a)
@@ -1478,13 +1478,13 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
 
         new KeyEventPostProcessor() {
 
-            int RotateKeyCode = Platform.getType().equals(
-                Platform.Type.MacOSX
-            ) ? KeyEvent.VK_META : KeyEvent.VK_CONTROL;
+            int RotateKeyCode = Platform.isMac()
+                    ? KeyEvent.VK_META
+                    : KeyEvent.VK_CONTROL;
 
-            int RotateModifierMask = Platform.getType().equals(
-                Platform.Type.MacOSX
-            ) ? MouseEvent.META_DOWN_MASK : MouseEvent.CTRL_DOWN_MASK;
+            int RotateModifierMask = Platform.isMac()
+                    ? MouseEvent.META_DOWN_MASK
+                    : MouseEvent.CTRL_DOWN_MASK;
 
             @Override
             public boolean postProcessKeyEvent(KeyEvent e) {

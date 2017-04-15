@@ -5,7 +5,7 @@ package com.lightcrafts.ui.operation;
 import com.lightcrafts.model.LayerMode;
 import com.lightcrafts.model.Operation;
 import com.lightcrafts.ui.LightZoneSkin;
-import com.lightcrafts.ui.layout.Box;
+
 import static com.lightcrafts.ui.operation.Locale.LOCALE;
 import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlNode;

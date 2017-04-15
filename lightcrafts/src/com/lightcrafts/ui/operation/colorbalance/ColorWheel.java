@@ -2,7 +2,6 @@
 
 package com.lightcrafts.ui.operation.colorbalance;
 
-import com.lightcrafts.ui.layout.Box;
 import com.lightcrafts.ui.toolkit.DropperButton;
 import com.lightcrafts.ui.swing.ColorSwatch;
 
