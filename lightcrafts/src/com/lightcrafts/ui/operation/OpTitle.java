@@ -72,7 +72,7 @@ class OpTitle extends SelectableTitle {
                 }
             }
         );
-        if (! control.isSingleton()) {
+        if (! control.isRawCorrection()) {
             buttonBox.add(activeButton);
             // buttonBox.add(Box.createHorizontalStrut(ButtonSpace));
             buttonBox.add(removeButton);
@@ -135,7 +135,7 @@ class OpTitle extends SelectableTitle {
 
         boolean isLocked = control.isLocked();
 
-        if (! control.isSingleton()) {
+        if (! control.isRawCorrection()) {
             if (! control.isActivated()) {
                 JMenuItem enableItem = new JMenuItem(
                     LOCALE.get("EnableMenuItem")
@@ -234,7 +234,7 @@ class OpTitle extends SelectableTitle {
         }
         menu.add(applyPreset, 5);
 
-        if (! control.isSingleton()) {
+        if (! control.isRawCorrection()) {
             JMenuItem deleteItem = new JMenuItem(LOCALE.get("DeleteMenuItem"));
             deleteItem.addActionListener(
                 new ActionListener() {

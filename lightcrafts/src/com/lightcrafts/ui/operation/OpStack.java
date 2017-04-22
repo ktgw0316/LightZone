@@ -1,8 +1,10 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2016-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.operation;
 
 import com.lightcrafts.model.*;
+import com.lightcrafts.model.ImageEditor.LensCorrectionsOperation;
 import com.lightcrafts.ui.operation.clone.CloneControl;
 import com.lightcrafts.ui.operation.clone.SpotControl;
 import com.lightcrafts.ui.operation.colorbalance.ColorPickerControl;
@@ -178,6 +180,22 @@ public class OpStack extends DraggableStack
         int index = getOpControlCount();
         WhitePointOperation op = engine.insertWhitePointOperation(index);
         OpControl control = new WhitePointControl(op, this);
+        addControl(control, index);
+        return control;
+    }
+
+    // The LensCorrections should be placed above the RAW Correction tools.
+    public OpControl addLensCorrectionsControl() {
+        int index = 0;
+        for (final OpControl op : opControls) {
+            if (!op.isRawCorrection()) {
+                break;
+            }
+            index++;
+        }
+        LensCorrectionsOperation op = engine.insertLensCorrectionsOperation(index);
+        // TODO: OpControl control = new LensCorrectionsControl(op, this);
+        OpControl control = new GenericControl(op, this);
         addControl(control, index);
         return control;
     }
@@ -725,6 +743,7 @@ public class OpStack extends DraggableStack
     private final static String CloneTag = "CloneOperation";
     private final static String SpotTag = "SpotOperation";
     private final static String WhitePointTag = "WhitePointOperation";
+    private final static String LensCorrectionsTag = "LensCorrectionsOperation";
     private final static String GenericTag = "GenericOperation";
     private final static String OpTypeTag = "OperationType";
 
@@ -795,6 +814,9 @@ public class OpStack extends DraggableStack
             }
             else if (tag.equals(WhitePointTag)) {
                 control = addWhitePointControl();
+            }
+            else if (tag.equals(LensCorrectionsTag)) {
+                control = addLensCorrectionsControl();
             }
             else if (tag.equals(GenericTag)) {
                 String typeTag = child.getAttribute(OpTypeTag);

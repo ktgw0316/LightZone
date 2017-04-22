@@ -326,7 +326,6 @@ public class ImageEditorEngine implements Engine {
         operationsSet.put(RawAdjustmentsOperation.typeV1, RawAdjustmentsOperation.class);
         operationsSet.put(RawAdjustmentsOperation.typeV2, RawAdjustmentsOperation.class);
         operationsSet.put(FilmGrainOperation.type, FilmGrainOperation.class);
-        operationsSet.put(LensCorrectionsOperation.type, LensCorrectionsOperation.class);
     }
 
     @Override
@@ -405,6 +404,14 @@ public class ImageEditorEngine implements Engine {
     @Override
     public WhitePointOperation insertWhitePointOperation(int position) {
         val op = new WhitePointOperationImpl(rendering);
+        rendering.addOperation(position, op);
+        return op;
+    }
+
+    @Override
+    public LensCorrectionsOperation insertLensCorrectionsOperation(int position) {
+        val type = LensCorrectionsOperation.type;
+        val op = new LensCorrectionsOperation(rendering, type, metadata);
         rendering.addOperation(position, op);
         return op;
     }
