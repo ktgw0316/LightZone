@@ -5,6 +5,7 @@ package com.lightcrafts.ui.operation.generic;
 
 import com.lightcrafts.model.GenericOperation;
 import com.lightcrafts.model.Operation;
+import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.ui.operation.OpControl;
 import com.lightcrafts.ui.operation.OpStack;
 import com.lightcrafts.utils.xml.XMLException;
@@ -13,6 +14,7 @@ import com.lightcrafts.utils.xml.XmlNode;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
@@ -57,6 +59,104 @@ public class GenericControl extends OpControl {
         val box = Box.createVerticalBox();
 
         box.add(Box.createVerticalStrut(6));
+
+        // Add all the choices:
+
+        val choiceKeys = op.getChoiceKeys();
+        for (val key : choiceKeys) {
+            val values = new Vector<String>(op.getChoiceValues(key));
+            val choice = new JComboBox(values);
+            choice.addActionListener(
+                    new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent event) {
+                            val value = (String) choice.getSelectedItem();
+                            op.setChoiceValue(key, value);
+                            undoSupport.postEdit(key + " Choice");
+
+                            // Dynamically update the values of other choices
+                            for (val _key : choiceKeys) {
+                                if (key.equals(_key)) {
+                                    continue;
+                                }
+                                val _values = op.getChoiceValues(_key);
+                                val _choice = choices.get(_key);
+                                val _oldSelection = (String)_choice.getSelectedItem();
+                                _choice.removeAllItems();
+                                String _selection = null;
+                                for (val _value : _values) {
+                                    _choice.addItem(_value);
+                                    if (_value.equals(_oldSelection)) {
+                                        _selection = _value;
+                                    }
+                                }
+                                _choice.setSelectedItem(_selection);
+                            }
+                        }
+                    }
+            );
+            choice.addMouseWheelListener(
+                    new MouseWheelListener() {
+                        @Override
+                        public void mouseWheelMoved(MouseWheelEvent e) {
+                            val source = (JComboBox) e.getComponent();
+                            if (!source.hasFocus()) {
+                                return;
+                            }
+                            val ni = source.getSelectedIndex() + e.getWheelRotation();
+                            if (ni >= 0 && ni < source.getItemCount()) {
+                                source.setSelectedIndex(ni);
+                            }
+                        }
+                    }
+            );
+            val oldChoice = choices.get(key);
+            if (oldChoice != null) {
+                choice.setSelectedItem(oldChoice.getSelectedItem());
+            }
+            choice.setBackground(Background);
+            choice.setFont(ControlFont);
+            choice.setPreferredSize(new Dimension(280, 15));
+
+            val panel = new JPanel();
+            val label = new JLabel(key + ":", JLabel.CENTER);
+            label.setPreferredSize(new Dimension(50, 15));
+            label.setHorizontalAlignment(JLabel.RIGHT);
+            label.setForeground(LightZoneSkin.Colors.ToolPanesForeground);
+            panel.setBackground(LightZoneSkin.Colors.ToolPanesBackground);
+            panel.add(label);
+            panel.add(choice);
+            box.add(panel);
+
+            choices.put(key, choice);
+        }
+
+        // Add all the checkboxes:
+
+        val checkboxKeys = op.getCheckboxKeys();
+        for (val key : checkboxKeys) {
+            val userKey = getUserPresentableKey(key);
+            val checkbox = new JCheckBox(userKey);
+            checkbox.addItemListener(
+                    new ItemListener() {
+                        @Override
+                        public void itemStateChanged(ItemEvent event) {
+                            val value = checkbox.isSelected();
+                            op.setCheckboxValue(key, value);
+                            undoSupport.postEdit(key + " Checkbox");
+                        }
+                    }
+            );
+            val oldCheckbox = checkboxes.get(key);
+            if (oldCheckbox != null) {
+                checkbox.setSelected(oldCheckbox.isSelected());
+            }
+            checkbox.setBackground(Background);
+            checkbox.setFont(ControlFont);
+            box.add(checkbox);
+
+            checkboxes.put(key, checkbox);
+        }
 
         // Add all the sliders:
 
@@ -105,74 +205,6 @@ public class GenericControl extends OpControl {
         sliderContainer.setBackground(Background);
         box.add(sliderContainer);
 
-        // Add all the checkboxes:
-
-        val checkboxKeys = op.getCheckboxKeys();
-        for (val key : checkboxKeys) {
-            val userKey = getUserPresentableKey(key);
-            val checkbox = new JCheckBox(userKey);
-            checkbox.addItemListener(
-                    new ItemListener() {
-                        @Override
-                        public void itemStateChanged(ItemEvent event) {
-                            val value = checkbox.isSelected();
-                            op.setCheckboxValue(key, value);
-                            undoSupport.postEdit(key + " Checkbox");
-                        }
-                    }
-            );
-            val oldCheckbox = checkboxes.get(key);
-            if (oldCheckbox != null) {
-                checkbox.setSelected(oldCheckbox.isSelected());
-            }
-            checkbox.setBackground(Background);
-            checkbox.setFont(ControlFont);
-            box.add(checkbox);
-
-            checkboxes.put(key, checkbox);
-        }
-
-        // Add all the choices:
-
-        val choiceKeys = op.getChoiceKeys();
-        for (val key : choiceKeys) {
-            val values = new Vector<String>(op.getChoiceValues(key));
-            val choice = new JComboBox(values);
-            choice.addActionListener(
-                    new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent event) {
-                            val value = (String) choice.getSelectedItem();
-                            op.setChoiceValue(key, value);
-                            undoSupport.postEdit(key + " Choice");
-                        }
-                    }
-            );
-            choice.addMouseWheelListener(
-                    new MouseWheelListener() {
-                        @Override
-                        public void mouseWheelMoved(MouseWheelEvent e) {
-                            val source = (JComboBox) e.getComponent();
-                            if (!source.hasFocus()) {
-                                return;
-                            }
-                            val ni = source.getSelectedIndex() + e.getWheelRotation();
-                            if (ni >= 0 && ni < source.getItemCount()) {
-                                source.setSelectedIndex(ni);
-                            }
-                        }
-                    }
-            );
-            val oldChoice = choices.get(key);
-            if (oldChoice != null) {
-                choice.setSelectedItem(oldChoice.getSelectedItem());
-            }
-            choice.setBackground(Background);
-            choice.setFont(ControlFont);
-            box.add(choice);
-
-            choices.put(key, choice);
-        }
         box.add(Box.createVerticalStrut(6));
 
         setContent(box);

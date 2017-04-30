@@ -25,7 +25,8 @@ public class DistortionOpImage extends GeometricOpImage {
     private final Point2D center;
     private String cameraMaker = "";
     private String cameraModel = "";
-    private String lensName = "";
+    private String lensMaker = "";
+    private String lensModel = "";
     private float focal = 0f;
     private float aperture = 0f;
 
@@ -132,7 +133,8 @@ public class DistortionOpImage extends GeometricOpImage {
     public DistortionOpImage(RenderedImage source, Map configuration, BorderExtender extender,
                              int fullWidth, int fullHeight, Point2D center,
                              String cameraMaker, String cameraModel,
-                             String lensName, float focal, float aperture) {
+                             String lensMaker, String lensModel,
+                             float focal, float aperture) {
         super(vectorize(source), null, configuration, true, extender, null);
 
         this.fullWidth  = fullWidth;
@@ -141,18 +143,21 @@ public class DistortionOpImage extends GeometricOpImage {
 
         this.cameraMaker = cameraMaker;
         this.cameraModel = cameraModel;
-        this.lensName = lensName;
+        this.lensMaker = lensMaker;
+        this.lensModel = lensModel;
         this.focal = focal;
         this.aperture = aperture;
 
-        if (!cameraModel.isEmpty() || !lensName.isEmpty()) {
+        if (!cameraModel.isEmpty() || !lensModel.isEmpty()) {
             System.out.println("camera maker = " + cameraMaker); // DEBUG
             System.out.println("camera model = " + cameraModel); // DEBUG
-            System.out.println("lens name    = " + lensName);    // DEBUG
+            System.out.println("lens maker   = " + lensMaker);   // DEBUG
+            System.out.println("lens model   = " + lensModel);   // DEBUG
             System.out.println("focal length = " + focal);       // DEBUG
             System.out.println("aperture     = " + aperture);    // DEBUG
 
-            val lensfun = new Lensfun(cameraMaker, cameraModel, lensName, focal, aperture);
+            val lensfun = new Lensfun(cameraMaker, cameraModel,
+                    lensMaker, lensModel, focal, aperture);
             distTerms = lensfun.getDistTerms();
             tcaTerms  = lensfun.getTcaTerms();
             val model = lensfun.getDistModel();

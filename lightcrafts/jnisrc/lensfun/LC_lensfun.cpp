@@ -1,6 +1,8 @@
 /* Copyright (C) 2015- Masahiro Kitagawa */
 
+#include <cstring>
 #include <iostream>
+#include <vector>
 #include <jni.h>
 #include <lensfun.h>
 #ifndef AUTO_DEP
@@ -9,52 +11,79 @@
 
 #include "LC_JNIUtils.h"
 
+inline const lfCamera* findCamera(JNIEnv *env, const lfDatabase* ldb,
+        jstring cameraMakerStr, jstring cameraModelStr)
+{
+    const char *cameraMaker = env->GetStringUTFChars(cameraMakerStr, NULL);
+    const char *cameraModel = env->GetStringUTFChars(cameraModelStr, NULL);
+    const lfCamera **cameras = ldb->FindCamerasExt(cameraMaker, cameraModel);
+    env->ReleaseStringUTFChars(cameraMakerStr, 0);
+    env->ReleaseStringUTFChars(cameraModelStr, 0);
+
+    if (!cameras) {
+        std::cerr << "Cannot find the camera \""
+            << cameraMaker << ": " << cameraModel << "\"" 
+            << " in database" << std::endl;
+        return nullptr;
+    }
+    const lfCamera *camera = cameras[0];
+    lf_free(cameras);
+    return camera;
+}
+
+inline const lfLens* findLenses(JNIEnv *env, const lfDatabase* ldb,
+        const lfCamera* camera, jstring lensMakerStr, jstring lensModelStr)
+{
+    const char *lensMaker = env->GetStringUTFChars(lensMakerStr, NULL);
+    const char *lensModel = env->GetStringUTFChars(lensModelStr, NULL);
+    const lfLens **lenses = ldb->FindLenses(camera, lensMaker, lensModel);
+    env->ReleaseStringUTFChars(lensMakerStr, 0);
+    env->ReleaseStringUTFChars(lensModelStr, 0);
+
+    if (!lenses) {
+        std::cerr << "Cannot find the lens \""
+            << lensMaker << ": " << lensModel << "\"";
+        if (camera) {
+            std::cerr << " for the camera \""
+                << camera->Maker << ": " << camera->Model << "\"";
+        }
+        std::cerr << " in database" << std::endl;
+        return nullptr;
+    }
+
+    // DEBUG
+    for (int i = 0; lenses[i]; ++i) {
+        std::cerr << "** lens" << i << " = "
+            << lenses[i]->Maker << ": " << lenses[i]->Model << std::endl;
+    }
+
+    const lfLens *lens = lenses[0];
+    lf_free(lenses);
+    return lens;
+}
+
 extern "C"
 JNIEXPORT jboolean JNICALL Java_com_lightcrafts_utils_Lensfun_lensfunTerms
 ( JNIEnv *env, jclass cls,
   jintArray jDistModel, jfloatArray jDistTerms,
   jfloatArray jTcaTerms,
   jstring cameraMakerStr, jstring cameraModelStr,
-  jstring lensNameStr, jfloat focal, jfloat aperture )
+  jstring lensMakerStr, jstring lensModelStr,
+  jfloat focal, jfloat aperture )
 {
-    const char *cameraMaker = env->GetStringUTFChars(cameraMakerStr, NULL);
-    const char *cameraModel = env->GetStringUTFChars(cameraModelStr, NULL);
-    const char *lensName    = env->GetStringUTFChars(lensNameStr, NULL);
-
     // Load lensfun database
     lfDatabase *ldb = lf_db_new();
-    ldb->Load();
-
-    // Find camera in the database
-    const lfCamera *camera = NULL;
-    const lfCamera **cameras = ldb->FindCamerasExt(cameraMaker, cameraModel);
-
-    if (!cameras) {
-        std::cerr << "Cannot find the camera " << cameraModel << " in database" << std::endl;
-    }
-    else {
-        camera = cameras[0];
-        std::cerr << "camera: " << camera->Model << std::endl; // DEBUG
-    }
-    lf_free(cameras);
-    env->ReleaseStringUTFChars(cameraMakerStr, 0);
-    env->ReleaseStringUTFChars(cameraModelStr, 0);
-
-    // Get lens informations from the database
-    const lfLens **lenses = ldb->FindLenses(camera, NULL, lensName);
-
-    if (!lenses) {
-        std::cerr << "Cannot find the lens " << lensName << " in database" << std::endl;
-        env->ReleaseStringUTFChars(lensNameStr, 0);
+    if (ldb->Load() != LF_NO_ERROR) {
+        ldb->Destroy();
         return false;
     }
 
-    for (int i = 0, imax = sizeof(lenses) / sizeof(lenses[0]); i < imax; ++i) {
-        std::cerr << "lense" << i << ": " << lenses[i]->Model << std::endl; // DEBUG
+    const lfCamera *camera = findCamera(env, ldb, cameraMakerStr, cameraModelStr);
+    const lfLens *lens = findLenses(env, ldb, camera, lensMakerStr, lensModelStr);
+    if (!lens) {
+        ldb->Destroy();
+        return false;
     }
-    const lfLens *lens = lenses[0];
-    lf_free(lenses);
-    env->ReleaseStringUTFChars(lensNameStr, 0);
 
     float crop = lens->CropFactor;
     if (focal < 0.1f) {
@@ -157,5 +186,98 @@ JNIEXPORT jboolean JNICALL Java_com_lightcrafts_utils_Lensfun_lensfunTerms
 
     ldb->Destroy();
     return true;
+}
+
+template <typename T>
+inline jobjectArray createJArray(JNIEnv *env, const T list, int size = -1)
+{
+    if (size < 0) {
+        // list must be null-terminated in this case
+        size = 0;
+        while (list[size]) {
+            ++size;
+        }
+    }
+
+    const jclass clazz = env->FindClass("java/lang/String");
+    const jobjectArray newArr = env->NewObjectArray(size, clazz, nullptr);
+
+    jstring utf_str;
+    for (int i = 0; i < size; ++i) {
+        const char* c_maker = lf_mlstr_get(list[i]->Maker);
+        const char* c_model = lf_mlstr_get(list[i]->Model);
+
+        const int len = strlen(c_maker);
+        const int cmp = strncmp(c_model, c_maker, len);
+        if (!cmp) {
+            // Remove maker name and a space from model
+            c_model += len + 1;
+        }
+
+        const std::string maker(c_maker);
+        const std::string model(c_model);
+        const std::string name = maker + ": " + model;
+        const char* c_name = name.c_str();
+        utf_str = env->NewStringUTF(c_name);
+        env->SetObjectArrayElement(newArr, i, utf_str);
+        env->DeleteLocalRef(utf_str);
+    }
+
+    return newArr;
+}
+
+extern "C"
+JNIEXPORT jobjectArray JNICALL
+Java_com_lightcrafts_utils_Lensfun_getCameraNames
+(JNIEnv *env, jclass cls)
+{
+    lfDatabase *ldb = lf_db_new();
+    ldb->Load();
+    const jobjectArray newArr = createJArray(env, ldb->GetCameras());
+    ldb->Destroy();
+    return newArr;
+}
+
+extern "C"
+JNIEXPORT jobjectArray JNICALL
+Java_com_lightcrafts_utils_Lensfun_getLensNames
+(JNIEnv *env, jclass cls)
+{
+    lfDatabase *ldb = lf_db_new();
+    ldb->Load();
+    const jobjectArray newArr = createJArray(env, ldb->GetLenses());
+    ldb->Destroy();
+    return newArr;
+}
+
+extern "C"
+JNIEXPORT jobjectArray JNICALL
+Java_com_lightcrafts_utils_Lensfun_getLensNamesForCamera
+(JNIEnv *env, jclass cls,
+ jstring cameraMakerStr, jstring cameraModelStr)
+{
+    lfDatabase *ldb = lf_db_new();
+    ldb->Load();
+
+    const lfCamera *camera = findCamera(env, ldb, cameraMakerStr, cameraModelStr);
+    const lfLens* const* allLenses = ldb->GetLenses();
+
+    std::vector<const lfLens*> list;
+    for (int i = 0; allLenses[i]; ++i) {
+        const lfLens** lenses =
+            ldb->FindLenses(camera, allLenses[i]->Maker, allLenses[i]->Model);
+        if (!lenses) {
+            continue;
+        }
+        list.push_back(lenses[0]);
+
+        // DEBUG
+        std::cout << "*** lens(" << i << ") = "
+            << lenses[0]->Maker << ": " << lenses[0]->Model << std::endl;  
+        lf_free(lenses);
+    }
+    const jobjectArray newArr = createJArray(env, list, list.size());
+    ldb->Destroy();
+    return newArr;
 }
 

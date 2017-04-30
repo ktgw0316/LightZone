@@ -2,6 +2,9 @@
 
 package com.lightcrafts.utils;
 
+import java.util.Arrays;
+import java.util.List;
+
 import lombok.Getter;
 
 /**
@@ -17,14 +20,46 @@ public class Lensfun {
     @Getter
     private float[] tcaTerms = {1f, 1f};
 
+    private static List<String> allCameraNames;
+    private static List<String> allLensNames;
+
     public Lensfun(String cameraMaker, String cameraModel,
-                   String lensName, float focal, float aperture) {
+                   String lensMaker, String lensModel,
+                   float focal, float aperture) {
         lensfunTerms(distModel, distTerms, tcaTerms,
-                cameraMaker, cameraModel, lensName, focal, aperture);
+                cameraMaker, cameraModel,
+                lensMaker, lensModel, focal, aperture);
     }
 
-    synchronized static native boolean lensfunTerms(int[] ret_distModel, float[] ret_distTerms,
-                                       float[] ret_tcaTerms,
-                                       String cameraMaker, String cameraModel,
-                                       String lensName, float focal, float aperture);
+    public synchronized static List<String> getAllCameraNames() {
+        if (allCameraNames == null) {
+            allCameraNames = Arrays.asList(getCameraNames());
+        }
+        return allCameraNames;
+    }
+
+    public synchronized static List<String> getAllLensNames() {
+        if (allLensNames == null) {
+            allLensNames = Arrays.asList(getLensNames());
+        }
+        return allLensNames;
+    }
+
+    public synchronized static List<String> getLensNamesFor(
+            String cameraMaker, String cameraModel) {
+        return Arrays.asList(
+                getLensNamesForCamera(cameraMaker, cameraModel));
+    }
+
+    private synchronized static native boolean lensfunTerms(
+            int[] ret_distModel, float[] ret_distTerms,
+            float[] ret_tcaTerms,
+            String cameraMaker, String cameraModel,
+            String lensMaker, String lensModel,
+            float focal, float aperture);
+
+    private static native String[] getCameraNames();
+    private static native String[] getLensNames();
+    private static native String[] getLensNamesForCamera(
+            String cameraMaker, String cameraModel);
 }
