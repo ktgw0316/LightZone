@@ -15,7 +15,8 @@ endif
 JNI_MACOSX_INCLUDES:=	-I/usr/local/include
 JNI_MACOSX_LDFLAGS:=	-L/usr/local/lib
 
-JAVAH_CLASSES:=		com.lightcrafts.jai.opimage.DistortionOpImage
+JAVAH_CLASSES:=		com.lightcrafts.jai.opimage.DistortionOpImage \
+			com.lightcrafts.utils.Lensfun
 
 ROOT:=			../../..
 include			../jni.mk

@@ -1,4 +1,4 @@
-/* Copyright (C) 2015 Masahiro Kitagawa */
+/* Copyright (C) 2015- Masahiro Kitagawa */
 
 package com.lightcrafts.jai.opimage;
 
@@ -6,6 +6,7 @@ import com.lightcrafts.mediax.jai.BorderExtender;
 import com.lightcrafts.mediax.jai.GeometricOpImage;
 import com.lightcrafts.mediax.jai.RasterFormatTag;
 import com.lightcrafts.mediax.jai.RasterAccessor;
+import com.lightcrafts.utils.Lensfun;
 
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
@@ -14,6 +15,8 @@ import java.awt.image.DataBuffer;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.Map;
+
+import lombok.val;
 
 public class DistortionOpImage extends GeometricOpImage {
 
@@ -149,15 +152,11 @@ public class DistortionOpImage extends GeometricOpImage {
             System.out.println("focal length = " + focal);       // DEBUG
             System.out.println("aperture     = " + aperture);    // DEBUG
 
-            int[] ret_distModel = {0};
-
-            synchronized(this) {
-                lensfunTerms(ret_distModel, distTerms,
-                             tcaTerms,
-                             cameraMaker, cameraModel,
-                             lensName, focal, aperture);
-            }
-            distModel = DistModelImpl.values()[ret_distModel[0]];
+            val lensfun = new Lensfun(cameraMaker, cameraModel, lensName, focal, aperture);
+            distTerms = lensfun.getDistTerms();
+            tcaTerms  = lensfun.getTcaTerms();
+            val model = lensfun.getDistModel();
+            distModel = DistModelImpl.values()[model[0]];
         }
         else {
             distModel = DistModelImpl.DIST_MODEL_NONE;
@@ -337,9 +336,4 @@ public class DistortionOpImage extends GeometricOpImage {
                                        int srcLineStride, int dstLineStride,
                                        int distModel, float[] distTerms,
                                        float[] tcaTerms);
-
-    static native boolean lensfunTerms(int[] ret_distModel, float[] ret_distTerms,
-                                       float[] ret_tcaTerms,
-                                       String cameraMaker, String cameraModel,
-                                       String lensName, float focal, float aperture);
 }
