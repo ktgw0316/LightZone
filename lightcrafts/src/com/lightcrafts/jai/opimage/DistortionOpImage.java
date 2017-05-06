@@ -57,7 +57,8 @@ public class DistortionOpImage extends GeometricOpImage {
             public float coeff(final float radiusSq) {
                 float k1 = distTerms[0];
                 float k2 = distTerms[1];
-                return (1f + k1 * radiusSq + k2 * radiusSq * radiusSq);
+                return 1f + radiusSq * (k1 + radiusSq * k2);
+                // = 1 + k1 * r^2 + k2 * r^4;
             }
         },
         DIST_MODEL_PTLENS {
@@ -67,7 +68,8 @@ public class DistortionOpImage extends GeometricOpImage {
                 float k2 = distTerms[1];
                 float k3 = distTerms[2];
                 final float radius = (float) Math.sqrt(radiusSq);
-                return k1 * radius * radiusSq + k2 * radiusSq + k3 * radius + 1f - k1 - k2 - k3;
+                return (k1 * radius + k2) * radiusSq + k3 * radius + 1f - k1 - k2 - k3;
+                // = k1 * r^3 + k2 * r^2 + k3 * r + 1 - k1 - k2 - k3;
             }
         },
         DIST_MODEL_LIGHTZONE {
@@ -75,7 +77,21 @@ public class DistortionOpImage extends GeometricOpImage {
             public float coeff(final float radiusSq) {
                 float k1 = distTerms[0];
                 float k2 = distTerms[1];
-                return (1f + k1 * radiusSq + k2 * radiusSq * radiusSq) / (1f + k1 + k2);
+                return 1f + radiusSq * (k1 + radiusSq * k2) / (1f + k1 + k2);
+		// = POLY5 / (1 + k1 + k2)
+            }
+        },
+
+	// c.f. http://download.macromedia.com/pub/labs/lensprofile_creator/lensprofile_creator_cameramodel.pdf
+        DIST_MODEL_ADOBE_RECTILINEAR {
+            @Override
+            public float coeff(final float radiusSq) {
+                float k1 = distTerms[0];
+                float k2 = distTerms[1];
+                float k3 = distTerms[2];
+		// NOTE: We ignore k4 and k5 terms
+                return 1f + radiusSq * (k1 + radiusSq * (k2 + radiusSq * k3));
+                // = 1 + k1 * r^2 + k2 * r^4 + k3 * r^6;
             }
         }
     }
