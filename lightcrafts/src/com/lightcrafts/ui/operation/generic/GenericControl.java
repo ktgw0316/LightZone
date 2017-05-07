@@ -37,13 +37,13 @@ public class GenericControl extends OpControl {
         "com/lightcrafts/ui/operation/generic/GenericControl"
     );
 
-    private GenericOperation op;
+    protected GenericOperation op;
 
     // GenericOperation settings keys mapped to their control Components:
 
-    private Map<String, GenericSlider> sliders = new HashMap<String, GenericSlider>();
-    private Map<String, JCheckBox> checkboxes = new HashMap<String, JCheckBox>();
-    private Map<String, JComboBox> choices = new HashMap<String, JComboBox>();
+    protected Map<String, GenericSlider> sliders = new HashMap<String, GenericSlider>();
+    protected Map<String, JCheckBox> checkboxes = new HashMap<String, JCheckBox>();
+    protected Map<String, JComboBox> choices = new HashMap<String, JComboBox>();
 
     public GenericControl(GenericOperation op, OpStack stack) {
         super(op, stack);
@@ -66,35 +66,7 @@ public class GenericControl extends OpControl {
         for (val key : choiceKeys) {
             val values = new Vector<String>(op.getChoiceValues(key));
             val choice = new JComboBox(values);
-            choice.addActionListener(
-                    new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent event) {
-                            val value = (String) choice.getSelectedItem();
-                            op.setChoiceValue(key, value);
-                            undoSupport.postEdit(key + " Choice");
-
-                            // Dynamically update the values of other choices
-                            for (val _key : choiceKeys) {
-                                if (key.equals(_key)) {
-                                    continue;
-                                }
-                                val _values = op.getChoiceValues(_key);
-                                val _choice = choices.get(_key);
-                                val _oldSelection = (String)_choice.getSelectedItem();
-                                _choice.removeAllItems();
-                                String _selection = null;
-                                for (val _value : _values) {
-                                    _choice.addItem(_value);
-                                    if (_value.equals(_oldSelection)) {
-                                        _selection = _value;
-                                    }
-                                }
-                                _choice.setSelectedItem(_selection);
-                            }
-                        }
-                    }
-            );
+            choice.addActionListener(choiceActionListener(key, choice));
             choice.addMouseWheelListener(
                     new MouseWheelListener() {
                         @Override
@@ -137,16 +109,7 @@ public class GenericControl extends OpControl {
         for (val key : checkboxKeys) {
             val userKey = getUserPresentableKey(key);
             val checkbox = new JCheckBox(userKey);
-            checkbox.addItemListener(
-                    new ItemListener() {
-                        @Override
-                        public void itemStateChanged(ItemEvent event) {
-                            val value = checkbox.isSelected();
-                            op.setCheckboxValue(key, value);
-                            undoSupport.postEdit(key + " Checkbox");
-                        }
-                    }
-            );
+            checkbox.addItemListener(checkboxItemListener(key, checkbox));
             val oldCheckbox = checkboxes.get(key);
             if (oldCheckbox != null) {
                 checkbox.setSelected(oldCheckbox.isSelected());
@@ -169,15 +132,7 @@ public class GenericControl extends OpControl {
             val userKey = getUserPresentableKey(key);
             val config = op.getSliderConfig(key);
             val slider = new GenericSlider(userKey, config);
-            slider.addChangeListener(
-                    new ChangeListener() {
-                        @Override
-                        public void stateChanged(ChangeEvent event) {
-                            val value = slider.getConfiguredValue();
-                            op.setSliderValue(key, value);
-                        }
-                    }
-            );
+            slider.addChangeListener(sliderChangeListener(key, slider));
             val oldSlider = sliders.get(key);
             if (oldSlider != null) {
                 slider.setConfiguredValue(oldSlider.getConfiguredValue());
@@ -210,6 +165,41 @@ public class GenericControl extends OpControl {
         setContent(box);
 
         undoSupport.initialize();
+    }
+
+    protected ChangeListener sliderChangeListener(
+            final String key, final GenericSlider slider) {
+        return new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent event) {
+                val value = slider.getConfiguredValue();
+                op.setSliderValue(key, value);
+            }
+        };
+    }
+
+    protected ItemListener checkboxItemListener(
+            final String key, final JCheckBox checkbox) {
+        return new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent event) {
+                val value = checkbox.isSelected();
+                op.setCheckboxValue(key, value);
+                undoSupport.postEdit(key + " Checkbox");
+            }
+        };
+    }
+
+    protected ActionListener choiceActionListener(
+            final String key, final JComboBox choice) {
+        return new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                val value = (String) choice.getSelectedItem();
+                op.setChoiceValue(key, value);
+                undoSupport.postEdit(key + " Choice");
+            }
+        };
     }
 
     protected void slewSlider(String key, double value) {

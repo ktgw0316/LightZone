@@ -194,8 +194,7 @@ public class OpStack extends DraggableStack
             index++;
         }
         LensCorrectionsOperation op = engine.insertLensCorrectionsOperation(index);
-        // TODO: OpControl control = new LensCorrectionsControl(op, this);
-        OpControl control = new GenericControl(op, this);
+        OpControl control = new LensCorrectionsControl(op, this);
         addControl(control, index);
         return control;
     }
@@ -386,6 +385,9 @@ public class OpStack extends DraggableStack
         else if (control instanceof WhitePointControl) {
             // WhitePointOperation is deprecated.
             op = engine.insertWhitePointOperation(index);
+        }
+        else if (control instanceof LensCorrectionsControl) {
+            op = engine.insertLensCorrectionsOperation(index);
         }
         else {
             op = engine.insertOperation(type, index);

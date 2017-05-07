@@ -22,8 +22,8 @@ import lombok.val;
 public class LensCorrectionsOperation extends BlendedOperation {
     private static final String MANUAL_MODE = "Manual_Correction";
     private static final String SEPARATOR = ": ";
-    private static final String CAMERA_NAME = "Camera";
-    private static final String LENS_NAME = "Lens";
+    public static final String CAMERA_NAME = "Camera";
+    public static final String LENS_NAME = "Lens";
     private static final String DISTORTION_K1 = "Main";
     private static final String DISTORTION_K2 = "Edge";
     private static final String TCA_R = "TCA_Red";
