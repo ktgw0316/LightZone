@@ -77,8 +77,8 @@ public class DistortionOpImage extends GeometricOpImage {
             public float coeff(final float radiusSq) {
                 float k1 = distTerms[0];
                 float k2 = distTerms[1];
-                return 1f + radiusSq * (k1 + radiusSq * k2) / (1f + k1 + k2);
-		// = POLY5 / (1 + k1 + k2)
+                return (1f + radiusSq * (k1 + radiusSq * k2)) / (1f + k1 + k2);
+                // = POLY5 / (1 + k1 + k2)
             }
         },
 
