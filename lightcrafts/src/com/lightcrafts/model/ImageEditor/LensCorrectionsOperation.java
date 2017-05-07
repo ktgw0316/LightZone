@@ -24,10 +24,10 @@ public class LensCorrectionsOperation extends BlendedOperation {
     private static final String SEPARATOR = ": ";
     public static final String CAMERA_NAME = "Camera";
     public static final String LENS_NAME = "Lens";
-    private static final String DISTORTION_K1 = "Main";
-    private static final String DISTORTION_K2 = "Edge";
-    private static final String TCA_R = "TCA_Red";
-    private static final String TCA_B = "TCA_Blue";
+    public static final String DISTORTION_K1 = "Main";
+    public static final String DISTORTION_K2 = "Edge";
+    public static final String TCA_R = "TCA_Red";
+    public static final String TCA_B = "TCA_Blue";
 
     private static final float distortion_k1_scale = 1e-3f;
     private static final float distortion_k2_scale = 1e-3f;

@@ -10,6 +10,8 @@ import lombok.val;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import static com.lightcrafts.model.ImageEditor.LensCorrectionsOperation.CAMERA_NAME;
 import static com.lightcrafts.model.ImageEditor.LensCorrectionsOperation.LENS_NAME;
@@ -46,6 +48,27 @@ public class LensCorrectionsControl extends GenericControl {
                         }
                     }
                     _choice.setSelectedItem(_selection);
+                }
+            }
+        };
+    }
+
+    @Override
+    protected ItemListener checkboxItemListener(
+            final String key, final JCheckBox checkbox) {
+        return new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent event) {
+                val value = checkbox.isSelected();
+                op.setCheckboxValue(key, value);
+                undoSupport.postEdit(key + " Checkbox");
+
+                // Enable/disable the choices and the sliders
+                for (val key : choices.keySet()) {
+                    choices.get(key).setEnabled(! value);
+                }
+                for (val key : sliders.keySet()) {
+                    sliders.get(key).setEnabled(value);
                 }
             }
         };
