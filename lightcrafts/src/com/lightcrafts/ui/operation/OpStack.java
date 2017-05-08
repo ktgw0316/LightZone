@@ -768,6 +768,9 @@ public class OpStack extends DraggableStack
                 // WhitePointOperation is deprecated.
                 child = node.addChild(WhitePointTag);
             }
+            else if (control instanceof LensCorrectionsControl) {
+                child = node.addChild(LensCorrectionsTag);
+            }
             else {
                 child = node.addChild(GenericTag);
                 GenericOperation op = (GenericOperation) control.getOperation();
