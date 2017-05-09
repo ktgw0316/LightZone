@@ -23,6 +23,7 @@ public class DistortionOpImage extends GeometricOpImage {
     private final int fullWidth;
     private final int fullHeight;
     private final Point2D center;
+    private final boolean shouldUseLensfun;
     private String cameraMaker = "";
     private String cameraModel = "";
     private String lensMaker = "";
@@ -72,6 +73,18 @@ public class DistortionOpImage extends GeometricOpImage {
                 // = k1 * r^3 + k2 * r^2 + k3 * r + 1 - k1 - k2 - k3;
             }
         },
+        // c.f. http://download.macromedia.com/pub/labs/lensprofile_creator/lensprofile_creator_cameramodel.pdf
+        DIST_MODEL_ADOBE_RECTILINEAR {
+            @Override
+            public float coeff(final float radiusSq) {
+                float k1 = distTerms[0];
+                float k2 = distTerms[1];
+                float k3 = distTerms[2];
+                // NOTE: We ignore k4 and k5 terms
+                return 1f + radiusSq * (k1 + radiusSq * (k2 + radiusSq * k3));
+                // = 1 + k1 * r^2 + k2 * r^4 + k3 * r^6;
+            }
+        },
         DIST_MODEL_LIGHTZONE {
             @Override
             public float coeff(final float radiusSq) {
@@ -79,19 +92,6 @@ public class DistortionOpImage extends GeometricOpImage {
                 float k2 = distTerms[1];
                 return (1f + radiusSq * (k1 + radiusSq * k2)) / (1f + k1 + k2);
                 // = POLY5 / (1 + k1 + k2)
-            }
-        },
-
-	// c.f. http://download.macromedia.com/pub/labs/lensprofile_creator/lensprofile_creator_cameramodel.pdf
-        DIST_MODEL_ADOBE_RECTILINEAR {
-            @Override
-            public float coeff(final float radiusSq) {
-                float k1 = distTerms[0];
-                float k2 = distTerms[1];
-                float k3 = distTerms[2];
-		// NOTE: We ignore k4 and k5 terms
-                return 1f + radiusSq * (k1 + radiusSq * (k2 + radiusSq * k3));
-                // = 1 + k1 * r^2 + k2 * r^4 + k3 * r^6;
             }
         }
     }
@@ -102,6 +102,8 @@ public class DistortionOpImage extends GeometricOpImage {
                              int fullWidth, int fullHeight, Point2D center,
                              float k1, float k2, float kr, float kb) {
         super(vectorize(source), null, configuration, true, extender, null);
+
+        shouldUseLensfun = false;
 
         this.fullWidth  = fullWidth;
         this.fullHeight = fullHeight;
@@ -116,42 +118,14 @@ public class DistortionOpImage extends GeometricOpImage {
         distModel = DistModelImpl.DIST_MODEL_LIGHTZONE;
     }
 
-    /*
-    public DistortionOpImage(RenderedImage source, Map configuration, BorderExtender extender,
-                             float k1, float kr, float kb) {
-        super(vectorize(source), null, configuration, true, extender, null);
-
-        fullWidth  = source.getWidth();
-        fullHeight = source.getHeight();
-        distTerms[0] = k1;
-        tcaTerms[0] = kr;
-        tcaTerms[1] = kb;
-
-        distModel = DistModelImpl.DIST_MODEL_POLY3;
-    }
-
-    public DistortionOpImage(RenderedImage source, Map configuration, BorderExtender extender,
-                             float k1, float k2, float k3, float kr, float kb) {
-        super(vectorize(source), null, configuration, true, extender, null);
-
-        fullWidth  = source.getWidth();
-        fullHeight = source.getHeight();
-        distTerms[0] = k1;
-        distTerms[1] = k2;
-        distTerms[2] = k3;
-        tcaTerms[0] = kr;
-        tcaTerms[1] = kb;
-
-        distModel = DistModelImpl.DIST_MODEL_PTLENS;
-    }
-    */
-
     public DistortionOpImage(RenderedImage source, Map configuration, BorderExtender extender,
                              int fullWidth, int fullHeight, Point2D center,
                              String cameraMaker, String cameraModel,
                              String lensMaker, String lensModel,
                              float focal, float aperture) {
         super(vectorize(source), null, configuration, true, extender, null);
+
+        shouldUseLensfun = true;
 
         this.fullWidth  = fullWidth;
         this.fullHeight = fullHeight;
@@ -317,7 +291,22 @@ public class DistortionOpImage extends GeometricOpImage {
             }
         }
         else if (src.getNumBands() == 3) {
-            synchronized(this) {
+            if (shouldUseLensfun) {
+                synchronized(this) {
+                    distortionColorLF(srcData, dstData,
+                            fullWidth, fullHeight,
+                            (int)center.getX(), (int)center.getY(),
+                            srcX, srcY, srcWidth, srcHeight,
+                            dstX, dstY, dstWidth, dstHeight,
+                            srcPixelStride, dstPixelStride,
+                            srcBandOffsets[0], srcBandOffsets[1], srcBandOffsets[2],
+                            dstBandOffsets[0], dstBandOffsets[1], dstBandOffsets[2],
+                            srcScanlineStride, dstScanlineStride,
+                            cameraMaker, cameraModel, lensMaker, lensModel, focal, aperture);
+                }
+            }
+            else {
+                synchronized (this) {
                 distortionColor(srcData, dstData,
                         fullWidth, fullHeight,
                         (int)center.getX(), (int)center.getY(),
@@ -328,6 +317,7 @@ public class DistortionOpImage extends GeometricOpImage {
                         dstBandOffsets[0], dstBandOffsets[1], dstBandOffsets[2],
                         srcScanlineStride, dstScanlineStride,
                         distModel.ordinal(), distTerms, tcaTerms);
+                }
             }
         }
     }
@@ -357,4 +347,19 @@ public class DistortionOpImage extends GeometricOpImage {
                                        int srcLineStride, int dstLineStride,
                                        int distModel, float[] distTerms,
                                        float[] tcaTerms);
+
+    static native void distortionColorLF(short srcData[], short dstData[],
+                                        int fullWidth, int fullHeight,
+                                        int centerX, int centerY,
+                                        int srcRectX, int srcRectY,
+                                        int srcRectWidth, int srcRectHeight,
+                                        int dstRectX, int dstRectY,
+                                        int dstRectWidth, int dstRectHeight,
+                                        int srcPixelStride, int dstPixelStride,
+                                        int srcROffset, int srcGOffset, int srcBOffset,
+                                        int dstROffset, int dstGOffset, int dstBOffset,
+                                        int srcLineStride, int dstLineStride,
+                                        String cameraMaker, String cameraModel,
+                                        String lensMaker, String lensModel,
+                                        float focal, float aperture);
 }
