@@ -169,6 +169,17 @@ public class DistortionOpImage extends GeometricOpImage {
         if (sourceIndex != 0)
             return null;
 
+        if (shouldUseLensfun) {
+            final int[] srcRect;
+            synchronized(this) {
+                srcRect = backwardMapRectLF(fullWidth, fullHeight,
+                        (int)center.getX(), (int)center.getY(),
+                        destRect.x, destRect.y, destRect.width, destRect.height,
+                        cameraMaker, cameraModel, lensMaker, lensModel, focal, aperture);
+            }
+            return new Rectangle(srcRect[0], srcRect[1], srcRect[2], srcRect[3]);
+        }
+
         final float centerX = (float) center.getX();
         final float centerY = (float) center.getY();
 
@@ -349,17 +360,25 @@ public class DistortionOpImage extends GeometricOpImage {
                                        float[] tcaTerms);
 
     static native void distortionColorLF(short srcData[], short dstData[],
-                                        int fullWidth, int fullHeight,
-                                        int centerX, int centerY,
-                                        int srcRectX, int srcRectY,
-                                        int srcRectWidth, int srcRectHeight,
-                                        int dstRectX, int dstRectY,
-                                        int dstRectWidth, int dstRectHeight,
-                                        int srcPixelStride, int dstPixelStride,
-                                        int srcROffset, int srcGOffset, int srcBOffset,
-                                        int dstROffset, int dstGOffset, int dstBOffset,
-                                        int srcLineStride, int dstLineStride,
-                                        String cameraMaker, String cameraModel,
-                                        String lensMaker, String lensModel,
-                                        float focal, float aperture);
+                                         int fullWidth, int fullHeight,
+                                         int centerX, int centerY,
+                                         int srcRectX, int srcRectY,
+                                         int srcRectWidth, int srcRectHeight,
+                                         int dstRectX, int dstRectY,
+                                         int dstRectWidth, int dstRectHeight,
+                                         int srcPixelStride, int dstPixelStride,
+                                         int srcROffset, int srcGOffset, int srcBOffset,
+                                         int dstROffset, int dstGOffset, int dstBOffset,
+                                         int srcLineStride, int dstLineStride,
+                                         String cameraMaker, String cameraModel,
+                                         String lensMaker, String lensModel,
+                                         float focal, float aperture);
+
+    static native int[] backwardMapRectLF(int fullWidth, int fullHeight,
+                                         int centerX, int centerY,
+                                         int dstRectX, int dstRectY,
+                                         int dstRectWidth, int dstRectHeight,
+                                         String cameraMaker, String cameraModel,
+                                         String lensMaker, String lensModel,
+                                         float focal, float aperture);
 }

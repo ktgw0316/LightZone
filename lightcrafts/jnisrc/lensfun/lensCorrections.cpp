@@ -298,6 +298,47 @@ static void applyModifier
     delete[] pos;
 }
 
+lfModifier* initModifier
+( JNIEnv *env,
+  jint fullWidth, jint fullHeight,
+  jstring cameraMakerStr, jstring cameraModelStr,
+  jstring lensMakerStr, jstring lensModelStr,
+  jfloat focal, jfloat aperture )
+{
+    // Load lensfun database
+    lfDatabase *ldb = lf_db_new();
+    if (ldb->Load() != LF_NO_ERROR) {
+        ldb->Destroy();
+        return nullptr;
+    }
+
+    const lfCamera *camera = findCamera(env, ldb, cameraMakerStr, cameraModelStr);
+    const lfLens *lens = findLenses(env, ldb, camera, lensMakerStr, lensModelStr);
+    if (!lens) {
+        ldb->Destroy();
+        return nullptr;
+    }
+
+    const float crop = camera ? camera->CropFactor : lens->CropFactor;
+    if (focal < 0.1f) {
+        focal = lens->MaxFocal;
+    }
+    if (aperture < 0.1f) {
+        aperture = lens->MinAperture;
+    }
+    constexpr float distance = 10; // TODO:
+    constexpr float scale = 0; // automatic scaling
+    const lfLensType targeom = lens->Type;
+
+    lfModifier *mod = new lfModifier(lens, crop, fullWidth, fullHeight);
+    if (!mod) {
+        return nullptr;
+    }
+    mod->Initialize(lens, LF_PF_U16, focal, aperture, distance, scale, targeom,
+            LF_MODIFY_ALL, false);
+    return mod;
+}
+
 extern "C"
 JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distortionColorLF
 ( JNIEnv *env, jclass cls,
@@ -314,37 +355,13 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distor
   jstring lensMakerStr, jstring lensModelStr,
   jfloat focal, jfloat aperture )
 {
-    // Load lensfun database
-    lfDatabase *ldb = lf_db_new();
-    if (ldb->Load() != LF_NO_ERROR) {
-        ldb->Destroy();
-        return;
-    }
-
-    const lfCamera *camera = findCamera(env, ldb, cameraMakerStr, cameraModelStr);
-    const lfLens *lens = findLenses(env, ldb, camera, lensMakerStr, lensModelStr);
-    if (!lens) {
-        ldb->Destroy();
-        return;
-    }
-
-    const float crop = camera ? camera->CropFactor : lens->CropFactor;
-    if (focal < 0.1f) {
-        focal = lens->MaxFocal;
-    }
-    if (aperture < 0.1f) {
-        aperture = lens->MinAperture;
-    }
-    constexpr float distance = 10; // TODO:
-    constexpr float scale = 0; // automatic scaling
-    const lfLensType targeom = lens->Type;
-
-    lfModifier *mod = new lfModifier(lens, crop, fullWidth, fullHeight);
+    lfModifier *mod = initModifier(
+            env, fullWidth, fullHeight,
+            cameraMakerStr, cameraModelStr,
+            lensMakerStr, lensModelStr, focal, aperture);
     if (!mod) {
         return;
     }
-    mod->Initialize(lens, LF_PF_U16, focal, aperture, distance, scale, targeom,
-            LF_MODIFY_ALL, false);
 
     unsigned short *srcData = (unsigned short *)env->GetPrimitiveArrayCritical(jsrcData, 0);
     unsigned short *dstData = (unsigned short *)env->GetPrimitiveArrayCritical(jdstData, 0);
@@ -364,3 +381,104 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distor
     env->ReleasePrimitiveArrayCritical(jdstData, dstData, 0);
 }
 
+
+extern "C"
+JNIEXPORT jintArray JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_backwardMapRectLF
+( JNIEnv *env, jclass cls,
+  jint fullWidth, jint fullHeight,
+  jint centerX, jint centerY,
+  jint dstRectX, jint dstRectY, jint dstRectWidth, jint dstRectHeight,
+  jstring cameraMakerStr, jstring cameraModelStr,
+  jstring lensMakerStr, jstring lensModelStr,
+  jfloat focal, jfloat aperture )
+{
+    lfModifier *mod = initModifier(
+            env, fullWidth, fullHeight,
+            cameraMakerStr, cameraModelStr,
+            lensMakerStr, lensModelStr, focal, aperture);
+    if (!mod) {
+        return nullptr;
+    }
+
+    float* top    = new float[dstRectWidth  * 2 * 3];
+    float* bottom = new float[dstRectWidth  * 2 * 3];
+    float* left   = new float[dstRectHeight * 2 * 3];
+    float* right  = new float[dstRectHeight * 2 * 3];
+
+    mod->ApplySubpixelGeometryDistortion(dstRectX, dstRectY,
+            dstRectWidth, 1, top);
+    mod->ApplySubpixelGeometryDistortion(dstRectX, dstRectY + dstRectHeight,
+            dstRectWidth, 1, bottom);
+    mod->ApplySubpixelGeometryDistortion(dstRectX,
+            dstRectY, 1, dstRectHeight, left);
+    mod->ApplySubpixelGeometryDistortion(dstRectX + dstRectWidth,
+            dstRectY, 1, dstRectHeight, right);
+
+    // initial values
+    int srcRectY    = top[1];
+    int srcRectMaxY = bottom[1];
+    int srcRectX    = left[0];
+    int srcRectMaxX = right[0];
+
+#pragma omp parallel
+    {
+#pragma omp for simd reduction(min:srcRectY, max:srcRectMaxY) nowait
+        for (int x = dstRectX, i = 0; x < dstRectX + dstRectWidth; ++x, i += 6) {
+            // Find topmost pixel
+            const float srcRY0 = top[i + 1];
+            const float srcGY0 = top[i + 3];
+            const float srcBY0 = top[i + 5];
+            const float minY = std::min(srcRY0, std::min(srcGY0, srcBY0));
+            if (minY < srcRectY) {
+                srcRectY = minY;
+            }
+
+            // Find bottommost pixel
+            const float srcRY1 = bottom[i + 1];
+            const float srcGY1 = bottom[i + 3];
+            const float srcBY1 = bottom[i + 5];
+            const float maxY = std::max(srcRY1, std::max(srcGY1, srcBY1));
+            if (maxY > srcRectMaxY) {
+                srcRectMaxY = maxY;
+            }
+        }
+
+#pragma omp for simd reduction(min:srcRectX, max:srcRectMaxX)
+        for (int y = dstRectY, i = 0; y < dstRectY + dstRectHeight; ++y, i += 6) {
+            // Find leftmost pixel
+            const float srcRX0 = left[i];
+            const float srcGX0 = left[i + 2];
+            const float srcBX0 = left[i + 4];
+            const float minX = std::min(srcRX0, std::min(srcGX0, srcBX0));
+            if (minX < srcRectX) {
+                srcRectX = minX;
+            }
+
+            // Find rightmost pixel
+            const float srcRX1 = right[i];
+            const float srcGX1 = right[i + 2];
+            const float srcBX1 = right[i + 4];
+            const float maxX = std::max(srcRX1, std::max(srcGX1, srcBX1));
+            if (maxX > srcRectMaxX) {
+                srcRectMaxX = maxX;
+            }
+        }
+    }
+
+    delete[] top;
+    delete[] bottom;
+    delete[] left;
+    delete[] right;
+    delete mod;
+
+    jintArray jsrcRect = env->NewIntArray(4);
+    jint* srcRect = env->GetIntArrayElements(jsrcRect, nullptr);
+
+    srcRect[0] = srcRectX;
+    srcRect[1] = srcRectY;
+    srcRect[2] = srcRectMaxX - srcRectX + 1; // width
+    srcRect[3] = srcRectMaxY - srcRectY + 1; // height
+
+    env->ReleaseIntArrayElements(jsrcRect, srcRect, 0);
+    return jsrcRect;
+}
