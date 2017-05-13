@@ -1,66 +1,15 @@
 /* Copyright (C) 2015- Masahiro Kitagawa */
 
+#include "LC_lensfun.h"
+
 #include <cstring>
-#include <iostream>
 #include <vector>
 #include <jni.h>
-#include <lensfun.h>
 #ifndef AUTO_DEP
 #include "javah/com_lightcrafts_utils_Lensfun.h"
 #endif
 
 #include "LC_JNIUtils.h"
-
-inline const lfCamera* findCamera(JNIEnv *env, const lfDatabase* ldb,
-        jstring cameraMakerStr, jstring cameraModelStr)
-{
-    const char *cameraMaker = env->GetStringUTFChars(cameraMakerStr, NULL);
-    const char *cameraModel = env->GetStringUTFChars(cameraModelStr, NULL);
-    const lfCamera **cameras = ldb->FindCamerasExt(cameraMaker, cameraModel);
-    env->ReleaseStringUTFChars(cameraMakerStr, 0);
-    env->ReleaseStringUTFChars(cameraModelStr, 0);
-
-    if (!cameras) {
-        std::cerr << "Cannot find the camera \""
-            << cameraMaker << ": " << cameraModel << "\"" 
-            << " in database" << std::endl;
-        return nullptr;
-    }
-    const lfCamera *camera = cameras[0];
-    lf_free(cameras);
-    return camera;
-}
-
-inline const lfLens* findLenses(JNIEnv *env, const lfDatabase* ldb,
-        const lfCamera* camera, jstring lensMakerStr, jstring lensModelStr)
-{
-    const char *lensMaker = env->GetStringUTFChars(lensMakerStr, NULL);
-    const char *lensModel = env->GetStringUTFChars(lensModelStr, NULL);
-    const lfLens **lenses = ldb->FindLenses(camera, lensMaker, lensModel);
-    env->ReleaseStringUTFChars(lensMakerStr, 0);
-    env->ReleaseStringUTFChars(lensModelStr, 0);
-
-    if (!lenses) {
-        std::cerr << "Cannot find the lens \""
-            << lensMaker << ": " << lensModel << "\"";
-        if (camera) {
-            std::cerr << " for the camera \""
-                << camera->Maker << ": " << camera->Model << "\"";
-        }
-        std::cerr << " in database" << std::endl;
-        return nullptr;
-    }
-
-    // DEBUG
-    for (int i = 0; lenses[i]; ++i) {
-        std::cerr << "** lens" << i << " = "
-            << lenses[i]->Maker << ": " << lenses[i]->Model << std::endl;
-    }
-
-    const lfLens *lens = lenses[0];
-    lf_free(lenses);
-    return lens;
-}
 
 extern "C"
 JNIEXPORT jboolean JNICALL Java_com_lightcrafts_utils_Lensfun_lensfunTerms
