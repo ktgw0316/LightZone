@@ -2,14 +2,17 @@
 
 #include "LC_lensfun.h"
 
+#include <cmath>
 #include <cstring>
 #include <vector>
+#include <omp.h>
 #include <jni.h>
 #ifndef AUTO_DEP
 #include "javah/com_lightcrafts_utils_Lensfun.h"
 #endif
 
 #include "LC_JNIUtils.h"
+#include "interpolation.h"
 
 extern "C"
 JNIEXPORT jboolean JNICALL Java_com_lightcrafts_utils_Lensfun_lensfunTerms
@@ -20,13 +23,28 @@ JNIEXPORT jboolean JNICALL Java_com_lightcrafts_utils_Lensfun_lensfunTerms
   jstring lensMakerStr, jstring lensModelStr,
   jfloat focal, jfloat aperture )
 {
-    // Load lensfun database
-    lfDatabase *ldb = lf_db_new();
-    if (ldb->Load() != LF_NO_ERROR) {
-        ldb->Destroy();
-        return false;
-    }
+/*
+    const char *cameraMaker = env->GetStringUTFChars(cameraMakerStr, NULL);
+    const char *cameraModel = env->GetStringUTFChars(cameraModelStr, NULL);
+    const char *lensMaker = env->GetStringUTFChars(lensMakerStr, NULL);
+    const char *lensModel = env->GetStringUTFChars(lensModelStr, NULL);
+    
+    const boolean b = lensfunTerms(
+    // TODO:
+    );
 
+    env->ReleaseStringUTFChars(cameraMakerStr, 0);
+    env->ReleaseStringUTFChars(cameraModelStr, 0);
+    env->ReleaseStringUTFChars(lensMakerStr, 0);
+    env->ReleaseStringUTFChars(lensModelStr, 0);
+
+    return b;
+    */
+    return true;
+}
+
+/*
+boolean LC_lensfun::lensfunTerms() {
     const lfCamera *camera = findCamera(env, ldb, cameraMakerStr, cameraModelStr);
     const lfLens *lens = findLenses(env, ldb, camera, lensMakerStr, lensModelStr);
     if (!lens) {
@@ -136,6 +154,7 @@ JNIEXPORT jboolean JNICALL Java_com_lightcrafts_utils_Lensfun_lensfunTerms
     ldb->Destroy();
     return true;
 }
+*/
 
 template <typename T>
 inline jobjectArray createJArray(JNIEnv *env, const T list, int size = -1)
@@ -176,26 +195,48 @@ inline jobjectArray createJArray(JNIEnv *env, const T list, int size = -1)
 }
 
 extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_lightcrafts_utils_Lensfun_init
+(JNIEnv *env, jobject obj)
+{
+    LC_lensfun* lf = new LC_lensfun();
+    return reinterpret_cast<long>(lf);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_lightcrafts_utils_Lensfun_destroy
+(JNIEnv *env, jobject obj, jlong handle)
+{
+    // Set the Java field to zero before delete the corresponding object
+    const jclass cls = env->GetObjectClass(obj);
+    const jfieldID field = env->GetFieldID(cls, "handle", "L");
+    if (!field) {
+        return;
+    }
+    env->SetLongField(obj, field, 0);
+
+    LC_lensfun* lf = reinterpret_cast<LC_lensfun*>(handle);
+    delete lf;
+}
+
+extern "C"
 JNIEXPORT jobjectArray JNICALL
 Java_com_lightcrafts_utils_Lensfun_getCameraNames
-(JNIEnv *env, jclass cls)
+(JNIEnv *env, jclass cls, jlong handle)
 {
-    lfDatabase *ldb = lf_db_new();
-    ldb->Load();
-    const jobjectArray newArr = createJArray(env, ldb->GetCameras());
-    ldb->Destroy();
+    LC_lensfun* lf = reinterpret_cast<LC_lensfun*>(handle);
+    const jobjectArray newArr = createJArray(env, lf->getCameras());
     return newArr;
 }
 
 extern "C"
 JNIEXPORT jobjectArray JNICALL
 Java_com_lightcrafts_utils_Lensfun_getLensNames
-(JNIEnv *env, jclass cls)
+(JNIEnv *env, jclass cls, jlong handle)
 {
-    lfDatabase *ldb = lf_db_new();
-    ldb->Load();
-    const jobjectArray newArr = createJArray(env, ldb->GetLenses());
-    ldb->Destroy();
+    LC_lensfun* lf = reinterpret_cast<LC_lensfun*>(handle);
+    const jobjectArray newArr = createJArray(env, lf->getLenses());
     return newArr;
 }
 
@@ -203,30 +244,301 @@ extern "C"
 JNIEXPORT jobjectArray JNICALL
 Java_com_lightcrafts_utils_Lensfun_getLensNamesForCamera
 (JNIEnv *env, jclass cls,
- jstring cameraMakerStr, jstring cameraModelStr)
+ jlong handle, jstring cameraMakerStr, jstring cameraModelStr)
 {
-    lfDatabase *ldb = lf_db_new();
-    ldb->Load();
+    LC_lensfun* lf = reinterpret_cast<LC_lensfun*>(handle);
 
-    const lfCamera *camera = findCamera(env, ldb, cameraMakerStr, cameraModelStr);
-    const lfLens* const* allLenses = ldb->GetLenses();
+    const char *cameraMaker = env->GetStringUTFChars(cameraMakerStr, NULL);
+    const char *cameraModel = env->GetStringUTFChars(cameraModelStr, NULL);
+
+    const lfCamera *camera = lf->findCamera(cameraMaker, cameraModel);
+
+    env->ReleaseStringUTFChars(cameraMakerStr, 0);
+    env->ReleaseStringUTFChars(cameraModelStr, 0);
+    
+    const lfLens* const* allLenses = lf->getLenses();
 
     std::vector<const lfLens*> list;
     for (int i = 0; allLenses[i]; ++i) {
-        const lfLens** lenses =
-            ldb->FindLenses(camera, allLenses[i]->Maker, allLenses[i]->Model);
-        if (!lenses) {
+        const lfLens* lens =
+            lf->findLens(camera, allLenses[i]->Maker, allLenses[i]->Model);
+        if (!lens) {
             continue;
         }
-        list.push_back(lenses[0]);
+        list.push_back(lens);
 
-        // DEBUG
+#ifdef DEBUG
         std::cout << "*** lens(" << i << ") = "
-            << lenses[0]->Maker << ": " << lenses[0]->Model << std::endl;  
-        lf_free(lenses);
+            << lens->Maker << ": " << lens->Model << std::endl;  
+#endif
     }
-    const jobjectArray newArr = createJArray(env, list, list.size());
+    return createJArray(env, list, list.size());
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_lightcrafts_utils_Lensfun_initModifier
+(JNIEnv *env, jobject obj, jlong handle,
+ jint fullWidth, jint fullHeight,
+ jstring cameraMakerStr, jstring cameraModelStr,
+ jstring lensMakerStr, jstring lensModelStr,
+ float focal, float aperture)
+{
+    LC_lensfun* lf = reinterpret_cast<LC_lensfun*>(handle);
+
+    const char *cameraMaker = env->GetStringUTFChars(cameraMakerStr, NULL);
+    const char *cameraModel = env->GetStringUTFChars(cameraModelStr, NULL);
+    const char *lensMaker = env->GetStringUTFChars(lensMakerStr, NULL);
+    const char *lensModel = env->GetStringUTFChars(lensModelStr, NULL);
+
+    lf->initModifier(
+            fullWidth, fullHeight,
+            cameraMaker, cameraModel,
+            lensMaker, lensModel, focal, aperture);
+
+    env->ReleaseStringUTFChars(cameraMakerStr, 0);
+    env->ReleaseStringUTFChars(cameraModelStr, 0);
+    env->ReleaseStringUTFChars(lensMakerStr, 0);
+    env->ReleaseStringUTFChars(lensModelStr, 0);
+}
+
+//
+// LC_lensfun
+//
+
+LC_lensfun::LC_lensfun() : ldb(lf_db_new())
+{
+    ldb->Load();
+}
+
+LC_lensfun::~LC_lensfun()
+{
+    delete mod;
     ldb->Destroy();
-    return newArr;
+}
+
+const lfCamera* LC_lensfun::findCamera(
+        const char *cameraMaker, const char *cameraModel) const
+{
+    const lfCamera **cameras = ldb->FindCamerasExt(cameraMaker, cameraModel);
+
+    if (!cameras) {
+#ifdef DEBUG
+        std::cerr << "Cannot find the camera \""
+            << cameraMaker << ": " << cameraModel << "\"" 
+            << " in database" << std::endl;
+#endif
+        return nullptr;
+    }
+    const lfCamera *camera = cameras[0];
+    lf_free(cameras);
+    return camera;
+}
+
+const lfLens* LC_lensfun::findLens(
+        const lfCamera* camera, const char *lensMaker, const char *lensModel) const
+{
+    const lfLens **lenses = ldb->FindLenses(camera, lensMaker, lensModel);
+
+    if (!lenses) {
+        return nullptr;
+    }
+
+#ifdef DEBUG
+    for (int i = 0; lenses[i]; ++i) {
+        std::cerr << "** lens" << i << " = "
+            << lenses[i]->Maker << ": " << lenses[i]->Model << std::endl;
+    }
+#endif
+
+    const lfLens *lens = lenses[0];
+    lf_free(lenses);
+    return lens;
+}
+
+const lfCamera* const* LC_lensfun::getCameras() const
+{
+    return ldb->GetCameras();
+}
+
+const lfLens* const* LC_lensfun::getLenses() const
+{
+    return ldb->GetLenses();
+}
+
+void LC_lensfun::initModifier
+( int fullWidth, int fullHeight,
+  const char* cameraMaker, const char* cameraModel,
+  const char* lensMaker, const char* lensModel,
+  float focal, float aperture )
+{
+    const lfCamera *camera = findCamera(cameraMaker, cameraModel);
+    const lfLens *lens = findLens(camera, lensMaker, lensModel);
+    if (!lens) {
+        return;
+    }
+
+    const float crop = camera ? camera->CropFactor : lens->CropFactor;
+    if (focal < 0.1f) {
+        focal = lens->MaxFocal;
+    }
+    if (aperture < 0.1f) {
+        aperture = lens->MinAperture;
+    }
+    constexpr float distance = 10; // TODO:
+    constexpr float scale = 0; // automatic scaling
+    const lfLensType targeom = lens->Type;
+
+    mod = new lfModifier(lens, crop, fullWidth, fullHeight);
+    if (!mod) {
+        return;
+    }
+    mod->Initialize(lens, LF_PF_U16, focal, aperture, distance, scale, targeom,
+            LF_MODIFY_ALL, false);
+}
+
+void LC_lensfun::applyModifier
+( const unsigned short *srcData, unsigned short *dstData,
+  int srcRectX, int srcRectY,
+  int srcRectWidth, int srcRectHeight,
+  int dstRectX, int dstRectY,
+  int dstRectWidth, int dstRectHeight,
+  int srcPixelStride, int dstPixelStride,
+  int srcROffset, int srcGOffset, int srcBOffset,
+  int dstROffset, int dstGOffset, int dstBOffset,
+  int srcLineStride, int dstLineStride ) const
+{
+    float* pos = new float[dstRectWidth * 2 * 3];
+
+#pragma omp parallel for schedule (guided)
+    for (int y = dstRectY; y < dstRectY + dstRectHeight; ++y) {
+        mod->ApplySubpixelGeometryDistortion(dstRectX, y, dstRectWidth, 1, pos);
+
+        for (int x = dstRectX, i = 0; x < dstRectX + dstRectWidth; ++x, i += 6) {
+            const float srcRX = pos[i];
+            const float srcRY = pos[i + 1];
+            const float srcGX = pos[i + 2];
+            const float srcGY = pos[i + 3];
+            const float srcBX = pos[i + 4];
+            const float srcBY = pos[i + 5];
+
+            const int dstIdx =
+                dstPixelStride * (x - dstRectX) + (y - dstRectY) * dstLineStride;
+
+            if (srcRX < srcRectX || srcRX >= srcRectX + srcRectWidth
+             || srcRY < srcRectY || srcRY >= srcRectY + srcRectHeight
+             || srcGX < srcRectX || srcGX >= srcRectX + srcRectWidth
+             || srcGY < srcRectY || srcGY >= srcRectY + srcRectHeight
+             || srcBX < srcRectX || srcBX >= srcRectX + srcRectWidth
+             || srcBY < srcRectY || srcBY >= srcRectY + srcRectHeight) {
+                dstData[dstIdx + dstROffset] = 0;
+                dstData[dstIdx + dstGOffset] = 0;
+                dstData[dstIdx + dstBOffset] = 0;
+            }
+            else {
+                const unsigned short valueR = BilinearInterp(
+                        srcData, srcPixelStride, srcROffset, srcLineStride,
+                        srcRX - srcRectX, srcRY - srcRectY);
+                const unsigned short valueG = BilinearInterp(
+                        srcData, srcPixelStride, srcGOffset, srcLineStride,
+                        srcGX - srcRectX, srcGY - srcRectY);
+                const unsigned short valueB = BilinearInterp(
+                        srcData, srcPixelStride, srcBOffset, srcLineStride,
+                        srcBX - srcRectX, srcBY - srcRectY);
+                dstData[dstIdx + dstROffset] = valueR < 0xffff ? valueR : 0xffff;
+                dstData[dstIdx + dstGOffset] = valueG < 0xffff ? valueG : 0xffff;
+                dstData[dstIdx + dstBOffset] = valueB < 0xffff ? valueB : 0xffff;
+            }
+        }
+    }
+
+    delete[] pos;
+}
+
+void LC_lensfun::backwardMapRect
+( int* srcRectParams,
+  int fullWidth, int fullHeight,
+  int centerX, int centerY,
+  int dstRectX, int dstRectY,
+  int dstRectWidth, int dstRectHeight,
+  const char* cameraMakerStr, const char* cameraModelStr,
+  const char* lensMakerStr, const char* lensModelStr,
+  float focal, float aperture ) const
+{
+    float* top    = new float[dstRectWidth  * 2 * 3];
+    float* bottom = new float[dstRectWidth  * 2 * 3];
+    float* left   = new float[dstRectHeight * 2 * 3];
+    float* right  = new float[dstRectHeight * 2 * 3];
+
+    mod->ApplySubpixelGeometryDistortion(dstRectX, dstRectY,
+            dstRectWidth, 1, top);
+    mod->ApplySubpixelGeometryDistortion(dstRectX, dstRectY + dstRectHeight,
+            dstRectWidth, 1, bottom);
+    mod->ApplySubpixelGeometryDistortion(dstRectX,
+            dstRectY, 1, dstRectHeight, left);
+    mod->ApplySubpixelGeometryDistortion(dstRectX + dstRectWidth,
+            dstRectY, 1, dstRectHeight, right);
+
+    // initial values
+    int srcRectY    = top[1];
+    int srcRectMaxY = bottom[1];
+    int srcRectX    = left[0];
+    int srcRectMaxX = right[0];
+
+#pragma omp parallel
+    {
+#pragma omp for simd reduction(min:srcRectY, max:srcRectMaxY) nowait
+        for (int x = dstRectX, i = 0; x < dstRectX + dstRectWidth; ++x, i += 6) {
+            // Find topmost pixel
+            const float srcRY0 = top[i + 1];
+            const float srcGY0 = top[i + 3];
+            const float srcBY0 = top[i + 5];
+            const float minY = std::min(srcRY0, std::min(srcGY0, srcBY0));
+            if (minY < srcRectY) {
+                srcRectY = minY;
+            }
+
+            // Find bottommost pixel
+            const float srcRY1 = bottom[i + 1];
+            const float srcGY1 = bottom[i + 3];
+            const float srcBY1 = bottom[i + 5];
+            const float maxY = std::max(srcRY1, std::max(srcGY1, srcBY1));
+            if (maxY > srcRectMaxY) {
+                srcRectMaxY = maxY;
+            }
+        }
+
+#pragma omp for simd reduction(min:srcRectX, max:srcRectMaxX)
+        for (int y = dstRectY, i = 0; y < dstRectY + dstRectHeight; ++y, i += 6) {
+            // Find leftmost pixel
+            const float srcRX0 = left[i];
+            const float srcGX0 = left[i + 2];
+            const float srcBX0 = left[i + 4];
+            const float minX = std::min(srcRX0, std::min(srcGX0, srcBX0));
+            if (minX < srcRectX) {
+                srcRectX = minX;
+            }
+
+            // Find rightmost pixel
+            const float srcRX1 = right[i];
+            const float srcGX1 = right[i + 2];
+            const float srcBX1 = right[i + 4];
+            const float maxX = std::max(srcRX1, std::max(srcGX1, srcBX1));
+            if (maxX > srcRectMaxX) {
+                srcRectMaxX = maxX;
+            }
+        }
+    }
+
+    delete[] top;
+    delete[] bottom;
+    delete[] left;
+    delete[] right;
+
+    // return values
+    srcRectParams[0] = srcRectX;
+    srcRectParams[1] = srcRectY;
+    srcRectParams[2] = srcRectMaxX - srcRectX + 1; // width
+    srcRectParams[3] = srcRectMaxY - srcRectY + 1; // height
 }
 

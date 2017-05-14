@@ -10,6 +10,7 @@
 
 #include "LC_JNIUtils.h"
 
+#include "LC_lensfun.h"
 #include "interpolation.h"
 
 std::function<float(float)> makeCoeff(int distModelType, const float* k)
@@ -185,60 +186,6 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distor
     env->ReleasePrimitiveArrayCritical(jdstData, dstData, 0);
 }
 
-#include <iostream>
-#include <lensfun.h>
-
-inline const lfCamera* findCamera(JNIEnv *env, const lfDatabase* ldb,
-        jstring cameraMakerStr, jstring cameraModelStr)
-{
-    const char *cameraMaker = env->GetStringUTFChars(cameraMakerStr, NULL);
-    const char *cameraModel = env->GetStringUTFChars(cameraModelStr, NULL);
-    const lfCamera **cameras = ldb->FindCamerasExt(cameraMaker, cameraModel);
-    env->ReleaseStringUTFChars(cameraMakerStr, 0);
-    env->ReleaseStringUTFChars(cameraModelStr, 0);
-
-    if (!cameras) {
-        std::cerr << "Cannot find the camera \""
-            << cameraMaker << ": " << cameraModel << "\"" 
-            << " in database" << std::endl;
-        return nullptr;
-    }
-    const lfCamera *camera = cameras[0];
-    lf_free(cameras);
-    return camera;
-}
-
-inline const lfLens* findLenses(JNIEnv *env, const lfDatabase* ldb,
-        const lfCamera* camera, jstring lensMakerStr, jstring lensModelStr)
-{
-    const char *lensMaker = env->GetStringUTFChars(lensMakerStr, NULL);
-    const char *lensModel = env->GetStringUTFChars(lensModelStr, NULL);
-    const lfLens **lenses = ldb->FindLenses(camera, lensMaker, lensModel);
-    env->ReleaseStringUTFChars(lensMakerStr, 0);
-    env->ReleaseStringUTFChars(lensModelStr, 0);
-
-    if (!lenses) {
-        std::cerr << "Cannot find the lens \""
-            << lensMaker << ": " << lensModel << "\"";
-        if (camera) {
-            std::cerr << " for the camera \""
-                << camera->Maker << ": " << camera->Model << "\"";
-        }
-        std::cerr << " in database" << std::endl;
-        return nullptr;
-    }
-
-    // DEBUG
-    for (int i = 0; lenses[i]; ++i) {
-        std::cerr << "** lens" << i << " = "
-            << lenses[i]->Maker << ": " << lenses[i]->Model << std::endl;
-    }
-
-    const lfLens *lens = lenses[0];
-    lf_free(lenses);
-    return lens;
-}
-
 static void applyModifier
 ( const lfModifier* mod,
   const unsigned short *srcData, unsigned short *dstData,
@@ -298,51 +245,6 @@ static void applyModifier
     delete[] pos;
 }
 
-lfModifier* initModifier
-( JNIEnv *env,
-  jint fullWidth, jint fullHeight,
-  jstring cameraMakerStr, jstring cameraModelStr,
-  jstring lensMakerStr, jstring lensModelStr,
-  jfloat focal, jfloat aperture )
-{
-    // Load lensfun database
-    lfDatabase *ldb = lf_db_new();
-    if (ldb->Load() != LF_NO_ERROR) {
-        ldb->Destroy();
-        return nullptr;
-    }
-
-    const lfCamera *camera = findCamera(env, ldb, cameraMakerStr, cameraModelStr);
-    const lfLens *lens = findLenses(env, ldb, camera, lensMakerStr, lensModelStr);
-    if (!lens) {
-        ldb->Destroy();
-        return nullptr;
-    }
-
-    const float crop = camera ? camera->CropFactor : lens->CropFactor;
-    if (focal < 0.1f) {
-        focal = lens->MaxFocal;
-    }
-    if (aperture < 0.1f) {
-        aperture = lens->MinAperture;
-    }
-    constexpr float distance = 10; // TODO:
-    constexpr float scale = 0; // automatic scaling
-    const lfLensType targeom = lens->Type;
-
-#if LF_VERSION_MAJOR == 0 && LF_VERSION_MINOR < 3
-    lfModifier *mod = lfModifier::Create(lens, crop, fullWidth, fullHeight);
-#else
-    lfModifier *mod = new lfModifier(lens, crop, fullWidth, fullHeight);
-#endif
-    if (!mod) {
-        return nullptr;
-    }
-    mod->Initialize(lens, LF_PF_U16, focal, aperture, distance, scale, targeom,
-            LF_MODIFY_ALL, false);
-    return mod;
-}
-
 extern "C"
 JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distortionColorLF
 ( JNIEnv *env, jclass cls,
@@ -359,18 +261,28 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distor
   jstring lensMakerStr, jstring lensModelStr,
   jfloat focal, jfloat aperture )
 {
-    lfModifier *mod = initModifier(
-            env, fullWidth, fullHeight,
-            cameraMakerStr, cameraModelStr,
-            lensMakerStr, lensModelStr, focal, aperture);
-    if (!mod) {
-        return;
-    }
+    LC_lensfun* lf = new LC_lensfun();
+
+    const char *cameraMaker = env->GetStringUTFChars(cameraMakerStr, NULL);
+    const char *cameraModel = env->GetStringUTFChars(cameraModelStr, NULL);
+    const char *lensMaker = env->GetStringUTFChars(lensMakerStr, NULL);
+    const char *lensModel = env->GetStringUTFChars(lensModelStr, NULL);
+
+    lf->initModifier(
+            fullWidth, fullHeight,
+            cameraMaker, cameraModel,
+            lensMaker, lensModel, focal, aperture);
+
+    env->ReleaseStringUTFChars(cameraMakerStr, 0);
+    env->ReleaseStringUTFChars(cameraModelStr, 0);
+    env->ReleaseStringUTFChars(lensMakerStr, 0);
+    env->ReleaseStringUTFChars(lensModelStr, 0);
 
     unsigned short *srcData = (unsigned short *)env->GetPrimitiveArrayCritical(jsrcData, 0);
     unsigned short *dstData = (unsigned short *)env->GetPrimitiveArrayCritical(jdstData, 0);
 
-    applyModifier(mod, srcData, dstData,
+    lf->applyModifier(
+            srcData, dstData,
             srcRectX, srcRectY,
             srcRectWidth, srcRectHeight,
             dstRectX, dstRectY,
@@ -380,13 +292,10 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distor
             dstROffset, dstGOffset, dstBOffset,
             srcLineStride, dstLineStride);
 
-#if LF_VERSION_MAJOR == 0 && LF_VERSION_MINOR < 3
-    mod->Destroy();
-#else
-    delete mod;
-#endif
     env->ReleasePrimitiveArrayCritical(jsrcData, srcData, 0);
     env->ReleasePrimitiveArrayCritical(jdstData, dstData, 0);
+
+    delete lf;
 }
 
 
@@ -400,97 +309,33 @@ JNIEXPORT jintArray JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_b
   jstring lensMakerStr, jstring lensModelStr,
   jfloat focal, jfloat aperture )
 {
-    lfModifier *mod = initModifier(
-            env, fullWidth, fullHeight,
-            cameraMakerStr, cameraModelStr,
-            lensMakerStr, lensModelStr, focal, aperture);
-    if (!mod) {
-        return nullptr;
-    }
+    LC_lensfun* lf = new LC_lensfun();
 
-    float* top    = new float[dstRectWidth  * 2 * 3];
-    float* bottom = new float[dstRectWidth  * 2 * 3];
-    float* left   = new float[dstRectHeight * 2 * 3];
-    float* right  = new float[dstRectHeight * 2 * 3];
+    const char *cameraMaker = env->GetStringUTFChars(cameraMakerStr, NULL);
+    const char *cameraModel = env->GetStringUTFChars(cameraModelStr, NULL);
+    const char *lensMaker = env->GetStringUTFChars(lensMakerStr, NULL);
+    const char *lensModel = env->GetStringUTFChars(lensModelStr, NULL);
 
-    mod->ApplySubpixelGeometryDistortion(dstRectX, dstRectY,
-            dstRectWidth, 1, top);
-    mod->ApplySubpixelGeometryDistortion(dstRectX, dstRectY + dstRectHeight,
-            dstRectWidth, 1, bottom);
-    mod->ApplySubpixelGeometryDistortion(dstRectX,
-            dstRectY, 1, dstRectHeight, left);
-    mod->ApplySubpixelGeometryDistortion(dstRectX + dstRectWidth,
-            dstRectY, 1, dstRectHeight, right);
-
-    // initial values
-    int srcRectY    = top[1];
-    int srcRectMaxY = bottom[1];
-    int srcRectX    = left[0];
-    int srcRectMaxX = right[0];
-
-#pragma omp parallel
-    {
-#pragma omp for simd reduction(min:srcRectY, max:srcRectMaxY) nowait
-        for (int x = dstRectX, i = 0; x < dstRectX + dstRectWidth; ++x, i += 6) {
-            // Find topmost pixel
-            const float srcRY0 = top[i + 1];
-            const float srcGY0 = top[i + 3];
-            const float srcBY0 = top[i + 5];
-            const float minY = std::min(srcRY0, std::min(srcGY0, srcBY0));
-            if (minY < srcRectY) {
-                srcRectY = minY;
-            }
-
-            // Find bottommost pixel
-            const float srcRY1 = bottom[i + 1];
-            const float srcGY1 = bottom[i + 3];
-            const float srcBY1 = bottom[i + 5];
-            const float maxY = std::max(srcRY1, std::max(srcGY1, srcBY1));
-            if (maxY > srcRectMaxY) {
-                srcRectMaxY = maxY;
-            }
-        }
-
-#pragma omp for simd reduction(min:srcRectX, max:srcRectMaxX)
-        for (int y = dstRectY, i = 0; y < dstRectY + dstRectHeight; ++y, i += 6) {
-            // Find leftmost pixel
-            const float srcRX0 = left[i];
-            const float srcGX0 = left[i + 2];
-            const float srcBX0 = left[i + 4];
-            const float minX = std::min(srcRX0, std::min(srcGX0, srcBX0));
-            if (minX < srcRectX) {
-                srcRectX = minX;
-            }
-
-            // Find rightmost pixel
-            const float srcRX1 = right[i];
-            const float srcGX1 = right[i + 2];
-            const float srcBX1 = right[i + 4];
-            const float maxX = std::max(srcRX1, std::max(srcGX1, srcBX1));
-            if (maxX > srcRectMaxX) {
-                srcRectMaxX = maxX;
-            }
-        }
-    }
-
-    delete[] top;
-    delete[] bottom;
-    delete[] left;
-    delete[] right;
-#if LF_VERSION_MAJOR == 0 && LF_VERSION_MINOR < 3
-    mod->Destroy();
-#else
-    delete mod;
-#endif
+    lf->initModifier(
+            fullWidth, fullHeight,
+            cameraMaker, cameraModel,
+            lensMaker, lensModel, focal, aperture);
 
     jintArray jsrcRect = env->NewIntArray(4);
-    jint* srcRect = env->GetIntArrayElements(jsrcRect, nullptr);
+    int* srcRect = (int*)env->GetIntArrayElements(jsrcRect, nullptr);
 
-    srcRect[0] = srcRectX;
-    srcRect[1] = srcRectY;
-    srcRect[2] = srcRectMaxX - srcRectX + 1; // width
-    srcRect[3] = srcRectMaxY - srcRectY + 1; // height
+    lf->backwardMapRect(
+        srcRect,
+        fullWidth, fullHeight, centerX, centerY,
+        dstRectX, dstRectY, dstRectWidth, dstRectHeight,
+        cameraMaker, cameraModel,
+        lensMaker, lensModel, focal, aperture);
 
     env->ReleaseIntArrayElements(jsrcRect, srcRect, 0);
+    env->ReleaseStringUTFChars(cameraMakerStr, 0);
+    env->ReleaseStringUTFChars(cameraModelStr, 0);
+    env->ReleaseStringUTFChars(lensMakerStr, 0);
+    env->ReleaseStringUTFChars(lensModelStr, 0);
+    delete lf;
     return jsrcRect;
 }

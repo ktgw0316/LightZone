@@ -52,10 +52,14 @@ public class LensCorrectionsOperation extends BlendedOperation {
     private float  focal = 0f;
     private float  aperture = 0f;
 
+    private Lensfun lf;
+
     static final OperationType type = new OperationTypeImpl("Lens Corrections");
 
     public LensCorrectionsOperation(Rendering rendering, OperationType type, ImageMetadata meta) {
         super(rendering, type);
+
+        lf = new Lensfun();
 
         this.meta = meta;
         setCameraFromMetadata();
@@ -64,9 +68,9 @@ public class LensCorrectionsOperation extends BlendedOperation {
         addChoiceKey(CAMERA_NAME);
         addChoiceKey(LENS_NAME);
         addChoiceValue(CAMERA_NAME, "(Automatic)" + SEPARATOR);
-        addChoiceValues(CAMERA_NAME, Lensfun.getAllCameraNames());
+        addChoiceValues(CAMERA_NAME, lf.getAllCameraNames());
         addChoiceValue(LENS_NAME, "(Automatic)" + SEPARATOR);
-        addChoiceValues(LENS_NAME, Lensfun.getAllLensNames());
+        addChoiceValues(LENS_NAME, lf.getAllLensNames());
 
         addCheckboxKey(MANUAL_MODE);
         setCheckboxValue(MANUAL_MODE, false);
@@ -160,8 +164,8 @@ public class LensCorrectionsOperation extends BlendedOperation {
     private void updateLenses() {
         clearChoiceValues(LENS_NAME);
         final List<String> values = ("".equals(cameraModel))
-                ? Lensfun.getAllLensNames()
-                : Lensfun.getLensNamesFor(cameraMaker, cameraModel);
+                ? lf.getAllLensNames()
+                : lf.getLensNamesFor(cameraMaker, cameraModel);
         addChoiceValue(LENS_NAME, "(Automatic)" + SEPARATOR);
         addChoiceValues(LENS_NAME, values);
     }

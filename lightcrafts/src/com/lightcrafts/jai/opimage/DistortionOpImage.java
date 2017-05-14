@@ -146,12 +146,14 @@ public class DistortionOpImage extends GeometricOpImage {
             System.out.println("focal length = " + focal);       // DEBUG
             System.out.println("aperture     = " + aperture);    // DEBUG
 
+            /*
             val lensfun = new Lensfun(cameraMaker, cameraModel,
                     lensMaker, lensModel, focal, aperture);
             distTerms = lensfun.getDistTerms();
             tcaTerms  = lensfun.getTcaTerms();
             val model = lensfun.getDistModel();
             distModel = DistModelImpl.values()[model[0]];
+            */
         }
         else {
             distModel = DistModelImpl.DIST_MODEL_NONE;

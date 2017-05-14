@@ -10,17 +10,37 @@ public:
     LC_lensfun();
     ~LC_lensfun();
 
-    void initModifier( 
-            int fullWidth, int fullHeight,
-            const char* cameraMaker, const char* cameraModel,
-            const char* lensMaker, const char* lensModel,
-            float focal, float aperture);
     const lfCamera* findCamera(
             const char *cameraMaker, const char *cameraModel) const;
     const lfLens* findLens(
             const lfCamera* camera, const char *lensMaker, const char *lensModel) const;
     const lfCamera* const* getCameras() const;
     const lfLens* const* getLenses() const;
+
+    void initModifier
+        ( int fullWidth, int fullHeight,
+          const char* cameraMaker, const char* cameraModel,
+          const char* lensMaker, const char* lensModel,
+          float focal, float aperture );
+    void applyModifier
+        ( const unsigned short *srcData, unsigned short *dstData,
+          int srcRectX, int srcRectY,
+          int srcRectWidth, int srcRectHeight,
+          int dstRectX, int dstRectY,
+          int dstRectWidth, int dstRectHeight,
+          int srcPixelStride, int dstPixelStride,
+          int srcROffset, int srcGOffset, int srcBOffset,
+          int dstROffset, int dstGOffset, int dstBOffset,
+          int srcLineStride, int dstLineStride ) const;
+    void backwardMapRect
+        ( int* srcRectParams,
+          int fullWidth, int fullHeight,
+          int centerX, int centerY,
+          int dstRectX, int dstRectY,
+          int dstRectWidth, int dstRectHeight,
+          const char* cameraMakerStr, const char* cameraModelStr,
+          const char* lensMakerStr, const char* lensModelStr,
+          float focal, float aperture ) const;
 
 private:
     JNIEnv* env;
