@@ -330,7 +330,11 @@ lfModifier* initModifier
     constexpr float scale = 0; // automatic scaling
     const lfLensType targeom = lens->Type;
 
+#if LF_VERSION_MAJOR == 0 && LF_VERSION_MINOR < 3
+    lfModifier *mod = lfModifier::Create(lens, crop, fullWidth, fullHeight);
+#else
     lfModifier *mod = new lfModifier(lens, crop, fullWidth, fullHeight);
+#endif
     if (!mod) {
         return nullptr;
     }
@@ -376,7 +380,11 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_distor
             dstROffset, dstGOffset, dstBOffset,
             srcLineStride, dstLineStride);
 
+#if LF_VERSION_MAJOR == 0 && LF_VERSION_MINOR < 3
+    mod->Destroy();
+#else
     delete mod;
+#endif
     env->ReleasePrimitiveArrayCritical(jsrcData, srcData, 0);
     env->ReleasePrimitiveArrayCritical(jdstData, dstData, 0);
 }
@@ -469,7 +477,11 @@ JNIEXPORT jintArray JNICALL Java_com_lightcrafts_jai_opimage_DistortionOpImage_b
     delete[] bottom;
     delete[] left;
     delete[] right;
+#if LF_VERSION_MAJOR == 0 && LF_VERSION_MINOR < 3
+    mod->Destroy();
+#else
     delete mod;
+#endif
 
     jintArray jsrcRect = env->NewIntArray(4);
     jint* srcRect = env->GetIntArrayElements(jsrcRect, nullptr);
