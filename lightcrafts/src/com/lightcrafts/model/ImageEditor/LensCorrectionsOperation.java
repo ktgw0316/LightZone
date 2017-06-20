@@ -17,6 +17,7 @@ import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
 import com.lightcrafts.utils.Lensfun;
 
+import lombok.NonNull;
 import lombok.val;
 
 public class LensCorrectionsOperation extends BlendedOperation {
@@ -59,18 +60,18 @@ public class LensCorrectionsOperation extends BlendedOperation {
     public LensCorrectionsOperation(Rendering rendering, OperationType type, ImageMetadata meta) {
         super(rendering, type);
 
-        lf = new Lensfun();
-
         this.meta = meta;
         setCameraFromMetadata();
         setLensFromMetadata();
 
+        lf = Lensfun.updateInstance(cameraMaker, cameraModel, lensMaker, lensModel, focal, aperture);
+
         addChoiceKey(CAMERA_NAME);
         addChoiceKey(LENS_NAME);
         addChoiceValue(CAMERA_NAME, "(Automatic)" + SEPARATOR);
-        addChoiceValues(CAMERA_NAME, lf.getAllCameraNames());
+        addChoiceValues(CAMERA_NAME, Lensfun.getAllCameraNames());
         addChoiceValue(LENS_NAME, "(Automatic)" + SEPARATOR);
-        addChoiceValues(LENS_NAME, lf.getAllLensNames());
+        addChoiceValues(LENS_NAME, lf.getLensNamesFor(cameraMaker, cameraModel));
 
         addCheckboxKey(MANUAL_MODE);
         setCheckboxValue(MANUAL_MODE, false);
@@ -96,21 +97,30 @@ public class LensCorrectionsOperation extends BlendedOperation {
     }
 
     private void setCameraFromMetadata() {
-        if (meta == null) {
-            return;
+        val camera = (meta == null) ? null : meta.getCameraMake(false);
+        if (camera == null || camera.isEmpty()) {
+            cameraMaker = "";
+            cameraModel = "";
         }
-        cameraMaker = meta.getCameraMake(false);
-        cameraModel = cameraMaker == null ? "" : meta.getCameraMake(true);
+        else {
+            cameraMaker = camera;
+            cameraModel = meta.getCameraMake(true).substring(camera.length() + 1);
+        }
     }
 
     private void setLensFromMetadata() {
-        if (meta == null) {
-            return;
+        val lens = (meta == null) ? null : meta.getLens();
+        if (lens == null) {
+            lensModel = "";
+            focal     = 0f;
+            aperture  = 0f;
+        }
+        else {
+            lensModel = lens;
+            focal     = meta.getFocalLength();
+            aperture  = meta.getAperture();
         }
         lensMaker = "";
-        lensModel = meta.getLens() == null ? "" : meta.getLens();
-        focal     = meta.getFocalLength();
-        aperture  = meta.getAperture();
     }
 
     @Override
@@ -141,7 +151,7 @@ public class LensCorrectionsOperation extends BlendedOperation {
         if (key.equals(CAMERA_NAME)) {
             val names = value.split(SEPARATOR, 2);
             cameraModel = names[1];
-            if ("".equals(cameraModel)) {
+            if (cameraModel.isEmpty()) {
                 setCameraFromMetadata();
             } else {
                 cameraMaker = names[0];
@@ -150,7 +160,7 @@ public class LensCorrectionsOperation extends BlendedOperation {
         } else if (key.equals(LENS_NAME)) {
             val names = value.split(SEPARATOR, 2);
             lensModel = names[1];
-            if ("".equals(lensModel)) {
+            if (lensModel.isEmpty()) {
                 setLensFromMetadata();
             } else {
                 lensMaker = names[0];
@@ -163,8 +173,8 @@ public class LensCorrectionsOperation extends BlendedOperation {
 
     private void updateLenses() {
         clearChoiceValues(LENS_NAME);
-        final List<String> values = ("".equals(cameraModel))
-                ? lf.getAllLensNames()
+        final List<String> values = (cameraModel.isEmpty())
+                ? Lensfun.getAllLensNames()
                 : lf.getLensNamesFor(cameraMaker, cameraModel);
         addChoiceValue(LENS_NAME, "(Automatic)" + SEPARATOR);
         addChoiceValues(LENS_NAME, values);
@@ -214,24 +224,27 @@ public class LensCorrectionsOperation extends BlendedOperation {
             else {
                 transform.preConcatenate(AffineTransform.getScaleInstance(1 / scaleFactor, 1 / scaleFactor));
             }
-            val center = transform.transform(new Point2D.Double(fullWidth / 2, fullHeight / 2), null);
 
-            PlanarImage front = back;
+            val center = transform.transform(new Point2D.Double(fullWidth / 2, fullHeight / 2), null);
+            val borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
+            final PlanarImage front;
             if (! manual_mode) {
-                val borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
-                front = new DistortionOpImage(front, JAIContext.fileCacheHint, borderExtender,
-                        fullWidth, fullHeight, center,
-                        cameraMaker, cameraModel, lensMaker, lensModel, focal, aperture);
+                lf = Lensfun.updateInstance(cameraMaker, cameraModel, lensMaker, lensModel, focal, aperture);
+                lf.updateModifier(fullWidth, fullHeight);
+                front = new DistortionOpImage(back, JAIContext.fileCacheHint, borderExtender,
+                        lf, center);
             }
             else if (Math.abs(distortion_k1) > 1e-3 || Math.abs(distortion_k2) > 1e-3 ||
                     Math.abs(tca_r_offset)  > 1e-3 || Math.abs(tca_b_offset)  > 1e-3) {
-                val borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
-                front = new DistortionOpImage(front, JAIContext.fileCacheHint, borderExtender,
+                front = new DistortionOpImage(back, JAIContext.fileCacheHint, borderExtender,
                         fullWidth, fullHeight, center,
                         distortion_k1_scale * distortion_k1,
                         distortion_k2_scale * distortion_k2,
                         1 + tca_scale * tca_r_offset,
                         1 + tca_scale * tca_b_offset);
+            }
+            else {
+                front = back;
             }
             front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
             return front;

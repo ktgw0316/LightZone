@@ -16,23 +16,17 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.Map;
 
-import lombok.val;
-
 public class DistortionOpImage extends GeometricOpImage {
 
-    private final int fullWidth;
-    private final int fullHeight;
+    private int fullWidth;
+    private int fullHeight;
     private final Point2D center;
     private final boolean shouldUseLensfun;
-    private String cameraMaker = "";
-    private String cameraModel = "";
-    private String lensMaker = "";
-    private String lensModel = "";
-    private float focal = 0f;
-    private float aperture = 0f;
 
     private static float[] distTerms = {0, 0, 0};
     private static float[] tcaTerms = {1f, 1f};
+
+    private Lensfun lf;
 
     private interface DistModel {
         float coeff(final float radiusSq);
@@ -119,46 +113,13 @@ public class DistortionOpImage extends GeometricOpImage {
     }
 
     public DistortionOpImage(RenderedImage source, Map configuration, BorderExtender extender,
-                             int fullWidth, int fullHeight, Point2D center,
-                             String cameraMaker, String cameraModel,
-                             String lensMaker, String lensModel,
-                             float focal, float aperture) {
+                             Lensfun lf, Point2D center) {
         super(vectorize(source), null, configuration, true, extender, null);
 
         shouldUseLensfun = true;
 
-        this.fullWidth  = fullWidth;
-        this.fullHeight = fullHeight;
         this.center = center;
-
-        this.cameraMaker = cameraMaker;
-        this.cameraModel = cameraModel;
-        this.lensMaker = lensMaker;
-        this.lensModel = lensModel;
-        this.focal = focal;
-        this.aperture = aperture;
-
-        if (!cameraModel.isEmpty() || !lensModel.isEmpty()) {
-            System.out.println("camera maker = " + cameraMaker); // DEBUG
-            System.out.println("camera model = " + cameraModel); // DEBUG
-            System.out.println("lens maker   = " + lensMaker);   // DEBUG
-            System.out.println("lens model   = " + lensModel);   // DEBUG
-            System.out.println("focal length = " + focal);       // DEBUG
-            System.out.println("aperture     = " + aperture);    // DEBUG
-
-            /*
-            val lensfun = new Lensfun(cameraMaker, cameraModel,
-                    lensMaker, lensModel, focal, aperture);
-            distTerms = lensfun.getDistTerms();
-            tcaTerms  = lensfun.getTcaTerms();
-            val model = lensfun.getDistModel();
-            distModel = DistModelImpl.values()[model[0]];
-            */
-        }
-        else {
-            distModel = DistModelImpl.DIST_MODEL_NONE;
-        }
-        System.out.println("distortion model = " + distModel.name()); // DEBUG
+        this.lf = lf;
     }
 
     @Override
@@ -168,18 +129,13 @@ public class DistortionOpImage extends GeometricOpImage {
 
     @Override
     protected Rectangle backwardMapRect(Rectangle destRect, int sourceIndex) {
-        if (sourceIndex != 0)
+        if (sourceIndex != 0) {
             return null;
-
+        }
         if (shouldUseLensfun) {
-            final int[] srcRect;
             synchronized(this) {
-                srcRect = backwardMapRectLF(fullWidth, fullHeight,
-                        (int)center.getX(), (int)center.getY(),
-                        destRect.x, destRect.y, destRect.width, destRect.height,
-                        cameraMaker, cameraModel, lensMaker, lensModel, focal, aperture);
+                return lf.backwardMapRect(center, destRect);
             }
-            return new Rectangle(srcRect[0], srcRect[1], srcRect[2], srcRect[3]);
         }
 
         final float centerX = (float) center.getX();
@@ -306,16 +262,14 @@ public class DistortionOpImage extends GeometricOpImage {
         else if (src.getNumBands() == 3) {
             if (shouldUseLensfun) {
                 synchronized(this) {
-                    distortionColorLF(srcData, dstData,
-                            fullWidth, fullHeight,
+                    lf.distortionColor(srcData, dstData,
                             (int)center.getX(), (int)center.getY(),
                             srcX, srcY, srcWidth, srcHeight,
                             dstX, dstY, dstWidth, dstHeight,
                             srcPixelStride, dstPixelStride,
                             srcBandOffsets[0], srcBandOffsets[1], srcBandOffsets[2],
                             dstBandOffsets[0], dstBandOffsets[1], dstBandOffsets[2],
-                            srcScanlineStride, dstScanlineStride,
-                            cameraMaker, cameraModel, lensMaker, lensModel, focal, aperture);
+                            srcScanlineStride, dstScanlineStride);
                 }
             }
             else {
@@ -360,27 +314,4 @@ public class DistortionOpImage extends GeometricOpImage {
                                        int srcLineStride, int dstLineStride,
                                        int distModel, float[] distTerms,
                                        float[] tcaTerms);
-
-    static native void distortionColorLF(short srcData[], short dstData[],
-                                         int fullWidth, int fullHeight,
-                                         int centerX, int centerY,
-                                         int srcRectX, int srcRectY,
-                                         int srcRectWidth, int srcRectHeight,
-                                         int dstRectX, int dstRectY,
-                                         int dstRectWidth, int dstRectHeight,
-                                         int srcPixelStride, int dstPixelStride,
-                                         int srcROffset, int srcGOffset, int srcBOffset,
-                                         int dstROffset, int dstGOffset, int dstBOffset,
-                                         int srcLineStride, int dstLineStride,
-                                         String cameraMaker, String cameraModel,
-                                         String lensMaker, String lensModel,
-                                         float focal, float aperture);
-
-    static native int[] backwardMapRectLF(int fullWidth, int fullHeight,
-                                         int centerX, int centerY,
-                                         int dstRectX, int dstRectY,
-                                         int dstRectWidth, int dstRectHeight,
-                                         String cameraMaker, String cameraModel,
-                                         String lensMaker, String lensModel,
-                                         float focal, float aperture);
 }

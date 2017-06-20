@@ -39,7 +39,7 @@ public class ColorModelState extends SerializableStateImpl {
 
     /**
      * Flag indicating that the ColorSpace is one of those of which an
-     * instance may be obtained using ColorSpace.getInstance() with one
+     * instance may be obtained using ColorSpace.updateInstance() with one
      * of the pre-defined constants ColorSpace.CS_*.
      */
     private static final int COLORSPACE_PREDEFINED = 1;
@@ -121,7 +121,7 @@ public class ColorModelState extends SerializableStateImpl {
                 boolean flag = false;
                 try {
                     Class<? extends ColorSpace> cls = cs.getClass();
-                    // Method getInstance = cls.getMethod("getInstance", 
+                    // Method updateInstance = cls.getMethod("updateInstance",
                     //                                    (Class<?>[]) null);
                     if (Modifier.isPublic(cls.getModifiers())) {
                         flag = true;
@@ -152,7 +152,7 @@ public class ColorModelState extends SerializableStateImpl {
                     String name = (String)in.readObject();
                     try {
                         Class<?> cls = Class.forName(name);
-                        Method getInstance = cls.getMethod("getInstance",
+                        Method getInstance = cls.getMethod("updateInstance",
                                                             (Class<?>[]) null);
                         cs = (ColorSpace)getInstance.invoke(null, (Object[]) null);
 

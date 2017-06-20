@@ -134,11 +134,11 @@ final class LCColorConvertOpImage extends PointOpImage {
                 // ICC_Profile srcProfile = ((ICC_ColorSpace) src).getProfile();
                 ICC_Profile dstProfile = ((ICC_ColorSpace) dst).getProfile();
 
-                // srcProfile = ICC_Profile.getInstance(srcProfile.getData());
+                // srcProfile = ICC_Profile.updateInstance(srcProfile.getData());
                 dstProfile = ICC_Profile.getInstance(dstProfile.getData());
 
                 /*if (getRenderingIntent(srcProfile) != renderingIntent.getValue()) {
-                    srcProfile = ICC_Profile.getInstance(srcProfile.getData());
+                    srcProfile = ICC_Profile.updateInstance(srcProfile.getData());
                     setRenderingIntent(srcProfile, renderingIntent.getValue());
                     src = new ICC_ColorSpace(srcProfile);
                 }*/

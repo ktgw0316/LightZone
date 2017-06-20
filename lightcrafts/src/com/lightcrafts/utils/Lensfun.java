@@ -2,38 +2,52 @@
 
 package com.lightcrafts.utils;
 
+import java.awt.*;
+import java.awt.geom.Point2D;
 import java.util.Arrays;
 import java.util.List;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Wrapper for Lensfun C++ library.
  */
+@RequiredArgsConstructor (access = AccessLevel.PRIVATE)
 public class Lensfun {
-    @Getter
-    private int[] distModel = {0};
+    private static Lensfun instance; // singleton
 
-    @Getter
-    private float[] distTerms = {0, 0, 0};
+    private final String cameraMaker;
+    private final String cameraModel;
+    private final String lensMaker;
+    private final String lensModel;
+    private final float focal;
+    private final float aperture;
 
-    @Getter
-    private float[] tcaTerms = {1f, 1f};
+    private int _fullWidth;
+    private int _fullHeight;
 
-    private static List<String> allCameraNames;
-    private static List<String> allLensNames;
+    @Getter (lazy = true)
+    private static final List<String> allCameraNames = Arrays.asList(getCameraNames());;
 
-    public Lensfun() {
-        handle = init();
-    }
+    @Getter (lazy = true)
+    private static final List<String> allLensNames = Arrays.asList(getLensNames());;
 
-    public Lensfun(String cameraMaker, String cameraModel,
-                   String lensMaker, String lensModel,
-                   float focal, float aperture) {
-        handle = init();
-        lensfunTerms(distModel, distTerms, tcaTerms,
-                cameraMaker, cameraModel,
-                lensMaker, lensModel, focal, aperture);
+    public static Lensfun updateInstance(
+            String cameraMaker, String cameraModel,
+            String lensMaker, String lensModel,
+            float focal, float aperture) {
+        // We don't check cameraMaker and lensMaker
+        if (instance == null
+                || !cameraModel.equals(instance.cameraModel)
+                || !lensModel.equals(instance.lensModel)
+                || instance.focal != focal
+                || instance.aperture != aperture) {
+            instance = new Lensfun(cameraMaker, cameraModel,
+                    lensMaker, lensModel, focal, aperture);
+        }
+        return instance;
     }
 
     @Override
@@ -41,66 +55,86 @@ public class Lensfun {
         try {
             super.finalize();
         } finally {
-            destroy(handle);
+            destroy(_handle);
         }
-    }
-
-    public synchronized List<String> getAllCameraNames() {
-        if (allCameraNames == null) {
-            allCameraNames = Arrays.asList(getCameraNames(handle));
-        }
-        return allCameraNames;
-    }
-
-    public synchronized List<String> getAllLensNames() {
-        if (allLensNames == null) {
-            allLensNames = Arrays.asList(getLensNames(handle));
-        }
-        return allLensNames;
     }
 
     public synchronized List<String> getLensNamesFor(
             String cameraMaker, String cameraModel) {
         return Arrays.asList(
-                getLensNamesForCamera(handle, cameraMaker, cameraModel));
+                getLensNamesForCamera(_handle, cameraMaker, cameraModel));
     }
 
-    public synchronized void initModifier(
-            int fullWidth, int fullHeight,
-            String cameraMaker, String cameraModel,
-            String lensMaker, String lensModel,
-            float focal, float aperture) {
-        initModifier(handle, fullWidth, fullHeight,
-                cameraMaker, cameraModel, lensMaker,
-                lensModel, focal, aperture);
+    public synchronized void updateModifier(int fullWidth, int fullHeight) {
+        if (_fullWidth != fullWidth || _fullHeight != fullHeight ) {
+            _fullWidth = fullWidth;
+            _fullHeight = fullHeight;
+            initModifier(_handle, fullWidth, fullHeight,
+                    cameraMaker, cameraModel, lensMaker, lensModel,
+                    focal, aperture);
+        }
     }
 
-    private long handle = 0;
+    private long _handle = init();
 
     private native long init();
     private native void destroy(long handle);
 
-    private synchronized static native boolean lensfunTerms(
-            int[] ret_distModel, float[] ret_distTerms,
-            float[] ret_tcaTerms,
-            String cameraMaker, String cameraModel,
-            String lensMaker, String lensModel,
-            float focal, float aperture);
-
-    private static native String[] getCameraNames(long handle);
-    private static native String[] getLensNames(long handle);
+    private static native String[] getCameraNames();
+    private static native String[] getLensNames();
     private static native String[] getLensNamesForCamera(
-            long handle, String cameraMaker, String cameraModel);
+            long lfHandle, String cameraMaker, String cameraModel);
 
-    private native void initModifier(
-            long handle, int fullWidth, int fullHeight,
-            String cameraMaker, String cameraModel,
-            String lensMaker, String lensModel,
-            float focal, float aperture);
+    private native void initModifier(long lfHandle, int fullWidth, int fullHeight,
+                                     String cameraMaker, String cameraModel,
+                                     String lensMaker, String lensModel,
+                                     float focal, float aperture);
 
-    private native void applyModifier(
-            long handle, int fullWidth, int fullHeight,
-            String cameraMaker, String cameraModel,
-            String lensMaker, String lensModel,
-            float focal, float aperture);
+    //
+    // Used by DistortionOpImage
+    //
+
+    public void distortionColor(
+            short srcData[], short dstData[],
+            int centerX, int centerY,
+            int srcRectX, int srcRectY, int srcRectWidth, int srcRectHeight,
+            int dstRectX, int dstRectY, int dstRectWidth, int dstRectHeight,
+            int srcPixelStride, int dstPixelStride,
+            int srcROffset, int srcGOffset, int srcBOffset,
+            int dstROffset, int dstGOffset, int dstBOffset,
+            int srcLineStride, int dstLineStride) {
+        distortionColor(
+                _handle,
+                srcData, dstData,
+                centerX, centerY,
+                srcRectX, srcRectY, srcRectWidth, srcRectHeight,
+                dstRectX, dstRectY, dstRectWidth, dstRectHeight,
+                srcPixelStride, dstPixelStride,
+                srcROffset, srcGOffset, srcBOffset,
+                dstROffset, dstGOffset, dstBOffset,
+                srcLineStride, dstLineStride);
+    }
+
+    public Rectangle backwardMapRect(Point2D center, Rectangle destRect) {
+        final int[] srcRect = backwardMapRect(_handle,
+                (int)center.getX(), (int)center.getY(),
+                destRect.x, destRect.y, destRect.width, destRect.height);
+        return new Rectangle(srcRect[0], srcRect[1], srcRect[2], srcRect[3]);
+    }
+
+    private native void distortionColor(
+            long lfHandle,
+            short[] srcData, short[] dstData,
+            int centerX, int centerY,
+            int srcRectX, int srcRectY, int srcRectWidth, int srcRectHeight,
+            int dstRectX, int dstRectY, int dstRectWidth, int dstRectHeight,
+            int srcPixelStride, int dstPixelStride,
+            int srcROffset, int srcGOffset, int srcBOffset,
+            int dstROffset, int dstGOffset, int dstBOffset,
+            int srcLineStride, int dstLineStride);
+
+    private native int[] backwardMapRect(
+            long lfHandle,
+            int centerX, int centerY,
+            int dstRectX, int dstRectY, int dstRectWidth, int dstRectHeight);
 }

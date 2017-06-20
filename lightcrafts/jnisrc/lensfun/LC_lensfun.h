@@ -5,7 +5,7 @@
 class LC_lensfun
 {
 public:
-    lfModifier* mod;
+    lfModifier* mod = nullptr;
 
     LC_lensfun();
     ~LC_lensfun();
@@ -34,18 +34,14 @@ public:
           int srcLineStride, int dstLineStride ) const;
     void backwardMapRect
         ( int* srcRectParams,
-          int fullWidth, int fullHeight,
           int centerX, int centerY,
           int dstRectX, int dstRectY,
-          int dstRectWidth, int dstRectHeight,
-          const char* cameraMakerStr, const char* cameraModelStr,
-          const char* lensMakerStr, const char* lensModelStr,
-          float focal, float aperture ) const;
+          int dstRectWidth, int dstRectHeight ) const;
 
 private:
     JNIEnv* env;
     static jclass cls;
 
-    lfDatabase* ldb;
+    lfDatabase* ldb = nullptr;
 };
 

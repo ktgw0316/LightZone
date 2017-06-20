@@ -38,7 +38,7 @@ public class ColorModelProxy implements Serializable {
 
     /**
      * Flag indicating that the ColorSpace is one of those of which an
-     * instance may be obtained using ColorSpace.getInstance() with one
+     * instance may be obtained using ColorSpace.updateInstance() with one
      * of the pre-defined constants ColorSpace.CS_*.
      */
     private static final int COLORSPACE_PREDEFINED = 1;
