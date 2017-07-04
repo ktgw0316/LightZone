@@ -2,6 +2,9 @@
 
 package com.lightcrafts.image.metadata;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * An <code>EXIFTags</code> defines the constants used for EXIF metadata tags.
  *
@@ -839,5 +842,64 @@ public interface EXIFTags extends ImageMetaTags {
     int EXIF_CFA_PATTERN_2                  = 0x828E;
     int EXIF_EXPOSURE_INDEX_2               = 0x9215;
 
+    List<Integer> TIFFCommonTags = Arrays.asList(
+            EXIF_APERTURE_VALUE,
+            EXIF_ARTIST,
+            EXIF_BITS_PER_SAMPLE,
+            EXIF_BRIGHTNESS_VALUE,
+            EXIF_COMPRESSION,
+            EXIF_COPYRIGHT,
+            EXIF_DATE_TIME,
+            EXIF_DOCUMENT_NAME,
+            EXIF_EXPOSURE_BIAS_VALUE,
+            EXIF_EXPOSURE_PROGRAM,
+            EXIF_EXPOSURE_TIME,
+            EXIF_FLASH,
+            EXIF_FNUMBER,
+            EXIF_GPS_IFD_POINTER,
+            EXIF_HOST_COMPUTER,
+            EXIF_ICC_PROFILE,
+            EXIF_IFD_POINTER,
+            EXIF_IMAGE_DESCRIPTION,
+            EXIF_IMAGE_HEIGHT,
+            EXIF_IMAGE_WIDTH,
+            EXIF_JPEG_INTERCHANGE_FORMAT,
+            EXIF_JPEG_INTERCHANGE_FORMAT_LENGTH,
+            EXIF_LIGHT_SOURCE,
+            EXIF_MAKE,
+            EXIF_MAX_APERTURE_VALUE,
+            EXIF_MS_RATING,
+            EXIF_METERING_MODE,
+            EXIF_MODEL,
+            EXIF_NEW_SUBFILE_TYPE,
+            EXIF_ORIENTATION,
+            EXIF_PHOTOMETRIC_INTERPRETATION,
+            EXIF_PLANAR_CONFIGURATION,
+            EXIF_PREDICTOR,
+            EXIF_PRIMARY_CHROMATICITIES,
+            EXIF_REFERENCE_BLACK_WHITE,
+            EXIF_RESOLUTION_UNIT,
+            EXIF_ROWS_PER_STRIP,
+            EXIF_SAMPLES_PER_PIXEL,
+            EXIF_SHUTTER_SPEED_VALUE,
+            EXIF_SOFTWARE,
+            EXIF_SPECTRAL_SENSITIVITY,
+            EXIF_STRIP_BYTE_COUNTS,
+            EXIF_STRIP_OFFSETS,
+            EXIF_SUBFILE_TYPE,
+            EXIF_SUB_IFDS,
+            EXIF_SUBJECT_AREA,
+            EXIF_SUBJECT_DISTANCE,
+            EXIF_TILE_BYTE_COUNTS,
+            EXIF_TILE_LENGTH,
+            EXIF_TILE_OFFSETS,
+            EXIF_TRANSFER_FUNCTION,
+            EXIF_WHITE_POINT,
+            EXIF_X_RESOLUTION,
+            EXIF_YCBCR_COEFFICIENTS,
+            EXIF_YCBCR_POSITIONING,
+            EXIF_YCBCR_SUBSAMPLING,
+            EXIF_Y_RESOLUTION
+    );
 }
 /* vim:set et sw=4 ts=4: */

@@ -16,7 +16,8 @@ import com.lightcrafts.utils.Rational;
 import com.lightcrafts.utils.TextUtil;
 import com.lightcrafts.utils.xml.ElementPrefixFilter;
 
-import static com.lightcrafts.image.metadata.EXIFTags.*;
+import static com.lightcrafts.image.metadata.EXIFTags.TIFFCommonTags;
+import static com.lightcrafts.image.metadata.ImageMetadata.unexportedTags;
 import com.lightcrafts.image.metadata.providers.ImageMetadataProvider;
 
 /**
@@ -839,20 +840,10 @@ public abstract class ImageMetadataDirectory
               i = sourceDir.iterator(); i.hasNext(); ) {
             final Map.Entry<Integer,ImageMetaValue> me = i.next();
             final int tagID = me.getKey();
-            switch ( tagID ) {
-                case EXIF_ARTIST:
-                case EXIF_COPYRIGHT:
-                case EXIF_DATE_TIME:
-                case EXIF_IMAGE_DESCRIPTION:
-                case EXIF_MAKE:
-                case EXIF_MODEL:
-                case EXIF_MS_RATING:
-                case EXIF_RESOLUTION_UNIT:
-                case EXIF_X_RESOLUTION:
-                case EXIF_Y_RESOLUTION:
-                    targetDir.putValue( tagID, me.getValue() );
-                    i.remove();
-                    break;
+            if (TIFFCommonTags.contains(tagID)
+                    && !unexportedTags.contains(tagID)) {
+                targetDir.putValue(tagID, me.getValue());
+                i.remove();
             }
         }
     }

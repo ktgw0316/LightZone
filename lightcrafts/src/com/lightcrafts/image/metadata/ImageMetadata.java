@@ -931,9 +931,9 @@ public class ImageMetadata implements
 
             ////////// Always use UTF-8 to write IPTC metadata.
 
-            byte[] utf8Marker = {0x1B, 0x25, 0x47}; // ESC, "%", "G"
             String value = "";
             try {
+                byte[] utf8Marker = {0x1B, 0x25, 0x47}; // ESC, "%", "G"
                 value = new String( utf8Marker, "ASCII" );
             } catch (UnsupportedEncodingException e) {
                 // This should never occur
@@ -945,69 +945,9 @@ public class ImageMetadata implements
 
         ////////// Remove other metadata because it makes no sense to export.
 
-        exifDir.removeValue( EXIF_CFA_PATTERN );
-        exifDir.removeValue( EXIF_COMPONENTS_CONFIGURATION );
-        exifDir.removeValue( EXIF_COMPRESSED_BITS_PER_PIXEL );
-        exifDir.removeValue( EXIF_IFD_POINTER );    // re-added later if needed
-        exifDir.removeValue( EXIF_INTEROPERABILITY_POINTER );
-        exifDir.removeValue( EXIF_JPEG_INTERCHANGE_FORMAT );
-        exifDir.removeValue( EXIF_JPEG_INTERCHANGE_FORMAT_LENGTH );
-        exifDir.removeValue( EXIF_MAKER_NOTE );
-        exifDir.removeValue( EXIF_SPATIAL_FREQUENCY_RESPONSE );
-        exifDir.removeValue( EXIF_SUBJECT_AREA );
-        tiffDir.removeValue( TIFF_CELL_LENGTH );
-        tiffDir.removeValue( TIFF_CELL_WIDTH );
-        tiffDir.removeValue( TIFF_CLIP_PATH );
-        tiffDir.removeValue( TIFF_COLOR_MAP );
-        tiffDir.removeValue( TIFF_COMPRESSION );
-        tiffDir.removeValue( TIFF_DOT_RANGE );
-        tiffDir.removeValue( TIFF_EXTRA_SAMPLES );
-        tiffDir.removeValue( TIFF_FILL_ORDER );
-        tiffDir.removeValue( TIFF_FREE_BYTE_COUNTS );
-        tiffDir.removeValue( TIFF_FREE_OFFSETS );
-        tiffDir.removeValue( TIFF_GRAY_RESPONSE_CURVE );
-        tiffDir.removeValue( TIFF_GRAY_RESPONSE_UNIT );
-        tiffDir.removeValue( TIFF_HALFTONE_HINTS );
-        tiffDir.removeValue( TIFF_INDEXED );
-        tiffDir.removeValue( TIFF_JPEG_AC_TABLES );
-        tiffDir.removeValue( TIFF_JPEG_DC_TABLES );
-        tiffDir.removeValue( TIFF_JPEG_INTERCHANGE_FORMAT );
-        tiffDir.removeValue( TIFF_JPEG_INTERCHANGE_FORMAT_LENGTH );
-        tiffDir.removeValue( TIFF_JPEG_LOSSLESS_PREDICTORS );
-        tiffDir.removeValue( TIFF_JPEG_POINT_TRANSFORMS );
-        tiffDir.removeValue( TIFF_JPEG_PROC );
-        tiffDir.removeValue( TIFF_JPEG_Q_TABLES );
-        tiffDir.removeValue( TIFF_JPEG_RESTART_INTERVAL );
-        tiffDir.removeValue( TIFF_LIGHTZONE );
-        tiffDir.removeValue( TIFF_NEW_SUBFILE_TYPE );
-        tiffDir.removeValue( TIFF_OPI_PROXY );
-        tiffDir.removeValue( TIFF_PHOTOSHOP_IMAGE_RESOURCES );
-        tiffDir.removeValue( TIFF_PLANAR_CONFIGURATION );
-        tiffDir.removeValue( TIFF_PREDICTOR );
-        tiffDir.removeValue( TIFF_PRIMARY_CHROMATICITIES );
-        tiffDir.removeValue( TIFF_REFERENCE_BLACK_WHITE );
-        tiffDir.removeValue( TIFF_ROWS_PER_STRIP );
-        tiffDir.removeValue( TIFF_SAMPLE_FORMAT );
-        tiffDir.removeValue( TIFF_SAMPLES_PER_PIXEL );
-        tiffDir.removeValue( TIFF_STRIP_BYTE_COUNTS );
-        tiffDir.removeValue( TIFF_SUBFILE_TYPE );
-        tiffDir.removeValue( TIFF_STRIP_OFFSETS );
-        tiffDir.removeValue( TIFF_SUB_IFDS );
-        tiffDir.removeValue( TIFF_T4_OPTIONS );
-        tiffDir.removeValue( TIFF_T6_OPTIONS );
-        tiffDir.removeValue( TIFF_THRESHHOLDING );
-        tiffDir.removeValue( TIFF_TILE_BYTE_COUNTS );
-        tiffDir.removeValue( TIFF_TILE_OFFSETS );
-        tiffDir.removeValue( TIFF_TRANSFER_FUNCTION );
-        tiffDir.removeValue( TIFF_TRANSFER_RANGE );
-        tiffDir.removeValue( TIFF_WHITE_POINT );
-        tiffDir.removeValue( TIFF_X_CLIP_PATH_UNITS );
-        tiffDir.removeValue( TIFF_X_POSITION );
-        tiffDir.removeValue( TIFF_YCBCR_COEFFICIENTS );
-        tiffDir.removeValue( TIFF_YCBCR_POSITIONING );
-        tiffDir.removeValue( TIFF_YCBCR_SUBSAMPLING );
-        tiffDir.removeValue( TIFF_Y_CLIP_PATH_UNITS );
-        tiffDir.removeValue( TIFF_Y_POSITION );
+        for (int tagID : unexportedTags) {
+            exifDir.removeValue(tagID);
+        }
 
         if ( toJPEG ) {
             //
@@ -1352,9 +1292,7 @@ public class ImageMetadata implements
                 getDirectoryFor( dirClass, true ).readExternal( in );
             }
             catch ( ClassNotFoundException e ) {
-                final IOException ioe = new IOException();
-                ioe.initCause( e );
-                throw ioe;
+                throw new IOException(e);
             }
         }
     }
@@ -1374,6 +1312,72 @@ public class ImageMetadata implements
             dir.writeExternal( out );
         }
     }
+
+    static final List<Integer> unexportedTags = Arrays.asList(
+            EXIF_CFA_PATTERN,
+            EXIF_COMPONENTS_CONFIGURATION,
+            EXIF_COMPRESSED_BITS_PER_PIXEL,
+            EXIF_IFD_POINTER, // re-added later if needed
+            EXIF_INTEROPERABILITY_POINTER,
+            EXIF_JPEG_INTERCHANGE_FORMAT,
+            EXIF_JPEG_INTERCHANGE_FORMAT_LENGTH,
+            EXIF_MAKER_NOTE,
+            EXIF_SPATIAL_FREQUENCY_RESPONSE,
+            EXIF_SUBJECT_AREA,
+            TIFF_CELL_LENGTH,
+            TIFF_CELL_WIDTH,
+            TIFF_CLIP_PATH,
+            TIFF_COLOR_MAP,
+            TIFF_COMPRESSION,
+            TIFF_DOT_RANGE,
+            TIFF_EXTRA_SAMPLES,
+            TIFF_FILL_ORDER,
+            TIFF_FREE_BYTE_COUNTS,
+            TIFF_FREE_OFFSETS,
+            TIFF_GRAY_RESPONSE_CURVE,
+            TIFF_GRAY_RESPONSE_UNIT,
+            TIFF_HALFTONE_HINTS,
+            TIFF_INDEXED,
+            TIFF_JPEG_AC_TABLES,
+            TIFF_JPEG_DC_TABLES,
+            TIFF_JPEG_INTERCHANGE_FORMAT,
+            TIFF_JPEG_INTERCHANGE_FORMAT_LENGTH,
+            TIFF_JPEG_LOSSLESS_PREDICTORS,
+            TIFF_JPEG_POINT_TRANSFORMS,
+            TIFF_JPEG_PROC,
+            TIFF_JPEG_Q_TABLES,
+            TIFF_JPEG_RESTART_INTERVAL,
+            TIFF_LIGHTZONE,
+            TIFF_NEW_SUBFILE_TYPE,
+            TIFF_OPI_PROXY,
+            TIFF_PHOTOSHOP_IMAGE_RESOURCES,
+            TIFF_PLANAR_CONFIGURATION,
+            TIFF_PREDICTOR,
+            TIFF_PRIMARY_CHROMATICITIES,
+            TIFF_REFERENCE_BLACK_WHITE,
+            TIFF_ROWS_PER_STRIP,
+            TIFF_SAMPLE_FORMAT,
+            TIFF_SAMPLES_PER_PIXEL,
+            TIFF_STRIP_BYTE_COUNTS,
+            TIFF_SUBFILE_TYPE,
+            TIFF_STRIP_OFFSETS,
+            TIFF_SUB_IFDS,
+            TIFF_T4_OPTIONS,
+            TIFF_T6_OPTIONS,
+            TIFF_THRESHHOLDING,
+            TIFF_TILE_BYTE_COUNTS,
+            TIFF_TILE_OFFSETS,
+            TIFF_TRANSFER_FUNCTION,
+            TIFF_TRANSFER_RANGE,
+            TIFF_WHITE_POINT,
+            TIFF_X_CLIP_PATH_UNITS,
+            TIFF_X_POSITION,
+            TIFF_YCBCR_COEFFICIENTS,
+            TIFF_YCBCR_POSITIONING,
+            TIFF_YCBCR_SUBSAMPLING,
+            TIFF_Y_CLIP_PATH_UNITS,
+            TIFF_Y_POSITION
+    );
 
     ////////// private ////////////////////////////////////////////////////////
 
