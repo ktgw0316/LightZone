@@ -2,6 +2,12 @@
 
 package com.lightcrafts.image.metadata;
 
+import com.lightcrafts.image.metadata.providers.GPSProvider;
+import com.lightcrafts.image.metadata.values.ImageMetaValue;
+import com.lightcrafts.image.metadata.values.StringMetaValue;
+import com.lightcrafts.image.metadata.values.UnsignedRationalMetaValue;
+import com.lightcrafts.utils.Rational;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -16,7 +22,8 @@ import static com.lightcrafts.image.metadata.ImageMetaType.*;
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */
 @SuppressWarnings({"CloneableClassWithoutClone"})
-public final class GPSDirectory extends ImageMetadataDirectory {
+public final class GPSDirectory extends ImageMetadataDirectory
+        implements GPSProvider {
 
     ////////// public /////////////////////////////////////////////////////////
 
@@ -25,6 +32,7 @@ public final class GPSDirectory extends ImageMetadataDirectory {
      *
      * @return Always returns &quot;GPSF&quot;.
      */
+    @Override
     public String getName() {
         return "GPS";
     }
@@ -32,6 +40,7 @@ public final class GPSDirectory extends ImageMetadataDirectory {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageMetaTagInfo getTagInfoFor( Integer id ) {
         return m_tagsByID.get( id );
     }
@@ -39,8 +48,78 @@ public final class GPSDirectory extends ImageMetadataDirectory {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageMetaTagInfo getTagInfoFor( String name ) {
         return m_tagsByName.get( name );
+    }
+
+    @Override
+    public Double getGPSLatitude() {
+        return getGPSCoordinate(GPS_LATITUDE, GPS_LATITUDE_REF, "N");
+    }
+
+    @Override
+    public Double getGPSLongitude() {
+        return getGPSCoordinate(GPS_LONGITUDE, GPS_LONGITUDE_REF, "E");
+    }
+
+    @Override
+    public String getGPSPositionDMS() {
+        return getGPSCoordinateDMS(GPS_LATITUDE, GPS_LATITUDE_REF) + " "
+                + getGPSCoordinateDMS(GPS_LONGITUDE, GPS_LONGITUDE_REF);
+    }
+
+    private Double getGPSCoordinate(int tagID, int refTagID, String orientation) {
+        final ImageMetaValue metaValue = getValue(tagID);
+        if (metaValue == null) {
+            return null;
+        }
+        final Rational[] values =
+                ((UnsignedRationalMetaValue) metaValue).getRationalValues();
+        if (values.length != 3) {
+            return null;
+        }
+
+        final ImageMetaValue refMetaValue = getValue(refTagID);
+        if (refMetaValue == null) {
+            return null;
+        }
+        final String refString = refMetaValue.getStringValue();
+        if (refString == null) {
+            return null;
+        }
+        final int sign = (refString.equalsIgnoreCase(orientation)) ? 1 : -1;
+
+        // FIXME: precise calculation
+        return sign * (values[0].doubleValue()
+                + values[1].doubleValue() / 60
+                + values[2].doubleValue() / 3600);
+    }
+
+    private String getGPSCoordinateDMS(int tagID, int refTagID) {
+        final ImageMetaValue metaValue = getValue(tagID);
+        if (metaValue == null) {
+            return "";
+        }
+        final Rational[] values =
+                ((UnsignedRationalMetaValue) metaValue).getRationalValues();
+        if (values.length != 3) {
+            return "";
+        }
+
+        final ImageMetaValue refMetaValue = getValue(refTagID);
+        if (refMetaValue == null) {
+            return "";
+        }
+        final String refString = refMetaValue.getStringValue();
+        if (refString == null) {
+            return "";
+        }
+
+        return values[0].intValue() + "°"
+                + values[1].intValue() + "'"
+                + values[2].floatValue() + "\""
+                + refString;
     }
 
     ////////// protected //////////////////////////////////////////////////////
@@ -50,6 +129,7 @@ public final class GPSDirectory extends ImageMetadataDirectory {
      *
      * @return Returns said {@link ResourceBundle}.
      */
+    @Override
     protected ResourceBundle getTagLabelBundle() {
         return m_tagBundle;
     }
@@ -57,6 +137,7 @@ public final class GPSDirectory extends ImageMetadataDirectory {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected Class<? extends ImageMetaTags> getTagsInterface() {
         return GPSTags.class;
     }

@@ -39,7 +39,7 @@ public class ImageMetadata implements
     ApertureProvider, BitsPerChannelProvider, CaptionProvider,
     CaptureDateTimeProvider, Cloneable, ColorTemperatureProvider,
     CopyrightProvider, Externalizable, FileDateTimeProvider, FlashProvider,
-    FocalLengthProvider, ISOProvider, LensProvider, MakeModelProvider,
+    FocalLengthProvider, GPSProvider, ISOProvider, LensProvider, MakeModelProvider,
     OrientationProvider, OriginalWidthHeightProvider, RatingProvider,
     ResolutionProvider, ShutterSpeedProvider, TitleProvider,
     WidthHeightProvider {
@@ -388,6 +388,52 @@ public class ImageMetadata implements
                 return value;
         }
         return 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Double getGPSLatitude() {
+        final Collection<ImageMetadataDirectory> dirs =
+                findProvidersOf( GPSProvider.class );
+        for ( ImageMetadataDirectory dir : dirs ) {
+            final Double latitude = ((GPSProvider)dir).getGPSLatitude();
+            if ( latitude != null )
+                return latitude;
+        }
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Double getGPSLongitude() {
+        final Collection<ImageMetadataDirectory> dirs =
+                findProvidersOf( GPSProvider.class );
+        for ( ImageMetadataDirectory dir : dirs ) {
+            final Double longitude = ((GPSProvider)dir).getGPSLongitude();
+            if ( longitude != null )
+                return longitude;
+        }
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getGPSPositionDMS() {
+        // TODO:
+        final Collection<ImageMetadataDirectory> dirs =
+                findProvidersOf( GPSProvider.class );
+        for ( ImageMetadataDirectory dir : dirs ) {
+            final String value = ((GPSProvider)dir).getGPSPositionDMS();
+            if ( value != null )
+                return value;
+        }
+        return null;
     }
 
     /**
