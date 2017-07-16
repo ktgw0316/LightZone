@@ -424,16 +424,30 @@ public class ImageMetadata implements
      * {@inheritDoc}
      */
     @Override
-    public String getGPSPositionDMS() {
-        // TODO:
+    public String getGPSLatitudeDMS() {
         final Collection<ImageMetadataDirectory> dirs =
                 findProvidersOf( GPSProvider.class );
         for ( ImageMetadataDirectory dir : dirs ) {
-            final String value = ((GPSProvider)dir).getGPSPositionDMS();
-            if ( value != null )
+            final String value = ((GPSProvider)dir).getGPSLatitudeDMS();
+            if (! value.isEmpty())
                 return value;
         }
-        return null;
+        return "";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getGPSLongitudeDMS() {
+        final Collection<ImageMetadataDirectory> dirs =
+                findProvidersOf( GPSProvider.class );
+        for ( ImageMetadataDirectory dir : dirs ) {
+            final String value = ((GPSProvider)dir).getGPSLongitudeDMS();
+            if (! value.isEmpty())
+                return value;
+        }
+        return "";
     }
 
     /**

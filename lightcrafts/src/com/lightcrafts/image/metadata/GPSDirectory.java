@@ -4,7 +4,6 @@ package com.lightcrafts.image.metadata;
 
 import com.lightcrafts.image.metadata.providers.GPSProvider;
 import com.lightcrafts.image.metadata.values.ImageMetaValue;
-import com.lightcrafts.image.metadata.values.StringMetaValue;
 import com.lightcrafts.image.metadata.values.UnsignedRationalMetaValue;
 import com.lightcrafts.utils.Rational;
 
@@ -64,9 +63,13 @@ public final class GPSDirectory extends ImageMetadataDirectory
     }
 
     @Override
-    public String getGPSPositionDMS() {
-        return getGPSCoordinateDMS(GPS_LATITUDE, GPS_LATITUDE_REF) + " "
-                + getGPSCoordinateDMS(GPS_LONGITUDE, GPS_LONGITUDE_REF);
+    public String getGPSLatitudeDMS() {
+        return getGPSCoordinateDMS(GPS_LATITUDE, GPS_LATITUDE_REF);
+    }
+
+    @Override
+    public String getGPSLongitudeDMS() {
+        return getGPSCoordinateDMS(GPS_LONGITUDE, GPS_LONGITUDE_REF);
     }
 
     private Double getGPSCoordinate(int tagID, int refTagID, String orientation) {

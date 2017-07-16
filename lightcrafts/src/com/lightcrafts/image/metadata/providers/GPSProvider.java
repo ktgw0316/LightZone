@@ -24,10 +24,18 @@ public interface GPSProvider extends ImageMetadataProvider {
     Double getGPSLongitude();
 
     /**
-     * Gets the latitude and longitude of the image as DMS (degrees,
-     * minutes, and seconds) string, e.g. 41°24'12.2"N 2°10'26.5"E
+     * Gets the latitude of the image as DMS (degrees, minutes, and seconds)
+     * string, e.g. 41°24'12.2"N
      *
-     * @return Returns said string or null if it's unavailable.
+     * @return Returns said string or empty string if it's unavailable.
      */
-    String getGPSPositionDMS();
+    String getGPSLatitudeDMS();
+
+    /**
+     * Gets the longitude of the image as DMS (degrees, minutes, and seconds)
+     * string, e.g. 2°10'26.5"E
+     *
+     * @return Returns said string or empty string if it's unavailable.
+     */
+    String getGPSLongitudeDMS();
 }
