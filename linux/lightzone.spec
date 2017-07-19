@@ -74,7 +74,7 @@ BuildRequires:	java-%{java_version}-devel, %{libX11_devel}, ant, autoconf, gcc, 
 BuildRequires:	java-rpmbuild, libgomp-devel
 %endif
 
-Requires:	java-%{java_version}, javahelp2, lcms2
+Requires:	java-%{java_version}, javahelp2, lcms2, libxml2-utils
 %if 0%{?suse_version} >= 1320
 Requires:	xerces-j2-xml-apis
 %else
