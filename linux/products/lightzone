@@ -52,12 +52,18 @@ else
   echo "jh.jar was not found."
 fi
 
-javapref=${HOME}/.java/.userPrefs/com/lightcrafts/app/prefs.xml
-maxmem=`xmllint --xpath 'map/entry[@key="MaxMemory"]/@value' ${javapref} | sed -r 's/value=\"([0-9]+)\"/\1/'`
-maxmem=$(( ${maxmem} * 1024 ))
-
 minmem=524288
-if [ -z ${maxmem} -o ${maxmem} -lt ${minmem} ]; then
+maxmem=${minmem}
+
+javapref=${HOME}/.java/.userPrefs/com/lightcrafts/app/prefs.xml
+if [ -f ${javapref} ]; then
+  maxmem_pref=`xmllint --xpath 'map/entry[@key="MaxMemory"]/@value' ${javapref} | sed -r 's/value=\"([0-9]+)\"/\1/'`
+  if [ ! -z ${maxmem_pref} ]; then
+    maxmem=$(( ${maxmem_pref} * 1024 ))
+  fi
+fi
+
+if [ ${maxmem} -le ${minmem} ]; then
   if [ ${totalmem} -ge 1048576 ]; then
     maxmem=$(( ${totalmem} / 2 ))
     # on 32-bit architectures there is ~2GB limit for maximum Java heap size
