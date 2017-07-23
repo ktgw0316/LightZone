@@ -17,8 +17,8 @@ import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
 import com.lightcrafts.utils.Lensfun;
 
-import lombok.NonNull;
 import lombok.val;
+import org.jetbrains.annotations.NotNull;
 
 public class LensCorrectionsOperation extends BlendedOperation {
     private static final String MANUAL_MODE = "Manual_Correction";
@@ -46,13 +46,23 @@ public class LensCorrectionsOperation extends BlendedOperation {
     private SliderConfig tca_b_offset_config;
 
     private final ImageMetadata meta;
-    private String cameraMaker = "";
-    private String cameraModel = "";
-    private String lensMaker = "";
-    private String lensModel = "";
-    private float  focal = 0f;
-    private float  aperture = 0f;
 
+    @NotNull
+    private String cameraMaker = "";
+
+    @NotNull
+    private String cameraModel = "";
+
+    @NotNull
+    private String lensMaker = "";
+
+    @NotNull
+    private String lensModel = "";
+
+    private float focal = 0f;
+    private float aperture = 0f;
+
+    @NotNull
     private Lensfun lf;
 
     static final OperationType type = new OperationTypeImpl("Lens Corrections");
