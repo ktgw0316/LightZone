@@ -189,9 +189,9 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
-    public String getFlash() {
+    public int getFlash() {
         final ImageMetaValue value = getValue( CORE_FLASH );
-        return value != null ? value.toString() : null;
+        return value != null ? value.getIntValue() : -1;
     }
 
     /**
@@ -677,9 +677,9 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
      */
     private void addFlash( ImageMetadata metadata ) {
         removeValue( CORE_FLASH );
-        final String flash = metadata.getFlash();
-        if ( flash != null )
-            putValue( CORE_FLASH, new StringMetaValue( flash ) );
+        final int flash = metadata.getFlash();
+        if ( flash != -1 )
+            putValue( CORE_FLASH, new UnsignedShortMetaValue( flash ) );
     }
 
     /**

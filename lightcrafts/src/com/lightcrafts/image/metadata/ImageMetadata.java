@@ -365,15 +365,15 @@ public class ImageMetadata implements
     /**
      * {@inheritDoc}
      */
-    public String getFlash() {
+    public int getFlash() {
         final Collection<ImageMetadataDirectory> dirs =
             findProvidersOf( FlashProvider.class );
         for ( ImageMetadataDirectory dir : dirs ) {
-            final String flash = ((FlashProvider)dir).getFlash();
-            if ( flash != null )
+            final int flash = ((FlashProvider)dir).getFlash();
+            if ( flash != -1 )
                 return flash;
         }
-        return null;
+        return -1;
     }
 
     /**

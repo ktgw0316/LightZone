@@ -117,9 +117,14 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
-    public String getFlash() {
+    public int getFlash() {
         final ImageMetaValue flashValue = getValue( EXIF_FLASH );
-        return hasTagValueLabelFor( flashValue );
+        if ( flashValue != null ) {
+            final int flashBits = flashValue.getIntValue();
+            if ( (flashBits & TIFF_FLASH_NOT_PRESENT_BIT) == 0 )
+                return flashBits;
+        }
+        return -1;
     }
 
     /**
