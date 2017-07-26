@@ -8,6 +8,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.image.BadImageFileException;
@@ -36,7 +38,7 @@ import static com.lightcrafts.image.types.TIFFConstants.*;
  */
 @SuppressWarnings({"CloneableClassWithoutClone"})
 public final class NikonDirectory extends MakerNotesDirectory implements
-    FocalLengthProvider, ISOProvider, LensProvider, PreviewImageProvider {
+    FocalLengthProvider, ISOProvider, PreviewImageProvider {
 
     ////////// public /////////////////////////////////////////////////////////
 
@@ -62,38 +64,6 @@ public final class NikonDirectory extends MakerNotesDirectory implements
         if ( value == null )
             value = getValue( NIKON_II_ISO );
         return value != null ? value.getIntValue() : 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getLens() {
-        ImageMetaValue lensValue =
-            getLensData( NIKON_LD1X_LENS_ID, NIKON_LD21_LENS_ID );
-        //
-        // Here, we always use the NIKON_LD1X_LENS_ID tag ID because the
-        // resources file doesn't have the lens labels duplicated for
-        // NIKON_LD21_LENS_ID.  This is done to eliminate redundancy since the
-        // labels are the same for both versions.
-        //
-        final String label = hasTagValueLabelFor( NIKON_LD1X_LENS_ID, lensValue );
-        if ( label != null )
-            return label;
-
-        lensValue = getValue( NIKON_LENS );
-        if ( lensValue != null )
-            return lensValue.toString();
-        return makeLensLabelFrom(
-            getLensData(
-                NIKON_LD1X_MIN_FOCAL_LENGTH,
-                NIKON_LD21_MIN_FOCAL_LENGTH
-            ),
-            getLensData(
-                NIKON_LD1X_MAX_FOCAL_LENGTH,
-                NIKON_LD21_MAX_FOCAL_LENGTH
-            ),
-            null
-        );
     }
 
     /**
@@ -372,6 +342,8 @@ switch_tagID:
             }
             case NIKON_FLASH_EXPOSURE_BRACKET_VALUE:
             case NIKON_FLASH_EXPOSURE_COMPENSATION: {
+                if ( !(value instanceof LongMetaValue) )
+                    return "?";
                 final long n = value.getLongValue() >>> 24;
                 return TextUtil.tenths( n / 6.0 );
             }
@@ -407,6 +379,41 @@ switch_tagID:
     }
 
     ////////// protected //////////////////////////////////////////////////////
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ImageMetaValue getLensNamesValue() {
+        // return getLensData( NIKON_LD1X_LENS_ID,
+        //                     NIKON_LD21_LENS_ID );
+
+        //
+        // Here, we always use the NIKON_LD1X_LENS_ID tag ID because the
+        // resources file doesn't have the lens labels duplicated for
+        // NIKON_LD21_LENS_ID.  This is done to eliminate redundancy since the
+        // labels are the same for both versions.
+        //
+        return getValue( NIKON_LD1X_LENS_ID );
+    }
+
+    @Override
+    protected ImageMetaValue getLongFocalValue() {
+        return getLensData( NIKON_LD1X_MAX_FOCAL_LENGTH,
+                            NIKON_LD21_MAX_FOCAL_LENGTH );
+    }
+
+    @Override
+    protected ImageMetaValue getShortFocalValue() {
+        return getLensData( NIKON_LD1X_MIN_FOCAL_LENGTH,
+                            NIKON_LD21_MIN_FOCAL_LENGTH );
+    }
+
+    @Override
+    protected ImageMetaValue getMaxApertureValue() {
+        return getLensData( NIKON_LD1X_APERTURE_AT_MAX_FOCAL,
+                            NIKON_LD21_EFFECTIVE_MAX_APERTURE );
+    }
 
     /**
      * Gets the priority of this directory for providing the metadata supplied
@@ -569,6 +576,7 @@ switch_tagID:
      * @return Returns the metadata or <code>null</code> if there is no such
      * metadata.
      */
+    // TODO: tag0204 and tag0400
     private ImageMetaValue getLensData( int tag0100, int tag0201 ) {
         final ImageMetaValue version = getValue( NIKON_LD_VERSION );
         if ( version != null )

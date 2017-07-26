@@ -11,6 +11,7 @@ import java.util.ResourceBundle;
 import com.lightcrafts.image.BadImageFileException;
 import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.image.metadata.*;
+import com.lightcrafts.image.metadata.providers.LensProvider;
 import com.lightcrafts.image.metadata.providers.PreviewImageProvider;
 import com.lightcrafts.image.metadata.values.*;
 import com.lightcrafts.image.types.ORFImageType;
@@ -22,13 +23,13 @@ import static com.lightcrafts.image.metadata.ImageMetaType.*;
 import static com.lightcrafts.image.metadata.makernotes.OlympusTags.*;
 
 /**
- * A <code>OlympusDirectory</code> is-an {@link ImageMetadataDirectory} for
+ * An {@code OlympusDirectory} is-an {@link ImageMetadataDirectory} for
  * holding Olympus-specific maker-note metadata.
  *
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */
 public final class OlympusDirectory extends MakerNotesDirectory implements
-    PreviewImageProvider {
+    LensProvider, PreviewImageProvider {
 
     ////////// public /////////////////////////////////////////////////////////
 
@@ -38,7 +39,6 @@ public final class OlympusDirectory extends MakerNotesDirectory implements
      * @param buf The {@link LCByteBuffer} the metadata is in.
      * @param offset The offset to the start of the maker-notes.
      * @return Returns said adjustments.
-     * @throws IOException 
      */
     public int[] getMakerNotesAdjustments( LCByteBuffer buf, int offset )
         throws IOException
@@ -201,6 +201,30 @@ public final class OlympusDirectory extends MakerNotesDirectory implements
     }
 
     ////////// protected //////////////////////////////////////////////////////
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ImageMetaValue getLongFocalValue() {
+        return getValue( OLYMPUS_E_MAX_FOCAL_LENGTH );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ImageMetaValue getShortFocalValue() {
+        return getValue( OLYMPUS_E_MIN_FOCAL_LENGTH );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ImageMetaValue getMaxApertureValue() {
+        return getValue( OLYMPUS_E_MAX_APERTURE_AT_MAX_FOCAL );
+    }
 
     /**
      * Get the {@link ResourceBundle} to use for tags.

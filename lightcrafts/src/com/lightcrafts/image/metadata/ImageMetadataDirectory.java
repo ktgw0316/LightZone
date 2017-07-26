@@ -10,15 +10,14 @@ import java.util.*;
 import org.w3c.dom.Element;
 import org.w3c.dom.Document;
 
+import com.lightcrafts.image.metadata.providers.ImageMetadataProvider;
 import com.lightcrafts.image.metadata.values.*;
 import com.lightcrafts.utils.bytebuffer.LCByteBuffer;
 import com.lightcrafts.utils.Rational;
 import com.lightcrafts.utils.TextUtil;
 import com.lightcrafts.utils.xml.ElementPrefixFilter;
 
-import static com.lightcrafts.image.metadata.EXIFTags.TIFFCommonTags;
-import static com.lightcrafts.image.metadata.ImageMetadata.unexportedTags;
-import com.lightcrafts.image.metadata.providers.ImageMetadataProvider;
+import static com.lightcrafts.image.metadata.EXIFTags.*;
 
 /**
  * An <code>ImageMetadataDirectory</code> contains all the metadata
@@ -840,10 +839,20 @@ public abstract class ImageMetadataDirectory
               i = sourceDir.iterator(); i.hasNext(); ) {
             final Map.Entry<Integer,ImageMetaValue> me = i.next();
             final int tagID = me.getKey();
-            if (TIFFCommonTags.contains(tagID)
-                    && !unexportedTags.contains(tagID)) {
-                targetDir.putValue(tagID, me.getValue());
-                i.remove();
+            switch ( tagID ) {
+                case EXIF_ARTIST:
+                case EXIF_COPYRIGHT:
+                case EXIF_DATE_TIME:
+                case EXIF_IMAGE_DESCRIPTION:
+                case EXIF_MAKE:
+                case EXIF_MODEL:
+                case EXIF_MS_RATING:
+                case EXIF_RESOLUTION_UNIT:
+                case EXIF_X_RESOLUTION:
+                case EXIF_Y_RESOLUTION:
+                    targetDir.putValue( tagID, me.getValue() );
+                    i.remove();
+                    break;
             }
         }
     }

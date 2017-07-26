@@ -230,6 +230,21 @@ public final class PanasonicDirectory extends MakerNotesDirectory implements
 
     ////////// protected //////////////////////////////////////////////////////
 
+    @Override
+    protected ImageMetaValue getLongFocalValue() {
+        return null;
+    }
+
+    @Override
+    protected ImageMetaValue getShortFocalValue() {
+        return null;
+    }
+
+    @Override
+    protected ImageMetaValue getMaxApertureValue() {
+        return null;
+    }
+
     /**
      * Get the {@link ResourceBundle} to use for tags.
      *

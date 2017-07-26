@@ -398,5 +398,23 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
         add( PENTAX_WHITE_POINT, "WhitePoint", META_USHORT );
         add( PENTAX_WORLD_TIME_LOCATION, "WorldTimeLocation", META_USHORT );
     }
+
+    @Override
+    protected ImageMetaValue getLongFocalValue() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    protected ImageMetaValue getShortFocalValue() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    protected ImageMetaValue getMaxApertureValue() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }
 /* vim:set et sw=4 ts=4: */

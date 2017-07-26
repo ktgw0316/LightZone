@@ -6,6 +6,7 @@ import com.lightcrafts.image.metadata.ImageMetadataDirectory;
 import com.lightcrafts.image.metadata.providers.LensProvider;
 import com.lightcrafts.image.metadata.providers.OrientationProvider;
 import com.lightcrafts.image.metadata.providers.ImageMetadataProvider;
+import com.lightcrafts.image.metadata.values.ImageMetaValue;
 
 /**
  * A <code>MakerNotesDirectory</code> is-an {@link ImageMetadataDirectory} that
@@ -16,7 +17,8 @@ import com.lightcrafts.image.metadata.providers.ImageMetadataProvider;
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */
 @SuppressWarnings({"CloneableClassWithoutClone"})
-public abstract class MakerNotesDirectory extends ImageMetadataDirectory {
+public abstract class MakerNotesDirectory extends ImageMetadataDirectory implements
+LensProvider {
 
     /**
      * Gets the priority of this directory for providing the metadata supplied
@@ -44,5 +46,77 @@ public abstract class MakerNotesDirectory extends ImageMetadataDirectory {
         return 100;
     }
 
+    abstract protected ImageMetaValue getLongFocalValue();
+    abstract protected ImageMetaValue getShortFocalValue();
+    abstract protected ImageMetaValue getMaxApertureValue();
+
+    protected ImageMetaValue getLensNamesValue() {
+        return null;
+    }
+
+    protected ImageMetaValue getFocalUnitsPerMMValue() {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getLens() {
+        final ImageMetaValue shortFocalValue = getShortFocalValue();
+        String shortFocalLabel = hasTagValueLabelFor( shortFocalValue );
+        if (shortFocalLabel != null)
+            shortFocalLabel = shortFocalLabel.replaceAll("\\.0$", "");
+
+        final ImageMetaValue longFocalValue = getLongFocalValue();
+        String longFocalLabel = hasTagValueLabelFor( longFocalValue );
+        if (longFocalLabel != null)
+            longFocalLabel = longFocalLabel.replaceAll("\\.0$", "");
+
+        final ImageMetaValue maxApertureValue = getMaxApertureValue();
+        String maxApertureLabel = hasTagValueLabelFor( maxApertureValue );
+        if (maxApertureLabel != null)
+            maxApertureLabel = maxApertureLabel.replaceAll("\\.0$", "");
+
+        final ImageMetaValue lensNamesValue = getLensNamesValue();
+        final String lensNamesLabel = hasTagValueLabelFor( lensNamesValue );
+
+        if ( lensNamesLabel != null ) {
+            // Check third party lenses
+            final String[] names = lensNamesLabel.split(" or ");
+            if (names.length == 1) {
+                return names[0];
+            }
+
+            for (String name : names) {
+                String focal = null;
+                String maxAperture = null;
+                final String[] segments = lensNamesLabel.split(" ");
+
+                for (String segment : segments) {
+                    if(segment.endsWith("mm")) {
+                        focal = segment.substring(0, segment.length() - 2);
+                    }
+                    else if (segment.startsWith("F/")) {
+                        maxAperture = segment.substring(2, segment.length()).split("-", 2)[0];
+                    }
+                }
+
+                if (focal == null || maxAperture == null)
+                    continue;
+
+                final String[] focals = focal.split("-", 2);
+                if (focals[0].equals(shortFocalLabel) &&
+                    (focals.length == 1 || focals[1].equals(longFocalLabel))) {
+                    if (maxAperture.equals(maxApertureLabel))
+                        return name;
+                }
+            }
+        }
+        return makeLensLabelFrom(
+            shortFocalValue,
+            longFocalValue,
+            getFocalUnitsPerMMValue()
+        );
+    }
 }
 /* vim:set et sw=4 ts=4: */

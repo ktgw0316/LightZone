@@ -231,7 +231,6 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
      */
     public String getLens() {
         final ImageMetaValue value = getValue( CORE_LENS );
-
         return value != null ? value.getStringValue() : null;
     }
 
@@ -369,9 +368,8 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
      * By default, the <code>CoreDirectory</code> is given the highest priority
      * because it is considered authoritative.
      * <p>
-     * However, an exception is made for {@link LensProvider} because
-     * orientation from EXIF/TIFF metadata (when merged from an XMP file) and
-     * makernotes metadata must take priority.
+     * However, an exception is made for {@link LensProvider} because lens data
+     * from makernotes have more detailed metadata about a given lens.
      *
      * @param provider The provider interface to get the priority for.
      * @return Returns a priority guaranteed to be higher than all others.
