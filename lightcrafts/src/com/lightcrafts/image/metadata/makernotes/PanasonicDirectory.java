@@ -50,7 +50,7 @@ public final class PanasonicDirectory extends MakerNotesDirectory implements
         //      0- 8: "Panasonic"
         //      9-11: 0 0 0
         //
-        return new int[]{ 12, offset };
+        return new int[]{ 12, 0 };
     }
 
     /**
