@@ -95,8 +95,28 @@ public final class OlympusDirectory extends MakerNotesDirectory implements
      */
     public void putValue( Integer tagID, ImageMetaValue value ) {
         switch ( tagID ) {
-            case OLYMPUS_CAMERA_SETTINGS:
-            case OLYMPUS_CAMERA_SETTINGS_OLD:
+            case OLYMPUS_CS_NOISE_FILTER:
+                value = new ShortMetaValue( value.getIntValue() );
+                break;
+            case OLYMPUS_E_EXTENDER_TYPE:
+                if ( value.getValueCount() == 6 ) {
+                    final int make = value.getIntValueAt( 0 );
+                    final int model = value.getIntValueAt( 2 );
+                    final int id = make * 100 + model;
+                    value = new UnsignedLongMetaValue( id );
+                }
+                break;
+            case OLYMPUS_E_LENS_TYPE:
+                if ( value.getValueCount() == 6 ) {
+                    final int make = value.getIntValueAt( 0 );
+                    final int model = value.getIntValueAt( 2 );
+                    final int submodel = value.getIntValueAt( 3 );
+                    final int id = make * 10000 + model * 100 + submodel;
+                    value = new LongMetaValue( id );
+                }
+                break;
+            case OLYMPUS_MINOLTA_CAMERA_SETTINGS:
+            case OLYMPUS_MINOLTA_CAMERA_SETTINGS_OLD:
                 explodeSubfields( tagID, 0, value, true );
                 break;
             case OLYMPUS_ISO: {
@@ -132,8 +152,22 @@ public final class OlympusDirectory extends MakerNotesDirectory implements
         switch ( value.getOwningTagID() ) {
             case OLYMPUS_BLUE_BALANCE:
             case OLYMPUS_RED_BALANCE:
-                return TextUtil.tenths( value.getFloatValue() / 256 );
-            case OLYMPUS_CS_CUSTOM_SATURATION: {
+                return TextUtil.tenths( value.getIntValue() / 256.0 );
+            case OLYMPUS_CS_MANOMETER_PRESSURE:
+                return TextUtil.tenths( value.getIntValue() / 10.0 ) + " kPa";
+            case OLYMPUS_E_FOCAL_PLANE_DIAGONAL:
+                return TextUtil.tenths( value.getDoubleValue() ) + "mm";
+            case OLYMPUS_E_MAX_APERTURE_AT_CUR_FOCAL:
+            case OLYMPUS_E_MAX_APERTURE_AT_MAX_FOCAL:
+            case OLYMPUS_E_MAX_APERTURE_AT_MIN_FOCAL: {
+                final int n = value.getIntValue();
+                final double d = Math.pow( Math.sqrt(2), n / 256.0 );
+                return "F/" + TextUtil.tenths( d );
+            }
+            case OLYMPUS_E_MAX_FOCAL_LENGTH:
+            case OLYMPUS_E_MIN_FOCAL_LENGTH:
+                return value.getStringValue() + "mm";
+            case OLYMPUS_MCS_CUSTOM_SATURATION: {
                 final String model = getOwningMetadata().getCameraMake( true );
                 if ( model != null && model.contains( "E-1" ) ) {
                     final long[] n = ((LongMetaValue)value).getLongValues();
@@ -143,17 +177,17 @@ public final class OlympusDirectory extends MakerNotesDirectory implements
                 }
                 // no break;
             }
-            case OLYMPUS_CS_CONTRAST_SETTING:
-            case OLYMPUS_CS_PM_CONTRAST:
-            case OLYMPUS_CS_PM_SATURATION:
-            case OLYMPUS_CS_PM_SHARPNESS:
-            case OLYMPUS_CS_SHARPNESS_SETTING: {
+            case OLYMPUS_MCS_CONTRAST_SETTING:
+            case OLYMPUS_MCS_PM_CONTRAST:
+            case OLYMPUS_MCS_PM_SATURATION:
+            case OLYMPUS_MCS_PM_SHARPNESS:
+            case OLYMPUS_MCS_SHARPNESS_SETTING: {
                 final String[] values = value.getValues();
                 if ( values.length != 3 )
                     return null;
                 return values[0] + " (" + values[1] + ',' + values[2] + ')';
             }
-            case OLYMPUS_CS_PANORAMA_MODE: {
+            case OLYMPUS_MCS_PANORAMA_MODE: {
                 if ( value.getValueCount() != 2 )
                     break;
                 final int tagID = value.getOwningTagID();
@@ -221,72 +255,109 @@ public final class OlympusDirectory extends MakerNotesDirectory implements
 
     static {
         add( OLYMPUS_APERTURE, "Aperture", META_SRATIONAL );
+        add( OLYMPUS_AUTO_FOCUS_RESULT, "AutoFocusResult", META_USHORT );
         add( OLYMPUS_BLACK_AND_WHITE_MODE, "BlackAndWhiteMode", META_USHORT );
         add( OLYMPUS_BLACK_LEVEL, "BlackLevel", META_USHORT );
         add( OLYMPUS_BLUE_BALANCE, "BlueBalance", META_USHORT );
+        add( OLYMPUS_BODY_FIRMWARE_VERSION, "BodyFirmwareVersion", META_STRING );
         add( OLYMPUS_BRIGHTNESS, "Brightness", META_SRATIONAL );
         add( OLYMPUS_CAMERA_ID, "CameraID", META_UNKNOWN );
         add( OLYMPUS_CAMERA_SETTINGS, "CameraSettings", META_UNDEFINED );
-        add( OLYMPUS_CAMERA_SETTINGS_OLD, "CameraSettingsOld", META_UNDEFINED );
         add( OLYMPUS_CAMERA_TYPE, "CameraType", META_UNKNOWN );
         add( OLYMPUS_CCD_SCAN_MODE, "CCDScanMode", META_USHORT );
+        add( OLYMPUS_COLOR_MATRIX_NUMBER, "ColorMatrixNumber", META_USHORT );
         add( OLYMPUS_COLOR_MODE, "ColorMode", META_ULONG );
         add( OLYMPUS_COMPRESSED_IMAGE_SIZE, "CompressedImageSize", META_ULONG );
         add( OLYMPUS_COMPRESSION_RATIO, "CompressionRatio", META_URATIONAL );
         add( OLYMPUS_CONTRAST, "Contrast", META_USHORT );
         add( OLYMPUS_CORING_FILTER, "CoringFilter", META_USHORT );
-        add( OLYMPUS_CS_PREVIEW_IMAGE_VALID, "CSPreviewImageValid", META_ULONG );
         add( OLYMPUS_CS_AE_LOCK, "CSAELock", META_USHORT );
         add( OLYMPUS_CS_AF_AREAS, "CSAFAreas", META_ULONG );
+        add( OLYMPUS_CS_AF_POINT_SELECTED, "CSAFPointSelected", META_SRATIONAL );
         add( OLYMPUS_CS_AF_SEARCH, "CSAFSearch", META_USHORT );
-        add( OLYMPUS_CS_COLORSPACE, "CSColorspace", META_USHORT );
+        add( OLYMPUS_CS_ART_FILTER, "CSArtFilter", META_USHORT );
+        add( OLYMPUS_CS_COLOR_SPACE, "CSColorSpace", META_USHORT );
         add( OLYMPUS_CS_COMPRESSION_FACTOR, "CSCompressionFactor", META_URATIONAL );
         add( OLYMPUS_CS_CONTRAST_SETTING, "CSContrastSetting", META_SSHORT );
-        add( OLYMPUS_CS_CUSTOM_SATURATION, "CSCustomSaturation", META_SSHORT );
+        add( OLYMPUS_CS_CUSTOM_SATURATION, "CScustomSaturation", META_SSHORT );
         add( OLYMPUS_CS_DISTORTION_CORRECTION, "CSDistortionCorrection", META_USHORT );
+        add( OLYMPUS_CS_DRIVE_MODE, "CSDriveMode", META_USHORT );
         add( OLYMPUS_CS_EXPOSURE_MODE, "CSExposureMode", META_USHORT );
-        add( OLYMPUS_CS_FLASH_EXPOSURE_COMPENSATION, "CSFlashExposureCompensation", META_SRATIONAL );
+        add( OLYMPUS_CS_EXPOSURE_SHIFT, "CSExposureShift", META_SRATIONAL );
+        add( OLYMPUS_CS_EXTENDED_WB_DETECT, "CSExtendedWBDetect", META_USHORT );
+        add( OLYMPUS_CS_FLASH_CONTROL_MODE, "CSFlashControlMode", META_USHORT );
+        add( OLYMPUS_CS_FLASH_EXPOSURE_COMP, "CSFLashExposureComp", META_SRATIONAL );
+        add( OLYMPUS_CS_FLASH_INTENSITY, "CSFlashIntensity", META_SRATIONAL );
         add( OLYMPUS_CS_FLASH_MODE, "CSFlashMode", META_USHORT );
+        add( OLYMPUS_CS_FLASH_REMOTE_CONTROL, "CSFlashRemoteControl", META_USHORT );
         add( OLYMPUS_CS_FOCUS_MODE, "CSFocusMode", META_USHORT );
-        add( OLYMPUS_CS_FOCUS_PROCESS, "CSFocusProcess", META_USHORT );
-        add( OLYMPUS_CS_GRADATION, "CSGradation", META_USHORT );
+        add( OLYMPUS_CS_FOCUS_PROCESS, "CSfocusProcess", META_USHORT );
+        add( OLYMPUS_CS_GRADATION, "CSGradation", META_SSHORT );
         add( OLYMPUS_CS_IMAGE_QUALITY_2, "CSImageQuality2", META_USHORT );
+        add( OLYMPUS_CS_IMAGE_STABILIZATION, "CSImageStabilization", META_ULONG );
+        add( OLYMPUS_CS_LEVEL_GAUGE_PITCH, "CSLevelGaugePitch", META_USHORT );
+        add( OLYMPUS_CS_LEVEL_GAUGE_ROLL, "CSLevelGaugeRoll", META_USHORT );
         add( OLYMPUS_CS_MACRO_MODE, "CSMacroMode", META_USHORT );
+        add( OLYMPUS_CS_MANOMETER_PRESSURE, "CSManometerPressure", META_USHORT );
+        add( OLYMPUS_CS_MANUAL_FLASH_STRENGTH, "CSManualFlashStrength", META_USHORT );
         add( OLYMPUS_CS_METERING_MODE, "CSMeteringMode", META_USHORT );
         add( OLYMPUS_CS_MODIFIED_SATURATION, "CSModifiedSaturation", META_USHORT );
+        add( OLYMPUS_CS_NOISE_FILTER, "CSNoiseFilter", META_SSHORT );
         add( OLYMPUS_CS_NOISE_REDUCTION, "CSNoiseReduction", META_USHORT );
         add( OLYMPUS_CS_PANORAMA_MODE, "CSPanoramaMode", META_USHORT );
         add( OLYMPUS_CS_PICTURE_MODE, "CSPictureMode", META_USHORT );
         add( OLYMPUS_CS_PM_BW_FILTER, "CSPMBWFilter", META_SSHORT );
-        add( OLYMPUS_CS_PM_CONTRAST, "CSPMContrast", META_SSHORT );
+        add( OLYMPUS_CS_PM_CONTRAST, "CSPMContrasT", META_SSHORT );
         add( OLYMPUS_CS_PM_HUE, "CSPMHue", META_SSHORT );
         add( OLYMPUS_CS_PM_SATURATION, "CSPMSaturation", META_SSHORT );
         add( OLYMPUS_CS_PM_SHARPNESS, "CSPMSharpness", META_SSHORT );
         add( OLYMPUS_CS_PM_TONE, "CSPMTone", META_SSHORT );
         add( OLYMPUS_CS_PREVIEW_IMAGE_LENGTH, "CSPreviewImageLength", META_ULONG );
         add( OLYMPUS_CS_PREVIEW_IMAGE_START, "CSPreviewImageStart", META_ULONG );
+        add( OLYMPUS_CS_PREVIEW_IMAGE_VALID, "CSPreviewImageValid", META_ULONG );
         add( OLYMPUS_CS_SCENE_MODE, "CSSceneMode", META_USHORT );
-        add( OLYMPUS_CS_SEQUENCE, "CSSequence", META_USHORT );
         add( OLYMPUS_CS_SHADING_COMPENSATION, "CSShadingCompensation", META_USHORT );
         add( OLYMPUS_CS_SHARPNESS_SETTING, "CSSharpnessSetting", META_SSHORT );
-        add( OLYMPUS_CS_WHITE_BALANCE, "CSWhiteBalance", META_USHORT );
-        add( OLYMPUS_CS_WHITE_BALANCE_BRACKET, "CSWhiteBalanceBracket", META_SSHORT );
-        add( OLYMPUS_CS_WHITE_BALANCE_TEMP, "CSWhiteBalanceTemp", META_USHORT );
         add( OLYMPUS_CS_VERSION, "CSVersion", META_UNDEFINED );
+        add( OLYMPUS_CS_WHITE_BALANCE_2, "CSWhiteBalance2", META_USHORT );
+        add( OLYMPUS_CS_WHITE_BALANCE_TEMP, "CSWhiteBalanceTemp", META_USHORT );
         add( OLYMPUS_DIGITAL_ZOOM, "DigitalZoom", META_URATIONAL );
+        add( OLYMPUS_E_EXTENDER_FIRMWARE_VERSION, "EExtenderFirmwareVersion", META_ULONG );
+        add( OLYMPUS_E_EXTENDER_MODEL, "EExtenderModel", META_STRING );
+        add( OLYMPUS_E_EXTENDER_SERIAL_NUMBER, "EExtenderSerialNumber", META_STRING );
+        add( OLYMPUS_E_EXTENDER_TYPE, "EExtenderType", META_UBYTE );
+        add( OLYMPUS_E_FLASH_FIRMWARE_VERSION, "EFlashFirmwareVersion", META_ULONG );
+        add( OLYMPUS_E_FLASH_MODEL, "EFlashModel", META_USHORT );
+        add( OLYMPUS_E_FLASH_SERIAL_NUMBER, "EFlashSerialNumber", META_STRING );
+        add( OLYMPUS_E_FLASH_TYPE, "EFlashType", META_USHORT );
+        add( OLYMPUS_E_FOCAL_PLANE_DIAGONAL, "EFocalPlaneDiagonal", META_URATIONAL );
+        add( OLYMPUS_E_INTERNAL_SERIAL_NUMBER, "EInternalSerialNumber", META_STRING );
+        add( OLYMPUS_E_LENS_FIRMWARE_VERSION, "ELensFirmwareVersion", META_ULONG );
+        add( OLYMPUS_E_LENS_PROPERTIES, "ELensProperties", META_USHORT );
+        add( OLYMPUS_E_LENS_SERIAL_NUMBER, "ELensSerialNumber", META_STRING );
+        add( OLYMPUS_E_LENS_TYPE, "ELensType", META_UBYTE );
+        add( OLYMPUS_E_MAX_APERTURE_AT_CUR_FOCAL, "EMaxApertureAtCurFocal", META_USHORT );
+        add( OLYMPUS_E_MAX_APERTURE_AT_MAX_FOCAL, "EMaxApertureAtMaxFocal", META_USHORT );
+        add( OLYMPUS_E_MAX_APERTURE_AT_MIN_FOCAL, "EMaxApertureAtMinFocal", META_USHORT );
+        add( OLYMPUS_E_MAX_FOCAL_LENGTH, "EMaxFocalLength", META_USHORT );
+        add( OLYMPUS_E_MIN_FOCAL_LENGTH, "EMinFocalLength", META_USHORT );
         add( OLYMPUS_EPSON_IMAGE_HEIGHT, "EpsonImageHeight", META_USHORT );
         add( OLYMPUS_EPSON_IMAGE_WIDTH, "EpsonImageWidth", META_USHORT );
         add( OLYMPUS_EPSON_SOFTWARE, "EpsonSoftware", META_STRING );
+        add( OLYMPUS_E_SERIAL_NUMBER, "ESerialNumber", META_STRING );
+        add( OLYMPUS_E_VERSION, "EVersion", META_UNDEFINED );
         add( OLYMPUS_EXPOSURE_COMPENSATION, "ExposureCompensation", META_SRATIONAL );
         add( OLYMPUS_EXTERNAL_FLASH_BOUNCE, "ExternalFlashBounce", META_USHORT );
         add( OLYMPUS_EXTERNAL_FLASH_MODE, "ExternalFlashMode", META_USHORT );
         add( OLYMPUS_EXTERNAL_FLASH_ZOOM, "ExternalFlashZoom", META_USHORT );
+        add( OLYMPUS_FIRMWARE, "Firmware", META_STRING );
         add( OLYMPUS_FLASH_CHARGE_LEVEL, "FlashChargeLevel", META_USHORT );
         add( OLYMPUS_FLASH_DEVICE, "FlashDevice", META_USHORT );
         add( OLYMPUS_FLASH_EXPOSURE_COMPENSATION, "FlashExposureCompensation", META_SRATIONAL );
         add( OLYMPUS_FLASH_MODE, "FlashMode", META_USHORT );
         add( OLYMPUS_FOCAL_PLANE_DIAGONAL, "FocalPlaneDiagonal", META_URATIONAL );
         add( OLYMPUS_FOCUS_MODE, "FocusMode", META_USHORT );
+        add( OLYMPUS_FOCUS_RANGE, "FocusRange", META_USHORT );
         add( OLYMPUS_FOCUS_STEP_COUNT, "FocusStepCount", META_USHORT );
         add( OLYMPUS_IMAGE_HEIGHT, "ImageHeight", META_ULONG );
         add( OLYMPUS_IMAGE_SIZE, "ImageSize", META_ULONG );
@@ -295,9 +366,52 @@ public final class OlympusDirectory extends MakerNotesDirectory implements
         add( OLYMPUS_ISO, "ISO", META_SRATIONAL );
         add( OLYMPUS_LENS_DISTORTION_PARAMS, "LensDistortionParams", META_SSHORT );
         add( OLYMPUS_LENS_TEMPERATURE, "LensTemperature", META_SSHORT );
+        add( OLYMPUS_LIGHT_CONDITION, "LightCondition", META_USHORT );
+        add( OLYMPUS_LIGHT_VALUE_CENTER, "LightValueCenter", META_SRATIONAL );
+        add( OLYMPUS_LIGHT_VALUE_PERIPHERY, "LightValuePeriphery", META_SRATIONAL );
         add( OLYMPUS_MACRO_MODE, "MacroMode", META_USHORT );
         add( OLYMPUS_MAKER_NOTES_VERSION, "MakerNotesVersion", META_UNDEFINED );
         add( OLYMPUS_MANUAL_FOCUS_DISTANCE, "ManualFocusDistance", META_URATIONAL );
+        add( OLYMPUS_MCS_AE_LOCK, "MCSAELock", META_USHORT );
+        add( OLYMPUS_MCS_AF_AREAS, "MCSAFAreas", META_ULONG );
+        add( OLYMPUS_MCS_AF_SEARCH, "MCSAFSearch", META_USHORT );
+        add( OLYMPUS_MCS_COLORSPACE, "MCSColorspace", META_USHORT );
+        add( OLYMPUS_MCS_COMPRESSION_FACTOR, "MCSCompressionFactor", META_URATIONAL );
+        add( OLYMPUS_MCS_CONTRAST_SETTING, "MCSContrastSetting", META_SSHORT );
+        add( OLYMPUS_MCS_CUSTOM_SATURATION, "MCSCustomSaturation", META_SSHORT );
+        add( OLYMPUS_MCS_DISTORTION_CORRECTION, "MCSDistortionCorrection", META_USHORT );
+        add( OLYMPUS_MCS_EXPOSURE_MODE, "MCSExposureMode", META_USHORT );
+        add( OLYMPUS_MCS_FLASH_EXPOSURE_COMPENSATION, "MCSFlashExposureCompensation", META_SRATIONAL );
+        add( OLYMPUS_MCS_FLASH_MODE, "MCSFlashMode", META_USHORT );
+        add( OLYMPUS_MCS_FOCUS_MODE, "MCSFocusMode", META_USHORT );
+        add( OLYMPUS_MCS_FOCUS_PROCESS, "MCSFocusProcess", META_USHORT );
+        add( OLYMPUS_MCS_GRADATION, "MCSGradation", META_USHORT );
+        add( OLYMPUS_MCS_IMAGE_QUALITY_2, "MCSImageQuality2", META_USHORT );
+        add( OLYMPUS_MCS_MACRO_MODE, "MCSMacroMode", META_USHORT );
+        add( OLYMPUS_MCS_METERING_MODE, "MCSMeteringMode", META_USHORT );
+        add( OLYMPUS_MCS_MODIFIED_SATURATION, "MCSModifiedSaturation", META_USHORT );
+        add( OLYMPUS_MCS_NOISE_REDUCTION, "MCSNoiseReduction", META_USHORT );
+        add( OLYMPUS_MCS_PANORAMA_MODE, "MCSPanoramaMode", META_USHORT );
+        add( OLYMPUS_MCS_PICTURE_MODE, "MCSPictureMode", META_USHORT );
+        add( OLYMPUS_MCS_PM_BW_FILTER, "MCSPMBWFilter", META_SSHORT );
+        add( OLYMPUS_MCS_PM_CONTRAST, "MCSPMContrast", META_SSHORT );
+        add( OLYMPUS_MCS_PM_HUE, "MCSPMHue", META_SSHORT );
+        add( OLYMPUS_MCS_PM_SATURATION, "MCSPMSaturation", META_SSHORT );
+        add( OLYMPUS_MCS_PM_SHARPNESS, "MCSPMSharpness", META_SSHORT );
+        add( OLYMPUS_MCS_PM_TONE, "MCSPMTone", META_SSHORT );
+        add( OLYMPUS_MCS_PREVIEW_IMAGE_LENGTH, "MCSPreviewImageLength", META_ULONG );
+        add( OLYMPUS_MCS_PREVIEW_IMAGE_START, "MCSPreviewImageStart", META_ULONG );
+        add( OLYMPUS_MCS_PREVIEW_IMAGE_VALID, "MCSPreviewImageValid", META_ULONG );
+        add( OLYMPUS_MCS_SCENE_MODE, "MCSSceneMode", META_USHORT );
+        add( OLYMPUS_MCS_SEQUENCE, "MCSSequence", META_USHORT );
+        add( OLYMPUS_MCS_SHADING_COMPENSATION, "MCSShadingCompensation", META_USHORT );
+        add( OLYMPUS_MCS_SHARPNESS_SETTING, "MCSSharpnessSetting", META_SSHORT );
+        add( OLYMPUS_MCS_VERSION, "MCSVersion", META_UNDEFINED );
+        add( OLYMPUS_MCS_WHITE_BALANCE, "MCSWhiteBalance", META_USHORT );
+        add( OLYMPUS_MCS_WHITE_BALANCE_BRACKET, "MCSWhiteBalanceBracket", META_SSHORT );
+        add( OLYMPUS_MCS_WHITE_BALANCE_TEMP, "MCSWhiteBalanceTemp", META_USHORT );
+        add( OLYMPUS_MINOLTA_CAMERA_SETTINGS, "CameraSettings", META_UNDEFINED );
+        add( OLYMPUS_MINOLTA_CAMERA_SETTINGS_OLD, "CameraSettingsOld", META_UNDEFINED );
         add( OLYMPUS_NEAR_LENS_STEP, "NearLensStep", META_USHORT );
         add( OLYMPUS_NOISE_REDUCTION, "NoiseReduction", META_USHORT );
         add( OLYMPUS_ONE_TOUCH_WHITE_BALANCE, "OneTouchWhiteBalance", META_USHORT );
@@ -309,14 +423,20 @@ public final class OlympusDirectory extends MakerNotesDirectory implements
         add( OLYMPUS_QUALITY, "Quality", META_USHORT );
         add( OLYMPUS_QUALITY_2, "Quality2", META_USHORT );
         add( OLYMPUS_RED_BALANCE, "RedBalance", META_USHORT );
+        add( OLYMPUS_SCENE_DETECT, "SceneDetect", META_USHORT );
+        add( OLYMPUS_SCENE_MODE, "SceneMode", META_USHORT );
         add( OLYMPUS_SENSOR_TEMPERATURE, "SensorTemperature", META_SSHORT );
         add( OLYMPUS_SERIAL_NUMBER, "SerialNumber", META_STRING );
         add( OLYMPUS_SERIAL_NUMBER_2, "SerialNumber2", META_STRING );
         add( OLYMPUS_SHARPNESS, "Sharpness", META_USHORT );
         add( OLYMPUS_SHARPNESS_FACTOR, "SharpnessFactor", META_USHORT );
         add( OLYMPUS_SHUTTER_SPEED, "ShutterSpeed", META_SRATIONAL );
+        add( OLYMPUS_SPECIAL_MODE, "SpecialMode", META_ULONG );
         add( OLYMPUS_TEXT_INFO, "TextInfo", META_UNDEFINED );
+        add( OLYMPUS_WHITE_BALANCE_BIAS, "WhiteBalanceBias", META_USHORT );
+        add( OLYMPUS_WHITE_BALANCE_BRACKET, "WhiteBalanceBracket", META_USHORT );
         add( OLYMPUS_WHITE_BALANCE_MODE, "WhiteBalanceMode", META_USHORT );
+        add( OLYMPUS_WHITE_BOARD, "WhiteBoard", META_USHORT );
         add( OLYMPUS_ZOOM_STEP_COUNT, "ZoomStepCount", META_USHORT );
     }
 }
