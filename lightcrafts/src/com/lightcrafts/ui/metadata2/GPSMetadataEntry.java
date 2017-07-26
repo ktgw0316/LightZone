@@ -26,7 +26,15 @@ public class GPSMetadataEntry extends MetadataEntry {
         if (dir == null) {
             return "";
         }
-        return dir.getGPSLatitudeDMS() + ", " + dir.getGPSLongitudeDMS();
+        final String lat = dir.getGPSLatitudeDMS();
+        if (lat.isEmpty()) {
+            return "";
+        }
+        final String lon = dir.getGPSLongitudeDMS();
+        if (lon.isEmpty()) {
+            return "";
+        }
+        return lat + ", " + lon;
     }
 
     @Override
