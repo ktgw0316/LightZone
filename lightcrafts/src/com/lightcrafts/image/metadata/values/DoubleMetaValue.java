@@ -117,12 +117,10 @@ public final class DoubleMetaValue extends NumericMetaValue {
     }
 
     /**
-     * Get the first value as a <code>long</code>.
-     *
-     * @return Returns said value.
+     * {@inheritDoc}
      */
-    public long getLongValue() {
-        return (long)getDoubleValue();
+    public long getLongValueAt(int index) {
+        return (long)m_value[index];
     }
 
     /**

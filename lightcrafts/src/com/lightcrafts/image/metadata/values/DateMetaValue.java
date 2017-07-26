@@ -95,7 +95,17 @@ public final class DateMetaValue extends ImageMetaValue {
      * @return Returns said value.
      */
     public Date getDateValue() {
-        return m_value[0];
+        return getDateValueAt(0);
+    }
+
+    /**
+     * Gets the {@link Date} value at the given index.
+     *
+     * @param index The index of the value to get.
+     * @return Returns said value.
+     */
+    public Date getDateValueAt( int index ) {
+        return m_value[ index ];
     }
 
     /**
@@ -110,8 +120,8 @@ public final class DateMetaValue extends ImageMetaValue {
     /**
      * {@inheritDoc}
      */
-    public long getLongValue() {
-        return getDateValue().getTime();
+    public long getLongValueAt(int index) {
+        return getDateValueAt(index).getTime();
     }
 
     /**
