@@ -192,6 +192,13 @@ public interface PanasonicTags extends ImageMetaTags {
     int PANASONIC_INTERNAL_SERIAL_NUMBER    = 0x0025;
 
     /**
+     * Lens type.
+     * <p>
+     * Type: ASCII.
+     */
+    int PANASONIC_LENS_TYPE                 = 0x0051;
+
+    /**
      * Macro mode.
      *  <blockquote>
      *    <table border="0" cellpadding="0">

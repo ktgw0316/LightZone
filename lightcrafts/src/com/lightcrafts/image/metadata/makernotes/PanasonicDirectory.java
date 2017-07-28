@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 import com.lightcrafts.image.metadata.*;
+import com.lightcrafts.image.metadata.providers.LensProvider;
 import com.lightcrafts.image.metadata.providers.OrientationProvider;
 import com.lightcrafts.image.metadata.values.*;
 import com.lightcrafts.utils.bytebuffer.LCByteBuffer;
@@ -23,9 +24,17 @@ import static com.lightcrafts.image.metadata.makernotes.PanasonicTags.*;
  */
 @SuppressWarnings({"CloneableClassWithoutClone"})
 public final class PanasonicDirectory extends MakerNotesDirectory implements
-    OrientationProvider {
+    LensProvider, OrientationProvider {
 
     ////////// public /////////////////////////////////////////////////////////
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getLens() {
+        final ImageMetaValue value = getValue( PANASONIC_LENS_TYPE );
+        return value.getStringValue();
+    }
 
     /**
      * Gets the maker-notes adjustments for Panasonic.
@@ -41,7 +50,7 @@ public final class PanasonicDirectory extends MakerNotesDirectory implements
         //      0- 8: "Panasonic"
         //      9-11: 0 0 0
         //
-        return new int[]{ 12, offset };
+        return new int[]{ 12, 0 };
     }
 
     /**
@@ -235,6 +244,7 @@ public final class PanasonicDirectory extends MakerNotesDirectory implements
         add( PANASONIC_IMAGE_QUALITY, "ImageQuality", META_USHORT );
         add( PANASONIC_IMAGE_STABILIZER, "ImageStabilizer", META_USHORT );
         add( PANASONIC_INTERNAL_SERIAL_NUMBER, "InternalSerialNumber", META_UNDEFINED );
+        add( PANASONIC_LENS_TYPE, "LensType", META_STRING );
         add( PANASONIC_MACRO_MODE, "MacroMode", META_USHORT );
         add( PANASONIC_NOISE_REDUCTION, "NoiseReduction", META_USHORT );
         add( PANASONIC_ROTATION, "Rotation", META_USHORT );
