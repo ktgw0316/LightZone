@@ -33,6 +33,7 @@ DEPEND="virtual/jdk
 
 RDEPEND="virtual/jre
 	dev-java/javahelp
+	dev-libs/libxml2
 	media-libs/lcms
 	media-libs/libjpeg-turbo
 	media-libs/tiff"
