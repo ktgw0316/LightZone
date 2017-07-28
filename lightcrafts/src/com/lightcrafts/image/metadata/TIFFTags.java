@@ -1066,6 +1066,13 @@ public interface TIFFTags extends ImageMetaTags {
     int TIFF_ORIENTATION                    = 0x0112;
 
     /**
+     * The address of an embedded JPEG thumbnail in Panasonic cameras.
+     * <p>
+     * Type: Undefined.
+     */
+    int TIFF_PANASONIC_JPEG_THUMBNAIL       = 0x002E;
+
+    /**
      * The name of the page from which this image was scanned.
      * <p>
      * Type: ASCII.

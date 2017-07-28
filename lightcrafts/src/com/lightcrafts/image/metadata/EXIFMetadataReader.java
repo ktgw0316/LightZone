@@ -121,6 +121,9 @@ public class EXIFMetadataReader extends ImageMetadataReader
                 // TODO: handle this case
                 return;
             case EXIF_MAKER_NOTE:
+                // at this point, m_metadata only contains placeholder data
+		// in order to be able to determine makernote class, we need to merge or rework this code to use `dir`
+                mergeEXIFDirectories();
                 final Class<? extends MakerNotesDirectory> notesClass =
                     MakerNoteProbe.determineMakerNotesFrom( m_metadata );
                 if ( notesClass != null ) {
