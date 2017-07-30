@@ -34,7 +34,18 @@ public final class PanasonicDirectory extends MakerNotesDirectory implements
      */
     public int getISO() {
         final ImageMetaValue value = getValue( PANASONIC_ISO );
-        return hasTagValueLabelFor( value ) == null ? value.getIntValue() : 0;
+        if (value == null || hasTagValueLabelFor(value) != null) {
+            return 0;
+        } else {
+            final int iso = value.getIntValue();
+            switch (iso) {
+                case 65534:
+                case 65535:
+                    return 0;
+                default:
+                    return iso;
+            }
+        }
     }
 
     /**
@@ -193,9 +204,22 @@ public final class PanasonicDirectory extends MakerNotesDirectory implements
                     break;
                 }
             }
-            case PANASONIC_ISO:
-                final String label = hasTagValueLabelFor( value );
-                return label != null ? label : String.valueOf( value.getIntValue() );
+            case PANASONIC_ISO: {
+                final String label = hasTagValueLabelFor(value);
+                if (label != null) {
+                    return label;
+                } else {
+                    final int iso = value.getIntValue();
+                    switch (iso) {
+                        case 65534:
+                            return "Intelligent";
+                        case 65535:
+                            return "n/a";
+                        default:
+                            return String.valueOf(iso);
+                    }
+                }
+            }
             case PANASONIC_TIME_SINCE_POWER_ON: {
                 if ( !value.isNumeric() )
                     break;
