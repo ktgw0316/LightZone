@@ -3,20 +3,15 @@
 package com.lightcrafts.image.metadata;
 
 import java.io.IOException;
-import java.io.File;
-import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.*;
 
 import com.lightcrafts.image.BadImageFileException;
-import com.lightcrafts.image.UnknownImageTypeException;
 import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.image.metadata.values.*;
-import com.lightcrafts.image.metadata.ImageMetadata;
 import com.lightcrafts.image.types.TIFFImageType;
 import com.lightcrafts.utils.Rational;
 import com.lightcrafts.utils.bytebuffer.ArrayByteBuffer;
-import com.lightcrafts.utils.bytebuffer.ByteBufferUtil;
 import com.lightcrafts.utils.bytebuffer.LCByteBuffer;
 
 import static com.lightcrafts.image.metadata.ImageMetadataConstants.*;
@@ -432,22 +427,6 @@ public class TIFFMetadataReader extends ImageMetadataReader {
                     m_metadata.getDirectoryFor( EXIFDirectory.class, true );
                 reader.readDirectory( subdirOffset, 0, exifDir );
                 return;
-            }
-            case TIFF_PANASONIC_JPEG_THUMBNAIL: {
-                ByteBuffer jpegBuffer = ByteBuffer.wrap( m_buf.getBytes(valueOffset, byteCount) );
-                File tmpFile = File.createTempFile("LCEmbeddedThumb", ".jpg");
-                String tmpName = tmpFile.getAbsolutePath();
-                ByteBufferUtil.dumpToFile(jpegBuffer, tmpName);
-                try {
-                        m_metadata.mergeFrom(ImageInfo.getInstanceFor( tmpFile ).getMetadata());
-                }
-                catch ( BadImageFileException e ) {
-                        logBadImageMetadata( "Processing embedded thumbnail's metadata threw a BadImageFileException" );
-                }
-                catch ( UnknownImageTypeException e ) {
-                        logBadImageMetadata( "Processing embedded thumbnail's metadata threw a UnknownImageTypeException" );
-                }
-                tmpFile.delete();
             }
             case TIFF_GPS_IFD_POINTER: {
                 final ImageMetadataDirectory gpsDir =
