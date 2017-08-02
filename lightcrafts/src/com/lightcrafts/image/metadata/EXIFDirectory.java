@@ -166,8 +166,15 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
      */
     @Override
     public String getLens() {
-        final ImageMetaValue value = getValue(EXIF_LENS_MODEL);
-        return value != null ? value.getStringValue() : null;
+        final ImageMetaValue model = getValue(EXIF_LENS_MODEL);
+        if (model != null) {
+            return model.getStringValue();
+        }
+        final ImageMetaValue info = getValue(EXIF_LENS_INFO);
+        if (info != null) {
+            return makeLensLabelFrom(info);
+        }
+        return null;
     }
 
     /**
@@ -467,6 +474,7 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
         add( EXIF_JPEG_INTERCHANGE_FORMAT, "JPEGInterchangeFormat", META_ULONG, false );
         add( EXIF_JPEG_INTERCHANGE_FORMAT_LENGTH, "JPEGInterchangeFormatLength", META_ULONG, false );
         add( EXIF_LIGHT_SOURCE, "LightSource", META_USHORT, false );
+        add( EXIF_LENS_INFO, "LensInfo", META_URATIONAL, false );
         add( EXIF_LENS_MAKE, "LensMake", META_STRING, false );
         add( EXIF_LENS_MODEL, "LensModel", META_STRING, false );
         add( EXIF_MAKE, "Make", META_STRING, false );

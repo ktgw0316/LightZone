@@ -402,6 +402,12 @@ public interface EXIFTags extends ImageMetaTags {
     int EXIF_LIGHT_SOURCE                   = TIFFTags.TIFF_LIGHT_SOURCE;
 
     /**
+     * Lens focal length range and aperture range.
+     * Type: Unsigned rational.
+     */
+    int EXIF_LENS_INFO                      = 0xA432;
+
+    /**
      * Lens make name.
      * Type: ASCII.
      */
