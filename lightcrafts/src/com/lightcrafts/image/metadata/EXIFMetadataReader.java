@@ -2,7 +2,6 @@
 
 package com.lightcrafts.image.metadata;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.ByteOrder;
 import java.util.HashMap;
@@ -40,7 +39,7 @@ public class EXIFMetadataReader extends ImageMetadataReader
                                boolean isSubdirectory ) {
         super( imageInfo, exifSegBuf );
         m_exifParser = new EXIFParser(
-            this, imageInfo.getFile(), exifSegBuf, isSubdirectory
+            this, imageInfo, exifSegBuf, isSubdirectory
         );
     }
 
@@ -102,12 +101,21 @@ public class EXIFMetadataReader extends ImageMetadataReader
     /**
      * {@inheritDoc}
      */
+    @Override
     public void gotTag( int tagID, int fieldType, int numValues, int byteCount,
                         int valueOffset, int valueOffsetAdjustment,
-                        int subdirOffset, File imageFile, LCByteBuffer buf,
+                        int subdirOffset, ImageInfo imageInfo, LCByteBuffer buf,
                         ImageMetadataDirectory dir )
         throws IOException
     {
+        if ( m_tagHandler != null ) {
+            final boolean handledTag = m_tagHandler.handleTag(
+                    tagID, fieldType, numValues, byteCount, valueOffset,
+                    valueOffsetAdjustment, subdirOffset, imageInfo, buf, dir
+            );
+            if ( handledTag )
+                return;
+        }
         switch ( tagID ) {
             case EXIF_GPS_IFD_POINTER:
                 final ImageMetadataDirectory gpsDir =
@@ -274,8 +282,8 @@ public class EXIFMetadataReader extends ImageMetadataReader
      * @param offset The offset from the beginning of the buffer of the maker
      * @param byteCount The total number of bytes for the maker notes data.
      */
-    public void readMakerNotes( int offset, int byteCount,
-                                ImageMetadataDirectory dir )
+    public void readMakerNotes(int offset, int byteCount,
+                                ImageMetadataDirectory dir)
         throws IOException
     {
         int valueOffsetAdjustment = 0;

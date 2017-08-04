@@ -4,13 +4,13 @@ package com.lightcrafts.image.metadata;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.HashSet;
 import java.util.Set;
 
 import com.lightcrafts.image.BadImageFileException;
+import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.image.metadata.values.*;
 import com.lightcrafts.utils.bytebuffer.LCByteBuffer;
 import com.lightcrafts.utils.Rational;
@@ -32,18 +32,19 @@ public final class EXIFParser {
     /**
      * Construct an <code>EXIFParser</code>.
      *
-     * @param imageFile The image to read the metadata from.
+     * @param handler The {@link EXIFParserEventHandler} to use.
+     * @param imageInfo The image.
      * @param exifSegBuf The {@link ByteBuffer} containing the raw binary EXIF
      * metadata from the image file.  Note that this is a subset of the
      * {@link ByteBuffer} of the entire image file.
      * @param isSubdirectory This is <code>true</code> only if we're reading a
      * subdirectory.
      */
-    public EXIFParser( EXIFParserEventHandler handler, File imageFile,
-                       LCByteBuffer exifSegBuf, boolean isSubdirectory ) {
+    public EXIFParser(EXIFParserEventHandler handler, ImageInfo imageInfo,
+               LCByteBuffer exifSegBuf, boolean isSubdirectory) {
         m_buf = exifSegBuf;
         m_handler = handler;
-        m_imageFile = imageFile;
+        m_imageInfo = imageInfo;
         m_isSubdirectory = isSubdirectory;
     }
 
@@ -100,10 +101,7 @@ public final class EXIFParser {
                 final int pos = calcIFDEntryPosition( offset, entry );
                 parseDirectoryEntry( pos, valueOffsetAdjustment, dir );
             }
-            catch ( IOException e ) {
-                throw e;
-            }
-            catch ( Exception e ) {
+            catch ( RuntimeException e ) {
                 m_handler.gotBadMetadata( e );
             }
             if ( m_stop )
@@ -125,9 +123,9 @@ public final class EXIFParser {
     public void parseHeader() throws BadImageFileException, IOException {
         m_buf.position( 0 );
         if ( m_buf.remaining() < EXIF_HEADER_SIZE )
-            throw new BadImageFileException( m_imageFile );
+            throw new BadImageFileException( m_imageInfo.getFile() );
         if ( !m_buf.getEquals( "Exif", "ASCII" ) )
-            throw new BadImageFileException( m_imageFile );
+            throw new BadImageFileException( m_imageInfo.getFile() );
         m_buf.skipBytes( 2 );
 
         final int byteOrder = m_buf.getShort();
@@ -136,10 +134,10 @@ public final class EXIFParser {
         else if ( byteOrder == TIFF_BIG_ENDIAN )
             m_buf.order( ByteOrder.BIG_ENDIAN );
         else
-            throw new BadImageFileException( m_imageFile );
+            throw new BadImageFileException( m_imageInfo.getFile() );
 
         if ( m_buf.getUnsignedShort() != TIFF_MAGIC_NUMBER )
-            throw new BadImageFileException( m_imageFile );
+            throw new BadImageFileException( m_imageInfo.getFile() );
     }
 
     /**
@@ -157,8 +155,6 @@ public final class EXIFParser {
 
             case EXIF_FIELD_TYPE_STRING: {
                 final String s = parseString( offset, numValues );
-                if ( s == null )
-                    return null;
                 switch ( tagID ) {
                     case EXIF_DATE_TIME:
                     case EXIF_DATE_TIME_DIGITIZED:
@@ -280,7 +276,7 @@ public final class EXIFParser {
 
             default:
                 throw new IllegalStateException(
-                    String.format( "unknown field type (0x%0) for tag ID 0x%0",
+                    String.format( "unknown field type (0x%x) for tag ID 0x%x",
                                    fieldType, tagID )
                 );
         }
@@ -303,7 +299,7 @@ public final class EXIFParser {
      * position of.
      * @return Returns said position.
      */
-    private static int calcIFDEntryPosition( int ifdOffset, int entry ) {
+    public static int calcIFDEntryPosition(int ifdOffset, int entry) {
         return ifdOffset + EXIF_SHORT_SIZE + entry * EXIF_IFD_ENTRY_SIZE;
     }
 
@@ -356,7 +352,7 @@ public final class EXIFParser {
         final int fieldType = m_buf.getUnsignedShort();
         if ( fieldType <= 0 || fieldType >= EXIF_FIELD_SIZE.length ) {
             m_handler.gotBadMetadata(
-                String.format( "unknown field type (0x%0) for tag ID 0x%0",
+                String.format( "unknown field type (0x%x) for tag ID 0x%x",
                                fieldType, tagID )
             );
             return;
@@ -389,7 +385,7 @@ public final class EXIFParser {
 
         m_handler.gotTag(
             tagID, fieldType, numValues, byteCount, valueOffset,
-            valueOffsetAdjustment, subdirOffset, m_imageFile, m_buf, dir
+            valueOffsetAdjustment, subdirOffset, m_imageInfo, m_buf, dir
         );
     }
 
@@ -467,9 +463,9 @@ public final class EXIFParser {
     private final EXIFParserEventHandler m_handler;
 
     /**
-     * The image {@link File} the EXIF metadata was read from.
+     * The image the EXIF metadata was read from.
      */
-    private final File m_imageFile;
+    private final ImageInfo m_imageInfo;
 
     /**
      * This is <code>true</code> only if we're reading an EXIF subdirectory.

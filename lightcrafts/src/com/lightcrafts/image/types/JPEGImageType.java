@@ -996,7 +996,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
          * @param valueOffset The offset of the first value.
          * @param valueOffsetAdjustment Not used.
          * @param subdirOffset Not used.
-         * @param imageFile Not used.
+         * @param imageInfo Not used.
          * @param buf The {@link LCByteBuffer} the raw metadata is in.
          * @param dir Not used.
          */
@@ -1004,7 +1004,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
         public void gotTag( int tagID, int fieldType, int numValues,
                             int byteCount, int valueOffset,
                             int valueOffsetAdjustment, int subdirOffset,
-                            File imageFile, LCByteBuffer buf,
+                            ImageInfo imageInfo, LCByteBuffer buf,
                             ImageMetadataDirectory dir ) throws IOException {
             if ( tagID == m_tagID ) {
                 buf.position( valueOffset );
