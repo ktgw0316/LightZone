@@ -2339,6 +2339,26 @@ public interface OlympusTags extends ImageMetaTags {
      *        <td align="right">34 =&nbsp;</td>
      *        <td>smile</td>
      *      </tr>
+     *      <tr>
+     *        <td align="right">35 =&nbsp;</td>
+     *        <td>quick shutter</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">43 =&nbsp;</td>
+     *        <td>hand-held starlight</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">100 =&nbsp;</td>
+     *        <td>panorama</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">101 =&nbsp;</td>
+     *        <td>magic filter</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">103 =&nbsp;</td>
+     *        <td>HDR</td>
+     *      </tr>
      *    </table>
      *  </blockquote>
      * Type: Unsigned short.
