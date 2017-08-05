@@ -18,7 +18,7 @@ import com.lightcrafts.image.metadata.values.ImageMetaValue;
  */
 @SuppressWarnings({"CloneableClassWithoutClone"})
 public abstract class MakerNotesDirectory extends ImageMetadataDirectory implements
-LensProvider {
+        LensProvider {
 
     /**
      * Gets the priority of this directory for providing the metadata supplied
@@ -28,8 +28,7 @@ LensProvider {
      * {@link ImageMetadataDirectory#getProviderPriorityFor(Class)} because
      * they have more detailed metadata about a given image.
      * <p>
-     * However, an exception is made for {@link OrientationProvider} and
-     * {@link LensProvider} because
+     * However, an exception is made for {@link OrientationProvider} because
      * orientation from EXIF/TIFF metadata (when merged from an XMP file), must
      * take priority.
      *
@@ -39,11 +38,7 @@ LensProvider {
     protected int getProviderPriorityFor(
         Class<? extends ImageMetadataProvider> provider )
     {
-        if (provider == OrientationProvider.class)
-            return 0;
-        if (provider == LensProvider.class)
-            return 5;
-        return 100;
+        return provider == OrientationProvider.class ? 0 : 100;
     }
 
     abstract protected ImageMetaValue getLongFocalValue();
