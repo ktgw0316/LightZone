@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2017-     Masahiro Kitagawa */
 
 package com.lightcrafts.image.metadata.makernotes;
 
@@ -11,6 +12,8 @@ import java.util.ResourceBundle;
 import com.lightcrafts.image.BadImageFileException;
 import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.image.metadata.*;
+import com.lightcrafts.image.metadata.providers.FlashProvider;
+import com.lightcrafts.image.metadata.providers.ISOProvider;
 import com.lightcrafts.image.metadata.providers.LensProvider;
 import com.lightcrafts.image.metadata.providers.PreviewImageProvider;
 import com.lightcrafts.image.metadata.values.*;
@@ -20,6 +23,7 @@ import com.lightcrafts.utils.bytebuffer.LCByteBuffer;
 import com.lightcrafts.utils.TextUtil;
 
 import static com.lightcrafts.image.metadata.ImageMetaType.*;
+import static com.lightcrafts.image.metadata.makernotes.OlympusConstants.*;
 import static com.lightcrafts.image.metadata.makernotes.OlympusTags.*;
 
 /**
@@ -29,9 +33,70 @@ import static com.lightcrafts.image.metadata.makernotes.OlympusTags.*;
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */
 public final class OlympusDirectory extends MakerNotesDirectory implements
-    LensProvider, PreviewImageProvider {
+        FlashProvider, ISOProvider, LensProvider, PreviewImageProvider {
 
     ////////// public /////////////////////////////////////////////////////////
+
+    /**
+     * Gets the state of the flash at the time the image was captured.  The
+     * value returned is the value of {@link TIFFTags#TIFF_FLASH TIFF_FLASH}.
+     * <p>
+     * Note that Olympus cameras don't seem to say whether the flash actually
+     * fired.
+     *
+     * @return Returns the flash state or -1 if it's unavailable.
+     */
+    @Override
+    public int getFlash() {
+        int flashBits = FLASH_NOT_PRESENT_BIT;
+
+        ImageMetaValue flashValue = getValue( OLYMPUS_FLASH_DEVICE );
+        if ( flashValue != null && flashValue.getIntValue() > 0 )
+            flashBits &= ~FLASH_NOT_PRESENT_BIT;
+
+        flashValue = getValue( OLYMPUS_E_FLASH_TYPE );
+        if ( flashValue != null && flashValue.getIntValue() > 0 )
+            flashBits &= ~FLASH_NOT_PRESENT_BIT;
+
+        flashValue = getValue( OLYMPUS_CS_FLASH_MODE );
+        if ( flashValue != null ) {
+            flashBits &= ~FLASH_NOT_PRESENT_BIT;
+            final int olympusFlashBits = flashValue.getIntValue();
+            if ( (olympusFlashBits & OLYMPUS_FLASH_COMPULSORY_BIT) != 0 )
+                flashBits |= 1 << 3;
+            if ( (olympusFlashBits & OLYMPUS_FLASH_RED_EYE_BIT) != 0 )
+                flashBits |= FLASH_RED_EYE_BIT;
+        }
+        return flashBits != FLASH_NOT_PRESENT_BIT ? flashBits : -1;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getISO() {
+        final ImageMetaValue value = getValue(OLYMPUS_ISO);
+        if (value == null || hasTagValueLabelFor(value) != null) {
+            return 0;
+        }
+        return value.getIntValue();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getLens() {
+        final String label = hasTagValueLabelFor(OLYMPUS_E_LENS_TYPE);
+        if (label != null) {
+            return label;
+        }
+        return makeLensLabelFrom(
+                getValue(OLYMPUS_E_MIN_FOCAL_LENGTH),
+                getValue(OLYMPUS_E_MIN_FOCAL_LENGTH),
+                null
+        );
+    }
 
     /**
      * Gets the maker-notes adjustments for Olympus.
@@ -40,6 +105,7 @@ public final class OlympusDirectory extends MakerNotesDirectory implements
      * @param offset The offset to the start of the maker-notes.
      * @return Returns said adjustments.
      */
+    @Override
     public int[] getMakerNotesAdjustments( LCByteBuffer buf, int offset )
         throws IOException
     {
@@ -55,6 +121,7 @@ public final class OlympusDirectory extends MakerNotesDirectory implements
      *
      * @return Always returns &quot;Olympus&quot;.
      */
+    @Override
     public String getName() {
         return "Olympus";
     }
@@ -62,6 +129,7 @@ public final class OlympusDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public RenderedImage getPreviewImage( ImageInfo imageInfo, int maxWidth,
                                           int maxHeight )
         throws BadImageFileException, IOException, UnknownImageTypeException
@@ -74,6 +142,7 @@ public final class OlympusDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageMetaTagInfo getTagInfoFor( Integer id ) {
         return m_tagsByID.get( id );
     }
@@ -81,6 +150,7 @@ public final class OlympusDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageMetaTagInfo getTagInfoFor( String name ) {
         return m_tagsByName.get( name );
     }
@@ -93,6 +163,7 @@ public final class OlympusDirectory extends MakerNotesDirectory implements
      * @param value The value to put.
      * @see #valueToString(ImageMetaValue)
      */
+    @Override
     public void putValue( Integer tagID, ImageMetaValue value ) {
         switch ( tagID ) {
             case OLYMPUS_CS_NOISE_FILTER:
@@ -148,6 +219,7 @@ public final class OlympusDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public String valueToString( ImageMetaValue value ) {
         switch ( value.getOwningTagID() ) {
             case OLYMPUS_BLUE_BALANCE:
@@ -231,6 +303,7 @@ public final class OlympusDirectory extends MakerNotesDirectory implements
      *
      * @return Returns said {@link ResourceBundle}.
      */
+    @Override
     protected ResourceBundle getTagLabelBundle() {
         return m_tagBundle;
     }
@@ -238,6 +311,7 @@ public final class OlympusDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     protected Class<? extends ImageMetaTags> getTagsInterface() {
         return OlympusTags.class;
     }

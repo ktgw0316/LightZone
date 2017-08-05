@@ -26,8 +26,8 @@ import static com.lightcrafts.image.metadata.EXIFTags.*;
  *
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */
-public abstract class ImageMetadataDirectory
-    implements Cloneable, Externalizable {
+public abstract class ImageMetadataDirectory implements
+        Cloneable, Externalizable, Iterable<Map.Entry<Integer,ImageMetaValue>> {
 
     ////////// public /////////////////////////////////////////////////////////
 
