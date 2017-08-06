@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2017-     Masahiro Kitagawa */
 
 package com.lightcrafts.image.metadata.makernotes;
 
@@ -72,12 +73,38 @@ public abstract class MakerNoteProbe {
      * maker notes or <code>null</code> if the manufacturer of maker notes
      * could not be determined.
      */
+    @Deprecated
     protected static Class<? extends MakerNotesDirectory>
     matchUsingMake( ImageMetadata metadata, String makeWanted,
                     Class<? extends MakerNotesDirectory> dir ) {
+        return matchUsingMake(metadata, dir, makeWanted);
+    }
+
+    /**
+     * Checks if the maker notes inside the given metadata matches a particular
+     * maker notes class by using the camera makes.
+     *
+     * @param metadata The {@link ImageMetadata} to probe.
+     * @param dir The {@link MakerNotesDirectory} subclass to return if the
+     * make wanted matches the make found in the metadata.
+     * @param makesWanted The camera makes.
+     * @return Returns the class of the {@link MakerNotesDirectory} for the
+     * maker notes or <code>null</code> if the manufacturer of maker notes
+     * could not be determined.
+     */
+    protected static Class<? extends MakerNotesDirectory>
+    matchUsingMake(ImageMetadata metadata,
+                   Class<? extends MakerNotesDirectory> dir,
+                   String... makesWanted)
+    {
         final String make = metadata.getCameraMake( false );
-        if ( make != null )
-            return make.contains( makeWanted.toUpperCase() ) ? dir : null;
+        if (make != null) {
+            for (String makeWanted : makesWanted) {
+                if (make.contains(makeWanted.toUpperCase())) {
+                    return dir;
+                }
+            }
+        }
         return null;
     }
 
