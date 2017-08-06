@@ -127,7 +127,6 @@ public abstract class MakerNoteProbe {
             OlympusMakerNoteProbe.INSTANCE,
             PanasonicMakerNoteProbe.INSTANCE,
             PentaxMakerNoteProbe.INSTANCE,
-            SamsungMakerNoteProbe.INSTANCE,
             SonyMakerNoteProbe.INSTANCE,
         };
     }
