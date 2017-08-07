@@ -73,11 +73,9 @@ public final class DNGImageType extends RawImageType implements TagHandler {
                 final Class<? extends MakerNotesDirectory> notesClass =
                         MakerNoteProbe.determineMakerNotesFrom(metadata);
                 if (notesClass != null) {
-                    final ImageMetadataDirectory notesDir =
-                            metadata.getDirectoryFor(notesClass, true);
                     final EXIFMetadataReader reader =
                             new EXIFMetadataReader(imageInfo, buf, true);
-                    reader.readMakerNotes(valueOffset, byteCount, notesDir);
+                    reader.readMakerNotes(valueOffset, byteCount, notesClass);
                 }
                 return true;
             default:
