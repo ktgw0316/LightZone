@@ -917,6 +917,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
         add( CORE_FILE_DATE_TIME, "FileDateTime", META_DATE, false );
         add( CORE_FILE_NAME, "FileName", META_STRING, false );
         add( CORE_FILE_SIZE, "FileSize", META_ULONG, false );
+        add( CORE_FLASH, "Flash", META_USHORT, false );
         add( CORE_FOCAL_LENGTH, "FocalLength", META_FLOAT, false );
         add( CORE_IMAGE_HEIGHT, "ImageHeight", META_USHORT, false );
         add( CORE_IMAGE_ORIENTATION, "ImageOrientation", META_USHORT, true );
