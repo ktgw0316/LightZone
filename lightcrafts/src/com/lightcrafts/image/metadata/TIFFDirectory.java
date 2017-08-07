@@ -249,6 +249,19 @@ public class TIFFDirectory extends ImageMetadataDirectory implements
     ////////// protected //////////////////////////////////////////////////////
 
     /**
+     * Gets the priority of this directory for providing the metadata supplied
+     * by implementing the given provider interface.
+     * <p>
+     * The priority is guaranteed to be higher than the default.
+     *
+     * @param p The provider interface to get the priority for.
+     * @return Returns said priority.
+     */
+    protected int getProviderPriorityFor(Class<? extends ImageMetadataProvider> p) {
+        return PROVIDER_PRIORITY_DEFAULT + 5;
+    }
+
+    /**
      * {@inheritDoc}.
      */
     protected ResourceBundle getTagLabelBundle() {

@@ -133,6 +133,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public float getAperture() {
         final ImageMetaValue value = getValue( CORE_APERTURE );
         return value != null ? value.getFloatValue() : 0;
@@ -141,6 +142,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getArtist() {
         final ImageMetaValue value = getValue( CORE_ARTIST );
         return value != null ? value.getStringValue() : null;
@@ -149,6 +151,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getCaption() {
         final ImageMetaValue value = getValue( CORE_CAPTION );
         return value != null ? value.getStringValue() : null;
@@ -157,6 +160,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public Date getCaptureDateTime() {
         final ImageMetaValue value = getValue( CORE_CAPTURE_DATE_TIME );
         return value != null ? ((DateMetaValue)value).getDateValue() : null;
@@ -165,6 +169,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getColorTemperature() {
         final ImageMetaValue value = getValue( CORE_COLOR_TEMPERATURE );
         return value != null ? value.getIntValue() : 0;
@@ -173,6 +178,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getCopyright() {
         final ImageMetaValue value = getValue( CORE_COPYRIGHT );
         return value != null ? value.getStringValue() : null;
@@ -181,6 +187,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public Date getFileDateTime() {
         final ImageMetaValue value = getValue( CORE_FILE_DATE_TIME );
         return value != null ? ((DateMetaValue)value).getDateValue() : null;
@@ -189,6 +196,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getFlash() {
         final ImageMetaValue value = getValue( CORE_FLASH );
         return value != null ? value.getIntValue() : -1;
@@ -197,6 +205,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public float getFocalLength() {
         final ImageMetaValue value = getValue( CORE_FOCAL_LENGTH );
         return value != null ? value.getFloatValue() : 0;
@@ -205,6 +214,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getImageHeight() {
         final ImageMetaValue value = getValue( CORE_IMAGE_HEIGHT );
         return value != null ? value.getIntValue() : 0;
@@ -213,6 +223,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getImageWidth() {
         final ImageMetaValue value = getValue( CORE_IMAGE_WIDTH );
         return value != null ? value.getIntValue() : 0;
@@ -221,6 +232,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getISO() {
         final ImageMetaValue value = getValue( CORE_ISO );
         return value != null ? value.getIntValue() : 0;
@@ -229,6 +241,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getLens() {
         final ImageMetaValue value = getValue( CORE_LENS );
         return value != null ? value.getStringValue() : null;
@@ -237,6 +250,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getCameraMake( boolean includeModel ) {
         final ImageMetaValue value = getValue( CORE_CAMERA );
         if ( value != null ) {
@@ -256,6 +270,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
      *
      * @return Always returns &quot;Core&quot;.
      */
+    @Override
     public String getName() {
         return "Core";
     }
@@ -263,6 +278,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getOriginalImageHeight() {
         final ImageMetaValue value = getValue( CORE_ORIGINAL_IMAGE_HEIGHT );
         return value != null ? value.getIntValue() : 0;
@@ -271,6 +287,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getOriginalImageWidth() {
         final ImageMetaValue value = getValue( CORE_ORIGINAL_IMAGE_WIDTH );
         return value != null ? value.getIntValue() : 0;
@@ -291,6 +308,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageOrientation getOrientation() {
         final ImageMetaValue value = getValue( CORE_IMAGE_ORIENTATION );
         if ( value != null )
@@ -301,6 +319,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getRating() {
         final ImageMetaValue value = getValue( CORE_RATING );
         return value != null ? value.getIntValue() : 0;
@@ -309,6 +328,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public float getShutterSpeed() {
         final ImageMetaValue value = getValue( CORE_SHUTTER_SPEED );
         return value != null ? value.getFloatValue() : 0;
@@ -317,6 +337,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageMetaTagInfo getTagInfoFor( Integer id ) {
         return m_tagsByID.get( id );
     }
@@ -324,6 +345,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageMetaTagInfo getTagInfoFor( String name ) {
         return m_tagsByName.get( name );
     }
@@ -331,6 +353,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public Collection<Element> toXMP( Document xmpDoc ) {
         return toXMP( xmpDoc, XMP_XAP_NS, XMP_XAP_PREFIX );
     }
@@ -338,6 +361,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public String valueToString( ImageMetaValue value ) {
         switch ( value.getOwningTagID() ) {
             case CORE_APERTURE:
@@ -371,10 +395,11 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
      * @param provider The provider interface to get the priority for.
      * @return Returns a priority guaranteed to be higher than all others.
      */
+    @Override
     protected int getProviderPriorityFor(
         Class<? extends ImageMetadataProvider> provider )
     {
-        return Integer.MAX_VALUE;
+        return provider == LensProvider.class ? 0 : Integer.MAX_VALUE;
     }
 
     /**
@@ -382,6 +407,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
      *
      * @return Returns said {@link ResourceBundle}.
      */
+    @Override
     protected ResourceBundle getTagLabelBundle() {
         return m_tagBundle;
     }
@@ -389,6 +415,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     protected Class<? extends ImageMetaTags> getTagsInterface() {
         return CoreTags.class;
     }
@@ -396,6 +423,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     protected Collection<Element> toXMP( Document xmpDoc, String nsURI,
                                          String prefix ) {
         final Collection<Element> elements = new ArrayList<Element>( 2 );

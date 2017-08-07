@@ -55,6 +55,7 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public float getAperture() {
         ImageMetaValue value = getValue( EXIF_FNUMBER );
         if ( value == null )
@@ -67,6 +68,7 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getArtist() {
         final ImageMetaValue value = getValue( EXIF_ARTIST );
         return value != null ? value.getStringValue() : null;
@@ -75,6 +77,7 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getBitsPerChannel() {
         final ImageMetaValue value = getValue( EXIF_BITS_PER_SAMPLE );
         return value != null ? value.getIntValue() : 0;
@@ -83,6 +86,7 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getCameraMake( boolean includeModel ) {
         return getCameraMake( EXIF_MAKE, EXIF_MODEL, includeModel );
     }
@@ -90,6 +94,7 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getCaption() {
         final ImageMetaValue value = getValue( EXIF_IMAGE_DESCRIPTION );
         return value != null ? value.getStringValue() : null;
@@ -98,6 +103,7 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public Date getCaptureDateTime() {
         ImageMetaValue value = getValue( EXIF_DATE_TIME_ORIGINAL );
         if ( value == null )
@@ -109,6 +115,7 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getCopyright() {
         final ImageMetaValue value = getValue( EXIF_COPYRIGHT );
         return value != null ? value.getStringValue() : null;
@@ -117,6 +124,7 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getFlash() {
         final ImageMetaValue flashValue = getValue( EXIF_FLASH );
         if ( flashValue != null ) {
@@ -130,6 +138,7 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public float getFocalLength() {
         final ImageMetaValue value = getValue( EXIF_FOCAL_LENGTH );
         return value != null ? value.getFloatValue() : 0;
@@ -138,6 +147,7 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getImageHeight() {
         return MetadataUtil.maxTagValue(
             this, EXIF_IMAGE_HEIGHT, EXIF_PIXEL_Y_DIMENSION
@@ -147,6 +157,7 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getImageWidth() {
         return MetadataUtil.maxTagValue(
             this, EXIF_IMAGE_WIDTH, EXIF_PIXEL_X_DIMENSION
@@ -156,6 +167,7 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getISO() {
         final ImageMetaValue value = getValue( EXIF_ISO_SPEED_RATINGS );
         return value != null ? value.getIntValue() : 0;
@@ -182,6 +194,7 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
      *
      * @return Always returns &quot;EXIF&quot;.
      */
+    @Override
     public String getName() {
         return "EXIF";
     }
@@ -189,6 +202,7 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageOrientation getOrientation() {
         final ImageMetaValue value = getValue( EXIF_ORIENTATION );
         if ( value != null )
@@ -204,6 +218,7 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getRating() {
         final ImageMetaValue rating = getValue( EXIF_MS_RATING );
         return rating != null ? rating.getIntValue() : 0;
@@ -212,6 +227,7 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public double getResolution() {
         final ImageMetaValue res = getValue( EXIF_X_RESOLUTION );
         return res != null ? res.getDoubleValue() : 0;
@@ -220,6 +236,7 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getResolutionUnit() {
         final ImageMetaValue unit = getValue( EXIF_RESOLUTION_UNIT );
         if ( unit != null ) {
@@ -236,6 +253,7 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public float getShutterSpeed() {
         boolean isAPEX = false;
         ImageMetaValue value = getValue( EXIF_EXPOSURE_TIME );
@@ -253,6 +271,7 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageMetaTagInfo getTagInfoFor( Integer id ) {
         return m_tagsByID.get( id );
     }
@@ -260,6 +279,7 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageMetaTagInfo getTagInfoFor( String name ) {
         return m_tagsByName.get( name );
     }
@@ -304,6 +324,7 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public Collection<Element> toXMP( Document xmpDoc  ) {
         return toXMP( xmpDoc, XMP_EXIF_NS, XMP_EXIF_PREFIX );
     }
@@ -311,6 +332,7 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public String valueToString( ImageMetaValue value ) {
         switch ( value.getOwningTagID() ) {
             case EXIF_APERTURE_VALUE:
@@ -367,8 +389,9 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
      * @param p The provider interface to get the priority for.
      * @return Returns said priority.
      */
+    @Override
     protected int getProviderPriorityFor( Class<? extends ImageMetadataProvider> p ) {
-        return 10;
+        return PROVIDER_PRIORITY_DEFAULT + 10;
     }
 
     /**
@@ -376,6 +399,7 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
      *
      * @return Returns said {@link ResourceBundle}.
      */
+    @Override
     protected ResourceBundle getTagLabelBundle() {
         return m_tagBundle;
     }
@@ -383,6 +407,7 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     protected Class<? extends ImageMetaTags> getTagsInterface() {
         return EXIFTags.class;
     }

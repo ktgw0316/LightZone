@@ -361,11 +361,7 @@ public final class CanonDirectory extends MakerNotesDirectory implements
      * Gets the priority of this directory for providing the metadata supplied
      * by implementing the given provider interface.
      * <p>
-     * By default, the priority for maker notes directories is higher than
-     * {@link ImageMetadataDirectory#getProviderPriorityFor(Class)} because
-     * they have more detailed metadata about a given image.
-     * <p>
-     * However, an exception is made for {@link ShutterSpeedProvider} for Canon
+     * The priority for {@link ShutterSpeedProvider} for Canon is the lowest
      * because it yields weird values.
      *
      * @param provider The provider interface to get the priority for.
@@ -374,8 +370,9 @@ public final class CanonDirectory extends MakerNotesDirectory implements
     protected int getProviderPriorityFor(
         Class<? extends ImageMetadataProvider> provider )
     {
-        return provider == ShutterSpeedProvider.class ? 0 :
-            super.getProviderPriorityFor( provider );
+        return (provider == ShutterSpeedProvider.class)
+                ? PROVIDER_PRIORITY_MIN
+                : super.getProviderPriorityFor( provider );
     }
 
     /**

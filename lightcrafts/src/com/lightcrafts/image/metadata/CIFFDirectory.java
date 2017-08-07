@@ -52,6 +52,7 @@ public final class CIFFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public float getAperture() {
         final ImageMetaValue value = getValue( CIFF_SI_FNUMBER );
         return  value != null ?
@@ -61,6 +62,7 @@ public final class CIFFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getArtist() {
         final ImageMetaValue value = getValue( CIFF_OWNER_NAME );
         return value != null ? value.getStringValue() : null;
@@ -69,6 +71,7 @@ public final class CIFFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getBitsPerChannel() {
         final ImageMetaValue value = getValue( CIFF_II_COMPONENT_BIT_DEPTH );
         return value != null ? value.getIntValue() : 0;
@@ -77,6 +80,7 @@ public final class CIFFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getCameraMake( boolean includeModel ) {
         final ImageMetaValue value = getValue( CIFF_MAKE_MODEL );
         if ( value != null ) {
@@ -125,6 +129,7 @@ public final class CIFFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public Date getCaptureDateTime() {
         final ImageMetaValue value = getValue( CIFF_CAPTURED_TIME );
         return  value instanceof DateMetaValue ?
@@ -134,6 +139,7 @@ public final class CIFFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getColorTemperature() {
         final ImageMetaValue value = getValue( CIFF_COLOR_TEMPERATURE );
         return value != null ? value.getIntValue() : 0;
@@ -143,6 +149,7 @@ public final class CIFFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public float getFocalLength() {
         final ImageMetaValue value = getValue( CIFF_FL_FOCAL_LENGTH );
         return value != null ? value.getFloatValue() : 0;
@@ -151,6 +158,7 @@ public final class CIFFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getImageHeight() {
         ImageMetaValue value = getValue( CIFF_II_IMAGE_HEIGHT );
         if ( value == null )
@@ -161,6 +169,7 @@ public final class CIFFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getImageWidth() {
         ImageMetaValue value = getValue( CIFF_II_IMAGE_WIDTH );
         if ( value == null )
@@ -171,6 +180,7 @@ public final class CIFFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getISO() {
         final ImageMetaValue value = getValue( CIFF_SI_ISO );
         if ( value != null )
@@ -197,6 +207,7 @@ public final class CIFFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getLens() {
         final ImageMetaValue lensValue = getValue( CIFF_CS_LENS_TYPE );
         final String label = hasTagValueLabelFor( lensValue );
@@ -214,6 +225,7 @@ public final class CIFFDirectory extends ImageMetadataDirectory implements
      *
      * @return Always returns &quot;CIFF&quot;.
      */
+    @Override
     public String getName() {
         return "CIFF";
     }
@@ -221,6 +233,7 @@ public final class CIFFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageOrientation getOrientation() {
         int orientation;
         ImageMetaValue value = getValue( CIFF_II_ROTATION );
@@ -257,6 +270,7 @@ public final class CIFFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public float getShutterSpeed() {
         final ImageMetaValue value = getValue( CIFF_SI_SHUTTER_SPEED );
         if ( value == null )
@@ -269,6 +283,7 @@ public final class CIFFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageMetaTagInfo getTagInfoFor( Integer id ) {
         return m_tagsByID.get( id );
     }
@@ -276,6 +291,7 @@ public final class CIFFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageMetaTagInfo getTagInfoFor( String name ) {
         return m_tagsByName.get( name );
     }
@@ -288,6 +304,7 @@ public final class CIFFDirectory extends ImageMetadataDirectory implements
      * @param value The value to put.
      * @see #valueToString(ImageMetaValue)
      */
+    @Override
     public void putValue( Integer tagID, ImageMetaValue value ) {
         switch ( tagID ) {
             case CIFF_BASE_ISO:
@@ -349,6 +366,7 @@ public final class CIFFDirectory extends ImageMetadataDirectory implements
      * <code>null</code> otherwise.
      * @see #putValue(Integer,ImageMetaValue)
      */
+    @Override
     public String valueToString( ImageMetaValue value ) {
         switch ( value.getOwningTagID() ) {
             case CIFF_CS_LONG_FOCAL_LENGTH:
@@ -396,10 +414,11 @@ public final class CIFFDirectory extends ImageMetadataDirectory implements
      * @param provider The provider interface to get the priority for.
      * @return Returns said priority.
      */
+    @Override
     protected int getProviderPriorityFor(
         Class<? extends ImageMetadataProvider> provider )
     {
-        return 0;
+        return PROVIDER_PRIORITY_DEFAULT - 10;
     }
 
     /**
@@ -407,6 +426,7 @@ public final class CIFFDirectory extends ImageMetadataDirectory implements
      *
      * @return Returns said {@link ResourceBundle}.
      */
+    @Override
     protected ResourceBundle getTagLabelBundle() {
         return m_tagBundle;
     }
@@ -414,6 +434,7 @@ public final class CIFFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     protected Class<? extends ImageMetaTags> getTagsInterface() {
         return CIFFTags.class;
     }

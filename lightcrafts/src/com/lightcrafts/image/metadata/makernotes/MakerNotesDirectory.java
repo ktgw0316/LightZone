@@ -24,21 +24,20 @@ public abstract class MakerNotesDirectory extends ImageMetadataDirectory impleme
      * Gets the priority of this directory for providing the metadata supplied
      * by implementing the given provider interface.
      * <p>
-     * By default, the priority for maker notes directories is higher than
-     * {@link ImageMetadataDirectory#getProviderPriorityFor(Class)} because
-     * they have more detailed metadata about a given image.
-     * <p>
-     * However, an exception is made for {@link OrientationProvider} because
-     * orientation from EXIF/TIFF metadata (when merged from an XMP file), must
-     * take priority.
+     * By default, the priority for {@link OrientationProvider} is lower
+     * because the orientation from EXIF/TIFF metadata (when merged from an XMP
+     * file), must take priority.
      *
      * @param provider The provider interface to get the priority for.
      * @return Returns said priority.
      */
+    @Override
     protected int getProviderPriorityFor(
         Class<? extends ImageMetadataProvider> provider )
     {
-        return provider == OrientationProvider.class ? 0 : 100;
+        return (provider == OrientationProvider.class)
+                ? PROVIDER_PRIORITY_MIN
+                : PROVIDER_PRIORITY_DEFAULT;
     }
 
     abstract protected ImageMetaValue getLongFocalValue();
@@ -56,6 +55,7 @@ public abstract class MakerNotesDirectory extends ImageMetadataDirectory impleme
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getLens() {
         final ImageMetaValue shortFocalValue = getShortFocalValue();
         String shortFocalLabel = hasTagValueLabelFor( shortFocalValue );

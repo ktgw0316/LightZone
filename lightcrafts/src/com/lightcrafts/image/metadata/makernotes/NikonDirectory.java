@@ -45,6 +45,7 @@ public final class NikonDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public float getFocalLength() {
         final ImageMetaValue value = getValue( NIKON_LD21_FOCAL_LENGTH );
         return value != null ? value.getFloatValue() : 0;
@@ -53,6 +54,7 @@ public final class NikonDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getISO() {
         ImageMetaValue value = getValue( NIKON_ISO );
         if ( value == null )
@@ -86,6 +88,7 @@ public final class NikonDirectory extends MakerNotesDirectory implements
      * @return If the maker-notes are either versions 1 or 2, returns said
      * adjustments; otherwise returns <code>null</code>.
      */
+    @Override
     public int[] getMakerNotesAdjustments( LCByteBuffer buf, int offset )
         throws IOException
     {
@@ -105,6 +108,7 @@ public final class NikonDirectory extends MakerNotesDirectory implements
      *
      * @return Always returns &quot;Nikon&quot;.
      */
+    @Override
     public String getName() {
         return "Nikon";
     }
@@ -112,6 +116,7 @@ public final class NikonDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public RenderedImage getPreviewImage( ImageInfo imageInfo, int maxWidth,
                                           int maxHeight )
         throws BadImageFileException, IOException, UnknownImageTypeException
@@ -124,6 +129,7 @@ public final class NikonDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageMetaTagInfo getTagInfoFor( Integer id ) {
         return m_tagsByID.get( id );
     }
@@ -131,6 +137,7 @@ public final class NikonDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageMetaTagInfo getTagInfoFor( String name ) {
         return m_tagsByName.get( name );
     }
@@ -142,6 +149,7 @@ public final class NikonDirectory extends MakerNotesDirectory implements
      * @param tagID The metadata tag ID (the key).
      * @param value The value to put.
      */
+    @Override
     public void putValue( Integer tagID, ImageMetaValue value ) {
 switch_tagID:
         switch ( tagID ) {
@@ -340,6 +348,7 @@ switch_tagID:
     /**
      * {@inheritDoc}
      */
+    @Override
     public String valueToString( ImageMetaValue value ) {
         switch ( value.getOwningTagID() ) {
             case NIKON_CROP_HIGH_SPEED: {
@@ -433,21 +442,19 @@ switch_tagID:
      * Gets the priority of this directory for providing the metadata supplied
      * by implementing the given provider interface.
      * <p>
-     * By default, the priority for maker notes directories is higher than
-     * {@link ImageMetadataDirectory#getProviderPriorityFor(Class)} because
-     * they have more detailed metadata about a given image.
-     * <p>
-     * However, an exception is made for {@link FocalLengthProvider} for Nikon
+     * The priority for {@link ShutterSpeedProvider} for Nikon is the lowest
      * because it yields weird values.
      *
      * @param provider The provider interface to get the priority for.
      * @return Returns said priority.
      */
+    @Override
     protected int getProviderPriorityFor(
         Class<? extends ImageMetadataProvider> provider )
     {
-        return provider == FocalLengthProvider.class ? 0 :
-            super.getProviderPriorityFor( provider );
+        return (provider == FocalLengthProvider.class)
+                ? PROVIDER_PRIORITY_MIN
+                : super.getProviderPriorityFor( provider );
     }
 
     /**
@@ -455,6 +462,7 @@ switch_tagID:
      *
      * @return Returns said {@link ResourceBundle}.
      */
+    @Override
     protected ResourceBundle getTagLabelBundle() {
         return m_tagBundle;
     }
@@ -462,6 +470,7 @@ switch_tagID:
     /**
      * {@inheritDoc}
      */
+    @Override
     protected Class<? extends ImageMetaTags> getTagsInterface() {
         return NikonTags.class;
     }
