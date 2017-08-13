@@ -107,15 +107,31 @@ public class LensCorrectionsOperation extends BlendedOperation {
     }
 
     private void setCameraFromMetadata() {
-        val camera = (meta == null) ? null : meta.getCameraMake(false);
-        if (camera == null || camera.isEmpty()) {
+        val make = (meta == null) ? null : meta.getCameraMake(false);
+        if (make == null || make.isEmpty()) {
             cameraMaker = "";
             cameraModel = "";
+            return;
         }
-        else {
-            cameraMaker = camera;
-            cameraModel = meta.getCameraMake(true).substring(camera.length() + 1);
+
+        cameraMaker = make.equalsIgnoreCase("RICOH") ? "PENTAX" : make;
+        val makeModel = meta.getCameraMake(true);
+        if (makeModel == null || makeModel.isEmpty()) {
+            cameraModel = "";
+            return;
         }
+
+        // Remove long maker name, such as "RICOH IMAGING COMPANY, LTD." or
+        // "OLYMPUS IMAGING CORP." from the makeModel.
+        val ss = new String[] {"LTD.", "CORP."};
+        for (val s : ss) {
+            int idx = makeModel.toUpperCase().lastIndexOf(s);
+            if (idx > 0) {
+                cameraModel = makeModel.substring(idx + s.length()).trim();
+                return;
+            }
+        }
+        cameraModel = makeModel.substring(make.length());
     }
 
     private void setLensFromMetadata() {
