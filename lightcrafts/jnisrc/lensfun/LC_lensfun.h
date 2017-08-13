@@ -17,11 +17,16 @@ public:
     const lfCamera* const* getCameras() const;
     const lfLens* const* getLenses() const;
 
+    lfLens* getDefaultLens();
+
     void initModifier
         ( int fullWidth, int fullHeight,
           const char* cameraMaker, const char* cameraModel,
           const char* lensMaker, const char* lensModel,
           float focal, float aperture );
+    void initModifier
+        ( int fullWidth, int fullHeight, float crop,
+          const lfLens* lens, float focal, float aperture );
     void applyModifier
         ( const unsigned short *srcData, unsigned short *dstData,
           int srcRectX, int srcRectY,

@@ -65,7 +65,7 @@ public class Lensfun {
                 getLensNamesForCamera(_handle, cameraMaker, cameraModel));
     }
 
-    public synchronized void updateModifier(int fullWidth, int fullHeight) {
+    public synchronized Lensfun updateModifier(int fullWidth, int fullHeight) {
         if (_fullWidth != fullWidth || _fullHeight != fullHeight ) {
             _fullWidth = fullWidth;
             _fullHeight = fullHeight;
@@ -73,6 +73,16 @@ public class Lensfun {
                     cameraMaker, cameraModel, lensMaker, lensModel,
                     focal, aperture);
         }
+        return instance;
+    }
+
+    public synchronized Lensfun updateModifier(int fullWidth, int fullHeight,
+            float k1, float k2, float kr, float kb) {
+        _fullWidth = fullWidth;
+        _fullHeight = fullHeight;
+        initModifierWithPoly5Lens(_handle, fullWidth, fullHeight,
+                k1, k2, kr, kb, focal, aperture);
+        return instance;
     }
 
     private long _handle = init();
@@ -89,6 +99,11 @@ public class Lensfun {
                                      String cameraMaker, String cameraModel,
                                      String lensMaker, String lensModel,
                                      float focal, float aperture);
+
+    private native void initModifierWithPoly5Lens(long lfHandle,
+                                                  int fullWidth, int fullHeight,
+                                                  float k1, float k2, float kr, float kb,
+                                                  float focal, float aperture);
 
     //
     // Used by DistortionOpImage

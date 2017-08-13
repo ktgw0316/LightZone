@@ -254,23 +254,26 @@ public class LensCorrectionsOperation extends BlendedOperation {
             val center = transform.transform(new Point2D.Double(fullWidth / 2, fullHeight / 2), null);
             val borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
             final PlanarImage front;
-            if (! manual_mode) {
-                lf = Lensfun.updateInstance(cameraMaker, cameraModel, lensMaker, lensModel, focal, aperture);
-                lf.updateModifier(fullWidth, fullHeight);
-                front = new DistortionOpImage(back, JAIContext.fileCacheHint, borderExtender,
-                        lf, center);
-            }
-            else if (Math.abs(distortion_k1) > 1e-3 || Math.abs(distortion_k2) > 1e-3 ||
-                    Math.abs(tca_r_offset)  > 1e-3 || Math.abs(tca_b_offset)  > 1e-3) {
-                front = new DistortionOpImage(back, JAIContext.fileCacheHint, borderExtender,
-                        fullWidth, fullHeight, center,
-                        distortion_k1_scale * distortion_k1,
-                        distortion_k2_scale * distortion_k2,
-                        1 + tca_scale * tca_r_offset,
-                        1 + tca_scale * tca_b_offset);
+            if (manual_mode && Math.abs(distortion_k1) < 1e-3 && Math.abs(distortion_k2) < 1e-3
+                            && Math.abs(tca_r_offset)  < 1e-3 && Math.abs(tca_b_offset)  < 1e-3) {
+                front = back;
             }
             else {
-                front = back;
+                if (manual_mode) {
+                    lf = Lensfun.updateInstance(cameraMaker, cameraModel, "", "", focal, aperture)
+                            .updateModifier(
+                                    fullWidth, fullHeight,
+                                    distortion_k1_scale * distortion_k1,
+                                    distortion_k2_scale * distortion_k2,
+                                    1 + tca_scale * tca_r_offset,
+                                    1 + tca_scale * tca_b_offset);
+                }
+                else {
+                    lf = Lensfun.updateInstance(cameraMaker, cameraModel, lensMaker, lensModel, focal, aperture)
+                            .updateModifier(fullWidth, fullHeight);
+                }
+                front = new DistortionOpImage(back, JAIContext.fileCacheHint, borderExtender,
+                        lf, center);
             }
             front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
             return front;

@@ -137,7 +137,7 @@ Java_com_lightcrafts_utils_Lensfun_initModifier
  jint fullWidth, jint fullHeight,
  jstring cameraMakerStr, jstring cameraModelStr,
  jstring lensMakerStr, jstring lensModelStr,
- float focal, float aperture)
+ jfloat focal, jfloat aperture)
 {
     auto lf = reinterpret_cast<LC_lensfun*>(handle);
 
@@ -145,11 +145,6 @@ Java_com_lightcrafts_utils_Lensfun_initModifier
     const auto cameraModel = env->GetStringUTFChars(cameraModelStr, NULL);
     const auto lensMaker   = env->GetStringUTFChars(lensMakerStr, NULL);
     const auto lensModel   = env->GetStringUTFChars(lensModelStr, NULL);
-
-    // DEBUG
-    std::cout << "cameraMaker: " << cameraMaker << std::endl;
-    std::cout << "cameraModel: " << cameraModel << std::endl;
-    std::cout << "lensModel  : " << lensModel << std::endl;
 
     lf->initModifier(
             fullWidth, fullHeight,
@@ -162,7 +157,31 @@ Java_com_lightcrafts_utils_Lensfun_initModifier
     env->ReleaseStringUTFChars(lensModelStr, 0);
 }
 
-JNIEXPORT void JNICALL Java_com_lightcrafts_utils_Lensfun_distortionColor
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_lightcrafts_utils_Lensfun_initModifierWithPoly5Lens
+  (JNIEnv *env, jobject obj,
+  jlong handle,
+  jint fullWidth, jint fullHeight,
+  jfloat k1, jfloat k2, jfloat kr, jfloat kb,
+  jfloat focal, jfloat aperture)
+{
+    auto lf = reinterpret_cast<LC_lensfun*>(handle);
+
+    auto lens = lf->getDefaultLens();
+
+    lfLensCalibDistortion dc = {LF_DIST_MODEL_POLY5, focal, {k1, k2}};
+    lens->AddCalibDistortion(&dc);
+
+    lfLensCalibTCA tcac = {LF_TCA_MODEL_LINEAR, focal, {kr, kb}};
+    lens->AddCalibTCA(&tcac);
+
+    lf->initModifier(fullWidth, fullHeight, 1, lens, focal, aperture);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_lightcrafts_utils_Lensfun_distortionColor
   (JNIEnv *env, jobject obj,
   jlong handle,
   jshortArray jsrcData, jshortArray jdstData,
@@ -195,7 +214,9 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_utils_Lensfun_distortionColor
     env->ReleasePrimitiveArrayCritical(jdstData, dstData, 0);
 }
 
-JNIEXPORT jintArray JNICALL Java_com_lightcrafts_utils_Lensfun_backwardMapRect
+extern "C"
+JNIEXPORT jintArray JNICALL
+Java_com_lightcrafts_utils_Lensfun_backwardMapRect
   (JNIEnv *env, jobject obj,
   jlong handle,
   jint centerX, jint centerY,
@@ -288,6 +309,16 @@ const lfLens* const* LC_lensfun::getLenses() const
     return ldb->GetLenses();
 }
 
+lfLens* LC_lensfun::getDefaultLens() {
+    auto lens = const_cast<lfLens*>(
+            findLens(nullptr, "Generic", "Rectilinear 10-1000mm f/1.0"));
+    if (!lens->Check()) {
+        std::cout << "Lensfun: Failed to get default lens" << std::endl;
+        return nullptr;
+    }
+    return lens;
+}
+
 void LC_lensfun::initModifier
 ( int fullWidth, int fullHeight,
   const char* cameraMaker, const char* cameraModel,
@@ -295,14 +326,32 @@ void LC_lensfun::initModifier
   float focal, float aperture )
 {
     const auto camera = findCamera(cameraMaker, cameraModel);
-    const auto lens = findLens(camera, lensMaker, lensModel);
-    if (!lens) {
-        // FIXME: This causes crash if lensModel is unknown
-        std::cout << "*** lens unknown... " << lensMaker << ": "<< lensModel << std::endl;
-        return;
+    const auto found_lens = findLens(camera, lensMaker, lensModel);
+    const auto lens = found_lens ? found_lens : getDefaultLens();
+
+    if (camera) {
+        std::cout << "Lensfun: camera maker: " << camera->Maker << std::endl;
+        std::cout << "Lensfun: camera model: " << camera->Model << std::endl;
+    }
+    else {
+        std::cout << "Lensfun: Camera not found" << std::endl;
+    }
+    if (found_lens) {
+        std::cout << "Lensfun: lens model  : " << lens->Model << std::endl;
+    }
+    else {
+        std::cout << "Lensfun: fallback to the default lens" << std::endl;
     }
 
     const float crop = camera ? camera->CropFactor : lens->CropFactor;
+
+    initModifier(fullWidth, fullHeight, crop, lens, focal, aperture);
+}
+
+void LC_lensfun::initModifier
+( int fullWidth, int fullHeight, float crop,
+  const lfLens* lens, float focal, float aperture )
+{
     if (focal < 0.1f) {
         focal = lens->MaxFocal;
     }
