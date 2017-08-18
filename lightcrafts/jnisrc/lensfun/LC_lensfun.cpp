@@ -80,7 +80,7 @@ Java_com_lightcrafts_utils_Lensfun_getCameraNames
 {
     auto lf = new LC_lensfun();
     const auto jarr = createJArray(env, lf->getCameras());
-    delete(lf);
+    delete lf;
     return jarr;
 }
 
@@ -91,7 +91,7 @@ Java_com_lightcrafts_utils_Lensfun_getLensNames
 {
     auto lf = new LC_lensfun();
     const auto jarr = createJArray(env, lf->getLenses());
-    delete(lf);
+    delete lf;
     return jarr;
 }
 
@@ -246,7 +246,7 @@ Java_com_lightcrafts_utils_Lensfun_backwardMapRect
 
 LC_lensfun::LC_lensfun()
 {
-    ldb = new lfDatabase();
+    ldb = lfDatabase::Create();
     if (ldb->Load() != LF_NO_ERROR) {
         std::cerr << "Lensfun database could not be loaded" << std::endl;
     }
@@ -254,10 +254,14 @@ LC_lensfun::LC_lensfun()
 
 LC_lensfun::~LC_lensfun()
 {
-    delete mod;
-    mod = nullptr;
-    delete ldb;
-    ldb = nullptr;
+    if (mod) {
+        mod->Destroy();
+        mod = nullptr;
+    }
+    if (ldb) {
+        ldb->Destroy();
+        ldb = nullptr;
+    }
 }
 
 const lfCamera* LC_lensfun::findCamera(
@@ -362,7 +366,7 @@ void LC_lensfun::initModifier
     constexpr float scale = 0; // automatic scaling
     const lfLensType targeom = lens->Type;
 
-    mod = new lfModifier(lens, crop, fullWidth, fullHeight);
+    mod = lfModifier::Create(lens, crop, fullWidth, fullHeight);
     if (!mod) {
         // FIXME: This causes crash
         std::cout << "*** mod unavailable" << std::endl;
