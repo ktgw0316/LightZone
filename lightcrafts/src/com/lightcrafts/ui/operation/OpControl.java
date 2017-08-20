@@ -150,7 +150,8 @@ public abstract class OpControl extends SelectableControl {
     }
 
     public boolean isRawCorrection() {
-        return title.getTitleText().startsWith("RAW");
+         return title.getTitleText().startsWith("RAW") ||
+                 operation.getType().getName().startsWith("RAW");
     }
 
     public Operation getOperation() {

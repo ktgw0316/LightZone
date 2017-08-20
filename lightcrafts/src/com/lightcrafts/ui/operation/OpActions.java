@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2016-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.operation;
 
@@ -114,6 +115,23 @@ public class OpActions {
         action = new AbstractAction(name, icon) {
             public void actionPerformed(ActionEvent event) {
                 stack.addSpotControl();
+            }
+        };
+        action.putValue(IconImageKey, image);
+        action.putValue(Action.SHORT_DESCRIPTION, tooltip);
+        action.putValue(OpKeyPropertyKey, key);
+        actions.add(action);
+
+        // Add an Action for the LensCorrections:
+
+        key = "LensCorrections";
+        name = getName(key);
+        image = getImage(key);
+        icon = new ImageIcon(image);
+        tooltip = Resources.getString(key + "_Tooltip");
+        action = new AbstractAction(name, icon) {
+            public void actionPerformed(ActionEvent event) {
+                stack.addLensCorrectionsControl();
             }
         };
         action.putValue(IconImageKey, image);

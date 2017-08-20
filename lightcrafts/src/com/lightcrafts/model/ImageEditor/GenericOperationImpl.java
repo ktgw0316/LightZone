@@ -69,6 +69,14 @@ abstract class GenericOperationImpl extends OperationImpl implements GenericOper
         choiceValues.get(key).add(value);
     }
 
+    void addChoiceValues(String key, List<String> values) {
+        choiceValues.get(key).addAll(values);
+    }
+
+    void clearChoiceValues(String key) {
+        choiceValues.get(key).clear();
+    }
+
     void setCheckboxKeys(List<String> keys) {
         checkboxKeys = keys;
     }

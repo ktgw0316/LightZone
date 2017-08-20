@@ -19,7 +19,7 @@ CFLAGS:=	-O3
 DEFINES:=	-D_WIN32_IE=0x0500 -D_WIN32_WINNT=0x0500 -DNTDDK_VERSION=0x05000200 -DUNICODE
 INCLUDES:=	-I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32" \
 		-I$(COMMON_DIR)/jnisrc/jniutils
-LDFLAGS:=	-mwindows -static-libgcc -static-libstdc++
+LDFLAGS:=	-mwindows
 LINK:=		-lshlwapi
 
 TARGET:=	LightZone.exe

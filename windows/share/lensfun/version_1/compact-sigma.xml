@@ -1,0 +1,88 @@
+<lensdatabase version="1">
+
+    <camera>
+        <maker>Sigma</maker>
+        <model>Sigma DP1</model>
+        <model lang="en">DP1</model>
+        <mount>sigmaDP1</mount>
+        <cropfactor>1.739</cropfactor>
+    </camera>
+
+    <camera>
+        <maker>Sigma</maker>
+        <model>Sigma DP1 Merrill</model>
+        <model lang="en">DP1 Merrill</model>
+        <mount>sigmaDP1M</mount>
+        <cropfactor>1.531</cropfactor>
+    </camera>
+
+    <camera>
+        <maker>Sigma</maker>
+        <model>Sigma DP1S</model>
+        <model lang="en">DP1S</model>
+        <mount>sigmaDP1</mount>
+        <cropfactor>1.739</cropfactor>
+    </camera>
+
+    <camera>
+        <maker>Sigma</maker>
+        <model>Sigma DP1X</model>
+        <model lang="en">DP1X</model>
+        <mount>sigmaDP1</mount>
+        <cropfactor>1.739</cropfactor>
+    </camera>
+
+    <camera>
+        <maker>Sigma</maker>
+        <model>Sigma DP2</model>
+        <model lang="en">DP2</model>
+        <mount>sigmaDP2</mount>
+        <cropfactor>1.739</cropfactor>
+    </camera>
+
+    <camera>
+        <maker>Sigma</maker>
+        <model>Sigma DP2 Merrill</model>
+        <model lang="en">DP2 Merrill</model>
+        <mount>sigmaDP2M</mount>
+        <cropfactor>1.531</cropfactor>
+    </camera>
+
+    <camera>
+        <maker>Sigma</maker>
+        <model>Sigma DP2S</model>
+        <model lang="en">DP2S</model>
+        <mount>sigmaDP2</mount>
+        <cropfactor>1.739</cropfactor>
+    </camera>
+
+    <camera>
+        <maker>Sigma</maker>
+        <model>Sigma DP2X</model>
+        <model lang="en">DP2X</model>
+        <mount>sigmaDP2</mount>
+        <cropfactor>1.739</cropfactor>
+    </camera>
+
+    <camera>
+        <maker>Sigma</maker>
+        <model>Sigma DP3 Merrill</model>
+        <model lang="en">DP3 Merrill</model>
+        <mount>sigmaDP3M</mount>
+        <cropfactor>1.531</cropfactor>
+    </camera>
+
+    <lens>
+        <maker>Sigma</maker>
+        <model>Sigma DP2 &amp; compatibles (Standard)</model>
+        <model lang="en">fixed lens</model>
+        <model lang="de">festes Objektiv</model>
+        <mount>sigmaDP2</mount>
+        <cropfactor>1.739</cropfactor>
+        <aspect-ratio>3:2</aspect-ratio>
+        <calibration>
+            <distortion model="ptlens" focal="24.2" a="0.00558" b="-0.01995" c="0.00605" />
+        </calibration>
+    </lens>
+
+</lensdatabase>

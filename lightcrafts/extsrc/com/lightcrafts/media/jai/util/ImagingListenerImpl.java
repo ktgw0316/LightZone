@@ -23,7 +23,7 @@ import com.lightcrafts.mediax.jai.util.ImagingListener;
  *
  * <p> This class is a singleton that has only one instance.  This single
  * instance can be retrieved by calling the static method
- * <code>getInstance</code>.
+ * <code>updateInstance</code>.
  *
  * @see ImagingListener
  *

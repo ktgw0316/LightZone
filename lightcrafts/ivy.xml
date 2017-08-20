@@ -3,6 +3,7 @@
   <info organisation="lightcrafts" module="lightcrafts"/>
   <dependencies>
     <dependency org="org.projectlombok" name="lombok" rev="1.16.10"/>
+    <dependency org="org.jetbrains" name="annotations" rev="15.0"/>
   </dependencies>
 </ivy-module>
 

@@ -1,8 +1,10 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2016-     Masahiro Kitagawa */
 
 package com.lightcrafts.model;
 
 import com.lightcrafts.image.export.ImageExportOptions;
+import com.lightcrafts.model.ImageEditor.LensCorrectionsOperation;
 import com.lightcrafts.utils.thread.ProgressThread;
 
 import java.awt.Component;
@@ -15,6 +17,8 @@ import java.awt.print.PrinterException;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import javax.swing.JMenuItem;
+
 import javax.swing.JMenuItem;
 
 /**
@@ -109,6 +113,13 @@ public interface Engine {
      * transformation.
      */
     WhitePointOperation insertWhitePointOperation(int position);
+
+    /**
+     * Add a LensCorrectionsOperation to the current pipeline at the bottom.
+     * @return A LensCorrectionsOperation instance that can control the inserted
+     * transformation.
+     */
+    LensCorrectionsOperation insertLensCorrectionsOperation(int position);
 
     /**
      * Get the special OperationType of the "RAW Adjustments" singleton

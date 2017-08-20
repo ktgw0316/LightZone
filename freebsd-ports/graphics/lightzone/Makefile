@@ -18,6 +18,7 @@ BUILD_DEPENDS=	ant:${PORTSDIR}/devel/apache-ant \
 		jhindexer:${PORTSDIR}/java/javahelp \
 		rsync:${PORTSDIR}/net/rsync
 LIB_DEPENDS=	liblcms2.so:${PORTSDIR}/graphics/lcms2 \
+		liblensfun.so:${PORTSDIR}/graphics/lensfun \
 		libtiff.so:${PORTSDIR}/graphics/tiff
 
 USE_GITHUB=	yes
