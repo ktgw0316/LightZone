@@ -48,5 +48,6 @@ private:
     static jclass cls;
 
     lfDatabase* ldb = nullptr;
+    lfLens* default_lens = nullptr;
 };
 

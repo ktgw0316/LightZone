@@ -169,6 +169,9 @@ Java_com_lightcrafts_utils_Lensfun_initModifierWithPoly5Lens
     auto lf = reinterpret_cast<LC_lensfun*>(handle);
 
     auto lens = lf->getDefaultLens();
+    if (!lens) {
+        return;
+    }
 
     lfLensCalibDistortion dc = {LF_DIST_MODEL_POLY5, focal, {k1, k2}};
     lens->AddCalibDistortion(&dc);
@@ -314,13 +317,15 @@ const lfLens* const* LC_lensfun::getLenses() const
 }
 
 lfLens* LC_lensfun::getDefaultLens() {
-    auto lens = const_cast<lfLens*>(
-            findLens(nullptr, "Generic", "Rectilinear 10-1000mm f/1.0"));
-    if (!lens->Check()) {
-        std::cout << "Lensfun: Failed to get default lens" << std::endl;
-        return nullptr;
+    if (!default_lens) {
+        default_lens = const_cast<lfLens*>(
+                findLens(nullptr, "Generic", "Rectilinear 10-1000mm f/1.0"));
+        if (!default_lens->Check()) {
+            std::cout << "Lensfun: Failed to get default lens" << std::endl;
+            default_lens = nullptr;
+        }
     }
-    return lens;
+    return default_lens;
 }
 
 void LC_lensfun::initModifier
