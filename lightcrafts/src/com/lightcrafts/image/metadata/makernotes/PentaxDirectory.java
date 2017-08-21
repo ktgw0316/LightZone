@@ -318,7 +318,7 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
                 }
                 break;
             case PENTAX_LENS_TYPE: {
-                if ( value.getValueCount() != 2 )
+                if ( value.getValueCount() != 4 )
                     return;
                 //
                 // Pentax Cameras use 2 values for this: a lens group and a
@@ -326,16 +326,10 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
                 // doesn't support this, we combine the 2 values into a single
                 // value.
                 //
-                final String[] values = value.getValues();
-                try {
-                    final int lensGroupID = Integer.parseInt( values[0] );
-                    final int lensID = Integer.parseInt( values[1] );
-                    final int lensLabelID = lensGroupID << 8 | lensID;
-                    value = new UnsignedShortMetaValue( lensLabelID );
-                }
-                catch ( NumberFormatException e ) {
-                    return;
-                }
+                final int lensGroupID = value.getIntValueAt(0);
+                final int lensID      = value.getIntValueAt(1);
+                final int lensLabelID = lensGroupID << 8 | lensID;
+                value = new UnsignedShortMetaValue( lensLabelID );
                 break;
             }
         }

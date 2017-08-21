@@ -659,7 +659,7 @@ public interface PentaxTags extends ImageMetaTags {
      * The first byte is a lens group ID and the second byte is a lens ID
      * within that group.
      * <p>
-     * Type: Unsigned byte (2).
+     * Type: Unsigned byte (4).
      */
     int PENTAX_LENS_TYPE                = 0x003F;
 
