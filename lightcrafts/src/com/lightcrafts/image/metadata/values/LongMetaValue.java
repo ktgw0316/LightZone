@@ -101,13 +101,6 @@ public class LongMetaValue extends NumericMetaValue {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public final long getLongValue() {
-        return getLongValueAt( 0 );
-    }
-
-    /**
      * Gets the <code>long</code> value at the given index.
      *
      * @param index The index to get the value for.

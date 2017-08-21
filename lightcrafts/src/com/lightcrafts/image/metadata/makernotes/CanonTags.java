@@ -502,6 +502,20 @@ public interface CanonTags extends ImageMetaTags {
     int CANON_CS_MACRO_MODE                 = CANON_CAMERA_SETTINGS << 8 | 0x01;
 
     /**
+     * Camera setting: Maximum lens aperture in F-number;
+     * <p>
+     * Type: Short.
+     */
+    int CANON_CS_MAX_APERTURE               = CANON_CAMERA_SETTINGS << 8 | 0x1A;
+
+    /**
+     * Camera setting: Minimum lens aperture in F-number;
+     * <p>
+     * Type: Short.
+     */
+    int CANON_CS_MIN_APERTURE               = CANON_CAMERA_SETTINGS << 8 | 0x1B;
+
+    /**
      * Camera setting: metering mode.
      *  <blockquote>
      *    <table border="0" cellpadding="0">

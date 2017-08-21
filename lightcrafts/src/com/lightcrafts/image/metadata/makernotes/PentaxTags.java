@@ -46,6 +46,38 @@ public interface PentaxTags extends ImageMetaTags {
      *      <tr valign="top">
      *        <td>9 =&nbsp;</td><td>bottom-right</td>
      *      </tr>
+     *      <tr>
+     *        <td align="right">11 =&nbsp;</td><td>lower-right</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">65533 =&nbsp;</td><td>face recognition</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">65534 =&nbsp;</td><td>automatic tracking</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">65535 =&nbsp;</td><td>auto</td>
+     *      </tr>
+     *    </table>
+     *  </blockquote>
+     * Type: Unsigned short.
+     */
+    int PENTAX_AF_POINT_SELECTED        = 0x000E;
+
+    /**
+     * Auto AF point.
+     *  <blockquote>
+     *    <table border="0" cellpadding="0">
+     *      <tr><td align="right">65535 =&nbsp;</td><td>none</td></tr>
+     *      <tr><td align="right">1 =&nbsp;</td><td>top-left</td></tr>
+     *      <tr><td align="right">2 =&nbsp;</td><td>top-center</td></tr>
+     *      <tr><td align="right">3 =&nbsp;</td><td>top-right</td></tr>
+     *      <tr><td align="right">4 =&nbsp;</td><td>left</td></tr>
+     *      <tr><td align="right">5 =&nbsp;</td><td>center</td></tr>
+     *      <tr><td align="right">6 =&nbsp;</td><td>right</td></tr>
+     *      <tr><td align="right">7 =&nbsp;</td><td>bottom-left</td></tr>
+     *      <tr><td align="right">8 =&nbsp;</td><td>bottom-center</td></tr>
+     *      <tr><td align="right">9 =&nbsp;</td><td>bottom-right</td></tr>
      *    </table>
      *  </blockquote>
      * Type: Unsigned short.
@@ -177,8 +209,29 @@ public interface PentaxTags extends ImageMetaTags {
      *      <tr valign="top">
      *        <td>260 =&nbsp;</td><td>on, red-eye reduction</td>
      *      </tr>
-     *      <tr valign="top">
-     *        <td>264 =&nbsp;</td><td>on, soft</td>
+     *      <tr>
+     *        <td align="right">261 =&nbsp;</td>
+     *        <td>on, wireless (master)</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">262 =&nbsp;</td>
+     *        <td>on, wireless (control)</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">264 =&nbsp;</td>
+     *        <td>on, soft</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">265 =&nbsp;</td>
+     *        <td>on, slow sync</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">266 =&nbsp;</td>
+     *        <td>on, slow sync, red-eye reduction</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">267 =&nbsp;</td>
+     *        <td>on, trailing-curtain sync</td>
      *      </tr>
      *    </table>
      *  </blockquote>
@@ -196,12 +249,31 @@ public interface PentaxTags extends ImageMetaTags {
 
     /**
      * Focal length.
-     * If the camera model is one of Optio 30, 33WR, 43WR, 450, 550, 555,
-     * 750Z or X, then the value is n / 10; otherwise, n / 100.
+     * If the camera model matches the regex .*(\*IST D|OPTIO [A-Z]).*, then
+     * the value is n / 100; otherwise, n / 10.
      * <p>
      * Type: Unsigned short.
      */
     int PENTAX_FOCAL_LENGTH             = 0x001D;
+
+    /**
+     * Focus mode.
+     *  <blockquote>
+     *    <table border="0" cellpadding="0">
+     *      <tr><td align="right">0 =&nbsp;</td><td>normal</td></tr>
+     *      <tr><td align="right">1 =&nbsp;</td><td>macro</td></tr>
+     *      <tr><td align="right">2 =&nbsp;</td><td>infinity</td></tr>
+     *      <tr><td align="right">3 =&nbsp;</td><td>manual</td></tr>
+     *      <tr><td align="right">4 =&nbsp;</td><td>super macro</td></tr>
+     *      <tr><td align="right">5 =&nbsp;</td><td>pan focus</td></tr>
+     *      <tr><td align="right">16 =&nbsp;</td><td>AF-S</td></tr>
+     *      <tr><td align="right">17 =&nbsp;</td><td>AF-C</td></tr>
+     *      <tr><td align="right">18 =&nbsp;</td><td>AF-A</td></tr>
+     *    </table>
+     *  </blockquote>
+     * Type: Unsigned short.
+     */
+    int PENTAX_FOCUS_MODE               = 0x000D;
 
     /**
      * Focus position.
@@ -587,9 +659,16 @@ public interface PentaxTags extends ImageMetaTags {
      * The first byte is a lens group ID and the second byte is a lens ID
      * within that group.
      * <p>
-     * Type: Unsigned byte (2).
+     * Type: Unsigned byte (4).
      */
     int PENTAX_LENS_TYPE                = 0x003F;
+
+    /**
+     * Light reading.
+     * <p>
+     * Type: Signed short.
+     */
+    int PENTAX_LIGHT_READING            = 0x0015;
 
     /**
      * Metering mode.
@@ -611,99 +690,206 @@ public interface PentaxTags extends ImageMetaTags {
     int PENTAX_METERING_MODE            = 0x0017;
 
     /**
-     * Mode.
-     *  <blockquote>
-     *    <table border="0" cellpadding="0">
-     *      <tr valign="top">
-     *        <td>0 =&nbsp;</td><td>auto</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>1 =&nbsp;</td><td>night</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>2 =&nbsp;</td><td>manual</td>
-     *      </tr>
-     *    </table>
-     *  </blockquote>
+     * Model ID.
+     * <p>
+     * Type: Unsigned long.
+     */
+    int PENTAX_MODEL_ID                 = 0x0005;
+
+    /**
+     * Model type.
+     * <p>
      * Type: Unsigned short.
      */
-    int PENTAX_MODE                     = 0x0001;
+    int PENTAX_MODEL_TYPE               = 0x0001;
 
     /**
      * Picture mode.
      *  <blockquote>
      *    <table border="0" cellpadding="0">
-     *      <tr valign="top">
-     *        <td>0 =&nbsp;</td><td>program</td>
+     *      <tr>
+     *        <td align="right">0 =&nbsp;</td>
+     *        <td>program</td>
      *      </tr>
-     *      <tr valign="top">
-     *        <td>5 =&nbsp;</td><td>portrait</td>
+     *      <tr>
+     *        <td align="right">1 =&nbsp;</td>
+     *        <td>shutter-speed priority</td>
      *      </tr>
-     *      <tr valign="top">
-     *        <td>6 =&nbsp;</td><td>landscape</td>
+     *      <tr>
+     *        <td align="right">2 =&nbsp;</td>
+     *        <td>program AE</td>
      *      </tr>
-     *      <tr valign="top">
-     *        <td>8 =&nbsp;</td><td>sport</td>
+     *      <tr>
+     *        <td align="right">3 =&nbsp;</td>
+     *        <td>manual</td>
      *      </tr>
-     *      <tr valign="top">
-     *        <td>9 =&nbsp;</td><td>night scene</td>
+     *      <tr>
+     *        <td align="right">5 =&nbsp;</td>
+     *        <td>portrait</td>
      *      </tr>
-     *      <tr valign="top">
-     *        <td>11 =&nbsp;</td><td>soft</td>
+     *      <tr>
+     *        <td align="right">6 =&nbsp;</td>
+     *        <td>landscape</td>
      *      </tr>
-     *      <tr valign="top">
-     *        <td>12 =&nbsp;</td><td>surf & snow</td>
+     *      <tr>
+     *        <td align="right">8 =&nbsp;</td>
+     *        <td>sport</td>
      *      </tr>
-     *      <tr valign="top">
-     *        <td>13 =&nbsp;</td><td>sunset</td>
+     *      <tr>
+     *        <td align="right">9 =&nbsp;</td>
+     *        <td>night scene</td>
      *      </tr>
-     *      <tr valign="top">
-     *        <td>14 =&nbsp;</td><td>autumn</td>
+     *      <tr>
+     *        <td align="right">11 =&nbsp;</td>
+     *        <td>soft</td>
      *      </tr>
-     *      <tr valign="top">
-     *        <td>15 =&nbsp;</td><td>flower</td>
+     *      <tr>
+     *        <td align="right">12 =&nbsp;</td>
+     *        <td>surf & snow</td>
      *      </tr>
-     *      <tr valign="top">
-     *        <td>17 =&nbsp;</td><td>fireworks</td>
+     *      <tr>
+     *        <td align="right">13 =&nbsp;</td>
+     *        <td>sunset</td>
      *      </tr>
-     *      <tr valign="top">
-     *        <td>18 =&nbsp;</td><td>text</td>
+     *      <tr>
+     *        <td align="right">14 =&nbsp;</td>
+     *        <td>autumn</td>
      *      </tr>
-     *      <tr valign="top">
-     *        <td>19 =&nbsp;</td><td>panorama</td>
+     *      <tr>
+     *        <td align="right">15 =&nbsp;</td>
+     *        <td>flower</td>
      *      </tr>
-     *      <tr valign="top">
-     *        <td>30 =&nbsp;</td><td>self portrait</td>
+     *      <tr>
+     *        <td align="right">17 =&nbsp;</td>
+     *        <td>fireworks</td>
      *      </tr>
-     *      <tr valign="top">
-     *        <td>37 =&nbsp;</td><td>museum</td>
+     *      <tr>
+     *        <td align="right">18 =&nbsp;</td>
+     *        <td>text</td>
      *      </tr>
-     *      <tr valign="top">
-     *        <td>38 =&nbsp;</td><td>food</td>
+     *      <tr>
+     *        <td align="right">19 =&nbsp;</td>
+     *        <td>panorama</td>
      *      </tr>
-     *      <tr valign="top">
-     *        <td>40 =&nbsp;</td><td>green mode</td>
+     *      <tr>
+     *        <td align="right">20 =&nbsp;</td>
+     *        <td>3-D</td>
      *      </tr>
-     *      <tr valign="top">
-     *        <td>49 =&nbsp;</td><td>light pet</td>
+     *      <tr>
+     *        <td align="right">21 =&nbsp;</td>
+     *        <td>black & white</td>
      *      </tr>
-     *      <tr valign="top">
-     *        <td>50 =&nbsp;</td><td>dark pet</td>
+     *      <tr>
+     *        <td align="right">22 =&nbsp;</td>
+     *        <td>sepia</td>
      *      </tr>
-     *      <tr valign="top">
-     *        <td>51 =&nbsp;</td><td>medium pet</td>
+     *      <tr>
+     *        <td align="right">23 =&nbsp;</td>
+     *        <td>red</td>
      *      </tr>
-     *      <tr valign="top">
-     *        <td>53 =&nbsp;</td><td>underwater</td>
+     *      <tr>
+     *        <td align="right">24 =&nbsp;</td>
+     *        <td>pink</td>
      *      </tr>
-     *      <tr valign="top">
-     *        <td>54 =&nbsp;</td><td>candlelight</td>
+     *      <tr>
+     *        <td align="right">25 =&nbsp;</td>
+     *        <td>purple</td>
      *      </tr>
-     *      <tr valign="top">
-     *        <td>55 =&nbsp;</td><td>natural skin tone</td>
+     *      <tr>
+     *        <td align="right">26 =&nbsp;</td>
+     *        <td>blue</td>
      *      </tr>
-     *      <tr valign="top">
-     *        <td>56 =&nbsp;</td><td>synchronous sound record</td>
+     *      <tr>
+     *        <td align="right">27 =&nbsp;</td>
+     *        <td>green</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">28 =&nbsp;</td>
+     *        <td>yellow</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">30 =&nbsp;</td>
+     *        <td>self portrait</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">31 =&nbsp;</td>
+     *        <td>illustration</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">33 =&nbsp;</td>
+     *        <td>digital filter</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">35 =&nbsp;</td>
+     *        <td>night scene portrait</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">37 =&nbsp;</td>
+     *        <td>museum</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">38 =&nbsp;</td>
+     *        <td>food</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">39 =&nbsp;</td>
+     *        <td>underwater</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">40 =&nbsp;</td>
+     *        <td>green mode</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">49 =&nbsp;</td>
+     *        <td>light pet</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">50 =&nbsp;</td>
+     *        <td>dark pet</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">51 =&nbsp;</td>
+     *        <td>medium pet</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">53 =&nbsp;</td>
+     *        <td>underwater</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">54 =&nbsp;</td>
+     *        <td>candlelight</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">55 =&nbsp;</td>
+     *        <td>natural skin tone</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">56 =&nbsp;</td>
+     *        <td>synchronous sound record</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">58 =&nbsp;</td>
+     *        <td>frame composite</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">60 =&nbsp;</td>
+     *        <td>kids</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">61 =&nbsp;</td>
+     *        <td>blur reduction</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">65 =&nbsp;</td>
+     *        <td>half-length portrait</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">221 =&nbsp;</td>
+     *        <td>P</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">255 =&nbsp;</td>
+     *        <td>pict</td>
      *      </tr>
      *    </table>
      *  </blockquote>
@@ -859,26 +1045,58 @@ public interface PentaxTags extends ImageMetaTags {
     int PENTAX_TONE_CURVES              = 0x0403;
 
     /**
+     * Pentax maker notes version.
+     * There are 4 bytes.
+     * <p>
+     * Type: Unsigned byte.
+     */
+    int PENTAX_VERSION                  = 0x0000;
+
+    /**
      * White balance.
      *  <blockquote>
      *    <table border="0" cellpadding="0">
-     *      <tr valign="top">
-     *        <td>0 =&nbsp;</td><td>auto</td>
+     *      <tr>
+     *        <td align="right">0 =&nbsp;</td><td>auto</td>
      *      </tr>
-     *      <tr valign="top">
-     *        <td>1 =&nbsp;</td><td>daylight</td>
+     *      <tr>
+     *        <td align="right">1 =&nbsp;</td><td>daylight</td>
      *      </tr>
-     *      <tr valign="top">
-     *        <td>2 =&nbsp;</td><td>shade</td>
+     *      <tr>
+     *        <td align="right">2 =&nbsp;</td><td>shade</td>
      *      </tr>
-     *      <tr valign="top">
-     *        <td>3 =&nbsp;</td><td>fluorescent</td>
+     *      <tr>
+     *        <td align="right">3 =&nbsp;</td><td>fluorescent</td>
      *      </tr>
-     *      <tr valign="top">
-     *        <td>4 =&nbsp;</td><td>tungsten</td>
+     *      <tr>
+     *        <td align="right">4 =&nbsp;</td><td>tungsten</td>
      *      </tr>
-     *      <tr valign="top">
-     *        <td>5 =&nbsp;</td><td>manual</td>
+     *      <tr>
+     *        <td align="right">5 =&nbsp;</td><td>manual</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">6 =&nbsp;</td><td>daylight fluorescent</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">7 =&nbsp;</td><td>day-white fluorescent</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">8 =&nbsp;</td><td>white fluorescent</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">9 =&nbsp;</td><td>flash</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">10 =&nbsp;</td><td>cloudy</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">17 =&nbsp;</td><td>kelvin</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">65534 =&nbsp;</td><td>unknown</td>
+     *      </tr>
+     *      <tr>
+     *        <td align="right">65535 =&nbsp;</td><td>user-selected</td>
      *      </tr>
      *    </table>
      *  </blockquote>

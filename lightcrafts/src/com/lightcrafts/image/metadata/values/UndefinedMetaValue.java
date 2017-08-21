@@ -56,7 +56,7 @@ public final class UndefinedMetaValue extends ImageMetaValue {
      *
      * @return Never returns.
      */
-    public long getLongValue() {
+    public long getLongValueAt(int index) {
         throw new UnsupportedOperationException();
     }
 

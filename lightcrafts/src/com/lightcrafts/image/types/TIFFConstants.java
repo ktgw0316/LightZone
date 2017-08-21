@@ -5,7 +5,7 @@ package com.lightcrafts.image.types;
 import com.lightcrafts.image.metadata.TIFFTags;
 
 /**
- * A <code>TIFFConstants</code> defines some constants for TIFF metadata.
+ * A {@code TIFFConstants} defines some constants for TIFF metadata.
  *
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */
@@ -135,6 +135,12 @@ public interface TIFFConstants {
     };
 
     /**
+     * TIFF date.  This type isn't defined in the TIFF specification.  We
+     * define it to distinguish dates from ordinary strings.
+     */
+    byte TIFF_FIELD_TYPE_DATE       = -1;
+
+    /**
      * TIFF unsigned byte (8 bits).
      */
     byte TIFF_FIELD_TYPE_UBYTE     = 1;
@@ -151,7 +157,7 @@ public interface TIFFConstants {
 
     /**
      * TIFF unsigned long (32 bits).
-     * Note that this is not the same size as a Java <code>long</code>.
+     * Note that this is not the same size as a Java {@code long}.
      */
     byte TIFF_FIELD_TYPE_ULONG     = 4;
 
@@ -177,7 +183,7 @@ public interface TIFFConstants {
 
     /**
      * TIFF signed long (32 bits).
-     * Note that this is not the same size as a Java <code>long</code>.
+     * Note that this is not the same size as a Java {@code long}.
      */
     byte TIFF_FIELD_TYPE_SLONG     = 9;
 
@@ -197,7 +203,7 @@ public interface TIFFConstants {
     byte TIFF_FIELD_TYPE_DOUBLE    = 12;
 
     /**
-     * TIFF IFD pointer (32 bits).
+     * TIFF IFD (Image File Directory) pointer (32 bits).
      */
     byte TIFF_FIELD_TYPE_IFD       = 13;
 
@@ -227,6 +233,55 @@ public interface TIFFConstants {
      * BigTIFF IFD pointer (64 bits).
      */
     byte TIFF_FIELD_TYPE_IFD64     = 18;
+
+    /**
+     * TIFF flash: flash fired.
+     * This is used with the {@link TIFFTags#TIFF_FLASH} metadata tag.
+     */
+    int TIFF_FLASH_FIRED_BIT = 0;
+
+    /**
+     * TIFF flash mode: auto.
+     * This is used with the {@link TIFFTags#TIFF_FLASH} metadata tag.
+     */
+    int TIFF_FLASH_MODE_AUTO = 3 << 3;
+
+    /**
+     * TIFF flash mode: compulsory off.
+     * This is used with the {@link TIFFTags#TIFF_FLASH} metadata tag.
+     */
+    int TIFF_FLASH_MODE_COMPULSORY_OFF = 2 << 3;
+
+    /**
+     * TIFF flash mode: complsory on.
+     * This is used with the {@link TIFFTags#TIFF_FLASH} metadata tag.
+     */
+    int TIFF_FLASH_MODE_COMPULSORY_ON = 1 << 3;
+
+    /**
+     * TIFF flash mode: unknown.
+     * This is used with the {@link TIFFTags#TIFF_FLASH} metadata tag.
+     */
+    int TIFF_FLASH_MODE_UNKNOWN = 0;
+
+    /**
+     * TIFF flash: flash not present.  Note that this bit is <i>set</i> when
+     * the flash is <i>not</i> present.
+     * This is used with the {@link TIFFTags#TIFF_FLASH} metadata tag.
+     */
+    int TIFF_FLASH_NOT_PRESENT_BIT = 1 << 5;
+
+    /**
+     * TIFF flash: red-eye reduction.
+     * This is used with the {@link TIFFTags#TIFF_FLASH} metadata tag.
+     */
+    int TIFF_FLASH_RED_EYE_BIT = 1 << 6;
+
+    /**
+     * TIFF flash: strobe return sense.
+     * This is used with the {@link TIFFTags#TIFF_FLASH} metadata tag.
+     */
+    int TIFF_FLASH_STROBE_RETURN_BITS = 3 << 1;
 
     /**
      * The size of the TIFF header (in bytes).

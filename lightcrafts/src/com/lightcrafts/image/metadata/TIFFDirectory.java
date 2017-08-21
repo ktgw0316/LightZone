@@ -104,9 +104,14 @@ public class TIFFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
-    public String getFlash() {
+    public int getFlash() {
         final ImageMetaValue flashValue = getValue( TIFF_FLASH );
-        return hasTagValueLabelFor( flashValue );
+        if ( flashValue != null ) {
+            final int flashBits = flashValue.getIntValue();
+            if ( (flashBits & TIFF_FLASH_NOT_PRESENT_BIT) == 0 )
+                return flashBits;
+        }
+        return -1;
     }
 
     /**
@@ -242,6 +247,19 @@ public class TIFFDirectory extends ImageMetadataDirectory implements
     }
 
     ////////// protected //////////////////////////////////////////////////////
+
+    /**
+     * Gets the priority of this directory for providing the metadata supplied
+     * by implementing the given provider interface.
+     * <p>
+     * The priority is guaranteed to be higher than the default.
+     *
+     * @param p The provider interface to get the priority for.
+     * @return Returns said priority.
+     */
+    protected int getProviderPriorityFor(Class<? extends ImageMetadataProvider> p) {
+        return PROVIDER_PRIORITY_DEFAULT + 5;
+    }
 
     /**
      * {@inheritDoc}.

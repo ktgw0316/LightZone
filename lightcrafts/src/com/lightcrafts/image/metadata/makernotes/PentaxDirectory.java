@@ -18,6 +18,7 @@ import com.lightcrafts.utils.bytebuffer.LCByteBuffer;
 import com.lightcrafts.utils.TextUtil;
 
 import static com.lightcrafts.image.metadata.ImageMetaType.*;
+import static com.lightcrafts.image.metadata.makernotes.PentaxConstants.*;
 import static com.lightcrafts.image.metadata.makernotes.PentaxTags.*;
 
 /**
@@ -28,7 +29,7 @@ import static com.lightcrafts.image.metadata.makernotes.PentaxTags.*;
  */
 @SuppressWarnings({"CloneableClassWithoutClone"})
 public final class PentaxDirectory extends MakerNotesDirectory implements
-    ApertureProvider, CaptureDateTimeProvider, FocalLengthProvider,
+    ApertureProvider, CaptureDateTimeProvider, FlashProvider, FocalLengthProvider,
     ISOProvider, LensProvider, PreviewImageProvider, ShutterSpeedProvider,
     WidthHeightProvider {
 
@@ -37,6 +38,7 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public float getAperture() {
         final ImageMetaValue value = getValue( PENTAX_FNUMBER );
         return  value == null ? 0 :
@@ -46,6 +48,7 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public Date getCaptureDateTime() {
         final ImageMetaValue value = getValue( PENTAX_DATE );
         return  value instanceof DateMetaValue ?
@@ -55,6 +58,56 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
+    public int getFlash() {
+        final ImageMetaValue value = getValue( PENTAX_FLASH_MODE );
+        if ( value != null ) {
+            int flashBits = 0;
+            final int pentaxFlash = value.getIntValue();
+            switch ( pentaxFlash ) {
+                case PENTAX_FLASH_AUTO_FIRED:
+                case PENTAX_FLASH_AUTO_FIRED_RED_EYE:
+                case PENTAX_FLASH_ON_FIRED:
+                    flashBits |= FLASH_FIRED_BIT;
+                    break;
+            }
+            switch ( pentaxFlash ) {
+                case PENTAX_FLASH_AUTO_FIRED:
+                case PENTAX_FLASH_AUTO_FIRED_RED_EYE:
+                case PENTAX_FLASH_AUTO_NO_FIRED:
+                    flashBits |= FLASH_MODE_AUTO;
+                    break;
+                case PENTAX_FLASH_OFF_NO_FIRED:
+                    flashBits |= FLASH_MODE_COMPULSORY_OFF;
+                    break;
+                case PENTAX_FLASH_ON_FIRED:
+                case PENTAX_FLASH_ON_NO_FIRE:
+                case PENTAX_FLASH_ON_RED_EYE:
+                case PENTAX_FLASH_ON_SLOW_SYNC:
+                case PENTAX_FLASH_ON_SLOW_SYNC_RED_EYE:
+                case PENTAX_FLASH_ON_SOFT:
+                case PENTAX_FLASH_ON_TRAILING_CURTAIN_SYNC:
+                case PENTAX_FLASH_ON_WIRELESS_CONTROL:
+                case PENTAX_FLASH_ON_WIRELESS_MASTER:
+                    flashBits |= FLASH_MODE_COMPULSORY_ON;
+                    break;
+            }
+            switch ( pentaxFlash ) {
+                case PENTAX_FLASH_AUTO_FIRED_RED_EYE:
+                case PENTAX_FLASH_ON_RED_EYE:
+                case PENTAX_FLASH_ON_SLOW_SYNC_RED_EYE:
+                    flashBits |= FLASH_RED_EYE_BIT;
+                    break;
+            }
+            return flashBits;
+        }
+        return -1;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public float getFocalLength() {
         final ImageMetaValue value = getValue( PENTAX_FOCAL_LENGTH );
         if ( value == null )
@@ -68,6 +121,7 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getImageHeight() {
         final ImageMetaValue value = getValue( PENTAX_RAW_IMAGE_SIZE );
         if ( value != null && value.getValueCount() == 2 ) {
@@ -84,6 +138,7 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getImageWidth() {
         final ImageMetaValue value = getValue( PENTAX_RAW_IMAGE_SIZE );
         return value != null ? value.getIntValue() : 0;
@@ -92,6 +147,7 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getISO() {
         final String label = hasTagValueLabelFor( PENTAX_ISO );
         if ( label != null )
@@ -107,6 +163,7 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getLens() {
         return hasTagValueLabelFor( PENTAX_LENS_TYPE );
     }
@@ -118,15 +175,29 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
      * @param offset The offset to the start of the maker-notes.
      * @return Returns said adjustments.
      */
-    public int[] getMakerNotesAdjustments( LCByteBuffer buf, int offset ) {
-        //
-        // The 6 bytes are:
-        //
-        //      0-2: "AOC"
-        //      3  : 0
-        //      4-5: "MM"
-        //
-        return new int[]{ 6, offset };
+    @Override
+    public int[] getMakerNotesAdjustments( LCByteBuffer buf, int offset )
+            throws IOException
+    {
+        if ( buf.getEquals( offset, "AOC", "ASCII" ) ) {
+            //
+            // These are the maker notes from a JPEG file.  The 6 bytes are:
+            //
+            //      0-2: "AOC"
+            //      3  : 0
+            //      4-5: "MM"
+            //
+            return new int[]{ 6, offset };
+        }
+        final String s = buf.getString( offset, 7, "ASCII" );
+        if ( s.equals( "PENTAX " ) || s.equals( "SAMSUNG" ) ) {
+            //
+            // These are the maker notes from a DNG file.  Note that the space
+            // after PENTAX is correct.
+            //
+            return new int[]{ 10, offset };
+        }
+        throw new IOException( "unknown maker notes header" );
     }
 
     /**
@@ -134,6 +205,7 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
      *
      * @return Always returns &quot;Pentax&quot;.
      */
+    @Override
     public String getName() {
         return "Pentax";
     }
@@ -141,6 +213,7 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public RenderedImage getPreviewImage( ImageInfo imageInfo, int maxWidth,
                                           int maxHeight )
         throws BadImageFileException, IOException, UnknownImageTypeException
@@ -153,6 +226,7 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public float getShutterSpeed() {
         final ImageMetaValue value = getValue( PENTAX_EXPOSURE_TIME );
         return value != null ? value.getFloatValue() * 1E-5F : 0F;
@@ -161,6 +235,7 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageMetaTagInfo getTagInfoFor( Integer id ) {
         return m_tagsByID.get( id );
     }
@@ -168,6 +243,7 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageMetaTagInfo getTagInfoFor( String name ) {
         return m_tagsByName.get( name );
     }
@@ -180,6 +256,7 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
      * @param value The value to put.
      * @see #valueToString(ImageMetaValue)
      */
+    @Override
     public void putValue( Integer tagID, ImageMetaValue value ) {
         switch ( tagID ) {
             case PENTAX_CONTRAST:
@@ -241,24 +318,18 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
                 }
                 break;
             case PENTAX_LENS_TYPE: {
-                if ( value.getValueCount() != 2 )
+                if ( value.getValueCount() != 4 )
                     return;
                 //
                 // Pentax Cameras use 2 values for this: a lens group and a
                 // lens ID within that group.  Since our value labeling scheme
-                // doesn't support this, we compbine the 2 values into a single
+                // doesn't support this, we combine the 2 values into a single
                 // value.
                 //
-                final String[] values = value.getValues();
-                try {
-                    final int lensGroupID = Integer.parseInt( values[0] );
-                    final int lensID = Integer.parseInt( values[1] );
-                    final int lensLabelID = lensGroupID << 8 | lensID;
-                    value = new UnsignedShortMetaValue( lensLabelID );
-                }
-                catch ( NumberFormatException e ) {
-                    return;
-                }
+                final int lensGroupID = value.getIntValueAt(0);
+                final int lensID      = value.getIntValueAt(1);
+                final int lensLabelID = lensGroupID << 8 | lensID;
+                value = new UnsignedShortMetaValue( lensLabelID );
                 break;
             }
         }
@@ -268,6 +339,7 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public String valueToString( ImageMetaValue value ) {
         switch ( value.getOwningTagID() ) {
             case PENTAX_BLUE_BALANCE:
@@ -301,6 +373,7 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
      *
      * @return Returns said {@link ResourceBundle}.
      */
+    @Override
     protected ResourceBundle getTagLabelBundle() {
         return m_tagBundle;
     }
@@ -308,6 +381,7 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     protected Class<? extends ImageMetaTags> getTagsInterface() {
         return PentaxTags.class;
     }
@@ -354,6 +428,7 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
     );
 
     static {
+        add( PENTAX_AF_POINT_SELECTED, "AFPointSelected", META_USHORT );
         add( PENTAX_AUTO_AF_POINT, "AutoAFPoint", META_USHORT );
         add( PENTAX_BLACK_POINT, "BlackPoint", META_USHORT );
         add( PENTAX_BLUE_BALANCE, "BlueBalance", META_USHORT );
@@ -369,6 +444,7 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
         add( PENTAX_FLASH_MODE, "FlashMode", META_USHORT );
         add( PENTAX_FNUMBER, "FNumber", META_USHORT );
         add( PENTAX_FOCAL_LENGTH, "FocalLength", META_USHORT );
+        add( PENTAX_FOCUS_MODE, "FocusMode", META_USHORT );
         add( PENTAX_FOCUS_POSITION, "FocusPosition", META_USHORT );
         add( PENTAX_FRAME_NUMBER, "FrameNumber", META_USHORT );
         add( PENTAX_HOME_TOWN_CITY, "HomeTownCity", META_USHORT );
@@ -377,8 +453,10 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
         add( PENTAX_IMAGE_SIZE, "ImageSize", META_USHORT );
         add( PENTAX_ISO, "ISO", META_USHORT );
         add( PENTAX_LENS_TYPE, "LensType", META_UBYTE );
+        add( PENTAX_LIGHT_READING, "LightReading", META_SSHORT );
         add( PENTAX_METERING_MODE, "MeteringMode", META_USHORT );
-        add( PENTAX_MODE, "Mode", META_USHORT );
+        add( PENTAX_MODEL_ID, "ModelID", META_ULONG );
+        add( PENTAX_MODEL_TYPE, "ModelType", META_USHORT );
         add( PENTAX_PICTURE_MODE, "PictureMode", META_USHORT );
         add( PENTAX_PREVIEW_IMAGE_DATA, "PreviewImageData", META_UNDEFINED );
         add( PENTAX_PREVIEW_IMAGE_LENGTH, "PreviewImageLength", META_ULONG );
@@ -393,10 +471,29 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
         add( PENTAX_TIME, "Time", META_UNDEFINED );
         add( PENTAX_TONE_CURVE, "ToneCurve", META_UNDEFINED );
         add( PENTAX_TONE_CURVES, "ToneCurves", META_UNDEFINED );
+        add( PENTAX_VERSION, "Version", META_UBYTE );
         add( PENTAX_WHITE_BALANCE, "WhiteBalance", META_USHORT );
         add( PENTAX_WHITE_BALANCE_MODE, "WhiteBalanceMode", META_USHORT );
         add( PENTAX_WHITE_POINT, "WhitePoint", META_USHORT );
         add( PENTAX_WORLD_TIME_LOCATION, "WorldTimeLocation", META_USHORT );
+    }
+
+    @Override
+    protected ImageMetaValue getLongFocalValue() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    protected ImageMetaValue getShortFocalValue() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    protected ImageMetaValue getMaxApertureValue() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }
 /* vim:set et sw=4 ts=4: */

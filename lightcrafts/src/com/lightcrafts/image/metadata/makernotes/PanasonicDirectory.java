@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 import com.lightcrafts.image.metadata.*;
+import com.lightcrafts.image.metadata.providers.ISOProvider;
 import com.lightcrafts.image.metadata.providers.LensProvider;
 import com.lightcrafts.image.metadata.providers.OrientationProvider;
 import com.lightcrafts.image.metadata.values.*;
@@ -24,16 +25,35 @@ import static com.lightcrafts.image.metadata.makernotes.PanasonicTags.*;
  */
 @SuppressWarnings({"CloneableClassWithoutClone"})
 public final class PanasonicDirectory extends MakerNotesDirectory implements
-    LensProvider, OrientationProvider {
+    ISOProvider, LensProvider, OrientationProvider {
 
     ////////// public /////////////////////////////////////////////////////////
 
     /**
      * {@inheritDoc}
      */
+    public int getISO() {
+        final ImageMetaValue value = getValue( PANASONIC_ISO );
+        if (value == null || hasTagValueLabelFor(value) != null) {
+            return 0;
+        } else {
+            final int iso = value.getIntValue();
+            switch (iso) {
+                case 65534:
+                case 65535:
+                    return 0;
+                default:
+                    return iso;
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public String getLens() {
         final ImageMetaValue value = getValue( PANASONIC_LENS_TYPE );
-        return value.getStringValue();
+        return value != null ? value.getStringValue() : null;
     }
 
     /**
@@ -130,6 +150,27 @@ public final class PanasonicDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    public void setOrientation( ImageOrientation orientation ) {
+        final int value;
+        switch ( orientation ) {
+            case ORIENTATION_LANDSCAPE:
+                value = 1;
+                break;
+            case ORIENTATION_90CW:
+                value = 6;
+                break;
+            case ORIENTATION_90CCW:
+                value = 8;
+                break;
+            default:
+                value = 0;
+        }
+        setValue( PANASONIC_ROTATION, value );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public String valueToString( ImageMetaValue value ) {
         switch ( value.getOwningTagID() ) {
             case PANASONIC_FIRMWARE_VERSION: {
@@ -163,17 +204,70 @@ public final class PanasonicDirectory extends MakerNotesDirectory implements
                     break;
                 }
             }
-            case PANASONIC_WHITE_BALANCE_BIAS: {
+            case PANASONIC_ISO: {
+                final String label = hasTagValueLabelFor(value);
+                if (label != null) {
+                    return label;
+                } else {
+                    final int iso = value.getIntValue();
+                    switch (iso) {
+                        case 65534:
+                            return "Intelligent";
+                        case 65535:
+                            return "n/a";
+                        default:
+                            return String.valueOf(iso);
+                    }
+                }
+            }
+            case PANASONIC_TIME_SINCE_POWER_ON: {
                 if ( !value.isNumeric() )
                     break;
-                final double bias = value.getFloatValue() / 3;
-                return MetadataUtil.convertBiasFromAPEX( bias );
+                final StringBuilder sb = new StringBuilder();
+                long time = value.getLongValue();
+                if ( time >= 24 * 3600 ) {
+                    final int days = (int)(time / (24 * 3600));
+                    sb.append( days );
+                    sb.append( " days " );  // TODO: localize
+                    time -= days * 24 * 3600;
+                }
+                final int h = (int)(time / 3600);
+                time -= h * 3600;
+                final int m = (int)(time / 60);
+                time -= m * 60;
+                final int s = (int)time;
+                sb.append( String.format( "%02d:%02d:%02d", h, m, s ) );
+                return sb.toString();
             }
+            case PANASONIC_TRAVEL_DAY:
+                if ( !value.isNumeric() )
+                    break;
+                return value.getIntValue() == 65535 ? "n/a" : value.getStringValue();
+            case PANASONIC_WHITE_BALANCE_BIAS:
+                if ( !value.isNumeric() )
+                    break;
+                final double bias = value.getIntValue() / 3.0;
+                return MetadataUtil.convertBiasFromAPEX( bias );
         }
         return super.valueToString( value );
     }
 
     ////////// protected //////////////////////////////////////////////////////
+
+    @Override
+    protected ImageMetaValue getLongFocalValue() {
+        return null;
+    }
+
+    @Override
+    protected ImageMetaValue getShortFocalValue() {
+        return null;
+    }
+
+    @Override
+    protected ImageMetaValue getMaxApertureValue() {
+        return null;
+    }
 
     /**
      * Get the {@link ResourceBundle} to use for tags.
@@ -233,27 +327,56 @@ public final class PanasonicDirectory extends MakerNotesDirectory implements
     );
 
     static {
+        add( PANASONIC_ACCESSORY_TYPE, "AccessoryType", META_STRING );
         add( PANASONIC_AUDIO, "Audio", META_USHORT );
+        add( PANASONIC_AUTO_FOCUS_ASSIST_LAMP, "AutoFocusAssistLamp", META_USHORT );
+        add( PANASONIC_BABY_AGE, "BabyAge", META_DATE );
+        add( PANASONIC_BABY_AGE_2, "BabyAge2", META_DATE );
         add( PANASONIC_BURST_MODE, "BurstMode", META_USHORT );
+        add( PANASONIC_CITY, "City", META_STRING );
         add( PANASONIC_COLOR_EFFECT, "ColorEffect", META_USHORT );
         add( PANASONIC_COLOR_MODE, "ColorMode", META_USHORT );
-        add( PANASONIC_CONTRAST, "Contrast", META_USHORT );
+        add( PANASONIC_CONTRAST, "Contrast", META_SSHORT );
+        add( PANASONIC_CONTRAST_MODE, "ContrastMode", META_USHORT );
+        add( PANASONIC_CONVERSION_LENS, "ConversionLens", META_USHORT );
+        add( PANASONIC_COUNTRY, "Country", META_STRING );
+        add( PANASONIC_EXIF_VERSION, "EXIFVersion", META_UNDEFINED );
+        add( PANASONIC_FACES_DETECTED, "FacesDetected", META_USHORT );
+        add( PANASONIC_FILM_MODE, "FilmMode", META_USHORT );
         add( PANASONIC_FIRMWARE_VERSION, "FirmwareVersion", META_UNDEFINED );
         add( PANASONIC_FLASH_BIAS, "FlashBias", META_SSHORT );
+        add( PANASONIC_FLASH_FIRED, "FlashFired", META_USHORT );
         add( PANASONIC_FOCUS_MODE, "FocusMode", META_USHORT );
+        add( PANASONIC_FLASH_WARNING, "FlashWarning", META_USHORT );
         add( PANASONIC_IMAGE_QUALITY, "ImageQuality", META_USHORT );
         add( PANASONIC_IMAGE_STABILIZER, "ImageStabilizer", META_USHORT );
+        add( PANASONIC_INTELLIGENT_RESOLUTION, "IntelligentResolution", META_UBYTE );
         add( PANASONIC_INTERNAL_SERIAL_NUMBER, "InternalSerialNumber", META_UNDEFINED );
+        add( PANASONIC_ISO, "ISO", META_USHORT );
+        add( PANASONIC_LANDMARK, "Landmark", META_STRING );
+        add( PANASONIC_LENS_SERIAL_NUMBER, "LensSerialNumber", META_STRING );
         add( PANASONIC_LENS_TYPE, "LensType", META_STRING );
         add( PANASONIC_MACRO_MODE, "MacroMode", META_USHORT );
         add( PANASONIC_NOISE_REDUCTION, "NoiseReduction", META_USHORT );
+        add( PANASONIC_OPTICAL_ZOOM_MODE, "OpticalZoomMode", META_USHORT );
         add( PANASONIC_ROTATION, "Rotation", META_USHORT );
+        add( PANASONIC_SATURATION, "Saturation", META_USHORT );
+        add( PANASONIC_SCENE_MODE, "SceneMode", META_USHORT );
         add( PANASONIC_SELF_TIMER, "SelfTimer", META_USHORT );
         add( PANASONIC_SEQUENCE_NUMBER, "SequenceNumber", META_ULONG );
+        add( PANASONIC_SHARPNESS, "Sharpness", META_USHORT );
         add( PANASONIC_SHOOTING_MODE, "ShootingMode", META_USHORT );
         add( PANASONIC_SPOT_MODE, "SpotMode", META_UBYTE );
+        add( PANASONIC_STATE, "State", META_STRING );
+        add( PANASONIC_TEXT_STAMP, "TextStamp", META_USHORT );
+        add( PANASONIC_TEXT_STAMP_2, "TextStamp2", META_USHORT );
+        add( PANASONIC_TEXT_STAMP_3, "TextStamp3", META_USHORT );
+        add( PANASONIC_TEXT_STAMP_4, "TextStamp4", META_USHORT );
+        add( PANASONIC_TIME_SINCE_POWER_ON, "TimeSincePowerOn", META_ULONG );
+        add( PANASONIC_TRAVEL_DAY, "TravelDay", META_USHORT );
         add( PANASONIC_WHITE_BALANCE, "WhiteBalance", META_USHORT );
         add( PANASONIC_WHITE_BALANCE_BIAS, "WhiteBalanceBias", META_SSHORT );
+        add( PANASONIC_WORLD_TIME_LOCATION, "WorldTimeDestination", META_USHORT );
     }
 }
 /* vim:set et sw=4 ts=4: */

@@ -1,20 +1,19 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
-/* Copyright (C) 2017-     Masahiro Kitagawa */
 
 package com.lightcrafts.image.metadata.makernotes;
 
 import com.lightcrafts.image.metadata.ImageMetadata;
 
 /**
- * <code>PentaxMakerNoteProbe</code> is-a {@link MakerNoteProbe} for
- * determining whether a maker note is by Pentax.
+ * {@code SonyMakerNoteProbe} is-a {@link MakerNoteProbe} for determining
+ * whether the maker notes are by Sony.
  *
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */
-final class PentaxMakerNoteProbe extends MakerNoteProbe {
+final class SonyMakerNoteProbe extends MakerNoteProbe {
 
-    /** The singleton instance of <code>PentaxMakerNoteProbe</code>. */
-    static final MakerNoteProbe INSTANCE = new PentaxMakerNoteProbe();
+    /** The singleton instance of {@code SonyMakerNoteProbe}. */
+    static final MakerNoteProbe INSTANCE = new SonyMakerNoteProbe();
 
     ////////// protected //////////////////////////////////////////////////////
 
@@ -24,16 +23,15 @@ final class PentaxMakerNoteProbe extends MakerNoteProbe {
     @Override
     protected Class<? extends MakerNotesDirectory>
     match( ImageMetadata metadata ) {
-        return matchUsingMake( metadata, PentaxDirectory.class,
-                "PENTAX", "RICOH" );
+        return matchUsingMake( metadata, "SONY", SonyDirectory.class );
     }
 
     ////////// private ////////////////////////////////////////////////////////
 
     /**
-     * Construct the singleton instance of <code>PentaxMakerNoteProbe</code>.
+     * Constructs the singleton instance of {@code SonyMakerNoteProbe}.
      */
-    private PentaxMakerNoteProbe() {
+    private SonyMakerNoteProbe() {
         // do nothing
     }
 }

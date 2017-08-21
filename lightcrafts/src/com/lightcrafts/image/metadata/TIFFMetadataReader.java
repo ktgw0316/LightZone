@@ -3,20 +3,15 @@
 package com.lightcrafts.image.metadata;
 
 import java.io.IOException;
-import java.io.File;
-import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.*;
 
 import com.lightcrafts.image.BadImageFileException;
-import com.lightcrafts.image.UnknownImageTypeException;
 import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.image.metadata.values.*;
-import com.lightcrafts.image.metadata.ImageMetadata;
 import com.lightcrafts.image.types.TIFFImageType;
 import com.lightcrafts.utils.Rational;
 import com.lightcrafts.utils.bytebuffer.ArrayByteBuffer;
-import com.lightcrafts.utils.bytebuffer.ByteBufferUtil;
 import com.lightcrafts.utils.bytebuffer.LCByteBuffer;
 
 import static com.lightcrafts.image.metadata.ImageMetadataConstants.*;
@@ -84,6 +79,7 @@ public class TIFFMetadataReader extends ImageMetadataReader {
      * @throws BadImageFileException if the internal format of the image file
      * header isn't as it's expected to be.
      */
+    @Override
     protected void readHeader() throws BadImageFileException, IOException {
         m_buf.position( 0 );
         if ( m_buf.remaining() < TIFF_HEADER_SIZE )
@@ -105,16 +101,16 @@ public class TIFFMetadataReader extends ImageMetadataReader {
     /**
      * Read the metadata from all directories.
      */
+    @Override
     protected void readAllDirectories() throws IOException {
-        ImageMetaValue xmpValue = null;
-
         m_buf.position(
             TIFF_HEADER_SIZE
             - TIFF_INT_SIZE     // so we can read the 0th IFD offset below
         );
         int ifdOffset = m_buf.getInt();
         final Set<Integer> ifdOffsetSet = new HashSet<Integer>();
-        for ( int dirIndex = 0; ifdOffset > 0; ++dirIndex ) {
+        ImageMetaValue xmpValue = null;
+        for (int dirIndex = 0; ifdOffset > 0; ++dirIndex ) {
             if ( !ifdOffsetSet.add( ifdOffset ) ) {
                 //
                 // There are some bad images in the wild where the next IFD
@@ -237,8 +233,11 @@ public class TIFFMetadataReader extends ImageMetadataReader {
             dir.setOwningMetadata( m_metadata );
             m_dirMap.put( name, dir );
             return dir;
-        }
-        catch ( Exception e ) {
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException( e );
+        } catch (InstantiationException e) {
+            throw new IllegalStateException( e );
+        } catch ( RuntimeException e ) {
             throw new IllegalStateException( e );
         }
     }
@@ -361,10 +360,7 @@ public class TIFFMetadataReader extends ImageMetadataReader {
                 final int pos = calcIFDEntryOffset( offset, entry );
                 readDirectoryEntry( pos, dir );
             }
-            catch ( IOException e ) {
-                throw e;
-            }
-            catch ( Exception e ) {
+            catch ( RuntimeException e ) {
                 logBadImageMetadata( e );
             }
         }
@@ -431,23 +427,8 @@ public class TIFFMetadataReader extends ImageMetadataReader {
                 final ImageMetadataDirectory exifDir =
                     m_metadata.getDirectoryFor( EXIFDirectory.class, true );
                 reader.readDirectory( subdirOffset, 0, exifDir );
+                reader.readMakerNotes();
                 return;
-            }
-            case TIFF_PANASONIC_JPEG_THUMBNAIL: {
-                ByteBuffer jpegBuffer = ByteBuffer.wrap( m_buf.getBytes(valueOffset, byteCount) );
-                File tmpFile = File.createTempFile("LCEmbeddedThumb", ".jpg");
-                String tmpName = tmpFile.getAbsolutePath();
-                ByteBufferUtil.dumpToFile(jpegBuffer, tmpName);
-                try {
-                        m_metadata.mergeFrom(ImageInfo.getInstanceFor( tmpFile ).getMetadata());
-                }
-                catch ( BadImageFileException e ) {
-                        logBadImageMetadata( "Processing embedded thumbnail's metadata threw a BadImageFileException" );
-                }
-                catch ( UnknownImageTypeException e ) {
-                        logBadImageMetadata( "Processing embedded thumbnail's metadata threw a UnknownImageTypeException" );
-                }
-                tmpFile.delete();
             }
             case TIFF_GPS_IFD_POINTER: {
                 final ImageMetadataDirectory gpsDir =
@@ -524,8 +505,6 @@ public class TIFFMetadataReader extends ImageMetadataReader {
 
             case TIFF_FIELD_TYPE_ASCII: {
                 final String s = readString( offset, numValues );
-                if ( s == null )
-                    return null;
                 switch ( tagID ) {
                     case TIFF_DATE_TIME:
                         //
@@ -666,11 +645,9 @@ public class TIFFMetadataReader extends ImageMetadataReader {
      */
     private static void copyValuesFromTo( ImageMetadataDirectory fromDir,
                                           ImageMetadataDirectory toDir ) {
-        for ( Iterator<Map.Entry<Integer,ImageMetaValue>> i = fromDir.iterator();
-              i.hasNext(); ) {
-            final Map.Entry<Integer,ImageMetaValue> me = i.next();
+        for (final Map.Entry<Integer, ImageMetaValue> me : fromDir) {
             final int tagID = me.getKey();
-            switch ( tagID ) {
+            switch (tagID) {
                 case TIFF_BITS_PER_SAMPLE:
                 case TIFF_COMPRESSION:
                 case TIFF_ICC_PROFILE:
@@ -706,9 +683,9 @@ public class TIFFMetadataReader extends ImageMetadataReader {
                 case TIFF_Y_RESOLUTION:
                     continue;
                 default:
-                    final ImageMetaValue toValue = toDir.getValue( tagID );
-                    if ( toValue == null )
-                        toDir.putValue( tagID, me.getValue() );
+                    final ImageMetaValue toValue = toDir.getValue(tagID);
+                    if (toValue == null)
+                        toDir.putValue(tagID, me.getValue());
             }
         }
     }

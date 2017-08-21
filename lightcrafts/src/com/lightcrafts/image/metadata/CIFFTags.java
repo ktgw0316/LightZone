@@ -438,6 +438,20 @@ public interface CIFFTags extends ImageMetaTags {
     int CIFF_CS_MACRO_MODE                  = CIFF_CAMERA_SETTINGS << 8 | 0x01;
 
     /**
+     * Camera setting: Maximum lens aperture in F-number;
+     * <p>
+     * Type: Short.
+     */
+    int CIFF_CS_MAX_APERTURE                = CIFF_CAMERA_SETTINGS << 8 | 0x1A;
+
+    /**
+     * Camera setting: Minimum lens aperture in F-number;
+     * <p>
+     * Type: Short.
+     */
+    int CIFF_CS_MIN_APERTURE                = CIFF_CAMERA_SETTINGS << 8 | 0x1B;
+
+    /**
      * Camera setting: metering mode.
      *  <blockquote>
      *    <table border="0" cellpadding="0">

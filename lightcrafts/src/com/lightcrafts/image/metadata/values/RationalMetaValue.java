@@ -113,8 +113,8 @@ public class RationalMetaValue extends NumericMetaValue {
     /**
      * {@inheritDoc}
      */
-    public final long getLongValue() {
-        return getRationalValue().longValue();
+    public final long getLongValueAt(int index) {
+        return m_value[index].longValue();
     }
 
     /**

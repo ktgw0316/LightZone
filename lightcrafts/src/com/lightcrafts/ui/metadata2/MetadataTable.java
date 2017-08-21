@@ -10,6 +10,8 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableCellEditor;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
+import java.net.URI;
 
 class MetadataTable extends JTable {
 
@@ -49,9 +51,18 @@ class MetadataTable extends JTable {
                                 Point p = event.getPoint();
                                 int row = rowAtPoint(p);
                                 int col = columnAtPoint(p);
-                                editCellAt(row, col);
-                                if (editorComp != null) {
+                                if (editCellAt(row, col) && editorComp != null) {
                                     editorComp.requestFocusInWindow();
+                                }
+                                else {
+                                    URI uri = model.getURIAt(row);
+                                    if (uri != null) {
+                                        try {
+                                            Desktop.getDesktop().browse(uri);
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -59,6 +70,7 @@ class MetadataTable extends JTable {
                 }                
             }
         );
+
         // Set up the default cell editor:
         //
         //   Same font as the renderer;

@@ -97,9 +97,9 @@ public final class StringMetaValue extends ImageMetaValue {
     /**
      * {@inheritDoc}
      */
-    public long getLongValue() {
+    public long getLongValueAt(int index) {
         try {
-            return Long.parseLong( getStringValue() );
+            return Long.parseLong( getStringValueAt(index) );
         }
         catch ( NumberFormatException e ) {
             return 0;
