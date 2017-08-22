@@ -66,6 +66,7 @@ public class EXIFMetadataReader extends ImageMetadataReader
     public void readAllDirectories() throws IOException {
         m_exifParser.parseAllDirectories();
         mergeEXIFDirectories();
+        readMakerNotes();
     }
 
     /**
