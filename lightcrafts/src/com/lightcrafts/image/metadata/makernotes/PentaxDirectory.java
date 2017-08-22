@@ -386,6 +386,25 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
         return PentaxTags.class;
     }
 
+    /**
+     * Gets the priority of this directory for providing the metadata supplied
+     * by implementing the given provider interface.
+     * <p>
+     * The priority for {@link LensProvider} for Pentax is higher than
+     * the priority from {@link CoreDirectory} and EXIF/TIFF metadata.
+     *
+     * @param provider The provider interface to get the priority for.
+     * @return Returns said priority.
+     */
+    @Override
+    protected int getProviderPriorityFor(
+            Class<? extends ImageMetadataProvider> provider )
+    {
+        return (provider == LensProvider.class)
+                ? PROVIDER_PRIORITY_DEFAULT + 20
+                : super.getProviderPriorityFor( provider );
+    }
+
     ////////// private ////////////////////////////////////////////////////////
 
     /**
