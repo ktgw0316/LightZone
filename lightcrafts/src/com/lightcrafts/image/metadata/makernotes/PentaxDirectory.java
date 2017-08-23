@@ -318,8 +318,10 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
                 }
                 break;
             case PENTAX_LENS_TYPE: {
-                if ( value.getValueCount() != 4 )
+                final int count = value.getValueCount();
+                if (count < 2 || 4 < count) {
                     return;
+                }
                 //
                 // Pentax Cameras use 2 values for this: a lens group and a
                 // lens ID within that group.  Since our value labeling scheme
