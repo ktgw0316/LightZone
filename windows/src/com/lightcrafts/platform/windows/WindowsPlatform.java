@@ -268,34 +268,7 @@ public final class WindowsPlatform extends Platform {
         final File profileDir = new File(
             windir + "\\system32\\spool\\drivers\\color"
         );
-        if ( !profileDir.isDirectory() )
-            return m_profiles;
-
-        final File[] files =
-            profileDir.listFiles( ICC_ProfileFileFilter.INSTANCE );
-        for ( File file : files ) {
-            final String path = file.getAbsolutePath();
-            try {
-                final ICC_Profile profile = ICC_Profile.getInstance( path );
-                final String name = ColorProfileInfo.getNameOf( profile );
-                m_profiles.add( new ColorProfileInfo( name, path ) );
-            }
-            catch ( IOException e ) {
-                // Trouble reading the file
-                System.err.println(
-                    "Can't read a color profile from " + path + ": "
-                    + e.getMessage()
-                );
-            }
-            catch ( Throwable t ) {
-                // Invalid color profile data
-                System.err.println(
-                    "Bad color profile at " + path + ": " + t.getMessage()
-                );
-            }
-        }
-        Collections.sort( m_profiles );
-        return m_profiles;
+        return getColorProfiles(profileDir);
     }
 
     /**
