@@ -113,9 +113,9 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
         if ( value == null )
             return 0;
         final String make = getOwningMetadata().getCameraMake( true );
-        if ( m_focalLengthPattern.matcher( make ).matches() )
-            return value.getIntValue() / 10F;
-        return value.getIntValue() / 100F;
+        return (make != null && m_focalLengthPattern.matcher(make).matches())
+                ? value.getIntValue() / 10F
+                : value.getIntValue() / 100F;
     }
 
     /**
@@ -290,6 +290,9 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
                 // time to the date field.
                 //
                 final ImageMetaValue dateValue = getValue( PENTAX_DATE );
+                if (dateValue == null) {
+                    return;
+                }
                 final Date date = ((DateMetaValue)dateValue).getDateValue();
                 final byte[] buf =
                     ((UndefinedMetaValue)value).getUndefinedValue();

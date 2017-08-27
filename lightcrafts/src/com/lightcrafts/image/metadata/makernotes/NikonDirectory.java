@@ -73,10 +73,13 @@ public final class NikonDirectory extends MakerNotesDirectory implements
      */
     @Override
     public String getLens() {
-        final String name = valueToString( getValue( NIKON_LENS ) );
-        if (name != null)
-            return name;
-
+        final ImageMetaValue value = getValue(NIKON_LENS);
+        if (value != null) {
+            final String name = valueToString(value);
+            if (name != null) {
+                return name;
+            }
+        }
         return super.getLens();
     }
 
@@ -328,20 +331,24 @@ switch_tagID:
             // We've got all the pieces needed to decrypt the encrypted lens
             // data so do it now.
             //
-            final byte[] lensData =
-                ((UndefinedMetaValue)removeValue( NIKON_LENS_DATA )).getUndefinedValue();
-            final long serialNumber =
-                getValue( NIKON_SERIAL_NUMBER ).getLongValue();
-            final long shutterCount =
-                getValue( NIKON_SHUTTER_COUNT ).getLongValue();
-            decrypt( lensData, 4, serialNumber, shutterCount );
-            m_decryptCount = Integer.MIN_VALUE; // never do this "if" again
-            //
-            // Since we support two version of Nikon lens data, we use
-            // NIKON_LENS_DATA << 8 | 0x21 for this version.
-            //
-            // TODO: support tag version 0x0204
-            explodeSubfields( NIKON_LENS_DATA << 8 | 0x21, lensData, 4 );
+            final ImageMetaValue lensDataValue = removeValue(NIKON_LENS_DATA);
+            final ImageMetaValue serialNumberValue = getValue(NIKON_SERIAL_NUMBER);
+            final ImageMetaValue shutterCountValue = getValue(NIKON_SHUTTER_COUNT);
+            if (lensDataValue != null && serialNumberValue != null
+                    && shutterCountValue != null) {
+                final byte[] lensData =
+                        ((UndefinedMetaValue) lensDataValue).getUndefinedValue();
+                final long serialNumber = serialNumberValue.getLongValue();
+                final long shutterCount = shutterCountValue.getLongValue();
+                decrypt(lensData, 4, serialNumber, shutterCount);
+                m_decryptCount = Integer.MIN_VALUE; // never do this "if" again
+                //
+                // Since we support two version of Nikon lens data, we use
+                // NIKON_LENS_DATA << 8 | 0x21 for this version.
+                //
+                // TODO: support tag version 0x0204
+                explodeSubfields(NIKON_LENS_DATA << 8 | 0x21, lensData, 4);
+            }
         }
     }
 
