@@ -110,7 +110,7 @@ Java_com_lightcrafts_utils_Lensfun_getLensNamesForCamera
 
     env->ReleaseStringUTFChars(cameraMakerStr, 0);
     env->ReleaseStringUTFChars(cameraModelStr, 0);
-    
+
     const lfLens* const* allLenses = lf->getLenses();
 
     std::vector<const lfLens*> list;
@@ -124,7 +124,7 @@ Java_com_lightcrafts_utils_Lensfun_getLensNamesForCamera
 
 #ifdef DEBUG
         std::cout << "*** lens(" << i << ") = "
-            << lens->Maker << ": " << lens->Model << std::endl;  
+            << lens->Maker << ": " << lens->Model << std::endl;
 #endif
     }
     return createJArray(env, list, list.size());
@@ -275,7 +275,7 @@ const lfCamera* LC_lensfun::findCamera(
     if (!cameras) {
 #ifdef DEBUG
         std::cerr << "Cannot find the camera \""
-            << cameraMaker << ": " << cameraModel << "\"" 
+            << cameraMaker << ": " << cameraModel << "\""
             << " in database" << std::endl;
 #endif
         return nullptr;
@@ -422,11 +422,11 @@ void LC_lensfun::applyModifier
                     dstData[dstIdx + dstBOffset] = 0;
                 }
                 else {
-                    dstData[dstIdx + dstROffset] = BilinearInterp(srcData, srcPixelStride,
+                    dstData[dstIdx + dstROffset] = MitchellInterp(srcData, srcPixelStride,
                             srcROffset, srcLineStride, srcRX - srcRectX, srcRY - srcRectY);
-                    dstData[dstIdx + dstGOffset] = BilinearInterp(srcData, srcPixelStride,
+                    dstData[dstIdx + dstGOffset] = MitchellInterp(srcData, srcPixelStride,
                             srcGOffset, srcLineStride, srcGX - srcRectX, srcGY - srcRectY);
-                    dstData[dstIdx + dstBOffset] = BilinearInterp(srcData, srcPixelStride,
+                    dstData[dstIdx + dstBOffset] = MitchellInterp(srcData, srcPixelStride,
                             srcBOffset, srcLineStride, srcBX - srcRectX, srcBY - srcRectY);
                 }
             }
