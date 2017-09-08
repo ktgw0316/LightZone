@@ -905,7 +905,12 @@ public interface EXIFTags extends ImageMetaTags {
             EXIF_YCBCR_COEFFICIENTS,
             EXIF_YCBCR_POSITIONING,
             EXIF_YCBCR_SUBSAMPLING,
-            EXIF_Y_RESOLUTION
+            EXIF_Y_RESOLUTION,
+
+            // DNG common tags
+            EXIF_FOCAL_LENGTH,
+            EXIF_ISO_SPEED_RATINGS,
+            EXIF_LENS_MODEL
     );
 }
 /* vim:set et sw=4 ts=4: */

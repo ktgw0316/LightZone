@@ -829,11 +829,16 @@ public class ImageMetadata implements
                 ((CIFFDirectory)ciffDir).convertMetadata( toJPEG );
             metadata.mergeFrom( ciffMetadata );
             metadata.removeDirectory( CIFFDirectory.class );
-        } else if ( tiffDir == null ) {
-            //
-            // There's no TIFF metadata; see if there's DNG metadata.
-            //
-            tiffDir = metadata.getDirectoryFor( DNGDirectory.class );
+        } else {
+            final ImageMetadataDirectory dngDir =
+                    metadata.getDirectoryFor(DNGDirectory.class);
+            if (dngDir != null) {
+                if (tiffDir == null) {
+                    tiffDir = metadata.getDirectoryFor(TIFFDirectory.class, true);
+                }
+                tiffDir.mergeFrom(dngDir);
+                metadata.removeDirectory(DNGDirectory.class);
+            }
         }
 
         final ImageMetadataDirectory exifDir =
@@ -1062,10 +1067,6 @@ public class ImageMetadata implements
                 EXIF_GPS_IFD_POINTER, new UnsignedLongMetaValue( 0 )
             );
 
-        //
-        // Remove other directories that aren't present in either JPEG or TIFF.
-        //
-        metadata.removeDirectory( DNGDirectory.class );
         //
         // Remove all maker notes since we currently don't export them.
         //
