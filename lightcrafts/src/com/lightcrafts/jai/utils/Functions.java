@@ -2,7 +2,7 @@
 
 package com.lightcrafts.jai.utils;
 
-import com.lightcrafts.mediax.jai.*;
+import javax.media.jai.*;
 import java.awt.image.*;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.*;

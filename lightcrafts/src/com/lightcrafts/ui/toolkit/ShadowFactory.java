@@ -12,9 +12,9 @@ package com.lightcrafts.ui.toolkit;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.JAIContext;
 
-import com.lightcrafts.mediax.jai.KernelJAI;
-import com.lightcrafts.mediax.jai.JAI;
-import com.lightcrafts.mediax.jai.BorderExtender;
+import javax.media.jai.KernelJAI;
+import javax.media.jai.JAI;
+import javax.media.jai.BorderExtender;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;

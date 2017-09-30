@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import javax.swing.*;
 import javax.swing.Timer;
 
-import com.lightcrafts.mediax.jai.*;
+import javax.media.jai.*;
 import com.lightcrafts.ui.LightZoneSkin;
 
 import lombok.*;

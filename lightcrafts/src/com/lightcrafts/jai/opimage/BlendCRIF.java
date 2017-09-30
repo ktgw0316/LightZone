@@ -4,9 +4,9 @@ package com.lightcrafts.jai.opimage;
 
 import com.lightcrafts.media.jai.opimage.RIFUtil;
 
-import com.lightcrafts.mediax.jai.ImageLayout;
-import com.lightcrafts.mediax.jai.CRIFImpl;
-import com.lightcrafts.mediax.jai.ROI;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.CRIFImpl;
+import javax.media.jai.ROI;
 
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;

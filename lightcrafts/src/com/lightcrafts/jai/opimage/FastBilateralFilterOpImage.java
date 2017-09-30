@@ -7,11 +7,11 @@ import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.image.*;
 
-import com.lightcrafts.mediax.jai.AreaOpImage;
-import com.lightcrafts.mediax.jai.BorderExtender;
-import com.lightcrafts.mediax.jai.ImageLayout;
-import com.lightcrafts.mediax.jai.RasterAccessor;
-import com.lightcrafts.mediax.jai.RasterFormatTag;
+import javax.media.jai.AreaOpImage;
+import javax.media.jai.BorderExtender;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.RasterAccessor;
+import javax.media.jai.RasterFormatTag;
 
 import java.util.Map;
 

@@ -8,7 +8,7 @@ import com.lightcrafts.utils.splines;
 import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.jai.LightnessLookupTable;
 
-import com.lightcrafts.mediax.jai.*;
+import javax.media.jai.*;
 import java.awt.*;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.image.DataBuffer;

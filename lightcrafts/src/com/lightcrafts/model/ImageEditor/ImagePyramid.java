@@ -5,10 +5,10 @@ package com.lightcrafts.model.ImageEditor;
 
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.utils.Functions;
-import com.lightcrafts.mediax.jai.BorderExtender;
-import com.lightcrafts.mediax.jai.Interpolation;
-import com.lightcrafts.mediax.jai.JAI;
-import com.lightcrafts.mediax.jai.RenderedOp;
+import javax.media.jai.BorderExtender;
+import javax.media.jai.Interpolation;
+import javax.media.jai.JAI;
+import javax.media.jai.RenderedOp;
 
 import lombok.val;
 

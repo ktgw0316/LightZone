@@ -3,8 +3,8 @@ package com.lightcrafts.model.ImageEditor;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.opimage.BilateralFilterRGBOpImage;
 import com.lightcrafts.jai.utils.Transform;
-import com.lightcrafts.mediax.jai.BorderExtender;
-import com.lightcrafts.mediax.jai.PlanarImage;
+import javax.media.jai.BorderExtender;
+import javax.media.jai.PlanarImage;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
 

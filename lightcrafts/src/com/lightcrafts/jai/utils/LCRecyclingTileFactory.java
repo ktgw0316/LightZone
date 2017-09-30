@@ -33,8 +33,8 @@ import java.util.HashMap;
 import java.util.Observable;
 import com.lightcrafts.media.jai.util.DataBufferUtils;
 
-import com.lightcrafts.mediax.jai.TileFactory;
-import com.lightcrafts.mediax.jai.TileRecycler;
+import javax.media.jai.TileFactory;
+import javax.media.jai.TileRecycler;
 
 /**
  * A simple implementation of <code>TileFactory</code> wherein the tiles

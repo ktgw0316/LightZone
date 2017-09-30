@@ -10,7 +10,7 @@ import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.LCROIShape;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.utils.SoftValueHashMap;
-import com.lightcrafts.mediax.jai.*;
+import javax.media.jai.*;
 
 import java.awt.image.*;
 import java.awt.image.renderable.ParameterBlock;

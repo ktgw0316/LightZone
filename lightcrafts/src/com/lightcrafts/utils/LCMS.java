@@ -14,8 +14,8 @@ import java.util.Map;
 import java.util.Arrays;
 
 import com.lightcrafts.media.jai.util.ImageUtil;
-import com.lightcrafts.mediax.jai.RasterAccessor;
-import com.lightcrafts.mediax.jai.RasterFormatTag;
+import javax.media.jai.RasterAccessor;
+import javax.media.jai.RasterFormatTag;
 import sun.awt.image.ShortInterleavedRaster;
 import sun.awt.image.ByteInterleavedRaster;
 import com.lightcrafts.jai.utils.Functions;

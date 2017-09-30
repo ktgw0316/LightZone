@@ -4,8 +4,8 @@ package com.lightcrafts.jai.operator;
 
 import com.lightcrafts.media.jai.util.AreaOpPropertyGenerator;
 
-import com.lightcrafts.mediax.jai.*;
-import com.lightcrafts.mediax.jai.registry.RenderedRegistryMode;
+import javax.media.jai.*;
+import javax.media.jai.registry.RenderedRegistryMode;
 import java.awt.image.RenderedImage;
 import java.awt.*;
 

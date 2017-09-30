@@ -11,9 +11,9 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
-import com.lightcrafts.mediax.jai.PlanarImage;
-import com.lightcrafts.mediax.jai.JAI;
-import com.lightcrafts.mediax.jai.ImageLayout;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.JAI;
+import javax.media.jai.ImageLayout;
 
 import org.w3c.dom.Document;
 

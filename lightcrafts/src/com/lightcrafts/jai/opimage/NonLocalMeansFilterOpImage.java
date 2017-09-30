@@ -2,7 +2,7 @@
 package com.lightcrafts.jai.opimage;
 
 import com.lightcrafts.image.color.ColorScience;
-import com.lightcrafts.mediax.jai.*;
+import javax.media.jai.*;
 
 import java.awt.*;
 import java.awt.image.DataBuffer;

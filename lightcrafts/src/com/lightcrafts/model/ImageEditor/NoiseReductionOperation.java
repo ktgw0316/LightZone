@@ -9,8 +9,8 @@ import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.utils.ColorScience;
 
-import com.lightcrafts.mediax.jai.*;
-import com.lightcrafts.mediax.jai.operator.MedianFilterDescriptor;
+import javax.media.jai.*;
+import javax.media.jai.operator.MedianFilterDescriptor;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.*;
 import java.text.DecimalFormat;

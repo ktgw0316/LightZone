@@ -17,12 +17,12 @@ import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
-import com.lightcrafts.mediax.jai.AreaOpImage;
-import com.lightcrafts.mediax.jai.BorderExtender;
-import com.lightcrafts.mediax.jai.ImageLayout;
-import com.lightcrafts.mediax.jai.RasterAccessor;
-import com.lightcrafts.mediax.jai.RasterFormatTag;
-import com.lightcrafts.mediax.jai.KernelJAI;
+import javax.media.jai.AreaOpImage;
+import javax.media.jai.BorderExtender;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.RasterAccessor;
+import javax.media.jai.RasterFormatTag;
+import javax.media.jai.KernelJAI;
 import java.util.Map;
 // import com.lightcrafts.media.jai.test.OpImageTester;
 

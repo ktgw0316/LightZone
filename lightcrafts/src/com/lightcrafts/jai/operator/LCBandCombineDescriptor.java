@@ -18,13 +18,13 @@ import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.image.renderable.RenderableImage;
-import com.lightcrafts.mediax.jai.JAI;
-import com.lightcrafts.mediax.jai.OperationDescriptorImpl;
-import com.lightcrafts.mediax.jai.ParameterBlockJAI;
-import com.lightcrafts.mediax.jai.RenderableOp;
-import com.lightcrafts.mediax.jai.RenderedOp;
-import com.lightcrafts.mediax.jai.registry.RenderableRegistryMode;
-import com.lightcrafts.mediax.jai.registry.RenderedRegistryMode;
+import javax.media.jai.JAI;
+import javax.media.jai.OperationDescriptorImpl;
+import javax.media.jai.ParameterBlockJAI;
+import javax.media.jai.RenderableOp;
+import javax.media.jai.RenderedOp;
+import javax.media.jai.registry.RenderableRegistryMode;
+import javax.media.jai.registry.RenderedRegistryMode;
 
 /**
  * An <code>OperationDescriptor</code> describing the "BandCombine" operation.
@@ -84,7 +84,7 @@ import com.lightcrafts.mediax.jai.registry.RenderedRegistryMode;
  *                     <td>NO_PARAMETER_DEFAULT</td>
  * </table></p>
  *
- * @see com.lightcrafts.mediax.jai.OperationDescriptor
+ * @see javax.media.jai.OperationDescriptor
  */
 public class LCBandCombineDescriptor extends OperationDescriptorImpl {
 

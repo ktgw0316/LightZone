@@ -4,7 +4,7 @@ package com.lightcrafts.jai.opimage;
 
 import com.lightcrafts.media.jai.opimage.RIFUtil;
 
-import com.lightcrafts.mediax.jai.*;
+import javax.media.jai.*;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.*;

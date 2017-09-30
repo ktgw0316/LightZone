@@ -5,10 +5,10 @@ package com.lightcrafts.jai.opimage;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.utils.Functions;
 
-import com.lightcrafts.mediax.jai.PlanarImage;
-import com.lightcrafts.mediax.jai.TileCache;
-import com.lightcrafts.mediax.jai.ImageLayout;
-import com.lightcrafts.mediax.jai.RasterFactory;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.TileCache;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.RasterFactory;
 import java.awt.image.*;
 import java.awt.*;
 

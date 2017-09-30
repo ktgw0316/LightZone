@@ -2,10 +2,10 @@
 
 package com.lightcrafts.image.metadata;
 
-import com.lightcrafts.mediax.jai.operator.TransposeType;
+import javax.media.jai.operator.TransposeType;
 
 import static com.lightcrafts.image.types.TIFFConstants.*;
-import static com.lightcrafts.mediax.jai.operator.TransposeDescriptor.*;
+import static javax.media.jai.operator.TransposeDescriptor.*;
 
 /**
  * An <code>ImageOrientation</code> specifies the orientation of an image.
