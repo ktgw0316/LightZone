@@ -9,7 +9,7 @@ import com.lightcrafts.jai.utils.LCRecyclingTileFactory;
 import com.lightcrafts.utils.ColorScience;
 import com.lightcrafts.utils.ColorProfileInfo;
 import com.lightcrafts.platform.Platform;
-import com.lightcrafts.media.jai.util.SunTileCache;
+import com.sun.media.jai.util.SunTileCache;
 
 import javax.media.jai.*;
 import javax.media.jai.registry.CRIFRegistry;

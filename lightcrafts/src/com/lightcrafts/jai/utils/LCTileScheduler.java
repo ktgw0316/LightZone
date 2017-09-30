@@ -36,7 +36,7 @@ import javax.media.jai.TileRequest;
 import javax.media.jai.TileScheduler;
 import javax.media.jai.util.ImagingException;
 import javax.media.jai.util.ImagingListener;
-import com.lightcrafts.media.jai.util.ImageUtil;
+import com.sun.media.jai.util.ImageUtil;
 
 /**
  * A class representing a request for non-prefetch background computation

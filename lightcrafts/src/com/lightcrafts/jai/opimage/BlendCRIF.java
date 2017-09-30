@@ -2,7 +2,7 @@
 
 package com.lightcrafts.jai.opimage;
 
-import com.lightcrafts.media.jai.opimage.RIFUtil;
+import com.sun.media.jai.opimage.RIFUtil;
 
 import javax.media.jai.ImageLayout;
 import javax.media.jai.CRIFImpl;

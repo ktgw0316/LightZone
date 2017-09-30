@@ -24,7 +24,7 @@ import javax.media.jai.RasterAccessor;
 import javax.media.jai.RasterFormatTag;
 import javax.media.jai.KernelJAI;
 import java.util.Map;
-// import com.lightcrafts.media.jai.test.OpImageTester;
+// import com.sun.media.jai.test.OpImageTester;
 
 /**
  * An OpImage class to perform separable convolve on a source image.
@@ -402,7 +402,7 @@ final class LCSeparableConvolveOpImage extends AreaOpImage {
 //     }
 
 //     public static void main(String args[]) {
-//         String classname = "com.lightcrafts.media.jai.opimage.SeparableConvolveOpImage";
+//         String classname = "com.sun.media.jai.opimage.SeparableConvolveOpImage";
 //         OpImageTester.performDiagnostics(classname,args);
 //     }
 }

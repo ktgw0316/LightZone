@@ -19,7 +19,7 @@ import com.lightcrafts.utils.ColorProfileInfo;
 import com.lightcrafts.model.ImageEditor.Rendering;
 import com.lightcrafts.model.ImageEditor.ImageProcessor;
 import com.lightcrafts.model.Operation;
-import com.lightcrafts.media.jai.util.ImageUtil;
+import com.sun.media.jai.util.ImageUtil;
 
 /**
  * Created by IntelliJ IDEA.

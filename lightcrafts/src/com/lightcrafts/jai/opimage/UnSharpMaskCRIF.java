@@ -12,7 +12,7 @@
  * $State: Exp $
  */
 package com.lightcrafts.jai.opimage;
-import com.lightcrafts.media.jai.opimage.RIFUtil;
+import com.sun.media.jai.opimage.RIFUtil;
 
 import java.awt.RenderingHints;
 import java.awt.image.RenderedImage;

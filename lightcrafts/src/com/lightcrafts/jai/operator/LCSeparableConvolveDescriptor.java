@@ -13,7 +13,7 @@
  */
 package com.lightcrafts.jai.operator;
 
-import com.lightcrafts.media.jai.util.AreaOpPropertyGenerator;
+import com.sun.media.jai.util.AreaOpPropertyGenerator;
 import java.awt.RenderingHints;
 import java.awt.image.RenderedImage;
 import javax.media.jai.JAI;
@@ -84,7 +84,7 @@ import javax.media.jai.registry.RenderedRegistryMode;
  * <tr><th>Name</th>        <th>Value</th></tr>
  * <tr><td>GlobalName</td>  <td>Convolve</td></tr>
  * <tr><td>LocalName</td>   <td>Convolve</td></tr>
- * <tr><td>Vendor</td>      <td>com.lightcrafts.media.jai</td></tr>
+ * <tr><td>Vendor</td>      <td>com.sun.media.jai</td></tr>
  * <tr><td>Description</td> <td>Performs kernel-based convolution
  *                              on an image.</td></tr>
  * <tr><td>DocURL</td>      <td>http://java.sun.com/products/java-media/jai/forDevelopers/jai-apidocs/javax/media/jai/operator/ConvolveDescriptor.html</td></tr>

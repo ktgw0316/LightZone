@@ -6,7 +6,7 @@ import javax.media.jai.PointOpImage;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.RasterFormatTag;
 import javax.media.jai.RasterAccessor;
-import com.lightcrafts.media.jai.util.ImageUtil;
+import com.sun.media.jai.util.ImageUtil;
 import com.lightcrafts.utils.ColorScience;
 
 import java.awt.image.*;

@@ -24,8 +24,8 @@ import javax.media.jai.PointOpImage;
 import javax.media.jai.RasterAccessor;
 import javax.media.jai.RasterFormatTag;
 import javax.media.jai.RasterFactory;
-import com.lightcrafts.media.jai.util.ImageUtil;
-import com.lightcrafts.media.jai.util.JDKWorkarounds;
+import com.sun.media.jai.util.ImageUtil;
+import com.sun.media.jai.util.JDKWorkarounds;
 
 /**
  * An <code>OpImage</code> implementing the "BandCombine" operation.

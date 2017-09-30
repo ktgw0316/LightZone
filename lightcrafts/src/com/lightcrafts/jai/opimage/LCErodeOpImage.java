@@ -25,7 +25,7 @@ import javax.media.jai.KernelJAI;
 import javax.media.jai.RasterAccessor;
 import javax.media.jai.RasterFormatTag;
 import java.util.Map;
-// import com.lightcrafts.media.jai.test.OpImageTester;
+// import com.sun.media.jai.test.OpImageTester;
 
 /**
  *

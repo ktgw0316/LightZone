@@ -21,7 +21,7 @@ import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 import javax.media.jai.CRIFImpl;
 import javax.media.jai.ImageLayout;
-import com.lightcrafts.media.jai.opimage.RIFUtil;
+import com.sun.media.jai.opimage.RIFUtil;
 import com.lightcrafts.jai.operator.LCMSColorConvertDescriptor;
 
 
@@ -30,7 +30,7 @@ import com.lightcrafts.jai.operator.LCMSColorConvertDescriptor;
  * and renderable image layers.
  *
  * @see javax.media.jai.operator.ColorConvertDescriptor
- * @see com.lightcrafts.media.jai.opimage.ColorConvertOpImage
+ * @see com.sun.media.jai.opimage.ColorConvertOpImage
  *
  * @since EA4
  *

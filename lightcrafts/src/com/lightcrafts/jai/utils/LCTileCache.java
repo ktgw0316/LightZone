@@ -13,8 +13,8 @@
  */
 package com.lightcrafts.jai.utils;
 
-import com.lightcrafts.media.jai.util.CacheDiagnostics;
-import com.lightcrafts.media.jai.util.ImageUtil;
+import com.sun.media.jai.util.CacheDiagnostics;
+import com.sun.media.jai.util.ImageUtil;
 import com.lightcrafts.utils.cache.*;
 import com.lightcrafts.utils.MemoryLimits;
 import com.lightcrafts.utils.LCArrays;

@@ -31,7 +31,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Observable;
-import com.lightcrafts.media.jai.util.DataBufferUtils;
+import com.sun.media.jai.util.DataBufferUtils;
 
 import javax.media.jai.TileFactory;
 import javax.media.jai.TileRecycler;

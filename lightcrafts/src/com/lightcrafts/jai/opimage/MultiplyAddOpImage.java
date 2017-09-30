@@ -25,9 +25,9 @@ import javax.media.jai.RasterAccessor;
 import javax.media.jai.RasterFormatTag;
 import javax.media.jai.RasterFactory;
 import java.util.Map;
-import com.lightcrafts.media.jai.util.ImageUtil;
-import com.lightcrafts.media.jai.util.JDKWorkarounds;
-/// import com.lightcrafts.media.jai.test.OpImageTester;
+import com.sun.media.jai.util.ImageUtil;
+import com.sun.media.jai.util.JDKWorkarounds;
+/// import com.sun.media.jai.test.OpImageTester;
 
 /**
  * An <code>OpImage</code> implementing the "Add" operation as

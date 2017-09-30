@@ -2,7 +2,7 @@
 
 package com.lightcrafts.jai.operator;
 
-import com.lightcrafts.media.jai.util.AreaOpPropertyGenerator;
+import com.sun.media.jai.util.AreaOpPropertyGenerator;
 
 import javax.media.jai.*;
 import javax.media.jai.registry.RenderedRegistryMode;
