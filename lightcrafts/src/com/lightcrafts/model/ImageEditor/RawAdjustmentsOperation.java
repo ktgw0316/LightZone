@@ -24,6 +24,8 @@ import java.awt.image.Raster;
 import java.util.*;
 
 import Jama.Matrix;
+import com.lightcrafts.utils.LCMatrix;
+
 import java.lang.String;
 
 import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_RAW_ADJUSTMENTS;
@@ -74,7 +76,7 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
     static final OperationType typeV1 = new OperationTypeImpl("RAW Adjustments");
     static final OperationType typeV2 = new OperationTypeImpl("RAW Adjustments V2");
 
-    private static final Matrix RGBtoZYX = new Matrix(ColorScience.RGBtoZYX()).transpose();
+    private static final Matrix RGBtoZYX = new LCMatrix(ColorScience.RGBtoZYX()).transpose();
     private static final Matrix XYZtoRGB = RGBtoZYX.inverse();
 
     public RawAdjustmentsOperation(Rendering rendering, OperationType type) {
@@ -141,10 +143,12 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
                     for (int j = 0; j < 3; j++)
                         cameraRGBWB[j][i] *= wb[i];
 
-                Matrix B = new Matrix(ColorScience.chromaticAdaptation(daylightTemperature, originalTemperature, caMethod));
+                Matrix B = new LCMatrix(ColorScience.chromaticAdaptation(daylightTemperature, originalTemperature, caMethod));
                 Matrix combo = XYZtoRGB.times(B.times(RGBtoZYX));
 
-                cameraRGBWB = combo.inverse().times(new Matrix(cameraRGBWB)).getArrayFloat();
+                cameraRGBWB = LCMatrix.getArrayFloat(
+                        combo.inverse().times(new LCMatrix(cameraRGBWB))
+                );
             }
 
             cameraRGBCA = dcRaw.getCameraRGB();
@@ -179,7 +183,7 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
         float sat = Float.MAX_VALUE;
         float minT = 0;
         for (int t = 1000; t < 40000; t+= (0.01 * t)) {
-            Matrix B = new Matrix(ColorScience.chromaticAdaptation(t, refT, caMethod));
+            Matrix B = new LCMatrix(ColorScience.chromaticAdaptation(t, refT, caMethod));
             Matrix combo = XYZtoRGB.times(B.times(RGBtoZYX));
 
             Matrix color = new Matrix(new double[][]{{rgb[0]}, {rgb[1]}, {rgb[2]}});
@@ -368,7 +372,7 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
             }
 
             // Chromatic adaptation matrix
-            Matrix B = new Matrix(ColorScience.chromaticAdaptation(daylightTemperature, temperature, caMethod));
+            Matrix B = new LCMatrix(ColorScience.chromaticAdaptation(daylightTemperature, temperature, caMethod));
             Matrix CA = XYZtoRGB.times(B.times(RGBtoZYX));
 
             // Normalize the CA matrix to keep exposure constant
@@ -378,7 +382,9 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
                 CA = CA.times(new Matrix(new double[][]{{1/max, 0, 0},{0, 1/max, 0},{0, 0, 1/max}}));
 
             // The matrix taking into account the camera color space and its basic white balance and exposure
-            float camMatrix[][] = CA.times(new Matrix(cameraRGB(temperature)).times(Math.pow(2, exposure))).getArrayFloat();
+            float camMatrix[][] = LCMatrix.getArrayFloat(
+                    CA.times(new LCMatrix(cameraRGB(temperature)).times(Math.pow(2, exposure)))
+            );
 
             front = new HighlightRecoveryOpImage(front, preMul, camMatrix, JAIContext.fileCacheHint);
             front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);

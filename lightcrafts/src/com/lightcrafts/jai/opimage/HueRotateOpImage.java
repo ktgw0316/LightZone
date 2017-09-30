@@ -18,7 +18,7 @@ import java.awt.*;
 import java.awt.color.ICC_ProfileRGB;
 import java.util.Map;
 
-import Jama.Matrix;
+import com.lightcrafts.utils.LCMatrix;
 
 /**
  * Copyright (C) Light Crafts, Inc.
@@ -37,8 +37,17 @@ public class HueRotateOpImage extends PointOpImage {
         this.angle = angle;
 
         ICC_ProfileRGB sRGB = (ICC_ProfileRGB) JAIContext.sRGBColorProfile;
-        toSRGB = new Matrix(sRGB.getMatrix()).inverse().times(new Matrix(((ICC_ProfileRGB) JAIContext.linearProfile).getMatrix())).getArrayFloat();
-        toLinearRGB = new Matrix(sRGB.getMatrix()).inverse().times(new Matrix(((ICC_ProfileRGB) JAIContext.linearProfile).getMatrix())).inverse().getArrayFloat();
+        toSRGB = LCMatrix.getArrayFloat(
+                new LCMatrix(sRGB.getMatrix())
+                        .inverse()
+                        .times(new LCMatrix(((ICC_ProfileRGB) JAIContext.linearProfile).getMatrix()))
+        );
+        toLinearRGB = LCMatrix.getArrayFloat(
+                new LCMatrix(sRGB.getMatrix())
+                        .inverse()
+                        .times(new LCMatrix(((ICC_ProfileRGB) JAIContext.linearProfile).getMatrix()))
+                        .inverse()
+        );
     }
 
     @Override

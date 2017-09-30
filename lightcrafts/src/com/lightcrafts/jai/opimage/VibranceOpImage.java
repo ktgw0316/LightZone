@@ -7,6 +7,7 @@ import com.lightcrafts.mediax.jai.ImageLayout;
 import com.lightcrafts.mediax.jai.RasterAccessor;
 import com.lightcrafts.mediax.jai.RasterFormatTag;
 import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.utils.LCMatrix;
 
 import java.awt.image.DataBuffer;
 import java.awt.image.RenderedImage;
@@ -17,8 +18,6 @@ import java.awt.color.ICC_ProfileRGB;
 import java.awt.color.ICC_Profile;
 import java.awt.color.ColorSpace;
 import java.util.Map;
-
-import Jama.Matrix;
 
 /**
  * Copyright (C) Light Crafts, Inc.
@@ -39,9 +38,14 @@ public class VibranceOpImage extends PointOpImage {
         saturationIncrease = transform[0][0] > 1;
 
         ICC_ProfileRGB linRGB = (ICC_ProfileRGB) ICC_Profile.getInstance(ColorSpace.CS_LINEAR_RGB);
-        toLinearsRGB = new Matrix(linRGB.getMatrix()).inverse().times(new Matrix(((ICC_ProfileRGB) JAIContext.linearProfile).getMatrix())).getArrayFloat();
+        toLinearsRGB = LCMatrix.getArrayFloat(
+                new LCMatrix(linRGB.getMatrix())
+                        .inverse()
+                        .times(new LCMatrix(((ICC_ProfileRGB) JAIContext.linearProfile).getMatrix()))
+        );
     }
 
+    @Override
     protected void computeRect(Raster[] sources,
                                WritableRaster dest,
                                Rectangle destRect) {

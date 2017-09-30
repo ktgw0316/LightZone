@@ -18,7 +18,7 @@ import java.awt.*;
 import java.awt.color.ICC_ProfileRGB;
 import java.util.Map;
 
-import Jama.Matrix;
+import com.lightcrafts.utils.LCMatrix;
 
 /**
  * Copyright (C) Light Crafts, Inc.
@@ -36,7 +36,11 @@ public class FilteredGrayscaleOpImage extends PointOpImage {
         permitInPlaceOperation();
         ICC_ProfileRGB sRGB = (ICC_ProfileRGB) JAIContext.sRGBColorProfile;
         ICC_ProfileRGB linRGB = (ICC_ProfileRGB) JAIContext.linearProfile;
-        toLinearsRGB = new Matrix(sRGB.getMatrix()).inverse().times(new Matrix(linRGB.getMatrix())).getArrayFloat();
+        toLinearsRGB = LCMatrix.getArrayFloat(
+                new LCMatrix(sRGB.getMatrix())
+                        .inverse()
+                        .times(new LCMatrix(linRGB.getMatrix()))
+        );
 
         this.filter = filter.clone();
         this.angle = angle;
