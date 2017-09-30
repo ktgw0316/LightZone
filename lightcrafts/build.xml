@@ -37,13 +37,6 @@
     </or>
   </condition>
 
-  <condition property="jai-classpath"
-             value="../linux/lib/mlibwrapper_jai.jar">
-    <not>
-      <os family="mac"/>
-    </not>
-  </condition>
-
   <target name="resolve" depends="init-ivy">
     <ivy:resolve file="${basedir}/ivy.xml"/>
     <ivy:retrieve/>

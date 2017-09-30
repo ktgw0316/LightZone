@@ -20,7 +20,6 @@ bin/lightzone
 %%JAVASHAREDIR%%/lightzone/lightcrafts-linux.jar
 %%JAVASHAREDIR%%/lightzone/lightcrafts.jar
 %%JAVASHAREDIR%%/lightzone/lightzonehelp.jar
-%%JAVASHAREDIR%%/lightzone/mlibwrapper_jai.jar
 %%JAVASHAREDIR%%/lightzone/substance-lite.jar
 share/applications/lightzone.desktop
 share/icons/hicolor/16x16/apps/lightzone.png
