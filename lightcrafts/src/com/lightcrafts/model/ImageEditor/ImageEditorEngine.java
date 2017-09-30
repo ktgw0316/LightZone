@@ -808,34 +808,35 @@ public class ImageEditorEngine implements Engine {
     public void write( ProgressThread thread,
                        ImageExportOptions exportOptions ) throws IOException {
         final ImageFileExportOptions fileOptions =
-            (ImageFileExportOptions)exportOptions;
+                (ImageFileExportOptions) exportOptions;
         final ImageType exportType = exportOptions.getImageType();
         final int exportWidth = fileOptions.resizeWidth.getValue();
         final int exportHeight = fileOptions.resizeHeight.getValue();
 
         final String exportProfileName = fileOptions.colorProfile.getValue();
         ICC_Profile profile =
-            ColorProfileInfo.getExportICCProfileFor( exportProfileName );
-        if ( profile == null )
+                ColorProfileInfo.getExportICCProfileFor(exportProfileName);
+        if (profile == null)
             profile = JAIContext.sRGBExportColorProfile;
 
         // LZN editor state data
         final byte[] lzn = exportOptions.getAuxData();
 
         PlanarImage exportImage = getRendering(
-            new Dimension( exportWidth, exportHeight ), profile,
-            exportType instanceof JPEGImageType ||
-                exportOptions.getIntValueOf(BitsPerChannelOption.NAME) == 8
+                new Dimension(exportWidth, exportHeight), profile,
+                exportType instanceof JPEGImageType ||
+                        exportOptions.getIntValueOf(BitsPerChannelOption.NAME) == 8
         );
 
-        // Uprez output images, while keeping aspect ratio of the CropBounds
+        // Uprez output images
         final CropBounds bounds = getCropBounds();
         double scaleX = exportWidth / (double) exportImage.getWidth();
         double scaleY = exportHeight / (double) exportImage.getHeight();
+        // If scaleX != scaleY, then modify one of them to keep bound's aspect ratio
         if (scaleX < scaleY) {
             final double newExportHeight = exportWidth * bounds.getHeight() / bounds.getWidth();
             scaleY = newExportHeight / exportImage.getHeight();
-        } else {
+        } else if (scaleX > scaleY) {
             final double newExportWidth = exportHeight * bounds.getWidth() / bounds.getHeight();
             scaleX = newExportWidth / exportImage.getWidth();
         }
