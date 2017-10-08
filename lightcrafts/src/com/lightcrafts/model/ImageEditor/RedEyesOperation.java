@@ -12,9 +12,9 @@ import com.lightcrafts.jai.opimage.RedMaskOpImage;
 import com.lightcrafts.jai.opimage.RedMaskBlackener;
 import com.lightcrafts.jai.operator.LCMSColorConvertDescriptor;
 
-import com.lightcrafts.mediax.jai.PlanarImage;
-import com.lightcrafts.mediax.jai.JAI;
-import com.lightcrafts.mediax.jai.KernelJAI;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.JAI;
+import javax.media.jai.KernelJAI;
 import com.lightcrafts.utils.LCMS;
 import com.lightcrafts.utils.LCMS_ColorSpace;
 import com.lightcrafts.ui.editor.EditorMode;

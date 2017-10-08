@@ -12,13 +12,13 @@
  * $State: Exp $
  */
 package com.lightcrafts.jai.opimage;
-import com.lightcrafts.media.jai.opimage.RIFUtil;
+import com.sun.media.jai.opimage.RIFUtil;
 
 import java.awt.RenderingHints;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
-import com.lightcrafts.mediax.jai.CRIFImpl;
-import com.lightcrafts.mediax.jai.ImageLayout;
+import javax.media.jai.CRIFImpl;
+import javax.media.jai.ImageLayout;
 
 public class UnSharpMaskCRIF extends CRIFImpl {
 

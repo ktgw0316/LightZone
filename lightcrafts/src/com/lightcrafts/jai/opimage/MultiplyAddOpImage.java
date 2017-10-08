@@ -19,19 +19,19 @@ import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
-import com.lightcrafts.mediax.jai.ImageLayout;
-import com.lightcrafts.mediax.jai.PointOpImage;
-import com.lightcrafts.mediax.jai.RasterAccessor;
-import com.lightcrafts.mediax.jai.RasterFormatTag;
-import com.lightcrafts.mediax.jai.RasterFactory;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.PointOpImage;
+import javax.media.jai.RasterAccessor;
+import javax.media.jai.RasterFormatTag;
+import javax.media.jai.RasterFactory;
 import java.util.Map;
-import com.lightcrafts.media.jai.util.ImageUtil;
-import com.lightcrafts.media.jai.util.JDKWorkarounds;
-/// import com.lightcrafts.media.jai.test.OpImageTester;
+import com.sun.media.jai.util.ImageUtil;
+import com.sun.media.jai.util.JDKWorkarounds;
+/// import com.sun.media.jai.test.OpImageTester;
 
 /**
  * An <code>OpImage</code> implementing the "Add" operation as
- * described in <code>com.lightcrafts.mediax.jai.operator.AddDescriptor</code>.
+ * described in <code>javax.media.jai.operator.AddDescriptor</code>.
  *
  * <p>This <code>OpImage</code> adds the pixel values of two source
  * images on a per-band basis. In case the two source images have different
@@ -55,7 +55,7 @@ import com.lightcrafts.media.jai.util.JDKWorkarounds;
  * data type <code>byte</code> is treated as unsigned, with maximum
  * value as 255 and minimum value as 0.
  *
- * @see com.lightcrafts.mediax.jai.operator.AddDescriptor
+ * @see javax.media.jai.operator.AddDescriptor
  * @see AddCRIF
  *
  */

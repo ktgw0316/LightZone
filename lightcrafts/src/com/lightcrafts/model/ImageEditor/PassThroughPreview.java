@@ -6,8 +6,8 @@ import com.lightcrafts.model.*;
 import com.lightcrafts.jai.utils.*;
 import com.lightcrafts.jai.JAIContext;
 
-import com.lightcrafts.mediax.jai.*;
-import com.lightcrafts.mediax.jai.operator.ConvolveDescriptor;
+import javax.media.jai.*;
+import javax.media.jai.operator.ConvolveDescriptor;
 import com.lightcrafts.ui.LightZoneSkin;
 
 import java.awt.*;

@@ -2,7 +2,7 @@
 
 package com.lightcrafts.jai.opimage;
 
-import com.lightcrafts.mediax.jai.*;
+import javax.media.jai.*;
 import com.lightcrafts.utils.DCRaw;
 import com.lightcrafts.jai.utils.Functions;
 

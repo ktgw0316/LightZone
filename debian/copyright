@@ -38,22 +38,11 @@ License: permissive
  In no event will the authors be held liable for any damages arising from
  the use of this software.
 
-Files: lightcrafts/extsrc/com/lightcrafts/*
-       linux/lib/mlibwrapper_jai.jar
+Files: lightcrafts/lib/jai_core*.jar
 Copyright: 2005 Sun Microsystems, Inc.
-License: Java Research License or Java Distribution License
- https://java.net/projects/jai-core/sources/svn/content/trunk/LICENSE-JRL.txt
- https://java.net/projects/jai-core/sources/svn/content/trunk/LICENSE-JDL.txt
-
-Files: lightcrafts/extsrc/com/sun/image/codec/jpeg/*
-Copyright: 2007 Free Software Foundation, Inc.
-           2007 Matthew Flaschen
-           2011 Red Hat, Inc.
-License: GPL-2+
-
-Files: lightcrafts/extsrc/sun/awt/image/codec/JPEG*.java
-Copyright: 2011 Red Hat, Inc.
-License: GPL-2+
+           2013 Oracle America, Inc.
+License: Oracle Binary Code License
+ https://www.oracle.com/technetwork/java/javase/downloads/java-se-archive-license-1382604.html
 
 Files: lightcrafts/lib/asm*.jar
 Copyright: 2000-2011 INRIA, France Télécom

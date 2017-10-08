@@ -9,7 +9,7 @@ import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.opimage.CachedImage;
 
-import com.lightcrafts.mediax.jai.*;
+import javax.media.jai.*;
 
 import lombok.Getter;
 import lombok.val;

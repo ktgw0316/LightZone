@@ -5,9 +5,9 @@ package com.lightcrafts.utils;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.JAIContext;
 
-import com.lightcrafts.mediax.jai.JAI;
-import com.lightcrafts.mediax.jai.BorderExtender;
-import com.lightcrafts.mediax.jai.KernelJAI;
+import javax.media.jai.JAI;
+import javax.media.jai.BorderExtender;
+import javax.media.jai.KernelJAI;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;

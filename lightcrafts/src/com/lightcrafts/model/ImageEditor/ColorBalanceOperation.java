@@ -7,9 +7,9 @@ import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
 import com.lightcrafts.utils.splines;
 
-import com.lightcrafts.mediax.jai.JAI;
-import com.lightcrafts.mediax.jai.LookupTableJAI;
-import com.lightcrafts.mediax.jai.PlanarImage;
+import javax.media.jai.JAI;
+import javax.media.jai.LookupTableJAI;
+import javax.media.jai.PlanarImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
 

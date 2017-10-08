@@ -54,9 +54,6 @@
         <fileset dir="${common-dir}/products">
           <include name="*.jar"/>
         </fileset>
-        <fileset dir="lib">
-          <include name="*.jar"/>
-        </fileset>
         <fileset dir="/usr">
           <include name="share/java*/**/*.jar"/>
           <include name="local/share/java/classes/*.jar"/>
@@ -153,8 +150,6 @@
     <signjar jar="products/lightcrafts.jar" storetype="${storetype}" keystore="${keystore}" alias="${alias}" storepass="${storepass}"/>
     <signjar jar="products/lightcrafts-linux.jar" storetype="${storetype}" keystore="${keystore}" alias="${alias}" storepass="${storepass}"/>
     <signjar jar="products/linux-so.jar" storetype="${storetype}" keystore="${keystore}" alias="${alias}" storepass="${storepass}"/>
-    <signjar jar="products/lcjai.jar" storetype="${storetype}" keystore="${keystore}" alias="${alias}" storepass="${storepass}"/>
-    <signjar jar="products/mlibwrapper_jai.jar" storetype="${storetype}" keystore="${keystore}" alias="${alias}" storepass="${storepass}"/>
   </target>
 
   <!--===== Assemble the WebStart Site =====================================-->

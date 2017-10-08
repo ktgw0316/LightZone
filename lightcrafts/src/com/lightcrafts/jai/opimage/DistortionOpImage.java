@@ -2,10 +2,10 @@
 
 package com.lightcrafts.jai.opimage;
 
-import com.lightcrafts.mediax.jai.BorderExtender;
-import com.lightcrafts.mediax.jai.GeometricOpImage;
-import com.lightcrafts.mediax.jai.RasterFormatTag;
-import com.lightcrafts.mediax.jai.RasterAccessor;
+import javax.media.jai.BorderExtender;
+import javax.media.jai.GeometricOpImage;
+import javax.media.jai.RasterFormatTag;
+import javax.media.jai.RasterAccessor;
 import com.lightcrafts.utils.Lensfun;
 
 import java.awt.image.Raster;

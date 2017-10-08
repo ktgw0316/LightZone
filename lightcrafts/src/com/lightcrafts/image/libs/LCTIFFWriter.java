@@ -16,7 +16,7 @@ import org.w3c.dom.Document;
 import com.lightcrafts.image.metadata.*;
 import com.lightcrafts.image.metadata.values.ImageMetaValue;
 import com.lightcrafts.image.types.TIFFImageType;
-import com.lightcrafts.mediax.jai.PlanarImage;
+import javax.media.jai.PlanarImage;
 import com.lightcrafts.utils.file.OrderableRandomAccessFile;
 import com.lightcrafts.utils.ProgressIndicator;
 import com.lightcrafts.utils.thread.ProgressThread;

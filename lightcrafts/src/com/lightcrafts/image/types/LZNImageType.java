@@ -5,7 +5,7 @@ package com.lightcrafts.image.types;
 import java.awt.color.ICC_Profile;
 import java.awt.image.RenderedImage;
 import java.io.*;
-import com.lightcrafts.mediax.jai.PlanarImage;
+import javax.media.jai.PlanarImage;
 
 import org.w3c.dom.Document;
 

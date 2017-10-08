@@ -19,7 +19,7 @@ import com.lightcrafts.jai.operator.LCMSColorConvertDescriptor;
 import com.lightcrafts.jai.opimage.CachedImage;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.utils.LCTileCache;
-import com.lightcrafts.mediax.jai.*;
+import javax.media.jai.*;
 import com.lightcrafts.model.*;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.utils.ColorProfileInfo;

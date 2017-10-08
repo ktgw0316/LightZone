@@ -10,7 +10,7 @@ import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.utils.ColorScience;
 
-import com.lightcrafts.mediax.jai.*;
+import javax.media.jai.*;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.image.RenderedImage;
 import java.awt.*;
