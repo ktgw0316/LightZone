@@ -8,6 +8,7 @@ import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
 import com.lightcrafts.model.ColorDropperOperation;
 import com.lightcrafts.utils.ColorScience;
+import com.lightcrafts.utils.LCMatrix;
 import com.lightcrafts.utils.splines;
 import com.lightcrafts.utils.DCRaw;
 
@@ -207,7 +208,7 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
         return result;
     }
 
-    private static Matrix RGBtoZYX = new Matrix(ColorScience.RGBtoZYX()).transpose();
+    private static Matrix RGBtoZYX = new LCMatrix(ColorScience.RGBtoZYX()).transpose();
     private static Matrix XYZtoRGB = RGBtoZYX.inverse();
 
     static float[] neutralize(int pixel[], ColorScience.CAMethod caMethod, float source, float REF_T) {
@@ -219,7 +220,7 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
         double wbr = 0, wbg = 0, wbb = 0;
 
         for (int t = 1000; t < 40000; t+= 0.001 * t) {
-            Matrix B = new Matrix(ColorScience.chromaticAdaptation(REF_T, t, caMethod));
+            Matrix B = new LCMatrix(ColorScience.chromaticAdaptation(REF_T, t, caMethod));
             Matrix combo = XYZtoRGB.times(B.times(RGBtoZYX));
 
             Matrix color = new Matrix(new double[][]{{pixel[0]}, {pixel[1]}, {pixel[2]}});
@@ -255,7 +256,7 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
     }
 
     static public float[][] whiteBalanceMatrix(float source, float REF_T, float mult, float cameraRGB[][], ColorScience.CAMethod caMethod) {
-        Matrix B = new Matrix(ColorScience.chromaticAdaptation(REF_T, source, caMethod));
+        Matrix B = new LCMatrix(ColorScience.chromaticAdaptation(REF_T, source, caMethod));
         Matrix combo = XYZtoRGB.times(B.times(RGBtoZYX));
 
         Matrix m = combo.times(new Matrix(new double[][]{{1},{1},{1}}));
@@ -265,12 +266,12 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
             combo = combo.times(new Matrix(new double[][]{{1/max, 0, 0},{0, 1/max, 0},{0, 0, 1/max}}));
 
         if (cameraRGB != null)
-            combo = combo.times(new Matrix(cameraRGB));
+            combo = combo.times(new LCMatrix(cameraRGB));
 
         if (mult != 1)
             combo = combo.times(mult);
 
-        return combo.getArrayFloat();
+        return LCMatrix.getArrayFloat(combo);
     }
 
     static public PlanarImage tintCast(PlanarImage image, float tint, float lightness) {

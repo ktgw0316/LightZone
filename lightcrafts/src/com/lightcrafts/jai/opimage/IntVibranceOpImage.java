@@ -19,6 +19,7 @@ import java.awt.color.ColorSpace;
 import java.util.Map;
 
 import Jama.Matrix;
+import com.lightcrafts.utils.LCMatrix;
 
 /**
  * Copyright (C) Light Crafts, Inc.
@@ -67,8 +68,8 @@ public class IntVibranceOpImage extends PointOpImage {
         saturationIncrease = transform[0][0] > 1;
 
         ICC_ProfileRGB linRGB = (ICC_ProfileRGB) ICC_Profile.getInstance(ColorSpace.CS_LINEAR_RGB);
-        Matrix XYZtoLinsRGB = new Matrix(linRGB.getMatrix()).inverse();
-        Matrix CIERGBtoXYZ = new Matrix(((ICC_ProfileRGB) JAIContext.linearProfile).getMatrix());
+        Matrix XYZtoLinsRGB = new LCMatrix(linRGB.getMatrix()).inverse();
+        Matrix CIERGBtoXYZ = new LCMatrix(((ICC_ProfileRGB) JAIContext.linearProfile).getMatrix());
         double CIERGBtoLinsRGB[][] = XYZtoLinsRGB.times(CIERGBtoXYZ).getArray();
 
         for (int i = 0; i < 3; i++)
