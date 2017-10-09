@@ -409,13 +409,28 @@ public class Rendering implements Cloneable {
         }
 
         if (!cropBounds.isAngleOnly()) {
-            CropBounds actualCropBounds = CropBounds.transform(completeInputTransform, cropBounds);
+            final CropBounds actualCropBounds = CropBounds.transform(completeInputTransform, cropBounds);
+            final Rectangle bounds = new Rectangle(xformedSourceImage.getMinX(), xformedSourceImage.getMinY(),
+                                                   xformedSourceImage.getWidth(), xformedSourceImage.getHeight());
 
-            Rectangle bounds = new Rectangle(xformedSourceImage.getMinX(), xformedSourceImage.getMinY(),
-                                             xformedSourceImage.getWidth(), xformedSourceImage.getHeight());
-            Rectangle finalBounds = bounds.intersection(new Rectangle(0, 0,
-                                                                      (int) Math.round(actualCropBounds.getWidth()),
-                                                                      (int) Math.round(actualCropBounds.getHeight())));
+            // Calculate inner width and height for actualCropBounds,
+            // while keeping the actualCropBound's aspect ratio as precisely as possible.
+            final double actualWidth  = actualCropBounds.getWidth();
+            final double actualHeight = actualCropBounds.getHeight();
+            final double ratio = actualWidth / actualHeight;
+            int intWidth  = (int) Math.round(actualWidth);
+            int intHeight = (int) Math.round(actualHeight);
+            if (intWidth > bounds.width) {
+                intWidth = bounds.width;
+                intHeight = (int) (intWidth / ratio);
+            }
+            if (intHeight > bounds.height) {
+                intHeight = bounds.height;
+                intWidth = (int) (intHeight * ratio);
+            }
+            final Rectangle rect = new Rectangle(0, 0, intWidth, intHeight);
+
+            final Rectangle finalBounds = bounds.intersection(rect);
             if (finalBounds.width > 0 && finalBounds.height > 0)
                 xformedSourceImage = Functions.crop(xformedSourceImage,
                                                     finalBounds.x, finalBounds.y,
