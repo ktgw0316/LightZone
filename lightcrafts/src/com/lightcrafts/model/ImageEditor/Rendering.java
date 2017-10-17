@@ -16,6 +16,10 @@ import java.awt.geom.Point2D;
 import java.awt.*;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.image.*;
+import java.beans.XMLEncoder;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Vector;
 
@@ -412,6 +416,18 @@ public class Rendering implements Cloneable {
             final CropBounds actualCropBounds = CropBounds.transform(completeInputTransform, cropBounds);
             final Rectangle bounds = new Rectangle(xformedSourceImage.getMinX(), xformedSourceImage.getMinY(),
                                                    xformedSourceImage.getWidth(), xformedSourceImage.getHeight());
+            // DEBUG
+            try {
+                BufferedOutputStream out = new BufferedOutputStream(
+                        new FileOutputStream("/tmp/LZDebug328d3e1" + ".xml"));
+                XMLEncoder enc = new XMLEncoder(out);
+                enc.writeObject(cropBounds);
+                enc.writeObject(actualCropBounds);
+                enc.writeObject(bounds);
+                enc.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
             // Calculate inner width and height for actualCropBounds,
             // while keeping the actualCropBound's aspect ratio as precisely as possible.
