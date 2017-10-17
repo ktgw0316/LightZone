@@ -1734,7 +1734,7 @@ public class Application {
             // preload jai_core.jar, jai_codec.jar, jai_imageio.jar:
             Startup.startupMessage(LOCALE.get("StartupClassesMessage"));
             Class.forName("javax.media.jai.JAI");
-            Class.forName("com.lightcrafts.media.jai.codec.ImageCodec");
+            Class.forName("com.sun.media.jai.codec.ImageCodec");
         }
         catch (ClassNotFoundException e) {
             showError(

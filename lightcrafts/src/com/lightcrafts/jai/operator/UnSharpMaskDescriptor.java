@@ -64,7 +64,7 @@ import javax.media.jai.registry.RenderedRegistryMode;
  * <tr><th>Name</th>        <th>Value</th></tr>
  * <tr><td>GlobalName</td>  <td>Add</td></tr>
  * <tr><td>LocalName</td>   <td>Add</td></tr>
- * <tr><td>Vendor</td>      <td>com.lightcrafts.media.jai</td></tr>
+ * <tr><td>Vendor</td>      <td>com.lightcrafts</td></tr>
  * <tr><td>Description</td> <td>Adds two images.</td></tr>
  * <tr><td>DocURL</td>      <td>http://java.sun.com/products/java-media/jai/forDevelopers/jai-apidocs/javax/media/jai/operator/AddDescriptor.html</td></tr>
  * <tr><td>Version</td>     <td>1.0</td></tr>

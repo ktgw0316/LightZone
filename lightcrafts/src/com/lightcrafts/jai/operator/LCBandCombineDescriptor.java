@@ -68,7 +68,7 @@ import javax.media.jai.registry.RenderedRegistryMode;
  * <tr><th>Name</th>        <th>Value</th></tr>
  * <tr><td>GlobalName</td>  <td>BandCombine</td></tr>
  * <tr><td>LocalName</td>   <td>BandCombine</td></tr>
- * <tr><td>Vendor</td>      <td>com.lightcrafts.media.jai</td></tr>
+ * <tr><td>Vendor</td>      <td>com.lightcrafts</td></tr>
  * <tr><td>Description</td> <td>Performs arbitrary interband linear combination
  *                              using a specified matrix.</td></tr>
  * <tr><td>DocURL</td>      <td>http://java.sun.com/products/java-media/jai/forDevelopers/jai-apidocs/javax/media/jai/operator/BandCombineDescriptor.html</td></tr>
