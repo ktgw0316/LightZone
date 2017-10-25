@@ -828,23 +828,13 @@ public class ImageEditorEngine implements Engine {
                         exportOptions.getIntValueOf(BitsPerChannelOption.NAME) == 8
         );
 
-        // Uprez output images
-        final CropBounds bounds = getCropBounds();
+        // Resize output images
         double scaleX = exportWidth / (double) exportImage.getWidth();
         double scaleY = exportHeight / (double) exportImage.getHeight();
-        // If scaleX != scaleY, then modify one of them to keep bound's aspect ratio
-        if (scaleX < scaleY) {
-            final double newExportHeight = exportWidth * bounds.getHeight() / bounds.getWidth();
-            scaleY = newExportHeight / exportImage.getHeight();
-        } else if (scaleX > scaleY) {
-            final double newExportWidth = exportHeight * bounds.getWidth() / bounds.getHeight();
-            scaleX = newExportWidth / exportImage.getWidth();
-        }
-        if (scaleX > 1 || scaleY > 1) {
+        if (scaleX != 1 || scaleY != 1) {
             AffineTransform xform = AffineTransform.getScaleInstance(scaleX, scaleY);
-
-            RenderingHints formatHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-
+            RenderingHints formatHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
+                    BorderExtender.createInstance(BorderExtender.BORDER_COPY));
             Interpolation interp = Interpolation.getInstance(Interpolation.INTERP_BICUBIC_2);
             ParameterBlock params = new ParameterBlock();
             params.addSource(exportImage);
@@ -853,7 +843,7 @@ public class ImageEditorEngine implements Engine {
             exportImage = JAI.create("Affine", params, formatHints);
         }
 
-        // Make sure that if uprezzing was requested and denied, the metadata
+        // Make sure that if resizing was requested and denied, the metadata
         // reflect the actual output image size
         if (fileOptions.resizeWidth.getValue() > exportImage.getWidth()) {
             fileOptions.resizeWidth.setValue(exportImage.getWidth());
