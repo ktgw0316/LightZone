@@ -420,21 +420,22 @@ public class Rendering implements Cloneable {
             final double ratio = actualWidth / actualHeight;
             int intWidth  = (int) Math.round(actualWidth);
             int intHeight = (int) Math.round(actualHeight);
-            if (intWidth > bounds.width) {
-                intWidth = bounds.width;
-                intHeight = (int) (intWidth / ratio);
-            }
-            if (intHeight > bounds.height) {
-                intHeight = bounds.height;
-                intWidth = (int) (intHeight * ratio);
-            }
+
             final Rectangle rect = new Rectangle(0, 0, intWidth, intHeight);
 
             final Rectangle finalBounds = bounds.intersection(rect);
-            if (finalBounds.width > 0 && finalBounds.height > 0)
+
+            if (finalBounds.width > 0 && finalBounds.height > 0) {
+                if (intWidth > finalBounds.width) {
+                    finalBounds.height = (int) (finalBounds.width / ratio);
+                }
+                if (intHeight > finalBounds.height) {
+                    finalBounds.width = (int) (finalBounds.height * ratio);
+                }
                 xformedSourceImage = Functions.crop(xformedSourceImage,
                                                     finalBounds.x, finalBounds.y,
                                                     finalBounds.width, finalBounds.height, null);
+            }
         }
 
         // We explicitly cache this
