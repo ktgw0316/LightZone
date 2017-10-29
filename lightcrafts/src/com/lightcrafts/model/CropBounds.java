@@ -307,20 +307,4 @@ public class CropBounds {
         copy.height = width;
         return copy;
     }
-
-    public void setAngle(double angle) {
-        this.angle = angle;
-    }
-
-    public void setCenter(Point2D center) {
-        this.center = center;
-    }
-
-    public void setWidth(double width) {
-        this.width = width;
-    }
-
-    public void setHeight(double height) {
-        this.height = height;
-    }
 }
