@@ -828,19 +828,13 @@ public class ImageEditorEngine implements Engine {
                 exportOptions.getIntValueOf(BitsPerChannelOption.NAME) == 8
         );
 
-        // Uprez output images, while keeping aspect ratio of the CropBounds
-        final CropBounds bounds = getCropBounds();
-        double scaleX = exportWidth / (double) exportImage.getWidth();
-        double scaleY = exportHeight / (double) exportImage.getHeight();
-        if (scaleX < scaleY) {
-            final double newExportHeight = exportWidth * bounds.getHeight() / bounds.getWidth();
-            scaleY = newExportHeight / exportImage.getHeight();
-        } else {
-            final double newExportWidth = exportHeight * bounds.getWidth() / bounds.getHeight();
-            scaleX = newExportWidth / exportImage.getWidth();
-        }
-        if (scaleX > 1 || scaleY > 1) {
-            AffineTransform xform = AffineTransform.getScaleInstance(scaleX, scaleY);
+        // Uprez output images
+
+        double scale = Math.min(exportWidth / (double) exportImage.getWidth(),
+                                exportHeight / (double) exportImage.getHeight());
+
+        if (scale > 1) {
+            AffineTransform xform = AffineTransform.getScaleInstance(scale, scale);
 
             RenderingHints formatHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
 
