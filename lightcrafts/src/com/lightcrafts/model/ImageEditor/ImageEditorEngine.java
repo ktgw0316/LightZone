@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2017-     Masahiro Kitagawa */
 
 package com.lightcrafts.model.ImageEditor;
 
@@ -769,13 +770,11 @@ public class ImageEditorEngine implements Engine {
 
     public PlanarImage getRendering(Dimension bounds, ICC_Profile profile,
                                     LCMSColorConvertDescriptor.RenderingIntent intent, boolean eightBits) {
-        final CropBounds cropBounds = getCropBounds();
-        
-        final float scale = (bounds != null) ? getScaleToFit(cropBounds, bounds) : 1;
+        final float scale = (bounds != null) ? rendering.getScaleToFit(bounds) : 1;
 
-        Rendering newRendering = canvas != null ? rendering.clone() : rendering;
+        final Rendering newRendering = canvas != null ? rendering.clone() : rendering;
 
-        newRendering.setCropAndScale(cropBounds, scale);
+        newRendering.setCropAndScale(getCropBounds(), scale);
 
         PlanarImage image = newRendering.getRendering();
 
@@ -794,37 +793,6 @@ public class ImageEditorEngine implements Engine {
             image = Functions.fromUShortToByte(image, null);
 
         return image;
-    }
-
-    private float getScaleToFit(CropBounds cropBounds, Dimension bounds) {
-        final Dimension newDimension = getDimensionToFit(cropBounds, bounds);
-        final Dimension dimension = getNaturalSize();
-        return (float) Math.min(
-                newDimension.getWidth() / dimension.getWidth(),
-                newDimension.getHeight() / dimension.getHeight());
-    }
-
-    static private Dimension getDimensionToFit(CropBounds cropBounds, Dimension bounds) {
-        final double width = cropBounds.getWidth();
-        final double height = cropBounds.getHeight();
-
-        // Fit longer sides
-        double scale = (width > height)
-                ? bounds.width / width
-                : bounds.height / height;
-        int newWidth = (int) (scale * width);
-        int newHeight = (int) (scale * height);
-
-        // Fit shorter sides only when the longer sides gave a wrong dimension
-        if (newWidth > bounds.width || newHeight > bounds.height) {
-            scale = (width < height)
-                    ? bounds.width / width
-                    : bounds.height / height;
-            newWidth = (int) (scale * width);
-            newHeight = (int) (scale * height);
-        }
-
-        return new Dimension(newWidth, newHeight);
     }
 
     public void prefetchRendering(Rectangle area) {

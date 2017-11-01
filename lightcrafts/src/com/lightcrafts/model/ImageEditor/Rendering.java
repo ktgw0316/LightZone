@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2017-     Masahiro Kitagawa */
 
 package com.lightcrafts.model.ImageEditor;
 
@@ -445,5 +446,13 @@ public class Rendering implements Cloneable {
             xformedSourceImage.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
 
         return xformedSourceImage;
+    }
+
+    float getScaleToFit(Dimension bounds) {
+        final Dimension newDimension = cropBounds.getDimensionToFit(bounds);
+        final Dimension dimension = getRenderingSize();
+        return (float) Math.min(
+                newDimension.getWidth() / dimension.getWidth(),
+                newDimension.getHeight() / dimension.getHeight());
     }
 }
