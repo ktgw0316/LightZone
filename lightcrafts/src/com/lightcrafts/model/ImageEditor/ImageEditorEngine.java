@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2017-     Masahiro Kitagawa */
 
 package com.lightcrafts.model.ImageEditor;
 
@@ -769,14 +770,9 @@ public class ImageEditorEngine implements Engine {
 
     public PlanarImage getRendering(Dimension bounds, ICC_Profile profile,
                                     LCMSColorConvertDescriptor.RenderingIntent intent, boolean eightBits) {
-        Dimension dimension = getNaturalSize();
+        final float scale = (bounds != null) ? rendering.getScaleToFit(bounds) : 1;
 
-        float scale = bounds != null
-                      ? Math.min(bounds.width / (float) dimension.getWidth(),
-                                 bounds.height / (float) dimension.getHeight())
-                      : 1;
-
-        Rendering newRendering = canvas != null ? rendering.clone() : rendering;
+        final Rendering newRendering = canvas != null ? rendering.clone() : rendering;
 
         newRendering.setCropAndScale(getCropBounds(), scale);
 
