@@ -11,6 +11,26 @@ import static org.junit.Assert.*;
 
 public class CropBoundsTest {
     @Test
+    public void createInvertedAspect() throws Exception {
+        final CropBounds rectangle = new CropBounds(
+                new Point2D.Float(50f, 50f), 200, 100, 0.5);
+        final CropBounds rectangleInv1 = rectangle.createInvertedAspect();
+        final CropBounds rectangleInv2 = rectangleInv1.createInvertedAspect();
+        final CropBounds rectangleInv3 = rectangleInv2.createInvertedAspect();
+        assertEquals(rectangle, rectangleInv2);
+        assertEquals(rectangleInv1, rectangleInv3);
+
+        final CropBounds angleOnly = new CropBounds(0.5);
+        final CropBounds angleOnlyInv1 = angleOnly.createInvertedAspect();
+        final CropBounds angleOnlyInv2 = angleOnlyInv1.createInvertedAspect();
+        final CropBounds angleOnlyInv3 = angleOnlyInv2.createInvertedAspect();
+        assertEquals(angleOnly, angleOnlyInv2);
+        assertEquals(angleOnlyInv1, angleOnlyInv3);
+
+        assertEquals(angleOnly, angleOnlyInv1); // TODO: Should we accept this?
+    }
+
+    @Test
     public void getDimensionToFit() throws Exception {
         // issue204
         final Dimension D1440x2560 = new Dimension(1440, 2560);

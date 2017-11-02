@@ -302,12 +302,7 @@ public class CropBounds {
     }
 
     public CropBounds createInvertedAspect() {
-        CropBounds copy = new CropBounds();
-        copy.angle = angle;
-        copy.center = (Point2D) center.clone();
-        copy.width = height;
-        copy.height = width;
-        return copy;
+        return new CropBounds(center, height, width, angle);
     }
 
     public Dimension getDimensionToFit(Dimension bounds) {
