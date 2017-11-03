@@ -200,7 +200,7 @@ public interface DNGTags extends TIFFTags {
      * tag specifies the difference between the zero light encoding level for
      * each row and the baseline zero light encoding level.
      * <p>
-     * If {@link DNG_SAMPLES_PER_PIXEL} is not equal to one, this single table
+     * If {@link #DNG_SAMPLES_PER_PIXEL} is not equal to one, this single table
      * applies to all the samples for each pixel.
      * <p>
      * Type: Signed rational.
@@ -394,7 +394,7 @@ public interface DNGTags extends TIFFTags {
      * of the final image.
      * <p>
      * DefaultCropOrigin specifies the origin of the final image area, in raw
-     * image coordinates (i.e., before the {@link DNG_DEFAULT_SCALE} has been
+     * image coordinates (i.e., before the {@link #DNG_DEFAULT_SCALE} has been
      * applied), relative to the top-left corner of the ActiveArea rectangle.
      * <p>
      * Type: Unsigned short, unsigned long, or unsigned rational.

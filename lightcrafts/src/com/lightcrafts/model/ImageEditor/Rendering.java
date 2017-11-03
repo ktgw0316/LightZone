@@ -173,8 +173,7 @@ public class Rendering implements Cloneable {
             return;
         }
 
-        PlanarImage processedImage = getXformedSourceImage();
-        processedImage = cropSourceImage(processedImage);
+        PlanarImage processedImage = cropSourceImage(getXformedSourceImage());
 
         for (val operation : pipeline) {
             if (!operation.isActive()) {
@@ -333,17 +332,38 @@ public class Rendering implements Cloneable {
         return xformedSourceImage;
     }
 
+    float getScaleToFit(Dimension bounds) {
+        val newDimension = cropBounds.getDimensionToFit(bounds);
+        val dimension = getRenderingSize();
+        return (float) Math.min(
+                newDimension.getWidth() / dimension.getWidth(),
+                newDimension.getHeight() / dimension.getHeight());
+    }
+
     private PlanarImage cropSourceImage(PlanarImage xformedSourceImage) {
         if (!cropBounds.isAngleOnly()) {
             val actualCropBounds = CropBounds.transform(inputTransform, cropBounds);
             val bounds = new Rectangle(
                     xformedSourceImage.getMinX(), xformedSourceImage.getMinY(),
                     xformedSourceImage.getWidth(), xformedSourceImage.getHeight());
-            val finalBounds = bounds.intersection(new Rectangle(
-                    0, 0,
-                    (int) Math.round(actualCropBounds.getWidth()),
-                    (int) Math.round(actualCropBounds.getHeight())));
+
+            // Calculate inner width and height for actualCropBounds,
+            // while keeping the actualCropBound's aspect ratio as precisely as possible.
+            val actualWidth  = actualCropBounds.getWidth();
+            val actualHeight = actualCropBounds.getHeight();
+            int intWidth  = (int) Math.round(actualWidth);
+            int intHeight = (int) Math.round(actualHeight);
+
+            val finalBounds = bounds.intersection(new Rectangle(0, 0, intWidth, intHeight));
+
             if (finalBounds.width > 0 && finalBounds.height > 0) {
+                val ratio = actualWidth / actualHeight;
+                if (intWidth > finalBounds.width) {
+                    finalBounds.height = (int) (finalBounds.width / ratio);
+                }
+                if (intHeight > finalBounds.height) {
+                    finalBounds.width = (int) (finalBounds.height * ratio);
+                }
                 xformedSourceImage = Functions.crop(
                         xformedSourceImage,
                         finalBounds.x, finalBounds.y,

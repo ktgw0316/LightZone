@@ -7,6 +7,7 @@ import com.lightcrafts.image.metadata.ImageMetadata;
 import com.lightcrafts.image.types.ImageType;
 
 import javax.swing.table.AbstractTableModel;
+import java.net.URI;
 
 /**
  * Provide a basic two-column, read-only table model containing key-value
@@ -69,6 +70,10 @@ class MetadataTableModel extends AbstractTableModel {
     // For the DefaultButtons, learn about the actual metadata structure.
     MetadataEntry getEntryAt(int row) {
         return section.get(row);
+    }
+
+    URI getURIAt(int row) {
+        return getEntryAt(row).getURI(meta);
     }
 
     // Write the current in-memory metadata back to its file.

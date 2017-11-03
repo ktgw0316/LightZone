@@ -45,13 +45,6 @@ public final class MinoltaDirectory extends MakerNotesDirectory
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public String getLens() {
-        return hasTagValueLabelFor( getValue( MINOLTA_LENS_ID ) );
-    }
-
-    /**
      * Gets the name of this directory.
      *
      * @return Always returns &quot;Minolta&quot;.
@@ -289,6 +282,29 @@ public final class MinoltaDirectory extends MakerNotesDirectory
     }
 
     ////////// protected //////////////////////////////////////////////////////
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ImageMetaValue getLensNamesValue() {
+        return getValue( MINOLTA_LENS_ID );
+    }
+
+    @Override
+    protected ImageMetaValue getLongFocalValue() {
+        return null; // TODO:
+    }
+
+    @Override
+    protected ImageMetaValue getShortFocalValue() {
+        return null; // TODO:
+    }
+
+    @Override
+    protected ImageMetaValue getMaxApertureValue() {
+        return getValue( MINOLTA_CS_MAX_APERTURE );
+    }
 
     /**
      * Get the {@link ResourceBundle} to use for tags.

@@ -1,12 +1,13 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2017-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.browser.folders;
 
 import com.lightcrafts.utils.directory.DirectoryListener;
 import com.lightcrafts.utils.directory.DirectoryMonitor;
 
+import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultTreeModel;
-import java.awt.*;
 import java.io.File;
 
 class FolderTreeModel extends DefaultTreeModel implements DirectoryListener {
@@ -14,6 +15,8 @@ class FolderTreeModel extends DefaultTreeModel implements DirectoryListener {
     private NodeFileIndex index;
 
     private DirectoryMonitor monitor;
+
+    private SwingWorker<Void, Void> worker;
 
     FolderTreeModel() {
         super(FolderTreeNode.createRoot());
@@ -23,37 +26,40 @@ class FolderTreeModel extends DefaultTreeModel implements DirectoryListener {
         monitor.addListener(this);
     }
 
-    // A folder's contents have changed or a folder has been deleted.
-    public void directoryChanged(final File dir ) {
-        if (! EventQueue.isDispatchThread()) {
-            EventQueue.invokeLater(
-                new Runnable() {
-                    public void run() {
-                        directoryChanged(dir);
-                    }
-                }
-            );
-            return;
-        }
+    @Override
+    public void directoryChanged(final File dir) {
         FolderTreeNode node = index.get(dir);
         if (node == null) {
             return;
         }
+
         // If the directory exists, then update its node's children.
         // If the directory does not exist, then update its parent's children.
-        if (dir.isDirectory()) {
-            node.updateChildren();
-            nodeStructureChanged(node);
-        }
-        else {
-            FolderTreeNode parent = (FolderTreeNode) node.getParent();
-            parent.updateChildren();
-            nodeStructureChanged(parent);
-        }
+        final FolderTreeNode dirNode = dir.isDirectory()
+                ? node
+                : (FolderTreeNode) node.getParent();
+        worker = new SwingWorker<Void, Void>() {
+            @Override
+            public Void doInBackground() {
+                dirNode.updateChildren();
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                nodeStructureChanged(dirNode);
+            }
+        };
+        worker.execute();
     }
 
     public void dispose() {
-        monitor.removeListener( this );
+        if (worker != null && !worker.isDone()) {
+            worker.cancel(true);
+        }
+        worker = null;
+
+        monitor.removeListener(this);
         monitor.dispose();
     }
 

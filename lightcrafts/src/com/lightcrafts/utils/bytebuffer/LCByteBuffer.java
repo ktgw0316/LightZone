@@ -230,6 +230,7 @@ public abstract class LCByteBuffer {
      * @throws BufferUnderflowException if there are fewer than the number of
      * bytes in the given string remaining in the buffer starting at its
      * current position.
+     * @see #getEquals(int,String,String)
      * @see #getString(int,String)
      */
     public final boolean getEquals( String s, String charsetName )
@@ -260,10 +261,10 @@ public abstract class LCByteBuffer {
     }
 
     /**
-     * Gets a <code>float</code> at the buffer's current position and advances
-     * the position by 4.
+     * Gets a {@code float} at the buffer's current position and advances the
+     * position by 4.
      *
-     * @return Returns said <code>float</code>.
+     * @return Returns said {@code float}.
      * @throws BufferUnderflowException if there are fewer than 4 bytes
      * remaining in the buffer starting at its current position.
      * @see #getFloat(int)

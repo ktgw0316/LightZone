@@ -32,22 +32,36 @@ public final class PanasonicDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
-    public String getFlash() {
+    @Override
+    public int getFlash() {
         final ImageMetaValue value = getValue( PANASONIC_FLASH_FIRED );
-        return value != null ? value.toString() : null;
+        return value != null ? value.getIntValue() : -1;
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getISO() {
         final ImageMetaValue value = getValue( PANASONIC_ISO );
-        return hasTagValueLabelFor( value ) == null ? value.getIntValue() : 0;
+        if (value == null || hasTagValueLabelFor(value) != null) {
+            return 0;
+        } else {
+            final int iso = value.getIntValue();
+            switch (iso) {
+                case 65534:
+                case 65535:
+                    return 0;
+                default:
+                    return iso;
+            }
+        }
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getLens() {
         final ImageMetaValue value = getValue( PANASONIC_LENS_TYPE );
         return value != null ? value.getStringValue() : null;
@@ -60,6 +74,7 @@ public final class PanasonicDirectory extends MakerNotesDirectory implements
      * @param offset The offset to the start of the maker-notes.
      * @return Returns said adjustments.
      */
+    @Override
     public int[] getMakerNotesAdjustments( LCByteBuffer buf, int offset ) {
         //
         // The 12 bytes are:
@@ -67,7 +82,7 @@ public final class PanasonicDirectory extends MakerNotesDirectory implements
         //      0- 8: "Panasonic"
         //      9-11: 0 0 0
         //
-        return new int[]{ 12, offset };
+        return new int[]{ 12, 0 };
     }
 
     /**
@@ -75,6 +90,7 @@ public final class PanasonicDirectory extends MakerNotesDirectory implements
      *
      * @return Always returns &quot;Panasonic&quot;.
      */
+    @Override
     public String getName() {
         return "Panasonic";
     }
@@ -82,6 +98,7 @@ public final class PanasonicDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageOrientation getOrientation() {
         final ImageMetaValue value = getValue( PANASONIC_ROTATION );
         if ( value != null )
@@ -99,6 +116,7 @@ public final class PanasonicDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageMetaTagInfo getTagInfoFor( Integer id ) {
         return m_tagsByID.get( id );
     }
@@ -106,6 +124,7 @@ public final class PanasonicDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageMetaTagInfo getTagInfoFor( String name ) {
         return m_tagsByName.get( name );
     }
@@ -118,6 +137,7 @@ public final class PanasonicDirectory extends MakerNotesDirectory implements
      * @param value The value to put.
      * @see #valueToString(ImageMetaValue)
      */
+    @Override
     public void putValue( Integer tagID, ImageMetaValue value ) {
         switch ( tagID ) {
             case PANASONIC_CONTRAST_MODE: {
@@ -168,6 +188,7 @@ public final class PanasonicDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public String valueToString( ImageMetaValue value ) {
         switch ( value.getOwningTagID() ) {
             case PANASONIC_FIRMWARE_VERSION: {
@@ -201,9 +222,22 @@ public final class PanasonicDirectory extends MakerNotesDirectory implements
                     break;
                 }
             }
-            case PANASONIC_ISO:
-                final String label = hasTagValueLabelFor( value );
-                return label != null ? label : String.valueOf( value.getIntValue() );
+            case PANASONIC_ISO: {
+                final String label = hasTagValueLabelFor(value);
+                if (label != null) {
+                    return label;
+                } else {
+                    final int iso = value.getIntValue();
+                    switch (iso) {
+                        case 65534:
+                            return "Intelligent";
+                        case 65535:
+                            return "n/a";
+                        default:
+                            return String.valueOf(iso);
+                    }
+                }
+            }
             case PANASONIC_TIME_SINCE_POWER_ON: {
                 if ( !value.isNumeric() )
                     break;
@@ -227,23 +261,38 @@ public final class PanasonicDirectory extends MakerNotesDirectory implements
                 if ( !value.isNumeric() )
                     break;
                 return value.getIntValue() == 65535 ? "n/a" : value.getStringValue();
-            case PANASONIC_WHITE_BALANCE_BIAS: {
+            case PANASONIC_WHITE_BALANCE_BIAS:
                 if ( !value.isNumeric() )
                     break;
-                final double bias = value.getFloatValue() / 3;
+                final double bias = value.getIntValue() / 3.0;
                 return MetadataUtil.convertBiasFromAPEX( bias );
-            }
         }
         return super.valueToString( value );
     }
 
     ////////// protected //////////////////////////////////////////////////////
 
+    @Override
+    protected ImageMetaValue getLongFocalValue() {
+        return null;
+    }
+
+    @Override
+    protected ImageMetaValue getShortFocalValue() {
+        return null;
+    }
+
+    @Override
+    protected ImageMetaValue getMaxApertureValue() {
+        return null;
+    }
+
     /**
      * Get the {@link ResourceBundle} to use for tags.
      *
      * @return Returns said {@link ResourceBundle}.
      */
+    @Override
     protected ResourceBundle getTagLabelBundle() {
         return m_tagBundle;
     }
@@ -251,6 +300,7 @@ public final class PanasonicDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     protected Class<? extends ImageMetaTags> getTagsInterface() {
         return PanasonicTags.class;
     }

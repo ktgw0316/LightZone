@@ -13,11 +13,11 @@ if [ "${PLATFORM}" = "Linux" ]; then
   usrdir=/usr
 elif [ "${PLATFORM}" = "SunOS" ]; then
   totalmem=`prtconf | grep 'Memory size:' | sed -r 's/.* ([0-9]+) .*/\1/'`
-  totalmem=`expr $totalmem \* 1024`
+  totalmem=$(( ${totalmem} * 1024 ))
   usrdir=/usr
 elif [ "${PLATFORM}" = "FreeBSD" ]; then
   totalmem=`sysctl -n hw.physmem`
-  totalmem=`expr $totalmem / 1024`
+  totalmem=$(( ${totalmem} / 1024 ))
   usrdir=%%LOCALBASE%%
 fi
 
@@ -52,14 +52,27 @@ else
   echo "jh.jar was not found."
 fi
 
-if [ $totalmem -ge 1048576 ]; then
-  maxmem=$(( $totalmem / 2 ))
-  # on 32-bit architectures there is ~2GB limit for maximum Java heap size
-  if [ $arch = "32" -a $totalmem -ge 4194304 ]; then
-    maxmem=2097152
+minmem=524288
+maxmem=${minmem}
+
+javapref=${HOME}/.java/.userPrefs/com/lightcrafts/app/prefs.xml
+if [ -f ${javapref} ]; then
+  maxmem_pref=`xmllint --xpath 'map/entry[@key="MaxMemory"]/@value' ${javapref} | sed -r 's/value=\"([0-9]+)\"/\1/'`
+  if [ ! -z ${maxmem_pref} ]; then
+    maxmem=$(( ${maxmem_pref} * 1024 ))
   fi
-else
-    maxmem=524288
+fi
+
+if [ ${maxmem} -le ${minmem} ]; then
+  if [ ${totalmem} -ge 1048576 ]; then
+    maxmem=$(( ${totalmem} / 2 ))
+    # on 32-bit architectures there is ~2GB limit for maximum Java heap size
+    if [ ${arch} = "32" -a ${totalmem} -ge 4194304 ]; then
+      maxmem=2097152
+    fi
+  else
+      maxmem=${minmem}
+  fi
 fi
 
 jvmopts=-XX:+UseG1GC \
@@ -80,12 +93,12 @@ for i in "$@"; do
   fi
 done
 
-(cd $pkgjavadir && LD_LIBRARY_PATH=$pkglibexecdir exec java \
+(cd ${pkgjavadir} && LD_LIBRARY_PATH=${pkglibexecdir} exec java \
 -classpath ".:${pkgjavadir}/*:${jhpath}" \
 -XX:+UseG1GC \
 -XX:MinHeapFreeRatio=30 \
 -XX:MaxHeapFreeRatio=30 \
 -Xmx${maxmem}k \
--Djava.library.path=$pkglibexecdir \
+-Djava.library.path=${pkglibexecdir} \
 -Dfile.encoding=UTF8 \
 com.lightcrafts.platform.linux.LinuxLauncher ${file} ${@} )

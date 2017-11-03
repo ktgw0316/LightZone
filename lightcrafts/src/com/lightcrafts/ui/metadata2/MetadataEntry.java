@@ -5,6 +5,8 @@ package com.lightcrafts.ui.metadata2;
 import com.lightcrafts.image.metadata.ImageMetadata;
 import com.lightcrafts.image.ImageInfo;
 
+import java.net.URI;
+
 abstract class MetadataEntry {
 
     /**
@@ -49,5 +51,9 @@ abstract class MetadataEntry {
      * to its default value.
      */
     void setDefaultValue(ImageMetadata meta) {
+    }
+
+    URI getURI(ImageMetadata meta) {
+        return null;
     }
 }

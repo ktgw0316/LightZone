@@ -292,7 +292,10 @@ public final class CanonDirectory extends MakerNotesDirectory implements
             case CANON_LI_FOCAL_LENGTH:
             case CANON_LI_LONG_FOCAL_LENGTH:
             case CANON_LI_SHORT_FOCAL_LENGTH:
-                return value.getStringValue() + "mm"; // TODO: localize "mm"
+                return TextUtil.tenthsNoDotZero( value.getShortValue() )  + "mm"; // TODO: localize "mm"
+            case CANON_CS_MAX_APERTURE:
+            case CANON_CS_MIN_APERTURE:
+                return TextUtil.tenthsNoDotZero( value.getShortValue() );
             case CANON_PI_DIGITAL_GAIN:
                 return TextUtil.tenths( value.getIntValue() / 10F );
             case CANON_SI_EXPOSURE_TIME:
@@ -315,14 +318,50 @@ public final class CanonDirectory extends MakerNotesDirectory implements
     ////////// protected //////////////////////////////////////////////////////
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ImageMetaValue getLensNamesValue() {
+        return getValue( CANON_CS_LENS_TYPE );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ImageMetaValue getFocalUnitsPerMMValue() {
+        return getValue( CANON_CS_FOCAL_UNITS_PER_MM );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ImageMetaValue getLongFocalValue() {
+        return getValue( CANON_CS_LONG_FOCAL_LENGTH );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ImageMetaValue getShortFocalValue() {
+        return getValue( CANON_CS_SHORT_FOCAL_LENGTH );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ImageMetaValue getMaxApertureValue() {
+        return getValue( CANON_CS_MAX_APERTURE );
+    }
+
+    /**
      * Gets the priority of this directory for providing the metadata supplied
      * by implementing the given provider interface.
      * <p>
-     * By default, the priority for maker notes directories is higher than
-     * {@link ImageMetadataDirectory#getProviderPriorityFor(Class)} because
-     * they have more detailed metadata about a given image.
-     * <p>
-     * However, an exception is made for {@link ShutterSpeedProvider} for Canon
+     * The priority for {@link ShutterSpeedProvider} for Canon is the lowest
      * because it yields weird values.
      *
      * @param provider The provider interface to get the priority for.
@@ -331,8 +370,9 @@ public final class CanonDirectory extends MakerNotesDirectory implements
     protected int getProviderPriorityFor(
         Class<? extends ImageMetadataProvider> provider )
     {
-        return provider == ShutterSpeedProvider.class ? 0 :
-            super.getProviderPriorityFor( provider );
+        return (provider == ShutterSpeedProvider.class)
+                ? PROVIDER_PRIORITY_MIN
+                : super.getProviderPriorityFor( provider );
     }
 
     /**
@@ -448,8 +488,10 @@ public final class CanonDirectory extends MakerNotesDirectory implements
         add( CANON_CS_ISO, "CSISO", META_SSHORT );
         add( CANON_CS_LENS_TYPE, "CSLensType", META_SSHORT );
         add( CANON_CS_LONG_FOCAL_LENGTH, "CSLongFocalLength", META_SSHORT );
+        add( CANON_CS_MAX_APERTURE, "CSMaxAperture", META_SSHORT );
         add( CANON_CS_MACRO_MODE, "CSMacroMode", META_SSHORT );
         add( CANON_CS_METERING_MODE, "CSMeteringMode", META_SSHORT );
+        add( CANON_CS_MIN_APERTURE, "CSMinAperture", META_SSHORT );
         add( CANON_CS_QUALITY, "CSQuality", META_SSHORT );
         add( CANON_CS_SATURATION, "CSSaturation", META_SSHORT );
         add( CANON_CS_SELF_TIMER_DELAY, "CSSelfTimerDelay", META_SSHORT );

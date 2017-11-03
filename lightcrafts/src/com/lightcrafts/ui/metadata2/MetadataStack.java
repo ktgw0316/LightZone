@@ -80,9 +80,7 @@ public class MetadataStack extends JPanel implements Scrollable {
 
         List<MetadataSection> sections = present.getSections();
 
-        Iterator<MetadataSection> i = sections.iterator();
-        while (i.hasNext()) {
-            MetadataSection section = i.next();
+        for (MetadataSection section : sections) {
             MetadataTableModel model =
                 new MetadataTableModel(info, meta, section);
             MetadataTable table = new MetadataTable(model);
@@ -92,14 +90,10 @@ public class MetadataStack extends JPanel implements Scrollable {
             control.add(table);
             control.add(buttons);
             add(control);
-            if (i.hasNext()) {
-                add(Box.createVerticalStrut(4));
-                add(new JSeparator());
-                add(Box.createVerticalStrut(4));
-            }
+            add(Box.createVerticalStrut(4));
+            add(new JSeparator());
+            add(Box.createVerticalStrut(4));
         }
-        add(Box.createVerticalStrut(4));
-        add(new JSeparator());
         add(Box.createVerticalGlue());
     }
 

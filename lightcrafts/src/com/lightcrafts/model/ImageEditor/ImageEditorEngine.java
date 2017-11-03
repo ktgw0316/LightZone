@@ -768,20 +768,14 @@ public class ImageEditorEngine implements Engine {
         return getRendering(bounds, JAIContext.sRGBColorProfile, true);
     }
 
-    public PlanarImage getRendering(Dimension bounds, ICC_Profile profile, boolean eightBits) {
-        return getRendering(bounds, profile, null, eightBits);
+    public PlanarImage getRendering(Dimension bounds, ICC_Profile profile, boolean isEightBits) {
+        return getRendering(bounds, profile, null, isEightBits);
     }
 
     public PlanarImage getRendering(Dimension bounds, ICC_Profile profile,
                                     LCMSColorConvertDescriptor.RenderingIntent intent,
                                     boolean isEightBits) {
-        val dimension = getNaturalSize();
-
-        // TODO: scale method
-        val scale = bounds != null
-                ? Math.min(bounds.width / (float) dimension.getWidth(),
-                           bounds.height / (float) dimension.getHeight())
-                : 1;
+        val scale = (bounds != null) ? rendering.getScaleToFit(bounds) : 1;
 
         val newRendering = canvas != null ? rendering.clone() : rendering;
 
@@ -791,11 +785,9 @@ public class ImageEditorEngine implements Engine {
 
         if (profile != null) {
             val exportColorSpace = (profile == JAIContext.sRGBColorProfile)
-                    ? JAIContext.sRGBColorSpace
-                    : new ICC_ColorSpace(profile);
-            image = (intent != null)
-                    ? Functions.toColorSpace(image, exportColorSpace, intent, null)
-                    : Functions.toColorSpace(image, exportColorSpace, null);
+                ? JAIContext.sRGBColorSpace
+                : new ICC_ColorSpace(profile);
+            image = Functions.toColorSpace(image, exportColorSpace, intent, null);
         }
 
         return isEightBits ? Functions.fromUShortToByte(image, null) : image;
@@ -811,7 +803,7 @@ public class ImageEditorEngine implements Engine {
                        ImageExportOptions exportOptions ) throws IOException {
         val fileOptions = (ImageFileExportOptions)exportOptions;
         val exportType = exportOptions.getImageType();
-        val exportWidth  = fileOptions.resizeWidth.getValue();
+        val exportWidth = fileOptions.resizeWidth.getValue();
         val exportHeight = fileOptions.resizeHeight.getValue();
 
         val exportProfileName = fileOptions.colorProfile.getValue();
@@ -828,8 +820,7 @@ public class ImageEditorEngine implements Engine {
 
         // Uprez output images
 
-        // TODO: scale method
-        val scale = Math.min(exportWidth  / (double) exportImage.getWidth(),
+        val scale = Math.min(exportWidth / (double) exportImage.getWidth(),
                              exportHeight / (double) exportImage.getHeight());
 
         if (scale > 1) {

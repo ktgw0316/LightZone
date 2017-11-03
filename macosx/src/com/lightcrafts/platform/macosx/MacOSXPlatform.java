@@ -26,6 +26,16 @@ import com.lightcrafts.ui.LightZoneSkin;
  */
 public final class MacOSXPlatform extends Platform {
 
+    private final static String home = System.getProperty("user.home");
+
+    private final static File SystemProfileDir = new File(
+        "/Library/ColorSync/Profiles"
+    );
+
+    private final static File UserProfileDir = new File(
+        home, "Library/ColorSync/Profiles"
+    );
+
     @Override
     public void bringAppToFront( String appName ) {
         AppleScript.bringAppToFront( appName );
@@ -51,34 +61,15 @@ public final class MacOSXPlatform extends Platform {
 
     @Override
     public File getDefaultImageDirectory() {
-        final String home = System.getProperty( "user.home" );
         return new File( home, "Pictures" );
     }
 
     @Override
     public synchronized Collection<ColorProfileInfo> getExportProfiles() {
         if ( m_exportProfiles == null ) {
-            final Collection<ColorProfileInfo> colorspaceProfiles =
-                MacOSXColorProfileManager.getProfilesFor( CM_COLORSPACE_CLASS );
-            final Collection<ColorProfileInfo> displayProfiles =
-                MacOSXColorProfileManager.getProfilesFor( CM_DISPLAY_CLASS );
-            final Collection<ColorProfileInfo> outputProfiles =
-                MacOSXColorProfileManager.getProfilesFor( CM_OUTPUT_CLASS );
-
-            m_exportProfiles = new ArrayList<ColorProfileInfo>();
-
-            if ( colorspaceProfiles != null )
-                m_exportProfiles.addAll( colorspaceProfiles );
-            if ( displayProfiles != null )
-                m_exportProfiles.addAll( displayProfiles );
-            if ( outputProfiles != null )
-                m_exportProfiles.addAll( outputProfiles );
-
-            if ( m_exportProfiles.isEmpty() )
-                m_exportProfiles = null;
-            else
-                m_exportProfiles =
-                    Collections.unmodifiableCollection( m_exportProfiles );
+            m_exportProfiles = new HashSet<ColorProfileInfo>();
+            m_exportProfiles.addAll(getColorProfiles(SystemProfileDir));
+            m_exportProfiles.addAll(getColorProfiles(UserProfileDir));
         }
         return m_exportProfiles;
     }
@@ -90,7 +81,6 @@ public final class MacOSXPlatform extends Platform {
 
     @Override
     public File getLightZoneDocumentsDirectory() {
-        final String home = System.getProperty( "user.home" );
         final String appName = Version.getApplicationName();
         final String path = "Library/Application Support/" + appName;
         return new File( home, path );

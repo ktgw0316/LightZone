@@ -5,8 +5,8 @@ package com.lightcrafts.image.metadata.makernotes;
 import com.lightcrafts.image.metadata.ImageMetaTags;
 
 /**
- * A <code>PanasonicTags</code> defines the constants used for Panasonic maker
- * note metadata tags.
+ * A {@code PanasonicTags} defines the constants used for Panasonic maker note
+ * metadata tags.
  *
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */
@@ -20,15 +20,11 @@ public interface PanasonicTags extends ImageMetaTags {
     int PANASONIC_ACCESSORY_TYPE            = 0x0053;
 
     /**
-     * Audio
+     * Audio.
      *  <blockquote>
      *    <table border="0" cellpadding="0">
-     *      <tr valign="top">
-     *        <td>1 =&nbsp;</td><td>yes</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>2 =&nbsp;</td><td>no</td>
-     *      </tr>
+     *      <tr><td>1 =&nbsp;</td><td>yes</td></tr>
+     *      <tr><td>2 =&nbsp;</td><td>no</td></tr>
      *    </table>
      *  </blockquote>
      * Type: Unsigned short.
@@ -65,15 +61,10 @@ public interface PanasonicTags extends ImageMetaTags {
      * Burst mode.
      *  <blockquote>
      *    <table border="0" cellpadding="0">
-     *      <tr valign="top">
-     *        <td>0 =&nbsp;</td><td>off</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>1 =&nbsp;</td><td>low/high quality</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>2 =&nbsp;</td><td>infinite</td>
-     *      </tr>
+     *      <tr><td>0 =&nbsp;</td><td>off</td></tr>
+     *      <tr><td>1 =&nbsp;</td><td>on</td></tr>
+     *      <tr><td>2 =&nbsp;</td><td>infinite</td></tr>
+     *      <tr><td>3 =&nbsp;</td><td>unlimited</td></tr>
      *    </table>
      *  </blockquote>
      * Type: Unsigned short.
@@ -91,21 +82,11 @@ public interface PanasonicTags extends ImageMetaTags {
      * Color effect.
      *  <blockquote>
      *    <table border="0" cellpadding="0">
-     *      <tr valign="top">
-     *        <td>1 =&nbsp;</td><td>off</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>2 =&nbsp;</td><td>warm</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>3 =&nbsp;</td><td>cool</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>4 =&nbsp;</td><td>black &amp; white</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>5 =&nbsp;</td><td>sepia</td>
-     *      </tr>
+     *      <tr><td>1 =&nbsp;</td><td>off</td></tr>
+     *      <tr><td>2 =&nbsp;</td><td>warm</td></tr>
+     *      <tr><td>3 =&nbsp;</td><td>cool</td></tr>
+     *      <tr><td>4 =&nbsp;</td><td>black &amp; white</td></tr>
+     *      <tr><td>5 =&nbsp;</td><td>sepia</td></tr>
      *    </table>
      *  </blockquote>
      * Type: Unsigned short.
@@ -116,12 +97,9 @@ public interface PanasonicTags extends ImageMetaTags {
      * Color mode.
      *  <blockquote>
      *    <table border="0" cellpadding="0">
-     *      <tr valign="top">
-     *        <td>0 =&nbsp;</td><td>normal</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>1 =&nbsp;</td><td>natural</td>
-     *      </tr>
+     *      <tr><td>0 =&nbsp;</td><td>normal</td></tr>
+     *      <tr><td>1 =&nbsp;</td><td>natural</td></tr>
+     *      <tr><td>2 =&nbsp;</td><td>vivid</td></tr>
      *    </table>
      *  </blockquote>
      * Type: Unsigned short.
@@ -139,15 +117,14 @@ public interface PanasonicTags extends ImageMetaTags {
      * Contrast mode.
      *  <blockquote>
      *    <table border="0" cellpadding="0">
-     *      <tr valign="top">
-     *        <td>0 =&nbsp;</td><td>normal</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>1 =&nbsp;</td><td>low</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>2 =&nbsp;</td><td>high</td>
-     *      </tr>
+     *      <tr><td align="right">0 =&nbsp;</td><td>normal</td></tr>
+     *      <tr><td align="right">1 =&nbsp;</td><td>low</td></tr>
+     *      <tr><td align="right">2 =&nbsp;</td><td>high</td></tr>
+     *      <tr><td align="right">6 =&nbsp;</td><td>medium low</td></tr>
+     *      <tr><td align="right">7 =&nbsp;</td><td>medium high</td></tr>
+     *      <tr><td align="right">400 =&nbsp;</td><td>low</td></tr>
+     *      <tr><td align="right">420 =&nbsp;</td><td>normal</td></tr>
+     *      <tr><td align="right">440 =&nbsp;</td><td>high</td></tr>
      *    </table>
      *  </blockquote>
      * Type: Unsigned short.
@@ -250,18 +227,10 @@ public interface PanasonicTags extends ImageMetaTags {
      * Focus mode.
      *  <blockquote>
      *    <table border="0" cellpadding="0">
-     *      <tr valign="top">
-     *        <td>1 =&nbsp;</td><td>auto</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>2 =&nbsp;</td><td>manual</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>4 =&nbsp;</td><td>auto, focus button</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>5 =&nbsp;</td><td>auto, continuous</td>
-     *      </tr>
+     *      <tr><td>1 =&nbsp;</td><td>auto</td></tr>
+     *      <tr><td>2 =&nbsp;</td><td>manual</td></tr>
+     *      <tr><td>4 =&nbsp;</td><td>auto, focus button</td></tr>
+     *      <tr><td>5 =&nbsp;</td><td>auto, continuous</td></tr>
      *    </table>
      *  </blockquote>
      * Type: Unsigned short.
@@ -272,18 +241,10 @@ public interface PanasonicTags extends ImageMetaTags {
      * Image quality.
      *  <blockquote>
      *    <table border="0" cellpadding="0">
-     *      <tr valign="top">
-     *        <td>2 =&nbsp;</td><td>high</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>3 =&nbsp;</td><td>normal</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>6 =&nbsp;</td><td>very high</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>7 =&nbsp;</td><td>raw</td>
-     *      </tr>
+     *      <tr><td>2 =&nbsp;</td><td>high</td></tr>
+     *      <tr><td>3 =&nbsp;</td><td>normal</td></tr>
+     *      <tr><td>6 =&nbsp;</td><td>very high</td></tr>
+     *      <tr><td>7 =&nbsp;</td><td>raw</td></tr>
      *    </table>
      *  </blockquote>
      * Type: Unsigned short.
@@ -294,15 +255,9 @@ public interface PanasonicTags extends ImageMetaTags {
      * Image stabilizer.
      *  <blockquote>
      *    <table border="0" cellpadding="0">
-     *      <tr valign="top">
-     *        <td>2 =&nbsp;</td><td>on, mode 1</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>3 =&nbsp;</td><td>off</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>4 =&nbsp;</td><td>on, mode 2</td>
-     *      </tr>
+     *      <tr><td>2 =&nbsp;</td><td>on, mode 1</td></tr>
+     *      <tr><td>3 =&nbsp;</td><td>off</td></tr>
+     *      <tr><td>4 =&nbsp;</td><td>on, mode 2</td></tr>
      *    </table>
      *  </blockquote>
      * Type: Unsigned short.
@@ -366,15 +321,10 @@ public interface PanasonicTags extends ImageMetaTags {
      * Macro mode.
      *  <blockquote>
      *    <table border="0" cellpadding="0">
-     *      <tr valign="top">
-     *        <td>1 =&nbsp;</td><td>on</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>2 =&nbsp;</td><td>off</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>257 =&nbsp;</td><td>tele-macro</td>
-     *      </tr>
+     *      <tr><td align="right">1 =&nbsp;</td><td>on</td></tr>
+     *      <tr><td align="right">2 =&nbsp;</td><td>off</td></tr>
+     *      <tr><td align="right">257 =&nbsp;</td><td>tele-macro</td></tr>
+     *      <tr><td align="right">1001 =&nbsp;</td><td>macro zoom</td></tr>
      *    </table>
      *  </blockquote>
      * Type: Unsigned short.
@@ -385,15 +335,11 @@ public interface PanasonicTags extends ImageMetaTags {
      * Noise reduction.
      *  <blockquote>
      *    <table border="0" cellpadding="0">
-     *      <tr valign="top">
-     *        <td>0 =&nbsp;</td><td>standard</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>1 =&nbsp;</td><td>low</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>2 =&nbsp;</td><td>high</td>
-     *      </tr>
+     *      <tr><td>0 =&nbsp;</td><td>standard</td></tr>
+     *      <tr><td>1 =&nbsp;</td><td>low</td></tr>
+     *      <tr><td>2 =&nbsp;</td><td>high</td></tr>
+     *      <tr><td>3 =&nbsp;</td><td>lowest</td></tr>
+     *      <tr><td>4 =&nbsp;</td><td>highest</td></tr>
      *    </table>
      *  </blockquote>
      * Type: Unsigned short.
@@ -416,15 +362,10 @@ public interface PanasonicTags extends ImageMetaTags {
      * Rotation.
      *  <blockquote>
      *    <table border="0" cellpadding="0">
-     *      <tr valign="top">
-     *        <td>1 =&nbsp;</td><td>landscape</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>6 =&nbsp;</td><td>90 CW</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>8 =&nbsp;</td><td>90 CCW</td>
-     *      </tr>
+     *      <tr><td>1 =&nbsp;</td><td>landscape</td></tr>
+     *      <tr><td>3 =&nbsp;</td><td>180</td></tr>
+     *      <tr><td>6 =&nbsp;</td><td>90 CW</td></tr>
+     *      <tr><td>8 =&nbsp;</td><td>90 CCW</td></tr>
      *    </table>
      *  </blockquote>
      * Type: Unsigned short.
@@ -447,15 +388,9 @@ public interface PanasonicTags extends ImageMetaTags {
      * Self timer.
      *  <blockquote>
      *    <table border="0" cellpadding="0">
-     *      <tr valign="top">
-     *        <td>1 =&nbsp;</td><td>off</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>2 =&nbsp;</td><td>10s</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>3 =&nbsp;</td><td>2s</td>
-     *      </tr>
+     *      <tr><td>1 =&nbsp;</td><td>off</td></tr>
+     *      <tr><td>2 =&nbsp;</td><td>10s</td></tr>
+     *      <tr><td>3 =&nbsp;</td><td>2s</td></tr>
      *    </table>
      *  </blockquote>
      * Type: Unsigned short.
@@ -480,54 +415,51 @@ public interface PanasonicTags extends ImageMetaTags {
      * Shooting mode.
      *  <blockquote>
      *    <table border="0" cellpadding="0">
-     *      <tr valign="top">
-     *        <td>1 =&nbsp;</td><td>normal</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>2 =&nbsp;</td><td>portrait</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>3 =&nbsp;</td><td>scenery</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>4 =&nbsp;</td><td>sports</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>5 =&nbsp;</td><td>night portrait</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>6 =&nbsp;</td><td>program</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>7 =&nbsp;</td><td>aperture priority</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>8 =&nbsp;</td><td>shutter program</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>9 =&nbsp;</td><td>macro</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>11 =&nbsp;</td><td>manual</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>13 =&nbsp;</td><td>panning</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>18 =&nbsp;</td><td>fireworks</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>19 =&nbsp;</td><td>party</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>20 =&nbsp;</td><td>snow</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>21 =&nbsp;</td><td>night scenery</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>22 =&nbsp;</td><td>food</td>
-     *      </tr>
+     *      <tr><td align="right">1 =&nbsp;</td><td>normal</td></tr>
+     *      <tr><td align="right">2 =&nbsp;</td><td>portrait</td></tr>
+     *      <tr><td align="right">3 =&nbsp;</td><td>scenery</td></tr>
+     *      <tr><td align="right">4 =&nbsp;</td><td>sports</td></tr>
+     *      <tr><td align="right">5 =&nbsp;</td><td>night portrait</td></tr>
+     *      <tr><td align="right">6 =&nbsp;</td><td>program</td></tr>
+     *      <tr><td align="right">7 =&nbsp;</td><td>aperture priority</td></tr>
+     *      <tr><td align="right">8 =&nbsp;</td><td>shutter program</td></tr>
+     *      <tr><td align="right">9 =&nbsp;</td><td>macro</td></tr>
+     *      <tr><td align="right">10 =&nbsp;</td><td>spot</td></tr>
+     *      <tr><td align="right">11 =&nbsp;</td><td>manual</td></tr>
+     *      <tr><td align="right">12 =&nbsp;</td><td>movie preview</td></tr>
+     *      <tr><td align="right">13 =&nbsp;</td><td>panning</td></tr>
+     *      <tr><td align="right">14 =&nbsp;</td><td>simple</td></tr>
+     *      <tr><td align="right">15 =&nbsp;</td><td>color effects</td></tr>
+     *      <tr><td align="right">16 =&nbsp;</td><td>self portrait</td></tr>
+     *      <tr><td align="right">17 =&nbsp;</td><td>economy</td></tr>
+     *      <tr><td align="right">18 =&nbsp;</td><td>fireworks</td></tr>
+     *      <tr><td align="right">19 =&nbsp;</td><td>party</td></tr>
+     *      <tr><td align="right">20 =&nbsp;</td><td>snow</td></tr>
+     *      <tr><td align="right">21 =&nbsp;</td><td>night scenery</td></tr>
+     *      <tr><td align="right">22 =&nbsp;</td><td>food</td></tr>
+     *      <tr><td align="right">23 =&nbsp;</td><td>baby</td></tr>
+     *      <tr><td align="right">24 =&nbsp;</td><td>soft skin</td></tr>
+     *      <tr><td align="right">25 =&nbsp;</td><td>candlelight</td></tr>
+     *      <tr><td align="right">26 =&nbsp;</td><td>starry night</td></tr>
+     *      <tr><td align="right">27 =&nbsp;</td><td>high sensitivity</td></tr>
+     *      <tr><td align="right">28 =&nbsp;</td><td>parorama assist</td></tr>
+     *      <tr><td align="right">29 =&nbsp;</td><td>underwater</td></tr>
+     *      <tr><td align="right">30 =&nbsp;</td><td>beach</td></tr>
+     *      <tr><td align="right">31 =&nbsp;</td><td>aerial</td></tr>
+     *      <tr><td align="right">32 =&nbsp;</td><td>sunset</td></tr>
+     *      <tr><td align="right">33 =&nbsp;</td><td>pet</td></tr>
+     *      <tr><td align="right">34 =&nbsp;</td><td>intelligent ISO</td></tr>
+     *      <tr><td align="right">35 =&nbsp;</td><td>clipboard</td></tr>
+     *      <tr><td align="right">36 =&nbsp;</td><td>high-speed continuous shooting</td></tr>
+     *      <tr><td align="right">37 =&nbsp;</td><td>intelligent auto</td></tr>
+     *      <tr><td align="right">39 =&nbsp;</td><td>muti-aspect</td></tr>
+     *      <tr><td align="right">41 =&nbsp;</td><td>transform</td></tr>
+     *      <tr><td align="right">42 =&nbsp;</td><td>flash burst</td></tr>
+     *      <tr><td align="right">43 =&nbsp;</td><td>pin hole</td></tr>
+     *      <tr><td align="right">44 =&nbsp;</td><td>film grain</td></tr>
+     *      <tr><td align="right">45 =&nbsp;</td><td>my color</td></tr>
+     *      <tr><td align="right">46 =&nbsp;</td><td>photo frame</td></tr>
+     *      <tr><td align="right">51 =&nbsp;</td><td>HDR</td></tr>
      *    </table>
      *  </blockquote>
      * Type: Unsigned short.
@@ -538,12 +470,8 @@ public interface PanasonicTags extends ImageMetaTags {
      * Spot mode.  Note that the value of interest is the second number only.
      *  <blockquote>
      *    <table border="0" cellpadding="0">
-     *      <tr valign="top">
-     *        <td>1 =&nbsp;</td><td>on</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>16 =&nbsp;</td><td>off</td>
-     *      </tr>
+     *      <tr><td align="right">1 =&nbsp;</td><td>on</td></tr>
+     *      <tr><td align="right">16 =&nbsp;</td><td>off</td></tr>
      *    </table>
      *  </blockquote>
      * Type: Unsigned short[2].
@@ -602,27 +530,13 @@ public interface PanasonicTags extends ImageMetaTags {
      * White balance.
      *  <blockquote>
      *    <table border="0" cellpadding="0">
-     *      <tr valign="top">
-     *        <td>1 =&nbsp;</td><td>auto</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>2 =&nbsp;</td><td>daylight</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>3 =&nbsp;</td><td>cloudy</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>4 =&nbsp;</td><td>halogen</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>5 =&nbsp;</td><td>manual</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>8 =&nbsp;</td><td>flash</td>
-     *      </tr>
-     *      <tr valign="top">
-     *        <td>10 =&nbsp;</td><td>black &amp; white</td>
-     *      </tr>
+     *      <tr><td align="right">1 =&nbsp;</td><td>auto</td></tr>
+     *      <tr><td align="right">2 =&nbsp;</td><td>daylight</td></tr>
+     *      <tr><td align="right">3 =&nbsp;</td><td>cloudy</td></tr>
+     *      <tr><td align="right">4 =&nbsp;</td><td>halogen</td></tr>
+     *      <tr><td align="right">5 =&nbsp;</td><td>manual</td></tr>
+     *      <tr><td align="right">8 =&nbsp;</td><td>flash</td></tr>
+     *      <tr><td align="right">10 =&nbsp;</td><td>black &amp; white</td></tr>
      *    </table>
      *  </blockquote>
      * Type: Unsigned short.

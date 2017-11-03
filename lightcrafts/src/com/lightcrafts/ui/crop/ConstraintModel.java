@@ -32,7 +32,7 @@ class ConstraintModel {
     }
 
     Action createMenuAction(final AspectConstraint constraint) {
-        return new AbstractAction(constraint.toString()) {
+        return new AbstractAction(constraint.getNameWithDescription()) {
             public void actionPerformed(ActionEvent event) {
                 setAspectConstraint(constraint);
             }

@@ -16,7 +16,8 @@ import com.lightcrafts.utils.Rational;
 import com.lightcrafts.utils.TextUtil;
 import com.lightcrafts.utils.xml.ElementPrefixFilter;
 
-import static com.lightcrafts.image.metadata.EXIFTags.*;
+import static com.lightcrafts.image.metadata.EXIFTags.TIFFCommonTags;
+import static com.lightcrafts.image.metadata.ImageMetadata.unexportedTags;
 import com.lightcrafts.image.metadata.providers.ImageMetadataProvider;
 
 /**
@@ -26,8 +27,8 @@ import com.lightcrafts.image.metadata.providers.ImageMetadataProvider;
  *
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */
-public abstract class ImageMetadataDirectory
-    implements Cloneable, Externalizable {
+public abstract class ImageMetadataDirectory implements
+        Cloneable, Externalizable, Iterable<Map.Entry<Integer,ImageMetaValue>> {
 
     ////////// public /////////////////////////////////////////////////////////
 
@@ -52,6 +53,7 @@ public abstract class ImageMetadataDirectory
      *
      * @return Returns said clone.
      */
+    @Override
     public final ImageMetadataDirectory clone() {
         final ImageMetadataDirectory copy;
         try {
@@ -500,6 +502,7 @@ public abstract class ImageMetadataDirectory
      *
      * @return Returns said {@link Iterator}.
      */
+    @Override
     public final synchronized Iterator<Map.Entry<Integer,ImageMetaValue>>
     iterator() {
         return m_tagIDToValueMap.entrySet().iterator();
@@ -734,6 +737,7 @@ public abstract class ImageMetadataDirectory
      *
      * @return Returns said {@link String}.
      */
+    @Override
     public final String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append( getName() );
@@ -792,6 +796,7 @@ public abstract class ImageMetadataDirectory
     /**
      * {@inheritDoc}
      */
+    @Override
     public void readExternal( ObjectInput in ) throws IOException {
         for ( int size = in.readShort(); size > 0; --size ) {
             final int tagID = in.readInt();
@@ -809,6 +814,7 @@ public abstract class ImageMetadataDirectory
      * (<code>int</code>), the metadata type (<code>short</code), and the
      * {@link ImageMetaValue}.
      */
+    @Override
     public void writeExternal( ObjectOutput out ) throws IOException {
         out.writeShort( size() );
         for ( Iterator<Map.Entry<Integer,ImageMetaValue>> i = iterator();
@@ -839,20 +845,10 @@ public abstract class ImageMetadataDirectory
               i = sourceDir.iterator(); i.hasNext(); ) {
             final Map.Entry<Integer,ImageMetaValue> me = i.next();
             final int tagID = me.getKey();
-            switch ( tagID ) {
-                case EXIF_ARTIST:
-                case EXIF_COPYRIGHT:
-                case EXIF_DATE_TIME:
-                case EXIF_IMAGE_DESCRIPTION:
-                case EXIF_MAKE:
-                case EXIF_MODEL:
-                case EXIF_MS_RATING:
-                case EXIF_RESOLUTION_UNIT:
-                case EXIF_X_RESOLUTION:
-                case EXIF_Y_RESOLUTION:
-                    targetDir.putValue( tagID, me.getValue() );
-                    i.remove();
-                    break;
+            if (TIFFCommonTags.contains(tagID)
+                    && !unexportedTags.contains(tagID)) {
+                targetDir.putValue(tagID, me.getValue());
+                i.remove();
             }
         }
     }
@@ -960,7 +956,7 @@ public abstract class ImageMetadataDirectory
     protected int getProviderPriorityFor(
         Class<? extends ImageMetadataProvider> provider )
     {
-        return 1;
+        return PROVIDER_PRIORITY_DEFAULT;
     }
 
     /**
@@ -1114,6 +1110,24 @@ public abstract class ImageMetadataDirectory
         }
         return null;
     }
+
+    /**
+     * The default provider priority.
+     * @see #getProviderPriorityFor(Class)
+     */
+    protected static final int PROVIDER_PRIORITY_DEFAULT = 1;
+
+    /**
+     * The maximum provider priority.
+     * @see #getProviderPriorityFor(Class)
+     */
+    protected static final int PROVIDER_PRIORITY_MAX = 10000;
+
+    /**
+     * The minumum provider priority.
+     * @see #getProviderPriorityFor(Class)
+     */
+    protected static final int PROVIDER_PRIORITY_MIN = -10000;
 
     ////////// private ////////////////////////////////////////////////////////
 

@@ -6,6 +6,7 @@ import com.lightcrafts.utils.ColorProfileInfo;
 import com.lightcrafts.utils.Version;
 import com.lightcrafts.utils.directory.DirectoryMonitor;
 import com.lightcrafts.utils.directory.UnixDirectoryMonitor;
+import com.lightcrafts.utils.file.ICC_ProfileFileFilter;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.regex.Pattern;
 
 /**
@@ -413,6 +415,53 @@ public class Platform {
 
     public PrinterLayer getPrinterLayer() {
         return printerLayer;
+    }
+
+    ////////// protected ////////////////////////////////////////////////////////
+
+    protected static Collection<ColorProfileInfo> getColorProfiles(
+            File profileDir
+    ) {
+        HashSet<ColorProfileInfo> profiles = new HashSet<ColorProfileInfo>();
+
+        if (! profileDir.isDirectory()) {
+            return profiles;
+        }
+
+        File[] files = profileDir.listFiles(ICC_ProfileFileFilter.INSTANCE);
+        if (files == null) {
+            return Collections.emptyList(); // Just in case of I/O error
+        }
+
+        for (File file : files) {
+            if (file.isDirectory()) {
+                profiles.addAll(getColorProfiles(file));
+            }
+            else if (file.isFile()) {
+                String path = file.getAbsolutePath();
+                try {
+                    final ICC_Profile profile = ICC_Profile.getInstance(path);
+                    final String name = ColorProfileInfo.getNameOf(profile);
+                    final ColorProfileInfo info = new ColorProfileInfo(name, path);
+                    profiles.add(info);
+                }
+                catch (IOException e) {
+                    // Trouble reading the file
+                    System.err.println(
+                            "Can't read a color profile from " + path + ": "
+                                    + e.getMessage()
+                    );
+                }
+                catch (Throwable e) {
+                    // Invalid color profile data
+                    System.err.println(
+                            "Not a valid color profile at " + path + ": "
+                                    + e.getMessage()
+                    );
+                }
+            }
+        }
+        return profiles;
     }
 
     ////////// private ////////////////////////////////////////////////////////

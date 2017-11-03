@@ -102,14 +102,15 @@ public abstract class MakerNoteProbe<T extends MakerNotesDirectory> {
     static {
         // TODO: is there a better way to do this?
         Arrays.asList(
-            CanonMakerNoteProbe.create(),
-            FujiMakerNoteProbe.create(),
-            KodakMakerNoteProbe.create(),
-            MinoltaMakerNoteProbe.create(),
-            NikonMakerNoteProbe.create(),
-            OlympusMakerNoteProbe.create(),
-            PanasonicMakerNoteProbe.create(),
-            PentaxMakerNoteProbe.create()
+                CanonMakerNoteProbe.create(),
+                FujiMakerNoteProbe.create(),
+                KodakMakerNoteProbe.create(),
+                MinoltaMakerNoteProbe.create(),
+                NikonMakerNoteProbe.create(),
+                OlympusMakerNoteProbe.create(),
+                PanasonicMakerNoteProbe.create(),
+                PentaxMakerNoteProbe.create(),
+                SonyMakerNoteProbe.create()
         );
     }
 }

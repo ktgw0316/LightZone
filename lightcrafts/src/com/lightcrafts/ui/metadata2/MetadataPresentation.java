@@ -94,6 +94,9 @@ class MetadataPresentation {
                 CoreDirectory.class, CoreTags.CORE_LENS
             )
         );
+        miscSection.addEntry(
+                new GPSMetadataEntry()
+        );
         sections.add(miscSection);
     }
 

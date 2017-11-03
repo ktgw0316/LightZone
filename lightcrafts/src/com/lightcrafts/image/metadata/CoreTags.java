@@ -39,6 +39,13 @@ public interface CoreTags extends ImageMetaTags {
      */
     int CORE_FILE_SIZE              = 0x0004;
 
+    /**
+     * File creation date/time.
+     * <p>
+     * Type: Date.
+     */
+    int CORE_FILE_CREATION_DATE_TIME    = 0x0005;
+
     ////////// Shot tags //////////////////////////////////////////////////////
 
     /**

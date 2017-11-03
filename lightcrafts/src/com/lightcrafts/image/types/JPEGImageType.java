@@ -987,15 +987,16 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
         /**
          * The {@link EXIFParser} just parsed a tag: see if it's the one whose
          * value we want to modify in-place: if it is, modify it and stop.
+         * Field type must be ULONG, SLONG, SSHORT, or USHORT.
          *
          * @param tagID The tag ID.
-         * @param fieldType Not used.
+         * @param fieldType The metadata field type.
          * @param numValues Not used.
          * @param byteCount Not used.
          * @param valueOffset The offset of the first value.
          * @param valueOffsetAdjustment Not used.
          * @param subdirOffset Not used.
-         * @param imageFile Not used.
+         * @param imageInfo Not used.
          * @param buf The {@link LCByteBuffer} the raw metadata is in.
          * @param dir Not used.
          */
@@ -1003,13 +1004,29 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
         public void gotTag( int tagID, int fieldType, int numValues,
                             int byteCount, int valueOffset,
                             int valueOffsetAdjustment, int subdirOffset,
-                            File imageFile, LCByteBuffer buf,
+                            ImageInfo imageInfo, LCByteBuffer buf,
                             ImageMetadataDirectory dir ) throws IOException {
             if ( tagID == m_tagID ) {
                 buf.position( valueOffset );
-                buf.putShort( m_newValue );
+
+                switch ( fieldType ) {
+                    case EXIF_FIELD_TYPE_SSHORT:
+                    case EXIF_FIELD_TYPE_USHORT:
+                        // 16-bit
+                        buf.putShort( m_newValue );
+                        m_succeeded = true;
+                        break;
+                    case EXIF_FIELD_TYPE_ULONG:
+                    case EXIF_FIELD_TYPE_SLONG:
+                        // 32-bit
+                        buf.putInt( m_newValue );
+                        m_succeeded = true;
+                        break;
+                    default:
+                        m_succeeded = false;
+                }
+
                 m_exifParser.stopParsing();
-                m_succeeded = true;
             }
         }
 

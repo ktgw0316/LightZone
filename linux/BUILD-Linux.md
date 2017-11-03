@@ -11,16 +11,19 @@ Building the LightZone source requires (at least) following packages:
 - __liblcms2-dev__
 - __libjpeg-dev__ or __libjpeg-turbo-dev__
 - __libtiff__
+- __libxml2-utils__ for xmllint
 - __make__
 - __openjdk-6-jdk__ or later
 - __pkg-config__
+- __rsync__
 
 ### Debian and Ubuntu
 _For Debian (>= squeeze, i386/amd64) and Ubuntu (>= 10.04 lucid). See also [Packaging on Debian or Ubuntu](#packaging_deb) below._
 
 Install required packages:
 
-    sudo apt-get install debhelper devscripts build-essential ant autoconf git-core javahelp2 default-jdk default-jre-headless liblcms2-dev libjpeg-turbo8-dev libtiff5-dev libx11-dev pkg-config
+    sudo apt-get install debhelper devscripts build-essential
+ ant autoconf git-core javahelp2 default-jdk default-jre-headless rsync liblcms2-dev libjpeg-turbo8-dev libtiff5-dev libx11-dev libxml2-utils pkg-config
 
 _(Note: gcc, g++, libc6-dev and make shall be installed with the build-essential.)_
 
@@ -31,7 +34,8 @@ Before start the build, you have to set JAVA_HOME environment variable, e.g.
 ### OpenSUSE (>= 12.2)
 Install required packages:
 
-    sudo zypper install ant autoconf gcc gcc-c++ make git javahelp2 liblcms2-devel libjpeg8-devel libtiff-devel libX11-devel java-1_7_0-openjdk-devel pkg-config
+    sudo zypper install ant autoconf gcc gcc-c++ make
+ git javahelp2 liblcms2-devel libjpeg8-devel libtiff-devel libxml2-utils rsync libX11-devel java-1_7_0-openjdk-devel pkg-config
 
 Set your JAVA_HOME variable to point to installed JDK, e.g.
 
