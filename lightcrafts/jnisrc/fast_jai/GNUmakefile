@@ -1,10 +1,6 @@
 HIGH_PERFORMANCE:=	1
 USE_ICC_HERE:=		1
 
-ROOT:=			../../..
-COMMON_DIR:=		$(ROOT)/lightcrafts
-include			$(COMMON_DIR)/mk/platform.mk
-
 TARGET_BASE:=		FASTJAI
 
 JNI_EXTRA_CFLAGS+=	-fopenmp -std=c++0x

@@ -1,17 +1,10 @@
 HIGH_PERFORMANCE:=	1
 USE_ICC_HERE:=		1
 
-ROOT:=			../../..
-include			$(ROOT)/lightcrafts/mk/platform.mk
-
 TARGET_BASE:=		DCRaw
 
 # Uncomment to compile in debug mode.
 #DEBUG:=			true
-
-ifeq ($(PLATFORM),MacOSX)
-  JNI_EXTRA_LINK:=      -lstdc++
-endif
 
 JNI_EXTRA_CFLAGS+=	-fopenmp
 
@@ -20,7 +13,7 @@ JNI_LINUX_DEFINES:=	-Dfgetc=getc_unlocked
 JNI_MACOSX_DEFINES:=	$(JNI_LINUX_DEFINES)
 
 JNI_WINDOWS_LINK:=      -lgomp.dll
-JNI_MACOSX_LINK:=	-single_module
+JNI_MACOSX_LINK:=	-lstdc++ -single_module
 
 ##
 # Altivec stuff is specified in JNI_PPC_DEFINES rather than JNI_PPC_CFLAGS
@@ -36,6 +29,7 @@ C_SOURCES:=		dcrawUtils.c
 
 JAVAH_CLASSES:=		com.lightcrafts.utils.DCRaw
 
+ROOT:=			../../..
 include			../jni.mk
 
 # vim:set noet sw=8 ts=8:
