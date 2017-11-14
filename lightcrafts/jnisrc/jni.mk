@@ -23,6 +23,9 @@
 #	JNI_EXTRA_LDFLAGS	Specify extra -L directives.
 #	JNI_EXTRA_LINK		Specify extra -l directives.
 #
+#	JNI_EXTRA_PKGCFG	Specify extra package name to set -I, _L,
+#				and -l directives using pkg-config.
+#
 #	JNI_EXTRA_CLEAN		Specify extra files to clean.
 #	JNI_EXTRA_DISTCLEAN	Specify extra files to distclean.
 #
@@ -70,6 +73,12 @@ INCLUDES:=		$(PLATFORM_INCLUDES) $(JAVA_INCLUDES) \
 LDFLAGS:=		$(PLATFORM_LDFLAGS) $(JAVA_LDFLAGS) \
 			-L$(COMMON_DIR)/products $(JNI_EXTRA_LDFLAGS)
 LINK:=			$(JNI_EXTRA_LINK)
+
+ifneq ($(JNI_EXTRA_PKGCFG),)
+  LINK+=		$(shell $(PKGCFG) --libs-only-l $(JNI_EXTRA_PKGCFG))
+  INCLUDES+=		$(shell $(PKGCFG) --cflags-only-I $(JNI_EXTRA_PKGCFG))
+  LDFLAGS+=		$(shell $(PKGCFG) --libs-only-L $(JNI_EXTRA_PKGCFG))
+endif
 
 TARGET_DIR:=		../../products
 

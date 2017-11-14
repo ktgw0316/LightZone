@@ -6,11 +6,7 @@ TARGET_BASE:=		LCLCMS
 # Uncomment to compile in debug mode.
 #DEBUG:=			true
 
-JNI_EXTRA_LINK:=	$(shell $(PKGCFG) --libs-only-l lcms2)
-JNI_LINUX_INCLUDES:=	$(shell $(PKGCFG) --cflags lcms2)
-JNI_LINUX_LDFLAGS:=	$(shell $(PKGCFG) --libs-only-L lcms2)
-JNI_WINDOWS_INCLUDES:=	$(JNI_LINUX_INCLUDES)
-JNI_WINDOWS_LDFLAGS:=	$(JNI_LINUX_LDFLAGS)
+JNI_EXTRA_PKGCFG:=	lcms2
 JNI_MACOSX_INCLUDES:=	-I/usr/local/include
 JNI_MACOSX_LDFLAGS:=	-L/usr/local/lib
 
