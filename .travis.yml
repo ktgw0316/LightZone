@@ -5,7 +5,6 @@ os:
 
 jdk:
   - oraclejdk8
-  - openjdk7
   - openjdk6
 
 addons:
@@ -16,6 +15,7 @@ addons:
       - tidy
       - liblcms2-dev
       - libtiff4-dev
+      - openjdk-6-jdk
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update ; fi
