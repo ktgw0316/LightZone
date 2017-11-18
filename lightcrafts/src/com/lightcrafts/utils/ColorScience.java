@@ -10,6 +10,9 @@ import java.awt.color.ICC_ProfileRGB;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.utils.Color.BlackBody;
 
+import lombok.experimental.ExtensionMethod;
+
+@ExtensionMethod(LCMatrix.class)
 public class ColorScience {
     static final float[][] rgbXYZ;
     static final float[] wtptXYZ;
@@ -114,17 +117,13 @@ public class ColorScience {
             whitePointTemperature = CCTX(wtptxy[0]);
             W = W(whitePointTemperature, Cxy);
 
-            RGBToXYZMat = LCMatrix.getArrayFloat(
-                    new LCMatrix(new float[][] {
-                            mul(W[0] / Zr[1], Zr),
-                            mul(W[1] / Zg[1], Zg),
-                            mul(W[2] / Zb[1], Zb)
-                    }).transpose()
-            );
+            RGBToXYZMat = new LCMatrix (new float[][] {
+                mul(W[0] / Zr[1], Zr),
+                mul(W[1] / Zg[1], Zg),
+                mul(W[2] / Zb[1], Zb)
+            }).transpose().getArrayFloat();
 
-            XYZToRGBMat = LCMatrix.getArrayFloat(
-                    new LCMatrix(RGBToXYZMat).inverse()
-            );
+            XYZToRGBMat = new LCMatrix(RGBToXYZMat).inverse().getArrayFloat();
         }
     }
 
@@ -156,10 +155,9 @@ public class ColorScience {
                 mdata[i][j] = rgbXYZ[i][j];
         Matrix XYZRGB = new Matrix(mdata);
 
-        float[][] S = LCMatrix.getArrayFloat(
-                new Matrix(new double[][] {{wtptXYZ[0], wtptXYZ[1], wtptXYZ[2]}})
-                        .times(XYZRGB.inverse())
-        );
+        float[][] S = new Matrix(new double[][] {{wtptXYZ[0], wtptXYZ[1], wtptXYZ[2]}})
+                .times(XYZRGB.inverse())
+                .getArrayFloat();
 
         return new float[][] {
             {S[0][0] * rgbXYZ[0][0], S[0][0] * rgbXYZ[0][1], S[0][0] * rgbXYZ[0][2]},
@@ -470,15 +468,11 @@ public class ColorScience {
 
         // source illuminant tristimulus in cone response domain
         float[] sXYZ = xy2XYZ(D(source));
-        sXYZ = LCMatrix.getArrayFloat(
-                new LCMatrix(new float[][] {{sXYZ[0], sXYZ[1], sXYZ[2]}}).times(B)
-        )[0];
+        sXYZ = new LCMatrix(new float[][] {{sXYZ[0], sXYZ[1], sXYZ[2]}}).times(B).getArrayFloat()[0];
 
         // target illuminant tristimulus in cone response domain
         float[] tXYZ = xy2XYZ(D(target));
-        tXYZ = LCMatrix.getArrayFloat(
-                new LCMatrix(new float[][] {{tXYZ[0], tXYZ[1], tXYZ[2]}}).times(B)
-        )[0];
+        tXYZ = new LCMatrix(new float[][] {{tXYZ[0], tXYZ[1], tXYZ[2]}}).times(B).getArrayFloat()[0];
 
         // scaling matrix for the colors
         float[][] diag = new float[][]{
@@ -488,9 +482,7 @@ public class ColorScience {
         };
 
         // total tansform
-        return LCMatrix.getArrayFloat(
-                B.times(new LCMatrix(diag)).times(B.inverse())
-        );
+        return B.times(new LCMatrix(diag)).times(B.inverse()).getArrayFloat();
     }
 
     public static double saturation(double r, double g, double b) {
@@ -601,11 +593,11 @@ public class ColorScience {
 
         System.out.println("W: " + Wr + ", " + Wg + ", " + Wb);
 
-        /* LCMatrix ww = new LCMatrix(RGBtoZYX()).transpose();
+        /* Matrix ww = new Matrix(RGBtoZYX()).transpose();
         ww.print(8, 6);
 
-        LCMatrix ca = new LCMatrix(chromaticAdaptation(7500, 5000));
-        float[] result = new LCMatrix(new float[][] {{0.2, 0.2, 0.2}}).times(ca).getArray()[0];
+        Matrix ca = new Matrix(chromaticAdaptation(7500, 5000));
+        float[] result = new Matrix(new float[][] {{0.2, 0.2, 0.2}}).times(ca).getArray()[0];
 
         for (int j = 0; j < 3; j++)
             System.out.print(" " + result[j]);

@@ -9,6 +9,7 @@ import javax.media.jai.RasterFormatTag;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.utils.ColorScience;
 import com.lightcrafts.utils.HSB;
+import com.lightcrafts.utils.LCMatrix;
 
 import java.awt.image.DataBuffer;
 import java.awt.image.RenderedImage;
@@ -18,7 +19,9 @@ import java.awt.*;
 import java.awt.color.ICC_ProfileRGB;
 import java.util.Map;
 
-import com.lightcrafts.utils.LCMatrix;
+import Jama.Matrix;
+
+import lombok.experimental.ExtensionMethod;
 
 /**
  * Copyright (C) Light Crafts, Inc.
@@ -26,6 +29,7 @@ import com.lightcrafts.utils.LCMatrix;
  * Date: Mar 20, 2007
  * Time: 4:32:46 PM
  */
+@ExtensionMethod(LCMatrix.class)
 public class FilteredGrayscaleOpImage extends PointOpImage {
     private final float[][] toLinearsRGB;
     private final float[] filter;
@@ -36,11 +40,7 @@ public class FilteredGrayscaleOpImage extends PointOpImage {
         permitInPlaceOperation();
         ICC_ProfileRGB sRGB = (ICC_ProfileRGB) JAIContext.sRGBColorProfile;
         ICC_ProfileRGB linRGB = (ICC_ProfileRGB) JAIContext.linearProfile;
-        toLinearsRGB = LCMatrix.getArrayFloat(
-                new LCMatrix(sRGB.getMatrix())
-                        .inverse()
-                        .times(new LCMatrix(linRGB.getMatrix()))
-        );
+        toLinearsRGB = new LCMatrix(sRGB.getMatrix()).inverse().times(new LCMatrix(linRGB.getMatrix())).getArrayFloat();
 
         this.filter = filter.clone();
         this.angle = angle;

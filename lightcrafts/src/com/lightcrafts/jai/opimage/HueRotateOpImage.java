@@ -9,6 +9,7 @@ import javax.media.jai.RasterAccessor;
 import javax.media.jai.RasterFormatTag;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.utils.HSB;
+import com.lightcrafts.utils.LCMatrix;
 
 import java.awt.image.DataBuffer;
 import java.awt.image.RenderedImage;
@@ -18,7 +19,9 @@ import java.awt.*;
 import java.awt.color.ICC_ProfileRGB;
 import java.util.Map;
 
-import com.lightcrafts.utils.LCMatrix;
+import Jama.Matrix;
+
+import lombok.experimental.ExtensionMethod;
 
 /**
  * Copyright (C) Light Crafts, Inc.
@@ -26,6 +29,7 @@ import com.lightcrafts.utils.LCMatrix;
  * Date: Mar 20, 2007
  * Time: 4:32:46 PM
  */
+@ExtensionMethod(LCMatrix.class)
 public class HueRotateOpImage extends PointOpImage {
     private float angle;
     private float toSRGB[][];
@@ -37,17 +41,8 @@ public class HueRotateOpImage extends PointOpImage {
         this.angle = angle;
 
         ICC_ProfileRGB sRGB = (ICC_ProfileRGB) JAIContext.sRGBColorProfile;
-        toSRGB = LCMatrix.getArrayFloat(
-                new LCMatrix(sRGB.getMatrix())
-                        .inverse()
-                        .times(new LCMatrix(((ICC_ProfileRGB) JAIContext.linearProfile).getMatrix()))
-        );
-        toLinearRGB = LCMatrix.getArrayFloat(
-                new LCMatrix(sRGB.getMatrix())
-                        .inverse()
-                        .times(new LCMatrix(((ICC_ProfileRGB) JAIContext.linearProfile).getMatrix()))
-                        .inverse()
-        );
+        toSRGB = new LCMatrix(sRGB.getMatrix()).inverse().times(new LCMatrix(((ICC_ProfileRGB) JAIContext.linearProfile).getMatrix())).getArrayFloat();
+        toLinearRGB = new LCMatrix(sRGB.getMatrix()).inverse().times(new LCMatrix(((ICC_ProfileRGB) JAIContext.linearProfile).getMatrix())).inverse().getArrayFloat();
     }
 
     @Override

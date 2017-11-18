@@ -15,6 +15,7 @@ import javax.media.jai.PlanarImage;
 import javax.media.jai.BorderExtender;
 import com.lightcrafts.utils.ColorScience;
 import com.lightcrafts.utils.DCRaw;
+import com.lightcrafts.utils.LCMatrix;
 import com.lightcrafts.image.types.AuxiliaryImageInfo;
 import com.lightcrafts.image.types.RawImageInfo;
 
@@ -24,12 +25,14 @@ import java.awt.image.Raster;
 import java.util.*;
 
 import Jama.Matrix;
-import com.lightcrafts.utils.LCMatrix;
+
+import lombok.experimental.ExtensionMethod;
 
 import java.lang.String;
 
 import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_RAW_ADJUSTMENTS;
 
+@ExtensionMethod(LCMatrix.class)
 public class RawAdjustmentsOperation extends BlendedOperation implements ColorDropperOperation, RawAdjustmentOperation {
     private static final String SOURCE = "Temperature";
     private static final String TINT = "Tint";
@@ -143,12 +146,11 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
                     for (int j = 0; j < 3; j++)
                         cameraRGBWB[j][i] *= wb[i];
 
-                Matrix B = new LCMatrix(ColorScience.chromaticAdaptation(daylightTemperature, originalTemperature, caMethod));
+                Matrix B = new LCMatrix(ColorScience.chromaticAdaptation(
+                        daylightTemperature, originalTemperature, caMethod));
                 Matrix combo = XYZtoRGB.times(B.times(RGBtoZYX));
 
-                cameraRGBWB = LCMatrix.getArrayFloat(
-                        combo.inverse().times(new LCMatrix(cameraRGBWB))
-                );
+                cameraRGBWB = combo.inverse().times(new LCMatrix(cameraRGBWB)).getArrayFloat();
             }
 
             cameraRGBCA = dcRaw.getCameraRGB();
@@ -335,7 +337,7 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
         public PlanarImage setFront() {
             PlanarImage front = back;
 
-            /*** WHITE BALANCE and EXPOSURE ***/
+            /* WHITE BALANCE and EXPOSURE */
 
             float lightness = 0.18f;
 
@@ -372,7 +374,8 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
             }
 
             // Chromatic adaptation matrix
-            Matrix B = new LCMatrix(ColorScience.chromaticAdaptation(daylightTemperature, temperature, caMethod));
+            Matrix B = new LCMatrix(ColorScience.chromaticAdaptation(
+                    daylightTemperature, temperature, caMethod));
             Matrix CA = XYZtoRGB.times(B.times(RGBtoZYX));
 
             // Normalize the CA matrix to keep exposure constant
@@ -382,9 +385,8 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
                 CA = CA.times(new Matrix(new double[][]{{1/max, 0, 0},{0, 1/max, 0},{0, 0, 1/max}}));
 
             // The matrix taking into account the camera color space and its basic white balance and exposure
-            float camMatrix[][] = LCMatrix.getArrayFloat(
-                    CA.times(new LCMatrix(cameraRGB(temperature)).times(Math.pow(2, exposure)))
-            );
+            float camMatrix[][] = CA.times(new LCMatrix(cameraRGB(temperature)).times(Math.pow(2, exposure)))
+                    .getArrayFloat();
 
             front = new HighlightRecoveryOpImage(front, preMul, camMatrix, JAIContext.fileCacheHint);
             front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
@@ -394,7 +396,7 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
 
             front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
 
-            /*** NOISE REDUCTION ***/
+            /* NOISE REDUCTION */
 
             if (color_noise != 0 || grain_noise != 0) {
                 BorderExtender borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);

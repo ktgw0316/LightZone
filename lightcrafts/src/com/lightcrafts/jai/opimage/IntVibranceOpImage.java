@@ -2,11 +2,13 @@
 
 package com.lightcrafts.jai.opimage;
 
+import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.utils.LCMatrix;
+
 import javax.media.jai.PointOpImage;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.RasterAccessor;
 import javax.media.jai.RasterFormatTag;
-import com.lightcrafts.jai.JAIContext;
 
 import java.awt.image.DataBuffer;
 import java.awt.image.RenderedImage;
@@ -19,7 +21,8 @@ import java.awt.color.ColorSpace;
 import java.util.Map;
 
 import Jama.Matrix;
-import com.lightcrafts.utils.LCMatrix;
+
+import lombok.experimental.ExtensionMethod;
 
 /**
  * Copyright (C) Light Crafts, Inc.
@@ -27,6 +30,7 @@ import com.lightcrafts.utils.LCMatrix;
  * Date: Mar 20, 2007
  * Time: 4:32:46 PM
  */
+@ExtensionMethod(LCMatrix.class)
 public class IntVibranceOpImage extends PointOpImage {
     private final int transform[][] = new int[3][3];
     private final int toLinearsRGB[][] = new int[3][3];
@@ -78,6 +82,7 @@ public class IntVibranceOpImage extends PointOpImage {
 
     }
 
+    @Override
     protected void computeRect(Raster[] sources,
                                WritableRaster dest,
                                Rectangle destRect) {
