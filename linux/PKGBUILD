@@ -7,8 +7,13 @@ url="http://lightzoneproject.org/"
 license=('custom:BSD-3-Clause')
 arch=('i686' 'x86_64')
 
+<<<<<<< HEAD
 depends=('java-runtime=8' 'javahelp2' 'lcms2' 'libjpeg-turbo' 'libtiff' 'libxml2')
 makedepends=('java-environment=8' 'apache-ant' 'autoconf' 'gcc' 'make' 'git' 'libx11' 'pkgconf' 'rsync' 'javahelp2' 'lcms2' 'libjpeg-turbo' 'libtiff')
+=======
+depends=('jre8-openjdk' 'javahelp2' 'lensfun' 'lcms2' 'libjpeg-turbo' 'libtiff' 'libxml2')
+makedepends=('jdk8-openjdk' 'apache-ant' 'autoconf' 'gcc' 'make' 'git' 'libx11' 'pkg-config' 'rsync' 'javahelp2' 'lensfun' 'lcms2' 'libjpeg-turbo' 'libtiff')
+>>>>>>> 99988022... Switch to Java8
 
 #vcsname=${pkgname}-${pkgver}
 #source=("${vcsname}.tar.bz2")
@@ -18,11 +23,15 @@ md5sums=('SKIP')
 
 build() {
   # Set $JAVA_HOME and $ANT_HOME
+<<<<<<< HEAD
   if [ -d /usr/lib/jvm/java-7-jdk ]; then
     export JAVA_HOME=/usr/lib/jvm/java-8-jdk
   else
     export JAVA_HOME=/usr/lib/jvm/java-8-openjdk
   fi
+=======
+  export JAVA_HOME=/usr/lib/jvm/java-8-openjdk
+>>>>>>> 99988022... Switch to Java8
   [ -f /etc/profile.d/apache-ant.sh ] && source /etc/profile.d/apache-ant.sh
 
   # Parallel compilation fails, so disable it
