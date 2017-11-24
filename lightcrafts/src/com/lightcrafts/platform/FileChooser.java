@@ -3,12 +3,10 @@
 package com.lightcrafts.platform;
 
 import com.lightcrafts.image.export.ImageExportOptions;
-
-import java.awt.Frame;
-import java.awt.Window;
-import java.io.File;
-
 import javafx.stage.FileChooser.ExtensionFilter;
+
+import java.awt.*;
+import java.io.File;
 
 public interface FileChooser {
 
@@ -23,7 +21,7 @@ public interface FileChooser {
      * @return A chosen File to open, or null to indicate the user cancelled.
      */
     File openFile(
-        String windowTitle, File directory, Frame parent, ExtensionFilter filter
+        String windowTitle, File directory, Frame parent, ExtensionFilter... filter
     );
 
     /**

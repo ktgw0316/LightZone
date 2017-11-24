@@ -34,7 +34,7 @@ public class DefaultFileChooser implements com.lightcrafts.platform.FileChooser 
 
     @Override
     public File openFile(
-        final String windowTitle, final File directory, Frame parent, final ExtensionFilter filter
+        final String windowTitle, final File directory, Frame parent, final ExtensionFilter... filter
     ) {
         final FutureTask<File> query = new FutureTask<File>(new Callable<File>() {
             @Override
@@ -45,7 +45,7 @@ public class DefaultFileChooser implements com.lightcrafts.platform.FileChooser 
                 }
                 chooser.setInitialDirectory(directory);
                 if (filter != null) {
-                    chooser.getExtensionFilters().add(filter);
+                    chooser.getExtensionFilters().addAll(filter);
                 }
                 return chooser.showOpenDialog(null);
             }
