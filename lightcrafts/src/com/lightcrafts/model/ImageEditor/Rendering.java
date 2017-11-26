@@ -125,17 +125,22 @@ public class Rendering implements Cloneable {
     }
 
     public void setCropAndScale(CropBounds cropBounds, float scaleFactor) {
-        if (cropBounds != null && !cropBounds.equals(this.cropBounds)) {
-            this.cropBounds = cropBounds;
-        }
-        if (scaleFactor != this.scaleFactor) {
-            this.scaleFactor = scaleFactor;
-        }
-        inputTransform = buildTransform(true);
-        transform = buildTransform(false);
-        if (xformedSourceImage != null) {
-            xformedSourceImage.dispose();
-            xformedSourceImage = null;
+        val shouldUpdatBounds = (cropBounds != null && !cropBounds.equals(this.cropBounds));
+        val shouldUpdateScale = (scaleFactor != this.scaleFactor);
+
+        if (shouldUpdatBounds || shouldUpdateScale) {
+            if (shouldUpdatBounds) {
+                this.cropBounds = cropBounds;
+            }
+            if (shouldUpdateScale) {
+                this.scaleFactor = scaleFactor;
+            }
+            inputTransform = buildTransform(true);
+            transform = buildTransform(false);
+            if (xformedSourceImage != null) {
+                xformedSourceImage.dispose();
+                xformedSourceImage = null;
+            }
         }
     }
 
