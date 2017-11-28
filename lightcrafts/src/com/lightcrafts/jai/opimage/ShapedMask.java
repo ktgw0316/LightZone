@@ -316,34 +316,7 @@ public class ShapedMask extends PlanarImage {
                 if (scaledImage.scale < 1) {
                     float scaleX = (float) Math.floor(maskImage.getWidth() / scaledImage.scale) / (float) maskImage.getWidth();
                     float scaleY = (float) Math.floor(maskImage.getHeight() / scaledImage.scale) / (float) maskImage.getHeight();
-
-                    if (scaledImage.tx != 0 || scaledImage.ty != 0)
-                        transform.concatenate(AffineTransform.getTranslateInstance(scaledImage.tx, scaledImage.ty));
-
-                    Rectangle scaledBounds = transform.createTransformedShape(maskImage.getBounds()).getBounds();
-
-                    // Avoid scaling underflows resulting into exeptions
-                    if (scaledBounds.width < 3 || scaledBounds.height < 3)
-                        continue;
-
-                    synchronized (expandedMasks) {
-                        AffinedImage key = new AffinedImage(maskImage, transform);
-                        PlanarImage affinedImage = expandedMasks.get(key);
-                        if (affinedImage == null) {
-                            RenderingHints hints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
-                                                                      BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-                            // hints.add(JAIContext.noCacheHint);
-                            Interpolation interp = Interpolation.getInstance(Interpolation.INTERP_BILINEAR);
-                            ParameterBlock params = new ParameterBlock();
-                            params.addSource(maskImage);
-                            params.add(transform);
-                            params.add(interp);
-                            maskImage = JAI.create("Affine", params, hints);
-                            expandedMasks.put(key, maskImage);
-                        } else {
-                            maskImage = affinedImage;
-                        }
-                    }
+                    transform.concatenate(AffineTransform.getScaleInstance(scaleX, scaleY));
                 }
 
                 if (scaledImage.tx != 0 || scaledImage.ty != 0)
