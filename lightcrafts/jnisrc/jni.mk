@@ -215,6 +215,11 @@ all: $(TARGET) $(POST_TARGET)
 include		$(COMMON_DIR)/mk/auto_dep.mk
 endif
 
+ifeq ($(PLATFORM),MacOSX)
+ifdef JNI_MACOSX_SHAREDLIB
+	USE_AR_RANLIB=yes
+endif
+endif
 
 ifeq ($(UNIVERSAL),1)
 
@@ -226,7 +231,7 @@ ifeq ($(PLATFORM),MacOSX)
 endif
 
 ifndef JNI_MANUAL_TARGET
-ifdef JNI_MACOSX_SHAREDLIB
+ifdef USE_AR_RANLIB
 $(TARGET_PPC): $(OBJECTS_PPC) $(BUILT_LIBS)
 	ar -rc $@ *-ppc.o
 	-ranlib $@
@@ -235,7 +240,7 @@ $(TARGET_PPC): $(OBJECTS_PPC) $(LOCAL_RANLIBS) $(BUILT_LIBS)
 	$(CC_LINK) $(CFLAGS_PPC) $(LDFLAGS) -o $@ *-ppc.o $(LINK)
 endif
 
-ifdef JNI_MACOSX_SHAREDLIB
+ifdef USE_AR_RANLIB
 $(TARGET_X86): $(OBJECTS_X86) $(BUILT_LIBS)
 	ar -rc $@ *-x86.o
 	-ranlib $@
@@ -243,12 +248,12 @@ else
 $(TARGET_X86): $(OBJECTS_X86) $(LOCAL_RANLIBS) $(BUILT_LIBS)
 	$(CC_LINK) $(CFLAGS_X86) $(LDFLAGS) -o $@ *-x86.o $(LINK)
 endif
-endif
+endif	# JNI_MANUAL_TARGET
 
 else	# UNIVERSAL
 
 ifndef JNI_MANUAL_TARGET
-ifdef JNI_MACOSX_SHAREDLIB
+ifdef USE_AR_RANLIB
 $(TARGET): $(OBJECTS) $(RC_OBJECTS) $(BUILT_LIBS)
 	-$(MKDIR) $(TARGET_DIR)
 	ar -rc $@ *.o
@@ -261,7 +266,7 @@ ifeq ($(PLATFORM),MacOSX)
 	cp -p $@ $(TARGET_DIR)
 endif
 endif
-endif
+endif	# JNI_MANUAL_TARGET
 
 endif	# UNIVERSAL
 
