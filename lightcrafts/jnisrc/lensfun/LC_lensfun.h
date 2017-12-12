@@ -39,7 +39,6 @@ public:
           int srcLineStride, int dstLineStride ) const;
     void backwardMapRect
         ( int* srcRectParams,
-          int centerX, int centerY,
           int dstRectX, int dstRectY,
           int dstRectWidth, int dstRectHeight ) const;
 

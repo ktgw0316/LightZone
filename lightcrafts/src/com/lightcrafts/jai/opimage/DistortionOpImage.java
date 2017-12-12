@@ -2,29 +2,25 @@
 
 package com.lightcrafts.jai.opimage;
 
-import javax.media.jai.BorderExtender;
-import javax.media.jai.GeometricOpImage;
-import javax.media.jai.RasterFormatTag;
-import javax.media.jai.RasterAccessor;
 import com.lightcrafts.utils.Lensfun;
 
+import javax.media.jai.BorderExtender;
+import javax.media.jai.GeometricOpImage;
+import javax.media.jai.RasterAccessor;
+import javax.media.jai.RasterFormatTag;
+import java.awt.*;
+import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
-import java.awt.image.DataBuffer;
-import java.awt.*;
-import java.awt.geom.Point2D;
 import java.util.Map;
 
 public class DistortionOpImage extends GeometricOpImage {
 
-    private final Point2D center;
     private Lensfun lf;
 
-    public DistortionOpImage(RenderedImage source, Map configuration, BorderExtender extender,
-                             Lensfun lf, Point2D center) {
+    public DistortionOpImage(RenderedImage source, Map configuration, BorderExtender extender, Lensfun lf) {
         super(vectorize(source), null, configuration, true, extender, null);
-        this.center = center;
         this.lf = lf;
     }
 
@@ -39,7 +35,7 @@ public class DistortionOpImage extends GeometricOpImage {
             return null;
         }
         synchronized(this) {
-            return lf.backwardMapRect(center, destRect);
+            return lf.backwardMapRect(destRect);
         }
     }
 
@@ -103,7 +99,6 @@ public class DistortionOpImage extends GeometricOpImage {
         else if (src.getNumBands() == 3) {
             synchronized(this) {
                 lf.distortionColor(srcData, dstData,
-                        (int)center.getX(), (int)center.getY(),
                         srcX, srcY, srcWidth, srcHeight,
                         dstX, dstY, dstWidth, dstHeight,
                         srcPixelStride, dstPixelStride,

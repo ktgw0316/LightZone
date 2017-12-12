@@ -2,23 +2,22 @@
 
 package com.lightcrafts.model.ImageEditor;
 
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
-import java.text.DecimalFormat;
-import java.util.List;
-
 import com.lightcrafts.image.metadata.ImageMetadata;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.opimage.DistortionOpImage;
 import com.lightcrafts.jai.utils.Transform;
-import javax.media.jai.BorderExtender;
-import javax.media.jai.PlanarImage;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
 import com.lightcrafts.utils.Lensfun;
-
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
+
+import javax.media.jai.BorderExtender;
+import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
+import java.awt.geom.AffineTransform;
+import java.text.DecimalFormat;
+import java.util.List;
 
 public class LensCorrectionsOperation extends BlendedOperation {
     private static final String MANUAL_MODE = "Manual_Correction";
@@ -247,12 +246,7 @@ public class LensCorrectionsOperation extends BlendedOperation {
 
                 transform.concatenate(AffineTransform.getScaleInstance(1 / scaleFactor, 1 / scaleFactor));
             }
-            else {
-                transform.preConcatenate(AffineTransform.getScaleInstance(1 / scaleFactor, 1 / scaleFactor));
-            }
 
-            val center = transform.transform(new Point2D.Double(fullWidth / 2, fullHeight / 2), null);
-            val borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
             final PlanarImage front;
             if (manual_mode && Math.abs(distortion_k1) < 1e-3 && Math.abs(distortion_k2) < 1e-3
                             && Math.abs(tca_r_offset)  < 1e-3 && Math.abs(tca_b_offset)  < 1e-3) {
@@ -272,8 +266,14 @@ public class LensCorrectionsOperation extends BlendedOperation {
                     lf = Lensfun.updateInstance(cameraMaker, cameraModel, lensMaker, lensModel, focal, aperture)
                             .updateModifier(fullWidth, fullHeight);
                 }
-                front = new DistortionOpImage(back, JAIContext.fileCacheHint, borderExtender,
-                        lf, center);
+                val shiftX = back.getMinX();
+                val shiftY = back.getMinY();
+                val shifted = JAI.create("affine", back,
+                        AffineTransform.getTranslateInstance(-shiftX, -shiftY));
+                val borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
+                val corrected = new DistortionOpImage(shifted, JAIContext.fileCacheHint, borderExtender, lf);
+                front = JAI.create("affine", corrected,
+                        AffineTransform.getTranslateInstance(shiftX, shiftY));
             }
             front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
             return front;

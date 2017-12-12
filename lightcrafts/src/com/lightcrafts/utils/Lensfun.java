@@ -2,14 +2,13 @@
 
 package com.lightcrafts.utils;
 
-import java.awt.*;
-import java.awt.geom.Point2D;
-import java.util.Arrays;
-import java.util.List;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import java.awt.*;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Wrapper for Lensfun C++ library.
@@ -29,10 +28,10 @@ public class Lensfun {
     private int _fullHeight;
 
     @Getter (lazy = true)
-    private static final List<String> allCameraNames = Arrays.asList(getCameraNames());;
+    private static final List<String> allCameraNames = Arrays.asList(getCameraNames());
 
     @Getter (lazy = true)
-    private static final List<String> allLensNames = Arrays.asList(getLensNames());;
+    private static final List<String> allLensNames = Arrays.asList(getLensNames());
 
     public static Lensfun updateInstance(
             String cameraMaker, String cameraModel,
@@ -111,7 +110,6 @@ public class Lensfun {
 
     public void distortionColor(
             short srcData[], short dstData[],
-            int centerX, int centerY,
             int srcRectX, int srcRectY, int srcRectWidth, int srcRectHeight,
             int dstRectX, int dstRectY, int dstRectWidth, int dstRectHeight,
             int srcPixelStride, int dstPixelStride,
@@ -121,7 +119,6 @@ public class Lensfun {
         distortionColor(
                 _handle,
                 srcData, dstData,
-                centerX, centerY,
                 srcRectX, srcRectY, srcRectWidth, srcRectHeight,
                 dstRectX, dstRectY, dstRectWidth, dstRectHeight,
                 srcPixelStride, dstPixelStride,
@@ -130,9 +127,8 @@ public class Lensfun {
                 srcLineStride, dstLineStride);
     }
 
-    public Rectangle backwardMapRect(Point2D center, Rectangle destRect) {
+    public Rectangle backwardMapRect(Rectangle destRect) {
         final int[] srcRect = backwardMapRect(_handle,
-                (int)center.getX(), (int)center.getY(),
                 destRect.x, destRect.y, destRect.width, destRect.height);
         return new Rectangle(srcRect[0], srcRect[1], srcRect[2], srcRect[3]);
     }
@@ -140,7 +136,6 @@ public class Lensfun {
     private native void distortionColor(
             long lfHandle,
             short[] srcData, short[] dstData,
-            int centerX, int centerY,
             int srcRectX, int srcRectY, int srcRectWidth, int srcRectHeight,
             int dstRectX, int dstRectY, int dstRectWidth, int dstRectHeight,
             int srcPixelStride, int dstPixelStride,
@@ -150,6 +145,5 @@ public class Lensfun {
 
     private native int[] backwardMapRect(
             long lfHandle,
-            int centerX, int centerY,
             int dstRectX, int dstRectY, int dstRectWidth, int dstRectHeight);
 }

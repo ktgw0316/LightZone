@@ -188,7 +188,6 @@ Java_com_lightcrafts_utils_Lensfun_distortionColor
   (JNIEnv *env, jobject obj,
   jlong handle,
   jshortArray jsrcData, jshortArray jdstData,
-  jint centerX, jint centerY,
   jint srcRectX, jint srcRectY, jint srcRectWidth, jint srcRectHeight,
   jint dstRectX, jint dstRectY, jint dstRectWidth, jint dstRectHeight,
   jint srcPixelStride, jint dstPixelStride,
@@ -222,7 +221,6 @@ JNIEXPORT jintArray JNICALL
 Java_com_lightcrafts_utils_Lensfun_backwardMapRect
   (JNIEnv *env, jobject obj,
   jlong handle,
-  jint centerX, jint centerY,
   jint dstRectX, jint dstRectY, jint dstRectWidth, jint dstRectHeight)
 {
     auto lf = reinterpret_cast<LC_lensfun*>(handle);
@@ -237,7 +235,6 @@ Java_com_lightcrafts_utils_Lensfun_backwardMapRect
     }
     lf->backwardMapRect(
             srcRect,
-            centerX, centerY,
             dstRectX, dstRectY, dstRectWidth, dstRectHeight);
     env->ReleaseIntArrayElements(jsrcRect, srcRect, 0);
     return jsrcRect;
@@ -438,7 +435,6 @@ void LC_lensfun::applyModifier
 
 void LC_lensfun::backwardMapRect
 ( int* srcRectParams,
-  int centerX, int centerY,
   int dstRectX, int dstRectY,
   int dstRectWidth, int dstRectHeight ) const
 {
