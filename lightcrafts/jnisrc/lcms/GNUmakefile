@@ -7,8 +7,6 @@ TARGET_BASE:=		LCLCMS
 #DEBUG:=			true
 
 JNI_EXTRA_PKGCFG:=	lcms2
-JNI_MACOSX_INCLUDES:=	-I/usr/local/include
-JNI_MACOSX_LDFLAGS:=	-L/usr/local/lib
 
 ##
 # This is to prevent LCMS from using the MessageBox() function to report errors
