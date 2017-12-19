@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Remove dylib path that depends on a build environment
+# Remove library paths that depends on a build environment
 # from libraries under specified directory.
 
 if [ $# -ne 1 ]; then
@@ -11,14 +11,28 @@ fi
 PATTERN="/usr/local/"
 
 cd $1
-for lib in *.dylib *.jnilib `find . -perm +0111 -type f`; do
+
+FILES=$(find . -name "*.jnilib" -o -name "dcraw_lz")
+
+# Copy required dylibs, and change its id
+for lib in ${FILES}; do
   otool -L ${lib} | grep ${PATTERN} | while read line; do
     fullpath=`echo ${line} | sed -e "s% *\(${PATTERN}[^ ]*\.dylib\).*%\1%"`
     name=`echo ${fullpath} | sed -e "s%.*/\(.*\.dylib\)%\1%"`
-    install_name_tool -change ${fullpath} @rpath/${name} ${lib}
+    cp -f ${fullpath} ${name}
+    chmod 755 ${name}
+    install_name_tool -id ${name} ${name} || continue
   done
 done
-for lib in *.jnilib `find . -perm +0111 -type f`; do
-  install_name_tool -add_rpath @loader_path ${lib}
-done
 
+# Rewrite the library paths
+for lib in ${FILES}; do
+  otool -L ${lib} | grep ${PATTERN} | while read line; do
+    fullpath=`echo ${line} | sed -e "s% *\(${PATTERN}[^ ]*\.dylib\).*%\1%"`
+    name=`echo ${fullpath} | sed -e "s%.*/\(.*\.dylib\)%\1%"`
+    install_name_tool -change ${fullpath} @rpath/${name} ${lib} || continue
+  done
+done
+for lib in ${FILES}; do
+  install_name_tool -add_rpath @loader_path ${lib} || continue
+done
