@@ -25,7 +25,7 @@ public interface GPSProvider extends ImageMetadataProvider {
 
     /**
      * Gets the latitude of the image as DMS (degrees, minutes, and seconds)
-     * string, e.g. 41°24'12.2"N
+     * string, e.g. 41&deg;24'12.2"N
      *
      * @return Returns said string or empty string if it's unavailable.
      */
@@ -33,7 +33,7 @@ public interface GPSProvider extends ImageMetadataProvider {
 
     /**
      * Gets the longitude of the image as DMS (degrees, minutes, and seconds)
-     * string, e.g. 2°10'26.5"E
+     * string, e.g. 2&deg;10'26.5"E
      *
      * @return Returns said string or empty string if it's unavailable.
      */

@@ -119,7 +119,7 @@ public final class GPSDirectory extends ImageMetadataDirectory
             return "";
         }
 
-        return values[0].intValue() + "°"
+        return values[0].intValue() + "\u00B0"
                 + values[1].intValue() + "'"
                 + values[2].floatValue() + "\""
                 + refString;
