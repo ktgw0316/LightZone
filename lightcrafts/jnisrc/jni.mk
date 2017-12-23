@@ -23,6 +23,9 @@
 #	JNI_EXTRA_LDFLAGS	Specify extra -L directives.
 #	JNI_EXTRA_LINK		Specify extra -l directives.
 #
+#	JNI_EXTRA_PKGCFG	Specify extra package name to set -I, _L,
+#				and -l directives using pkg-config.
+#
 #	JNI_EXTRA_CLEAN		Specify extra files to clean.
 #	JNI_EXTRA_DISTCLEAN	Specify extra files to distclean.
 #
@@ -70,6 +73,12 @@ INCLUDES:=		$(PLATFORM_INCLUDES) $(JAVA_INCLUDES) \
 LDFLAGS:=		$(PLATFORM_LDFLAGS) $(JAVA_LDFLAGS) \
 			-L$(COMMON_DIR)/products $(JNI_EXTRA_LDFLAGS)
 LINK:=			$(JNI_EXTRA_LINK)
+
+ifneq ($(JNI_EXTRA_PKGCFG),)
+  LINK+=		$(shell $(PKGCFG) --libs-only-l $(JNI_EXTRA_PKGCFG))
+  INCLUDES+=		$(shell $(PKGCFG) --cflags-only-I $(JNI_EXTRA_PKGCFG))
+  LDFLAGS+=		$(shell $(PKGCFG) --libs-only-L $(JNI_EXTRA_PKGCFG))
+endif
 
 TARGET_DIR:=		../../products
 
@@ -206,6 +215,11 @@ all: $(TARGET) $(POST_TARGET)
 include		$(COMMON_DIR)/mk/auto_dep.mk
 endif
 
+ifeq ($(PLATFORM),MacOSX)
+ifdef JNI_MACOSX_SHAREDLIB
+	USE_AR_RANLIB=yes
+endif
+endif
 
 ifeq ($(UNIVERSAL),1)
 
@@ -217,7 +231,7 @@ ifeq ($(PLATFORM),MacOSX)
 endif
 
 ifndef JNI_MANUAL_TARGET
-ifdef JNI_MACOSX_SHAREDLIB
+ifdef USE_AR_RANLIB
 $(TARGET_PPC): $(OBJECTS_PPC) $(BUILT_LIBS)
 	ar -rc $@ *-ppc.o
 	-ranlib $@
@@ -226,7 +240,7 @@ $(TARGET_PPC): $(OBJECTS_PPC) $(LOCAL_RANLIBS) $(BUILT_LIBS)
 	$(CC_LINK) $(CFLAGS_PPC) $(LDFLAGS) -o $@ *-ppc.o $(LINK)
 endif
 
-ifdef JNI_MACOSX_SHAREDLIB
+ifdef USE_AR_RANLIB
 $(TARGET_X86): $(OBJECTS_X86) $(BUILT_LIBS)
 	ar -rc $@ *-x86.o
 	-ranlib $@
@@ -234,12 +248,12 @@ else
 $(TARGET_X86): $(OBJECTS_X86) $(LOCAL_RANLIBS) $(BUILT_LIBS)
 	$(CC_LINK) $(CFLAGS_X86) $(LDFLAGS) -o $@ *-x86.o $(LINK)
 endif
-endif
+endif	# JNI_MANUAL_TARGET
 
 else	# UNIVERSAL
 
 ifndef JNI_MANUAL_TARGET
-ifdef JNI_MACOSX_SHAREDLIB
+ifdef USE_AR_RANLIB
 $(TARGET): $(OBJECTS) $(RC_OBJECTS) $(BUILT_LIBS)
 	-$(MKDIR) $(TARGET_DIR)
 	ar -rc $@ *.o
@@ -252,7 +266,7 @@ ifeq ($(PLATFORM),MacOSX)
 	cp -p $@ $(TARGET_DIR)
 endif
 endif
-endif
+endif	# JNI_MANUAL_TARGET
 
 endif	# UNIVERSAL
 

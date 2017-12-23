@@ -1,20 +1,13 @@
 HIGH_PERFORMANCE:=	1
 USE_ICC_HERE:=		1
 
-ROOT:=			../../..
-COMMON_DIR:=		$(ROOT)/lightcrafts
-include			$(COMMON_DIR)/mk/platform.mk
-
 TARGET_BASE:=		fbf
 
 FW_DIR:=		/System/Library/Frameworks
 
 JNI_EXTRA_CFLAGS+=	-fopenmp -std=c++0x
 
-ifeq ($(PLATFORM),MacOSX)
-  JNI_EXTRA_LINK:=      -lstdc++
-endif
-
+JNI_MACOSX_LINK:=	-lstdc++
 # JNI_WINDOWS_LINK:=	-lLCJNI
 JNI_LINUX_LINK:=	$(JNI_WINDOWS_LINK)
 

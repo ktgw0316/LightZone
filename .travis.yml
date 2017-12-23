@@ -6,7 +6,6 @@ os:
 
 jdk:
   - oraclejdk8
-  - openjdk7
   - openjdk6
 
 addons:
@@ -18,6 +17,7 @@ addons:
       - liblensfun-dev
       - liblcms2-dev
       - libtiff4-dev
+      - openjdk-6-jdk
 
 before_install:
   - sudo hostname "$(hostname | cut -c1-63)"

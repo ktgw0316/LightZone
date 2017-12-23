@@ -65,8 +65,8 @@ ifeq ($(PLATFORM),MacOSX)
     CC:=		gcc
     CXX:=		g++
   else ifeq ($(MACOSX_MINOR_VERSION),12) # Sierra
-    CC:=		gcc-7
-    CXX:=		g++-7
+    CC:=		clang
+    CXX:=		clang++
   else
     CC:=		clang-omp
     CXX:=		clang-omp++
