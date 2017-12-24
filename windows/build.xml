@@ -11,8 +11,18 @@
         outputproperty="processor">
     <arg value="-m"/>
   </exec>
+  <property environment="env"/>
   <condition property="64bit">
-    <matches string="${processor}" pattern="^.*64$"/>
+    <or>
+      <matches string="${env.TARGET}" pattern="x86_64"/>
+      <matches string="${env.TARGET}" pattern="amd64"/>
+      <and>
+        <not>
+          <matches string="${env.TARGET}" pattern="i.*86"/>
+        </not>
+        <matches string="${processor}" pattern="^.*64$"/>
+      </and>
+    </or>
   </condition>
   <condition property="jre-arch" value="amd64" else="x86">
     <isset property="64bit"/>

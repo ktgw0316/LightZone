@@ -13,7 +13,14 @@ ifndef JAVA_HOME
   $(error "JAVA_HOME" must be set)
 endif
 
-PROCESSOR:=		$(shell uname -m)
+##
+# Target architecture
+##
+ifdef TARGET
+  PROCESSOR:=		$(TARGET)
+else
+  PROCESSOR:=		$(shell uname -m)
+endif
 ifeq ($(PROCESSOR),i486)
   PROCESSOR:=		i386
 else ifeq ($(PROCESSOR),i586)
