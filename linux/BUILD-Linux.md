@@ -22,7 +22,7 @@ _For Debian (>= squeeze, i386/amd64) and Ubuntu (>= 10.04 lucid). See also [Pack
 
 Install required packages:
 
-    sudo apt-get install debhelper devscripts build-essential ant autoconf git-core javahelp2 default-jdk default-jre-headless rsync libjpeg-turbo8-dev libtiff5-dev libx11-dev libxml2-utils
+    sudo apt-get install debhelper devscripts build-essential ant autoconf git-core javahelp2 default-jdk default-jre-headless rsync libjpeg-turbo8-dev liblcms2-dev libtiff5-dev libx11-dev libxml2-utils
 
 _(Note: gcc, g++, libc6-dev and make shall be installed with the build-essential.)_
 
