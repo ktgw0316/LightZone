@@ -120,14 +120,12 @@ public class LinuxPlatform extends Platform {
         return LinuxKeyUtil.isKeyPressed(keyCode);
     }
 
-    private static Collection<ColorProfileInfo> getColorProfiles() {
-        if (Profiles != null) {
-            return Profiles;
+    private static synchronized Collection<ColorProfileInfo> getColorProfiles() {
+        if (Profiles == null) {
+            Profiles = new HashSet<ColorProfileInfo>();
+            Profiles.addAll(getColorProfiles(SystemProfileDir));
+            Profiles.addAll(getColorProfiles(UserProfileDir));
         }
-        Profiles = new HashSet<ColorProfileInfo>();
-        Profiles.addAll(getColorProfiles(SystemProfileDir));
-        Profiles.addAll(getColorProfiles(UserProfileDir));
-
         return Profiles;
     }
 

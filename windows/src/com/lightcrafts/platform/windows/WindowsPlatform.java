@@ -257,18 +257,16 @@ public final class WindowsPlatform extends Platform {
     ////////// private ////////////////////////////////////////////////////////
 
     private static synchronized Collection<ColorProfileInfo> getColorProfiles() {
-        if ( m_profiles != null )
-            return m_profiles;
-        m_profiles = new ArrayList<ColorProfileInfo>();
+        if (m_profiles == null) {
+            String windir = System.getenv("WINDIR");
+            if (windir == null)
+                windir = "C:\\WINDOWS";
 
-        String windir = System.getenv( "WINDIR" );
-        if ( windir == null )
-            windir = "C:\\WINDOWS";
-
-        final File profileDir = new File(
-            windir + "\\system32\\spool\\drivers\\color"
-        );
-        return getColorProfiles(profileDir);
+            final File profileDir = new File(
+                    windir + "\\system32\\spool\\drivers\\color");
+            m_profiles = getColorProfiles(profileDir);
+        }
+        return m_profiles;
     }
 
     /**
@@ -305,6 +303,6 @@ public final class WindowsPlatform extends Platform {
      * The ICC profiles from
      * <code>$WINDIR\system32\spool\drivers\color</code>.
      */
-    private static List<ColorProfileInfo> m_profiles;
+    private static Collection<ColorProfileInfo> m_profiles;
 }
 /* vim:set et sw=4 ts=4: */
