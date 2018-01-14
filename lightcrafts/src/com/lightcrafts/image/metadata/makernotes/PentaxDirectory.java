@@ -189,8 +189,8 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
             //
             return new int[]{ 6, offset };
         }
-        final String s = buf.getString( offset, 7, "ASCII" );
-        if ( s.equals( "PENTAX " ) || s.equals( "SAMSUNG" ) ) {
+        final String s = buf.getString( offset, 7, "ASCII" ).toUpperCase();
+        if (s.equals("PENTAX ") || s.equals("SAMSUNG") || s.startsWith("RICOH")) {
             //
             // These are the maker notes from a DNG file.  Note that the space
             // after PENTAX is correct.
