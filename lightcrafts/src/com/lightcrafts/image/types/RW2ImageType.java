@@ -2,21 +2,16 @@
 
 package com.lightcrafts.image.types;
 
+import com.lightcrafts.image.BadImageFileException;
+import com.lightcrafts.image.ImageInfo;
+import com.lightcrafts.image.metadata.*;
+import com.lightcrafts.image.metadata.makernotes.PanasonicDirectory;
+import com.lightcrafts.utils.bytebuffer.LCByteBuffer;
+import com.lightcrafts.utils.bytebuffer.LCMappedByteBuffer;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-
-import com.lightcrafts.image.BadImageFileException;
-import com.lightcrafts.image.ImageInfo;
-import com.lightcrafts.image.metadata.EXIFMetadataReader;
-import com.lightcrafts.image.metadata.EXIFSegmentFinder;
-import com.lightcrafts.image.metadata.ImageMetadataDirectory;
-import com.lightcrafts.image.metadata.ImageMetadataReader;
-import com.lightcrafts.image.metadata.MetadataUtil;
-import com.lightcrafts.image.metadata.TIFFMetadataReader;
-import com.lightcrafts.image.metadata.TagHandler;
-import com.lightcrafts.utils.bytebuffer.LCByteBuffer;
-import com.lightcrafts.utils.bytebuffer.LCMappedByteBuffer;
 
 import static com.lightcrafts.image.metadata.PanasonicRawTags.PANASONIC_JPEG_FROM_RAW;
 
@@ -59,6 +54,9 @@ public final class RW2ImageType extends RawImageType implements TagHandler {
                               ImageMetadataDirectory dir )
         throws IOException
     {
+        if (!(dir instanceof PanasonicDirectory)) {
+            return false;
+        }
         switch ( tagID ) {
             case PANASONIC_JPEG_FROM_RAW: {
                 // The embedded JPEG image has lots of metadata including the

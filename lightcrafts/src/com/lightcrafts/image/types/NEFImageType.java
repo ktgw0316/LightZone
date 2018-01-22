@@ -96,6 +96,9 @@ public final class NEFImageType extends RawImageType implements TagHandler {
                               ImageMetadataDirectory dir )
         throws IOException
     {
+        if (!(dir instanceof NikonDirectory)) {
+            return false;
+        }
         switch ( tagID ) {
             case NIKON_PREVIEW_IMAGE_IFD_POINTER: {
                 //
