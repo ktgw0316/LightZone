@@ -23,6 +23,7 @@ Source:		%{name}-%{version}.tar.bz2
 %define libjpeg_devel libjpeg-turbo-devel
 %define libX11_devel libX11-devel
 %define pkg_config pkgconfig
+%define xmllint libxml2
 %define debug_package %{nil}
 %endif
 
@@ -36,6 +37,7 @@ Source:		%{name}-%{version}.tar.bz2
 %define libjpeg_devel libjpeg-turbo-devel
 %define libX11_devel libX11-devel
 %define pkg_config pkgconfig
+%define xmllint libxml2
 %define debug_package %{nil}
 %endif
 
@@ -45,6 +47,7 @@ Source:		%{name}-%{version}.tar.bz2
 %define libjpeg_devel libjpeg8-devel
 %define libX11_devel xorg-x11-libX11-devel
 %define pkg_config pkg-config
+%define xmllint libxml2
 BuildRequires: update-desktop-files
 %endif
 
@@ -59,6 +62,7 @@ BuildRequires: update-desktop-files
 %define lcms2_devel liblcms2-devel
 %define libjpeg_devel libjpeg8-devel
 %define pkg_config pkg-config
+%define xmllint libxml2-tools
 %endif
 
 %if 0%{?mdkversion} || 0%{?pclinuxos}
@@ -67,6 +71,7 @@ BuildRequires: update-desktop-files
 %define libjpeg_devel libjpeg8-devel
 %define libX11_devel libX11-devel
 %define pkg_config pkg-config
+%define xmllint libxml2-utils
 %endif
 
 BuildRequires:	java-%{java_version}-devel, %{libX11_devel}, ant, autoconf, gcc, gcc-c++, make, git, javahelp2, %{lcms2_devel}, lensfun-devel, %{libjpeg_devel}, libtiff-devel, %{pkg_config}, rsync
@@ -74,7 +79,7 @@ BuildRequires:	java-%{java_version}-devel, %{libX11_devel}, ant, autoconf, gcc, 
 BuildRequires:	java-rpmbuild, libgomp-devel
 %endif
 
-Requires:	java-%{java_version}, javahelp2, lcms2, lensfun, libxml2-utils
+Requires:	java-%{java_version}, javahelp2, lcms2, lensfun, %{xmllint}
 %if 0%{?suse_version} >= 1320
 Requires:	xerces-j2-xml-apis
 %else

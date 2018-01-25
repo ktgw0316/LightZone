@@ -58,8 +58,8 @@ Do NOT set C_INCLUDE_PATH=/usr/include for mingw compilers.
 
 Before starting your first build, you have to copy HtmlHelp.lib to mingw library path:
 
-    cp ${MSSDK_HOME}/Lib/win8/um/x86/Htmlhelp.Lib /mingw32/lib/libhtmlhelp.a
-    cp ${MSSDK_HOME}/Lib/win8/um/x64/Htmlhelp.Lib /mingw64/lib/libhtmlhelp.a
+    cp "${MSSDK_HOME}/Lib/10.0.14393.0/um/x86/Htmlhelp.Lib" /mingw32/lib/libhtmlhelp.a
+    cp "${MSSDK_HOME}/Lib/10.0.14393.0/um/x64/Htmlhelp.Lib" /mingw64/lib/libhtmlhelp.a
 
 Checkout your project with Git. If you have problems with line endings in build (the \r stuff), do
 following:
@@ -71,6 +71,10 @@ To start the build:
 
     cd windows
     ant build-installer
+
+If you want to build a 32-bit binary on 64-bit machine, specify TARGET variable:
+
+    TARGET=i386 ant build-installer
 
 ### Known build issues
 -   In LightZone there are now no version information. There was a problem with rc.exe from MSSDK

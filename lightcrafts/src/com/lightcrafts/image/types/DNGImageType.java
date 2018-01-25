@@ -66,6 +66,9 @@ public final class DNGImageType extends RawImageType implements TagHandler {
                              LCByteBuffer buf, ImageMetadataDirectory dir)
             throws IOException
     {
+        if (!(dir instanceof DNGDirectory)) {
+            return false;
+        }
         switch (tagID) {
             case DNG_PRIVATE_DATA:
                 // This is used for maker notes by some camera vendors.

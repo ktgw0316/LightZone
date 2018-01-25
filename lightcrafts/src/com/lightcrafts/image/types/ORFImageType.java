@@ -2,14 +2,15 @@
 
 package com.lightcrafts.image.types;
 
-import java.io.IOException;
-import java.util.Map;
-
 import com.lightcrafts.image.BadImageFileException;
 import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.image.metadata.*;
+import com.lightcrafts.image.metadata.makernotes.OlympusDirectory;
 import com.lightcrafts.image.metadata.values.ImageMetaValue;
 import com.lightcrafts.utils.bytebuffer.LCByteBuffer;
+
+import java.io.IOException;
+import java.util.Map;
 
 import static com.lightcrafts.image.metadata.makernotes.OlympusTags.*;
 
@@ -110,6 +111,9 @@ public final class ORFImageType extends RawImageType implements TagHandler {
                               ImageMetadataDirectory dir )
             throws IOException
     {
+        if (!(dir instanceof OlympusDirectory)) {
+            return false;
+        }
         switch (tagID) {
             case OLYMPUS_CAMERA_SETTINGS:
             case OLYMPUS_CAMERA_TYPE:

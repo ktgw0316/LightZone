@@ -52,5 +52,9 @@ public class CropBoundsTest {
                 new Point2D.Double(2554.8590, 1728.0603),
                 3455.5752, 3455.5752, 0);
         assertEquals(D3455x3455, crop.getDimensionToFit(D3455x3455));
+
+        crop = new CropBounds(
+                new Point2D.Double(0, 0), 0, 0, 0);
+        assertEquals(D3455x3455, crop.getDimensionToFit(D3455x3455));
     }
 }

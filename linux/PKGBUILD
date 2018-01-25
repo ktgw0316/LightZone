@@ -18,6 +18,9 @@ build() {
   export JAVA_HOME=/usr/lib/jvm/java-7-openjdk
   [ -f /etc/profile.d/apache-ant.sh ] && source /etc/profile.d/apache-ant.sh
 
+  # Parallel compilation fails, so disable it
+  export MAKEFLAGS="-j1"
+
   cd "${srcdir}/${pkgname}-${pkgver}/"
   ant -f linux/build.xml jar
 }

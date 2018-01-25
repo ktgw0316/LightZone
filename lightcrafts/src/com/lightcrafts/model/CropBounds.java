@@ -306,6 +306,10 @@ public class CropBounds {
     }
 
     public Dimension getDimensionToFit(Dimension bounds) {
+        if (width <= 0 || height <= 0) {
+            return new Dimension(bounds.width, bounds.height);
+        }
+
         // Fit longer sides
         double scale = (width > height)
                 ? bounds.width / width
