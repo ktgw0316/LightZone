@@ -207,9 +207,6 @@ public class LensCorrectionsOperation extends BlendedOperation {
 
     @Override
     public void setSliderValue(String key, double value) {
-        if (! manual_mode) // TODO:
-            return;
-
         value = roundValue(key, value);
 
         if (key.equals(DISTORTION_K1) && distortion_k1 != value)
