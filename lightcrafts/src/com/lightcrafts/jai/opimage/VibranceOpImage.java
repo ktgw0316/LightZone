@@ -2,13 +2,12 @@
 
 package com.lightcrafts.jai.opimage;
 
-import com.lightcrafts.jai.JAIContext;
-import com.lightcrafts.utils.LCMatrix;
-
 import javax.media.jai.PointOpImage;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.RasterAccessor;
 import javax.media.jai.RasterFormatTag;
+import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.utils.LCMatrix;
 
 import java.awt.image.DataBuffer;
 import java.awt.image.RenderedImage;
@@ -20,17 +19,12 @@ import java.awt.color.ICC_Profile;
 import java.awt.color.ColorSpace;
 import java.util.Map;
 
-import Jama.Matrix;
-
-import lombok.experimental.ExtensionMethod;
-
 /**
  * Copyright (C) Light Crafts, Inc.
  * User: fabio
  * Date: Mar 20, 2007
  * Time: 4:32:46 PM
  */
-@ExtensionMethod(LCMatrix.class)
 public class VibranceOpImage extends PointOpImage {
     private final float transform[][];
     private final boolean saturationIncrease;
@@ -44,10 +38,11 @@ public class VibranceOpImage extends PointOpImage {
         saturationIncrease = transform[0][0] > 1;
 
         ICC_ProfileRGB linRGB = (ICC_ProfileRGB) ICC_Profile.getInstance(ColorSpace.CS_LINEAR_RGB);
-        toLinearsRGB = new LCMatrix(linRGB.getMatrix())
-                .inverse()
-                .times(new LCMatrix(((ICC_ProfileRGB) JAIContext.linearProfile).getMatrix()))
-                .getArrayFloat();
+        toLinearsRGB = LCMatrix.getArrayFloat(
+                new LCMatrix(linRGB.getMatrix())
+                        .inverse()
+                        .times(new LCMatrix(((ICC_ProfileRGB) JAIContext.linearProfile).getMatrix()))
+        );
     }
 
     @Override

@@ -3,9 +3,6 @@
 package com.lightcrafts.model.ImageEditor;
 
 import Jama.Matrix;
-
-import com.lightcrafts.image.types.RawImageInfo;
-import com.lightcrafts.image.types.AuxiliaryImageInfo;
 import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
@@ -19,6 +16,8 @@ import javax.media.jai.JAI;
 import javax.media.jai.LookupTableJAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedOp;
+import com.lightcrafts.image.types.RawImageInfo;
+import com.lightcrafts.image.types.AuxiliaryImageInfo;
 
 import java.awt.geom.Point2D;
 import java.awt.image.renderable.ParameterBlock;
@@ -27,8 +26,6 @@ import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.TreeMap;
 
-import lombok.experimental.ExtensionMethod;
-
 /**
  * Created by IntelliJ IDEA.
  * User: fabio
@@ -36,7 +33,6 @@ import lombok.experimental.ExtensionMethod;
  * Time: 7:08:49 PM
  * To change this template use File | Settings | File Templates.
  */
-@ExtensionMethod(LCMatrix.class)
 public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOperation {
     private static final String SOURCE = "Temperature";
     private final String TINT = "Tint";
@@ -275,7 +271,7 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
         if (mult != 1)
             combo = combo.times(mult);
 
-        return combo.getArrayFloat();
+        return LCMatrix.getArrayFloat(combo);
     }
 
     static public PlanarImage tintCast(PlanarImage image, float tint, float lightness) {
