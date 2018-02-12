@@ -6,7 +6,7 @@
     <dependency org="javax.media" name="jai_codec" rev="1.1.3"/>
     <dependency org="org.projectlombok" name="lombok" rev="1.16.10"/>
     <dependency org="org.jetbrains" name="annotations" rev="15.0"/>
-    <dependency org="gov.nist.math.jama" name="gov.nist.math.jama" rev="1.1.1"/>
+    <dependency org="org.ejml" name="ejml-simple" rev="0.33"/>
   </dependencies>
 </ivy-module>
 

@@ -2,21 +2,21 @@
 
 package com.lightcrafts.jai.opimage;
 
-import javax.media.jai.PointOpImage;
-import javax.media.jai.ImageLayout;
-import javax.media.jai.RasterAccessor;
-import javax.media.jai.RasterFormatTag;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.utils.LCMatrix;
 
-import java.awt.image.DataBuffer;
-import java.awt.image.RenderedImage;
-import java.awt.image.Raster;
-import java.awt.image.WritableRaster;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.PointOpImage;
+import javax.media.jai.RasterAccessor;
+import javax.media.jai.RasterFormatTag;
 import java.awt.*;
-import java.awt.color.ICC_ProfileRGB;
-import java.awt.color.ICC_Profile;
 import java.awt.color.ColorSpace;
+import java.awt.color.ICC_Profile;
+import java.awt.color.ICC_ProfileRGB;
+import java.awt.image.DataBuffer;
+import java.awt.image.Raster;
+import java.awt.image.RenderedImage;
+import java.awt.image.WritableRaster;
 import java.util.Map;
 
 /**
@@ -40,8 +40,8 @@ public class VibranceOpImage extends PointOpImage {
         ICC_ProfileRGB linRGB = (ICC_ProfileRGB) ICC_Profile.getInstance(ColorSpace.CS_LINEAR_RGB);
         toLinearsRGB = LCMatrix.getArrayFloat(
                 new LCMatrix(linRGB.getMatrix())
-                        .inverse()
-                        .times(new LCMatrix(((ICC_ProfileRGB) JAIContext.linearProfile).getMatrix()))
+                        .invert()
+                        .mult(new LCMatrix(((ICC_ProfileRGB) JAIContext.linearProfile).getMatrix()))
         );
     }
 

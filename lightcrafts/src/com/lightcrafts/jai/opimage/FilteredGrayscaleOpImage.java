@@ -3,8 +3,8 @@
 package com.lightcrafts.jai.opimage;
 
 import com.lightcrafts.image.color.ColorScience;
-import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.image.color.HSB;
+import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.utils.LCMatrix;
 
 import javax.media.jai.ImageLayout;
@@ -37,8 +37,8 @@ public class FilteredGrayscaleOpImage extends PointOpImage {
         ICC_ProfileRGB linRGB = (ICC_ProfileRGB) JAIContext.linearProfile;
         toLinearsRGB = LCMatrix.getArrayFloat(
                 new LCMatrix(sRGB.getMatrix())
-                        .inverse()
-                        .times(new LCMatrix(linRGB.getMatrix()))
+                        .invert()
+                        .mult(new LCMatrix(linRGB.getMatrix()))
         );
 
         this.filter = filter.clone();
