@@ -2,6 +2,8 @@
 
 package com.lightcrafts.model;
 
+import com.lightcrafts.image.color.ColorScience;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -56,4 +58,12 @@ public abstract class Preview extends JComponent {
      * Derived classes must paint something.
      */
     protected abstract void paintComponent(Graphics graphics);
+
+    static protected double calcZone(double lightness) {
+        return 16 * Math.log1p(lightness) / (8 * Math.log(2));
+    }
+
+    static protected float calcLightness(int red, int green, int blue) {
+        return ColorScience.Wr * red + ColorScience.Wg * green + ColorScience.Wb * blue;
+    }
 }
