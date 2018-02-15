@@ -9,7 +9,6 @@ import java.awt.color.ICC_ColorSpace;
 import java.awt.image.*;
 import java.awt.geom.AffineTransform;
 import java.io.*;
-import java.util.Arrays;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.TileCache;
@@ -72,7 +71,7 @@ public final class LCTIFFReader extends LCTIFFCommon implements LCImageReader {
      * @return Returns the {@link ICC_Profile} or <code>null</code> if the
      * image doesn't have a color profile.
      */
-    public ICC_Profile getICCProfile() throws ColorProfileException {
+    public ICC_Profile getICCProfile() throws BadColorProfileException {
         final byte[] iccProfileData = getICCProfileData();
         if ( iccProfileData == null )
             return null;
@@ -354,6 +353,7 @@ public final class LCTIFFReader extends LCTIFFCommon implements LCImageReader {
             this.setImageLayout(layout);
         }
 
+        @Override
         public void dispose() {
             super.dispose();
             reader.dispose();
@@ -385,6 +385,7 @@ public final class LCTIFFReader extends LCTIFFCommon implements LCImageReader {
             }
         }
 
+        @Override
         public Raster getTile(int tileX, int tileY) {
             Raster tile = null;	// the requested tile, to be returned
 
@@ -568,7 +569,7 @@ public final class LCTIFFReader extends LCTIFFCommon implements LCImageReader {
         m_image = image;
     }
 
-    /**
+    /*
      * NOTE: TIFF read functions can be called in parallel for different tiles, make them synchronized...
      */
 
@@ -659,6 +660,7 @@ public final class LCTIFFReader extends LCTIFFCommon implements LCImageReader {
 
             final JFrame frame = new JFrame("TIFF Image");
             final JPanel imagePanel = new JPanel() {
+                @Override
                 public void paintComponent(Graphics g) {
                     ((Graphics2D) g).drawRenderedImage(image, new AffineTransform());
                 }
@@ -668,7 +670,7 @@ public final class LCTIFFReader extends LCTIFFCommon implements LCImageReader {
             frame.setContentPane(scrollPane);
             frame.pack();
             frame.setSize(800, 600);
-            frame.show();
+            frame.setVisible(true);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -23,10 +23,8 @@ class ButtonPanel extends Box {
         done = new JButton(LOCALE.get("DoneButton"));
         setup = new JButton(LOCALE.get("SetupButton"));
 
+        int width = print.getPreferredSize().width;
         int maxWidth = 0;
-        int width;
-
-        width = print.getPreferredSize().width;
         maxWidth = (width > maxWidth) ? width : maxWidth;
 
         width = cancel.getPreferredSize().width;
@@ -98,6 +96,6 @@ class ButtonPanel extends Box {
         frame.setContentPane(panel);
         frame.setLocation(100, 100);
         frame.pack();
-        frame.show();
+        frame.setVisible(true);
     }
 }

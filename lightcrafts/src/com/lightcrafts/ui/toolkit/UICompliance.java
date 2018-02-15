@@ -39,18 +39,13 @@ public class UICompliance {
             dialog.getRootPane().getActionMap().put(action, action);
         }
         pane.selectInitialValue();
-        dialog.show();
+        dialog.setVisible(true);
         dialog.dispose();
 
         Object selectedValue = pane.getValue();
 
         if(selectedValue == null)
             return JOptionPane.CLOSED_OPTION;
-        if(options == null) {
-            if(selectedValue instanceof Integer)
-                return (Integer) selectedValue;
-            return JOptionPane.CLOSED_OPTION;
-        }
         for(int counter = 0, maxCounter = options.length;
             counter < maxCounter; counter++) {
             if(options[counter].equals(selectedValue))
@@ -58,5 +53,4 @@ public class UICompliance {
         }
         return JOptionPane.CLOSED_OPTION;
     }
-
 }
