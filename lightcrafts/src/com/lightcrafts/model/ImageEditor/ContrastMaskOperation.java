@@ -8,7 +8,7 @@ import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.model.LayerConfig;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
-import com.lightcrafts.utils.ColorScience;
+import com.lightcrafts.image.color.ColorScience;
 
 import javax.media.jai.*;
 import java.awt.*;

@@ -7,7 +7,7 @@ import com.lightcrafts.model.SliderConfig;
 import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.JAIContext;
-import com.lightcrafts.utils.ColorScience;
+import com.lightcrafts.image.color.ColorScience;
 
 import javax.media.jai.*;
 import javax.media.jai.operator.MedianFilterDescriptor;

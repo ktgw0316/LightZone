@@ -2,6 +2,7 @@
 
 package com.lightcrafts.model.ImageEditor;
 
+import com.lightcrafts.image.color.ColorScience;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.LCROIShape;
 import com.lightcrafts.jai.operator.LCMSColorConvertDescriptor;
@@ -9,12 +10,11 @@ import com.lightcrafts.jai.opimage.BlendOpImage;
 import com.lightcrafts.jai.opimage.RGBColorSelectionMaskOpImage;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.utils.Transform;
-import javax.media.jai.*;
 import com.lightcrafts.model.*;
-import com.lightcrafts.utils.ColorScience;
-import com.lightcrafts.utils.LCMS_ColorSpace;
 import com.lightcrafts.utils.LCMS;
+import com.lightcrafts.utils.LCMS_ColorSpace;
 
+import javax.media.jai.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;

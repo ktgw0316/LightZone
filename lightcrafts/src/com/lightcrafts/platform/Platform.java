@@ -2,7 +2,7 @@
 
 package com.lightcrafts.platform;
 
-import com.lightcrafts.utils.ColorProfileInfo;
+import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.utils.Version;
 import com.lightcrafts.utils.directory.DirectoryMonitor;
 import com.lightcrafts.utils.directory.UnixDirectoryMonitor;

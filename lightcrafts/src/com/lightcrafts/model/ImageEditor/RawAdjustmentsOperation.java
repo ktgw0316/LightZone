@@ -13,10 +13,10 @@ import com.lightcrafts.jai.opimage.NonLocalMeansFilterOpImage;
 
 import javax.media.jai.PlanarImage;
 import javax.media.jai.BorderExtender;
-import com.lightcrafts.utils.ColorScience;
-import com.lightcrafts.utils.DCRaw;
+import com.lightcrafts.image.color.ColorScience;
 import com.lightcrafts.image.types.AuxiliaryImageInfo;
 import com.lightcrafts.image.types.RawImageInfo;
+import com.lightcrafts.utils.DCRaw;
 
 import java.text.DecimalFormat;
 import java.awt.geom.Point2D;

@@ -5,7 +5,7 @@ package com.lightcrafts.platform.linux;
 import com.lightcrafts.platform.AlertDialog;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.ui.LightZoneSkin;
-import com.lightcrafts.utils.ColorProfileInfo;
+import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.utils.Version;
 
 import javax.help.HelpSet;

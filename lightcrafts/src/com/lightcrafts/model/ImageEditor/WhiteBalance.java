@@ -6,7 +6,7 @@ import com.lightcrafts.model.SliderConfig;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.jai.JAIContext;
-import com.lightcrafts.utils.ColorScience;
+import com.lightcrafts.image.color.ColorScience;
 
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;

@@ -2,15 +2,15 @@
 
 package com.lightcrafts.jai.opimage;
 
-import javax.media.jai.PointOpImage;
-import javax.media.jai.ImageLayout;
-import javax.media.jai.RasterFormatTag;
-import javax.media.jai.RasterAccessor;
+import com.lightcrafts.image.color.ColorScience;
 import com.sun.media.jai.util.ImageUtil;
-import com.lightcrafts.utils.ColorScience;
 
-import java.awt.image.*;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.PointOpImage;
+import javax.media.jai.RasterAccessor;
+import javax.media.jai.RasterFormatTag;
 import java.awt.*;
+import java.awt.image.*;
 import java.util.Map;
 
 /**

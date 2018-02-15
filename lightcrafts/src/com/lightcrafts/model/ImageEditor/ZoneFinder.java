@@ -2,26 +2,29 @@
 
 package com.lightcrafts.model.ImageEditor;
 
-import static com.lightcrafts.model.ImageEditor.Locale.LOCALE;
-import com.lightcrafts.model.*;
-import com.lightcrafts.jai.utils.*;
+import com.lightcrafts.image.color.ColorScience;
 import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.jai.utils.Functions;
+import com.lightcrafts.model.Operation;
+import com.lightcrafts.model.Preview;
+import com.lightcrafts.model.Region;
+import com.lightcrafts.model.ZoneOperation;
+import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.utils.Segment;
-import com.lightcrafts.utils.ColorScience;
 
 import javax.media.jai.*;
-import com.lightcrafts.ui.LightZoneSkin;
-
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.color.ColorSpace;
 import java.awt.color.ICC_ColorSpace;
-import java.awt.color.ICC_ProfileRGB;
 import java.awt.color.ICC_Profile;
+import java.awt.color.ICC_ProfileRGB;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.image.*;
 import java.awt.image.renderable.ParameterBlock;
-import java.awt.geom.AffineTransform;
+
+import static com.lightcrafts.model.ImageEditor.Locale.LOCALE;
 
 public class ZoneFinder extends Preview implements PaintListener {
     private static final boolean ADJUST_GRAYSCALE = true;

@@ -1,6 +1,9 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
 
-package com.lightcrafts.utils;
+package com.lightcrafts.image.color;
+
+import com.lightcrafts.platform.Platform;
+import com.lightcrafts.utils.bytebuffer.ByteBufferUtil;
 
 import java.awt.color.ICC_Profile;
 import java.io.File;
@@ -9,9 +12,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.*;
-
-import com.lightcrafts.utils.bytebuffer.ByteBufferUtil;
-import com.lightcrafts.platform.Platform;
 
 /**
  * A <code>ColorProfileInfo</code> contains information for an ICC profile.

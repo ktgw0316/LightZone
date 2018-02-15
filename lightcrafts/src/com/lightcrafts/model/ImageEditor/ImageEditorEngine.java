@@ -22,7 +22,7 @@ import com.lightcrafts.jai.utils.LCTileCache;
 import javax.media.jai.*;
 import com.lightcrafts.model.*;
 import com.lightcrafts.platform.Platform;
-import com.lightcrafts.utils.ColorProfileInfo;
+import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.utils.UserCanceledException;
 import com.lightcrafts.utils.thread.ProgressThread;
 

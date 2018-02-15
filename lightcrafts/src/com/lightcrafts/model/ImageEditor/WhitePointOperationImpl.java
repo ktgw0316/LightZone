@@ -7,7 +7,7 @@ import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.WhitePointOperation;
 import com.lightcrafts.utils.splines;
-import com.lightcrafts.utils.ColorScience;
+import com.lightcrafts.image.color.ColorScience;
 
 import javax.media.jai.JAI;
 import javax.media.jai.LookupTableJAI;

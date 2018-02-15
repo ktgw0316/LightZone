@@ -29,7 +29,7 @@ import com.lightcrafts.image.metadata.values.UndefinedMetaValue;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.opimage.CachedImage;
 import com.lightcrafts.utils.bytebuffer.ByteBufferUtil;
-import com.lightcrafts.utils.ColorProfileInfo;
+import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.utils.file.FileUtil;
 import com.lightcrafts.utils.UserCanceledException;
 import com.lightcrafts.utils.thread.ProgressThread;

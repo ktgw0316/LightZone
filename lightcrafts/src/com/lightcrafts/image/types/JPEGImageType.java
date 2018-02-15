@@ -30,7 +30,7 @@ import com.lightcrafts.image.libs.LCImageLibException;
 import com.lightcrafts.image.libs.LCJPEGReader;
 import com.lightcrafts.image.libs.LCJPEGWriter;
 import com.lightcrafts.utils.bytebuffer.*;
-import com.lightcrafts.utils.ColorProfileInfo;
+import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.utils.thread.ProgressThread;
 import com.lightcrafts.utils.UserCanceledException;
 import com.lightcrafts.utils.file.FileUtil;

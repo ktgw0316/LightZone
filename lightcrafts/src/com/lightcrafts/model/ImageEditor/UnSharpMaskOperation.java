@@ -2,20 +2,19 @@
 
 package com.lightcrafts.model.ImageEditor;
 
+import com.lightcrafts.image.color.ColorScience;
+import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.jai.utils.Functions;
+import com.lightcrafts.jai.utils.Transform;
+import com.lightcrafts.model.Operation;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
-import com.lightcrafts.model.Operation;
-import com.lightcrafts.jai.utils.Transform;
-import com.lightcrafts.jai.utils.Functions;
-import com.lightcrafts.jai.JAIContext;
-import com.lightcrafts.utils.ColorScience;
 
 import javax.media.jai.*;
-import java.awt.image.renderable.ParameterBlock;
-import java.awt.image.RenderedImage;
 import java.awt.*;
+import java.awt.image.RenderedImage;
+import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
-import java.text.StringCharacterIterator;
 import java.util.LinkedList;
 
 public class UnSharpMaskOperation extends BlendedOperation {

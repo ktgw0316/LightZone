@@ -15,7 +15,7 @@ import java.text.DecimalFormat;
 
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.operator.LCMSColorConvertDescriptor;
-import com.lightcrafts.utils.ColorProfileInfo;
+import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.model.ImageEditor.Rendering;
 import com.lightcrafts.model.ImageEditor.ImageProcessor;
 import com.lightcrafts.model.Operation;

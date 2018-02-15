@@ -8,7 +8,7 @@ import javax.media.jai.ImageLayout;
 import javax.media.jai.RasterAccessor;
 import javax.media.jai.RasterFormatTag;
 import com.lightcrafts.jai.JAIContext;
-import com.lightcrafts.utils.HSB;
+import com.lightcrafts.image.color.HSB;
 
 import java.awt.image.DataBuffer;
 import java.awt.image.RenderedImage;

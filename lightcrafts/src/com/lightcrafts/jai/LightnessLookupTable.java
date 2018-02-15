@@ -2,7 +2,7 @@
 
 package com.lightcrafts.jai;
 
-import com.lightcrafts.utils.ColorScience;
+import com.lightcrafts.image.color.ColorScience;
 
 import javax.media.jai.LookupTableJAI;
 import javax.media.jai.RasterFactory;

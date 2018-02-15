@@ -17,7 +17,7 @@ import sun.awt.shell.ShellFolder;
 import com.lightcrafts.platform.FileChooser;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.platform.PrinterLayer;
-import com.lightcrafts.utils.ColorProfileInfo;
+import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.utils.directory.DirectoryMonitor;
 import com.lightcrafts.utils.directory.WindowsDirectoryMonitor;
 import com.lightcrafts.utils.file.FileUtil;

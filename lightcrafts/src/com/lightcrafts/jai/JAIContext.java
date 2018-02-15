@@ -6,8 +6,8 @@ import com.lightcrafts.jai.operator.*;
 import com.lightcrafts.jai.opimage.*;
 import com.lightcrafts.jai.utils.LCTileCache;
 import com.lightcrafts.jai.utils.LCRecyclingTileFactory;
-import com.lightcrafts.utils.ColorScience;
-import com.lightcrafts.utils.ColorProfileInfo;
+import com.lightcrafts.image.color.ColorScience;
+import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.platform.Platform;
 import com.sun.media.jai.util.SunTileCache;
 

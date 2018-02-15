@@ -2,16 +2,16 @@
 
 package com.lightcrafts.jai.opimage;
 
-import javax.media.jai.PointOpImage;
+import com.lightcrafts.image.color.ColorScience;
+import com.lightcrafts.model.ColorSelection;
+
 import javax.media.jai.ImageLayout;
+import javax.media.jai.PointOpImage;
 import javax.media.jai.RasterAccessor;
 import javax.media.jai.RasterFormatTag;
-import com.lightcrafts.model.ColorSelection;
-import com.lightcrafts.utils.ColorScience;
-
-import java.awt.image.*;
-import java.awt.color.ColorSpace;
 import java.awt.*;
+import java.awt.color.ColorSpace;
+import java.awt.image.*;
 import java.util.Map;
 
 public class ColorSelectionMaskOpImage extends PointOpImage {

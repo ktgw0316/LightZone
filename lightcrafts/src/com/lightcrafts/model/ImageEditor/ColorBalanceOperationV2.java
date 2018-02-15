@@ -2,13 +2,13 @@
 
 package com.lightcrafts.model.ImageEditor;
 
+import com.lightcrafts.image.color.ColorMatrix2;
+import com.lightcrafts.image.color.ColorScience;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
-import com.lightcrafts.utils.ColorScience;
 import com.lightcrafts.utils.splines;
-import com.lightcrafts.utils.ColorMatrix2;
 
 import javax.media.jai.JAI;
 import javax.media.jai.LookupTableJAI;

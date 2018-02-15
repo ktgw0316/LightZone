@@ -2,21 +2,22 @@
 
 package com.lightcrafts.model.ImageEditor;
 
-import static com.lightcrafts.model.ImageEditor.Locale.LOCALE;
+import com.lightcrafts.image.color.ColorScience;
+import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.model.Preview;
 import com.lightcrafts.model.Region;
-import com.lightcrafts.utils.ColorScience;
-import com.lightcrafts.utils.LCMS;
-import com.lightcrafts.jai.utils.Functions;
-import com.lightcrafts.jai.JAIContext;
-import com.lightcrafts.ui.toolkit.ShadowFactory;
 import com.lightcrafts.ui.LightZoneSkin;
+import com.lightcrafts.ui.toolkit.ShadowFactory;
+import com.lightcrafts.utils.LCMS;
 
 import javax.media.jai.IHSColorSpace;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.awt.font.TextLayout;
+import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
+
+import static com.lightcrafts.model.ImageEditor.Locale.LOCALE;
 
 /** A Preview that shows formatted text derived from a given
   * ImageEditorDisplay and a mouse location, like color channel values.

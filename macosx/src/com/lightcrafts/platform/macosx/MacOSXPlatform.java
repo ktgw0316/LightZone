@@ -14,7 +14,7 @@ import ch.randelshofer.quaqua.filechooser.QuaquaFileSystemView;
 import ch.randelshofer.quaqua.QuaquaLookAndFeel;
 
 import com.lightcrafts.platform.*;
-import com.lightcrafts.utils.ColorProfileInfo;
+import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.utils.file.FileUtil;
 import com.lightcrafts.utils.Version;
 

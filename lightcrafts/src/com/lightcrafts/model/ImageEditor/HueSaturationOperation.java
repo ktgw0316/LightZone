@@ -4,7 +4,7 @@ package com.lightcrafts.model.ImageEditor;
 
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
-import com.lightcrafts.utils.ColorMatrix2;
+import com.lightcrafts.image.color.ColorMatrix2;
 import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.opimage.IntVibranceOpImage;

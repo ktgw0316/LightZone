@@ -1,6 +1,6 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
 
-package com.lightcrafts.utils;
+package com.lightcrafts.image.color;
 
 /**
  * Copyright (C) 2007 Light Crafts, Inc.

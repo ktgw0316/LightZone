@@ -2,17 +2,19 @@
 
 package com.lightcrafts.model.ImageEditor;
 
+import com.lightcrafts.image.color.ColorScience;
+import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.jai.utils.Functions;
+import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
-import com.lightcrafts.jai.utils.Transform;
-import com.lightcrafts.jai.utils.Functions;
-import com.lightcrafts.jai.JAIContext;
 
-import javax.media.jai.*;
-import com.lightcrafts.utils.ColorScience;
-
-import java.awt.image.renderable.ParameterBlock;
+import javax.media.jai.BorderExtender;
+import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.RenderedOp;
 import java.awt.*;
+import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
 
 import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_NOISE_REDUCTION;
