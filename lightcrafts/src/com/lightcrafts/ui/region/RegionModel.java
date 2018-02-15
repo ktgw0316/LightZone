@@ -3,11 +3,9 @@
 package com.lightcrafts.ui.region;
 
 import com.lightcrafts.model.Contour;
-import com.lightcrafts.utils.xml.XmlDocument;
 import com.lightcrafts.utils.xml.XMLException;
+import com.lightcrafts.utils.xml.XmlDocument;
 import com.lightcrafts.utils.xml.XmlNode;
-
-import static com.lightcrafts.ui.region.Locale.LOCALE;
 
 import javax.swing.event.UndoableEditListener;
 import javax.swing.undo.AbstractUndoableEdit;
@@ -17,6 +15,8 @@ import javax.swing.undo.UndoableEditSupport;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.*;
+
+import static com.lightcrafts.ui.region.Locale.LOCALE;
 
 /**
  * A RegionModel maintains a collection of Curves that define various
@@ -581,7 +581,7 @@ class RegionModel {
             MajorRegionMode oldMode = majorMode;
             oldMode.modeExited();
 
-            restore(comps, root);
+            restore((List<CurveComponent>) comps, (XmlNode) root);
 
             XmlNode modeNode = root.getChild(ModeTag);
             newMode.restore(modeNode);
@@ -629,51 +629,18 @@ class RegionModel {
     // have already been consistently initialized by addComponent():
 
     void restore(List<CurveComponent> comps, XmlNode node) throws XMLException {
-        isRestoring = true;
-        Map<Integer, Curve> curveNumbers = new HashMap<Integer, Curve>();
-        int count = 0;
-        XmlNode[] curveNodes = node.getChildren(CurveTag);
-        for (XmlNode curveNode : curveNodes) {
-            Curve curve = CurveFactory.restore(curveNode);
-            curve.restore(curveNode);
-            curveNumbers.put(count++, curve);
-        }
-        XmlNode[] compNodes = node.getChildren(ComponentTag);
-        if (compNodes.length != comps.size()) {
-            throw new XMLException(
-                "The number of regions doesn't match the number of tools"
-            );
-        }
-        removeCurves();
-        Iterator<CurveComponent> compIter = comps.iterator();
-        for (XmlNode compNode : compNodes) {
-            CurveComponent comp = compIter.next();
-            XmlNode[] refNodes = compNode.getChildren(ReferenceTag);
-            for (XmlNode refNode : refNodes) {
-                String attr = refNode.getAttribute(IndexTag);
-                Integer index;
-                try {
-                    index = Integer.valueOf(attr);
-                }
-                catch (NumberFormatException e) {
-                    throw new XMLException("Not a number: " + attr, e);
-                }
-                Curve curve = curveNumbers.get(index);
-                if (curve == null) {
-                    throw new XMLException(
-                        "Curve index out of bounds: " + attr
-                    );
-                }
-                addCurve(comp, curve);
-            }
-        }
-        isRestoring = false;
+        restore(comps, node, true);
     }
 
     // This works just like restore() above, except it doesn't clear out
     // the preexisting model state.
 
     void addSaved(List<CurveComponent> comps, XmlNode node) throws XMLException {
+        restore(comps, node, false);
+    }
+
+    private void restore(List<CurveComponent> comps, XmlNode node, boolean shouldRemoveCurves)
+            throws XMLException {
         isRestoring = true;
         Map<Integer, Curve> curveNumbers = new HashMap<Integer, Curve>();
         int count = 0;
@@ -688,6 +655,9 @@ class RegionModel {
             throw new XMLException(
                 "The number of regions doesn't match the number of tools"
             );
+        }
+        if (shouldRemoveCurves) {
+            removeCurves();
         }
         Iterator<CurveComponent> compIter = comps.iterator();
         for (XmlNode compNode : compNodes) {
