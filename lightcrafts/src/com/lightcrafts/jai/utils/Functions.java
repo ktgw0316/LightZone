@@ -2,24 +2,22 @@
 
 package com.lightcrafts.jai.utils;
 
-import javax.media.jai.*;
-import java.awt.image.*;
-import java.awt.image.renderable.ParameterBlock;
-import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.awt.color.ColorSpace;
-import java.awt.color.ICC_Profile;
-import java.io.IOException;
-import java.text.NumberFormat;
-import java.text.DecimalFormat;
-
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.operator.LCMSColorConvertDescriptor;
-import com.lightcrafts.image.color.ColorProfileInfo;
-import com.lightcrafts.model.ImageEditor.Rendering;
 import com.lightcrafts.model.ImageEditor.ImageProcessor;
+import com.lightcrafts.model.ImageEditor.Rendering;
 import com.lightcrafts.model.Operation;
 import com.sun.media.jai.util.ImageUtil;
+
+import javax.media.jai.*;
+import java.awt.*;
+import java.awt.color.ColorSpace;
+import java.awt.color.ICC_Profile;
+import java.awt.geom.AffineTransform;
+import java.awt.image.*;
+import java.awt.image.renderable.ParameterBlock;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 /**
  * Created by IntelliJ IDEA.
@@ -654,30 +652,6 @@ public class Functions {
             return Functions.toColorSpace(Functions.fromByteToUShort(image, JAIContext.noCacheHint), linearCS, hints);
         else
             return Functions.toColorSpace(image, linearCS, hints);
-    }
-
-    public static void intToBigEndian(int value, byte[] array, int index) {
-            array[index]   = (byte) (value >> 24);
-            array[index+1] = (byte) (value >> 16);
-            array[index+2] = (byte) (value >>  8);
-            array[index+3] = (byte) (value);
-    }
-
-    // Hack to extract a color profile and write it into a file as an output profile
-    public static void extractProfile(ICC_Profile profile, String path) {
-        if (profile.getProfileClass() != ICC_Profile.CLASS_OUTPUT) {
-            byte[] theHeader = profile.getData(ICC_Profile.icSigHead);
-            intToBigEndian (ICC_Profile.icSigOutputClass, theHeader, ICC_Profile.icHdrDeviceClass);
-            profile.setData (ICC_Profile.icSigHead, theHeader);
-        }
-
-        String profileName = ColorProfileInfo.getNameOf(profile);
-
-        try {
-            profile.write(path + profileName + ".icc");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public static WritableRaster copyData(WritableRaster raster, Raster source) {
