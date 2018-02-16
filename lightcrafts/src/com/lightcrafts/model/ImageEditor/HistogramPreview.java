@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2018-     Masahiro Kitagawa */
 
 package com.lightcrafts.model.ImageEditor;
 
@@ -6,6 +7,7 @@ import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.model.Preview;
 import com.lightcrafts.model.Region;
+import lombok.val;
 
 import javax.media.jai.Histogram;
 import javax.media.jai.PlanarImage;
@@ -33,12 +35,22 @@ public class HistogramPreview extends Preview implements PaintListener {
 
     @Override
     public void setDropper(Point p) {
+        if (p == null || engine == null)
+            return;
 
+        Color sample = engine.getPixelValue(p.x, p.y);
+        final int zone;
+        if (sample == null) {
+            zone = -1;
+        } else {
+            val lightness = calcLightness(sample.getRed(), sample.getGreen(), sample.getBlue());
+            zone = (int) calcZone(lightness);
+        }
+        setFocusedZone(zone, null);
     }
 
     @Override
     public void setRegion(Region region) {
-
     }
 
     @Override
@@ -179,7 +191,7 @@ public class HistogramPreview extends Preview implements PaintListener {
         }
     }
 
-    private static float[] logTable = new float[0x10000];
+    private static final float[] logTable = new float[0x10000];
 
     static {
         for (int i = 0; i < 0x10000; i++)
