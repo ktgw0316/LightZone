@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2018-     Masahiro Kitagawa */
 
 package com.lightcrafts.model.ImageEditor;
 
@@ -11,6 +12,7 @@ import com.lightcrafts.model.Region;
 import com.lightcrafts.model.ZoneOperation;
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.utils.Segment;
+import lombok.val;
 
 import javax.media.jai.BorderExtender;
 import javax.media.jai.JAI;
@@ -42,6 +44,24 @@ public class ZoneFinder extends Preview implements PaintListener {
 
     @Override
     public void setDropper(Point p) {
+        if (p == null || engine == null)
+            return;
+
+        final int zone;
+        if (engine.getPixelValue(p.x, p.y) == null) {
+            zone = -1;
+        } else {
+            val map = requantize(lastPreview, -1);
+            int[] sample = new int[3];
+            val size = engine.getRendering().getRenderingSize();
+            map.getData().getPixel(
+                    (int) (p.x * map.getWidth() / size.getWidth()),
+                    (int) (p.y * map.getHeight() / size.getHeight()),
+                    sample);
+            zone = zoneFrom(sample[0]);
+        }
+        setFocusedZone(zone);
+        // repaint();
     }
 
     @Override
@@ -203,17 +223,32 @@ public class ZoneFinder extends Preview implements PaintListener {
         return image;
     }
 
-    // requantize the segmented image to match the same lightness scale used in the zone mapper
-    private static RenderedImage requantize(RenderedImage image, int focusZone) {
-        int steps = 16;
-        int[] colors = new int[steps + 1];
+    static private final int steps = 16;
+
+    /**
+     * the same lightness scale used in the zone mapper
+     */
+    static private final int[] colors = new int[steps + 1];
+    static {
         for (int i = 0; i < steps; i++) {
-            float color = (float) ((Math.pow(2, i * 8.0 / (steps - 1)) - 1) / 255.);
-            float[] srgbColor = Functions.fromLinearToCS(JAIContext.systemColorSpace, new float[] {color, color, color});
+            val color = (float) ((Math.pow(2, i * 8.0 / (steps - 1)) - 1) / 255.);
+            val srgbColor = Functions.fromLinearToCS(JAIContext.systemColorSpace, new float[] {color, color, color});
             colors[i] = (int) (255 * srgbColor[0]);
         }
         colors[steps] = colors[steps - 1];
+    }
 
+    private static int zoneFrom(int lightness) {
+        for (int i = 1; i <= steps; i++) {
+            if (lightness < colors[i]) {
+                return i - 1;
+            }
+        }
+        return steps;
+    }
+
+    // requantize the segmented image to match the same lightness scale used in the zone mapper
+    private static RenderedImage requantize(RenderedImage image, int focusZone) {
         byte[][] lut = new byte[3][256];
         int step = 0;
         for (int i = 0; i < colors[steps]; i++) {
