@@ -105,7 +105,10 @@ public class FilmGrainOperation extends BlendedOperation {
                 for (int y = 0; y < height; ++y) {
                     for (int x = 0; x < width; ++x) {
                         for (int c = 0; c < numBands; ++c) {
-                            val value = noise.eval(x / featureSize, y / featureSize, (c - 1) * color);
+                            val value = noise.eval(
+                                    x / (featureSize * scale),
+                                    y / (featureSize * scale),
+                                    (c - 1) * color);
                             val rgb = (short) ((value * intensity + 1) * 32767.5);
                             rawShorts[pos++] = rgb;
                         }
@@ -115,7 +118,10 @@ public class FilmGrainOperation extends BlendedOperation {
             else {
                 for (int y = 0; y < height; ++y) {
                     for (int x = 0; x < width; ++x) {
-                        val value = noise.eval(x / featureSize, y / featureSize, 0);
+                        val value = noise.eval(
+                                x / (featureSize * scale),
+                                y / (featureSize * scale),
+                                0);
                         val rgb = (short) ((value * intensity + 1) * 32767.5);
                         for (int c = 0; c < numBands; ++c) {
                             rawShorts[pos++] = rgb;
