@@ -1,11 +1,16 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2018-     Masahiro Kitagawa */
 
 package com.lightcrafts.image.metadata;
 
 import com.lightcrafts.image.metadata.providers.GPSProvider;
-import com.lightcrafts.image.metadata.values.ImageMetaValue;
 import com.lightcrafts.image.metadata.values.UnsignedRationalMetaValue;
 import com.lightcrafts.utils.Rational;
+
+import lombok.Data;
+import lombok.Getter;
+import lombok.val;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,22 +24,13 @@ import static com.lightcrafts.image.metadata.ImageMetaType.*;
  * GPS metadata.
  *
  * @author Paul J. Lucas [paul@lightcrafts.com]
+ * @author Masahiro Kitagawa [arctica0316@gmail.com]
  */
 @SuppressWarnings({"CloneableClassWithoutClone"})
 public final class GPSDirectory extends ImageMetadataDirectory
         implements GPSProvider {
 
     ////////// public /////////////////////////////////////////////////////////
-
-    /**
-     * Gets the name of this directory.
-     *
-     * @return Always returns &quot;GPSF&quot;.
-     */
-    @Override
-    public String getName() {
-        return "GPS";
-    }
 
     /**
      * {@inheritDoc}
@@ -54,75 +50,74 @@ public final class GPSDirectory extends ImageMetadataDirectory
 
     @Override
     public Double getGPSLatitude() {
-        return getGPSCoordinate(GPS_LATITUDE, GPS_LATITUDE_REF, "N");
+        return readGPSCoordinate(GPS_LATITUDE, GPS_LATITUDE_REF, "N");
     }
 
     @Override
     public Double getGPSLongitude() {
-        return getGPSCoordinate(GPS_LONGITUDE, GPS_LONGITUDE_REF, "E");
+        return readGPSCoordinate(GPS_LONGITUDE, GPS_LONGITUDE_REF, "E");
     }
 
+    @NotNull
     @Override
     public String getGPSLatitudeDMS() {
-        return getGPSCoordinateDMS(GPS_LATITUDE, GPS_LATITUDE_REF);
+        return readGPSCoordinateDMS(GPS_LATITUDE, GPS_LATITUDE_REF);
     }
 
+    @NotNull
     @Override
     public String getGPSLongitudeDMS() {
-        return getGPSCoordinateDMS(GPS_LONGITUDE, GPS_LONGITUDE_REF);
+        return readGPSCoordinateDMS(GPS_LONGITUDE, GPS_LONGITUDE_REF);
     }
 
-    private Double getGPSCoordinate(int tagID, int refTagID, String orientation) {
-        final ImageMetaValue metaValue = getValue(tagID);
-        if (metaValue == null) {
+    private Double readGPSCoordinate(int tagID, int refTagID, String orientation) {
+        val metadata = readMetadata(tagID, refTagID);
+        if (metadata == null) {
             return null;
         }
-        final Rational[] values =
-                ((UnsignedRationalMetaValue) metaValue).getRationalValues();
-        if (values.length != 3) {
-            return null;
-        }
+        val values = metadata.left;
+        val refString = metadata.right;
 
-        final ImageMetaValue refMetaValue = getValue(refTagID);
-        if (refMetaValue == null) {
-            return null;
-        }
-        final String refString = refMetaValue.getStringValue();
-        if (refString == null) {
-            return null;
-        }
-        final int sign = (refString.equalsIgnoreCase(orientation)) ? 1 : -1;
+        val sign = (refString.equalsIgnoreCase(orientation)) ? 1 : -1;
 
-        // FIXME: precise calculation
         return sign * (values[0].doubleValue()
                 + values[1].doubleValue() / 60
                 + values[2].doubleValue() / 3600);
     }
 
-    private String getGPSCoordinateDMS(int tagID, int refTagID) {
-        final ImageMetaValue metaValue = getValue(tagID);
-        if (metaValue == null) {
+    @NotNull
+    private String readGPSCoordinateDMS(int tagID, int refTagID) {
+        val metadata = readMetadata(tagID, refTagID);
+        if (metadata == null) {
             return "";
         }
-        final Rational[] values =
-                ((UnsignedRationalMetaValue) metaValue).getRationalValues();
-        if (values.length != 3) {
-            return "";
-        }
-
-        final ImageMetaValue refMetaValue = getValue(refTagID);
-        if (refMetaValue == null) {
-            return "";
-        }
-        final String refString = refMetaValue.getStringValue();
-        if (refString == null) {
-            return "";
-        }
+        val values = metadata.left;
+        val refString = metadata.right;
 
         return values[0].intValue() + "\u00B0"
                 + values[1].intValue() + "'"
                 + values[2].floatValue() + "\""
                 + refString;
+    }
+
+    private Pair<Rational[], String> readMetadata(int tagID, int refTagID) {
+        val metaValue = getValue(tagID);
+        if (metaValue == null) {
+            return null;
+        }
+        val values = ((UnsignedRationalMetaValue) metaValue).getRationalValues();
+        if (values.length != 3) {
+            return null;
+        }
+        val refMetaValue = getValue(refTagID);
+        if (refMetaValue == null) {
+            return null;
+        }
+        val refString = refMetaValue.getStringValue();
+        if (refString == null) {
+            return null;
+        }
+        return Pair.of(values, refString);
     }
 
     ////////// protected //////////////////////////////////////////////////////
@@ -147,6 +142,15 @@ public final class GPSDirectory extends ImageMetadataDirectory
 
     ////////// private ////////////////////////////////////////////////////////
 
+    @Data(staticConstructor = "of")
+    static private class Pair<A, B> {
+        private final A left;
+        private final B right;
+    }
+
+    @Getter
+    private final String name = "GPS";
+
     /**
      * Add the tag mappings.
      *
@@ -155,8 +159,7 @@ public final class GPSDirectory extends ImageMetadataDirectory
      * @param type The tag's {@link ImageMetaType}.
      */
     private static void add( int id, String name, ImageMetaType type ) {
-        final ImageMetaTagInfo tagInfo =
-            new ImageMetaTagInfo( id, name, type, false );
+        val tagInfo = new ImageMetaTagInfo( id, name, type, false );
         m_tagsByID.put( id, tagInfo );
         m_tagsByName.put( name, tagInfo );
     }
