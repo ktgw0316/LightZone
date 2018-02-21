@@ -2,18 +2,22 @@
 
 package com.lightcrafts.utils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.MalformedURLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.ResourceBundle;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 
 /** A container and accessor for static version data, either configured in
@@ -119,7 +123,7 @@ public final class Version {
      * Gets the user-presentable version String.
      */
     public static String getVersionName() {
-        return Version;
+        return Version != null ? Version : "";
     }
 
     /**
@@ -154,7 +158,7 @@ public final class Version {
      * Reads a given resource.
      *
      * @param name The name of the resource file to read.
-     * @return Returns the contents of saif resource file as a string.
+     * @return Returns the contents of said resource file as a string.
      */
     private static String readResource( String name ) {
         InputStream in = null;
