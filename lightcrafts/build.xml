@@ -1,4 +1,4 @@
-<project name="lightcrafts" default="build">
+<project name="lightcrafts" default="build" xmlns:ivy="antlib:org.apache.ivy.ant">
 
   <tstamp/>
 
@@ -23,7 +23,7 @@
   </condition>
 
 	<!--===== Application build ==============================================-->
-  
+
   <condition property="MAKE" value="make">
     <not>
       <or>
@@ -46,7 +46,32 @@
     </not>
   </condition>
 
-  <target name="javac">
+  <target name="resolve" depends="init-ivy">
+    <ivy:resolve file="${basedir}/ivy.xml"/>
+    <ivy:retrieve/>
+  </target>
+
+  <property name="ivy.version" value="2.4.0"/>
+  <property name="ivy.jar.dir" value="${basedir}/lib"/>
+  <property name="ivy.jar.file"
+            value="${ivy.jar.dir}/ivy.jar"/>
+
+  <target name="download-ivy" unless="offline">
+    <mkdir dir="${ivy.jar.dir}"/>
+    <get src="http://repo2.maven.org/maven2/org/apache/ivy/ivy/${ivy.version}/ivy-${ivy.version}.jar"
+         dest="${ivy.jar.file}" usetimestamp="true"/>
+  </target>
+
+  <target name="init-ivy" depends="download-ivy" unless="ivy.initialized">
+    <path id="ivy.lib.path">
+      <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
+    </path>
+    <taskdef resource="org/apache/ivy/ant/antlib.xml"
+             uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+    <property name="ivy.initialized" value="true"/>
+  </target>
+
+  <target name="javac" depends="resolve">
     <exec executable="${MAKE}" dir="products" failonerror="true"
           vmlauncher="true"/>
 

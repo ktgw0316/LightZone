@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0">
+  <info organisation="lightcrafts" module="lightcrafts"/>
+  <dependencies>
+    <dependency org="de.dimaki" name="refuel" rev="0.1.1"/>
+  </dependencies>
+</ivy-module>
+

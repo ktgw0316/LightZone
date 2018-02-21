@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2018-     Masahiro Kitagawa */
 
 package com.lightcrafts.app;
 
@@ -9,14 +10,10 @@ import com.lightcrafts.utils.ProgressIndicator;
 import com.lightcrafts.utils.Version;
 import com.lightcrafts.utils.WebBrowser;
 import com.lightcrafts.utils.thread.ProgressThread;
-import com.lightcrafts.utils.xml.ElementFilter;
-import com.lightcrafts.utils.xml.XMLUtil;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+import de.dimaki.refuel.appcast.entity.Appcast;
+import de.dimaki.refuel.updater.boundary.Updater;
+import de.dimaki.refuel.updater.entity.ApplicationStatus;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.prefs.BackingStoreException;
@@ -26,7 +23,7 @@ import static com.lightcrafts.app.Locale.LOCALE;
 
 /**
  * <code>CheckForUpdate</code> checks to see if an update of the software is
- * available.  There are two seperate methods: asynchronous and synchronous.
+ * available.  There are two separate methods: asynchronous and synchronous.
  * <p>
  * The asynchronous method follows the pattern:
  * <pre>
@@ -40,6 +37,7 @@ import static com.lightcrafts.app.Locale.LOCALE;
  * </pre>
  *
  * @author Paul J. Lucas [paul@lightcrafts.com]
+ * @author Masahiro Kitagawa [arctica0316@gmail.com]
  */
 public final class CheckForUpdate {
 
@@ -148,12 +146,17 @@ public final class CheckForUpdate {
         new BackgroundCheckThread().start();
     }
 
+    public static boolean isEnabled() {
+        // Refuel only supports Java 8 or later
+        return Double.parseDouble(System.getProperty("java.specification.version")) >= 1.8;
+    }
+
     ////////// private ////////////////////////////////////////////////////////
 
     /**
      * A <code>BackgroundCheckThread</code> is-a {@link Thread} that checks to
      * see if a new version of the software is available by fetchcing the
-     * latest version information from the Light Crafts' version server.
+     * latest version information from a version server.
      * <p>
      * Since this runs in the background, all exceptions are caught and
      * ignored.
@@ -162,6 +165,7 @@ public final class CheckForUpdate {
 
         ////////// public /////////////////////////////////////////////////////
 
+        @Override
         public void run() {
             //
             // First, check to see if this computer has an active internet
@@ -217,7 +221,7 @@ public final class CheckForUpdate {
     /**
      * A <code>SynchronousCheckThread</code> is-a {@link Thread} that checks to
      * see if a new version of the software is available by fetchcing the
-     * latest version information from the Light Crafts' version server.
+     * latest version information from a version server.
      * <p>
      * Since this runs synchronously, any exception is reported via
      * {@link ProgressDialog#getThrown()}.
@@ -226,13 +230,9 @@ public final class CheckForUpdate {
 
         ////////// public /////////////////////////////////////////////////////
 
+        @Override
         public void run() {
-            try {
-                m_isUpdateAvailable = checkIfUpdateIsAvailable();
-            }
-            catch ( IOException e ) {
-                throw new RuntimeException( e );
-            }
+            m_isUpdateAvailable = checkIfUpdateIsAvailable();
         }
 
         ////////// package ////////////////////////////////////////////////////
@@ -261,79 +261,29 @@ public final class CheckForUpdate {
     }
 
     /**
-     * A <code>VersionFilter</code> is-an {@link ElementFilter} that matches
-     * a <code>version</code> element having matching <code>product</code>,
-     * <code>platform</code>, and <code>customer</code> attributes.
-     * All comparisons are case-insensitive.
-     * <p>
-     * The <code>product</code> attribute matches if the value is one of empty,
-     * &quot;all&quot;, &quot;any&quot;, &quot;basic&quot;, or &quot;full&quot;.
-     * <p>
-     * The <code>platform</code> attribute matches if it is contained in the
-     * operating system name or the value is one of empty, &quot;all&quot;, or
-     * &quot;any&quot;.
-     */
-    private static final class VersionFilter extends ElementFilter {
-
-        ////////// public /////////////////////////////////////////////////////
-
-        public boolean accept( Node node ) {
-            if ( !super.accept( node ) )
-                return false;
-            final Element element = (Element)node;
-
-            final String product =
-                element.getAttribute( "product" ).toLowerCase();
-//            final boolean productMatches = isAny( product ) ||
-//                product.equals( LicenseChecker.isBasic() ? "basic" : "full" );
-            final boolean productMatches = true;
-            if ( !productMatches )
-                return false;
-
-            final String platform =
-                element.getAttribute( "platform" ).toLowerCase();
-            final boolean platformMatches = isAny( platform ) ||
-                m_osName.contains( platform );
-            if ( !platformMatches )
-                return false;
-
-            return true;
-        }
-
-        ////////// package ////////////////////////////////////////////////////
-
-        VersionFilter() {
-            super( "version", "customer", CUSTOMER );
-        }
-
-        ////////// private ////////////////////////////////////////////////////
-
-        /**
-         * Checks whether the given string matches either &quot;any&quot; or
-         * &quot;all&quot;.
-         *
-         * @param s The string to check.  It is assumed to have been converted
-         * to lower case.
-         * @return Returns <code>true</code> only if the string is one of
-         * empty, &quot;any&quot; or &quot;all&quot;.
-         */
-        private static boolean isAny( String s ) {
-            return s.length() == 0 || s.equals( "all" ) || s.equals( "any" );
-        }
-
-
-        private static final String m_osName =
-            System.getProperty( "os.name" ).toLowerCase();
-    }
-
-    /**
      * Checks if an update is available by fetching the latest version
-     * information from the Light Crafts' version server.
+     * information from a version server.
      *
      * @return Returns <code>true</code> only if an update is available.
      */
-    private static boolean checkIfUpdateIsAvailable() throws IOException {
-        return false;
+    private static boolean checkIfUpdateIsAvailable() {
+        final String  currentVersion = Version.getVersionName();
+        return checkIfUpdateIsAvailable(currentVersion, CHECK_URL);
+    }
+
+    static boolean checkIfUpdateIsAvailable(String currentVersion, URL url) {
+        final Updater updater = new Updater();
+        if (currentVersion.contains("alpha") || currentVersion.contains("beta") || currentVersion.contains("rc")) {
+            // TODO:
+        }
+        final ApplicationStatus applicationStatus = updater.getApplicationStatus(currentVersion, url);
+        if (!ApplicationStatus.UPDATE_AVAILABLE.equals(applicationStatus)) {
+            // This also handles the case for development versions when the version
+            // resource hasn't been populated.
+            return false;
+        }
+        final Appcast appcast = applicationStatus.getAppcast();
+        return parseAppcast(appcast);
     }
 
     /**
@@ -384,58 +334,16 @@ public final class CheckForUpdate {
     }
 
     /**
-     * Parses a XML versions document as obtained from the web server.
+     * Parses an Appcast document as obtained from the web server.
      *
-     * @param doc The {@link Document} to parse.
+     * @param appcast The {@link Appcast} to parse.
      * @return Returns <code>true</code> only if the document was parsed
      * successfully and a version we're interested in was found.
      */
-    private static boolean parseVersionsDocument( Document doc ) {
-        m_updateRevision = 0;
-        m_updateURL = "";
-        m_updateVersion = "";
-
-        final Element root = doc.getDocumentElement();
-        final Element version =
-            (Element)XMLUtil.getFirstChildOf( root, new VersionFilter() );
-        if ( version == null )
-            return false;
-
-        ////////// Parse the version number ///////////////////////////////////
-
-        final Element number = (Element)XMLUtil.getFirstChildOf(
-            version, new ElementFilter( "number" )
-        );
-        if ( number == null )
-            return false;
-        m_updateVersion = XMLUtil.getTextOfFirstTextChildOf( number );
-
-        ////////// Parse the revision number //////////////////////////////////
-
-        final Element revision = (Element)XMLUtil.getFirstChildOf(
-            version, new ElementFilter( "revision" )
-        );
-        if ( revision == null )
-            return false;
-        final String updateRevision =
-            XMLUtil.getTextOfFirstTextChildOf( revision );
-        try {
-            m_updateRevision = Integer.parseInt( updateRevision );
-        }
-        catch ( NumberFormatException e ) {
-            return false;
-        }
-
-        ////////// Parse the URL //////////////////////////////////////////////
-
-        final Element url = (Element)XMLUtil.getFirstChildOf(
-            version, new ElementFilter( "url" )
-        );
-        if ( url == null )
-            return false;
-        m_updateURL = XMLUtil.getTextOfFirstTextChildOf( url );
-
-        return true;
+    private static boolean parseAppcast(Appcast appcast) {
+        m_updateURL = appcast.getChannel().getItems().get(0).getReleaseNotesLink();
+        m_updateVersion = appcast.getLatestVersion();
+        return m_updateURL != null && m_updateVersion != null;
     }
 
     /**
@@ -558,11 +466,6 @@ public final class CheckForUpdate {
     private static final Preferences m_prefs;
 
     /**
-     * The subversion revision number of the update.
-     */
-    private static int m_updateRevision;
-
-    /**
      * The URL to go to to get the update.
      */
     private static String m_updateURL;
@@ -583,7 +486,7 @@ public final class CheckForUpdate {
      * there's a new version.
      * @see #CHECK_URL_STRING
      */
-    private static final String CHECK_HOST = "versions.lightcrafts.com";
+    private static final String CHECK_HOST = "raw.githubusercontent.com";
 
     /**
      * The URL to fetch the <code>versions.xml</code> document from.
@@ -597,13 +500,9 @@ public final class CheckForUpdate {
      * @see #CHECK_URL
      */
     private static final String CHECK_URL_STRING =
-        "http://" + CHECK_HOST + "/products/"
-        + Version.getApplicationName().toLowerCase() + "/versions.xml";
-
-    /**
-     * The customer type.
-     */
-    private static final String CUSTOMER;
+            "https://" + CHECK_HOST
+            + "/ktgw0316/homebrew-" + Version.getApplicationName().toLowerCase()
+            + "/master/appcast.xml";
 
     /**
      * How many milliseconds in the future "later" is.
@@ -651,11 +550,6 @@ public final class CheckForUpdate {
      */
     private static final String REMIND_KEY = "remind";
 
-    /**
-     * Flag used only for testing.  See {@link #main(String[])}.
-     */
-    private static boolean m_testing;
-
     static {
         try {
             CHECK_URL = new URL( CHECK_URL_STRING );
@@ -663,25 +557,15 @@ public final class CheckForUpdate {
         catch ( MalformedURLException e ) {
             e.printStackTrace();
         }
-
-        final String customer = System.getProperty( "customer" );
-        CUSTOMER = customer != null && customer.length() > 0 ?
-            customer : "generic";
-
         m_prefs = Preferences.userRoot().node( "com/lightcrafts/app" );
     }
 
     ////////// main() /////////////////////////////////////////////////////////
 
-    public static void main( String[] args ) throws IOException {
-        m_testing = true;
-        //checkNowAndWait();
-
-        final Document doc =
-            XMLUtil.readDocumentFrom( new File( "/tmp/versions.xml" ) );
-        parseVersionsDocument( doc );
-
-        System.exit( 0 );
+    public static void main( String[] args ) throws MalformedURLException {
+        final boolean isAvailable = checkIfUpdateIsAvailable(
+                "4.1.9", new URL("file:///tmp/lightzone/appcast.xml"));
+        System.exit(isAvailable ? 0 : 1);
     }
 }
 /* vim:set et sw=4 ts=4: */
