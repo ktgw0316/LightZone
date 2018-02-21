@@ -2,6 +2,8 @@
 
 package com.lightcrafts.utils;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -118,8 +120,9 @@ public final class Version {
     /**
      * Gets the user-presentable version String.
      */
+    @NotNull
     public static String getVersionName() {
-        return Version;
+        return Version != null ? Version : "";
     }
 
     /**
@@ -154,7 +157,7 @@ public final class Version {
      * Reads a given resource.
      *
      * @param name The name of the resource file to read.
-     * @return Returns the contents of saif resource file as a string.
+     * @return Returns the contents of said resource file as a string.
      */
     private static String readResource( String name ) {
         InputStream in = null;

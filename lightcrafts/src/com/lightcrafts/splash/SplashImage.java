@@ -48,10 +48,13 @@ public final class SplashImage extends BufferedImage {
     public static String[] getDefaultSplashText( String licenseText ) {
         final String name = Version.getVersionName();
         final String revision = Version.getRevisionNumber();
-        final String versionText = "Version " + name + " (" + revision + ')';
-        if ( licenseText != null )
-            return new String[]{ versionText, licenseText };
-        return new String[]{ versionText };
+        final String versionText = name.isEmpty() ? "Version unknown"
+                : revision.isEmpty()
+                ? "Version " + name
+                : "Version " + name + " (" + revision + ')';
+        return (licenseText != null)
+                ? new String[]{versionText, licenseText}
+                : new String[]{versionText};
     }
 
     ////////// private ////////////////////////////////////////////////////////
