@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle"  xmlns:dc="http://purl.org/dc/elements/1.1/">
+   <channel>
+      <title>LightZone Changelog</title>
+      <link>http://you.com/app/appcast.xml</link>
+      <description>Most recent changes with links to updates.</description>
+      <language>en</language>
+         <item>
+            <title>Version 4.1.8</title>
+            <pubDate>Fri Jan 5 21:40:47 2018 +0900</pubDate>
+            <sparkle:releaseNotesLink>https://github.com/ktgw0316/LightZone/releases/tag/4.1.8</sparkle:releaseNotesLink>
+            <enclosure url="https://github.com/ktgw0316/LightZone/archive/4.1.8.zip" sparkle:version="4.1.8" type="application/octet-stream"/>
+         </item>
+   </channel>
+</rss>
