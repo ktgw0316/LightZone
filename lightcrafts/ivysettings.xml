@@ -3,6 +3,7 @@
   <resolvers>
     <chain name="myChain">
       <ibiblio name="tidalwave" root="http://services.tidalwave.it/nexus/content/repositories/public/" m2compatible="true"/>
+      <ibiblio name="geotoolkit" root="http://maven.geotoolkit.org/" m2compatible="true"/>
       <ibiblio name="ibiblio" m2compatible="true"/>
     </chain>
   </resolvers>
