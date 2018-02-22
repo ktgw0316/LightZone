@@ -53,7 +53,7 @@ Java_com_lightcrafts_utils_Lensfun_init
 (JNIEnv *env, jobject obj)
 {
     auto lf = new LC_lensfun();
-    return reinterpret_cast<long>(lf);
+    return reinterpret_cast<uintptr_t>(lf);
 }
 
 extern "C"
@@ -234,7 +234,7 @@ Java_com_lightcrafts_utils_Lensfun_backwardMapRect
         return nullptr;
     }
     lf->backwardMapRect(
-            srcRect,
+            reinterpret_cast<int*>(srcRect),
             dstRectX, dstRectY, dstRectWidth, dstRectHeight);
     env->ReleaseIntArrayElements(jsrcRect, srcRect, 0);
     return jsrcRect;
