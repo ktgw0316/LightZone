@@ -22,6 +22,7 @@ public class HistogramPreview extends Preview implements PaintListener {
     private int[][] bins = null;
     private double[][] controlPoints = null;
     private int currentFocusZone = -1;
+    private Color sample;
     final ImageEditorEngine engine;
 
     HistogramPreview(final ImageEditorEngine engine) {
@@ -38,7 +39,7 @@ public class HistogramPreview extends Preview implements PaintListener {
         if (p == null || engine == null)
             return;
 
-        Color sample = engine.getPixelValue(p.x, p.y);
+        sample = engine.getPixelValue(p.x, p.y);
         final int zone;
         if (sample == null) {
             zone = -1;
@@ -126,6 +127,8 @@ public class HistogramPreview extends Preview implements PaintListener {
                 }
             }
 
+            final int maxY = (int) (4.5 + miny); // == yscale(max)
+
             scaler s = new scaler();
 
             for (int c = 0; c < bins.length; c++) {
@@ -174,6 +177,13 @@ public class HistogramPreview extends Preview implements PaintListener {
                 g2d.fill(gp);
                 g2d.setComposite(AlphaComposite.SrcOver);
                 g2d.draw(gp);
+
+                if (sample != null) {
+                    val value = 255 * sample.getRGBColorComponents(null)[c];
+                    val position = calcZone(value) / 16;
+                    val sampleX = (int) (position * width + minx);
+                    g2d.drawLine(sampleX, zeroY, sampleX, maxY);
+                }
             }
         }
 
