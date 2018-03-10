@@ -59,6 +59,10 @@ public abstract class Preview extends JComponent {
      */
     protected abstract void paintComponent(Graphics graphics);
 
+    static protected double calcZone(Color c) {
+        return calcZone(calcLightness(c.getRed(), c.getGreen(), c.getBlue()));
+    }
+
     static protected double calcZone(double lightness) {
         return 16 * Math.log1p(lightness) / (8 * Math.log(2));
     }

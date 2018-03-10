@@ -40,13 +40,7 @@ public class HistogramPreview extends Preview implements PaintListener {
             return;
 
         sample = engine.getPixelValue(p.x, p.y);
-        final int zone;
-        if (sample == null) {
-            zone = -1;
-        } else {
-            val lightness = calcLightness(sample.getRed(), sample.getGreen(), sample.getBlue());
-            zone = (int) calcZone(lightness);
-        }
+        val zone = (sample != null) ? (int) Math.round(calcZone(sample)) : -1;
         setFocusedZone(zone, null);
     }
 

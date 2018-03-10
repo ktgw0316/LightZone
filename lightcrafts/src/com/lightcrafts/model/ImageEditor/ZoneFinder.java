@@ -47,19 +47,8 @@ public class ZoneFinder extends Preview implements PaintListener {
         if (p == null || engine == null)
             return;
 
-        final int zone;
-        if (engine.getPixelValue(p.x, p.y) == null) {
-            zone = -1;
-        } else {
-            val map = requantize(lastPreview, -1);
-            int[] sample = new int[3];
-            val size = engine.getRendering().getRenderingSize();
-            map.getData().getPixel(
-                    (int) (p.x * map.getWidth() / size.getWidth()),
-                    (int) (p.y * map.getHeight() / size.getHeight()),
-                    sample);
-            zone = zoneFrom(sample[0]);
-        }
+        val sample = engine.getAveragedPixelValue(p.x, p.y);
+        val zone = (sample != null) ? (int) Math.round(calcZone(sample)) : -1;
         setFocusedZone(zone);
         // repaint();
     }
@@ -386,7 +375,7 @@ public class ZoneFinder extends Preview implements PaintListener {
 
         assert (image.getColorModel().getColorSpace().isCS_sRGB()
                 || image.getColorModel().getColorSpace() == JAIContext.systemColorSpace)
-               && image.getSampleModel().getDataType() == DataBuffer.TYPE_BYTE;
+                && image.getSampleModel().getDataType() == DataBuffer.TYPE_BYTE;
 
         if (previewDimension.getHeight() > 1 && previewDimension.getWidth() > 1) {
             Operation op = engine.getSelectedOperation();
