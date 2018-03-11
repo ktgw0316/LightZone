@@ -6,7 +6,7 @@ include			$(COMMON_DIR)/mk/platform.mk
 
 TARGET_BASE:=		LCLENSFUN
 
-JNI_EXTRA_CFLAGS:=	-std=c++1y
+JNI_EXTRA_CFLAGS:=	-std=c++14
 JNI_EXTRA_INCLUDES:=	$(shell $(PKGCFG) --cflags lensfun)
 JNI_EXTRA_LINK:=	$(shell $(PKGCFG) --libs-only-l lensfun)
 ifneq ($(PLATFORM),MacOSX)

@@ -40,9 +40,9 @@ TOOLS_BIN:=		$(abspath $(ROOT)/lightcrafts/tools/bin)
 # Default to a normal (Unix) classpath seperator.
 CLASSPATH_SEP:=		:
 
-# The default C and C++ compilers.
-CC:=			gcc
-CXX:=			g++
+# The default C and C++ compilers for Linux, FreeBSD, OpenIndiana, or MSYS2
+CC?=			gcc
+CXX?=			g++
 PKGCFG:=		pkg-config
 
 # Unset USE_ICC_HERE if the overall USE_ICC flags != 1.

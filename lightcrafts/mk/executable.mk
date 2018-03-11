@@ -44,9 +44,7 @@ EXECUTABLE:=1
 ##
 # Undefine all this stuff so we don't get any defaults.
 ##
-CC:=
 CFLAGS:=
-CXX:=
 DEFINES:=
 INCLUDES:=
 LDFLAGS:=

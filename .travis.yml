@@ -6,10 +6,11 @@ os:
 
 jdk:
   - oraclejdk8
-  - openjdk6
 
 addons:
   apt:
+    sources:
+      - ubuntu-toolchain-r-test
     packages:
       - autoconf
       - javahelp2
@@ -17,7 +18,10 @@ addons:
       - liblensfun-dev
       - liblcms2-dev
       - libtiff4-dev
-      - openjdk-6-jdk
+      - g++-5
+
+env:
+  - CXX=g++-5 CC=gcc-5
 
 before_install:
   - sudo hostname "$(hostname | cut -c1-63)"
