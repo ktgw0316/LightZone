@@ -2,23 +2,18 @@
 
 package com.lightcrafts.utils;
 
-import javax.imageio.ImageIO;
-import java.io.IOException;
-import java.io.File;
-import java.awt.color.ICC_Profile;
-import java.awt.color.ColorSpace;
-import java.awt.color.ICC_ColorSpace;
-import java.awt.image.*;
-import java.awt.*;
-import java.util.Map;
-import java.util.Arrays;
-
 import com.sun.media.jai.util.ImageUtil;
+
 import javax.media.jai.RasterAccessor;
 import javax.media.jai.RasterFormatTag;
-import sun.awt.image.ShortInterleavedRaster;
-import sun.awt.image.ByteInterleavedRaster;
-import com.lightcrafts.jai.utils.Functions;
+import java.awt.*;
+import java.awt.color.ICC_Profile;
+import java.awt.image.ColorModel;
+import java.awt.image.DataBuffer;
+import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
+import java.util.Arrays;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -469,74 +464,10 @@ public class LCMS {
         return src;
     }
 
-    @Deprecated
-    private static ShortInterleavedRaster normalizeRaster(ShortInterleavedRaster raster) {
-        boolean reallocBuffer = false;
-        int scanLineStride = raster.getScanlineStride();
-        int dataOffsets[] = raster.getDataOffsets();
-        for (int i = 0; i < dataOffsets.length; i++)
-            if (dataOffsets[i] != i) {
-                reallocBuffer = true;
-                break;
-            }
-        int bands = raster.getNumBands();
-        if (!reallocBuffer && (raster.getPixelStride() != bands || scanLineStride != raster.getWidth() * bands))
-            reallocBuffer = true;
-        if (reallocBuffer) {
-            PixelInterleavedSampleModel sm = (PixelInterleavedSampleModel) raster.getSampleModel();
-
-            PixelInterleavedSampleModel newSM = new PixelInterleavedSampleModel(sm.getDataType(),
-                                                                                raster.getWidth(),
-                                                                                raster.getHeight(),
-                                                                                bands, bands * raster.getWidth(),
-                                                                                bands == 1
-                                                                                ? new int[] {0}
-                                                                                : new int[] {0, 1, 2});
-            ShortInterleavedRaster newRaster = new ShortInterleavedRaster(newSM, new Point(raster.getMinX(),
-                                                                                           raster.getMinY()));
-
-            Functions.copyData(newRaster, raster);
-            raster = newRaster;
-        }
-        return raster;
-    }
-
-    @Deprecated
-    private static ByteInterleavedRaster normalizeRaster(ByteInterleavedRaster raster) {
-        boolean reallocBuffer = false;
-        int scanLineStride = raster.getScanlineStride();
-        int dataOffsets[] = raster.getDataOffsets();
-        for (int i = 0; i < dataOffsets.length; i++)
-            if (dataOffsets[i] != i) {
-                reallocBuffer = true;
-                break;
-            }
-        int bands = raster.getNumBands();
-        if (!reallocBuffer && (raster.getPixelStride() != bands || scanLineStride != raster.getWidth() * bands))
-            reallocBuffer = true;
-        if (reallocBuffer) {
-            PixelInterleavedSampleModel sm = (PixelInterleavedSampleModel) raster.getSampleModel();
-
-            PixelInterleavedSampleModel newSM = new PixelInterleavedSampleModel(sm.getDataType(),
-                                                                                raster.getWidth(),
-                                                                                raster.getHeight(),
-                                                                                bands, bands * raster.getWidth(),
-                                                                                bands == 1
-                                                                                ? new int[] {0}
-                                                                                : new int[] {0, 1, 2});
-
-            ByteInterleavedRaster newRaster = new ByteInterleavedRaster(newSM, new Point(raster.getMinX(),
-                                                                                           raster.getMinY()));
-            Functions.copyData(newRaster, raster);
-            raster = newRaster;
-        }
-        return raster;
-    }
-
     public static class Transform {
         private static Map<Object, RCHandle> transformCache = new RCHandleHashMap<Object, RCHandle>(20);
 
-        private RCHandle cmsTransform = null;
+        private RCHandle cmsTransform;
 
         private static class TransformData {
             final long inputProfileHandle;
@@ -686,56 +617,12 @@ public class LCMS {
             }
         }
 
-        @Deprecated
-        public void doTransform(ByteInterleavedRaster input, ByteInterleavedRaster output) {
-            if (cmsTransform != null) {
-                ByteInterleavedRaster ri = normalizeRaster(input);
-                ByteInterleavedRaster ro;
-                int outBands = output.getNumBands();
-                if (!input.getBounds().equals(output.getBounds())) {
-                    int[] offsets = outBands == 1 ? new int[] {0} : new int[] {0, 1, 2};
-                    SampleModel sm = new PixelInterleavedSampleModel(DataBuffer.TYPE_BYTE,
-                                                                     ri.getWidth(), ri.getHeight(),
-                                                                     outBands, outBands * ri.getWidth(),
-                                                                     offsets);
-                    ro = new ByteInterleavedRaster(sm, new Point(ri.getMinX(), ri.getMinY()));
-                } else
-                    ro = normalizeRaster(output);
-                int pixels = outBands == 1 ? ro.getDataStorage().length : ro.getDataStorage().length / outBands;
-                LCMSNative.cmsDoTransform(cmsTransform.handle, ri.getDataStorage(), ro.getDataStorage(), pixels);
-                if (ro != output)
-                    Functions.copyData(output, ro);
-            }
-        }
-
         public void doTransform(byte[] input, byte[] output) {
             LCMSNative.cmsDoTransform(cmsTransform.handle, input, output, 1);
         }
 
         public void doTransform(double[] input, double[] output) {
             LCMSNative.cmsDoTransform(cmsTransform.handle, input, output, 1);
-        }
-
-        @Deprecated
-        public void doTransform(ShortInterleavedRaster input, ShortInterleavedRaster output) {
-            if (cmsTransform != null) {
-                ShortInterleavedRaster ri = normalizeRaster(input);
-                ShortInterleavedRaster ro;
-                int outBands = output.getNumBands();
-                if (!input.getBounds().equals(output.getBounds())) {
-                    int[] offsets = outBands == 1 ? new int[] {0} : new int[] {0, 1, 2};
-                    SampleModel sm = new PixelInterleavedSampleModel(DataBuffer.TYPE_USHORT,
-                                                                     ri.getWidth(), ri.getHeight(),
-                                                                     outBands, outBands * ri.getWidth(),
-                                                                     offsets);
-                    ro = new ShortInterleavedRaster(sm, new Point(ri.getMinX(), ri.getMinY()));
-                } else
-                    ro = normalizeRaster(output);
-                int pixels = outBands == 1 ? ro.getDataStorage().length : ro.getDataStorage().length / outBands;
-                LCMSNative.cmsDoTransform(cmsTransform.handle, ri.getDataStorage(), ro.getDataStorage(), pixels);
-                if (ro != output)
-                    Functions.copyData(output, ro);
-            }
         }
 
         public void doTransform(short[] input, short[] output) {
@@ -752,43 +639,6 @@ public class LCMS {
         @Override
         public void finalize() {
             dispose();
-        }
-    }
-
-    public static void main(String args[]) {
-        try {
-            ICC_Profile inProfile = ICC_Profile.getInstance("/System/Library/ColorSync/Profiles/AdobeRGB1998.icc");
-            ICC_Profile outProfile = ICC_Profile.getInstance("/Library/ColorSync/Profiles/CIE 1931 D50 Gamma 1.icm");
-
-            Profile cmsOutProfile = new Profile(outProfile);
-            Profile cmsInProfile = new Profile(inProfile);
-
-            BufferedImage inputImage = ImageIO.read(new File("/Stuff/Reference/small-q60-adobergb.TIF"));
-            ShortInterleavedRaster inputRaster = (ShortInterleavedRaster) inputImage.getTile(0, 0);
-
-            ColorSpace outCS = new ICC_ColorSpace(outProfile);
-            ColorModel outCM = new ComponentColorModel(outCS, false, false,
-                                                       Transparency.OPAQUE, DataBuffer.TYPE_USHORT);
-            ShortInterleavedRaster outputRaster =
-                    (ShortInterleavedRaster) outCM.createCompatibleWritableRaster(inputImage.getWidth(),
-                                                                                  inputImage.getHeight());
-            BufferedImage outputImage = new BufferedImage(outCM, outputRaster, false, null);
-
-            Transform cmsTransform = new Transform(cmsInProfile, TYPE_RGB_16,
-                                                   cmsOutProfile, TYPE_RGB_16,
-                                                   INTENT_PERCEPTUAL,
-                                                   0);
-
-            cmsTransform.doTransform(inputRaster, outputRaster);
-
-            ImageIO.write(outputImage, "TIF", new File("/Stuff/small-q60-CIED65.TIF"));
-
-            cmsTransform.dispose();
-            cmsOutProfile.dispose();
-            cmsInProfile.dispose();
-            // System.out.println("Profile: " + hProfile + ", " + );
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }
