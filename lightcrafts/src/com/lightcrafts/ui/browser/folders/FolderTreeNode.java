@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2018-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.browser.folders;
 
@@ -204,19 +205,10 @@ class FolderTreeNode implements TreeNode {
                 FileSystemView.isRoot(file);
     }
 
-    // Compute (or recompute) the chilren of this node.  Useful in the TreeNode
+    // Compute (or recompute) the children of this node.  Useful in the TreeNode
     // methods, and also when folder modifications are detected.
-    void updateChildren() {
-        if (children != null) {
-            for (FolderTreeNode child : children) {
-                // don't bother recursing; leak a little
-                monitor.removeDirectory(child.resolvedFile);
-                index.remove(child);
-                child.parent = null;
-            }
-        }
-        children = new ArrayList<FolderTreeNode>();
-
+    synchronized void updateChildren() {
+        children = new ArrayList<>();
         File[] files = FileSystemView.getFiles(resolvedFile, true);
         if (files != null && files.length > 0) {
             Arrays.sort(files);
@@ -225,7 +217,7 @@ class FolderTreeNode implements TreeNode {
                     children.add(new FolderTreeNode(file, this, index, monitor));
             }
         }
-        Collections.sort(children, FolderTreeNodeComparator.INSTANCE);
+        children.sort(FolderTreeNodeComparator.INSTANCE);
     }
 
     NodeFileIndex getIndex() {
