@@ -1,19 +1,18 @@
 package com.lightcrafts.model.ImageEditor;
 
-import com.lightcrafts.utils.OpenSimplexNoise;
+import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.jai.opimage.FilmGrainOpImage;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.utils.Transform;
-import javax.media.jai.JAI;
-import javax.media.jai.PlanarImage;
 import com.lightcrafts.model.Operation;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
+import lombok.val;
 
-import java.awt.image.*;
+import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
-
-import lombok.val;
 
 /**
  * Created by Masahiro Kitagawa on 2017/01/20.
@@ -37,7 +36,7 @@ public class FilmGrainOperation extends BlendedOperation {
         super(rendering, type);
 
         addSliderKey(SIZE);
-        setSliderConfig(SIZE, new SliderConfig(0.1, 2, featureSize, 0.1, false,
+        setSliderConfig(SIZE, new SliderConfig(1, 3, featureSize, 0.1, false,
                 new DecimalFormat("0.0")));
 
         addSliderKey(SHARPNESS);
@@ -58,7 +57,9 @@ public class FilmGrainOperation extends BlendedOperation {
         value = roundValue(key, value);
 
         if (key.equals(SIZE) && featureSize != value) {
-            featureSize = value;
+            // Add small number (< 0.1) to avoid disappearance of the grain
+            // when zoom scale is 1:3, 1:6, etc.
+            featureSize = value + 0.01;
         }
         else if (key.equals(SHARPNESS) && sharpness != value) {
             sharpness = value;
@@ -85,7 +86,11 @@ public class FilmGrainOperation extends BlendedOperation {
 
         @Override
         public PlanarImage setFront() {
-            val grain = grainImage(back.getWidth(), back.getHeight(), featureSize, intensity);
+            val grain0 = new FilmGrainOpImage(back, featureSize * scale, color, intensity);
+            grain0.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
+
+            // TODO: Do this in FilmGrainOpImage
+            val grain = Functions.gaussianBlur(grain0, rendering, op, (1.0 - sharpness) * scale);
 
             val pb = new ParameterBlock();
             pb.addSource(back)
@@ -93,53 +98,8 @@ public class FilmGrainOperation extends BlendedOperation {
                     .add("Hard Light");
             return JAI.create("Blend", pb, null);
         }
-
-        private RenderedImage grainImage(int width, int height,
-                                         double featureSize, double intensity) {
-            val numBands = back.getNumBands();
-            val rawShorts = new short[numBands * width * height];
-
-            val noise = new OpenSimplexNoise();
-            int pos = 0;
-            if (color != 0) {
-                for (int y = 0; y < height; ++y) {
-                    for (int x = 0; x < width; ++x) {
-                        for (int c = 0; c < numBands; ++c) {
-                            val value = noise.eval(
-                                    x / (featureSize * scale),
-                                    y / (featureSize * scale),
-                                    (c - 1) * color);
-                            val rgb = (short) ((value * intensity + 1) * 32767.5);
-                            rawShorts[pos++] = rgb;
-                        }
-                    }
-                }
-            }
-            else {
-                for (int y = 0; y < height; ++y) {
-                    for (int x = 0; x < width; ++x) {
-                        val value = noise.eval(
-                                x / (featureSize * scale),
-                                y / (featureSize * scale),
-                                0);
-                        val rgb = (short) ((value * intensity + 1) * 32767.5);
-                        for (int c = 0; c < numBands; ++c) {
-                            rawShorts[pos++] = rgb;
-                        }
-                    }
-                }
-
-            }
-
-            val dataBuffer = new DataBufferUShort(rawShorts, rawShorts.length);
-            val raster = Raster.createInterleavedRaster(
-                    dataBuffer, width, height, width * numBands, numBands, new int[]{0, 1, 2}, null);
-            val cm = back.getColorModel();
-            val front = new BufferedImage(cm, raster, cm.isAlphaPremultiplied(), null);
-
-            return Functions.gaussianBlur(front, rendering, op, (1.0 - sharpness) * scale);
-        }
     }
+
     @Override
     public boolean neutralDefault() {
         return false;
