@@ -19,6 +19,7 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.Raster;
+import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
@@ -433,5 +434,17 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
     @Override
     public LayerConfig getDefaultLayerConfig() {
         return new LayerConfig(new LayerModeImpl("Normal"), 1.);
+    }
+
+    static RenderedImage createSingleChannel(RenderedImage source) {
+        if (source.getColorModel().getNumComponents() != 3) {
+            return source;
+        }
+
+        final double[][] yChannel = new double[][]{{ColorScience.Wr, ColorScience.Wg, ColorScience.Wb, 0}};
+        ParameterBlock pb = new ParameterBlock()
+                .addSource(source)
+                .add(yChannel);
+        return JAI.create("BandCombine", pb, null);
     }
 }

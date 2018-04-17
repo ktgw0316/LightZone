@@ -28,6 +28,22 @@ import java.text.NumberFormat;
 public class Functions {
     public static boolean DEBUG = false;
 
+    public static LookupTableJAI computeGammaTable(int dataType, double gamma) {
+        if (dataType == DataBuffer.TYPE_BYTE) {
+            byte[] tableDataByte = new byte[0x100];
+            for (int i = 0; i < tableDataByte.length; i++) {
+                tableDataByte[i] = (byte) (0xFF * Math.pow(i / (double) 0xFF, gamma) + 0.5);
+            }
+            return new LookupTableJAI(tableDataByte);
+        } else {
+            short[] tableDataUShort = new short[0x10000];
+            for (int i = 0; i < tableDataUShort.length; i++) {
+                tableDataUShort[i] = (short) (0xFFFF * Math.pow(i / (double) 0xFFFF, gamma) + 0.5);
+            }
+            return new LookupTableJAI(tableDataUShort, true);
+        }
+    }
+
     static public RenderedOp crop(RenderedImage image, float x, float y, float width, float height, RenderingHints hints) {
         ParameterBlock pb = new ParameterBlock();
         pb.addSource(image);

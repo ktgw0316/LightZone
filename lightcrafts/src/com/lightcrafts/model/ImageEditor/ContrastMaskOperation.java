@@ -2,18 +2,17 @@
 
 package com.lightcrafts.model.ImageEditor;
 
+import com.lightcrafts.image.color.ColorScience;
+import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.utils.Transform;
-import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.model.LayerConfig;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
-import com.lightcrafts.image.color.ColorScience;
 
 import javax.media.jai.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.awt.image.DataBuffer;
 import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
 
@@ -27,10 +26,6 @@ import java.text.DecimalFormat;
 public class ContrastMaskOperation extends BlendedOperation {
     private double radius = 128;
     private double gamma = 2.2;
-    private short[] tableDataUShort = new short[0x10000];
-    private byte[] tableDataByte = new byte[0x100];
-    private LookupTableJAI byteLut = null;
-    private LookupTableJAI ushortLut = null;
 
     public ContrastMaskOperation(Rendering rendering) {
         super(rendering, type);
@@ -58,31 +53,11 @@ public class ContrastMaskOperation extends BlendedOperation {
             radius = value;
         } else if (key.equals("Gamma") && gamma != value) {
             gamma = value;
-            byteLut = null;
-            ushortLut = null;
         } else {
             return;
         }
 
         super.setSliderValue(key, value);
-    }
-
-    private LookupTableJAI computeGammaTable(int dataType) {
-        if (dataType == DataBuffer.TYPE_BYTE) {
-            if (byteLut != null)
-                return byteLut;
-            for (int i = 0; i < tableDataByte.length; i++) {
-                tableDataByte[i] = (byte) (0xFF * Math.pow(i / (double) 0xFF, gamma) + 0.5);
-            }
-            return byteLut = new LookupTableJAI(tableDataByte);
-        } else {
-            if (ushortLut != null)
-                return ushortLut;
-            for (int i = 0; i < tableDataUShort.length; i++) {
-                tableDataUShort[i] = (short) (0xFFFF * Math.pow(i / (double) 0xFFFF, gamma) + 0.5);
-            }
-            return ushortLut = new LookupTableJAI(tableDataUShort, true);
-        }
     }
 
     private class ContrastMask extends BlendedTransform {
@@ -141,7 +116,7 @@ public class ContrastMaskOperation extends BlendedOperation {
             }
 
             scaleDown = JAI.create("Not", scaleDown, JAIContext.noCacheHint);       // Invert
-            LookupTableJAI table = computeGammaTable(scaleDown.getSampleModel().getDataType());
+            LookupTableJAI table = Functions.computeGammaTable(scaleDown.getSampleModel().getDataType(), gamma);
             ParameterBlock pb = new ParameterBlock();
             pb.addSource(scaleDown);
             pb.add(table);

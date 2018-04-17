@@ -2,7 +2,6 @@
 
 package com.lightcrafts.model.ImageEditor;
 
-import com.lightcrafts.image.color.ColorScience;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.opimage.FastBilateralFilterOpImage;
 import com.lightcrafts.jai.opimage.HDROpImage2;
@@ -104,16 +103,7 @@ public class HDROperationV3 extends BlendedOperation {
         @Override
         public PlanarImage setFront() {
             if (lastBack.get() != back || mask.get() == null || depth != last_radius || fuzz != last_fuzz) {
-                RenderedImage singleChannel;
-                if (back.getColorModel().getNumComponents() == 3) {
-                    double[][] yChannel = new double[][]{{ColorScience.Wr, ColorScience.Wg, ColorScience.Wb, 0}};
-
-                    ParameterBlock pb = new ParameterBlock();
-                    pb.addSource( back );
-                    pb.add( yChannel );
-                    singleChannel = JAI.create("BandCombine", pb, null);
-                } else
-                    singleChannel = back;
+                final RenderedImage singleChannel = createSingleChannel(back);
 
                 PlanarImage maskImage = new FastBilateralFilterOpImage(singleChannel,
                                                                        JAIContext.fileCacheHint,
