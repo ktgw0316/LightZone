@@ -57,7 +57,7 @@ public class Functions {
         float rescale = 1;
 
         final int size = Math.min(image.getWidth(), image.getHeight());
-        final int tileSize = Math.max( JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT);
+        final int tileSize = Math.max(JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT);
 
         if (size > tileSize) {
             while (newRadius > 32) {
@@ -66,41 +66,43 @@ public class Functions {
             }
         }
 
-        RenderingHints extenderHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
-                                                  BorderExtender.createInstance(BorderExtender.BORDER_COPY));
+        RenderedImage scaleDown = (rescale != 1) ? scaledRendering(rendering, op, rescale, true) : image;
+        if (processor != null) {
+            scaleDown = processor.process(scaleDown);
+        }
 
-        Interpolation interp = Interpolation.getInstance(Interpolation.INTERP_BICUBIC);
-
-        RenderedImage scaleDown;
-        if (rescale != 1) {
-            scaleDown = scaledRendering(rendering, op, rescale, true);
-            if (processor != null)
-                scaleDown = processor.process(scaleDown);
-        } else
-            scaleDown = processor != null ? processor.process(image) : image;
-
-        KernelJAI kernel = Functions.getGaussKernel(newRadius);
-        ParameterBlock pb = new ParameterBlock();
-        pb.addSource(scaleDown);
-        pb.add(kernel);
-        RenderedOp blur = JAI.create("LCSeparableConvolve", pb, extenderHints);
+        final RenderedOp blur = fastGaussianBlur(scaleDown, newRadius);
 
         if (rescale != 1) {
-            pb = new ParameterBlock();
+            ParameterBlock pb = new ParameterBlock();
             pb.addSource(blur);
             pb.add(AffineTransform.getScaleInstance(image.getWidth() / (double) blur.getWidth(),
                                                     image.getHeight() / (double) blur.getHeight()));
-            pb.add(interp);
+            pb.add(Interpolation.getInstance(Interpolation.INTERP_BICUBIC));
             RenderingHints sourceLayoutHints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT,
                                                                   new ImageLayout(0, 0,
                                                                                   JAIContext.TILE_WIDTH,
                                                                                   JAIContext.TILE_HEIGHT,
                                                                                   null, null));
+            RenderingHints extenderHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
+                    BorderExtender.createInstance(BorderExtender.BORDER_COPY));
             sourceLayoutHints.add(extenderHints);
             // sourceLayoutHints.add(JAIContext.noCacheHint);
             return JAI.create("Affine", pb, sourceLayoutHints);
-        } else
+        } else {
             return blur;
+        }
+    }
+
+    public static RenderedOp fastGaussianBlur(RenderedImage image, double radius) {
+        // TODO: Make this fast
+        RenderingHints extenderHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
+                BorderExtender.createInstance(BorderExtender.BORDER_COPY));
+        KernelJAI kernel = getGaussKernel(radius);
+        ParameterBlock pb = new ParameterBlock()
+                .addSource(image)
+                .add(kernel);
+        return JAI.create("LCSeparableConvolve", pb, extenderHints);
     }
 
     public static ImageLayout getImageLayout(RenderedImage image) {
@@ -504,7 +506,7 @@ public class Functions {
                 BufferedImage srgbImage = new BufferedImage(sRGBColorModel,
                                                             ((BufferedImage) image).getRaster(), false, null);
                 big.drawRenderedImage(srgbImage, new AffineTransform());
-                // Functions.copyData(goodImage.getRaster(), ((BufferedImage) image).getRaster());
+                // copyData(goodImage.getRaster(), ((BufferedImage) image).getRaster());
             }
             big.dispose();
             return goodImage;
@@ -649,9 +651,9 @@ public class Functions {
             return image;
 
         if (image.getSampleModel().getDataType() == DataBuffer.TYPE_BYTE)
-            return Functions.toColorSpace(Functions.fromByteToUShort(image, JAIContext.noCacheHint), linearCS, hints);
+            return toColorSpace(fromByteToUShort(image, JAIContext.noCacheHint), linearCS, hints);
         else
-            return Functions.toColorSpace(image, linearCS, hints);
+            return toColorSpace(image, linearCS, hints);
     }
 
     public static WritableRaster copyData(WritableRaster raster, Raster source) {

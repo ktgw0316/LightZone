@@ -11,8 +11,9 @@ import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
 
-import javax.media.jai.*;
-import java.awt.*;
+import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.RenderedOp;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.lang.ref.SoftReference;
@@ -114,28 +115,16 @@ public class HDROperationV3 extends BlendedOperation {
                 } else
                     singleChannel = back;
 
-                BorderExtender copyExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
-                RenderingHints extenderHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER, copyExtender);
-
                 PlanarImage maskImage = new FastBilateralFilterOpImage(singleChannel,
                                                                        JAIContext.fileCacheHint,
                                                                        (float) (depth * scale), 0.1f);
-
-//                ParameterBlock pb = new ParameterBlock();
-//                pb.addSource(maskImage);
-//                pb.add(new int[]{1});
-//                maskImage = JAI.create("bandselect", pb, null);
 
                 ParameterBlock pb = new ParameterBlock();
                 pb.addSource(maskImage);
                 pb.add(new int[]{0});
                 RenderedOp bfMask = JAI.create("bandselect", pb, null);
 
-                KernelJAI kernel = Functions.getGaussKernel(10 * fuzz * scale);
-                pb = new ParameterBlock();
-                pb.addSource(bfMask);
-                pb.add(kernel);
-                RenderedOp blurredMask = JAI.create("LCSeparableConvolve", pb, extenderHints);
+                RenderedOp blurredMask = Functions.fastGaussianBlur(bfMask, 10 * fuzz * scale);
 
                 pb = new ParameterBlock();
                 pb.addSource( maskImage );

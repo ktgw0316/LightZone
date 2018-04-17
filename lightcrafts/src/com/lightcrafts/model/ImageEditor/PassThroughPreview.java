@@ -2,20 +2,22 @@
 
 package com.lightcrafts.model.ImageEditor;
 
-import com.lightcrafts.model.*;
-import com.lightcrafts.jai.utils.*;
 import com.lightcrafts.jai.JAIContext;
-
-import javax.media.jai.*;
-import javax.media.jai.operator.ConvolveDescriptor;
+import com.lightcrafts.jai.utils.Functions;
+import com.lightcrafts.model.Preview;
+import com.lightcrafts.model.Region;
 import com.lightcrafts.ui.LightZoneSkin;
 
+import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.image.*;
-import java.awt.image.renderable.ParameterBlock;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
+import java.awt.image.RenderedImage;
+import java.awt.image.renderable.ParameterBlock;
 import java.lang.ref.SoftReference;
 
 public class PassThroughPreview
@@ -142,10 +144,7 @@ public class PassThroughPreview
             float scale = Math.min(
                 previewSize.width / (float) visibleRect.width,
                 previewSize.height / (float) visibleRect.height);
-
-            image = ConvolveDescriptor.create(
-                image, Functions.getGaussKernel(.25 / scale), null
-            );
+            image = Functions.fastGaussianBlur(image, .25 / scale);
             ParameterBlock pb = new ParameterBlock();
             pb.addSource(image);
             pb.add(scale);

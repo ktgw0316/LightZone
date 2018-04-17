@@ -11,11 +11,8 @@ import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
 
-import javax.media.jai.BorderExtender;
 import javax.media.jai.JAI;
-import javax.media.jai.KernelJAI;
 import javax.media.jai.PlanarImage;
-import java.awt.*;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.lang.ref.SoftReference;
@@ -124,9 +121,6 @@ public class HDROperationV2 extends BlendedOperation {
                     singleChannel = back;
                 }
 
-                BorderExtender copyExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
-                RenderingHints extenderHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER, copyExtender);
-
                 PlanarImage maskImage = new FastBilateralFilterOpImage(singleChannel,
                                                                        JAIContext.fileCacheHint,
                                                                        (float) (depth * scale), 0.1f);
@@ -137,11 +131,7 @@ public class HDROperationV2 extends BlendedOperation {
                 maskImage = JAI.create("bandselect", pb, null);
 
                 if (fuzz > 0.1) {
-                    KernelJAI kernel = Functions.getGaussKernel(10 * (fuzz - 0.1) * scale);
-                    pb = new ParameterBlock();
-                    pb.addSource(maskImage);
-                    pb.add(kernel);
-                    maskImage = JAI.create("LCSeparableConvolve", pb, extenderHints);
+                    maskImage = Functions.fastGaussianBlur(maskImage, 10 * (fuzz - 0.1) * scale);
                 }
 
                 last_radius = fuzz;

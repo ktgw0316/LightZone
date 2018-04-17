@@ -186,13 +186,7 @@ public class ShapedMask extends PlanarImage {
         ScaledImage contourImage = new ScaledImage();
 
         if (contourWidth > 1) {
-            KernelJAI kernel = Functions.getGaussKernel(kernelWidth);
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(supportImage);
-            pb.add(kernel);
-            RenderingHints hints = new RenderingHints(JAI.KEY_BORDER_EXTENDER, extender);
-
-            contourImage.image = JAI.create("LCSeparableConvolve", pb, hints);
+            contourImage.image = Functions.fastGaussianBlur(supportImage, kernelWidth);
         } else {
             contourImage.image = (PlanarImage) supportImage;
         }

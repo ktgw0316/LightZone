@@ -400,30 +400,8 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
                 pb.addSource(abImage);
                 PlanarImage maskImage = JAI.create("BandMerge", pb, layoutHints);
 
-                colorSelectionMask = new RGBColorSelectionMaskOpImage(maskImage, getColorSelection(), null);
-
-                ParameterBlock maskPB;
-
-//              KernelJAI morph = new KernelJAI(3, 3, new float[]{1, 1, 1, 1, 1, 1, 1, 1, 1});
-//
-//              maskPB = new ParameterBlock();
-//              maskPB.addSource(colorSelectionMask);
-//              maskPB.add(morph);
-//              colorSelectionMask = JAI.create("Erode", maskPB, null);
-//
-//              maskPB = new ParameterBlock();
-//              maskPB.addSource(colorSelectionMask);
-//              maskPB.add(morph);
-//              colorSelectionMask = JAI.create("Dilate", maskPB, null);
-
-                RenderingHints extenderHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
-                        BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-                KernelJAI kernel = Functions.getGaussKernel(0.5 * scale);
-                maskPB = new ParameterBlock();
-                maskPB.addSource(colorSelectionMask);
-                maskPB.add(kernel);
-                colorSelectionMask = JAI.create("Convolve", maskPB, extenderHints);
-
+                colorSelectionMask = Functions.fastGaussianBlur(
+                        new RGBColorSelectionMaskOpImage(maskImage, getColorSelection(), null), 0.5 * scale);
                 lastColorSelection = colorSelection;
             } else if (colorSelection == null || colorSelection.isAllSelected()) {
                 colorSelectionMask = null;

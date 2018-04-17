@@ -27,7 +27,6 @@ import java.text.DecimalFormat;
 public class ContrastMaskOperation extends BlendedOperation {
     private double radius = 128;
     private double gamma = 2.2;
-    private KernelJAI kernel = null;
     private short[] tableDataUShort = new short[0x10000];
     private byte[] tableDataByte = new byte[0x100];
     private LookupTableJAI byteLut = null;
@@ -57,7 +56,6 @@ public class ContrastMaskOperation extends BlendedOperation {
 
         if (key.equals("Radius") && radius != value) {
             radius = value;
-            kernel = null;
         } else if (key.equals("Gamma") && gamma != value) {
             gamma = value;
             byteLut = null;
@@ -96,11 +94,7 @@ public class ContrastMaskOperation extends BlendedOperation {
 
         @Override
         public PlanarImage setFront() {
-            double[][] transform = {
-                { ColorScience.Wr, ColorScience.Wg, ColorScience.Wb, 0 }
-            };
-
-            // Calculate a blurred desautuated inverted version of the source as a mask
+            // Calculate a blurred desaturated inverted version of the source as a mask
             double newRadius = radius * scale;
             double rescale = 1;
             int divideByTwo = 1;
@@ -139,6 +133,9 @@ public class ContrastMaskOperation extends BlendedOperation {
             if (scaleDown.getColorModel().getNumComponents() == 3) {
                 ParameterBlock pb = new ParameterBlock();
                 pb.addSource(scaleDown);
+                double[][] transform = {
+                        {ColorScience.Wr, ColorScience.Wg, ColorScience.Wb, 0}
+                };
                 pb.add(transform);
                 scaleDown = JAI.create("BandCombine", pb, JAIContext.noCacheHint);  // Desaturate, single banded
             }
@@ -151,13 +148,7 @@ public class ContrastMaskOperation extends BlendedOperation {
             // we cache this since convolution scans its input multiple times
             gammaCurve = JAI.create("lookup", pb, null /*JAIContext.noCacheHint*/);
 
-            kernel = Functions.getGaussKernel(newRadius);
-            pb = new ParameterBlock();
-            pb.addSource(gammaCurve);
-            pb.add(kernel);
-            // RenderingHints convolveHints = new RenderingHints(hints);
-            // convolveHints.add(JAIContext.noCacheHint);
-            RenderedOp blur = JAI.create("LCSeparableConvolve", pb, hints);    // Gaussian Blur
+            final RenderedOp blur = Functions.fastGaussianBlur(gammaCurve, newRadius);
 
             if (rescale != 1) {
                 pb = new ParameterBlock();
