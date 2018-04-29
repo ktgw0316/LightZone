@@ -44,10 +44,8 @@ EXECUTABLE:=1
 ##
 # Undefine all this stuff so we don't get any defaults.
 ##
-CFLAGS:=
 DEFINES:=
 INCLUDES:=
-LDFLAGS:=
 LINK:=
 
 COMMON_DIR:=		$(ROOT)/lightcrafts
@@ -61,7 +59,7 @@ else
 endif
 
 DEFINES:=		$(EXEC_EXTRA_DEFINES)
-INCLUDES:=		$(EXEC_EXTRA_INCLUDES)
+INCLUDES:=		$(PLATFORM_INCLUDES) $(EXEC_EXTRA_INCLUDES)
 LDFLAGS:=		$(PLATFORM_LDFLAGS) -L$(COMMON_DIR)/products \
 			$(EXEC_EXTRA_LDFLAGS)
 LINK:=			$(EXEC_EXTRA_LINK)
