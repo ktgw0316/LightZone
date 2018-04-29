@@ -49,10 +49,8 @@
 ##
 # Undefine all this stuff so we don't get any defaults.
 ##
-CFLAGS=
 DEFINES:=
 INCLUDES:=
-LDFLAGS:=
 LINK:=
 
 COMMON_DIR:=		$(ROOT)/lightcrafts
