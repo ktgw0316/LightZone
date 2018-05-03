@@ -7,6 +7,7 @@ import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.model.Engine;
 import com.lightcrafts.model.EngineListener;
+import com.lightcrafts.model.Scale;
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.utils.awt.geom.HiDpi;
 import com.lightcrafts.utils.SoftValueHashMap;
@@ -32,6 +33,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ImageEditorDisplay extends JPanel {
+    private static final boolean DEBUG = false;
+
     @Getter
     private PlanarImage source;
 
@@ -59,6 +62,7 @@ public class ImageEditorDisplay extends JPanel {
     // Workaround for unreliable ComponentListener.componentResized() callbacks.
     private ConcurrentLinkedQueue<ComponentListener> compListeners =
             new ConcurrentLinkedQueue<>();
+    private boolean shouldUseScaledTileCache = true;
 
     @SuppressWarnings("deprecation")
     @Override
@@ -98,6 +102,7 @@ public class ImageEditorDisplay extends JPanel {
     private static class CacheKey {
         final int tileX;
         final int tileY;
+        final Scale scale;
     }
 
     private boolean[][] validImageBackground = null;
@@ -159,11 +164,18 @@ public class ImageEditorDisplay extends JPanel {
 
         synchronizedImage = synchronous;
 
+        shouldUseScaledTileCache = true;
+
         if (oldImage == null || !oldImage.getBounds().equals(image.getBounds())) {
-            backgroundCache = new SoftValueHashMap<>();
+            if (backgroundCache == null) {
+                backgroundCache = new SoftValueHashMap<>();
+            }
 
             // Swing geometry
             setPreferredSize(HiDpi.userSpaceDimensionFrom(source));
+        }
+        else {
+           shouldUseScaledTileCache = false;
         }
         repaint();
     }
@@ -266,7 +278,7 @@ public class ImageEditorDisplay extends JPanel {
             JAIContext.sRGBColorSpace, false, false, Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
 
     private BufferedImage getBackgroundTile(@NotNull WritableRaster tile, int x, int y) {
-        val key = new CacheKey(x, y);
+        val key = new CacheKey(x, y, engine.getScale());
         BufferedImage image = backgroundCache.get(key);
         val tileImage = new BufferedImage(sRGBColorModel,
                                          (WritableRaster) tile.createTranslatedChild(0, 0),
@@ -386,10 +398,16 @@ public class ImageEditorDisplay extends JPanel {
         }
 
         // if we don't have a fresh tile, try and see if we have an old one around
-        val backgroundTileCache = backgroundCache.get(new CacheKey(tx, ty));
+        val backgroundTileCache = backgroundCache.get(new CacheKey(tx, ty, engine.getScale()));
         if (backgroundTileCache != null) {
             // Recycle the background tile
             g2d.drawImage(backgroundTileCache, null, source.tileXToX(tx), source.tileYToY(ty));
+            return;
+        }
+
+        // Reuse tile of different zoom level
+        if (shouldUseScaledTileCache
+                && drawScaledTileCache(g2d, tx, ty, tileClipRect.width, tileClipRect.height)) {
             return;
         }
 
@@ -409,6 +427,45 @@ public class ImageEditorDisplay extends JPanel {
         // If all fails paint the default background color
         g2d.setColor(backgroundColor);
         g2d.fillRect(tileClipRect.x, tileClipRect.y, tileClipRect.width, tileClipRect.height);
+    }
+
+    private boolean drawScaledTileCache(Graphics2D g2d, int tx, int ty,
+                                        int tileWidth, int tileHeight) {
+        val scale = engine.getScale();
+
+        // Check if we are not already at minimum zoom level
+        val scaleList = engine.getPreferredScales();
+        val smallerScale = (scaleList.subList(1, scaleList.size()).contains(scale))
+                ? scaleList.get(scaleList.indexOf(scale) - 1) : null;
+        if (smallerScale == null) {
+            return false;
+        }
+
+        val magnitude = scale.getFactor() / smallerScale.getFactor();
+        val smallerTileIndexX = (int) (tx / magnitude);
+        val smallerTileIndexY = (int) (ty / magnitude);
+        val smallerTileCache = backgroundCache.get(
+                new CacheKey(smallerTileIndexX, smallerTileIndexY, smallerScale));
+        if (smallerTileCache == null) {
+            return false;
+        }
+
+        // Scale tile size and offsets
+        val ox = source.tileXToX(tx);
+        val oy = source.tileYToY(ty);
+        val offX = (int) ((tx % magnitude) * tileWidth / magnitude);
+        val offY = (int) ((ty % magnitude) * tileHeight / magnitude);
+        g2d.drawImage(smallerTileCache,
+                ox, oy, ox + tileWidth, oy + tileHeight,
+                offX, offY,
+                offX + (int) (tileWidth / magnitude),
+                offY + (int) (tileHeight / magnitude), null);
+        if (DEBUG) {
+            g2d.setColor(Color.red);
+            g2d.drawRect(ox, oy, tileWidth - 1, tileHeight - 1);
+        }
+
+        return true;
     }
 
     private void updateTileComputingStatus(Point[] tileIndices, Rectangle clipBounds) {
