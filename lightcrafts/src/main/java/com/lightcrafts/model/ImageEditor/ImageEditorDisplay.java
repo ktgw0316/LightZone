@@ -7,10 +7,14 @@ import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.model.Engine;
 import com.lightcrafts.model.EngineListener;
+import com.lightcrafts.model.Scale;
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.utils.awt.geom.HiDpi;
 import com.lightcrafts.utils.SoftValueHashMap;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,6 +37,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ImageEditorDisplay extends JPanel {
+    private static final boolean DEBUG = false;
+
     @Getter
     private PlanarImage source;
 
@@ -60,6 +66,7 @@ public class ImageEditorDisplay extends JPanel {
     // Workaround for unreliable ComponentListener.componentResized() callbacks.
     private final ConcurrentLinkedQueue<ComponentListener> compListeners =
             new ConcurrentLinkedQueue<>();
+    private boolean shouldUseScaledTileCache = true;
 
     @SuppressWarnings("deprecation")
     @Override
@@ -94,7 +101,7 @@ public class ImageEditorDisplay extends JPanel {
         super.removeComponentListener(listener);
     }
 
-    private record CacheKey(int tileX, int tileY) {
+    private record CacheKey(int tileX, int tileY, Scale scale) {
     }
 
     private boolean[][] validImageBackground = null;
@@ -156,11 +163,18 @@ public class ImageEditorDisplay extends JPanel {
 
         synchronizedImage = synchronous;
 
+        shouldUseScaledTileCache = true;
+
         if (oldImage == null || !oldImage.getBounds().equals(image.getBounds())) {
-            backgroundCache = new SoftValueHashMap<>();
+            if (backgroundCache == null) {
+                backgroundCache = new SoftValueHashMap<>();
+            }
 
             // Swing geometry
             setPreferredSize(HiDpi.userSpaceDimensionFrom(source));
+        }
+        else {
+           shouldUseScaledTileCache = false;
         }
         repaint();
     }
@@ -262,7 +276,7 @@ public class ImageEditorDisplay extends JPanel {
             JAIContext.sRGBColorSpace, false, false, Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
 
     private BufferedImage getBackgroundTile(@NotNull WritableRaster tile, int x, int y) {
-        final var key = new CacheKey(x, y);
+        final var key = new CacheKey(x, y, engine.getScale());
         BufferedImage image = backgroundCache.get(key);
         final var tileImage = new BufferedImage(sRGBColorModel,
                                          (WritableRaster) tile.createTranslatedChild(0, 0),
@@ -363,27 +377,74 @@ public class ImageEditorDisplay extends JPanel {
         }
 
         // if we don't have a fresh tile, try and see if we have an old one around
-        final var backgroundTileCache = backgroundCache.get(new CacheKey(tx, ty));
+        final var backgroundTileCache = backgroundCache.get(new CacheKey(tx, ty, engine.getScale()));
         if (backgroundTileCache != null) {
             // Recycle the background tile
             return g2d.drawImage(backgroundTileCache, source.tileXToX(tx), source.tileYToY(ty), this);
         }
 
-        final var cachedTiles = availableTiles(new Point(tx, ty));
-        if (cachedTiles[0] != null) {
-            final var cachedTile = (WritableRaster) cachedTiles[0];
-            return g2d.drawImage(getBackgroundTile(cachedTile, tx, ty),
-                    cachedTile.getMinX(), cachedTile.getMinY(), this);
+        // Reuse tile of different zoom level
+        if (shouldUseScaledTileCache
+                && drawScaledTileCache(g2d, tx, ty, tileClipRect.width, tileClipRect.height)) {
+            return true;
         }
 
-        if (backgroundImage instanceof BufferedImage) {
-            return g2d.drawImage((BufferedImage) backgroundImage, tileClipRect.x, tileClipRect.y, this);
+        final var cachedTiles = availableTiles(new Point(tx, ty));
+        if (cachedTiles.length == 1 && cachedTiles[0] != null) {
+            final var cachedTile = (WritableRaster) cachedTiles[0];
+            g2d.drawImage(getBackgroundTile(cachedTile, tx, ty), null,
+                    cachedTile.getMinX(), cachedTile.getMinY());
+            return true;
+        }
+
+        if (backgroundImage instanceof BufferedImage
+                && g2d.drawImage((BufferedImage) backgroundImage, tileClipRect.x, tileClipRect.y, this)) {
+            return true;
         }
 
         // If all fails paint the default background color
         g2d.setColor(backgroundColor);
         g2d.fillRect(tileClipRect.x, tileClipRect.y, tileClipRect.width, tileClipRect.height);
         return false;
+    }
+
+    private boolean drawScaledTileCache(Graphics2D g2d, int tx, int ty,
+                                        int tileWidth, int tileHeight) {
+        final var scale = engine.getScale();
+
+        // Check if we are not already at minimum zoom level
+        final var scaleList = engine.getPreferredScales();
+        final var smallerScale = (scaleList.subList(1, scaleList.size()).contains(scale))
+                ? scaleList.get(scaleList.indexOf(scale) - 1) : null;
+        if (smallerScale == null) {
+            return false;
+        }
+
+        final var magnitude = scale.getFactor() / smallerScale.getFactor();
+        final var smallerTileIndexX = (int) (tx / magnitude);
+        final var smallerTileIndexY = (int) (ty / magnitude);
+        final var smallerTileCache = backgroundCache.get(
+                new CacheKey(smallerTileIndexX, smallerTileIndexY, smallerScale));
+        if (smallerTileCache == null) {
+            return false;
+        }
+
+        // Scale tile size and offsets
+        final var ox = source.tileXToX(tx);
+        final var oy = source.tileYToY(ty);
+        final var offX = (int) ((tx % magnitude) * tileWidth / magnitude);
+        final var offY = (int) ((ty % magnitude) * tileHeight / magnitude);
+        g2d.drawImage(smallerTileCache,
+                ox, oy, ox + tileWidth, oy + tileHeight,
+                offX, offY,
+                offX + (int) (tileWidth / magnitude),
+                offY + (int) (tileHeight / magnitude), null);
+        if (DEBUG) {
+            g2d.setColor(Color.red);
+            g2d.drawRect(ox, oy, tileWidth - 1, tileHeight - 1);
+        }
+
+        return true;
     }
 
     private boolean computingTiles = false;
