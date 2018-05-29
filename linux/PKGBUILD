@@ -7,26 +7,33 @@ url="http://lightzoneproject.org/"
 license=('custom:BSD-3-Clause')
 arch=('i686' 'x86_64')
 
-depends=('jre7-openjdk' 'javahelp2' 'lcms2' 'libjpeg-turbo' 'libtiff' 'libxml2')
-makedepends=('jdk7-openjdk' 'apache-ant' 'autoconf' 'gcc' 'make' 'git' 'libx11' 'pkg-config' 'rsync' 'javahelp2' 'lcms2' 'libjpeg-turbo' 'libtiff')
+depends=('java-runtime=8' 'javahelp2' 'lcms2' 'libjpeg-turbo' 'libtiff' 'libxml2')
+makedepends=('java-environment=8' 'apache-ant' 'autoconf' 'gcc' 'make' 'git' 'libx11' 'pkg-config' 'rsync' 'javahelp2' 'lcms2' 'libjpeg-turbo' 'libtiff')
 
-source=("${pkgname}-${pkgver}.tar.bz2")
-md5sums=()
+#vcsname=${pkgname}-${pkgver}
+#source=("${vcsname}.tar.bz2")
+vcsname='LightZone'
+source=("git+https://github.com/Aries85/${vcsname}.git")
+md5sums=('SKIP')
 
 build() {
   # Set $JAVA_HOME and $ANT_HOME
-  export JAVA_HOME=/usr/lib/jvm/java-7-openjdk
+  if [ -d /usr/lib/jvm/java-7-jdk ]; then
+    export JAVA_HOME=/usr/lib/jvm/java-8-jdk
+  else
+    export JAVA_HOME=/usr/lib/jvm/java-8-openjdk
+  fi
   [ -f /etc/profile.d/apache-ant.sh ] && source /etc/profile.d/apache-ant.sh
 
   # Parallel compilation fails, so disable it
   export MAKEFLAGS="-j1"
 
-  cd "${srcdir}/${pkgname}-${pkgver}/"
+  cd "${srcdir}/${vcsname}/"
   ant -f linux/build.xml jar
 }
 
 package() {
-  cd "${srcdir}/${pkgname}-${pkgver}/"
+  cd "${srcdir}/${vcsname}/"
 
   _libexecdir=/usr/lib
   install -dm 0755 "${pkgdir}/${_libexecdir}/${pkgname}"
