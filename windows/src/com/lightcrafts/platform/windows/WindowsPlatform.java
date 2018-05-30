@@ -27,7 +27,6 @@ import com.lightcrafts.utils.Version;
 import static com.lightcrafts.platform.windows.WindowsFileUtil.*;
 
 import com.lightcrafts.ui.LightZoneSkin;
-import com.sun.java.swing.plaf.windows.WindowsLookAndFeel;
 
 public final class WindowsPlatform extends Platform {
 
@@ -110,36 +109,6 @@ public final class WindowsPlatform extends Platform {
         final File myDocuments =
             FileSystemView.getFileSystemView().getDefaultDirectory();
         return new File( myDocuments, Version.getApplicationName() );
-    }
-
-    @Override
-    public LookAndFeel getLookAndFeel() {
-        LookAndFeel laf = LightZoneSkin.getLightZoneLookAndFeel();
-
-        boolean addWindows = false;
-
-        if (addWindows) {
-            WindowsLookAndFeel quaqua = new WindowsLookAndFeel();
-
-            UIDefaults quaquaDefaults = quaqua.getDefaults();
-            Set<Object> quaquaKeys = quaquaDefaults.keySet();
-
-            String[] fromQuaqua = new String[] {
-                    "FileChooser",
-            };
-
-            Stream.of(fromQuaqua).forEach(qk -> {
-                quaquaKeys.stream()
-                    .filter(key -> key instanceof String &&
-                            ((String) key).startsWith(qk))
-                    .forEach(key -> {
-                        Object value = quaquaDefaults.get(key);
-                        UIManager.put(key, value);
-                    });
-            });
-        }
-
-        return laf;
     }
 
     @Override
