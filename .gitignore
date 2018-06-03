@@ -18,6 +18,7 @@
 *.0
 .idea/**
 lightcrafts/build
+lightcrafts/coprocesses/dcraw/\.pc/*.patch
 lightcrafts/extbuild
 lightcrafts/products
 lightcrafts/jnisrc/*/javah
