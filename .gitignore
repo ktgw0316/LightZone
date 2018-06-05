@@ -35,6 +35,7 @@ debian/lightzone
 lightcrafts/coprocesses/*/Debug
 lightcrafts/coprocesses/*/Release
 lightcrafts/coprocesses/*/x64
+lightcrafts/coprocesses/dcraw/\.pc/*.patch
 lightcrafts/extbuild
 lightcrafts/jnisrc/*/*/arch-*
 lightcrafts/jnisrc/*/*config\.h
