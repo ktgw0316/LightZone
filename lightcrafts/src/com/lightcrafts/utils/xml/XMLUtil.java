@@ -3,23 +3,23 @@
 
 package com.lightcrafts.utils.xml;
 
-import java.io.*;
-import java.util.*;
+import com.lightcrafts.utils.TextUtil;
+import com.lightcrafts.utils.file.FileUtil;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
+import org.w3c.dom.CharacterData;
+import org.w3c.dom.*;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
-import lombok.RequiredArgsConstructor;
-import lombok.val;
-
-import org.w3c.dom.*;
-import org.xml.sax.SAXException;
-
-import com.lightcrafts.utils.file.FileUtil;
-import com.lightcrafts.utils.TextUtil;
+import java.io.*;
+import java.util.*;
 
 import static com.lightcrafts.image.metadata.XMPConstants.XMP_XAP_NS;
 
@@ -472,6 +472,23 @@ public final class XMLUtil {
     static {
         try {
             m_builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+
+            m_builder.setErrorHandler(new ErrorHandler() {
+                @Override
+                public void warning(SAXParseException e) {
+                    // Suppress XML parse errors on System.err
+                }
+
+                @Override
+                public void fatalError(SAXParseException e) throws SAXParseException {
+                    throw e;
+                }
+
+                @Override
+                public void error(SAXParseException e) throws SAXParseException {
+                    throw e;
+                }
+            });
         }
         catch ( Exception e ) {
             throw new IllegalStateException( e );
