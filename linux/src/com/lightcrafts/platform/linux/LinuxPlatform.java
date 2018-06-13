@@ -119,55 +119,6 @@ public class LinuxPlatform extends Platform {
     }
 
     @Override
-    public int getPhysicalMemoryInMB() {
-        final String osname = System.getProperty("os.name");
-
-        String[] cmd;
-        String regex;
-        if (osname.indexOf("Linux") >= 0) {
-            cmd = new String[] {"cat", "/proc/meminfo"};
-            regex = "MemTotal: *([0-9]*) .*";
-        } else if (osname.indexOf("SunOS") >= 0) {
-            cmd = new String[] {"prtconf"};
-            regex = "Memory size: *([0-9]*) .*";
-        } else {
-            cmd = new String[] {"dmesg"};
-            regex = "real memory *([0-9]*) .*";
-        }
-        Pattern pattern = Pattern.compile(regex);
-
-        try {
-            Process process = Runtime.getRuntime().exec(cmd);
-            InputStream in = process.getInputStream();
-            InputStreamReader reader = new InputStreamReader(in);
-            BufferedReader buffer = new BufferedReader(reader);
-            String line = buffer.readLine();
-            while (line != null) {
-                Matcher matcher = pattern.matcher(line);
-                if (matcher.matches()) {
-                    String text = matcher.replaceAll("$1");
-                    int i = Integer.parseInt(text);
-                    if (osname.indexOf("Linux") >= 0)
-                        return i / 1024;
-                    else if (osname.indexOf("SunOS") >= 0)
-                        return i;
-                    else
-                        return i / 1048576;
-                }
-                line = buffer.readLine();
-            }
-            buffer.close();
-        }
-        catch (IOException  e) {
-            System.err.println("Can't get memory size: " + e.getMessage());
-        }
-        catch (NumberFormatException e) {
-            System.err.println("Malformed memory size text: " + e.getMessage());
-        }
-        return super.getPhysicalMemoryInMB();
-    }
-
-    @Override
     public void loadLibraries() throws UnsatisfiedLinkError {
         System.loadLibrary("Linux");
     }

@@ -125,11 +125,6 @@ public final class MacOSXPlatform extends Platform {
     }
 
     @Override
-    public int getPhysicalMemoryInMB() {
-        return MacOSXMemory.getPhysicalMemoryInMB();
-    }
-
-    @Override
     public Collection<ColorProfileInfo> getPrinterProfiles() {
         return getExportProfiles();
         /* return MacOSXColorProfileManager.getProfilesFor(

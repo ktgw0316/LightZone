@@ -139,11 +139,6 @@ public final class WindowsPlatform extends Platform {
     }
 
     @Override
-    public int getPhysicalMemoryInMB() {
-        return WindowsMemory.getPhysicalMemoryInMB();
-    }
-
-    @Override
     public Collection<ColorProfileInfo> getPrinterProfiles() {
         return getColorProfiles();
     }

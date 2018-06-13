@@ -14,6 +14,7 @@ import java.awt.color.ICC_Profile;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.util.Collection;
 import java.util.Collections;
@@ -193,7 +194,9 @@ public class Platform {
      * @return Returns the amount of memory in megabytes.
      */
     public int getPhysicalMemoryInMB() {
-        return 0;
+        com.sun.management.OperatingSystemMXBean os =
+            (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+        return (int) os.getTotalPhysicalMemorySize() / 1048576;
     }
 
     /**
