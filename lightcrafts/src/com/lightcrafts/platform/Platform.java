@@ -285,13 +285,12 @@ public class Platform {
      * @param hostName The fully qualified name of the desired host to connect
      * to.
      * @return Returns <code>true</code> only if this computer currently has
-     * an active internet connection and thus can reach the specified host.
+     * an active internet connection and can reach the specified host.
      */
-    @SuppressWarnings({"ResultOfMethodCallIgnored"})
     public boolean hasInternetConnectionTo( String hostName ) {
         try {
-            InetAddress.getByName( hostName );
-            return true;
+            final InetAddress address = InetAddress.getByName(hostName);
+            return address.isReachable(2000);
         }
         catch (Throwable t) {
             return false;

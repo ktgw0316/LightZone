@@ -143,11 +143,6 @@ public final class MacOSXPlatform extends Platform {
     }
 
     @Override
-    public boolean hasInternetConnectionTo( String hostName ) {
-        return MacOSXInternetConnection.hasConnectionTo( hostName );
-    }
-
-    @Override
     public File isSpecialFile( File file ) {
         file = FileUtil.resolveAliasFile( file );
         if ( !(file instanceof MacOSXSmartFolder) &&

@@ -149,11 +149,6 @@ public final class WindowsPlatform extends Platform {
     }
 
     @Override
-    public boolean hasInternetConnectionTo( String hostName ) {
-        return WindowsInternetConnection.hasConnection();
-    }
-
-    @Override
     public void hideFile( File file ) throws IOException {
         WindowsFileUtil.hideFile( file.getAbsolutePath() );
     }
