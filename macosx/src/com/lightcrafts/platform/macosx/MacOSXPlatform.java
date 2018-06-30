@@ -28,9 +28,10 @@ public final class MacOSXPlatform extends Platform {
 
     private final static String home = System.getProperty("user.home");
 
-    private final static File SystemProfileDir = new File(
-        "/Library/ColorSync/Profiles"
-    );
+    private final static File[] SystemProfileDirs = new File[] {
+        new File("/Library/ColorSync/Profiles"),
+        new File("/System/Library/ColorSync/Profiles")
+    };
 
     private final static File UserProfileDir = new File(
         home, "Library/ColorSync/Profiles"
@@ -68,7 +69,9 @@ public final class MacOSXPlatform extends Platform {
     public synchronized Collection<ColorProfileInfo> getExportProfiles() {
         if ( m_exportProfiles == null ) {
             m_exportProfiles = new HashSet<ColorProfileInfo>();
-            m_exportProfiles.addAll(getColorProfiles(SystemProfileDir));
+            for (File SystemProfileDir : SystemProfileDirs) {
+                m_exportProfiles.addAll(getColorProfiles(SystemProfileDir));
+            }
             m_exportProfiles.addAll(getColorProfiles(UserProfileDir));
         }
         return m_exportProfiles;
