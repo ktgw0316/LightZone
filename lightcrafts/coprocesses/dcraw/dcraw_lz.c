@@ -102,11 +102,6 @@ typedef unsigned long long UINT64;
 
 #ifdef _OPENMP
 #include <omp.h>
-#define uf_omp_get_thread_num() omp_get_thread_num()
-#define uf_omp_get_num_threads() omp_get_num_threads()
-#else
-#define uf_omp_get_thread_num() 0
-#define uf_omp_get_num_threads() 1
 #endif
 
 /*
@@ -4485,7 +4480,7 @@ void CLASS vng_interpolate()
     +1,-1,+1,+1,0,0x88, +1,+0,+1,+2,0,0x08, +1,+0,+2,-1,0,0x40,
     +1,+0,+2,+1,0,0x10
   }, chood[] = { -1,-1, -1,0, -1,+1, 0,+1, +1,+1, +1,0, +1,-1, 0,-1 };
-  ushort (*brow[4])[4], *pix;
+  ushort (*brow[5])[4], *pix;
   int prow=8, pcol=2, *ip, *code[16][16], gval[8], gmin, gmax, sum[4];
   int row, col, x, y, x1, x2, y1, y2, t, weight, grads, color, diag;
   int g, diff, thold, num, c;
@@ -4495,7 +4490,7 @@ void CLASS vng_interpolate()
 
   if (filters == 1) prow = pcol = 16;
   if (filters == 9) prow = pcol =  6;
-  int *ipalloc = ip = (int *) calloc (prow*pcol, 1280);
+  ip = (int *) calloc (prow*pcol, 1280);
   merror (ip, "vng_interpolate()");
   for (row=0; row < prow; row++)		/* Precalculate for VNG */
     for (col=0; col < pcol; col++) {
@@ -4530,15 +4525,14 @@ void CLASS vng_interpolate()
 #pragma omp parallel default(shared) \
   private(row,col,g,brow,pix,ip,gval,diff,gmin,gmax,thold,sum,color,num,c,t)
 {
-  ushort (*rowtmp)[4];
-  rowtmp = (ushort(*)[4])malloc(4 * width * 4 * sizeof(ushort));
-  int slice = (height - 4) / uf_omp_get_num_threads();
-  int start_row = 2 + slice * uf_omp_get_thread_num();
-  int end_row = MIN(start_row + slice, height - 2);
-  for (row = start_row; row < end_row; row++) {	/* Do VNG interpolation */
-
-    for (g = 0; g < 4; g++)
-      brow[g] = &rowtmp[(row + g - 2) % 4];
+  brow[4] = (ushort (*)[4]) calloc (width*3, sizeof **brow);
+  merror (brow[4], "vng_interpolate()");
+  /* Do not use 'pragma omp for' here */
+  for (row=0; row < 3; row++)
+    brow[row] = brow[4] + row*width;
+  int slice_row = 0;
+#pragma omp for schedule(static) nowait
+  for (row=2; row < height-2; row++) {		/* Do VNG interpolation */
     for (col=2; col < width-2; col++) {
       pix = image[row*width+col];
       ip = code[row % prow][col % pcol];
@@ -4582,15 +4576,19 @@ void CLASS vng_interpolate()
 	brow[2][col][c] = CLIP(t);
       }
     }
-    if (row > start_row + 1)				/* Write buffer to image */
+    if (slice_row > 1)			/* Write buffer to image */
       memcpy (image[(row-2)*width+2], brow[0]+2, (width-4)*sizeof *image);
+    for (g=0; g < 4; g++)
+      brow[(g-1) & 3] = brow[g];
+    slice_row++;
   }
   if (row == height - 2) {
     memcpy (image[(row-2)*width+2], brow[0]+2, (width-4)*sizeof *image);
     memcpy (image[(row-1)*width+2], brow[1]+2, (width-4)*sizeof *image);
   }
+  free (brow[4]);
 } /* pragma omp parallel */
-  free(ipalloc);
+  free (code[0][0]);
 }
 
 /*

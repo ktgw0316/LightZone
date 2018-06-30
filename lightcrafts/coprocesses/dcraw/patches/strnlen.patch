@@ -2,7 +2,7 @@ Index: dcraw/dcraw_lz.c
 ===================================================================
 --- dcraw.orig/dcraw_lz.c
 +++ dcraw/dcraw_lz.c
-@@ -10049,6 +10049,13 @@ struct tiff_hdr {
+@@ -10047,6 +10047,13 @@ struct tiff_hdr {
    char desc[512], make[64], model[64], soft[32], date[20], artist[64];
  };
  
