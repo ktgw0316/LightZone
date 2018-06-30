@@ -2,7 +2,7 @@ Index: dcraw/dcraw_lz.c
 ===================================================================
 --- dcraw.orig/dcraw_lz.c
 +++ dcraw/dcraw_lz.c
-@@ -145,7 +145,10 @@ int output_color=1, output_bps=8, output
+@@ -140,7 +140,10 @@ int output_color=1, output_bps=8, output
  int no_auto_bright=0;
  unsigned greybox[4] = { 0, 0, UINT_MAX, UINT_MAX };
  float cam_mul[4], pre_mul[4], cmatrix[3][4], rgb_cam[3][4];
@@ -14,7 +14,7 @@ Index: dcraw/dcraw_lz.c
    { 0.412453, 0.357580, 0.180423 },
    { 0.212671, 0.715160, 0.072169 },
    { 0.019334, 0.119193, 0.950227 } };
-@@ -10227,6 +10230,9 @@ int CLASS main (int argc, const char **a
+@@ -10225,6 +10228,9 @@ int CLASS main (int argc, const char **a
  #ifndef NO_LCMS
    const char *cam_profile=0, *out_profile=0;
  #endif
@@ -24,7 +24,7 @@ Index: dcraw/dcraw_lz.c
  
  #ifndef LOCALTIME
    putenv ((char *) "TZ=UTC");
-@@ -10321,6 +10327,9 @@ int CLASS main (int argc, const char **a
+@@ -10319,6 +10325,9 @@ int CLASS main (int argc, const char **a
        case 'p':  cam_profile = argv[arg++];
  #endif
  	break;
@@ -34,7 +34,7 @@ Index: dcraw/dcraw_lz.c
        case 'P':  bpfile     = argv[arg++];  break;
        case 'K':  dark_frame = argv[arg++];  break;
        case 'z':  timestamp_only    = 1;  break;
-@@ -10349,6 +10358,19 @@ int CLASS main (int argc, const char **a
+@@ -10347,6 +10356,19 @@ int CLASS main (int argc, const char **a
  	return 1;
      }
    }
@@ -54,7 +54,7 @@ Index: dcraw/dcraw_lz.c
    if (arg == argc) {
      fprintf (stderr,_("No files to process.\n"));
      return 1;
-@@ -10493,6 +10515,10 @@ int CLASS main (int argc, const char **a
+@@ -10491,6 +10513,10 @@ int CLASS main (int argc, const char **a
  	    for (c = i && putchar('/') && 0; c < fwide; c++)
  	      putchar (cdesc[fcol(i,c)]);
  	}
@@ -65,7 +65,7 @@ Index: dcraw/dcraw_lz.c
  	printf (_("\nDaylight multipliers:"));
  	FORCC printf (" %f", pre_mul[c]);
  	if (cam_mul[0] > 0) {
-@@ -10605,6 +10631,11 @@ thumbnail:
+@@ -10603,6 +10629,11 @@ thumbnail:
      if (write_to_stdout)
        strcpy (ofname,_("standard output"));
      else {
@@ -77,7 +77,7 @@ Index: dcraw/dcraw_lz.c
        strcpy (ofname, ifname);
        if ((cp = strrchr (ofname, '.'))) *cp = 0;
        if (multi_out)
-@@ -10637,3 +10668,5 @@ cleanup:
+@@ -10635,3 +10666,5 @@ cleanup:
    }
    return status;
  }
