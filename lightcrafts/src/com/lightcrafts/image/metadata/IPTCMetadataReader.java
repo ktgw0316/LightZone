@@ -14,6 +14,7 @@ import com.lightcrafts.image.types.ImageType;
 import com.lightcrafts.image.types.JPEGImageType;
 import com.lightcrafts.utils.bytebuffer.LCByteBuffer;
 
+import java.util.Arrays;
 import static com.lightcrafts.image.metadata.IPTCConstants.*;
 import static com.lightcrafts.image.metadata.IPTCTags.*;
 import static com.lightcrafts.image.types.AdobeConstants.*;
@@ -225,7 +226,7 @@ public final class IPTCMetadataReader extends ImageMetadataReader
                 final ImageMetaValue oldCharset = dir.getValue( IPTC_CODED_CHARACTER_SET );
                 if ( oldCharset != null ) {
                     byte[] utf8 = {0x1B, 0x25, 0x47}; // ESC, "%", "G"
-                    if ( oldCharset.getStringValue().getBytes() == utf8 )
+                    if (Arrays.equals(oldCharset.getStringValue().getBytes(), utf8))
                         c = "UTF-8";
                 }
                 String s = m_buf.getString( byteCount, c );
