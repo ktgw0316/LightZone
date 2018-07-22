@@ -881,13 +881,6 @@ public class ImageMetadata implements
                 }
                 metadata.removeDirectory( SubEXIFDirectory.class );
             }
-
-            //
-            // Move those tags that are common between TIFF and EXIF metadata
-            // from the EXIF directory to the TIFF directory since, for a TIFF
-            // file, they *must* be there.
-            //
-            ImageMetadataDirectory.moveValuesFromTo( exifDir, tiffDir );
         }
 
         ////////// Values that are always put.
