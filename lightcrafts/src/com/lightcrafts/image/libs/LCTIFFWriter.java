@@ -27,7 +27,8 @@ import com.lightcrafts.utils.Version;
 import com.lightcrafts.utils.xml.XMLUtil;
 
 import static com.lightcrafts.image.metadata.EXIFConstants.*;
-import static com.lightcrafts.image.metadata.EXIFTags.*;
+import static com.lightcrafts.image.metadata.EXIFTags.EXIF_GPS_IFD_POINTER;
+import static com.lightcrafts.image.metadata.EXIFTags.EXIF_IFD_POINTER;
 import static com.lightcrafts.image.metadata.TIFFTags.*;
 import static com.lightcrafts.image.types.TIFFConstants.*;
 
@@ -462,18 +463,15 @@ public final class LCTIFFWriter extends LCTIFFCommon {
             final int numValues = file.readInt();
             final int byteCount = numValues * EXIF_FIELD_SIZE[ fieldType ];
             if ( byteCount > TIFF_INLINE_VALUE_MAX_SIZE ||
-                 tagID == EXIF_IFD_POINTER ) {
-                int valueOffset = file.readInt();
-                valueOffset += (int)dirOffset + parentDirSize;
+                 tagID == EXIF_IFD_POINTER || tagID == EXIF_GPS_IFD_POINTER ) {
+                final int origValueOffset = file.readInt();
+                final int valueOffset = origValueOffset + (int)dirOffset + parentDirSize;
                 file.seek( file.getFilePointer() - TIFF_INT_SIZE );
                 file.writeInt( valueOffset );
                 switch ( tagID ) {
                     case EXIF_IFD_POINTER:
-                        final int exifIFDSize =
-                            EXIF_SHORT_SIZE
-                            + entryCount * EXIF_IFD_ENTRY_SIZE
-                            + EXIF_INT_SIZE;
-                        fixEXIFDirectory( file, valueOffset, -exifIFDSize );
+                    case EXIF_GPS_IFD_POINTER:
+                        fixEXIFDirectory( file, valueOffset, -origValueOffset );
                         break;
                 }
             }
