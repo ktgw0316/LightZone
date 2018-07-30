@@ -2,29 +2,28 @@
 
 package com.lightcrafts.image.metadata;
 
-import java.io.*;
-import java.util.*;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.Document;
-
-import com.lightcrafts.image.metadata.providers.*;
-import com.lightcrafts.image.metadata.values.*;
 import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.image.metadata.makernotes.MakerNotesDirectory;
+import com.lightcrafts.image.metadata.providers.*;
+import com.lightcrafts.image.metadata.values.*;
 import com.lightcrafts.image.types.ImageType;
 import com.lightcrafts.image.types.JPEGImageType;
 import com.lightcrafts.image.types.TIFFImageType;
-import com.lightcrafts.utils.CollectionUtil;
 import com.lightcrafts.utils.LightCraftsException;
 import com.lightcrafts.utils.Version;
 import com.lightcrafts.utils.xml.XMLUtil;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import java.io.*;
+import java.util.*;
 
 import static com.lightcrafts.image.metadata.CoreTags.*;
-import static com.lightcrafts.image.metadata.EXIFConstants.*;
+import static com.lightcrafts.image.metadata.EXIFConstants.EXIF_SUBEXIF_TAG_ID_START;
 import static com.lightcrafts.image.metadata.EXIFTags.*;
-import static com.lightcrafts.image.metadata.ImageOrientation.*;
 import static com.lightcrafts.image.metadata.IPTCTags.*;
+import static com.lightcrafts.image.metadata.ImageOrientation.ORIENTATION_LANDSCAPE;
+import static com.lightcrafts.image.metadata.ImageOrientation.ORIENTATION_UNKNOWN;
 import static com.lightcrafts.image.metadata.TIFFTags.*;
 import static com.lightcrafts.image.metadata.XMPConstants.XMP_DC_NS;
 import static com.lightcrafts.image.metadata.XMPConstants.XMP_DC_PREFIX;
@@ -1293,13 +1292,26 @@ public class ImageMetadata implements
      * orientation of the image; otherwise just use landscape.
      * @param includeXMPPacket If <code>true</code>, XMP packet processing
      * instructions are included in the new document.
+     * @return Returns said document.
+     */
+    public Document toXMP(boolean useActualOrientation, boolean includeXMPPacket) {
+        return toXMP(useActualOrientation, includeXMPPacket, null);
+    }
+
+    /**
+     * Convert all the metadata into an XMP XML document.
+     *
+     * @param useActualOrientation If <code>true</code>, use the actual
+     * orientation of the image; otherwise just use landscape.
+     * @param includeXMPPacket If <code>true</code>, XMP packet processing
+     * instructions are included in the new document.
      * @param dirClass The set of directories to include or <code>null</code>
      * for all.
      * @return Returns said document.
      */
     public Document toXMP( boolean useActualOrientation,
                            boolean includeXMPPacket,
-                           Class<? extends ImageMetadataDirectory>... dirClass )
+                           Class<? extends ImageMetadataDirectory> dirClass)
     {
         final ImageMetadata metadata = prepForXMP( useActualOrientation );
         final Document doc = XMPUtil.createEmptyXMPDocument( includeXMPPacket );
@@ -1314,22 +1326,17 @@ public class ImageMetadata implements
      * @param dirClass The set of directories to include or <code>null</code>
      * for all.
      */
-    public void toXMP( Document xmpDoc,
-                       Class<? extends ImageMetadataDirectory>... dirClass ) {
-        final Set<Class<? extends ImageMetadataDirectory>> dirSet =
-            CollectionUtil.asSet( dirClass );
-
+    private void toXMP( Document xmpDoc,
+                       Class<? extends ImageMetadataDirectory> dirClass ) {
         final Element rdfElement = XMPUtil.getRDFElementOf( xmpDoc );
         for ( ImageMetadataDirectory dir : getDirectories() ) {
-            if ( dirSet != null && !dirSet.isEmpty() &&
-                 !dirSet.contains( dir.getClass() ) )
-                continue;
-            final Collection<Element> rdfDescElements = dir.toXMP( xmpDoc );
-            if ( rdfDescElements != null )
-                for ( Element element : rdfDescElements )
-                    rdfElement.appendChild( element );
+            if (dirClass == null || dirClass == dir.getClass()) {
+                final Collection<Element> rdfDescElements = dir.toXMP(xmpDoc);
+                if (rdfDescElements != null)
+                    for (Element element : rdfDescElements)
+                        rdfElement.appendChild(element);
+            }
         }
-
         final Element dcRDFDescElement = toDublinCoreXMP( xmpDoc );
         if ( dcRDFDescElement != null )
             rdfElement.appendChild( dcRDFDescElement );
