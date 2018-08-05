@@ -58,6 +58,11 @@ public interface JPEGConstants {
     byte JPEG_APP4_MARKER  = (byte)0xE4;
 
     /**
+     * Adobe-specific Embed marker is stored in this segment.
+     */
+    byte JPEG_APPC_MARKER  = (byte)0xEC;
+
+    /**
      * IPTC metadata is stored in this segment.
      */
     byte JPEG_APPD_MARKER  = (byte)0xED;
