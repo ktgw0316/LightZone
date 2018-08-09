@@ -12,6 +12,7 @@ TARGET_BASE:=		MacOSX
 # Uncomment to compile in debug mode.
 #DEBUG:=			true
 
+JNI_MACOSX_INCLUDES:=	-I$(ROOT)/macosx
 JNI_MACOSX_LDFLAGS+=	-framework SystemConfiguration
 JNI_MACOSX_LINK:=	$(COMMON_DIR)/jnisrc/jniutils/libLCJNI.a
 

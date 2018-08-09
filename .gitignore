@@ -1,3 +1,4 @@
+-
 *.o
 *.d
 *.a
@@ -17,11 +18,11 @@
 *.status
 *.0
 .idea/**
+*/javah
 lightcrafts/build
 lightcrafts/coprocesses/dcraw/\.pc/*.patch
 lightcrafts/extbuild
 lightcrafts/products
-lightcrafts/jnisrc/*/javah
 lightcrafts/jnisrc/*/arch-*
 lightcrafts/jnisrc/*/*/arch-*
 lightcrafts/jnisrc/tiff/autom4te.cache
@@ -29,14 +30,12 @@ lightcrafts/jnisrc/tiff/configure
 lightcrafts/jnisrc/tiff/tif_config.h
 linux/build/
 linux/help/build/
-linux/jnisrc/libLinux/javah/
 linux/products/LightZone-forkd
 linux/products/dcraw_lz
 windows/build
 windows/helpers/JavaAppLauncher/jar_md5_include
 windows/helpers/JavaAppLauncher/LightZone.ico
 windows/helpers/JavaAppLauncher/lightzone.res
-windows/jnisrc/*/javah
 windows/md5sums
 windows/output.txt
 windows/products
@@ -47,6 +46,5 @@ debian/DEBIAN
 debian/lightzone
 debian/files
 macosx/build/
-macosx/jnisrc/libMacOSX/javah/
 macosx/products/LightZone-forkd
 macosx/products/dcraw_lz
