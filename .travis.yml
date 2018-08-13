@@ -1,7 +1,12 @@
 language: java
 
+matrix:
+  allow_failures:
+    - os: osx
+
 os:
   - linux
+  - osx
 
 jdk:
   - oraclejdk8
@@ -20,9 +25,10 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then tar xf apache-ant-1.10.5-bin.tar.gz; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export PATH=`pwd`/apache-ant-1.10.5/bin:$PATH; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install autoconf clang-omp libtiff little-cms2 pkg-config; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install ant little-cms2 llvm; fi
   - echo $(ant -version)
 
 script:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ant -f linux/build.xml; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ant -f macosx/build.xml; fi
 
