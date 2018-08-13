@@ -2,7 +2,7 @@
 
 ## Install required packages
 Building the LightZone source requires (at least) following packages:
-- __ant__
+- __ant__ version 1.9.8 or later to support nativeheaderdir parameter
 - __fakeroot__ for linux package creation
 - __g++__
 - __gcc__
@@ -13,7 +13,7 @@ Building the LightZone source requires (at least) following packages:
 - __libtiff__
 - __libxml2-utils__ for xmllint
 - __make__
-- __openjdk-6-jdk__ or later
+- __openjdk-8-jdk__ or later
 - __pkg-config__
 - __rsync__
 
@@ -33,11 +33,11 @@ Before start the build, you have to set JAVA_HOME environment variable, e.g.
 ### OpenSUSE (>= 12.2)
 Install required packages:
 
-    sudo zypper install ant autoconf gcc gcc-c++ make git javahelp2 libjpeg8-devel libtiff-devel libX11-devel libxml2-utils rsync java-1_7_0-openjdk-devel
+    sudo zypper install ant autoconf gcc gcc-c++ make git javahelp2 libjpeg8-devel libtiff-devel libX11-devel libxml2-utils rsync java-1_8_0-openjdk-devel
 
 Set your JAVA_HOME variable to point to installed JDK, e.g.
 
-    export JAVA_HOME=/usr/lib/jvm/java-1.7.0-openjdk-1.7.0
+    export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0
 
 ## Build
 To start the build:
@@ -136,7 +136,7 @@ There are build scripts in _freebsd-ports/graphics/lightzone/_ directory.
 
 ## Miscellaneous
 ### If you prefer Oracle Java to OpenJDK
-You can use _Oracle Java JRE version 6, 7, 8 or 9_ instead of openjdk-7-jdk.
+You can use _Oracle Java JRE version 8 or later_ instead of openjdk-8-jdk.
 
 Easiest way to setup one of these on Ubuntu is, for example:
 

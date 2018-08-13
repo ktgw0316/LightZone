@@ -15,7 +15,7 @@ Source:		%{name}-%{version}.tar.bz2
 
 %if 0%{?rhel}
 %if 0%{?rhel} >= 7
-%define java_version 1.7.0-openjdk
+%define java_version 1.8.0-openjdk
 %else
 %define java_version 1.6.0-openjdk
 %endif
@@ -42,7 +42,7 @@ Source:		%{name}-%{version}.tar.bz2
 %endif
 
 %if 0%{?sles_version}
-%define java_version 1_7_0-openjdk
+%define java_version 1_8_0-openjdk
 %define lcms2_devel liblcms2-devel
 %define libjpeg_devel libjpeg8-devel
 %define libX11_devel xorg-x11-libX11-devel
@@ -53,7 +53,7 @@ BuildRequires: update-desktop-files
 
 %if 0%{?suse_version}
 %if 0%{?suse_version} > 1210
-%define java_version 1_7_0-openjdk
+%define java_version 1_8_0-openjdk
 %define libX11_devel libX11-devel
 %else
 %define java_version 1_6_0-openjdk
