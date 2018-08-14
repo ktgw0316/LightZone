@@ -843,10 +843,13 @@ public abstract class ImageMetadataDirectory implements
             final int tagID = me.getKey();
             if (TIFFCommonTags.contains(tagID)
                     && !unexportedTags.contains(tagID)) {
+                final ImageMetaValue oldValue = targetDir.getValue(tagID);
+                if (oldValue == null || oldValue.isEmpty()) {
                 targetDir.putValue(tagID, me.getValue());
                 i.remove();
             }
         }
+    }
     }
 
     /**

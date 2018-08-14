@@ -670,6 +670,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
             JPEG_APP1_MARKER,   // EXIF or XMP
             JPEG_APP2_MARKER,   // ICC profile
             JPEG_APP4_MARKER,   // LightZone
+            JPEG_APPC_MARKER,   // Adobe EPS or PDF
             JPEG_APPD_MARKER,   // IPTC
             JPEG_APPE_MARKER    // Adobe
         );

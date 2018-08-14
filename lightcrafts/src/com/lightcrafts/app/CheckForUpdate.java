@@ -109,7 +109,7 @@ public final class CheckForUpdate {
      * Note that if automatic updates checks have been disabled via the user
      * preference, this method will do nothing.
      */
-    public static void showAlertIfAvailable() {
+    private static void showAlertIfAvailable() {
         if ( shouldCheckForUpdate() && isUpdateAvailable( true ) )
             showDownloadNowOrLaterAlert();
     }

@@ -2,12 +2,12 @@ Source: lightzone
 Section: graphics
 Priority: optional
 Maintainer: Masahiro Kitagawa <arctica0316@gmail.com>
-Build-Depends: debhelper, devscripts, ant, autoconf, git-core, javahelp2, openjdk-8-jdk | oracle-java8-jdk, openjfx, liblcms2-dev, liblensfun-dev, libglib2.0-dev, libjpeg62-dev (<= 6b1-1) | libjpeg62-turbo-dev | libjpeg-turbo8-dev | libjpeg8-dev, libtiff5-dev | libtiff4-dev (<< 3.9.6), libx11-dev, pkg-config, rsync
+Build-Depends: debhelper, devscripts, ant, autoconf, git-core, javahelp2, default-jdk (>= 1.8), default-jre-headless (>= 1.8), openjfx, liblcms2-dev, liblensfun-dev, libglib2.0-dev, libjpeg62-dev (<= 6b1-1) | libjpeg62-turbo-dev | libjpeg-turbo8-dev | libjpeg8-dev, libtiff5-dev | libtiff4-dev (<< 3.9.6), libx11-dev, pkg-config, rsync
 Homepage: http://lightzoneproject.org/
 Standards-Version: 3.9.4.0
 
 Package: lightzone
 Architecture: i386 amd64
-Depends: openjfx | oracle-java8-jre, javahelp2, libgomp1, liblcms2-2, libjpeg62 (<= 6b1-1) | libjpeg62-turbo | libjpeg-turbo8 | libjpeg8, libtiff5 | libtiff4 (<< 3.9.6), libxml2-utils
+Depends: openjfx, openjdk-8-jre | openjdk-9-jre | openjdk-10-jre | openjdk-11-jre | oracle-java8-jre | oracle-java9-jre | oracle-java10-jre | oracle-java11-jre, javahelp2, libgomp1, liblensfun0, liblcms2-2, libjpeg62 (<= 6b1-1) | libjpeg62-turbo | libjpeg-turbo8 | libjpeg8, libtiff5 | libtiff4 (<< 3.9.6), libxml2-utils
 Description: Open-source professional-level digital darkroom software
  LightZone is open-source professional-level digital darkroom software for Windows, Mac OS X, and Linux. Rather than using layers as many other photo editors do, LightZone lets the user build up a stack of tools which can be rearranged, turned off and on, and removed from the stack. It's a non-destructive editor, where any of the tools can be re-adjusted or modified later - even in a different editing session. A tool stack can be copied to a batch of photos at one time. LightZone operates in a 16-bit linear color space with the wide gamut of ProPhoto RGB.

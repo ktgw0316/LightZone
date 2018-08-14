@@ -361,6 +361,17 @@ public abstract class ImageMetaValue implements
     }
 
     /**
+     * Returns true if this metadata value is null or its length is 0.
+     *
+     * @return Returns true if this metadata value is null or its length is 0,
+     * otherwise false
+     */
+    public boolean isEmpty() {
+        String value = getStringValue();
+        return value == null || value.isEmpty();
+    }
+
+    /**
      * Returns whether this image metadata value is numeric.
      *
      * @return Returns <code>false</code> by default.

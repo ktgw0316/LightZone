@@ -35,7 +35,9 @@
 
   <target name="javac" depends="common">
     <mkdir dir="build"/>
-    <javac destdir="build" source="1.8" target="1.8" debug="true">
+    <mkdir dir="javah"/>
+    <javac destdir="build" includeantruntime="false" debug="true"
+           source="1.8" target="1.8" nativeheaderdir="javah">
       <src path="src"/>
       <compilerarg value="-XDignore.symbol.file"/>
       <classpath>
@@ -203,6 +205,7 @@
   <target name="clean-up">
     <ant dir="${common-dir}" target="${clean-method}"/>
     <delete dir="build"/>
+    <delete dir="javah"/>
     <delete dir="${app-dir}"/>
     <exec executable="make" dir="dmg">
       <arg value="${clean-method}"/>

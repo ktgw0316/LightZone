@@ -268,7 +268,7 @@ public abstract class ImageType {
      * image type that can not be exported to.
      * @see #canExport()
      */
-    public void putImage( ImageInfo imageInfo, PlanarImage image,
+    protected void putImage( ImageInfo imageInfo, PlanarImage image,
                           ImageExportOptions options, Document lznDoc,
                           ProgressThread thread ) throws IOException {
         throw new UnsupportedOperationException(

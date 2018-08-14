@@ -370,7 +370,8 @@ public class TIFFImageType extends ImageType implements TrueImageTypeProvider {
     /**
      * {@inheritDoc}
      */
-    public void putImage( ImageInfo imageInfo, PlanarImage image,
+    @Override
+    protected void putImage( ImageInfo imageInfo, PlanarImage image,
                           ImageExportOptions options, Document lznDoc,
                           ProgressThread thread ) throws IOException {
         final ExportOptions tiffOptions = (ExportOptions)options;

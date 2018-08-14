@@ -9,6 +9,9 @@ package com.lightcrafts.image.types;
  */
 public interface AdobeConstants {
 
+    /** The size (in bytes) of an Adobe JPEG APPC segment. */
+    int ADOBE_APPC_SEGMENT_SIZE = 6;
+
     /** The size (in bytes) of an Adobe JPEG APPE segment. */
     int ADOBE_APPE_SEGMENT_SIZE = 12;
 

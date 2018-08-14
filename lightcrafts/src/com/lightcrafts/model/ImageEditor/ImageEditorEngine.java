@@ -852,9 +852,8 @@ public class ImageEditorEngine implements Engine {
 
         // LZN editor state data
         val lzn = exportOptions.getAuxData();
-        val doc = XMLUtil.readDocumentFrom(new ByteArrayInputStream(lzn));
         val imageInfo = (m_exportInfo != null) ? m_exportInfo : m_imageInfo;
-        exportType.putImage(imageInfo, exportImage, exportOptions, doc, thread);
+        exportType.putImage(imageInfo, exportImage, exportOptions, lzn, thread);
     }
 
     Color getPixelValue(final int x, final int y) {

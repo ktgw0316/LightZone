@@ -66,8 +66,9 @@
     <exec executable="${MAKE}" dir="products" failonerror="true"
           vmlauncher="false"/>
     <mkdir dir="build"/>
+    <mkdir dir="javah"/>
     <javac destdir="build" includeantruntime="false" debug="true"
-           source="1.8" target="1.8">
+           source="1.8" target="1.8" nativeheaderdir="javah">
       <src path="src"/>
       <classpath>
         <fileset dir="lib">
@@ -200,6 +201,7 @@
 
   <target name="clean-up">
     <delete dir="build"/>
+    <delete dir="javah"/>
     <exec executable="${MAKE}" dir="jnisrc">
       <arg value="${clean-method}"/>
     </exec>

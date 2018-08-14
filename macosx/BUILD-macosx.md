@@ -1,6 +1,6 @@
 # Development guide
 
-Written and tested on MacOSX 10.10.1 with Java 1.6 64-bit and Eclipse 3.6.
+Written and tested on MacOSX 10.13 with Java 8 64-bit.
 
 LightZone can be built with Ant, and edited with any java IDE; these instructions use Eclipse for convenience,
 since it's a common IDE with Ant built in.
@@ -8,23 +8,20 @@ since it's a common IDE with Ant built in.
 These instructions sometimes say to right-click on something; use Control+Click instead if necessary.
 
 ## General Info and Status
-At this stage of development, the LightZone OSX port builds a 64-bit LightZone and runs it from Ant or from inside Eclipse.
-It doesn't yet package the binary launcher for 64-bit; that work is still to be done.
-
 The application's startup java class is com.lightcrafts.app.Application.
-There's also an OSX-specific startup class that isn't built yet.  Once ready, it will read its info
+There's also an OSX-specific startup class, which will read its info
 from LightZone/macosx/resources/Info.plist and launch the MainClass defined there.
 
 ## Install required software
 Building the LightZone source requires the following software:
 
-- __Java__ version 1.6 from Apple, or more up-to-date version from Oracle
+- __Java__ version 8 or later from Oracle
 - __git__
 - __homebrew__ from http://brew.sh/
 
 You need to install following packages using homebrew:
 - __llvm__ (to correctly compile OpenMP; it includes __clang__ and __clang++__)
-- __ant__
+- __ant__ version 1.9.8 or later to support nativeheaderdir parameter
 - __autoconf__
 - __jpeg-turbo__
 - __libtiff__ "brew edit libtiff", replace all "jpeg" occurences with "jpeg-turbo", then "brew install libtiff --build-from-source"
@@ -52,7 +49,7 @@ If you're using Eclipse, skip this section.
 
 - Make sure command-line tools, clang-omp, git, and ant are installed.
 - Make sure your default java version is set in the Java Preferences app.
-- Set the JAVA_HOME environment variable to /Library/Java/Home
+- Set the `JAVA_HOME` environment variable to /Library/Java/Home
 - cd to LightZone/macosx in the source folder.
 - To build LightZone, run these commands; each run's output should end with "`BUILD SUCCESSFUL`" when you run it.
 If you have errors, see the "Troubleshooting" section of this document.
@@ -118,7 +115,7 @@ Set up this config for the build:
 - Targets tab: check clean  ; un-check the default "build"
 - JRE tab: Separate JRE  ; in the dropdown, be sure to select the same one you're using throughout the project
 - Environment tab:
-	- New: JAVA_HOME = /Library/Java/Home
+	- New: `JAVA_HOME = /Library/Java/Home`
 	- Choose "Append Environment", not Replace
 - Click Apply, click Run
 

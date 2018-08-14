@@ -4,18 +4,22 @@ package com.lightcrafts.utils;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.MalformedURLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.ResourceBundle;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 
 /** A container and accessor for static version data, either configured in
@@ -26,8 +30,6 @@ import java.util.regex.Pattern;
   * places the stdout into lightcrafts/resources/com/lightcrafts/app/resources.
   */
 public final class Version {
-
-    ////////// public /////////////////////////////////////////////////////////
 
     /**
      * Gets the application's name.
@@ -57,7 +59,7 @@ public final class Version {
     }
 
     public static Map<String, URL> getVideoURLs() {
-        Map<String, URL> map = new HashMap<String, URL>();
+        Map<String, URL> map = new HashMap<>();
         // TODO put in final video URLs
         map.put("Introduction to Relight", getVideoLearningCenterURL());
         map.put("Advanced Relight", getVideoLearningCenterURL());
@@ -74,13 +76,10 @@ public final class Version {
         if ( GITInfo == null )
             return "";
         try {
-            String text =
-                RevisionPattern.matcher( GITInfo ).replaceAll( "$1" );
-			if (text != null)
-                if (7 < text.length()) {
-                    text = text.substring(0,7);
-                } else
-                    text = text.substring(0);
+            String text = RevisionPattern.matcher( GITInfo ).replaceAll( "$1" );
+            if (text != null && 7 < text.length()) {
+                text = text.substring(0,7);
+            }
             return text;
         }
         catch ( NumberFormatException e ) {
@@ -88,7 +87,7 @@ public final class Version {
         }
     }
 
-    public static Date getChangeDate() {
+    private static Date getChangeDate() {
         if ( GITInfo == null )
             return null;
         try {
@@ -124,34 +123,6 @@ public final class Version {
     public static String getVersionName() {
         return Version != null ? Version : "";
     }
-
-    /**
-     * Get the Light Crafts homepage URL, or null if the URL text is not
-     * configured or is invalid.
-     */
-    public static URL getHomepageURL() {
-        try {
-            return new URL( m_properties.getString( "company-URL" ) );
-        }
-        catch ( MalformedURLException e ) {
-            return null;
-        }
-    }
-
-    /**
-     * Get the application help URL, or null if the URL text is not
-     * configured or is invalid.
-     */
-    public static URL getHelpURL() {
-        try {
-            return new URL( m_properties.getString( "help-URL" ) );
-        }
-        catch (MalformedURLException e) {
-            return null;
-        }
-    }
-
-    ////////// private ////////////////////////////////////////////////////////
 
     /**
      * Reads a given resource.
@@ -238,7 +209,7 @@ public final class Version {
 
     ////////// main() for testing /////////////////////////////////////////////
 
-    public static void main( String[] args ) throws Exception {
+    public static void main( String[] args ) {
         System.out.println( getApplicationName() );
         System.out.println( getUri() );
         System.out.println( getRevisionNumber() );
