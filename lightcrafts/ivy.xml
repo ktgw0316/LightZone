@@ -3,6 +3,9 @@
   <info organisation="lightcrafts" module="lightcrafts"/>
   <dependencies>
     <dependency org="de.dimaki" name="refuel" rev="0.1.1"/>
+    <dependency org="javax.xml.bind" name="jaxb-api" rev="2.3.0"/>
+    <dependency org="org.glassfish.jaxb" name="jaxb-runtime" rev="2.3.0.1"/>
+    <dependency org="javax.activation" name="javax.activation-api" rev="1.2.0"/>    
   </dependencies>
 </ivy-module>
 
