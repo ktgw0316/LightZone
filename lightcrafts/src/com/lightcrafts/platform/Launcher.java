@@ -10,6 +10,7 @@ import com.lightcrafts.utils.ForkDaemon;
 import com.lightcrafts.utils.Version;
 
 import javax.swing.*;
+import java.awt.GraphicsEnvironment;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -55,14 +56,11 @@ public class Launcher {
 
     protected void enableTextAntiAliasing() {
         try {
-            Class<?> clazz0 = Class.forName("sun.swing.SwingUtilities2");
-            Method isLocalDisplay = clazz0.getMethod("isLocalDisplay");
-            final Object lafCond = isLocalDisplay.invoke(null);
-
             Class<?> clazz = Class.forName("sun.swing.SwingUtilities2$AATextInfo");
             Method method = clazz.getMethod("getAATextInfo", boolean.class);
-            Object aaTextInfo = method.invoke(null, lafCond);
+            Object aaTextInfo = method.invoke(null, isLocalDisplay());
 
+            Class<?> clazz0 = Class.forName("sun.swing.SwingUtilities2");
             Field field = clazz0.getField("AA_TEXT_PROPERTY_KEY");
             Object aaTextPropertyKey = field.get(null);
             UIManager.getDefaults().put(aaTextPropertyKey, aaTextInfo);
@@ -74,6 +72,12 @@ public class Launcher {
         catch (InvocationTargetException ignored) {}
         catch (IllegalAccessException    ignored) {}
         catch (NoSuchFieldException      ignored) {}
+    }
+
+    private static boolean isLocalDisplay() {
+        final GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        return (!(ge instanceof sun.java2d.SunGraphicsEnvironment))
+                || ((sun.java2d.SunGraphicsEnvironment) ge).isDisplayLocal();
     }
 
     protected void showAppVersion() {
