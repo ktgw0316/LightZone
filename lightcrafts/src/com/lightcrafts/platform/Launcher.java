@@ -3,6 +3,7 @@
 package com.lightcrafts.platform;
 
 import com.lightcrafts.app.Application;
+import com.lightcrafts.app.CheckForUpdate;
 import com.lightcrafts.app.ExceptionDialog;
 import com.lightcrafts.splash.SplashImage;
 import com.lightcrafts.splash.SplashWindow;
@@ -33,6 +34,8 @@ public class Launcher {
             checkCpu();
             UIManager.setLookAndFeel(Platform.getPlatform().getLookAndFeel());
 
+            CheckForUpdate.start();
+
             final String licenseText = "Open Source";
             final SplashImage splash = new SplashImage(
                 SplashImage.getDefaultSplashText(licenseText)
@@ -43,6 +46,8 @@ public class Launcher {
             startForkDaemon();
             Application.main(args);
             SplashWindow.disposeSplash();
+
+            CheckForUpdate.showAlertIfAvailable();
         }
         catch (Throwable t) {
             (new ExceptionDialog()).handle(t);
