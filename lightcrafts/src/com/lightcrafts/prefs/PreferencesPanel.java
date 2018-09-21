@@ -30,7 +30,7 @@ public class PreferencesPanel extends JPanel {
             addItem(this, items, new DisplayProfileItem(help));
         }
         addItem(this, items, new BrowserCacheItem(help));
-//        addItem(this, items, new CheckForUpdateItem(help));
+        addItem(this, items, new CheckForUpdateItem(help));
         addItem(this, items, new ExportDirectoryItem(help));
         addItem(this, items, new SaveDirectoryItem(help));
         addItem(this, items, new AutoSaveItem(help));
