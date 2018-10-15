@@ -31,7 +31,7 @@ class ImageBrowserMouseListener implements MouseInputListener {
             controller.handleEvent(event);
         }
         else if (event.getClickCount() == 2) {
-            Point p = event.getPoint();
+            final Point p = event.getPoint();
             int index = browser.getIndex(p);
             ImageDatum datum = browser.getImageDatum(index);
             if (datum != null) {
@@ -48,7 +48,7 @@ class ImageBrowserMouseListener implements MouseInputListener {
         }
         else {
             // Identify which ImageDatum got the click:
-            Point p = event.getPoint();
+            final Point p = event.getPoint();
             int index = browser.getIndex(p);
             if (index < 0) {
                 selection.clearSelected();

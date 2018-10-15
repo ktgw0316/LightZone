@@ -8,6 +8,7 @@ import com.lightcrafts.ui.browser.model.ImageDatumType;
 import com.lightcrafts.ui.browser.model.ImageGroup;
 import com.lightcrafts.ui.browser.model.ImageList;
 import com.lightcrafts.ui.LightZoneSkin;
+import com.lightcrafts.utils.awt.geom.HiDpi;
 
 import javax.swing.*;
 import java.awt.*;
@@ -44,11 +45,14 @@ public class CollapsedImageBrowser extends AbstractImageBrowser {
             return;
         }
         Graphics2D g = (Graphics2D) graphics;
-        Rectangle clip = g.getClipBounds();
 
         // Figure out which ImageDatums fall within the clip bounds.
+        final Rectangle clip0 = g.getClipBounds();
         List<ImageDatum> datums = getAllImageData();
-        int[] indices = getIndices(datums.size(), clip);
+        int[] indices = getIndices(datums.size(), clip0);
+
+        HiDpi.resetTransformScaleOf(g);
+        final Rectangle clip = g.getClipBounds();
 
         // Iterate backwards through indices, so repaints get enqueued
         // in a visually pleasing order.
@@ -67,7 +71,7 @@ public class CollapsedImageBrowser extends AbstractImageBrowser {
             // This queue prevents GC of recently painted images:
             recentImages.add(image);
 
-            Rectangle rect = getBounds(index);
+            final Rectangle rect = HiDpi.imageSpaceRectFrom(getBounds(index));
             g.setClip(clip.intersection(rect));
 
             File file = datum.getFile();

@@ -36,11 +36,15 @@ public class HiDpi {
         g.setTransform(tx);
     }
 
+    public static Dimension userSpaceDimensionFrom(Dimension d) {
+        return userSpaceDimensionFrom(d.getWidth(), d.getHeight());
+    }
+
     public static Dimension userSpaceDimensionFrom(RenderedImage image) {
         return userSpaceDimensionFrom(image.getWidth(), image.getHeight());
     }
 
-    private static Dimension userSpaceDimensionFrom(int width, int height) {
+    private static Dimension userSpaceDimensionFrom(double width, double height) {
         return new Dimension(
                 scaleToInt(width, inverseDefaultTransform.getScaleX()),
                 scaleToInt(height, inverseDefaultTransform.getScaleY()));
@@ -66,7 +70,7 @@ public class HiDpi {
                 scaleToInt(height, scaleY));
     }
 
-    static private int scaleToInt(int value, double scale) {
+    static private int scaleToInt(double value, double scale) {
         return (int) Math.round(value * scale);
     }
 }
