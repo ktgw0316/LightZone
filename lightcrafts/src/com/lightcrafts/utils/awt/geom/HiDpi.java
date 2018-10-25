@@ -50,6 +50,16 @@ public class HiDpi {
                 scaleToInt(height, inverseDefaultTransform.getScaleY()));
     }
 
+    public static Dimension imageSpaceDimensionFrom(Dimension d) {
+        return imageSpaceDimensionFrom(d.getWidth(), d.getHeight());
+    }
+
+    private static Dimension imageSpaceDimensionFrom(double width, double height) {
+        return new Dimension(
+                scaleToInt(width, defaultTransform.getScaleX()),
+                scaleToInt(height, defaultTransform.getScaleY()));
+    }
+
     public static Point imageSpacePointFrom(Point point) {
         final Point p = new Point();
         HiDpi.defaultTransform.transform(point, p);
