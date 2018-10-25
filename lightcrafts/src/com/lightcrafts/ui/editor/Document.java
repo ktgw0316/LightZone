@@ -451,17 +451,7 @@ public class Document {
      * handled inside Document.
      */
     public void zoomToFit() {
-        Rectangle rect = editor.getMaxImageBounds();
-        // Sometimes during frame initialization, the max image bounds
-        // is reported as zero.  Perhaps some layout glitch involving
-        // scroll pane interaction?
-        if ((rect.width > 0) && (rect.height > 0)) {
-            Scale oldScale = scale.getCurrentScale();
-            Scale newScale = engine.setScale(rect);
-            if (! scale.setScale(newScale)) {
-                engine.setScale(oldScale);
-            }
-        }
+        editor.setScaleToFit();
     }
 
     /**

@@ -63,19 +63,9 @@ final class FitButton
 
     // This zoom-to-fit logic is copied from Document.zoomToFit().
     void doZoomToFit() {
-        Rectangle rect = editor.getMaxImageBounds();
-        // Sometimes during frame initialization, the max image bounds
-        // is reported as zero.  Perhaps some layout glitch involving
-        // scroll pane interaction?
-        if ((rect.width > 0) && (rect.height > 0)) {
-            isChangingScale = true;
-            Scale oldScale = scale.getCurrentScale();
-            Scale newScale = engine.setScale(rect);
-            if (! scale.setScale(newScale)) {
-                engine.setScale(oldScale);
-            }
-            isChangingScale = false;
-        }
+        isChangingScale = true;
+        editor.setScaleToFit();
+        isChangingScale = false;
     }
 
     // If a scale change from another source is detected, exit the

@@ -6,6 +6,7 @@ package com.lightcrafts.ui.editor;
 import com.lightcrafts.model.Engine;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.Preview;
+import com.lightcrafts.model.Scale;
 import com.lightcrafts.ui.ActivityMeter;
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.ui.crop.CropMode;
@@ -19,6 +20,7 @@ import com.lightcrafts.ui.scroll.CenteringScrollPane;
 import com.lightcrafts.ui.scroll.PannerOverlay;
 import com.lightcrafts.ui.scroll.ScrollMode;
 import com.lightcrafts.ui.toolkit.BoxedButton;
+import com.lightcrafts.utils.awt.geom.HiDpi;
 import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlNode;
 
@@ -139,6 +141,21 @@ public class Editor {
             modes.setEditorMode( mode );
     }
 
+    void setScaleToFit() {
+        final Rectangle rect = HiDpi.imageSpaceRectFrom(getMaxImageBounds());
+
+        // Sometimes during frame initialization, the max image bounds
+        // is reported as zero.  Perhaps some layout glitch involving
+        // scroll pane interaction?
+        if (rect.width > 0 && rect.height > 0) {
+            final Scale oldScale = scale.getCurrentScale();
+            final Scale newScale = engine.setScale(rect);
+            if (! scale.setScale(newScale)) {
+                engine.setScale(oldScale);
+            }
+        }
+    }
+
     private static class MiniScrollMode extends AbstractMode {
         private JPanel overlay;     // just something to setCursor() on
 
@@ -248,8 +265,8 @@ public class Editor {
                     opControls.setDropper(null);
                 }
                 private void updateDropper(MouseEvent e) {
-                    Point p = e.getPoint();
-                    Point q = new Point();
+                    final Point p = HiDpi.imageSpacePointFrom(e.getPoint());
+                    final Point q = new Point();
                     AffineTransform xform = modes.getOverlayTransform();
                     try {
                         xform.inverseTransform(p, q);

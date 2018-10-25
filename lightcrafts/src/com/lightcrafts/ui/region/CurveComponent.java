@@ -2,6 +2,8 @@
 
 package com.lightcrafts.ui.region;
 
+import com.lightcrafts.utils.awt.geom.HiDpi;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -430,7 +432,8 @@ class CurveComponent extends JComponent
     }
 
     private void handlePopup(MouseEvent event) {
-        final Point p = event.getPoint();
+        final Point p0 = event.getPoint();
+        final Point p = HiDpi.imageSpacePointFrom(p0);
 
         JPopupMenu menu = new JPopupMenu();
         JMenuItem item = null;
@@ -498,7 +501,7 @@ class CurveComponent extends JComponent
                 menu.add(item);
             }
         }
-        menu.show(this, p.x, p.y);
+        menu.show(this, p0.x, p0.y);
     }
 
     protected void paintComponent(Graphics graphics) {
@@ -512,6 +515,7 @@ class CurveComponent extends JComponent
         if (xform != null) {
             AffineTransform newTransform =
                 (AffineTransform) oldTransform.clone();
+            newTransform.concatenate(HiDpi.inverseDefaultTransform);
             newTransform.concatenate(xform);
             g.setTransform(newTransform);
         }

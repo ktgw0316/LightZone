@@ -3,6 +3,7 @@
 package com.lightcrafts.ui.browser.view;
 
 import com.lightcrafts.ui.browser.model.ImageDatum;
+import com.lightcrafts.utils.awt.geom.HiDpi;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -110,7 +111,7 @@ class ImageDatumControl {
 
     Rectangle getRect() {
         if (index >= 0) {
-            Rectangle rect = browser.getBounds(index);
+            Rectangle rect = HiDpi.imageSpaceRectFrom(browser.getBounds(index));
             return rect;
         }
         return null;
@@ -153,7 +154,7 @@ class ImageDatumControl {
             event.getID() == MouseEvent.MOUSE_RELEASED ||
             event.getID() == MouseEvent.MOUSE_CLICKED
         ) {
-            Point p = event.getPoint();
+            Point p = HiDpi.imageSpacePointFrom(event.getPoint());
 
             Rectangle leftRect = getRotateLeftRect();
             if (leftRect != null) {
@@ -196,7 +197,7 @@ class ImageDatumControl {
 //        }
         if (event.getID() == MouseEvent.MOUSE_MOVED) {
             // Update highlights and schedule repaint of the affordance.
-            Point p = event.getPoint();
+            final Point p = HiDpi.imageSpacePointFrom(event.getPoint());
             Rectangle leftRect = getRotateLeftRect();
             boolean wasHoverLeft = hoverLeft;
             hoverLeft = (leftRect != null) && leftRect.contains(p);
@@ -222,7 +223,7 @@ class ImageDatumControl {
             ImageDatum datum = browser.getImageDatum(index);
 
             // Figure out which affordance, and update the datum.
-            Point p = event.getPoint();
+            final Point p = HiDpi.imageSpacePointFrom(event.getPoint());
 
             Rectangle leftRect = getRotateLeftRect();
             if (leftRect != null) {
