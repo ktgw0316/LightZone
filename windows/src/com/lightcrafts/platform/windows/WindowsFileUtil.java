@@ -138,33 +138,6 @@ public final class WindowsFileUtil {
         return isShortcut( path ) ? resolveShortcutImpl( path ) : path;
     }
 
-    /**
-     * Tell Windows Explorer to show the folder the given file is in and to
-     * select the file.
-     *
-     * @param path The full path of the file to show and select.
-     * @return Returns <code>true</code> only if the file was selected
-     * successfully.
-     */
-    public static boolean showInExplorer( String path ) {
-        try {
-            Runtime.getRuntime().exec( "explorer /select, " + path );
-            //
-            // We'd like to be able to test the exit value of the process, but
-            // explorer always returns 1 regardless of success/failure, so
-            // always return true.
-            //
-            // Note that if it does fail, explorer displays an error alert to
-            // the user.
-            //
-            return true;
-        }
-        catch ( IOException e ) {
-            // ignore
-        }
-        return false;
-    }
-
     ////////// private ////////////////////////////////////////////////////////
 
     /**

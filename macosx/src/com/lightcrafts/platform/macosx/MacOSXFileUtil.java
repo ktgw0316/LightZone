@@ -100,16 +100,6 @@ public final class MacOSXFileUtil {
      */
     public static native String resolveAlias( String path );
 
-    /**
-     * Tell the Finder to show the folder the given file is in and to select
-     * the file.
-     *
-     * @param path The full path of the file to show and select.
-     * @return Returns <code>true</code> only if the file was selected
-     * successfully.
-     */
-    public static native boolean showInFinder( String path );
-
     ////////// private ////////////////////////////////////////////////////////
 
     /**

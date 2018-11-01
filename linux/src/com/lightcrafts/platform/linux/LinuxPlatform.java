@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2013-     Masahiro Kitagawa */
 
 package com.lightcrafts.platform.linux;
 
@@ -186,41 +187,6 @@ public class LinuxPlatform extends Platform {
     @Override
     public void makeModal(Dialog dialog) {
         dialog.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
-    }
-
-    public boolean showFileInFolder( String path ) {
-        // If the path points to a file, pop up to its enclosing folder.
-        File file = new File(path);
-        if (file.isFile()) {
-            path = file.getParent();
-        }
-        String[] fileManagers = new String[] {
-            "nautilus",  // Gnome
-            "dolphin",   // KDE
-            "konqueror", // KDE
-            "nemo",      // Cinnamon
-            "caja",      // MATE
-            "thunar",    // Xfce
-            "pcmanfm",   // LXDE
-            "rox-filer"  // RQX
-            // others?
-        };
-        try {
-            Runtime rt = Runtime.getRuntime();
-            for (String fileManager : fileManagers ) {
-                String[] args = new String[]{ "which", fileManager };
-                if (rt.exec(args).waitFor() == 0) {
-                    args = new String[] { fileManager, path };
-                    rt.exec(args);
-                    return true;
-                }
-            }
-        }
-        catch ( Exception e ) {
-            // do nothing
-            e.printStackTrace();
-        }
-        return false;
     }
 
     @Override
