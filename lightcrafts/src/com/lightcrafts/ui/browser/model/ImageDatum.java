@@ -496,13 +496,9 @@ public class ImageDatum {
         String key = getRotateKey();
         int rotate = 0;
         if ((cache != null) && cache.contains(key)) {
-            try {
-                InputStream in = cache.getStreamFor(key);
-                try {
+            try (InputStream in = cache.getStreamFor(key)) {
+                if (in != null) {
                     rotate = in.read();
-                }
-                finally {
-                    in.close();
                 }
             }
             catch (IOException e) {
@@ -579,89 +575,36 @@ public class ImageDatum {
             return;
         }
         String metaKey = getMetadataKey();
-        ObjectOutputStream out = null;
-        try {
-            out = new ObjectOutputStream(cache.putToStream(metaKey));
+        try (ObjectOutputStream out = new ObjectOutputStream(cache.putToStream(metaKey))) {
             out.writeObject(meta);
         }
         catch (IOException e) {
             // metadata will be reread next time
             System.err.println("metadata cache error: " + e.getMessage());
         }
-        finally {
-            if (out != null) {
-                try {
-                    out.close();
-                }
-                catch (IOException e) {
-                    System.err.println(
-                        "metadata cache error: " + e.getMessage()
-                    );
-                }
-            }
-        }
         String fileTimeKey = getFileTimeCacheKey();
-        try {
-            out = new ObjectOutputStream(cache.putToStream(fileTimeKey));
+        try (ObjectOutputStream out = new ObjectOutputStream(cache.putToStream(fileTimeKey))) {
             out.writeObject(fileCacheTime);
         }
         catch (IOException e) {
             System.err.println("file time cache error: " + e.getMessage());
         }
-        finally {
-            if (out != null) {
-                try {
-                    out.close();
-                }
-                catch (IOException e) {
-                    System.err.println(
-                        "file time cache error: " + e.getMessage()
-                    );
-                }
-            }
-        }
         if (xmpFile == null) {
             return;
         }
         String xmpFileKey = getXmpKey();
-        try {
-            out = new ObjectOutputStream(cache.putToStream(xmpFileKey));
+        try (ObjectOutputStream out = new ObjectOutputStream(cache.putToStream(xmpFileKey))) {
             out.writeObject(xmpFile);
         }
         catch (IOException e) {
             System.err.println("file time cache error: " + e.getMessage());
         }
-        finally {
-            if (out != null) {
-                try {
-                    out.close();
-                }
-                catch (IOException e) {
-                    System.err.println(
-                        "file time cache error: " + e.getMessage()
-                    );
-                }
-            }
-        }
         String xmpFileTimeKey = getXmpFileTimeCacheKey();
-        try {
-            out = new ObjectOutputStream(cache.putToStream(xmpFileTimeKey));
+        try (ObjectOutputStream out = new ObjectOutputStream(cache.putToStream(xmpFileTimeKey))) {
             out.writeObject(xmpFileCacheTime);
         }
         catch (IOException e) {
             System.err.println("XMP file time cache error: " + e.getMessage());
-        }
-        finally {
-            if (out != null) {
-                try {
-                    out.close();
-                }
-                catch (IOException e) {
-                    System.err.println(
-                        "XMP file time cache error: " + e.getMessage()
-                    );
-                }
-            }
         }
     }
 
@@ -671,84 +614,42 @@ public class ImageDatum {
         }
         String fileTimeKey = getFileTimeCacheKey();
         if (cache.contains(fileTimeKey)) {
-            ObjectInputStream oin = null;
-            try {
-                InputStream in = cache.getStreamFor(fileTimeKey);
+            try (InputStream in = cache.getStreamFor(fileTimeKey)) {
                 if (in != null) {
-                    oin = new ObjectInputStream(in);
-                    fileCacheTime = (Long) oin.readObject();
-                }
-            }
-            catch (IOException e) {
-                fileCacheTime = 0;
-            }
-            catch (ClassNotFoundException e) {
-                fileCacheTime = 0;
-            }
-            finally {
-                if (oin != null) {
-                    try {
-                        oin.close();
-                    }
-                    catch (IOException e) {
-                        // ignore
+                    try (ObjectInputStream oin = new ObjectInputStream(in)) {
+                        fileCacheTime = (Long) oin.readObject();
                     }
                 }
+            }
+            catch (IOException | ClassNotFoundException e) {
+                fileCacheTime = 0;
             }
         }
         String xmpFileKey = getXmpKey();
         if (cache.contains(xmpFileKey)) {
-            ObjectInputStream oin = null;
-            try {
-                InputStream in = cache.getStreamFor(xmpFileKey);
+            try (InputStream in = cache.getStreamFor(xmpFileKey)) {
                 if (in != null) {
-                    oin = new ObjectInputStream(in);
-                    xmpFile = (File) oin.readObject();
-                }
-            }
-            catch (IOException e) {
-                xmpFile = null;
-            }
-            catch (ClassNotFoundException e) {
-                xmpFile = null;
-            }
-            finally {
-                if (oin != null) {
-                    try {
-                        oin.close();
-                    }
-                    catch (IOException e) {
-                        // ignore
+                    try (ObjectInputStream oin = new ObjectInputStream(in)) {
+                        xmpFile = (File) oin.readObject();
                     }
                 }
+            }
+            catch (IOException | ClassNotFoundException e) {
+                xmpFile = null;
             }
         }
         if (xmpFile != null) {
             String xmpFileTimeKey = getXmpFileTimeCacheKey();
             if (cache.contains(xmpFileTimeKey)) {
-                ObjectInputStream oin = null;
-                try {
-                    InputStream in = cache.getStreamFor(xmpFileTimeKey);
+                try (InputStream in = cache.getStreamFor(xmpFileTimeKey)) {
                     if (in != null) {
-                        oin = new ObjectInputStream(in);
-                        xmpFileCacheTime = (Long) oin.readObject();
-                    }
-                }
-                catch (IOException e) {
-                    xmpFileCacheTime = 0;
-                }
-                catch (ClassNotFoundException e) {
-                    xmpFileCacheTime = 0;
-                }
-                finally {
-                    if (oin != null) {
-                        try {
-                            oin.close();
-                        }
-                        catch (IOException e) {
-                            // ignore
+                        try (ObjectInputStream oin = new ObjectInputStream(in)) {
+                            xmpFileCacheTime = (Long) oin.readObject();
                         }
                     }
+                }
+                catch (IOException | ClassNotFoundException e) {
+                    xmpFileCacheTime = 0;
                 }
             }
         }
@@ -757,29 +658,15 @@ public class ImageDatum {
         }
         String metaKey = getMetadataKey();
         if (cache.contains(metaKey)) {
-            ObjectInputStream oin = null;
-            try {
-                InputStream in = cache.getStreamFor(metaKey);
+            try (InputStream in = cache.getStreamFor(metaKey)) {
                 if (in != null) {
-                    oin = new ObjectInputStream(in);
-                    meta = (ImageMetadata) oin.readObject();
-                }
-            }
-            catch (IOException e) {
-                // getMetadata() will fall back to parsing out metadata
-            }
-            catch (ClassNotFoundException e) {
-                // getMetadata() will fall back to parsing out metadata
-            }
-            finally {
-                if (oin != null) {
-                    try {
-                        oin.close();
-                    }
-                    catch (IOException e) {
-                        // ignore
+                    try (ObjectInputStream oin = new ObjectInputStream(in)) {
+                        meta = (ImageMetadata) oin.readObject();
                     }
                 }
+            }
+            catch (IOException | ClassNotFoundException e) {
+                // getMetadata() will fall back to parsing out metadata
             }
         }
     }

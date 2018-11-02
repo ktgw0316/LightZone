@@ -153,9 +153,9 @@ public class DocumentWriter {
         // Fill up the LZN file:
         SaveOptions options = doc.getSaveOptions();
         File file = options.getFile();
-        OutputStream out = new FileOutputStream(file);
-        xmlDoc.write(out);
-        out.close();
+        try (OutputStream out = new FileOutputStream(file)) {
+            xmlDoc.write(out);
+        }
 
         // Add thumbnail data for the browser:
         RenderedImage thumb = engine.getRendering(new Dimension(320, 320));

@@ -47,24 +47,17 @@ class TemplateDeployer {
                 "Couldn't find resource for template " + template
             );
         }
-        OutputStream out = new FileOutputStream(file);
         byte[] buffer = new byte[10000];    // bigger than any template
-        try {
-            int count;
+        int count;
+        try (OutputStream out = new FileOutputStream(file)) {
             do {
                 count = in.read(buffer);
                 if (count > 0) {
                     out.write(buffer, 0, count);
                 }
             } while (count >= 0);
-        }
-        finally {
-            try {
-                out.close();
-            }
-            catch (IOException e) {
-                System.out.println("Failed to close template " + template);
-            }
+        } catch (IOException e) {
+            System.out.println("Failed to close template " + template);
         }
     }
 

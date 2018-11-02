@@ -31,10 +31,8 @@ public final class OutputStreamImageDataReceiver
      */
     public synchronized void dispose() {
         if (m_channel != null) {
-            final WritableByteChannel temp = m_channel;
-            m_channel = null;
-            try {
-                temp.close();
+            try (WritableByteChannel temp = m_channel) {
+                m_channel = null;
             } catch (IOException e) {
                 e.printStackTrace();
             }

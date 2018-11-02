@@ -58,20 +58,9 @@ public final class FileUtil {
      * @throws IOException if anything goes wrong.
      */
     public static void copyFile( File source, File target ) throws IOException {
-        final FileChannel sourceChannel =
-            new FileInputStream( source ).getChannel();
-        final FileChannel targetChannel =
-            new FileOutputStream( target ).getChannel();
-        try {
+        try (FileChannel sourceChannel = new FileInputStream( source ).getChannel();
+             FileChannel targetChannel = new FileOutputStream( target ).getChannel()) {
             sourceChannel.transferTo( 0, sourceChannel.size(), targetChannel );
-        }
-        finally {
-            try {
-                targetChannel.close();
-            }
-            finally {
-                sourceChannel.close();
-            }
         }
     }
 
@@ -412,12 +401,8 @@ public final class FileUtil {
      * @see #readEntireStream(InputStream)
      */
     public static String readEntireFile( File file ) throws IOException {
-        final InputStream is = new FileInputStream( file );
-        try {
-            return readEntireStream( is );
-        }
-        finally {
-            is.close();
+        try (InputStream is = new FileInputStream(file)) {
+            return readEntireStream(is);
         }
     }
 

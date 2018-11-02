@@ -166,22 +166,11 @@ public final class ColorProfileInfo implements Comparable {
      */
     public synchronized ICC_Profile getICCProfile() {
         if ( m_iccProfile == null ) {
-            InputStream in = null;
-            try {
-                in = new FileInputStream( m_path );
-                m_iccProfile = ICC_Profile.getInstance( in );
+            try (InputStream in = new FileInputStream(m_path)) {
+                m_iccProfile = ICC_Profile.getInstance(in);
             }
             catch ( IOException e ) {
                 System.err.println( "Bad color profile path: " + m_path );
-            }
-            finally {
-                try {
-                    if ( in != null )
-                        in.close();
-                }
-                catch ( IOException e ) {
-                    // nothing
-                }
             }
         }
         return m_iccProfile;

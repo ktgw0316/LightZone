@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2018-     Masahiro Kitagawa */
 
 package com.lightcrafts.platform.linux;
 
@@ -52,10 +53,10 @@ public class LinuxPlatform extends Platform {
         ProcessBuilder pb = new ProcessBuilder("xdg-user-dir", "PICTURES");
         try {
             Process p = pb.start();
-            BufferedReader br =
-                    new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String line = br.readLine();
-            br.close();
+            final String line;
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+                line = br.readLine();
+            }
             p.waitFor();
             p.destroy();
             if (p.exitValue() == 0 && line != null && ! line.equals(home)) {
@@ -147,25 +148,25 @@ public class LinuxPlatform extends Platform {
 
         try {
             Process process = Runtime.getRuntime().exec(cmd);
-            InputStream in = process.getInputStream();
-            InputStreamReader reader = new InputStreamReader(in);
-            BufferedReader buffer = new BufferedReader(reader);
-            String line = buffer.readLine();
-            while (line != null) {
-                Matcher matcher = pattern.matcher(line);
-                if (matcher.matches()) {
-                    String text = matcher.replaceAll("$1");
-                    int i = Integer.parseInt(text);
-                    if (osname.contains("Linux"))
-                        return i / 1024;
-                    else if (osname.contains("SunOS"))
-                        return i;
-                    else
-                        return i / 1048576;
+            try (InputStream in = process.getInputStream();
+                 InputStreamReader reader = new InputStreamReader(in);
+                 BufferedReader buffer = new BufferedReader(reader)) {
+                String line = buffer.readLine();
+                while (line != null) {
+                    Matcher matcher = pattern.matcher(line);
+                    if (matcher.matches()) {
+                        String text = matcher.replaceAll("$1");
+                        int i = Integer.parseInt(text);
+                        if (osname.contains("Linux"))
+                            return i / 1024;
+                        else if (osname.contains("SunOS"))
+                            return i;
+                        else
+                            return i / 1048576;
+                    }
+                    line = buffer.readLine();
                 }
-                line = buffer.readLine();
             }
-            buffer.close();
         }
         catch (IOException  e) {
             System.err.println("Can't get memory size: " + e.getMessage());

@@ -32,10 +32,8 @@ public final class InputStreamImageDataProvider implements LCImageDataProvider {
      */
     public synchronized void dispose() {
         if (m_channel != null) {
-            final ReadableByteChannel temp = m_channel;
-            m_channel = null;
-            try {
-                temp.close();
+            try (ReadableByteChannel temp = m_channel) {
+                m_channel = null;
             } catch (IOException e) {
                 e.printStackTrace();
             }
