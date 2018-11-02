@@ -3,6 +3,7 @@
 package com.lightcrafts.utils.xml;
 
 import java.util.ArrayList;
+import java.util.Base64;
 
 import org.w3c.dom.*;
 
@@ -173,7 +174,7 @@ public class XmlNode {
      * encoding.  To recover these data, use <code>getData()</code>.
      */
     public void setData(byte[] data) {
-        String s = Base64.encodeBytes(data);
+        String s = Base64.getEncoder().encodeToString(data);
         clearData();
         Document doc = element.getOwnerDocument();
         Text text = doc.createTextNode(s);
@@ -197,7 +198,7 @@ public class XmlNode {
                 sb.append( text.getData() );
             }
         }
-        return Base64.decode( sb.toString() );
+        return Base64.getDecoder().decode(sb.toString());
     }
 
     /**
