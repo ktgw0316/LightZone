@@ -71,7 +71,7 @@ LDFLAGS:=		$(PLATFORM_LDFLAGS) $(JAVA_LDFLAGS) \
 			-L$(COMMON_DIR)/products $(JNI_EXTRA_LDFLAGS)
 LINK:=			$(JNI_EXTRA_LINK)
 
-ifneq ($(JNI_EXTRA_PKGCFG),)
+ifdef JNI_EXTRA_PKGCFG
   LINK+=		$(shell $(PKGCFG) --libs-only-l $(JNI_EXTRA_PKGCFG))
   INCLUDES+=		$(shell $(PKGCFG) --cflags-only-I $(JNI_EXTRA_PKGCFG))
   LDFLAGS+=		$(shell $(PKGCFG) --libs-only-L $(JNI_EXTRA_PKGCFG))
