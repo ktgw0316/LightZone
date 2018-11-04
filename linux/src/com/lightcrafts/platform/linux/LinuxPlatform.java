@@ -62,9 +62,7 @@ public class LinuxPlatform extends Platform {
                 return new File(line);
             }
         }
-        catch (IOException e) {
-        }
-        catch (InterruptedException e) {
+        catch (IOException | InterruptedException ignored) {
         }
 
         return new File( home, Version.getApplicationName() );
@@ -122,7 +120,7 @@ public class LinuxPlatform extends Platform {
 
     private static synchronized Collection<ColorProfileInfo> getColorProfiles() {
         if (Profiles == null) {
-            Profiles = new HashSet<ColorProfileInfo>();
+            Profiles = new HashSet<>();
             Profiles.addAll(getColorProfiles(SystemProfileDir));
             Profiles.addAll(getColorProfiles(UserProfileDir));
         }
@@ -135,10 +133,10 @@ public class LinuxPlatform extends Platform {
 
         String[] cmd;
         String regex;
-        if (osname.indexOf("Linux") >= 0) {
+        if (osname.contains("Linux")) {
             cmd = new String[] {"cat", "/proc/meminfo"};
             regex = "MemTotal: *([0-9]*) .*";
-        } else if (osname.indexOf("SunOS") >= 0) {
+        } else if (osname.contains("SunOS")) {
             cmd = new String[] {"prtconf"};
             regex = "Memory size: *([0-9]*) .*";
         } else {
@@ -158,9 +156,9 @@ public class LinuxPlatform extends Platform {
                 if (matcher.matches()) {
                     String text = matcher.replaceAll("$1");
                     int i = Integer.parseInt(text);
-                    if (osname.indexOf("Linux") >= 0)
+                    if (osname.contains("Linux"))
                         return i / 1024;
-                    else if (osname.indexOf("SunOS") >= 0)
+                    else if (osname.contains("SunOS"))
                         return i;
                     else
                         return i / 1048576;
