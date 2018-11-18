@@ -18,8 +18,6 @@ import com.lightcrafts.platform.FileChooser;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.platform.PrinterLayer;
 import com.lightcrafts.utils.ColorProfileInfo;
-import com.lightcrafts.utils.directory.DirectoryMonitor;
-import com.lightcrafts.utils.directory.WindowsDirectoryMonitor;
 import com.lightcrafts.utils.file.FileUtil;
 import com.lightcrafts.utils.file.ICC_ProfileFileFilter;
 import com.lightcrafts.utils.Version;
@@ -37,11 +35,6 @@ public final class WindowsPlatform extends Platform {
         final String path =
             WindowsFileUtil.getFolderPathOf( FOLDER_MY_PICTURES );
         return path != null ? new File( path ) : null;
-    }
-
-    @Override
-    public DirectoryMonitor getDirectoryMonitor() {
-        return new WindowsDirectoryMonitor();
     }
 
     @Override
