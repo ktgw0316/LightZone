@@ -204,7 +204,8 @@ void CLASS init_fuji_block(struct fuji_compressed_block *info, const struct fuji
   info->fillbytes = 1;
 
   info->linebuf[_R0] = info->linealloc;
-  for (int i = _R1; i <= _B4; i++)
+  int i;
+  for (i = _R1; i <= _B4; i++)
     info->linebuf[i] = info->linebuf[i - 1] + params->line_width + 2;
 
   // init buffer
@@ -213,8 +214,9 @@ void CLASS init_fuji_block(struct fuji_compressed_block *info, const struct fuji
   info->cur_bit = 0;
   info->cur_pos = 0;
   info->cur_buf_offset = raw_offset;
-  for (int j = 0; j < 3; j++)
-    for (int i = 0; i < 41; i++)
+  int j;
+  for (j = 0; j < 3; j++)
+    for (i = 0; i < 41; i++)
     {
       info->grad_even[j][i].value1 = params->maxDiff;
       info->grad_even[j][i].value2 = 1;
@@ -238,13 +240,14 @@ void copy_line_to_xtrans(struct fuji_compressed_block *info, int cur_line, int c
   int offset = fuji_header.block_width * cur_block + 6 * fuji_header.raw_width * cur_line;
   ushort *raw_block_data = raw_image + offset;
   int row_count = 0;
+  int i;
 
-  for (int i = 0; i < 3; i++)
+  for (i = 0; i < 3; i++)
   {
     lineBufR[i] = info->linebuf[_R2 + i] + 1;
     lineBufB[i] = info->linebuf[_B2 + i] + 1;
   }
-  for (int i = 0; i < 6; i++)
+  for (i = 0; i < 6; i++)
     lineBufG[i] = info->linebuf[_G2 + i] + 1;
 
   while (row_count < 6)
@@ -285,20 +288,22 @@ void copy_line_to_bayer(struct fuji_compressed_block *info, int cur_line, int cu
   ushort *line_buf;
 
   int fuji_bayer[2][2];
-  for (int r = 0; r < 2; r++)
-    for (int c = 0; c < 2; c++)
+  int r, c;
+  for (r = 0; r < 2; r++)
+    for (c = 0; c < 2; c++)
       fuji_bayer[r][c] = FC(r, c); // We'll downgrade G2 to G below
 
   int offset = fuji_header.block_width * cur_block + 6 * fuji_header.raw_width * cur_line;
   ushort *raw_block_data = raw_image + offset;
   int row_count = 0;
+  int i;
 
-  for (int i = 0; i < 3; i++)
+  for (i = 0; i < 3; i++)
   {
     lineBufR[i] = info->linebuf[_R2 + i] + 1;
     lineBufB[i] = info->linebuf[_B2 + i] + 1;
   }
-  for (int i = 0; i < 6; i++)
+  for (i = 0; i < 6; i++)
     lineBufG[i] = info->linebuf[_G2 + i] + 1;
 
   while (row_count < 6)
@@ -555,7 +560,8 @@ static void fuji_decode_interpolation_even(int line_width, ushort *line_buf, int
 
 static void fuji_extend_generic(ushort *linebuf[_ltotal], int line_width, int start, int end)
 {
-  for (int i = start; i <= end; i++)
+  int i;
+  for (i = start; i <= end; i++)
   {
     linebuf[i][0] = linebuf[i - 1][1];
     linebuf[i][line_width + 1] = linebuf[i - 1][line_width];
@@ -932,7 +938,8 @@ void fuji_decode_strip(const struct fuji_compressed_params *info_common, int cur
       fuji_bayer_decode_block(&info, info_common, cur_line);
 
     // copy data from line buffers and advance
-    for (int i = 0; i < 6; i++)
+    int i;
+    for (i = 0; i < 6; i++)
       memcpy(info.linebuf[mtable[i].a], info.linebuf[mtable[i].b], line_size);
 
     if (fuji_header.raw_type == 16)
@@ -940,7 +947,7 @@ void fuji_decode_strip(const struct fuji_compressed_params *info_common, int cur
     else
       copy_line_to_bayer(&info, cur_line, cur_block, cur_block_width);
 
-    for (int i = 0; i < 3; i++)
+    for (i = 0; i < 3; i++)
     {
       memset(info.linebuf[ztable[i].a], 0, ztable[i].b * line_size);
       info.linebuf[ztable[i].a][0] = info.linebuf[ztable[i].a - 1][1];
