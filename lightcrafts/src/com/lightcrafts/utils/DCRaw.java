@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2016-     Masahiro Kitagawa */
 
 package com.lightcrafts.utils;
 
@@ -292,153 +293,170 @@ public final class DCRaw implements
         String secondaryInfo[] = { DCRAW_PATH, "-v", "-i", "-s", "1", "-t", "0", m_fileName };
 
         synchronized (DCRaw.class) {
-            Process p = null;
-            InputStream dcrawStdOut;
-            InputStream dcrawStdErr;
-            if (ForkDaemon.INSTANCE != null) {
-                ForkDaemon.INSTANCE.invoke(secondary ? secondaryInfo : info);
-                dcrawStdOut = ForkDaemon.INSTANCE.getStdOut();
-                dcrawStdErr = ForkDaemon.INSTANCE.getStdErr();
-            } else {
-                p = Runtime.getRuntime().exec(secondary ? secondaryInfo : info);
-                dcrawStdOut = p.getInputStream();
-                dcrawStdErr = new BufferedInputStream(p.getErrorStream());
-            }
+            final Process p = execProcess(secondary ? secondaryInfo : info);
+            final InputStream dcrawStdErr = getDcrawStdErr(p);
+            final InputStream dcrawStdOut = getDcrawStdOut(p);
+            try {
+                // output expected on stdout
+                String line, args;
+                while ((line = readln(dcrawStdOut)) != null) {
+                    // System.out.println(line);
 
-            // output expected on stdout
-            String line, args;
-            while ((line = readln(dcrawStdOut)) != null) {
-                // System.out.println(line);
+                    String search;
 
-                String search;
-
-                if (secondary) {
-                    if (line.startsWith(search = CAMERA_MULTIPLIERS)) {
-                        String multipliers[] = line.substring(search.length()).split("\\s");
-                        m_secondary_cam_mul[0] = Float.parseFloat(multipliers[0]);
-                        m_secondary_cam_mul[1] = Float.parseFloat(multipliers[1]);
-                        m_secondary_cam_mul[2] = Float.parseFloat(multipliers[2]);
-                        m_secondary_cam_mul[3] = Float.parseFloat(multipliers[3]);
+                    if (secondary) {
+                        if (line.startsWith(search = CAMERA_MULTIPLIERS)) {
+                            String multipliers[] = line.substring(search.length()).split("\\s");
+                            m_secondary_cam_mul[0] = Float.parseFloat(multipliers[0]);
+                            m_secondary_cam_mul[1] = Float.parseFloat(multipliers[1]);
+                            m_secondary_cam_mul[2] = Float.parseFloat(multipliers[2]);
+                            m_secondary_cam_mul[3] = Float.parseFloat(multipliers[3]);
+                        }
+                    } else {
+                        // if (line.startsWith(search = FILENAME)) {
+                        //     String filename = line.substring(search.length());
+                        // } else
+                        if (line.startsWith(search = TIMESTAMP)) {
+                            String timestamp = line.substring(search.length());
+                            try {
+                                m_captureDateTime = new SimpleDateFormat().parse(timestamp).getTime();
+                            } catch (ParseException e) {
+                                m_captureDateTime = 0;
+                            }
+                        } else if (line.startsWith(search = CAMERA)) {
+                            String camera = line.substring(search.length());
+                            m_make = camera.substring(0, camera.indexOf(' '));
+                            m_model = camera.substring(m_make.length() + 1);
+                        } else if (line.startsWith(search = ISO)) {
+                            String iso = line.substring(search.length());
+                            m_iso = Integer.decode(iso);
+                        } else if (line.startsWith(search = SHUTTER)) {
+                            String shutterSpeed = line.substring(search.length() + 2);
+                            float exposureTime = 0;
+                            try {
+                                exposureTime = Float.valueOf(shutterSpeed.substring(0, shutterSpeed.indexOf(" sec")));
+                                if (exposureTime != 0)
+                                    m_shutterSpeed = 1 / exposureTime;
+                            } catch (NumberFormatException e) {
+                            }
+                        } else if (line.startsWith(search = APERTURE)) {
+                            String aperture = line.substring(search.length() + 2);
+                            try {
+                                m_aperture = Float.valueOf(aperture);
+                            } catch (NumberFormatException e) {
+                            }
+                        } else if (line.startsWith(search = FOCAL_LENGTH)) {
+                            String focalLenght = line.substring(search.length());
+                            try {
+                                m_focalLength = Float.valueOf(focalLenght.substring(0, focalLenght.indexOf(" mm")));
+                            } catch (NumberFormatException e) {
+                            }
+                            // } else if (line.startsWith(search = NUM_RAW_IMAGES)) {
+                            //     String numRawImages = line.substring(search.length());
+                            // } else if (line.startsWith(search = EMBEDDED_ICC_PROFILE)) {
+                            //     String embeddedICCProfile = line.substring(search.length());
+                        } else if (line.startsWith(CANNOT_DECODE)) {
+                            m_decodable = false;
+                        } else if ((args = match(line, THUMB_SIZE)) != null) {
+                            String sizes[] = args.split(" x ");
+                            m_thumbWidth = Integer.decode(sizes[0]);
+                            m_thumbHeight = Integer.decode(sizes[1]);
+                        } else if ((args = match(line, FULL_SIZE)) != null) {
+                            String sizes[] = args.split(" x ");
+                            m_fullWidth = Integer.decode(sizes[0]);
+                            m_fullHeight = Integer.decode(sizes[1]);
+                        } else if ((args = match(line, IMAGE_SIZE)) != null) {
+                            String sizes[] = args.split(" x ");
+                            m_rawWidth = Integer.decode(sizes[0]);
+                            m_rawHeight = Integer.decode(sizes[1]);
+                        } else if ((args = match(line, OUTPUT_SIZE)) != null) {
+                            String sizes[] = args.split(" x ");
+                            m_width = Integer.decode(sizes[0]);
+                            m_height = Integer.decode(sizes[1]);
+                        } else if (line.startsWith(search = RAW_COLORS)) {
+                            String rawColors = line.substring(search.length());
+                            m_rawColors = Integer.decode(rawColors);
+                        } else if (line.startsWith(search = FILTER_PATTERN)) {
+                            String pattern = line.substring(search.length());
+                            if (pattern.length() >= 8 && !pattern.substring(0, 4).equals(pattern.substring(4, 8)))
+                                m_filters = -1;
+                            else if (pattern.startsWith("BG/GR"))
+                                m_filters = 0x16161616;
+                            else if (pattern.startsWith("GR/BG"))
+                                m_filters = 0x61616161;
+                            else if (pattern.startsWith("GB/RG"))
+                                m_filters = 0x49494949;
+                            else if (pattern.startsWith("RG/GB"))
+                                m_filters = 0x94949494;
+                            else
+                                m_filters = -1;
+                        } else if (line.startsWith(search = DAYLIGHT_MULTIPLIERS)) {
+                            String multipliers[] = line.substring(search.length()).split("\\s");
+                            m_pre_mul[0] = Float.parseFloat(multipliers[0]);
+                            m_pre_mul[1] = Float.parseFloat(multipliers[1]);
+                            m_pre_mul[2] = Float.parseFloat(multipliers[2]);
+                            m_pre_mul[3] = m_pre_mul[1];
+                        } else if (line.startsWith(search = CAMERA_MULTIPLIERS)) {
+                            String multipliers[] = line.substring(search.length()).split("\\s");
+                            m_cam_mul[0] = Float.parseFloat(multipliers[0]);
+                            m_cam_mul[1] = Float.parseFloat(multipliers[1]);
+                            m_cam_mul[2] = Float.parseFloat(multipliers[2]);
+                            m_cam_mul[3] = Float.parseFloat(multipliers[3]);
+                        } else if (line.startsWith(CAMERA_RGB_PROFILE)) {
+                            String rgb_cam[] = line.substring(CAMERA_RGB_PROFILE.length()).split("\\s");
+                            m_rgb_cam = new float[9];
+                            for (int i = 0; i < 9; i++) {
+                                m_rgb_cam[i] = Float.parseFloat(rgb_cam[i]);
+                            }
+                        } else if (line.startsWith(CAMERA_XYZ_PROFILE)) {
+                            String xyz_cam[] = line.substring(CAMERA_XYZ_PROFILE.length()).split("\\s");
+                            m_xyz_cam = new float[9];
+                            for (int i = 0; i < 9; i++) {
+                                m_xyz_cam[i] = Float.parseFloat(xyz_cam[i]);
+                            }
+                        }
                     }
+                }
+
+                // Flush stderr just in case...
+                while ((line = readln(dcrawStdErr)) != null)
+                    ; // System.out.println(line);
+            } finally {
+                if (p != null) {
+                    dcrawStdErr.close();
+                    dcrawStdOut.close();
+                    try {
+                        p.waitFor();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    m_error = p.exitValue();
+                    p.destroy();
                 } else {
-                    // if (line.startsWith(search = FILENAME)) {
-                    //     String filename = line.substring(search.length());
-                    // } else
-                    if (line.startsWith(search = TIMESTAMP)) {
-                        String timestamp = line.substring(search.length());
-                        try {
-                            m_captureDateTime = new SimpleDateFormat().parse(timestamp).getTime();
-                        } catch (ParseException e) {
-                            m_captureDateTime = 0;
-                        }
-                    } else if (line.startsWith(search = CAMERA)) {
-                        String camera = line.substring(search.length());
-                        m_make = camera.substring(0, camera.indexOf(' '));
-                        m_model = camera.substring(m_make.length() + 1);
-                    } else if (line.startsWith(search = ISO)) {
-                        String iso = line.substring(search.length());
-                        m_iso = Integer.decode(iso);
-                    } else if (line.startsWith(search = SHUTTER)) {
-                        String shutterSpeed = line.substring(search.length() + 2);
-                        float exposureTime = 0;
-                        try {
-                            exposureTime = Float.valueOf(shutterSpeed.substring(0, shutterSpeed.indexOf(" sec")));
-                            if (exposureTime != 0)
-                                m_shutterSpeed = 1 / exposureTime;
-                        } catch (NumberFormatException e) { }
-                    } else if (line.startsWith(search = APERTURE)) {
-                        String aperture = line.substring(search.length() + 2);
-                        try {
-                            m_aperture = Float.valueOf(aperture);
-                        } catch (NumberFormatException e) { }
-                    } else if (line.startsWith(search = FOCAL_LENGTH)) {
-                        String focalLenght = line.substring(search.length());
-                        try {
-                            m_focalLength = Float.valueOf(focalLenght.substring(0, focalLenght.indexOf(" mm")));
-                        } catch (NumberFormatException e) { }
-                    // } else if (line.startsWith(search = NUM_RAW_IMAGES)) {
-                    //     String numRawImages = line.substring(search.length());
-                    // } else if (line.startsWith(search = EMBEDDED_ICC_PROFILE)) {
-                    //     String embeddedICCProfile = line.substring(search.length());
-                    } else if (line.startsWith(CANNOT_DECODE)) {
-                        m_decodable = false;
-                    } else if ((args = match(line, THUMB_SIZE)) != null) {
-                        String sizes[] = args.split(" x ");
-                        m_thumbWidth = Integer.decode(sizes[0]);
-                        m_thumbHeight = Integer.decode(sizes[1]);
-                    } else if ((args = match(line, FULL_SIZE)) != null) {
-                        String sizes[] = args.split(" x ");
-                        m_fullWidth = Integer.decode(sizes[0]);
-                        m_fullHeight = Integer.decode(sizes[1]);
-                    } else if ((args = match(line, IMAGE_SIZE)) != null) {
-                        String sizes[] = args.split(" x ");
-                        m_rawWidth = Integer.decode(sizes[0]);
-                        m_rawHeight = Integer.decode(sizes[1]);
-                    } else if ((args = match(line, OUTPUT_SIZE)) != null) {
-                        String sizes[] = args.split(" x ");
-                        m_width = Integer.decode(sizes[0]);
-                        m_height = Integer.decode(sizes[1]);
-                    } else if (line.startsWith(search = RAW_COLORS)) {
-                        String rawColors = line.substring(search.length());
-                        m_rawColors = Integer.decode(rawColors);
-                    } else if (line.startsWith(search = FILTER_PATTERN)) {
-                        String pattern = line.substring(search.length());
-                        if (pattern.length() >= 8 && !pattern.substring(0,4).equals(pattern.substring(4,8)))
-                            m_filters = -1;
-                        else if (pattern.startsWith("BG/GR"))
-                            m_filters = 0x16161616;
-                        else if (pattern.startsWith("GR/BG"))
-                            m_filters = 0x61616161;
-                        else if (pattern.startsWith("GB/RG"))
-                            m_filters = 0x49494949;
-                        else if (pattern.startsWith("RG/GB"))
-                            m_filters = 0x94949494;
-                        else
-                            m_filters = -1;
-                    } else if (line.startsWith(search = DAYLIGHT_MULTIPLIERS)) {
-                        String multipliers[] = line.substring(search.length()).split("\\s");
-                        m_pre_mul[0] = Float.parseFloat(multipliers[0]);
-                        m_pre_mul[1] = Float.parseFloat(multipliers[1]);
-                        m_pre_mul[2] = Float.parseFloat(multipliers[2]);
-                        m_pre_mul[3] = m_pre_mul[1];
-                    } else if (line.startsWith(search = CAMERA_MULTIPLIERS)) {
-                        String multipliers[] = line.substring(search.length()).split("\\s");
-                        m_cam_mul[0] = Float.parseFloat(multipliers[0]);
-                        m_cam_mul[1] = Float.parseFloat(multipliers[1]);
-                        m_cam_mul[2] = Float.parseFloat(multipliers[2]);
-                        m_cam_mul[3] = Float.parseFloat(multipliers[3]);
-                    } else if (line.startsWith(CAMERA_RGB_PROFILE)) {
-                        String rgb_cam[] = line.substring(CAMERA_RGB_PROFILE.length()).split("\\s");
-                        m_rgb_cam = new float[9];
-                        for (int i = 0; i < 9; i++) {
-                            m_rgb_cam[i] = Float.parseFloat(rgb_cam[i]);
-                        }
-                    } else if (line.startsWith(CAMERA_XYZ_PROFILE)) {
-                        String xyz_cam[] = line.substring(CAMERA_XYZ_PROFILE.length()).split("\\s");
-                        m_xyz_cam = new float[9];
-                        for (int i = 0; i < 9; i++) {
-                            m_xyz_cam[i] = Float.parseFloat(xyz_cam[i]);
-                        }
-                    }
+                    m_error = 0;
                 }
             }
+        }
+    }
 
-            // Flush stderr just in case...
-            while ((line = readln(dcrawStdErr)) != null)
-                ; // System.out.println(line);
+    private InputStream getDcrawStdOut(Process p) {
+        return p == null
+                ? ForkDaemon.INSTANCE.getStdOut()
+                : p.getInputStream();
+    }
 
-            if (p != null) {
-                dcrawStdOut.close();
-                try {
-                    p.waitFor();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                m_error = p.exitValue();
-                p.destroy();
-            } else {
-                m_error = 0;
-            }
+    private InputStream getDcrawStdErr(Process p) {
+        return p == null
+                ? ForkDaemon.INSTANCE.getStdErr()
+                : new BufferedInputStream(p.getErrorStream());
+    }
+
+    private Process execProcess(String[] cmd) throws IOException {
+        if (ForkDaemon.INSTANCE != null) {
+            ForkDaemon.INSTANCE.invoke(cmd);
+            return null;
+        } else {
+            return Runtime.getRuntime().exec(cmd);
         }
     }
 
@@ -457,88 +475,83 @@ public final class DCRaw implements
         }
     }
 
-    private static ImageData readPPM(File file) throws IOException, BadImageFileException {
-        FileInputStream s = new FileInputStream(file);
-
+    private static ImageData readPPM(File file) throws BadImageFileException {
         ImageData imageData;
-        try {
+        try (FileInputStream s = new FileInputStream(file)) {
             String S1 = readln(s);
 
             int width;
             int height;
             int bands;
             int dataType;
-            if (S1.equals("P5") || S1.equals("P6")) {
-                bands = S1.equals("P5") ? 1 : 3;
-                String S2 = readln(s);
-                String S3 = readln(s);
+            switch (S1) {
+                case "P5":
+                case "P6":
+                    bands = S1.equals("P5") ? 1 : 3;
+                    String S2 = readln(s);
+                    String S3 = readln(s);
 
-                String dimensions[] = S2.split("\\s");
-                width = Integer.parseInt(dimensions[0]);
-                height = Integer.parseInt(dimensions[1]);
+                    String dimensions[] = S2.split("\\s");
+                    width = Integer.parseInt(dimensions[0]);
+                    height = Integer.parseInt(dimensions[1]);
 
-                dataType = S3.equals("255") ? DataBuffer.TYPE_BYTE : DataBuffer.TYPE_USHORT;
+                    dataType = S3.equals("255") ? DataBuffer.TYPE_BYTE : DataBuffer.TYPE_USHORT;
 
-                imageData = new ImageData(width, height, bands, dataType);
-            } else if (S1.equals("P7")) {
-                String WIDTH = "WIDTH ";
-                String HEIGHT = "HEIGHT ";
-                String DEPTH = "DEPTH ";
-                String MAXVAL = "MAXVAL ";
-                // String TUPLTYPE = "TUPLTYPE ";
-                // String ENDHDR = "ENDHDR";
-                String SWIDTH = readln(s);
-                width = Integer.parseInt(SWIDTH.substring(WIDTH.length()));
-                String SHEIGHT = readln(s);
-                height = Integer.parseInt(SHEIGHT.substring(HEIGHT.length()));
-                String SDEPTH = readln(s);
-                bands = Integer.parseInt(SDEPTH.substring(DEPTH.length()));
-                String SMAXVAL = readln(s);
-                dataType = SMAXVAL.substring(MAXVAL.length()).equals("65535")
-                           ? DataBuffer.TYPE_USHORT
-                           : DataBuffer.TYPE_BYTE;
-                // String STUPLTYPE = readln(s);
-                // String SENDHDR = readln(s);
-                imageData = new ImageData(width, height, bands, dataType);
-            } else {
-                return null;
+                    imageData = new ImageData(width, height, bands, dataType);
+                    break;
+                case "P7":
+                    String WIDTH = "WIDTH ";
+                    String HEIGHT = "HEIGHT ";
+                    String DEPTH = "DEPTH ";
+                    String MAXVAL = "MAXVAL ";
+                    // String TUPLTYPE = "TUPLTYPE ";
+                    // String ENDHDR = "ENDHDR";
+                    String SWIDTH = readln(s);
+                    width = Integer.parseInt(SWIDTH.substring(WIDTH.length()));
+                    String SHEIGHT = readln(s);
+                    height = Integer.parseInt(SHEIGHT.substring(HEIGHT.length()));
+                    String SDEPTH = readln(s);
+                    bands = Integer.parseInt(SDEPTH.substring(DEPTH.length()));
+                    String SMAXVAL = readln(s);
+                    dataType = SMAXVAL.substring(MAXVAL.length()).equals("65535")
+                            ? DataBuffer.TYPE_USHORT
+                            : DataBuffer.TYPE_BYTE;
+                    // String STUPLTYPE = readln(s);
+                    // String SENDHDR = readln(s);
+                    imageData = new ImageData(width, height, bands, dataType);
+                    break;
+                default:
+                    return null;
             }
 
             int totalData = width * height * bands * (dataType == DataBuffer.TYPE_BYTE ? 1 : 2);
 
-            FileChannel c = s.getChannel();
+            try (FileChannel c = s.getChannel()) {
+                if (file.length() != totalData + c.position()) {
+                    throw new BadImageFileException(file);
+                }
 
-            if (file.length() != totalData + c.position()) {
-                c.close();
-                throw new BadImageFileException(file);
+                ByteBuffer bb = c.map(FileChannel.MapMode.READ_ONLY, c.position(), totalData);
+
+                if (dataType == DataBuffer.TYPE_USHORT) {
+                    // bb.order(ByteOrder.BIG_ENDIAN);
+                    bb.order(ByteOrder.nativeOrder());
+                    bb.asShortBuffer().get((short[]) imageData.data);
+
+                    // Darty hack to prevent crash on Arch Linux (issue #125)
+                    if (ByteOrder.nativeOrder() != ByteOrder.BIG_ENDIAN)
+                        for (int i = 0; i < ((short[]) imageData.data).length; ++i)
+                            ((short[]) imageData.data)[i] = Short.reverseBytes(((short[]) imageData.data)[i]);
+                } else {
+                    bb.get((byte[]) imageData.data);
+                }
+
+                ByteBufferUtil.clean(bb);
             }
-
-            ByteBuffer bb = c.map(FileChannel.MapMode.READ_ONLY, c.position(), totalData);
-
-            if (dataType == DataBuffer.TYPE_USHORT) {
-                // bb.order(ByteOrder.BIG_ENDIAN);
-                bb.order(ByteOrder.nativeOrder());
-                bb.asShortBuffer().get((short[]) imageData.data);
-
-                // Darty hack to prevent crash on Arch Linux (issue #125)
-                if (ByteOrder.nativeOrder() != ByteOrder.BIG_ENDIAN)
-                    for (int i = 0; i < ((short[]) imageData.data).length; ++i)
-                        ((short[]) imageData.data)[i] = Short.reverseBytes(((short[]) imageData.data)[i]);
-            } else {
-                bb.get((byte[]) imageData.data);
-            }
-
-            ByteBufferUtil.clean(bb);
-
-            c.close();
         } catch (Exception e) {
             e.printStackTrace();
-            s.close();
             throw new BadImageFileException(file, e);
-        } finally {
-            s.close();
         }
-
         return imageData;
     }
 
@@ -607,44 +620,36 @@ public final class DCRaw implements
             String ofName = null;
 
             synchronized (DCRaw.class) {
-                Process p = null;
-                InputStream dcrawStdErr;
-                InputStream dcrawStdOut;
-                if (ForkDaemon.INSTANCE != null) {
-                    ForkDaemon.INSTANCE.invoke(cmd);
-                    dcrawStdErr = ForkDaemon.INSTANCE.getStdErr();
-                    dcrawStdOut = ForkDaemon.INSTANCE.getStdOut();
-                } else {
-                    p = Runtime.getRuntime().exec(cmd);
-                    dcrawStdErr = new BufferedInputStream(p.getErrorStream());
-                    dcrawStdOut = p.getInputStream();
-                }
+                final Process p = execProcess(cmd);
+                final InputStream dcrawStdErr = getDcrawStdErr(p);
+                final InputStream dcrawStdOut = getDcrawStdOut(p);
+                try {
+                    String line, args;
+                    // output expected on stderr
+                    while ((line = readln(dcrawStdErr)) != null) {
+                        System.out.println(line);
 
-                String line, args;
-                // output expected on stderr
-                while ((line = readln(dcrawStdErr)) != null) {
-                    System.out.println(line);
-
-                    if ((args = match(line, DCRAW_OUTPUT)) != null)
-                        ofName = args.substring(0, args.indexOf(" ..."));
-                }
-
-                // Flush stdout just in case...
-                while ((line = readln(dcrawStdOut)) != null)
-                    System.out.println(line);
-
-                if (p != null) {
-                    dcrawStdErr.close();
-
-                    try {
-                        p.waitFor();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        if ((args = match(line, DCRAW_OUTPUT)) != null)
+                            ofName = args.substring(0, args.indexOf(" ..."));
                     }
-                    m_error = p.exitValue();
-                    p.destroy();
-                } else {
-                    m_error = 0;
+
+                    // Flush stdout just in case...
+                    while ((line = readln(dcrawStdOut)) != null)
+                        System.out.println(line);
+                } finally {
+                    if (p != null) {
+                        dcrawStdErr.close();
+                        dcrawStdOut.close();
+                        try {
+                            p.waitFor();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        m_error = p.exitValue();
+                        p.destroy();
+                    } else {
+                        m_error = 0;
+                    }
                 }
             }
 

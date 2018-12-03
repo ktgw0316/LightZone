@@ -134,13 +134,8 @@ public final class LZNImageType extends ImageType
             final XmlNode cache = getCacheNode( xml );
             cache.setData( buf.toByteArray() );
 
-            final OutputStream out =
-                new FileOutputStream( imageInfo.getFile() );
-            try {
-                xml.write( out );
-            }
-            finally {
-                out.close();
+            try (OutputStream out = new FileOutputStream(imageInfo.getFile())) {
+                xml.write(out);
             }
         }
         catch ( LCImageLibException e ) {

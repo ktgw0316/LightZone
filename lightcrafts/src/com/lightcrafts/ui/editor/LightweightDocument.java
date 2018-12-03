@@ -77,16 +77,14 @@ public class LightweightDocument {
         // Instead, we just do some grepping:
         String line;
         Matcher matcher = null;
-        BufferedReader reader = new BufferedReader(
-            new InputStreamReader(in, "UTF-8")
-        );
-        do {
-            line = reader.readLine();
-            if (line != null) {
-                matcher = PathsPattern.matcher(line);
-            }
-        } while ((line != null) && (! matcher.matches()));
-        reader.close();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"))) {
+            do {
+                line = reader.readLine();
+                if (line != null) {
+                    matcher = PathsPattern.matcher(line);
+                }
+            } while ((line != null) && (!matcher.matches()));
+        }
 
         if (matcher == null) {
             // readLine() returned null the first time it was called.

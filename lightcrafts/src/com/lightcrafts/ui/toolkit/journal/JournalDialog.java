@@ -2,14 +2,11 @@
 
 package com.lightcrafts.ui.toolkit.journal;
 
-import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.ui.toolkit.TextAreaFactory;
 
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.*;
 import java.io.*;
 
@@ -108,9 +105,12 @@ public class JournalDialog extends JDialog implements JournalListener {
 
         addWindowListener(
             new WindowAdapter() {
+                @Override
                 public void windowOpened(WindowEvent event) {
                     Journal.start();
                 }
+
+                @Override
                 public void windowClosed(WindowEvent event) {
                     Journal.stop();
                 }
@@ -122,6 +122,7 @@ public class JournalDialog extends JDialog implements JournalListener {
     /**
      * Implementing the package-private JournalListener interface.
      */
+    @Override
     public void journalStarted(boolean replaying) {
         if (replaying) {
             setStatus("Replaying");
@@ -135,6 +136,7 @@ public class JournalDialog extends JDialog implements JournalListener {
     /**
      * Implementing the package-private JournalListener interface.
      */
+    @Override
     public void journalEvent(int count, boolean replaying) {
         setCounter(count);
     }
@@ -142,12 +144,11 @@ public class JournalDialog extends JDialog implements JournalListener {
     /**
      * Implementing the package-private JournalListener interface.
      */
+    @Override
     public void journalEnded(boolean replaying) {
         setStatus("Stopped");
-        try {
-            OutputStream out = new FileOutputStream(file);
+        try (OutputStream out = new FileOutputStream(file)) {
             Journal.write(out);
-            out.close();
         }
         catch (IOException e) {
             System.err.println("Error writing journal: " + e.getMessage());
@@ -184,80 +185,60 @@ public class JournalDialog extends JDialog implements JournalListener {
 
     private JButton createSaveButton() {
         JButton save = new JButton("Save");
-        save.addActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    JFileChooser chooser = new JFileChooser();
-                    int result = chooser.showSaveDialog(Instance);
-                    if (result == JFileChooser.APPROVE_OPTION) {
-                        try {
-                            setFile(chooser.getSelectedFile());
-                            OutputStream out = new FileOutputStream(file);
-                            Journal.write(out);
-                            out.close();
-                        }
-                        catch (IOException e) {
-                            System.err.println(e.getMessage());
-                        }
-                    }
+        save.addActionListener(event -> {
+            JFileChooser chooser = new JFileChooser();
+            int result = chooser.showSaveDialog(Instance);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                setFile(chooser.getSelectedFile());
+                try (OutputStream out = new FileOutputStream(file)) {
+                    Journal.write(out);
+                }
+                catch (IOException e) {
+                    System.err.println(e.getMessage());
                 }
             }
-        );
+        });
         return save;
     }
 
     private JButton createLoadButton() {
         JButton save = new JButton("Load");
-        save.addActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    JFileChooser chooser = new JFileChooser();
-                    int result = chooser.showOpenDialog(Instance);
-                    if (result == JFileChooser.APPROVE_OPTION) {
-                        try {
-                            Journal.clear();
-                            File file = chooser.getSelectedFile();
-                            InputStream in = new FileInputStream(file);
-                            Journal.read(in);
-                            in.close();
-                        }
-                        catch (IOException e) {
-                            System.err.println(e.getMessage());
-                        }
-                    }
+        save.addActionListener(event -> {
+            JFileChooser chooser = new JFileChooser();
+            int result = chooser.showOpenDialog(Instance);
+            if (result == JFileChooser.APPROVE_OPTION) {
+                Journal.clear();
+                File file = chooser.getSelectedFile();
+                try (InputStream in = new FileInputStream(file)) {
+                    Journal.read(in);
+                }
+                catch (IOException e) {
+                    System.err.println(e.getMessage());
                 }
             }
-        );
+        });
         return save;
     }
 
     private JButton createReplayButton() {
         JButton replay = new JButton("Replay");
-        replay.addActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    Owner.toFront();
-                    Journal.replay(Owner);
-                }
-            }
-        );
+        replay.addActionListener(event -> {
+            Owner.toFront();
+            Journal.replay(Owner);
+        });
         return replay;
     }
 
     private JButton createPrintButton() {
         JButton print = new JButton("Print");
-        print.addActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    try {
-                        Journal.write(System.out);
-                    }
-                    catch (IOException e) {
-                        System.out.println(e.getMessage());
-                    }
-                }
+        print.addActionListener(event -> {
+            try {
+                Journal.write(System.out);
             }
-        );
+            catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+        });
         return print;
     }
 

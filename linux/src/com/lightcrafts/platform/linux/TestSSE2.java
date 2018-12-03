@@ -51,13 +51,13 @@ class TestSSE2 {
 
         try {
             Process process = Runtime.getRuntime().exec(cmd);
-            InputStream in = process.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-            while ((line = reader.readLine()) != null) {
-                if (Pattern.compile(regex).matcher(line).find())
-                    break;
+            try (InputStream in = process.getInputStream();
+                 BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
+                while ((line = reader.readLine()) != null) {
+                    if (Pattern.compile(regex).matcher(line).find())
+                        break;
+                }
             }
-            reader.close();
         }
         catch (IOException e) {
             e.printStackTrace();

@@ -1552,25 +1552,18 @@ public class ImageMetadata implements
     ////////// main (for testing) /////////////////////////////////////////////
 
     public static void main( String[] args ) throws Exception {
-        final FileOutputStream fos = new FileOutputStream( "/tmp/out" );
-        final ObjectOutputStream oos = new ObjectOutputStream( fos );
-
-        final ImageInfo info = ImageInfo.getInstanceFor( new File( args[0] ) );
-        ImageMetadata metadata = info.getMetadata();
-        metadata.writeExternal( oos );
-
-        oos.close();
-        fos.close();
-
-        final FileInputStream fis = new FileInputStream( "/tmp/out" );
-        final ObjectInputStream ois = new ObjectInputStream( fis );
-
-        metadata = new ImageMetadata();
-        metadata.readExternal( ois );
-
-        ois.close();
-        fis.close();
-
+        ImageMetadata metadata;
+        try (FileOutputStream fos = new FileOutputStream("/tmp/out");
+             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+            final ImageInfo info = ImageInfo.getInstanceFor(new File(args[0]));
+            metadata = info.getMetadata();
+            metadata.writeExternal(oos);
+        }
+        try (FileInputStream fis = new FileInputStream("/tmp/out");
+             ObjectInputStream ois = new ObjectInputStream(fis)) {
+            metadata = new ImageMetadata();
+            metadata.readExternal(ois);
+        }
         System.out.println( metadata.toString() );
     }
 }

@@ -1,5 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
-/* Copyright (C) 2016 Masahiro Kitagawa */
+/* Copyright (C) 2016-     Masahiro Kitagawa */
 
 package com.lightcrafts.utils.bytebuffer;
 
@@ -28,12 +28,10 @@ public final class ByteBufferUtil {
      * @param fileName The name of the file to dump to.
      */
     public static void dumpToFile( ByteBuffer buf, String fileName ) {
-        try {
-            final FileOutputStream fos = new FileOutputStream( fileName );
-            fos.write( buf.array() );
-            fos.close();
+        try (FileOutputStream fos = new FileOutputStream(fileName)) {
+            fos.write(buf.array());
         }
-        catch ( Exception e ) {
+        catch ( IOException e ) {
             e.printStackTrace();
             System.exit( -1 );
         }
@@ -340,12 +338,8 @@ public final class ByteBufferUtil {
         else
             throw new IllegalArgumentException( "unsupported MapMode" );
 
-        final RandomAccessFile raf = new RandomAccessFile( file, rafMode );
-        try {
-            return raf.getChannel().map( mapMode, position, size );
-        }
-        finally {
-            raf.close();
+        try (RandomAccessFile raf = new RandomAccessFile(file, rafMode)) {
+            return raf.getChannel().map(mapMode, position, size);
         }
     }
 

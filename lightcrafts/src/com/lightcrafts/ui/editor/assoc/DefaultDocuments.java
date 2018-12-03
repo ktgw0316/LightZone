@@ -70,26 +70,11 @@ class DefaultDocuments {
         final Properties properties = new Properties();
 
         // TODO: Java7 try-with-resources, multi-catch
-        Reader reader = null;
-        try {
-            reader = new InputStreamReader(
-                    DefaultDocuments.class.getResourceAsStream(
-                            "resources/CompatibleCameras.properties"),
-                    "UTF-8");
+        try (Reader reader = new InputStreamReader(DefaultDocuments.class.getResourceAsStream(
+                        "resources/CompatibleCameras.properties"), "UTF-8")) {
             properties.load(reader);
-        } catch (UnsupportedEncodingException e) {
-            return name;
-        } catch (FileNotFoundException e) {
-            return name;
         } catch (IOException e) {
             return name;
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException ignored) {
-                }
-            }
         }
 
         final String newName = properties.getProperty(name);
