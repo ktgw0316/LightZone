@@ -1,8 +1,10 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2014-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.metadata2;
 
 import com.lightcrafts.ui.LightZoneSkin;
+import com.lightcrafts.utils.WebBrowser;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -10,7 +12,6 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableCellEditor;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.IOException;
 import java.net.URI;
 
 class MetadataTable extends JTable {
@@ -41,33 +42,26 @@ class MetadataTable extends JTable {
         // Selection is not allowed, so a single click should enter the editor:
         addMouseListener(
             new MouseAdapter() {
+                @Override
                 public void mouseClicked(final MouseEvent event) {
                     // Another mouse event handler may be using this click
                     // to define a focus change or other end-edit action,
                     // so enqueue our start-edit action.
-                    EventQueue.invokeLater(
-                        new Runnable() {
-                            public void run() {
-                                Point p = event.getPoint();
-                                int row = rowAtPoint(p);
-                                int col = columnAtPoint(p);
-                                if (editCellAt(row, col) && editorComp != null) {
-                                    editorComp.requestFocusInWindow();
-                                }
-                                else {
-                                    URI uri = model.getURIAt(row);
-                                    if (uri != null) {
-                                        try {
-                                            Desktop.getDesktop().browse(uri);
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                }
+                    EventQueue.invokeLater(() -> {
+                        Point p = event.getPoint();
+                        int row = rowAtPoint(p);
+                        int col = columnAtPoint(p);
+                        if (editCellAt(row, col) && editorComp != null) {
+                            editorComp.requestFocusInWindow();
+                        }
+                        else {
+                            URI uri = model.getURIAt(row);
+                            if (uri != null) {
+                                WebBrowser.browse(uri);
                             }
                         }
-                    );
-                }                
+                    });
+                }
             }
         );
 
