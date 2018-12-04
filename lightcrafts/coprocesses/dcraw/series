@@ -3,3 +3,5 @@ xtrans_yama1968.patch
 lightzone.patch
 strnlen.patch
 MSVC.patch
+fuji_compressed
+remove_restricted
