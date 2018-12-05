@@ -232,12 +232,15 @@
     <delete dir="javah"/>
     <delete dir="extbuild"/>
     <exec executable="${MAKE}" dir="jnisrc">
+      <arg value="-j"/>
       <arg value="${clean-method}"/>
     </exec>
     <exec executable="${MAKE}" dir="coprocesses">
+      <arg value="-j"/>
       <arg value="${clean-method}"/>
     </exec>
     <exec executable="${MAKE}" dir="products">
+      <arg value="-j"/>
       <arg value="${clean-method}"/>
     </exec>
     <ant dir="test" target="${clean-method}"/>

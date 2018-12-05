@@ -197,6 +197,7 @@
       <arg value="distclean"/>
     </exec>
     <exec executable="${MAKE}" dir="jnisrc">
+      <arg value="-j"/>
       <arg value="distclean"/>
     </exec>
   </target>

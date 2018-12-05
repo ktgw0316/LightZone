@@ -223,6 +223,7 @@
       <arg value="${clean-method}"/>
     </exec>
     <exec executable="make" dir="products">
+      <arg value="-j"/>
       <arg value="${clean-method}"/>
     </exec>
     <delete file="products/lightzone.jvmargs"/>
