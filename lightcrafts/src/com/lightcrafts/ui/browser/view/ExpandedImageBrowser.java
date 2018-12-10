@@ -8,6 +8,7 @@ import com.lightcrafts.ui.browser.model.ImageDatumType;
 import com.lightcrafts.ui.browser.model.ImageGroup;
 import com.lightcrafts.ui.browser.model.ImageList;
 import com.lightcrafts.ui.LightZoneSkin;
+import com.lightcrafts.utils.awt.geom.HiDpi;
 
 import javax.swing.*;
 import java.awt.*;
@@ -66,11 +67,14 @@ public class ExpandedImageBrowser extends AbstractImageBrowser {
             return;
         }
         Graphics2D g = (Graphics2D) graphics;
-        Rectangle clip = g.getClipBounds();
 
         // Figure out which ImageDatums fall within the clip bounds.
+        final Rectangle clip0 = g.getClipBounds();
         List<ImageDatum> datums = getAllImageData();
-        int[] indices = getIndices(datums.size(), clip);
+        int[] indices = getIndices(datums.size(), clip0);
+
+        HiDpi.resetTransformScaleOf(g);
+        final Rectangle clip = g.getClipBounds();
 
         // Set up context for the ImageGroup highlights.
         Color oldColor = g.getColor();
@@ -93,7 +97,7 @@ public class ExpandedImageBrowser extends AbstractImageBrowser {
             // This queue prevents GC of recently painted images:
             recentImages.add(image);
 
-            Rectangle rect = getBounds(index);
+            final Rectangle rect = HiDpi.imageSpaceRectFrom(getBounds(index));
             g.setClip(clip.intersection(rect));
 
             // If this ImageDatum is a member of a nontrivial ImageGroup,

@@ -2,6 +2,8 @@
 
 package com.lightcrafts.ui.mode;
 
+import com.lightcrafts.utils.awt.geom.HiDpi;
+
 import javax.swing.*;
 import javax.swing.event.MouseInputListener;
 import java.awt.*;
@@ -37,8 +39,9 @@ public class ModeOverlay extends JLayeredPane {
 
         // Add a listener on the overlay to support autoscrolling:
         autoscroller = new MouseMotionAdapter() {
+            @Override
             public void mouseDragged(MouseEvent e) {
-                Rectangle r = new Rectangle(e.getX(), e.getY(), 1, 1);
+                Rectangle r = HiDpi.imageSpaceRectFrom(new Rectangle(e.getX(), e.getY(), 1, 1));
                 scrollRectToVisible(r);
             }
         };
@@ -220,7 +223,9 @@ public class ModeOverlay extends JLayeredPane {
         doUnderlayLayout();
 
         Point loc = underlay.getLocation();
-        return AffineTransform.getTranslateInstance(loc.x, loc.y);
+        final double tx = loc.x * HiDpi.defaultTransform.getScaleX();
+        final double ty = loc.y * HiDpi.defaultTransform.getScaleY();
+        return AffineTransform.getTranslateInstance(tx, ty);
     }
 
     /**

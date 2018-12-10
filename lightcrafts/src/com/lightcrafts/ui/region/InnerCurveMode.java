@@ -2,6 +2,8 @@
 
 package com.lightcrafts.ui.region;
 
+import com.lightcrafts.utils.awt.geom.HiDpi;
+
 import java.awt.*;
 import java.awt.event.MouseEvent;
 
@@ -27,20 +29,20 @@ class InnerCurveMode extends MinorRegionMode {
         else {
             model.editCancel();
         }
-        Point p = event.getPoint();
+        final Point p = HiDpi.imageSpacePointFrom(event.getPoint());
         update(p, false);
         
         model.notifyChangeEnd(curve);
     }
 
     public void mouseMoved(MouseEvent event) {
-        Point p = event.getPoint();
+        final Point p = HiDpi.imageSpacePointFrom(event.getPoint());
         update(p, true);
         autoscroll(event);
     }
 
     public void mouseDragged(MouseEvent event) {
-        Point p = event.getPoint();
+        final Point p = HiDpi.imageSpacePointFrom(event.getPoint());
         update(p, true);
         autoscroll(event);
     }

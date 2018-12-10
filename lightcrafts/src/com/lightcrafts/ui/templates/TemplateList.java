@@ -191,10 +191,8 @@ public class TemplateList extends JPanel implements ListSelectionListener {
                 continue;
             }
             File file = new File(dir, key + ".lzt");
-            try {
-                OutputStream out = new FileOutputStream(file);
+            try (OutputStream out = new FileOutputStream(file)) {
                 doc.write(out);
-                out.close();
             }
             catch (IOException e) {
                 showError(

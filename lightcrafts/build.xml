@@ -64,7 +64,9 @@
 
   <target name="javac" depends="resolve">
     <exec executable="${MAKE}" dir="products" failonerror="true"
-          vmlauncher="false"/>
+          vmlauncher="true">
+      <arg value="-j"/>
+    </exec>
     <mkdir dir="build"/>
     <mkdir dir="javah"/>
     <javac destdir="build" includeantruntime="false" debug="true"
@@ -200,15 +202,20 @@
   <!--===== Clean up =======================================================-->
 
   <target name="clean-up">
-    <delete dir="build"/>
-    <delete dir="javah"/>
+    <parallel>
+      <delete dir="build"/>
+      <delete dir="javah"/>
+    </parallel>
     <exec executable="${MAKE}" dir="jnisrc">
+      <arg value="-j"/>
       <arg value="${clean-method}"/>
     </exec>
     <exec executable="${MAKE}" dir="coprocesses">
+      <arg value="-j"/>
       <arg value="${clean-method}"/>
     </exec>
     <exec executable="${MAKE}" dir="products">
+      <arg value="-j"/>
       <arg value="${clean-method}"/>
     </exec>
     <ant dir="test" target="${clean-method}"/>

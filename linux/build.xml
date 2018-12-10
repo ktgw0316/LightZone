@@ -42,7 +42,9 @@
   <target name="common">
     <ant dir="${common-dir}" target="jar"/>
     <exec executable="${MAKE}" dir="products" failonerror="true"
-          vmlauncher="true"/>
+          vmlauncher="true">
+      <arg value="-j"/>
+    </exec>
   </target>
 
   <target name="javac" depends="common">
@@ -183,15 +185,18 @@
   <target name="distclean">
     <ant dir="${common-dir}" target="distclean"/>
     <ant dir="help" target="clean"/>
-    <delete dir="archive"/>
-    <delete dir="build"/>
-    <delete dir="javah"/>
-    <delete dir="webstart"/>
-    <delete file="LightZone.tar.gz"/>
+    <parallel>
+      <delete dir="archive"/>
+      <delete dir="build"/>
+      <delete dir="javah"/>
+      <delete dir="webstart"/>
+      <delete file="LightZone.tar.gz"/>
+    </parallel>
     <exec executable="${MAKE}" dir="products">
       <arg value="distclean"/>
     </exec>
     <exec executable="${MAKE}" dir="jnisrc">
+      <arg value="-j"/>
       <arg value="distclean"/>
     </exec>
   </target>

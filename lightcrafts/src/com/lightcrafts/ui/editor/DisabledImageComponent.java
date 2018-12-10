@@ -4,6 +4,7 @@ package com.lightcrafts.ui.editor;
 
 import static com.lightcrafts.ui.editor.Locale.LOCALE;
 import com.lightcrafts.ui.LightZoneSkin;
+import com.lightcrafts.utils.awt.geom.HiDpi;
 import javax.media.jai.JAI;
 import javax.media.jai.BorderExtender;
 import javax.media.jai.Interpolation;
@@ -46,6 +47,7 @@ class DisabledImageComponent extends JComponent implements Scrollable {
 
     protected void paintComponent(Graphics graphics) {
         Graphics2D g = (Graphics2D) graphics;
+        HiDpi.resetTransformScaleOf(g);
 
         g.setColor(LightZoneSkin.Colors.EditorBackground);
         Shape clip = g.getClip();
@@ -86,7 +88,7 @@ class DisabledImageComponent extends JComponent implements Scrollable {
     private AffineTransform getTransform() {
         // Compute the transform that maps into this size at the origin
 
-        Dimension bound = getSize();
+        final Dimension bound = HiDpi.imageSpaceDimensionFrom(getSize());
 
         // Two possible scale factors, depending on the aspect ratio
         double hSpace = bound.width;
@@ -199,6 +201,8 @@ class DisabledImageComponent extends JComponent implements Scrollable {
     private void initButton() {
         JLabel comp = new JLabel(LOCALE.get("ClickToEditMessage"));
         comp.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
+        comp.setFont(new Font("SansSerif", Font.PLAIN,
+                (int) Math.floor(HiDpi.defaultTransform.getScaleX() * 11)));
 
         Dimension size = comp.getPreferredSize();
         comp.setSize(size);

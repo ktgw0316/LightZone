@@ -27,6 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import lombok.val;
 
@@ -65,7 +66,9 @@ public class DocumentWriter {
             // We're performing some kind of Engine export:
             val engine = doc.getEngine();
             val export = SaveOptions.getExportOptions(options);
-
+            if (export == null) {
+                return false;
+            }
             val app = (OtherApplication)doc.getSource();
 
             // Mangle LZN and add it to the export options as appropriate:
@@ -161,9 +164,9 @@ public class DocumentWriter {
         val file = options.getFile();
 
         // Fill up the LZN file:
-        val out = new FileOutputStream(file);
-        xmlDoc.write(out);
-        out.close();
+        try (OutputStream out = new FileOutputStream(file)) {
+            xmlDoc.write(out);
+        }
 
         // Add thumbnail data for the browser:
         val thumbRendering = (PlanarImage) engine.getRendering(new Dimension(320, 320));

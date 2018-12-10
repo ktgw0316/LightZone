@@ -57,12 +57,8 @@ public final class EXIFSegmentFinder implements JPEGParserEventHandler {
      */
     public LCMappedByteBuffer getEXIFSegment()
             throws IOException, BadImageFileException {
-        final LCMappedByteBuffer buf = new LCMappedByteBuffer( m_imageFile );
-        try {
-            return getEXIFSegmentFrom( buf );
-        }
-        finally {
-            buf.close();
+        try (LCMappedByteBuffer buf = new LCMappedByteBuffer(m_imageFile)) {
+            return getEXIFSegmentFrom(buf);
         }
     }
 

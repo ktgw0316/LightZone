@@ -76,12 +76,8 @@ public final class XMPMetadataReader {
      * @see #readFrom(InputStream)
      */
     public static ImageMetadata readFrom( File file ) throws IOException {
-        final FileInputStream fis = new FileInputStream( file );
-        try {
-            return readFrom( fis );
-        }
-        finally {
-            fis.close();
+        try (FileInputStream fis = new FileInputStream(file)) {
+            return readFrom(fis);
         }
     }
 

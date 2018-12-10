@@ -423,17 +423,7 @@ public class Document {
      * handled inside Document.
      */
     public void zoomToFit() {
-        val rect = editor.getMaxImageBounds();
-        // Sometimes during frame initialization, the max image bounds
-        // is reported as zero.  Perhaps some layout glitch involving
-        // scroll pane interaction?
-        if (rect.width > 0 && rect.height > 0) {
-            val oldScale = scaleModel.getCurrentScale();
-            val newScale = engine.setScale(rect);
-            if (! scaleModel.setScale(newScale)) {
-                engine.setScale(oldScale);
-            }
-        }
+        editor.setScaleToFit();
     }
 
     /**

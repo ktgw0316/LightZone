@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2018-     Masahiro Kitagawa */
 
 package com.lightcrafts.image.types;
 
@@ -960,13 +961,9 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
         LCMappedByteBuffer getEXIFSegmentOf( File jpegFile )
             throws BadImageFileException, IOException
         {
-            final LCMappedByteBuffer buf = new LCMappedByteBuffer( jpegFile );
-            try {
-                JPEGParser.parse( this, jpegFile, buf );
+            try (LCMappedByteBuffer buf = new LCMappedByteBuffer(jpegFile)) {
+                JPEGParser.parse(this, jpegFile, buf);
                 return m_exifSegBuf;
-            }
-            finally {
-                buf.close();
             }
         }
 
@@ -1165,22 +1162,17 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
             m_segFilter = segFilter;
             m_segInfo = segments;
 
-            final LCMappedByteBuffer buf = new LCMappedByteBuffer( jpegFile );
             File newFile = null;
             try {
-                try {
-                    newFile = File.createTempFile(
-                        "LZcp", null, jpegFile.getParentFile()
-                    );
-                    m_raf = new RandomAccessFile( newFile, "rw" );
+                newFile = File.createTempFile("LZcp", null, jpegFile.getParentFile());
+                try (LCMappedByteBuffer buf = new LCMappedByteBuffer(jpegFile);
+                    RandomAccessFile raf = new RandomAccessFile( newFile, "rw" )) {
+                    m_raf = raf;
                     m_raf.writeByte( JPEG_MARKER_BYTE );
                     m_raf.writeByte( JPEG_SOI_MARKER );
                     JPEGParser.parse( this, jpegFile, buf );
                 }
                 finally {
-                    if ( m_raf != null )
-                        m_raf.close();
-                    buf.close();
                     if ( m_copied ) {
                         //
                         // In order to rename an image file, we must make sure
@@ -1302,33 +1294,27 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
             // Case 1b: if we're removing the value, we also need to create a
             // new JPEG containing a newly constructed EXIF segment.
             //
-            final LCMappedByteBuffer exifSegBuf =
-                new EXIFSegmentFinder().getEXIFSegmentOf( jpegFile );
-            if ( exifSegBuf == null || removeValue ) {
-                metadata = metadata.prepForExport( INSTANCE, true );
-                final ByteBuffer newEXIFSegBuf =
-                    EXIFEncoder.encode( metadata, true );
-                new JPEGCopier().copyAndInsertSegments(
-                    jpegInfo.getFile(), null,
-                    new JPEGCopier.SegmentInfo(
-                        JPEG_APP1_MARKER, newEXIFSegBuf.array()
-                    )
-                );
-                return;
-            }
-
-            //
-            // Case 2: see if the JPEG's EXIF metadata contains the tag: if so,
-            // modify it in-place.
-            //
-            try {
-                final InPlaceModifier modifier =
-                    new InPlaceModifier( jpegInfo, exifSegBuf );
-                if ( modifier.modify( tagID, newValue ) )
+            try (LCMappedByteBuffer exifSegBuf = new EXIFSegmentFinder().getEXIFSegmentOf(jpegFile)) {
+                if (exifSegBuf == null || removeValue) {
+                    metadata = metadata.prepForExport(INSTANCE, true);
+                    final ByteBuffer newEXIFSegBuf =
+                            EXIFEncoder.encode(metadata, true);
+                    new JPEGCopier().copyAndInsertSegments(
+                            jpegInfo.getFile(), null,
+                            new JPEGCopier.SegmentInfo(
+                                    JPEG_APP1_MARKER, newEXIFSegBuf.array()
+                            )
+                    );
                     return;
-            }
-            finally {
-                exifSegBuf.close();
+                }
+
+                //
+                // Case 2: see if the JPEG's EXIF metadata contains the tag: if so,
+                // modify it in-place.
+                //
+                final InPlaceModifier modifier = new InPlaceModifier(jpegInfo, exifSegBuf);
+                if (modifier.modify(tagID, newValue))
+                    return;
             }
         }
 

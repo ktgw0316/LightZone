@@ -8,6 +8,7 @@ import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.model.Engine;
 import com.lightcrafts.model.EngineListener;
 import com.lightcrafts.ui.LightZoneSkin;
+import com.lightcrafts.utils.awt.geom.HiDpi;
 import com.lightcrafts.utils.SoftValueHashMap;
 import lombok.*;
 import org.jetbrains.annotations.NotNull;
@@ -113,7 +114,7 @@ public class ImageEditorDisplay extends JPanel {
             backgroundCache = new SoftValueHashMap<>();
             source.addTileComputationListener(tileManager);
             // Swing geometry
-            setPreferredSize(new Dimension(source.getWidth(), source.getHeight()));
+            setPreferredSize(HiDpi.userSpaceDimensionFrom(source));
         }
         setOpaque(true);
 
@@ -162,8 +163,7 @@ public class ImageEditorDisplay extends JPanel {
             backgroundCache = new SoftValueHashMap<>();
 
             // Swing geometry
-            Dimension dim = new Dimension(source.getWidth(), source.getHeight());
-            setPreferredSize(dim);
+            setPreferredSize(HiDpi.userSpaceDimensionFrom(source));
         }
         repaint();
     }
@@ -319,6 +319,11 @@ public class ImageEditorDisplay extends JPanel {
         g2d.setBackground(backgroundColor);
         g2d.clearRect(0, 0, getWidth(), getHeight());
 
+        HiDpi.resetTransformScaleOf(g2d);
+
+        g2d.setBackground(backgroundColor);
+        g2d.clearRect(0, 0, getWidth(), getHeight());
+
         // empty component (no image)
         if (source == null) {
             return;
@@ -424,7 +429,7 @@ public class ImageEditorDisplay extends JPanel {
                 val time = (computingTiles && synchronizedImage && startGetTiles > 0)
                         ? endGetTiles - startGetTiles
                         : 0;
-                paintListener.paintDone(source, getVisibleRect(), synchronizedImage, time);
+                paintListener.paintDone(source, HiDpi.imageSpaceRectFrom(getVisibleRect()), synchronizedImage, time);
             }
             startGetTiles = -1;
             computingTiles = false;

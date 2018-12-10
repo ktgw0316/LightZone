@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2016-     Masahiro Kitagawa */
 
 package com.lightcrafts.platform;
 
@@ -16,6 +17,10 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -62,8 +67,6 @@ public class Platform {
                     || osName.startsWith( "freebsd" )
                     || osName.startsWith( "openbsd" )
                     || osName.startsWith( "sunos" ) )
-                return Linux;
-            if ( osName.startsWith( "sunos" ) )
                 return Linux;
             if ( osName.equals( "mac os x" ) )
                 return MacOSX;
@@ -400,6 +403,24 @@ public class Platform {
      * successfully.
      */
     public boolean showFileInFolder( String path ) {
+        if (!Desktop.isDesktopSupported()) {
+            return false;
+        }
+        final Desktop desktop = Desktop.getDesktop();
+        if(!desktop.isSupported(Desktop.Action.OPEN)) {
+            return false;
+        }
+
+        try {
+            Path p = Paths.get(path).toRealPath(LinkOption.NOFOLLOW_LINKS);
+            if (!Files.isDirectory(p)) {
+                p = p.getParent();
+            }
+            desktop.open(p.toFile());
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
@@ -424,7 +445,7 @@ public class Platform {
     protected static Collection<ColorProfileInfo> getColorProfiles(
             File profileDir
     ) {
-        HashSet<ColorProfileInfo> profiles = new HashSet<ColorProfileInfo>();
+        HashSet<ColorProfileInfo> profiles = new HashSet<>();
 
         if (! profileDir.isDirectory()) {
             return profiles;

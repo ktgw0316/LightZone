@@ -8,6 +8,7 @@ import javax.media.jai.JAI;
 import javax.media.jai.BorderExtender;
 import javax.media.jai.Interpolation;
 import com.lightcrafts.jai.utils.Functions;
+import com.lightcrafts.utils.awt.geom.HiDpi;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,7 +30,8 @@ class ImageDatumRenderer {
     // An empty border around every rendering: (Room for ImageGroup highlight)
     private final static Insets ImageInset = new Insets(8, 8, 8, 8);
 
-    private final static int TextHeight = Platform.isMac() ? 19 : 14;
+    private final static int TextHeight = (int) Math.floor(
+            HiDpi.defaultTransform.getScaleY() * (Platform.isMac() ? 19 : 14));
 
     // Vertical space between the image area and the label text:
     private final static int TextGap = 4;
@@ -64,7 +66,8 @@ class ImageDatumRenderer {
         label.setHorizontalAlignment(SwingConstants.CENTER);
         label.setForeground(LabelForeground);
         label.setBackground(LabelBackground);
-        label.setFont(new Font("SansSerif", Font.PLAIN, 10));
+        label.setFont(new Font("SansSerif", Font.PLAIN,
+                (int) Math.floor(HiDpi.defaultTransform.getScaleX() * 11)));
         label.setOpaque(true);
     }
 

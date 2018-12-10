@@ -21,13 +21,7 @@ ifdef TARGET
 else
   PROCESSOR:=		$(shell uname -m)
 endif
-ifeq ($(PROCESSOR),i486)
-  PROCESSOR:=		i386
-else ifeq ($(PROCESSOR),i586)
-  PROCESSOR:=		i386
-else ifeq ($(PROCESSOR),i686)
-  PROCESSOR:=		i386
-else ifeq ($(PROCESSOR),i86pc)
+ifeq ($(PROCESSOR),$(filter $(PROCESSOR),i486 i586 i686 i86pc))
   PROCESSOR:=		i386
 else ifeq ($(PROCESSOR),amd64)
   PROCESSOR:=		x86_64
@@ -111,7 +105,7 @@ ifeq ($(PLATFORM),MacOSX)
   # performance CFLAGS go in the FAST_CFLAGS_* variables below.
   ##
   MACOSX_CFLAGS_PPC:=	-mcpu=G4 -mtune=G5
-  MACOSX_CFLAGS_X86:=	-march=core2 -mtune=generic
+  MACOSX_CFLAGS_X86:=	-march=core2
 
   ifdef HIGH_PERFORMANCE
     ##
@@ -189,7 +183,7 @@ else
   ifeq ($(PROCESSOR),x86_64)
     P4_CPU_FLAGS:=	-march=athlon64
   else
-    P4_CPU_FLAGS:=	-march=pentium4
+    P4_CPU_FLAGS:=	-march=pentium4 -m32
   endif
 
   SSE_FLAGS_OFF:=	$(P4_CPU_FLAGS) -mno-sse
@@ -274,14 +268,14 @@ endif
 # Linux, FreeBSD or OpenIndiana
 ##
 ifeq ($(PLATFORM),$(filter $(PLATFORM),Linux FreeBSD SunOS))
-  ifeq ($(PROCESSOR),x86_64)
-    PLATFORM_CFLAGS+=	-march=athlon64 -mtune=generic $(SSE_FLAGS) -fPIC
-  else ifeq ($(PROCESSOR),i386)
-    PLATFORM_CFLAGS+=	-march=pentium4 -mtune=generic $(SSE_FLAGS) -fPIC
+  PLATFORM_CFLAGS+=	-fPIC
+
+  ifeq ($(PROCESSOR),$(filter $(PROCESSOR),x86_64 i386))
+    PLATFORM_CFLAGS+=	$(SSE_FLAGS)
   else ifeq ($(PROCESSOR),ppc)
-    PLATFORM_CFLAGS+=	-mcpu=powerpc -fPIC
+    PLATFORM_CFLAGS+=	-mcpu=powerpc
   else ifeq ($(PROCESSOR),ppc64)
-    PLATFORM_CFLAGS+=	-mcpu=powerpc64 -fPIC
+    PLATFORM_CFLAGS+=	-mcpu=powerpc64
   endif
 
   ifdef HIGH_PERFORMANCE

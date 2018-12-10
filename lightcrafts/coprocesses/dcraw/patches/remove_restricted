@@ -1,0 +1,40 @@
+Index: dcraw/dcraw_lz.c
+===================================================================
+--- dcraw.orig/dcraw_lz.c
++++ dcraw/dcraw_lz.c
+@@ -6474,8 +6474,8 @@ void CLASS parse_foveon()
+ 	if (wide > raw_width && high > raw_height) {
+ 	  switch (pent) {
+ 	    case  5:  load_flags = 1;
+-	    case  6:  load_raw = &CLASS foveon_sd_load_raw;  break;
+-	    case 30:  load_raw = &CLASS foveon_dp_load_raw;  break;
++	    // case  6:  load_raw = &CLASS foveon_sd_load_raw;  break;
++	    // case 30:  load_raw = &CLASS foveon_dp_load_raw;  break;
+ 	    default:  load_raw = 0;
+ 	  }
+ 	  raw_width  = wide;
+@@ -6494,7 +6494,7 @@ void CLASS parse_foveon()
+ 	  thumb_offset = off+24;
+ 	  thumb_width = wide;
+ 	  thumb_height = high;
+-	  write_thumb = &CLASS foveon_thumb;
++	  // write_thumb = &CLASS foveon_thumb;
+ 	}
+ 	break;
+       case 0x464d4143:			/* CAMF */
+@@ -9886,12 +9886,14 @@ next:
+ #ifdef COLORCHECK
+     colorcheck();
+ #endif
++    /*
+     if (is_foveon) {
+       if (document_mode || load_raw == &CLASS foveon_dp_load_raw) {
+ 	for (i=0; i < height*width*4; i++)
+ 	  if ((short) image[0][i] < 0) image[0][i] = 0;
+       } else foveon_interpolate();
+-    } else if (document_mode < 2)
++    } else */
++    if (document_mode < 2)
+       scale_colors();
+     pre_interpolate();
+     if (filters && !document_mode) {

@@ -246,12 +246,8 @@ public final class XMLUtil {
      * @return Returns a new {@link Document}.
      */
     public static Document readDocumentFrom( File file ) throws IOException {
-        final FileInputStream fis = new FileInputStream( file );
-        try {
-            return readDocumentFrom( fis );
-        }
-        finally {
-            fis.close();
+        try (FileInputStream fis = new FileInputStream(file)) {
+            return readDocumentFrom(fis);
         }
     }
 
@@ -351,15 +347,9 @@ public final class XMLUtil {
      * @see #encodeDocument(Document,boolean)
      * @see #writeDocumentTo(Document,OutputStream)
      */
-    public static void writeDocumentTo( Document doc, File file )
-        throws IOException
-    {
-        final FileOutputStream fos = new FileOutputStream( file );
-        try {
-            writeDocumentTo( doc, fos );
-        }
-        finally {
-            fos.close();
+    public static void writeDocumentTo( Document doc, File file ) throws IOException {
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            writeDocumentTo(doc, fos);
         }
     }
 

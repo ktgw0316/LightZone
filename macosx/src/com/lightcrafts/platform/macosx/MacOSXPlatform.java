@@ -170,11 +170,6 @@ public final class MacOSXPlatform extends Platform {
     }
 
     @Override
-    public boolean showFileInFolder( String path ) {
-        return MacOSXFileUtil.showInFinder( path );
-    }
-
-    @Override
     public void showHelpTopic( String topic ) {
         MacOSXHelp.showHelpTopic( topic );
     }

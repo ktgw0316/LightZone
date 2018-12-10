@@ -232,15 +232,6 @@ final class UnSharpMaskOpImage extends PointOpImage {
     static {
         for (int i = 0; i < sigmoidTableLenght; i++)
             sigmoidTable[i] = (float) sigmoid(0.02 * (i - sigmoidTableLenght / 2));
-
-        /* try {
-            FileOutputStream tableDump = new FileOutputStream("/Stuff/tableDump");
-            for (float entry : sigmoidTable)
-                tableDump.write((Float.toString(entry) + '\n').getBytes());
-            tableDump.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } */
     }
 
     private static double sigmoidT(double x) {

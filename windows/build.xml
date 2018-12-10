@@ -49,7 +49,9 @@
   <target name="common">
     <ant dir="${common-dir}" target="jar"/>
     <exec executable="make" dir="products" failonerror="true"
-          vmlauncher="false"/>
+          vmlauncher="false">
+      <arg value="-j"/>
+    </exec>
   </target>
 
   <target name="javac" depends="common">
@@ -213,9 +215,12 @@
 
   <target name="clean-up">
     <ant dir="${common-dir}" target="${clean-method}"/>
-    <delete dir="build"/>
-    <delete dir="javah"/>
-    <delete file="${installer-name}"/>
+    <parallel>
+      <delete dir="build"/>
+      <delete dir="javah"/>
+      <delete file="${installer-name}"/>
+      <delete file="products/lightzone.jvmargs"/>
+    </parallel>
     <exec executable="make" dir="helpers">
       <arg value="${clean-method}"/>
     </exec>
@@ -223,9 +228,9 @@
       <arg value="${clean-method}"/>
     </exec>
     <exec executable="make" dir="products">
+      <arg value="-j"/>
       <arg value="${clean-method}"/>
     </exec>
-    <delete file="products/lightzone.jvmargs"/>
     <antcall target="cc-clean"/>
   </target>
 

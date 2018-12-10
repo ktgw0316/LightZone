@@ -197,11 +197,6 @@ public final class WindowsPlatform extends Platform {
     }
 
     @Override
-    public boolean showFileInFolder( String path ) {
-        return WindowsFileUtil.showInExplorer( path );
-    }
-
-    @Override
     public void showHelpTopic( String topic ) {
         WindowsHelp.showHelpTopic( topic );
     }

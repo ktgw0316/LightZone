@@ -6,7 +6,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
@@ -131,36 +130,28 @@ public final class Version {
      * @return Returns the contents of said resource file as a string.
      */
     private static String readResource( String name ) {
-        InputStream in = null;
         try {
             final URL url = Version.class.getResource( "resources/" + name );
-            if ( url == null )
-                throw new FileNotFoundException( "Revision resource" );
-            in = url.openStream();
-            final BufferedReader reader =
-                new BufferedReader( new InputStreamReader( in ) );
-            final StringBuilder sb = new StringBuilder();
-            String line;
-            do {
-                line = reader.readLine();
-                if ( line != null ) {
-                    sb.append( line );
-                    sb.append( '\n' );
-                }
-            } while ( line != null );
-            return sb.toString();
+            if ( url == null ) {
+                throw new FileNotFoundException("Revision resource");
+            }
+            try (InputStream in = url.openStream()) {
+                final BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                final StringBuilder sb = new StringBuilder();
+                String line;
+                do {
+                    line = reader.readLine();
+                    if ( line != null ) {
+                        sb.append( line );
+                        sb.append( '\n' );
+                    }
+                } while ( line != null );
+
+                return sb.toString();
+            }
         }
         catch ( Throwable t ) {
             System.err.println( "Failed to read " + name + " resource" );
-        }
-        finally {
-            if ( in != null )
-                try {
-                    in.close();
-                }
-                catch ( IOException e ) {
-                    // ignore
-                }
         }
         return null;
     }
