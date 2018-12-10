@@ -73,7 +73,9 @@
 
   <target name="javac" depends="resolve">
     <exec executable="${MAKE}" dir="products" failonerror="true"
-          vmlauncher="true"/>
+          vmlauncher="true">
+      <arg value="-j"/>
+    </exec>
 
     <mkdir dir="extbuild"/>
     <javac srcdir="extsrc" destdir="extbuild" includeantruntime="false"
@@ -228,9 +230,11 @@
   <!--===== Clean up =======================================================-->
 
   <target name="clean-up">
-    <delete dir="build"/>
-    <delete dir="javah"/>
-    <delete dir="extbuild"/>
+    <parallel>
+      <delete dir="build"/>
+      <delete dir="javah"/>
+      <delete dir="extbuild"/>
+    </parallel>
     <exec executable="${MAKE}" dir="jnisrc">
       <arg value="-j"/>
       <arg value="${clean-method}"/>

@@ -30,7 +30,9 @@
   <target name="common">
     <ant dir="${common-dir}" target="jar"/>
     <exec executable="make" dir="products" failonerror="true"
-          vmlauncher="false"/>
+          vmlauncher="false">
+      <arg value="-j"/>
+    </exec>
   </target>
 
   <target name="javac" depends="common">
@@ -204,9 +206,11 @@
 
   <target name="clean-up">
     <ant dir="${common-dir}" target="${clean-method}"/>
-    <delete dir="build"/>
-    <delete dir="javah"/>
-    <delete dir="${app-dir}"/>
+    <parallel>
+      <delete dir="build"/>
+      <delete dir="javah"/>
+      <delete dir="${app-dir}"/>
+    </parallel>
     <exec executable="make" dir="dmg">
       <arg value="-j"/>
       <arg value="${clean-method}"/>

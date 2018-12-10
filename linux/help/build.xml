@@ -58,8 +58,10 @@
     </target>
 
     <target name="clean">
-        <delete file="lightzonehelp.jar"/>
-        <delete dir="build"/>
+        <parallel>
+            <delete file="lightzonehelp.jar"/>
+            <delete dir="build"/>
+        </parallel>
     </target>
 
 </project>
