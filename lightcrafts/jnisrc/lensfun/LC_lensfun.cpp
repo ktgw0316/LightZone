@@ -173,7 +173,11 @@ Java_com_lightcrafts_utils_Lensfun_initModifierWithPoly5Lens
         return;
     }
 
+#if (LF_VERSION >= 0x00035f00) // 0.3.95
+    lfLensCalibDistortion dc = {LF_DIST_MODEL_POLY5, focal, focal, false, {k1, k2}};
+#else
     lfLensCalibDistortion dc = {LF_DIST_MODEL_POLY5, focal, {k1, k2}};
+#endif
     lens->AddCalibDistortion(&dc);
 
     lfLensCalibTCA tcac = {LF_TCA_MODEL_LINEAR, focal, {kr, kb}};
@@ -246,7 +250,7 @@ Java_com_lightcrafts_utils_Lensfun_backwardMapRect
 
 LC_lensfun::LC_lensfun()
 {
-    ldb = lfDatabase::Create();
+    ldb = new lfDatabase();
     if (ldb->Load() != LF_NO_ERROR) {
         std::cerr << "Lensfun database could not be loaded" << std::endl;
     }
@@ -255,11 +259,11 @@ LC_lensfun::LC_lensfun()
 LC_lensfun::~LC_lensfun()
 {
     if (mod) {
-        mod->Destroy();
+        delete mod;
         mod = nullptr;
     }
     if (ldb) {
-        ldb->Destroy();
+        delete ldb;
         ldb = nullptr;
     }
 }
@@ -368,14 +372,26 @@ void LC_lensfun::initModifier
     constexpr float scale = 0; // automatic scaling
     const lfLensType targeom = lens->Type;
 
-    mod = lfModifier::Create(lens, crop, fullWidth, fullHeight);
+#if (LF_VERSION >= 0x00035f00) // 0.3.95
+    mod = new lfModifier(crop, fullWidth, fullHeight, LF_PF_U16);
+#else
+    mod = new lfModifier(lens, crop, fullWidth, fullHeight);
+#endif
     if (!mod) {
         // FIXME: This causes crash
         std::cout << "*** mod unavailable" << std::endl;
         return;
     }
+#if (LF_VERSION >= 0x00035f00) // 0.3.95
+    mod->EnableDistortionCorrection(lens, focal);
+    mod->EnableTCACorrection(lens, focal);
+    mod->EnableVignettingCorrection(lens, focal, aperture, distance);
+    mod->EnableProjectionTransform(lens, focal, targeom);
+    mod->EnableScaling(scale);
+#else
     mod->Initialize(lens, LF_PF_U16, focal, aperture, distance, scale, targeom,
             LF_MODIFY_ALL, false);
+#endif
 }
 
 void LC_lensfun::applyModifier
