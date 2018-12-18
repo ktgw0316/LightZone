@@ -688,7 +688,7 @@
     </applications>
   </installerGui>
   <mediaSets>
-    <windows name="LightZoneWithJava" id="3" customizedId="" mediaFileName="${compiler:sys.shortName}-Installer-x86" installDir="${compiler:sys.shortName}" overridePrincipalLanguage="false" jreBitType="32" runPostProcessor="true" postProcessor="cmd /C resources\sign\install4j_shim.cmd $EXECUTABLE" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="windows-x86-1.8.0_152" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="" verifyIntegrity="true">
+    <windows name="LightZoneWithJava" id="3" customizedId="" mediaFileName="${compiler:sys.shortName}-Installer-x86" installDir="${compiler:sys.shortName}" overridePrincipalLanguage="false" jreBitType="32" runPostProcessor="true" postProcessor="cmd /C resources\sign\install4j_shim.cmd $EXECUTABLE" failOnPostProcessorError="false" useLegacyMediaFileIds="false" legacyMediaFileIds="" includedJRE="windows-x86-1.8.0_192" manualJREEntry="false" bundleType="1" jreURL="" jreShared="false" directDownload="false" installOnlyIfNecessary="false" customInstallBaseDir="" contentFilesType="1" downloadURL="" verifyIntegrity="true">
       <excludedLaunchers />
       <excludedBeans />
       <overriddenPrincipalLanguage id="en" customLocalizationFile="" />
