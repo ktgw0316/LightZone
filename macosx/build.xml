@@ -133,18 +133,7 @@
     <delete dir="${app-dir}" quiet="true"/>
   </target>
 
-  <condition property="jdk-provider" value="oracle">
-    <or>
-      <equals arg1="${ant.java.version}" arg2="1.7"/>
-      <equals arg1="${ant.java.version}" arg2="1.8"/>
-      <equals arg1="${ant.java.version}" arg2="1.9"/>
-    </or>
-  </condition>
-
-  <condition property="jdk-provider" value="apple">
-    <equals arg1="${ant.java.version}" arg2="1.6"/>
-  </condition>
-
+  <property name="jdk-provider" value="oracle"/>
   <import file="${jdk-provider}.xml"/>
 
   <!--===== Make a dmg file ================================================-->
