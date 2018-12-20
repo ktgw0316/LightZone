@@ -80,7 +80,13 @@
     <mkdir dir="extbuild"/>
     <javac srcdir="extsrc" destdir="extbuild" includeantruntime="false"
            source="1.6" target="1.6"
-           debug="true" classpath="${jai-classpath}"/>
+           debug="true" classpath="${jai-classpath}">
+      <classpath>
+        <fileset dir="lib">
+          <include name="*.jar"/>
+        </fileset>
+      </classpath>
+    </javac>
 
     <mkdir dir="build"/>
     <mkdir dir="javah"/>
