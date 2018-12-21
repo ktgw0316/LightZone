@@ -39,7 +39,7 @@ License: permissive
  the use of this software.
 
 Files: lightcrafts/extsrc/com/lightcrafts/*
-       linux/lib/mlibwrapper_jai.jar
+       lightcrafts/lib/mlibwrapper_jai.jar
 Copyright: 2005 Sun Microsystems, Inc.
 License: Java Research License or Java Distribution License
  https://java.net/projects/jai-core/sources/svn/content/trunk/LICENSE-JRL.txt

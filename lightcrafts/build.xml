@@ -39,12 +39,7 @@
     </or>
   </condition>
 
-  <condition property="jai-classpath"
-             value="../linux/lib/mlibwrapper_jai.jar">
-    <not>
-      <os family="mac"/>
-    </not>
-  </condition>
+  <property name="jai-classpath" value="lib/mlibwrapper_jai.jar"/>
 
   <target name="resolve" depends="init-ivy">
     <ivy:resolve file="${basedir}/ivy.xml"/>
@@ -80,13 +75,7 @@
     <mkdir dir="extbuild"/>
     <javac srcdir="extsrc" destdir="extbuild" includeantruntime="false"
            source="1.6" target="1.6"
-           debug="true" classpath="${jai-classpath}">
-      <classpath>
-        <fileset dir="lib">
-          <include name="*.jar"/>
-        </fileset>
-      </classpath>
-    </javac>
+           debug="true" classpath="${jai-classpath}"/>
 
     <mkdir dir="build"/>
     <mkdir dir="javah"/>
