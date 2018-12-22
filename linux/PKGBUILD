@@ -18,7 +18,7 @@ md5sums=('SKIP')
 
 build() {
   # Set $JAVA_HOME and $ANT_HOME
-  if [ -d /usr/lib/jvm/java-7-jdk ]; then
+  if [ -d /usr/lib/jvm/java-8-jdk ]; then
     export JAVA_HOME=/usr/lib/jvm/java-8-jdk
   else
     export JAVA_HOME=/usr/lib/jvm/java-8-openjdk
