@@ -1,6 +1,6 @@
 # Maintainer: KITAGAWA Masahiro <arctica0316@gmail.com>
 pkgname="lightzone"
-pkgver=4.1.8
+pkgver=4.1.9
 pkgrel=0
 pkgdesc="Open-source professional-level digital darkroom software"
 url="http://lightzoneproject.org/"
@@ -18,7 +18,7 @@ md5sums=('SKIP')
 
 build() {
   # Set $JAVA_HOME and $ANT_HOME
-  if [ -d /usr/lib/jvm/java-7-jdk ]; then
+  if [ -d /usr/lib/jvm/java-8-jdk ]; then
     export JAVA_HOME=/usr/lib/jvm/java-8-jdk
   else
     export JAVA_HOME=/usr/lib/jvm/java-8-openjdk

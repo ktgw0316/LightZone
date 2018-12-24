@@ -5,9 +5,12 @@ TARGET_BASE:=		fbf
 
 FW_DIR:=		/System/Library/Frameworks
 
-JNI_EXTRA_CFLAGS+=	-fopenmp -std=c++0x
+JNI_WINDOWS_CFLAGS:=	-fopenmp
+JNI_LINUX_CFLAGS:=	$(JNI_WINDOWS_CFLAGS)
+JNI_MACOSX_CFLAGS:=	-Xpreprocessor -fopenmp
+JNI_EXTRA_CFLAGS+=	-std=c++0x
 
-JNI_MACOSX_LINK:=	-lstdc++
+JNI_MACOSX_LINK:=	-lstdc++ -lomp
 # JNI_WINDOWS_LINK:=	-lLCJNI
 JNI_LINUX_LINK:=	$(JNI_WINDOWS_LINK)
 
