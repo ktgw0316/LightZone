@@ -52,7 +52,7 @@ _Note: If the build failed with a message_
 
 _manually download Apache Ant, unpack it somewhere (e.g. to your home directory) and append it to the path:_
 
-    export PATH=/home/yourusername/apache-ant-1.8.4/bin/:$PATH
+    export PATH=/home/yourusername/apache-ant-1.10.5/bin/:$PATH
 
 ## Test Run
 To check if it works fine before installing:
@@ -62,12 +62,12 @@ To check if it works fine before installing:
 ## Create a package and install
 ### <a name="packaging_deb"/>.deb package (Debian or Ubuntu)
 You need to place an original source tarball in parent directory.
-For instance, if you want to build v4.1.7 in /tmp directory,
+For instance, if you want to build v4.1.9 in /tmp directory,
 
     cd /tmp
     mkdir lightzone
-    curl -L https://github.com/Aries85/LightZone/tarball/master > lightzone_4.1.7.orig.tar.gz
-    tar xf lightzone_4.1.7.orig.tar.gz -C lightzone --strip-components=1
+    curl -L https://github.com/Aries85/LightZone/tarball/master > lightzone_4.1.9.orig.tar.gz
+    tar xf lightzone_4.1.9.orig.tar.gz -C lightzone --strip-components=1
     cd lightzone
 
 (If you want to build a package including your modification, you need to create its source tarball by yourself and place the tarball in the parent directory of the source code.)
@@ -117,7 +117,7 @@ In the local overlay use the portage groups:
     mkdir media-gfx/lightroom
 
 Put _linux/lightzone_9999.ebuild_ in the local overlay.
-If you need to build specific version, replace the _9999_ in the filename with the version number such as _4.1.5_.
+If you need to build specific version, replace the _9999_ in the filename with the version number such as _4.1.9_.
 
 Move into the new directory _media-gfx/lightroom_ and do:
 
