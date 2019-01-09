@@ -17,7 +17,7 @@ $(DEST_COMMON_PRODUCTS): FORCE
 	$(call SYMLINK,$(COMMON_DIR)/products/$@,$@)
 
 libs: $(DEST_COMMON_PRODUCTS)
-	$(shell ldd *.dll | grep -o "/.*mingw.*\.dll" | sort | uniq | xargs -r cp -u -t .)
+	$(shell ntldd *.dll | grep -o " => .*mingw.*\.dll" | sort | uniq | sed 's/ => \(.*\)/"\1"/g' | xargs -r cygpath | xargs -r cp -u -t .)
 
 .PHONY: FORCE
 FORCE:
