@@ -35,19 +35,14 @@ public final class FileUtil {
      * at least one {@link File} that has been accepted by the given
      * {@link FileFilter}.
      */
-    public static boolean containsAtLeastOne( File dir, FileFilter filter ) {
-        dir = Platform.getPlatform().isSpecialFile( dir );
-        final File[] allFiles = dir.listFiles();
-        if ( allFiles != null && allFiles.length > 0 ) {
-            if ( filter == null )
-                return true;
-            for ( File file : allFiles ) {
-                final File file2 = Platform.getPlatform().isSpecialFile( file );
-                if ( filter.accept( file2 ) )
-                    return true;
-            }
-        }
-        return false;
+    public static boolean containsAtLeastOne(File dir, @NotNull FileFilter filter)
+            throws IOException {
+        final Platform platform = Platform.getPlatform();
+        final Path dirPath = platform.isSpecialFile(dir).toPath();
+        return Files.list(dirPath)
+                .map(Path::toFile)
+                .map(platform::isSpecialFile)
+                .anyMatch(filter::accept);
     }
 
     /**
@@ -58,31 +53,7 @@ public final class FileUtil {
      * @throws IOException if anything goes wrong.
      */
     public static void copyFile( File source, File target ) throws IOException {
-        try (FileChannel sourceChannel = new FileInputStream( source ).getChannel();
-             FileChannel targetChannel = new FileOutputStream( target ).getChannel()) {
-            sourceChannel.transferTo( 0, sourceChannel.size(), targetChannel );
-        }
-    }
-
-    /**
-     * Delete a file.  If the file is actually a directory, delete the files it
-     * contains as well.  If the directory contains subdirectories, they are
-     * also deleted only if they are either empty or <code>recursive</code> is
-     * <code>true</code>.
-     *
-     * @param dir The {@link File} to delete.
-     * @param filter The {@link FileFilter} to use, or <code>null</code>.
-     * @param recursive If <code>true</code>, also delete all encountered
-     * subdirectories and their contents.
-     * @return Returns <code>false</code> only if at least one delete attempt
-     * fails.
-     */
-    public static boolean delete( File dir, FileFilter filter,
-                                  boolean recursive ) {
-        if ( dir.isDirectory() && !(dir instanceof SmartFolder) && recursive &&
-             !delete( listFiles( dir, filter, recursive ), filter, recursive ) )
-            return false;
-        return dir.delete();
+        Files.copy(source.toPath(), target.toPath(), StandardCopyOption.COPY_ATTRIBUTES);
     }
 
     /**
