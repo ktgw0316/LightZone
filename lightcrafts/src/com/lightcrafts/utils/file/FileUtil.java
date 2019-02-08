@@ -9,7 +9,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.nio.channels.FileChannel;
@@ -183,7 +183,8 @@ public final class FileUtil {
      * not be obtained.
      */
     public static long getLastAccessTimeOf( File file ) throws IOException {
-        return getLastAccessTime( file.getAbsolutePath() ) * 1000;
+        return Files.readAttributes(file.toPath().toAbsolutePath(), BasicFileAttributes.class)
+                .lastAccessTime().toMillis();
     }
 
     /**
@@ -560,25 +561,6 @@ public final class FileUtil {
     ////////// private ////////////////////////////////////////////////////////
 
     /**
-     * Gets the last access time of a file.
-     *
-     * @param fileName The full path to the file.
-     * @return Returns the number of seconds since epoch of the last access
-     * time.
-     * @throws IOException if the file doesn't exist or the access time could
-     * not be obtained.
-     */
-    private static long getLastAccessTime( String fileName )
-        throws IOException, UnsupportedEncodingException
-    {
-        byte[] fileNameUtf8 = ( fileName + '\000' ).getBytes( "UTF-8" );
-        return getLastAccessTime( fileNameUtf8 );
-    }
-
-    private static native long getLastAccessTime( byte[] fileNameUtf8 )
-        throws IOException;
-
-    /**
      * The set of characters that are illegal in filenames comprising Linux,
      * Mac OS X, and Windows.  Additionally, the '%' character, although not
      * illegal, is included first so it will be encoded first by
@@ -588,10 +570,6 @@ public final class FileUtil {
 
     private static final Pattern NUMBERED_FILE_PATTERN =
         Pattern.compile( "^.*-(\\d+)\\.[a-z]{3,4}$" );
-
-    static {
-        System.loadLibrary( "LCFileUtil" );
-    }
 
     private static final FileFilter dirFilter = new FileFilter() {
         public boolean accept(File file) {
