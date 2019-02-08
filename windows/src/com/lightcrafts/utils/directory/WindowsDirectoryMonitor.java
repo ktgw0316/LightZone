@@ -1,7 +1,9 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2013-     Masahiro Kitagawa */
 
 package com.lightcrafts.utils.directory;
 
+import javax.swing.filechooser.FileSystemView;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
@@ -12,8 +14,6 @@ import java.util.stream.Stream;
 
 import com.lightcrafts.utils.file.FileUtil;
 import com.lightcrafts.platform.windows.WindowsFileUtil;
-
-import sun.awt.shell.ShellFolder;
 
 /**
  * A <code>WindowsDirectoryMonitor</code> is-a {@link DirectoryMonitor} for
@@ -205,14 +205,11 @@ public final class WindowsDirectoryMonitor extends DirectoryMonitor {
      * @return Returns said hash code.
      */
     private static long newHashCode( File dir ) {
-        if ( dir instanceof ShellFolder ) {
-            //
+        final FileSystemView fsv = FileSystemView.getFileSystemView();
+        if (fsv.getSystemDisplayName(dir).equals("Network")) {
             // This is a hack to work around the problem of scanning the
             // "Network" pseudo-folder that takes a long time.
-            //
-            final ShellFolder sf = (ShellFolder)dir;
-            if ( sf.getDisplayName().equals( "Network" ) )
-                return 0;
+            return 0;
         }
         final File[] contents =
             FileUtil.listFiles( dir, DirectoryOnlyFilter.INSTANCE, false );
