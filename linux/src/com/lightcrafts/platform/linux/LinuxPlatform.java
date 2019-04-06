@@ -128,6 +128,7 @@ public class LinuxPlatform extends Platform {
         return Profiles;
     }
 
+    // See proposal notes
     @Override
     public int getPhysicalMemoryInMB() {
         final String osname = System.getProperty("os.name");
