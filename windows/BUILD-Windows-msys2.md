@@ -23,6 +23,9 @@ Download and install (or unpack) following:
     1. Install __lcms2__. This will also install __libtiff__ and __libjpeg-turbo__.
     -    For 32-bit: `pacman -S mingw-w64-i686-lcms2`
     -    For 64-bit: `pacman -S mingw-w64-x86_64-lcms2`
+    1. Install __ntldd__.
+    -    For 32-bit: `pacman -S mingw-w64-i686-ntldd-git`
+    -    For 64-bit: `pacman -S mingw-w64-x86_64-ntldd-git`
 -   __Oracle JDK SE 8__ (Java Development Kit)
 -   __Microsoft Windows SDK__
     Pick the right version based on your Windows version. Information and download links are

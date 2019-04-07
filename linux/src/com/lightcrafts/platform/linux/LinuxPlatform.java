@@ -117,6 +117,7 @@ public class LinuxPlatform extends Platform {
         return Profiles;
     }
 
+    // See proposal notes
     @Override
     public void loadLibraries() throws UnsatisfiedLinkError {
         System.loadLibrary("Linux");
