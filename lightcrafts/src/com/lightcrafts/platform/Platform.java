@@ -9,6 +9,13 @@ import com.lightcrafts.utils.directory.DirectoryMonitor;
 import com.lightcrafts.utils.directory.UnixDirectoryMonitor;
 import com.lightcrafts.utils.file.ICC_ProfileFileFilter;
 
+import javax.management.AttributeNotFoundException;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
+import javax.management.ReflectionException;
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 import java.awt.color.ICC_Profile;
@@ -197,9 +204,18 @@ public class Platform {
      * @return Returns the amount of memory in megabytes.
      */
     public int getPhysicalMemoryInMB() {
-        com.sun.management.OperatingSystemMXBean os =
-            (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-        return (int) os.getTotalPhysicalMemorySize() / 1048576;
+        long totalPhysicalMemory = 0;
+        final MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
+        try {
+            final Object attribute = mBeanServer.getAttribute(
+                    new ObjectName("java.lang", "type", "OperatingSystem"),
+                    "TotalPhysicalMemorySize");
+            totalPhysicalMemory = Long.parseLong(attribute.toString());
+        } catch (AttributeNotFoundException | MBeanException | InstanceNotFoundException
+                | ReflectionException | MalformedObjectNameException e) {
+            e.printStackTrace();
+        }
+        return (int) (totalPhysicalMemory / 1048576);
     }
 
     /**
