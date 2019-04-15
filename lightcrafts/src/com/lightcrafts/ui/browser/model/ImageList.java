@@ -13,6 +13,7 @@ import java.io.File;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import lombok.Getter;
 import lombok.val;
@@ -328,39 +329,26 @@ public class ImageList {
             // generating bogus ImageGroup assignments:
 //            ImageGroup.checkConsistency(list);
 
-            // Identify the distinct ImageGroups:
-            Set<ImageGroup> groups = list.stream()
+            // Sort group members by file modification time:
+            final Comparator<ImageDatum> modificationTimeComparator =
+                    Comparator.comparing((ImageDatum m) -> m.getFile().lastModified()).reversed();
+
+            final List<ImageDatum> newList = list.stream()
                     .map(ImageDatum::getGroup)
-                    .collect(Collectors.toSet());
-
-            // Put the leaders into a sortable list:
-            List<ImageDatum> leaders = new LinkedList<>();
-            groups.stream()
+                    .distinct()
                     .map(ImageGroup::getLeader)
-                    .forEach(leader -> {
-                        if (leaders.contains(leader)) {
-                            System.out.println("redundant leader");
-                        }
-                        leaders.add(leader);
-                    });
-
-            // Rebuild the list, putting members by leaders:
-            list.clear();
-            leaders.stream()
                     .sorted(comp)
-                    .peek(list::add)
+                    .distinct()
                     .flatMap(leader -> {
                         val members = leader.getGroup().getImageDatums();
-                        return members.stream()
-                                .filter(member -> !member.equals(leader));
+                        return Stream.concat(Stream.of(leader),
+                                members.stream()
+                                        .filter(m -> !m.equals(leader))
+                                        .sorted(modificationTimeComparator));
                     })
-                    // Sort group members by file modification time:
-                    .sorted((l, r) -> {
-                        val lTime = l.getFile().lastModified();
-                        val rTime = r.getFile().lastModified();
-                        return (int) Math.signum(lTime - rTime);
-                    })
-                    .forEach(list::add);
+                    .collect(Collectors.toList());
+            list.clear();
+            list.addAll(newList);
         }
     }
 
