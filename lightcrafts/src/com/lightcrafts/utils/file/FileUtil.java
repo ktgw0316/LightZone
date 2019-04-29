@@ -9,12 +9,16 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.nio.channels.FileChannel;
 
 import com.lightcrafts.platform.Platform;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A <code>FileUtil</code> is a set of utility functions for files.
@@ -35,19 +39,14 @@ public final class FileUtil {
      * at least one {@link File} that has been accepted by the given
      * {@link FileFilter}.
      */
-    public static boolean containsAtLeastOne( File dir, FileFilter filter ) {
-        dir = Platform.getPlatform().isSpecialFile( dir );
-        final File[] allFiles = dir.listFiles();
-        if ( allFiles != null && allFiles.length > 0 ) {
-            if ( filter == null )
-                return true;
-            for ( File file : allFiles ) {
-                final File file2 = Platform.getPlatform().isSpecialFile( file );
-                if ( filter.accept( file2 ) )
-                    return true;
-            }
-        }
-        return false;
+    public static boolean containsAtLeastOne(File dir, @NotNull FileFilter filter)
+            throws IOException {
+        final Platform platform = Platform.getPlatform();
+        final Path dirPath = platform.isSpecialFile(dir).toPath();
+        return Files.list(dirPath)
+                .map(Path::toFile)
+                .map(platform::isSpecialFile)
+                .anyMatch(filter::accept);
     }
 
     /**
@@ -58,31 +57,7 @@ public final class FileUtil {
      * @throws IOException if anything goes wrong.
      */
     public static void copyFile( File source, File target ) throws IOException {
-        try (FileChannel sourceChannel = new FileInputStream( source ).getChannel();
-             FileChannel targetChannel = new FileOutputStream( target ).getChannel()) {
-            sourceChannel.transferTo( 0, sourceChannel.size(), targetChannel );
-        }
-    }
-
-    /**
-     * Delete a file.  If the file is actually a directory, delete the files it
-     * contains as well.  If the directory contains subdirectories, they are
-     * also deleted only if they are either empty or <code>recursive</code> is
-     * <code>true</code>.
-     *
-     * @param dir The {@link File} to delete.
-     * @param filter The {@link FileFilter} to use, or <code>null</code>.
-     * @param recursive If <code>true</code>, also delete all encountered
-     * subdirectories and their contents.
-     * @return Returns <code>false</code> only if at least one delete attempt
-     * fails.
-     */
-    public static boolean delete( File dir, FileFilter filter,
-                                  boolean recursive ) {
-        if ( dir.isDirectory() && !(dir instanceof SmartFolder) && recursive &&
-             !delete( listFiles( dir, filter, recursive ), filter, recursive ) )
-            return false;
-        return dir.delete();
+        Files.copy(source.toPath(), target.toPath(), StandardCopyOption.COPY_ATTRIBUTES);
     }
 
     /**
@@ -183,7 +158,8 @@ public final class FileUtil {
      * not be obtained.
      */
     public static long getLastAccessTimeOf( File file ) throws IOException {
-        return getLastAccessTime( file.getAbsolutePath() ) * 1000;
+        return Files.readAttributes(file.toPath().toAbsolutePath(), BasicFileAttributes.class)
+                .lastAccessTime().toMillis();
     }
 
     /**
@@ -560,25 +536,6 @@ public final class FileUtil {
     ////////// private ////////////////////////////////////////////////////////
 
     /**
-     * Gets the last access time of a file.
-     *
-     * @param fileName The full path to the file.
-     * @return Returns the number of seconds since epoch of the last access
-     * time.
-     * @throws IOException if the file doesn't exist or the access time could
-     * not be obtained.
-     */
-    private static long getLastAccessTime( String fileName )
-        throws IOException, UnsupportedEncodingException
-    {
-        byte[] fileNameUtf8 = ( fileName + '\000' ).getBytes( "UTF-8" );
-        return getLastAccessTime( fileNameUtf8 );
-    }
-
-    private static native long getLastAccessTime( byte[] fileNameUtf8 )
-        throws IOException;
-
-    /**
      * The set of characters that are illegal in filenames comprising Linux,
      * Mac OS X, and Windows.  Additionally, the '%' character, although not
      * illegal, is included first so it will be encoded first by
@@ -588,10 +545,6 @@ public final class FileUtil {
 
     private static final Pattern NUMBERED_FILE_PATTERN =
         Pattern.compile( "^.*-(\\d+)\\.[a-z]{3,4}$" );
-
-    static {
-        System.loadLibrary( "LCFileUtil" );
-    }
 
     private static final FileFilter dirFilter = new FileFilter() {
         public boolean accept(File file) {
