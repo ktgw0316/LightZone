@@ -452,6 +452,15 @@ public class Functions {
         return layout;
     }
 
+    public static RenderedImage systemColorSpaceImage(RenderedImage image) {
+        ColorModel colors = image.getColorModel();
+        ColorSpace space = colors.getColorSpace();
+        if (space != null && !space.equals(JAIContext.systemColorSpace)) {
+            image = toColorSpace(image, JAIContext.systemColorSpace, null);
+        }
+        return new sRGBWrapper(image);
+    }
+
     public static class sRGBWrapper extends PlanarImage {
         final RenderedImage source;
 
