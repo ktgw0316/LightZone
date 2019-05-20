@@ -6,12 +6,13 @@ package com.lightcrafts.ui.browser.model;
 import com.lightcrafts.image.BadImageFileException;
 import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.image.UnknownImageTypeException;
-import static com.lightcrafts.image.metadata.CoreTags.*;
 import com.lightcrafts.image.metadata.*;
-import static com.lightcrafts.image.metadata.TIFFTags.TIFF_XMP_PACKET;
 import com.lightcrafts.image.metadata.values.ImageMetaValue;
-import static com.lightcrafts.ui.browser.model.Locale.LOCALE;
 import com.lightcrafts.utils.filecache.FileCache;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.val;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.awt.image.RenderedImage;
@@ -21,11 +22,11 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.val;
-import org.jetbrains.annotations.Nullable;
+import static com.lightcrafts.image.metadata.CoreTags.*;
+import static com.lightcrafts.image.metadata.TIFFTags.TIFF_XMP_PACKET;
+import static com.lightcrafts.ui.browser.model.Locale.LOCALE;
 
 /**
  * A holder for all data that are derived from an image for browser purposes,
@@ -436,9 +437,10 @@ public class ImageDatum {
             return;
         }
         // Push a rotation change out to all running PreviewUpdaters.
-        val newRefs = new LinkedList<PreviewUpdater>();
-        previews.removeIf(Objects::isNull); // Just in case
-        previews.forEach(updater -> newRefs.add(new PreviewUpdater(updater, img, meta)));
+        val newRefs = previews.stream()
+                .filter(Objects::nonNull) // Just in case
+                .map(updater -> new PreviewUpdater(updater, img, meta))
+                .collect(Collectors.toList());
         previews.clear();
         previews.addAll(newRefs);
     }
