@@ -4,12 +4,14 @@
 package com.lightcrafts.ui.metadata;
 
 import com.lightcrafts.image.metadata.ImageMetadataDirectory;
-import com.lightcrafts.image.metadata.values.ImageMetaValue;
 import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * Represent an ImageMetadataDirectory as a String name plus a List of
@@ -20,35 +22,28 @@ class MetadataDirectoryModel {
     @Getter
     private String name;
 
-    private ArrayList<KeyValuePair> pairs;
+    private List<KeyValuePair> pairs;
 
     private static Comparator<KeyValuePair> KeyValuePairComp =
-            (pair1, pair2) -> {
-                String s1 = pair1.getKey();
-                String s2 = pair2.getKey();
-                return s1.compareTo(s2);
-            };
+            Comparator.comparing(p -> p.key);
+
+    private static Comparator<KeyValuePair> NoSortComp = (p1, p2) -> 0;
 
     MetadataDirectoryModel(
         ImageMetadataDirectory directory, boolean filter, boolean sort
     ) {
         name = directory.getName();
-        pairs = new ArrayList<>();
-        directory.forEach(entry -> {
-            Integer id = entry.getKey();
-            ImageMetaValue value = directory.getValue(id);
-            if (value != null && value.isDisplayable()) {
-                String key = directory.getTagLabelFor(id);
-                KeyValuePair pair = new KeyValuePair(id, key, value);
-                pairs.add(pair);
-            }
-        });
-        if (filter) {
-            pairs = MetaTagFilter.filter(directory, pairs);
-        }
-        if (sort) {
-            pairs.sort(KeyValuePairComp);
-        }
+        pairs = StreamSupport.stream(directory.spliterator(), false)
+                .map(Map.Entry::getKey)
+                .map(id -> new KeyValuePair(id, null, directory.getValue(id)))
+                .filter(p -> p.value != null && p.value.isDisplayable())
+                .map(p -> {
+                    String key = directory.getTagLabelFor(p.tagID);
+                    return new KeyValuePair(p.tagID, key, p.value);
+                })
+                .filter(p -> !filter || directory.shouldDisplayTag(p.tagID))
+                .sorted(sort ? KeyValuePairComp : NoSortComp)
+                .collect(Collectors.toList());
     }
 
     List<KeyValuePair> getPairs() {
