@@ -2,7 +2,7 @@
   <settings defaultResolver="myChain"/>
   <resolvers>
     <chain name="myChain">
-      <ibiblio name="geotoolkit" root="http://maven.geotoolkit.org/" m2compatible="true"/>
+      <ibiblio name="osgeo" root="http://download.osgeo.org/webdav/geotools/" m2compatible="true"/>
       <ibiblio name="ibiblio" m2compatible="true"/>
     </chain>
   </resolvers>
