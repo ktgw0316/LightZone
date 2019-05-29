@@ -22,9 +22,8 @@ addons:
       - tidy
       - liblensfun-dev
       - liblcms2-dev
-      - libtiff4-dev
-      - g++-5
-
+      - libtiff-dev
+      
 env:
   - CXX=g++-5 CC=gcc-5
 
