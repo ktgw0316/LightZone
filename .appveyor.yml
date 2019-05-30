@@ -1,0 +1,16 @@
+version: 4.1.9.{build}-{branch}
+
+image: ubuntu1804
+
+branches:
+  only:
+    - testing
+
+clone_depth: 1
+
+init:
+  - sh: sudo apt-get update
+  - sh: sudo apt-get install -y ant autoconf javahelp2 tidy libglib2.0-dev liblensfun-dev liblcms2-dev libtiff-dev
+
+build_script:
+  - ant -f linux/build.xml
