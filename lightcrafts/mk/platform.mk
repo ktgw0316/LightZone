@@ -34,7 +34,7 @@ TOOLS_BIN:=		$(abspath $(ROOT)/lightcrafts/tools/bin)
 # Default to a normal (Unix) classpath seperator.
 CLASSPATH_SEP:=		:
 
-# The default C and C++ compilers for Linux, FreeBSD, OpenIndiana, or MSYS2
+# The default C and C++ compilers for Linux, FreeBSD, or OpenIndiana
 CC?=			gcc
 CXX?=			g++
 PKGCFG:=		pkg-config
@@ -209,22 +209,23 @@ ifeq ($(PLATFORM),Windows)
     NUM_PROCESSORS:=	1
   endif
 
+  ifeq ($(PROCESSOR),x86_64)
+    MINGW:=		x86_64-w64-mingw32
+  else
+    MINGW:=		i686-w64-mingw32
+  endif
+  CC:=		$(MINGW)-gcc
+  CXX:=		$(MINGW)-g++
+  PKGCFG:=	$(MINGW)-pkg-config
+
   ifeq ($(CYGWIN),1)
-    ifeq ($(PROCESSOR),x86_64)
-      MINGW:=		x86_64-w64-mingw32
-    else
-      MINGW:=		i686-w64-mingw32
-    endif
-    CC:=		$(MINGW)-gcc
-    CXX:=		$(MINGW)-g++
-    PKGCFG:=		$(MINGW)-pkg-config
-    MINGW_DIR:=		/usr/$(MINGW)/sys-root/mingw/
+    MINGW_DIR?=		/usr/$(MINGW)/sys-root/mingw/
   else
     # MSYS2
     ifeq ($(PROCESSOR),x86_64)
-      MINGW_DIR:=	/mingw64/
+      MINGW_DIR?=	/mingw64/
     else
-      MINGW_DIR:=	/mingw32/
+      MINGW_DIR?=	/mingw32/
     endif
   endif
 
