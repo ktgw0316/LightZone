@@ -6,7 +6,6 @@ image:
 
 branches:
   only:
-    - appveyor
     - testing
 
 clone_depth: 1
