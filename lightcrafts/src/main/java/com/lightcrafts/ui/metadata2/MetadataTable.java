@@ -177,6 +177,12 @@ class MetadataTable extends JTable {
     @Override
     public TableCellRenderer getCellRenderer(int row, int col) {
         Object o = getValueAt(row, col);
+        if (o instanceof Icon) {
+            int height = ((Icon) o).getIconHeight();
+            if (height > this.getRowHeight(row)) {
+                setRowHeight(row, height);
+            }
+        }
         return getDefaultRenderer(o.getClass());
     }
 

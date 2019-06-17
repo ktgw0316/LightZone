@@ -11,6 +11,7 @@ import java.awt.*;
 
 class MetadataTableCellRenderer extends DefaultTableCellRenderer {
 
+    @Override
     public Component getTableCellRendererComponent(
         JTable table,
         Object value,
@@ -44,5 +45,20 @@ class MetadataTableCellRenderer extends DefaultTableCellRenderer {
             label.setBackground(LightZoneSkin.Colors.ToolPanesBackground);
         }
         return label;
+    }
+
+    @Override
+    public void setValue(Object value) {
+        if (value instanceof Icon) {
+            setText("");
+            setIcon((Icon) value);
+            setToolTipText("© OpenStreetMap contributors");
+            return;
+        }
+        super.setValue(value);
+        setToolTipText(null);
+        if (value == null) {
+            setIcon(null);
+        }
     }
 }
