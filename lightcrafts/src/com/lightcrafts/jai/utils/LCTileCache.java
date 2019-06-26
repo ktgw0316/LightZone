@@ -90,6 +90,8 @@ public final class LCTileCache extends Observable
      */
     private SortedSet<LCCachedTile> cacheSortedSet;
 
+    private LinkedList<LCCachedTile> tileList;
+
     /** The memory capacity of the cachedObject. */
     @Getter
     private long memoryCapacity;
@@ -109,12 +111,6 @@ public final class LCTileCache extends Observable
      */
     @Getter
     private Comparator tileComparator = null;
-
-    /** Pointer to the first (newest) tile of the linked LCCachedTile list. */
-    private LCCachedTile first = null;
-
-    /** Pointer to the last (oldest) tile of the linked LCCachedTile list. */
-    private LCCachedTile last = null;
 
     /** Tile count used for diagnostics */
     @Getter
@@ -195,6 +191,8 @@ public final class LCTileCache extends Observable
         // lower values of LOAD_FACTOR increase speed, decrease space efficiency
         cachedObject = new Hashtable<>(DEFAULT_HASHTABLE_CAPACITY, LOAD_FACTOR);
 
+        tileList = new LinkedList<>();
+
         if (useDisk) {
             m_objectCache = createDiskCache();
 
@@ -260,19 +258,7 @@ public final class LCTileCache extends Observable
         } else {
             // create a new tile
             ct = new LCCachedTile(owner, tileX, tileY, tile, tileCacheMetric);
-            ct.tileTimeStamp = timeStamp++;
-            ct.previous = null;
-            ct.next = first;
-
-            if (first == null && last == null) {
-                first = ct;
-                last  = ct;
-            } else {
-                if (first != null) {
-                    first.previous = ct;
-                }
-                first = ct;        // put this tile at the top of the list
-            }
+            updateTileList(ct, ADD);
 
             // add to tile cachedObject
             if ( cachedObject.put(ct.key, ct) == null ) {
@@ -282,12 +268,6 @@ public final class LCTileCache extends Observable
 
                 if ( cacheSortedSet != null ) {
                     cacheSortedSet.add(ct);
-                }
-
-                if ( diagnostics ) {
-                    ct.action = ADD;
-                    setChanged();
-                    notifyObservers(ct);
                 }
             }
 
@@ -335,21 +315,7 @@ public final class LCTileCache extends Observable
                 cacheSortedSet.remove(ct);
             }
 
-            if ( ct == first ) {
-                if ( ct == last ) {
-                    first = null;  // only one tile in the list
-                    last  = null;
-                } else {
-                    first = ct.next;
-                    first.previous = null;
-                }
-            } else if ( ct == last ) {
-                last = ct.previous;
-                last.next = null;
-            } else {
-                ct.previous.next = ct.next;
-                ct.next.previous = ct.previous;
-            }
+            tileList.remove(ct);
 
             // Notify observers that a tile has been removed.
             if ( diagnostics ) {
@@ -357,9 +323,6 @@ public final class LCTileCache extends Observable
                 setChanged();
                 notifyObservers(ct);
             }
-
-            ct.previous = null;
-            ct.next = null;
 
             return true;
         }
@@ -369,21 +332,13 @@ public final class LCTileCache extends Observable
     private void updateTileList(LCCachedTile ct, int action) {
         ct.tileTimeStamp = timeStamp++;
 
-        if (ct != first) {
+        if (tileList.isEmpty()) {
+            tileList.add(ct);
+        }
+        else if (!tileList.getFirst().equals(ct)) {
             // Bring this tile to the beginning of the list.
-            if (ct == last) {
-                last = ct.previous;
-                last.next = null;
-            } else {
-                ct.previous.next = ct.next;
-                ct.next.previous = ct.previous;
-            }
-
-            ct.previous = null;
-            ct.next = first;
-
-            first.previous = ct;
-            first = ct;
+            tileList.remove(ct);
+            tileList.addFirst(ct);
         }
 
         cacheHitCount++;
@@ -649,6 +604,8 @@ public final class LCTileCache extends Observable
             cacheSortedSet = Collections.synchronizedSortedSet( new TreeSet<LCCachedTile>(tileComparator) );
         }
 
+        tileList.clear();
+
         // force reset after diagnostics
         cacheTileCount = 0;
         timeStamp   = 0;
@@ -783,16 +740,18 @@ public final class LCTileCache extends Observable
     private void standard_memory_control() {
         long limit = (long)(memoryCapacity * memoryThreshold);
 
-        while( cacheMemoryUsed > limit && last != null ) {
-            LCCachedTile ct = cachedObject.get(last.key);
+        while( cacheMemoryUsed > limit && ! tileList.isEmpty() ) {
+            final Object lastKey = tileList.getLast().key;
+            LCCachedTile ct = cachedObject.get(lastKey);
 
             if ( ct != null ) {
-                RenderedImage owner = ct.getOwner();
-                if (owner != null && owner.getProperty(JAIContext.PERSISTENT_CACHE_TAG) == Boolean.TRUE)
-                    if (m_objectCache != null)
-                        writeTileToDisk(ct, last.key);
-
-                removeFromTileList(last.key, REMOVE_FROM_MEMCON);
+                if (m_objectCache != null) {
+                    RenderedImage owner = ct.getOwner();
+                    if (owner != null && owner.getProperty(JAIContext.PERSISTENT_CACHE_TAG) == Boolean.TRUE) {
+                        writeTileToDisk(ct, lastKey);
+                    }
+                }
+                removeFromTileList(lastKey, REMOVE_FROM_MEMCON);
             }
         }
     }
@@ -1062,10 +1021,9 @@ public final class LCTileCache extends Observable
     private void custom_memory_control() {
         long limit = (long)(memoryCapacity * memoryThreshold);
         Iterator<LCCachedTile> iter = cacheSortedSet.iterator();
-        LCCachedTile ct;
 
         while( iter.hasNext() && (cacheMemoryUsed > limit) ) {
-            ct = iter.next();
+            final LCCachedTile ct = iter.next();
 
             cacheMemoryUsed -= ct.tileSize;
             synchronized (this) {
@@ -1083,49 +1041,9 @@ public final class LCTileCache extends Observable
 //                e.printStackTrace();
             }
 
-            // remove tile from the linked list
-            if ( ct == first ) {
-                if ( ct == last ) {
-                    first = null;
-                    last  = null;
-                } else {
-                    first = ct.next;
-
-                    if ( first != null ) {
-                        first.previous = null;
-                    }
-                }
-            } else if ( ct == last ) {
-                last = ct.previous;
-
-                if ( last != null ) {
-                    last.next = null;
-                }
-            } else {
-                LCCachedTile ptr = first.next;
-
-                while( ptr != null ) {
-
-                    if ( ptr == ct ) {
-                        if ( ptr.previous != null ) {
-                            ptr.previous.next = ptr.next;
-                        }
-
-                        if ( ptr.next != null ) {
-                            ptr.next.previous = ptr.previous;
-                        }
-
-                        break;
-                    }
-
-                    ptr = ptr.next;
-                }
-            }
-
-            // remove reference in the hashtable
+            tileList.remove(ct);
             cachedObject.remove(ct.key);
 
-            // diagnostics
             if ( diagnostics ) {
                 ct.action = REMOVE_FROM_MEMCON;
                 setChanged();
@@ -1173,14 +1091,11 @@ public final class LCTileCache extends Observable
     // test
     public void dump() {
 
-        System.out.println("first = " + first);
-        System.out.println("last  = " + last);
+        System.out.println("first = " + tileList.getFirst());
+        System.out.println("last  = " + tileList.getLast());
 
-        Iterator<LCCachedTile> iter = cacheSortedSet.iterator();
         int k = 0;
-
-        while( iter.hasNext() ) {
-            LCCachedTile ct = iter.next();
+        for (LCCachedTile ct : cacheSortedSet) {
             System.out.println(k++);
             System.out.println(ct);
         }

@@ -31,8 +31,6 @@ import java.math.BigInteger;
  * includes all the information associated with a tile, and is put
  * into the tile cache.
  *
- * <p> It also serves as a double linked list.
- *
  * @see LCTileCache
  *
  */
@@ -60,9 +58,6 @@ final class LCCachedTile implements CachedTile {
 
     @Getter
     long tileSize;		// the memory used by this tile in bytes
-
-    LCCachedTile previous;	// the SunCachedTile before this tile
-    LCCachedTile next;		// the SunCachedTile after this tile
 
     @Getter
     int action = 0;             // add, remove, update from tile cache
