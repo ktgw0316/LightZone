@@ -1020,7 +1020,7 @@ public final class LCTileCache extends Observable
                                                                        tileY * owner.getTileHeight()));
             else {
                 int bands = sm.getNumBands();
-                int bandOffsets[] = ((PixelInterleavedSampleModel) sm).getBandOffsets();
+                int[] bandOffsets = ((PixelInterleavedSampleModel) sm).getBandOffsets();
 
                 raster = Raster.createInterleavedRaster(db, owner.getTileWidth(), owner.getTileHeight(),
                                                         bands * owner.getTileWidth(), bands, bandOffsets,

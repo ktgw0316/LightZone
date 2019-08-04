@@ -82,7 +82,7 @@ public class HDROpImage2 extends PointOpImage {
         d.copyDataToRaster();
     }
 
-    private static int softLightBlendPixelsIntensity(int front, int back, short intensityTable[]) {
+    private static int softLightBlendPixelsIntensity(int front, int back, short[] intensityTable) {
         int m = front * back / c;
         int s = c - (c - front) * (c - back) / c;
         int p = 0xffff & intensityTable[back];
@@ -105,7 +105,7 @@ public class HDROpImage2 extends PointOpImage {
         return c - (c - front) * (c - back) / c;
     }
 
-    private static int screenBlendPixelsIntensity(int front, int back, short intensityTable[]) {
+    private static int screenBlendPixelsIntensity(int front, int back, short[] intensityTable) {
         int s = c - (c - front) * (c - back) / c;
         int p = 0xffff & intensityTable[back];
         return (p * s) / c;

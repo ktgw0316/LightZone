@@ -1433,8 +1433,8 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
      * All the possible filename extensions for JPEG files.  All must be lower
      * case and the preferred one must be first.
      */
-    private static final String EXTENSIONS[] = {
-        "jpg", "jpe", "jpeg"
+    private static final String[] EXTENSIONS = {
+            "jpg", "jpe", "jpeg"
     };
 
     /**

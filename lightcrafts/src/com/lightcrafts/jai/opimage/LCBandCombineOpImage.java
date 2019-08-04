@@ -152,7 +152,7 @@ final class LCBandCombineOpImage extends PointOpImage {
 
             int rows = matrix.length;
             int cols = matrix[0].length;
-            int sortedMatrix[][] = new int[rows][cols];
+            int[][] sortedMatrix = new int[rows][cols];
 
             int[] bandOffsets = src.getOffsetsForBands();
 
@@ -244,7 +244,7 @@ final class LCBandCombineOpImage extends PointOpImage {
         } else {
             int rows = matrix.length;
             int cols = matrix[0].length;
-            int intMatrix[][] = new int[rows][cols];
+            int[][] intMatrix = new int[rows][cols];
 
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < cols - 1; j++) {
@@ -301,7 +301,7 @@ final class LCBandCombineOpImage extends PointOpImage {
 
             int rows = matrix.length;
             int cols = matrix[0].length;
-            int sortedMatrix[][] = new int[rows][cols];
+            int[][] sortedMatrix = new int[rows][cols];
 
             int minBandOffset = sBandOffsets[0];
             for (int i = 0; i < rows; i++) {
@@ -391,7 +391,7 @@ final class LCBandCombineOpImage extends PointOpImage {
         } else {
             int rows = matrix.length;
             int cols = matrix[0].length;
-            int intMatrix[][] = new int[rows][cols];
+            int[][] intMatrix = new int[rows][cols];
 
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < cols - 1; j++) {

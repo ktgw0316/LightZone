@@ -85,8 +85,8 @@ public final class SR2ImageType extends RawImageType {
      * All the possible filename extensions for SR2 files.  All must be lower
      * case and the preferred one must be first.
      */
-    private static final String EXTENSIONS[] = {
-        "sr2", "srf"
+    private static final String[] EXTENSIONS = {
+            "sr2", "srf"
     };
 }
 /* vim:set et sw=4 ts=4: */

@@ -206,7 +206,7 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
             Rectangle intersection = tileBounds.intersection(sampleRect);
 
             pixel = new int[]{0, 0, 0};
-            int currentPixel[] = new int[3];
+            int[] currentPixel = new int[3];
 
             for (int i = intersection.x; i < intersection.x + intersection.width; i++) {
                 for (int j = intersection.y; j < intersection.y + intersection.height; j++) {
@@ -328,7 +328,7 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
         @Override
         public PlanarImage update() {
             if (clickPoint != null) {
-                int pixel[] = pointToPixel(clickPoint);
+                int[] pixel = pointToPixel(clickPoint);
                 if (pixel != null) {
                     int r = pixel[0] / 256;
                     int g = pixel[1] / 256;

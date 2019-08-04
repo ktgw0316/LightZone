@@ -130,7 +130,7 @@ public final class ForkDaemon {
     public static void main( String[] args ) {
         try {
             final ForkDaemon daemon = new ForkDaemon();
-            final byte buffer[] = new byte[256];
+            final byte[] buffer = new byte[256];
 
             daemon.invoke( new String[]{ "./dcraw" } );
             while ( true ) {

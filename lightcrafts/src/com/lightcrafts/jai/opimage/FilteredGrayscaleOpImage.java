@@ -30,7 +30,7 @@ public class FilteredGrayscaleOpImage extends PointOpImage {
     private final float[] filter;
     private final float angle;
 
-    public FilteredGrayscaleOpImage(RenderedImage source, float filter[], float angle, float strength, Map config) {
+    public FilteredGrayscaleOpImage(RenderedImage source, float[] filter, float angle, float strength, Map config) {
         super(source, new ImageLayout(source), config, true);
         permitInPlaceOperation();
         ICC_ProfileRGB sRGB = (ICC_ProfileRGB) JAIContext.sRGBColorProfile;
@@ -81,13 +81,13 @@ public class FilteredGrayscaleOpImage extends PointOpImage {
         int width = src.getWidth();
         int height = src.getHeight();
 
-        short dstData[] = dst.getShortDataArray(0);
-        int dstBandOffsets[] = dst.getBandOffsets();
+        short[] dstData = dst.getShortDataArray(0);
+        int[] dstBandOffsets = dst.getBandOffsets();
         int dstLineStride = dst.getScanlineStride();
         int dstPixelStride = dst.getPixelStride();
 
-        short srcData[] = src.getShortDataArray(0);
-        int srcBandOffsets[] = src.getBandOffsets();
+        short[] srcData = src.getShortDataArray(0);
+        int[] srcBandOffsets = src.getBandOffsets();
         int srcLineStride = src.getScanlineStride();
         int srcPixelStride = src.getPixelStride();
 
@@ -101,14 +101,14 @@ public class FilteredGrayscaleOpImage extends PointOpImage {
 
         float filterHue, filterSat;
         {
-            float hsb[] = new float[3];
+            float[] hsb = new float[3];
             HSB.fromRGB(filter, hsb);
             filterHue = (float) (2 * Math.PI * hsb[0] - Math.PI);
             filterSat = hsb[1];
         }
 
-        float rgb[] = new float[3];
-        float hsb[] = new float[3];
+        float[] rgb = new float[3];
+        float[] hsb = new float[3];
 
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {

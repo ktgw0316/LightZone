@@ -37,7 +37,7 @@ public class RGBColorSelectionMaskOpImage extends PointOpImage {
     public RGBColorSelectionMaskOpImage(RenderedImage source, RGBColorSelection colorSelection, Map config) {
         super(source, createLayout(source), config, true);
         this.colorSelection = colorSelection;
-        short labColors[] = new short[3];
+        short[] labColors = new short[3];
 
         ts.doTransform(new short[] {(short) (colorSelection.red * 0xffff),
                                     (short) (colorSelection.green * 0xffff),
@@ -64,34 +64,34 @@ public class RGBColorSelectionMaskOpImage extends PointOpImage {
         int width = dst.getWidth();
         int height = dst.getHeight();
 
-        int dstBandOffsets[] = dst.getBandOffsets();
+        int[] dstBandOffsets = dst.getBandOffsets();
         int dstLineStride = dst.getScanlineStride();
 
-        int srcBandOffsets[] = src.getBandOffsets();
+        int[] srcBandOffsets = src.getBandOffsets();
         int srcLineStride = src.getScanlineStride();
 
         int dstOffset = dstBandOffsets[0];
 
-        float colorSelectionArray[] = {
-            L, a, b,
-            colorSelection.isColorEnabled ? colorSelection.radius : -1,
-            colorSelection.isLuminosityEnabled ? colorSelection.luminosityLower : 0,
-            colorSelection.isLuminosityEnabled ? colorSelection.luminosityLowerFeather : 0,
-            colorSelection.isLuminosityEnabled ? colorSelection.luminosityUpper : 1,
-            colorSelection.isLuminosityEnabled ? colorSelection.luminosityUpperFeather : 0
+        float[] colorSelectionArray = {
+                L, a, b,
+                colorSelection.isColorEnabled ? colorSelection.radius : -1,
+                colorSelection.isLuminosityEnabled ? colorSelection.luminosityLower : 0,
+                colorSelection.isLuminosityEnabled ? colorSelection.luminosityLowerFeather : 0,
+                colorSelection.isLuminosityEnabled ? colorSelection.luminosityUpper : 1,
+                colorSelection.isLuminosityEnabled ? colorSelection.luminosityUpperFeather : 0
         };
 
         if (src.getDataType() == DataBuffer.TYPE_INT && dst.getDataType() == DataBuffer.TYPE_INT) {
-            int srcData[] = src.getIntDataArray(0);
-            int dstData[] = dst.getIntDataArray(0);
+            int[] srcData = src.getIntDataArray(0);
+            int[] dstData = dst.getIntDataArray(0);
             nativeIntLoop(srcData, dstData, width, height,
                     srcBandOffsets, dstOffset,
                     srcLineStride, dstLineStride,
                     colorSelectionArray, colorSelection.isInverted);
         }
         else if (src.getDataType() == DataBuffer.TYPE_USHORT && dst.getDataType() == DataBuffer.TYPE_BYTE) {
-            short srcData[] = src.getShortDataArray(0);
-            byte dstData[] = dst.getByteDataArray(0);
+            short[] srcData = src.getShortDataArray(0);
+            byte[] dstData = dst.getByteDataArray(0);
             nativeUshortLoop(srcData, dstData, width, height,
                     srcBandOffsets, dstOffset,
                     srcLineStride, dstLineStride,
@@ -110,17 +110,17 @@ public class RGBColorSelectionMaskOpImage extends PointOpImage {
                                       int srcLineStride, int dstLineStride,
                                       float[] colorSelection, boolean invert);
 
-    private native void nativeUshortLoop(short srcData[], byte dstData[],
+    private native void nativeUshortLoop(short[] srcData, byte[] dstData,
                                          int width, int height,
-                                         int srcBandOffsets[], int dstOffset,
+                                         int[] srcBandOffsets, int dstOffset,
                                          int srcLineStride, int dstLineStride,
-                                         float colorSelection[], boolean invert);
+                                         float[] colorSelection, boolean invert);
 
-    private void ushortLoop(short srcData[], byte dstData[],
+    private void ushortLoop(short[] srcData, byte[] dstData,
                             int width, int height,
-                            int srcBandOffsets[], int dstOffset,
+                            int[] srcBandOffsets, int dstOffset,
                             int srcLineStride, int dstLineStride,
-                            float colorSelection[]) {
+                            float[] colorSelection) {
         int srcROffset = srcBandOffsets[0];
         int srcGOffset = srcBandOffsets[1];
         int srcBOffset = srcBandOffsets[2];

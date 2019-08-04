@@ -13,11 +13,13 @@ import java.util.Map;
 
 public final class NonLocalMeansFilterOpImage extends AreaOpImage {
 
-    final float y_kernel[], c_kernel[]; // negated exponents of the spatial gaussian function
+    final float[] y_kernel;
+    final float[] c_kernel; // negated exponents of the spatial gaussian function
     final int y_search_radius, c_search_radius;
     final int y_patch_radius, c_patch_radius;
     final float y_h, c_h; // intensities
-    final float rgb_to_yst[], yst_to_rgb[];
+    final float[] rgb_to_yst;
+    final float[] yst_to_rgb;
 
     static float SQR(float x) { return x * x; }
 
@@ -122,16 +124,16 @@ public final class NonLocalMeansFilterOpImage extends AreaOpImage {
         int swidth = src.getWidth();
         int sheight = src.getHeight();
 
-        short dstDataArrays[][] = dst.getShortDataArrays();
-        int dstBandOffsets[] = dst.getBandOffsets();
+        short[][] dstDataArrays = dst.getShortDataArrays();
+        int[] dstBandOffsets = dst.getBandOffsets();
         int dstScanlineStride = dst.getScanlineStride();
 
-        short srcDataArrays[][] = src.getShortDataArrays();
-        int srcBandOffsets[] = src.getBandOffsets();
+        short[][] srcDataArrays = src.getShortDataArrays();
+        int[] srcBandOffsets = src.getBandOffsets();
         int srcScanlineStride = src.getScanlineStride();
 
-        short dstData[] = dstDataArrays[0];
-        short srcData[] = srcDataArrays[0];
+        short[] dstData = dstDataArrays[0];
+        short[] srcData = srcDataArrays[0];
 
         if (src.getNumBands() == 3)
             nonLocalMeansFilter(srcData, dstData,
@@ -146,12 +148,12 @@ public final class NonLocalMeansFilterOpImage extends AreaOpImage {
                     srcScanlineStride, dstScanlineStride);
     }
 
-    static native void nonLocalMeansFilter(short srcData[], short destData[],
+    static native void nonLocalMeansFilter(short[] srcData, short[] destData,
                                            int y_search_radius, int y_patch_radius,
                                            int c_search_radius, int c_patch_radius,
                                            float y_h, float c_h,
-                                           float y_kernel[], float c_kernel[],
-                                           float rgb_to_yst[], float yst_to_rgb[],
+                                           float[] y_kernel, float[] c_kernel,
+                                           float[] rgb_to_yst, float[] yst_to_rgb,
                                            int width, int height,
                                            int srcROffset, int srcGOffset, int srcBOffset,
                                            int destROffset, int destGOffset, int destBOffset,

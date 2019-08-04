@@ -84,8 +84,8 @@ public final class DCRImageType extends RawImageType {
      * All the possible filename extensions for DCR files.  All must be lower
      * case and the preferred one must be first.
      */
-    private static final String EXTENSIONS[] = {
-        "dcr"
+    private static final String[] EXTENSIONS = {
+            "dcr"
     };
 }
 /* vim:set et sw=4 ts=4: */

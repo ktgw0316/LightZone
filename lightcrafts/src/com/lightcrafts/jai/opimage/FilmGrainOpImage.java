@@ -53,9 +53,9 @@ public final class FilmGrainOpImage extends SourcelessOpImage {
                 dst.getPixelStride(), dst.getScanlineStride());
     }
 
-    private void grainImage(short dstData[], int dstX, int dstY, int dstWidth, int dstHeight,
-                                     int numBands, int[] dstBandOffset,
-                                     int dstPixelStride, int dstLineStride) {
+    private void grainImage(short[] dstData, int dstX, int dstY, int dstWidth, int dstHeight,
+                            int numBands, int[] dstBandOffset,
+                            int dstPixelStride, int dstLineStride) {
         if (color != 0) {
             for (int y = 0, pos0 = 0; y < dstHeight; ++y, pos0 += dstLineStride) {
                 for (int x = 0, pos = pos0; x < dstWidth; ++x, pos += dstPixelStride) {

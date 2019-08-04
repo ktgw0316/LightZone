@@ -241,20 +241,20 @@ final class LCErodeOpImage extends AreaOpImage {
         int dheight   = dst.getHeight();
         int dnumBands = dst.getNumBands();
 
-        int dstBandOffsets[]  = dst.getBandOffsets();
+        int[] dstBandOffsets = dst.getBandOffsets();
         int dstPixelStride    = dst.getPixelStride();
         int dstScanlineStride = dst.getScanlineStride();
 
-        int srcBandOffsets[]  = src.getBandOffsets();
+        int[] srcBandOffsets = src.getBandOffsets();
         int srcPixelStride    = src.getPixelStride();
         int srcScanlineStride = src.getScanlineStride();
 
-        byte dstDataArrays[][] = dst.getByteDataArrays();
-        byte srcDataArrays[][] = src.getByteDataArrays();
+        byte[][] dstDataArrays = dst.getByteDataArrays();
+        byte[][] srcDataArrays = src.getByteDataArrays();
 
         for (int k = 0; k < dnumBands; k++) {
-            byte dstData[] = dstDataArrays[k];
-            byte srcData[] = srcDataArrays[k];
+            byte[] dstData = dstDataArrays[k];
+            byte[] srcData = srcDataArrays[k];
             int srcScanlineOffset = srcBandOffsets[k];
             int dstScanlineOffset = dstBandOffsets[k];
             for (int j = 0; j < dheight; j++) {
@@ -299,20 +299,20 @@ final class LCErodeOpImage extends AreaOpImage {
         int dheight   = dst.getHeight();
         int dnumBands = dst.getNumBands();
 
-        int dstBandOffsets[]  = dst.getBandOffsets();
+        int[] dstBandOffsets = dst.getBandOffsets();
         int dstPixelStride    = dst.getPixelStride();
         int dstScanlineStride = dst.getScanlineStride();
 
-        int srcBandOffsets[]  = src.getBandOffsets();
+        int[] srcBandOffsets = src.getBandOffsets();
         int srcPixelStride    = src.getPixelStride();
         int srcScanlineStride = src.getScanlineStride();
 
-        short dstDataArrays[][] = dst.getShortDataArrays();
-        short srcDataArrays[][] = src.getShortDataArrays();
+        short[][] dstDataArrays = dst.getShortDataArrays();
+        short[][] srcDataArrays = src.getShortDataArrays();
 
         for (int k = 0; k < dnumBands; k++)  {
-            short dstData[] = dstDataArrays[k];
-            short srcData[] = srcDataArrays[k];
+            short[] dstData = dstDataArrays[k];
+            short[] srcData = srcDataArrays[k];
             int srcScanlineOffset = srcBandOffsets[k];
             int dstScanlineOffset = dstBandOffsets[k];
             for (int j = 0; j < dheight; j++)  {
@@ -362,20 +362,20 @@ final class LCErodeOpImage extends AreaOpImage {
         int dheight   = dst.getHeight();
         int dnumBands = dst.getNumBands();
 
-        int dstBandOffsets[]  = dst.getBandOffsets();
+        int[] dstBandOffsets = dst.getBandOffsets();
         int dstPixelStride    = dst.getPixelStride();
         int dstScanlineStride = dst.getScanlineStride();
 
-        int srcBandOffsets[]  = src.getBandOffsets();
+        int[] srcBandOffsets = src.getBandOffsets();
         int srcPixelStride    = src.getPixelStride();
         int srcScanlineStride = src.getScanlineStride();
 
-        short dstDataArrays[][] = dst.getShortDataArrays();
-        short srcDataArrays[][] = src.getShortDataArrays();
+        short[][] dstDataArrays = dst.getShortDataArrays();
+        short[][] srcDataArrays = src.getShortDataArrays();
 
         for (int k = 0; k < dnumBands; k++)  {
-            short dstData[] = dstDataArrays[k];
-            short srcData[] = srcDataArrays[k];
+            short[] dstData = dstDataArrays[k];
+            short[] srcData = srcDataArrays[k];
             int srcScanlineOffset = srcBandOffsets[k];
             int dstScanlineOffset = dstBandOffsets[k];
             for (int j = 0; j < dheight; j++)  {
@@ -424,20 +424,20 @@ final class LCErodeOpImage extends AreaOpImage {
         int dheight   = dst.getHeight();
         int dnumBands = dst.getNumBands();
 
-        int dstBandOffsets[]  = dst.getBandOffsets();
+        int[] dstBandOffsets = dst.getBandOffsets();
         int dstPixelStride    = dst.getPixelStride();
         int dstScanlineStride = dst.getScanlineStride();
 
-        int srcBandOffsets[]  = src.getBandOffsets();
+        int[] srcBandOffsets = src.getBandOffsets();
         int srcPixelStride    = src.getPixelStride();
         int srcScanlineStride = src.getScanlineStride();
 
-        int dstDataArrays[][] = dst.getIntDataArrays();
-        int srcDataArrays[][] = src.getIntDataArrays();
+        int[][] dstDataArrays = dst.getIntDataArrays();
+        int[][] srcDataArrays = src.getIntDataArrays();
 
         for (int k = 0; k < dnumBands; k++)  {
-            int dstData[] = dstDataArrays[k];
-            int srcData[] = srcDataArrays[k];
+            int[] dstData = dstDataArrays[k];
+            int[] srcData = srcDataArrays[k];
             int srcScanlineOffset = srcBandOffsets[k];
             int dstScanlineOffset = dstBandOffsets[k];
             for (int j = 0; j < dheight; j++)  {
@@ -480,20 +480,20 @@ final class LCErodeOpImage extends AreaOpImage {
         int dheight   = dst.getHeight();
         int dnumBands = dst.getNumBands();
 
-        int dstBandOffsets[]  = dst.getBandOffsets();
+        int[] dstBandOffsets = dst.getBandOffsets();
         int dstPixelStride    = dst.getPixelStride();
         int dstScanlineStride = dst.getScanlineStride();
 
-        int srcBandOffsets[]  = src.getBandOffsets();
+        int[] srcBandOffsets = src.getBandOffsets();
         int srcPixelStride    = src.getPixelStride();
         int srcScanlineStride = src.getScanlineStride();
 
-        float dstDataArrays[][] = dst.getFloatDataArrays();
-        float srcDataArrays[][] = src.getFloatDataArrays();
+        float[][] dstDataArrays = dst.getFloatDataArrays();
+        float[][] srcDataArrays = src.getFloatDataArrays();
 
         for (int k = 0; k < dnumBands; k++)  {
-            float dstData[] = dstDataArrays[k];
-            float srcData[] = srcDataArrays[k];
+            float[] dstData = dstDataArrays[k];
+            float[] srcData = srcDataArrays[k];
             int srcScanlineOffset = srcBandOffsets[k];
             int dstScanlineOffset = dstBandOffsets[k];
             for (int j = 0; j < dheight; j++)  {
@@ -537,20 +537,20 @@ final class LCErodeOpImage extends AreaOpImage {
         int dheight   = dst.getHeight();
         int dnumBands = dst.getNumBands();
 
-        int dstBandOffsets[]  = dst.getBandOffsets();
+        int[] dstBandOffsets = dst.getBandOffsets();
         int dstPixelStride    = dst.getPixelStride();
         int dstScanlineStride = dst.getScanlineStride();
 
-        int srcBandOffsets[]  = src.getBandOffsets();
+        int[] srcBandOffsets = src.getBandOffsets();
         int srcPixelStride    = src.getPixelStride();
         int srcScanlineStride = src.getScanlineStride();
 
-        double dstDataArrays[][] = dst.getDoubleDataArrays();
-        double srcDataArrays[][] = src.getDoubleDataArrays();
+        double[][] dstDataArrays = dst.getDoubleDataArrays();
+        double[][] srcDataArrays = src.getDoubleDataArrays();
 
         for (int k = 0; k < dnumBands; k++)  {
-            double dstData[] = dstDataArrays[k];
-            double srcData[] = srcDataArrays[k];
+            double[] dstData = dstDataArrays[k];
+            double[] srcData = srcDataArrays[k];
             int srcScanlineOffset = srcBandOffsets[k];
             int dstScanlineOffset = dstBandOffsets[k];
             for (int j = 0; j < dheight; j++)  {

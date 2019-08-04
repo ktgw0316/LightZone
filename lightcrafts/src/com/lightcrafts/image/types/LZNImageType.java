@@ -218,8 +218,8 @@ public final class LZNImageType extends ImageType
      * All the possible filename extensions for LZN files.  All must be lower
      * case and the preferred one must be first.
      */
-    private static final String EXTENSIONS[] = {
-        "lzn"
+    private static final String[] EXTENSIONS = {
+            "lzn"
     };
 
     /**

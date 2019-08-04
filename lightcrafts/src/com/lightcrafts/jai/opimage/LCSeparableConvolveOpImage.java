@@ -40,8 +40,8 @@ final class LCSeparableConvolveOpImage extends AreaOpImage {
     protected KernelJAI kernel;
     protected int kw, kh, kx, ky;
 
-    private float hValues[];
-    private float vValues[];
+    private float[] hValues;
+    private float[] vValues;
 
     /**
      * Creates a SeparableConvoveOpImage on the source
@@ -148,13 +148,13 @@ final class LCSeparableConvolveOpImage extends AreaOpImage {
         int dheight = dst.getHeight();
         int dnumBands = dst.getNumBands();
 
-        byte dstDataArrays[][] = dst.getByteDataArrays();
-        int dstBandOffsets[] = dst.getBandOffsets();
+        byte[][] dstDataArrays = dst.getByteDataArrays();
+        int[] dstBandOffsets = dst.getBandOffsets();
         int dstPixelStride = dst.getPixelStride();
         int dstScanlineStride = dst.getScanlineStride();
 
-        byte srcDataArrays[][] = src.getByteDataArrays();
-        int srcBandOffsets[] = src.getBandOffsets();
+        byte[][] srcDataArrays = src.getByteDataArrays();
+        int[] srcBandOffsets = src.getBandOffsets();
         int srcPixelStride = src.getPixelStride();
         int srcScanlineStride = src.getScanlineStride();
 
@@ -164,8 +164,8 @@ final class LCSeparableConvolveOpImage extends AreaOpImage {
                 if (dstBandOffsets[k] < dstBandOffsets[band0])
                     band0 = k;
 
-            byte dstData[] = dstDataArrays[band0];
-            byte srcData[] = srcDataArrays[band0];
+            byte[] dstData = dstDataArrays[band0];
+            byte[] srcData = srcDataArrays[band0];
             int srcScanlineOffset = srcBandOffsets[band0];
             int dstScanlineOffset = dstBandOffsets[band0];
 
@@ -175,8 +175,8 @@ final class LCSeparableConvolveOpImage extends AreaOpImage {
                                    dheight, dwidth, kw, kh, hValues, vValues);
         } else
             for (int k = 0; k < dnumBands; k++) {
-                byte dstData[] = dstDataArrays[k];
-                byte srcData[] = srcDataArrays[k];
+                byte[] dstData = dstDataArrays[k];
+                byte[] srcData = srcDataArrays[k];
                 int srcScanlineOffset = srcBandOffsets[k];
                 int dstScanlineOffset = dstBandOffsets[k];
 
@@ -196,13 +196,13 @@ final class LCSeparableConvolveOpImage extends AreaOpImage {
         int dheight = dst.getHeight();
         int dnumBands = dst.getNumBands();
 
-        short dstDataArrays[][] = dst.getShortDataArrays();
-        int dstBandOffsets[] = dst.getBandOffsets();
+        short[][] dstDataArrays = dst.getShortDataArrays();
+        int[] dstBandOffsets = dst.getBandOffsets();
         int dstPixelStride = dst.getPixelStride();
         int dstScanlineStride = dst.getScanlineStride();
 
-        short srcDataArrays[][] = src.getShortDataArrays();
-        int srcBandOffsets[] = src.getBandOffsets();
+        short[][] srcDataArrays = src.getShortDataArrays();
+        int[] srcBandOffsets = src.getBandOffsets();
         int srcPixelStride = src.getPixelStride();
         int srcScanlineStride = src.getScanlineStride();
 
@@ -212,8 +212,8 @@ final class LCSeparableConvolveOpImage extends AreaOpImage {
                 if (dstBandOffsets[k] < dstBandOffsets[band0])
                     band0 = k;
 
-            short dstData[] = dstDataArrays[band0];
-            short srcData[] = srcDataArrays[band0];
+            short[] dstData = dstDataArrays[band0];
+            short[] srcData = srcDataArrays[band0];
             int srcScanlineOffset = srcBandOffsets[band0];
             int dstScanlineOffset = dstBandOffsets[band0];
 
@@ -223,8 +223,8 @@ final class LCSeparableConvolveOpImage extends AreaOpImage {
                                    dheight, dwidth, kw, kh, hValues, vValues);
         } else
             for (int k = 0; k < dnumBands; k++) {
-                short dstData[] = dstDataArrays[k];
-                short srcData[] = srcDataArrays[k];
+                short[] dstData = dstDataArrays[k];
+                short[] srcData = srcDataArrays[k];
                 int srcScanlineOffset = srcBandOffsets[k];
                 int dstScanlineOffset = dstBandOffsets[k];
 
@@ -244,13 +244,13 @@ final class LCSeparableConvolveOpImage extends AreaOpImage {
         int dheight = dst.getHeight();
         int dnumBands = dst.getNumBands();
 
-        short dstDataArrays[][] = dst.getShortDataArrays();
-        int dstBandOffsets[] = dst.getBandOffsets();
+        short[][] dstDataArrays = dst.getShortDataArrays();
+        int[] dstBandOffsets = dst.getBandOffsets();
         int dstPixelStride = dst.getPixelStride();
         int dstScanlineStride = dst.getScanlineStride();
 
-        short srcDataArrays[][] = src.getShortDataArrays();
-        int srcBandOffsets[] = src.getBandOffsets();
+        short[][] srcDataArrays = src.getShortDataArrays();
+        int[] srcBandOffsets = src.getBandOffsets();
         int srcPixelStride = src.getPixelStride();
         int srcScanlineStride = src.getScanlineStride();
 
@@ -260,8 +260,8 @@ final class LCSeparableConvolveOpImage extends AreaOpImage {
                 if (dstBandOffsets[k] < dstBandOffsets[band0])
                     band0 = k;
 
-            short dstData[] = dstDataArrays[band0];
-            short srcData[] = srcDataArrays[band0];
+            short[] dstData = dstDataArrays[band0];
+            short[] srcData = srcDataArrays[band0];
             int srcScanlineOffset = srcBandOffsets[band0];
             int dstScanlineOffset = dstBandOffsets[band0];
 
@@ -271,8 +271,8 @@ final class LCSeparableConvolveOpImage extends AreaOpImage {
                                                 dheight, dwidth, kw, kh, hValues, vValues);
         } else
             for (int k = 0; k < dnumBands; k++) {
-                short dstData[] = dstDataArrays[k];
-                short srcData[] = srcDataArrays[k];
+                short[] dstData = dstDataArrays[k];
+                short[] srcData = srcDataArrays[k];
                 int srcScanlineOffset = srcBandOffsets[k];
                 int dstScanlineOffset = dstBandOffsets[k];
 
@@ -290,13 +290,13 @@ final class LCSeparableConvolveOpImage extends AreaOpImage {
         int dheight = dst.getHeight();
         int dnumBands = dst.getNumBands();
 
-        int dstDataArrays[][] = dst.getIntDataArrays();
-        int dstBandOffsets[] = dst.getBandOffsets();
+        int[][] dstDataArrays = dst.getIntDataArrays();
+        int[] dstBandOffsets = dst.getBandOffsets();
         int dstPixelStride = dst.getPixelStride();
         int dstScanlineStride = dst.getScanlineStride();
 
-        int srcDataArrays[][] = src.getIntDataArrays();
-        int srcBandOffsets[] = src.getBandOffsets();
+        int[][] srcDataArrays = src.getIntDataArrays();
+        int[] srcBandOffsets = src.getBandOffsets();
         int srcPixelStride = src.getPixelStride();
         int srcScanlineStride = src.getScanlineStride();
 
@@ -306,8 +306,8 @@ final class LCSeparableConvolveOpImage extends AreaOpImage {
                 if (dstBandOffsets[k] < dstBandOffsets[band0])
                     band0 = k;
 
-            int dstData[] = dstDataArrays[band0];
-            int srcData[] = srcDataArrays[band0];
+            int[] dstData = dstDataArrays[band0];
+            int[] srcData = srcDataArrays[band0];
             int srcScanlineOffset = srcBandOffsets[band0];
             int dstScanlineOffset = dstBandOffsets[band0];
 
@@ -317,8 +317,8 @@ final class LCSeparableConvolveOpImage extends AreaOpImage {
                                               dheight, dwidth, kw, kh, hValues, vValues);
         } else
             for (int k = 0; k < dnumBands; k++) {
-                int dstData[] = dstDataArrays[k];
-                int srcData[] = srcDataArrays[k];
+                int[] dstData = dstDataArrays[k];
+                int[] srcData = srcDataArrays[k];
                 int srcScanlineOffset = srcBandOffsets[k];
                 int dstScanlineOffset = dstBandOffsets[k];
 
@@ -337,19 +337,19 @@ final class LCSeparableConvolveOpImage extends AreaOpImage {
         int dheight = dst.getHeight();
         int dnumBands = dst.getNumBands();
 
-        float dstDataArrays[][] = dst.getFloatDataArrays();
-        int dstBandOffsets[] = dst.getBandOffsets();
+        float[][] dstDataArrays = dst.getFloatDataArrays();
+        int[] dstBandOffsets = dst.getBandOffsets();
         int dstPixelStride = dst.getPixelStride();
         int dstScanlineStride = dst.getScanlineStride();
 
-        float srcDataArrays[][] = src.getFloatDataArrays();
-        int srcBandOffsets[] = src.getBandOffsets();
+        float[][] srcDataArrays = src.getFloatDataArrays();
+        int[] srcBandOffsets = src.getBandOffsets();
         int srcPixelStride = src.getPixelStride();
         int srcScanlineStride = src.getScanlineStride();
 
         for (int k = 0; k < dnumBands; k++)  {
-            float dstData[] = dstDataArrays[k];
-            float srcData[] = srcDataArrays[k];
+            float[] dstData = dstDataArrays[k];
+            float[] srcData = srcDataArrays[k];
             int srcScanlineOffset = srcBandOffsets[k];
             int dstScanlineOffset = dstBandOffsets[k];
 
@@ -367,19 +367,19 @@ final class LCSeparableConvolveOpImage extends AreaOpImage {
         int dheight = dst.getHeight();
         int dnumBands = dst.getNumBands();
 
-        double dstDataArrays[][] = dst.getDoubleDataArrays();
-        int dstBandOffsets[] = dst.getBandOffsets();
+        double[][] dstDataArrays = dst.getDoubleDataArrays();
+        int[] dstBandOffsets = dst.getBandOffsets();
         int dstPixelStride = dst.getPixelStride();
         int dstScanlineStride = dst.getScanlineStride();
 
-        double srcDataArrays[][] = src.getDoubleDataArrays();
-        int srcBandOffsets[] = src.getBandOffsets();
+        double[][] srcDataArrays = src.getDoubleDataArrays();
+        int[] srcBandOffsets = src.getBandOffsets();
         int srcPixelStride = src.getPixelStride();
         int srcScanlineStride = src.getScanlineStride();
 
         for (int k = 0; k < dnumBands; k++)  {
-            double dstData[] = dstDataArrays[k];
-            double srcData[] = srcDataArrays[k];
+            double[] dstData = dstDataArrays[k];
+            double[] srcData = srcDataArrays[k];
             int srcScanlineOffset = srcBandOffsets[k];
             int dstScanlineOffset = dstBandOffsets[k];
 

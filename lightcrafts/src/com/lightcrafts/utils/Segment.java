@@ -10,5 +10,5 @@ package com.lightcrafts.utils;
  * To change this template use File | Settings | File Templates.
  */
 public class Segment {
-    synchronized public static native byte[] segmentImage(byte image[], int channels, int height, int width);
+    synchronized public static native byte[] segmentImage(byte[] image, int channels, int height, int width);
 }

@@ -79,7 +79,7 @@ public class LightZoneSkin extends SubstanceAbstractSkin {
     static Color relight(Color color, float amount) {
         IHSColorSpace ihs = IHSColorSpace.getInstance();
 
-        float components[] = new float[3];
+        float[] components = new float[3];
         components = ihs.fromRGB(color.getColorComponents(components));
         components[0] *= amount;
         components = ihs.toRGB(components);

@@ -16,7 +16,7 @@ import java.awt.geom.GeneralPath;
 import java.awt.image.Raster;
 
 public class HistogramPreview extends Preview implements PaintListener {
-    private int bins[][] = null;
+    private int[][] bins = null;
     private double[][] controlPoints = null;
     private int currentFocusZone = -1;
     final ImageEditorEngine engine;
@@ -178,7 +178,7 @@ public class HistogramPreview extends Preview implements PaintListener {
         }
     }
 
-    private static float logTable[] = new float[0x10000];
+    private static float[] logTable = new float[0x10000];
 
     static {
         for (int i = 0; i < 0x10000; i++)

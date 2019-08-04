@@ -25,7 +25,7 @@ class ZoneOperationImpl extends BlendedOperation implements ZoneOperation {
     private double[][] controlPoints = {{0, 0}, {1, 1}};
     private short[] tableData = new short[0x10000];
     private LookupTableJAI table = null;
-    private double curve[][] = new double[0x100][2];
+    private double[][] curve = new double[0x100][2];
 
     private int scale = LuminosityScale;  // LuminosityScale (default) or RGBScale
 
@@ -125,7 +125,7 @@ class ZoneOperationImpl extends BlendedOperation implements ZoneOperation {
         } else {
             double xmin = 0;
             double ymin = 0;
-            for (double cp[] : controlPoints) {
+            for (double[] cp : controlPoints) {
                 if (cp[0] == x) {
                     return fy(cp[1]);
                 } else if (x > cp[0]) {
@@ -163,7 +163,7 @@ class ZoneOperationImpl extends BlendedOperation implements ZoneOperation {
     }
 
     private void updateCurve() {
-	double weights[] = new double[controlPoints.length];
+        double[] weights = new double[controlPoints.length];
 	weights[0] = weights[controlPoints.length - 1] = 1.0;
 	for (int i = 1; i < controlPoints.length - 1; i++)
 	    weights[i] = weight;

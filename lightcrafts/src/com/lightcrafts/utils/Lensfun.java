@@ -105,7 +105,7 @@ public class Lensfun {
     //
 
     public void distortionColor(
-            short srcData[], short dstData[],
+            short[] srcData, short[] dstData,
             int srcRectX, int srcRectY, int srcRectWidth, int srcRectHeight,
             int dstRectX, int dstRectY, int dstRectWidth, int dstRectHeight,
             int srcPixelStride, int dstPixelStride,

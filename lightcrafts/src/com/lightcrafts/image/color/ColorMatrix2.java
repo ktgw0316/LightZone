@@ -17,9 +17,9 @@ public class ColorMatrix2 {
     *	matrixmult -
     *		multiply two matricies
     */
-    static void matrixmult(float a[][], float b[][], float c[][]) {
+    static void matrixmult(float[][] a, float[][] b, float[][] c) {
         int x, y;
-        float temp[][] = new float[4][4];
+        float[][] temp = new float[4][4];
 
         for (y = 0; y < 4; y++)
             for (x = 0; x < 4; x++) {
@@ -37,7 +37,7 @@ public class ColorMatrix2 {
     *	xformpnt -
     *		transform a 3D point using a matrix
     */
-    public static void xformpnt(float matrix[][], float in[], float out[]) {
+    public static void xformpnt(float[][] matrix, float[] in, float[] out) {
         out[0] = in[0] * matrix[0][0] + in[1] * matrix[1][0] + in[2] * matrix[2][0] + matrix[3][0];
         out[1] = in[0] * matrix[0][1] + in[1] * matrix[1][1] + in[2] * matrix[2][1] + matrix[3][1];
         out[2] = in[0] * matrix[0][2] + in[1] * matrix[1][2] + in[2] * matrix[2][2] + matrix[3][2];
@@ -47,8 +47,8 @@ public class ColorMatrix2 {
     *	cscalemat -
     *		make a color scale marix
     */
-    public static void cscalemat(float mat[][], float rscale, float gscale, float bscale) {
-        float mmat[][] = new float[4][4];
+    public static void cscalemat(float[][] mat, float rscale, float gscale, float bscale) {
+        float[][] mmat = new float[4][4];
 
         mmat[0][0] = rscale;
         mmat[0][1] = 0;
@@ -77,8 +77,8 @@ public class ColorMatrix2 {
     *	lummat -
     *		make a luminance marix
     */
-    public static void lummat(float mat[][]) {
-        float mmat[][] = new float[4][4];
+    public static void lummat(float[][] mat) {
+        float[][] mmat = new float[4][4];
         float rwgt, gwgt, bwgt;
 
         rwgt = RLUM;
@@ -110,8 +110,8 @@ public class ColorMatrix2 {
     *	saturatemat -
     *		make a saturation marix
     */
-    public static void saturatemat(float mat[][], float sat) {
-        float mmat[][] = new float[4][4];
+    public static void saturatemat(float[][] mat, float sat) {
+        float[][] mmat = new float[4][4];
         float a, b, c, d, e, f, g, h, i;
         float rwgt, gwgt, bwgt;
 
@@ -154,8 +154,8 @@ public class ColorMatrix2 {
     *	offsetmat -
     *		offset r, g, and b
     */
-    public static void offsetmat(float mat[][], float roffset, float goffset, float boffset) {
-        float mmat[][] = new float[4][4];
+    public static void offsetmat(float[][] mat, float roffset, float goffset, float boffset) {
+        float[][] mmat = new float[4][4];
 
         mmat[0][0] = 1;
         mmat[0][1] = 0;
@@ -183,8 +183,8 @@ public class ColorMatrix2 {
     *	xrotate -
     *		rotate about the x (red) axis
     */
-    public static void xrotatemat(float mat[][], float rs, float rc) {
-        float mmat[][] = new float[4][4];
+    public static void xrotatemat(float[][] mat, float rs, float rc) {
+        float[][] mmat = new float[4][4];
 
         mmat[0][0] = 1;
         mmat[0][1] = 0;
@@ -212,8 +212,8 @@ public class ColorMatrix2 {
     *	yrotate -
     *		rotate about the y (green) axis
     */
-    public static void yrotatemat(float mat[][], float rs, float rc) {
-        float mmat[][] = new float[4][4];
+    public static void yrotatemat(float[][] mat, float rs, float rc) {
+        float[][] mmat = new float[4][4];
 
         mmat[0][0] = rc;
         mmat[0][1] = 0;
@@ -241,8 +241,8 @@ public class ColorMatrix2 {
     *	zrotate -
     *		rotate about the z (blue) axis
     */
-    public static void zrotatemat(float mat[][], float rs, float rc) {
-        float mmat[][] = new float[4][4];
+    public static void zrotatemat(float[][] mat, float rs, float rc) {
+        float[][] mmat = new float[4][4];
 
         mmat[0][0] = rc;
         mmat[0][1] = rs;
@@ -270,8 +270,8 @@ public class ColorMatrix2 {
     *	zshear -
     *		shear z using x and y.
     */
-    public static void zshearmat(float mat[][], float dx, float dy) {
-        float mmat[][] = new float[4][4];
+    public static void zshearmat(float[][] mat, float dx, float dy) {
+        float[][] mmat = new float[4][4];
 
         mmat[0][0] = 1;
         mmat[0][1] = 0;
@@ -299,7 +299,7 @@ public class ColorMatrix2 {
     *	simplehuerotatemat -
     *		simple hue rotation. This changes luminance
     */
-    public static void simplehuerotatemat(float mat[][], float rot) {
+    public static void simplehuerotatemat(float[][] mat, float rot) {
         float mag;
         float xrs, xrc;
         float yrs, yrc;
@@ -330,15 +330,15 @@ public class ColorMatrix2 {
     *	huerotatemat -
     *		rotate the hue, while maintaining luminance.
     */
-    public static void huerotatemat(float mat[][], float rot) {
-        float mmat[][] = new float[][] {
+    public static void huerotatemat(float[][] mat, float rot) {
+        float[][] mmat = new float[][]{
                 {1, 0, 0, 0},
                 {0, 1, 0, 0},
                 {0, 0, 1, 0},
                 {0, 0, 0, 1}
         };
         float mag;
-        float l[] = new float[3];
+        float[] l = new float[3];
         float xrs, xrc;
         float yrs, yrc;
         float zrs, zrc;

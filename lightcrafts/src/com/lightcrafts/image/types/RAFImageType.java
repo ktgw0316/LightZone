@@ -128,8 +128,8 @@ public final class RAFImageType extends RawImageType {
      * All the possible filename extensions for RAF files.  All must be lower
      * case and the preferred one must be first.
      */
-    private static final String EXTENSIONS[] = {
-        "raf"
+    private static final String[] EXTENSIONS = {
+            "raf"
     };
 }
 /* vim:set et sw=4 ts=4: */

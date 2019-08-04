@@ -227,7 +227,7 @@ final class UnSharpMaskOpImage extends PointOpImage {
     }
 
     static final int sigmoidTableLenght = 16 * 1024;
-    static final float sigmoidTable[] = new float[sigmoidTableLenght];
+    static final float[] sigmoidTable = new float[sigmoidTableLenght];
 
     static {
         for (int i = 0; i < sigmoidTableLenght; i++)

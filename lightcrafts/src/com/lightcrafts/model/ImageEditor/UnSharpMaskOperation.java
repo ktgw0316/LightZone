@@ -89,8 +89,8 @@ public class UnSharpMaskOperation extends BlendedOperation {
         return x * (1 - 1 / Math.exp(x * x / 5.0)) / 10.0;
     }
 
-    private static short tableData[] = new short[0x10000];
-    private static short invTableData[] = new short[0x10000];
+    private static short[] tableData = new short[0x10000];
+    private static short[] invTableData = new short[0x10000];
     private static LookupTableJAI table, invTable;
 
     private static synchronized LookupTableJAI getTable() {

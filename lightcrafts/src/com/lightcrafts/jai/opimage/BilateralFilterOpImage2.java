@@ -21,7 +21,9 @@ import java.util.Map;
 final class BilateralFilterOpImage2 extends AreaOpImage {
     private int wr; /* window radius */
     private int ws; /* window size */
-    private float kernel[], scale_r, elut[];
+    private float[] kernel;
+    private float scale_r;
+    private float[] elut;
 
     private static double SQR(double x) {
         return x * x;
@@ -105,20 +107,20 @@ final class BilateralFilterOpImage2 extends AreaOpImage {
         int dwidth = dst.getWidth();
         int dheight = dst.getHeight();
 
-        short dstDataArrays[][] = dst.getShortDataArrays();
-        int dstBandOffsets[] = dst.getBandOffsets();
+        short[][] dstDataArrays = dst.getShortDataArrays();
+        int[] dstBandOffsets = dst.getBandOffsets();
         int dstPixelStride = dst.getPixelStride();
         int dstScanlineStride = dst.getScanlineStride();
 
-        short srcDataArrays[][] = src.getShortDataArrays();
-        int srcBandOffsets[] = src.getBandOffsets();
+        short[][] srcDataArrays = src.getShortDataArrays();
+        int[] srcBandOffsets = src.getBandOffsets();
         int srcPixelStride = src.getPixelStride();
         int srcScanlineStride = src.getScanlineStride();
-        float tmpBuffer[][] = new float[3][ws * dwidth];
+        float[][] tmpBuffer = new float[3][ws * dwidth];
         int tmpBufferSize = ws * dwidth;
 
-        short dstData[] = dstDataArrays[0];
-        short srcData[] = srcDataArrays[0];
+        short[] dstData = dstDataArrays[0];
+        short[] srcData = srcDataArrays[0];
         int srcScanlineOffset = srcBandOffsets[0];
         int dstScanlineOffset = dstBandOffsets[0];
 

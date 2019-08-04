@@ -630,8 +630,8 @@ public class TIFFImageType extends ImageType implements TrueImageTypeProvider {
      * All the possible filename extensions for TIFF files.  All must be lower
      * case and the preferred one must be first.
      */
-    private static final String EXTENSIONS[] = {
-        "tif", "tiff", "iiq"
+    private static final String[] EXTENSIONS = {
+            "tif", "tiff", "iiq"
     };
 
     /**

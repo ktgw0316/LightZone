@@ -60,7 +60,7 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
         if (cameraRGBWB == null)
             return cameraRGBCA;
 
-        float matrix[][] = new float[3][3];
+        float[][] matrix = new float[3][3];
         float m = mixer(t);
 
         for (int i = 0; i < 3; i++)
@@ -178,7 +178,7 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
             setSliderConfig(GRAIN_NOISE, new SliderConfig(0, 20, grain_noise, .01, false, format));
     }
 
-    static float neutralTemperature(float rgb[], float refT) {
+    static float neutralTemperature(float[] rgb, float refT) {
         float sat = Float.MAX_VALUE;
         float minT = 0;
         for (int t = 1000; t < 40000; t+= (0.01 * t)) {
@@ -270,13 +270,13 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
     private float[] autoWhiteBalance(PlanarImage image) {
         int iheight = image.getHeight();
         int iwidth = image.getWidth();
-        double dsum[] = new double[6];
-        int sum[] = new int[6];
+        double[] dsum = new double[6];
+        int[] sum = new int[6];
         int maximum = 0xffff;
         int black = 0;
 
-        int pixel[] = new int[3];
-        int caPixel[] = new int[3];
+        int[] pixel = new int[3];
+        int[] caPixel = new int[3];
 
         for (int row = 0; row < iheight - 7; row += 8) {
             skip_block:
@@ -309,7 +309,7 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
             }
         }
 
-        float pre_mul[] = new float[3];
+        float[] pre_mul = new float[3];
         for (int c = 0; c < 3; c++)
             if (dsum[c] != 0)
                 pre_mul[c] = (float) (dsum[c + 3] / dsum[c]);
@@ -336,7 +336,7 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
             float lightness = 0.18f;
 
             if (autoWB) {
-                float wb[] = autoWhiteBalance(back);
+                float[] wb = autoWhiteBalance(back);
                 System.out.println("Auto WB: " + wb[0] + ", " + wb[1] + ", " + wb[2]);
 
                 temperature = neutralTemperature(wb, daylightTemperature);
@@ -344,7 +344,7 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
 
                 System.out.println("Correlated Temperature: " + temperature);
             } else if (p != null) {
-                int pixel[] = pointToPixel(p);
+                int[] pixel = pointToPixel(p);
 
                 if (pixel != null) {
                     float oldTemperature = 0;
@@ -352,12 +352,12 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
                     for (int k = 0; k < 10 && Math.abs(oldTemperature - temperature) > 0.01 * temperature; k++) {
                         oldTemperature = temperature;
 
-                        int newPixel[] = new int[3];
+                        int[] newPixel = new int[3];
                         for (int i = 0; i < 3; i++)
                             for (int j = 0; j < 3; j++)
                                 newPixel[j] += (int) (pixel[i] * cameraRGB(temperature)[j][i]);
 
-                        float n[] = WhiteBalanceV2.neutralize(newPixel, caMethod, temperature, daylightTemperature);
+                        float[] n = WhiteBalanceV2.neutralize(newPixel, caMethod, temperature, daylightTemperature);
 
                         lightness = newPixel[1]/255.0f;
 

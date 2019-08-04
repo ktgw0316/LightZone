@@ -87,11 +87,11 @@ public class HueSaturationOperation extends BlendedOperation {
     }
 
     private double[][] computeTransform() {
-        float matrix[][] = {
-            {1, 0, 0, 0},
-            {0, 1, 0, 0},
-            {0, 0, 1, 0},
-            {0, 0, 0, 1},
+        float[][] matrix = {
+                {1, 0, 0, 0},
+                {0, 1, 0, 0},
+                {0, 0, 1, 0},
+                {0, 0, 0, 1},
         };
 
         if (saturation != 0.0)
@@ -105,7 +105,7 @@ public class HueSaturationOperation extends BlendedOperation {
             ColorMatrix2.cscalemat(matrix, lit, lit, lit);
         }
 
-        double transform[][] = new double[3][4];
+        double[][] transform = new double[3][4];
 
         for (int i = 0; i < 3; i++)
             for (int j = 0; j < 4; j++)
@@ -115,17 +115,17 @@ public class HueSaturationOperation extends BlendedOperation {
     }
 
     private float[][] computeVibranceTransform() {
-        float matrix[][] = {
-            {1, 0, 0, 0},
-            {0, 1, 0, 0},
-            {0, 0, 1, 0},
-            {0, 0, 0, 1},
+        float[][] matrix = {
+                {1, 0, 0, 0},
+                {0, 1, 0, 0},
+                {0, 0, 1, 0},
+                {0, 0, 0, 1},
         };
 
         if (vibrance != 0.0)
             ColorMatrix2.saturatemat(matrix, vibrance / 100 + 1);
 
-        float transform[][] = new float[3][4];
+        float[][] transform = new float[3][4];
 
         for (int i = 0; i < 3; i++)
             for (int j = 0; j < 4; j++)
@@ -141,7 +141,7 @@ public class HueSaturationOperation extends BlendedOperation {
 
         @Override
         public PlanarImage setFront() {
-            double hslTransform[][] = computeTransform();
+            double[][] hslTransform = computeTransform();
             ParameterBlock pb = new ParameterBlock();
             pb.addSource(back);
             pb.add(hslTransform);

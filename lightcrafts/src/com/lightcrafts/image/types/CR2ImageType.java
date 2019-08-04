@@ -146,8 +146,8 @@ public final class CR2ImageType extends RawImageType {
      * All the possible filename extensions for CR2 files.  All must be lower
      * case and the preferred one must be first.
      */
-    private static final String EXTENSIONS[] = {
-        "cr2"
+    private static final String[] EXTENSIONS = {
+            "cr2"
     };
 }
 /* vim:set et sw=4 ts=4: */

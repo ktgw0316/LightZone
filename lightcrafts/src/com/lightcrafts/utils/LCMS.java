@@ -340,11 +340,11 @@ public class LCMS {
     }
 
     private static class RGBProfileComponents {
-        final double whitePoint[];
-        final double primaries[];
+        final double[] whitePoint;
+        final double[] primaries;
         final double gamma;
 
-        RGBProfileComponents(double whitePoint[], double primaries[], double gamma) {
+        RGBProfileComponents(double[] whitePoint, double[] primaries, double gamma) {
             this.whitePoint = whitePoint;
             this.primaries = primaries;
             this.gamma = gamma;
@@ -387,14 +387,14 @@ public class LCMS {
             if (handle != null && handle.increment() > 1)
                 cmsProfile = handle;
             else {
-                byte data[] = iccProfile.getData();
+                byte[] data = iccProfile.getData();
                 cmsProfile = new RCHandle(LCMSNative.cmsOpenProfileFromMem(data, data.length));
                 profileCache.put(iccProfile, cmsProfile);
                 cmsProfile.increment(); // for the cache reference
             }
         }
 
-        public Profile(double whitePoint[], double primaries[], double gamma) {
+        public Profile(double[] whitePoint, double[] primaries, double gamma) {
             RGBProfileComponents components = new RGBProfileComponents(whitePoint, primaries, gamma);
             RCHandle handle = profileCache.get(components);
 
@@ -439,7 +439,7 @@ public class LCMS {
 
     private static RasterAccessor normalizeRaster(RasterAccessor src, RasterFormatTag rft, ColorModel cm) {
         boolean reallocBuffer = false;
-        final int dataOffsets[] = src.getBandOffsets();
+        final int[] dataOffsets = src.getBandOffsets();
         for (int i = 0; i < dataOffsets.length; i++) {
             if (dataOffsets[i] != i) {
                 reallocBuffer = true;

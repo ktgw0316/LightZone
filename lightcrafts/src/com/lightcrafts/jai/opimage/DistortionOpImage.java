@@ -75,13 +75,13 @@ public class DistortionOpImage extends GeometricOpImage {
         final int dstWidth = dst.getWidth();
         final int dstHeight = dst.getHeight();
 
-        short dstDataArrays[][] = dst.getShortDataArrays();
-        final int dstBandOffsets[] = dst.getBandOffsets();
+        short[][] dstDataArrays = dst.getShortDataArrays();
+        final int[] dstBandOffsets = dst.getBandOffsets();
         final int dstPixelStride = dst.getPixelStride();
         final int dstScanlineStride = dst.getScanlineStride();
 
-        final short srcDataArrays[][] = src.getShortDataArrays();
-        final int srcBandOffsets[] = src.getBandOffsets();
+        final short[][] srcDataArrays = src.getShortDataArrays();
+        final int[] srcBandOffsets = src.getBandOffsets();
         final int srcPixelStride = src.getPixelStride();
         final int srcScanlineStride = src.getScanlineStride();
 
@@ -90,8 +90,8 @@ public class DistortionOpImage extends GeometricOpImage {
         final int srcWidth = src.getWidth();
         final int srcHeight = src.getHeight();
 
-        short dstData[] = dstDataArrays[0];
-        short srcData[] = srcDataArrays[0];
+        short[] dstData = dstDataArrays[0];
+        short[] srcData = srcDataArrays[0];
 
         if (src.getNumBands() == 1) {
             // TODO:

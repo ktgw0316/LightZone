@@ -65,13 +65,13 @@ public class RedMaskOpImage extends PointOpImage {
         int width = src.getWidth();
         int height = src.getHeight();
 
-        byte dstData[] = dst.getByteDataArray(0);
-        int dstBandOffsets[] = dst.getBandOffsets();
+        byte[] dstData = dst.getByteDataArray(0);
+        int[] dstBandOffsets = dst.getBandOffsets();
         int dstLineStride = dst.getScanlineStride();
         int dstPixelStride = dst.getPixelStride();
 
-        short srcData[] = src.getShortDataArray(0);
-        int srcBandOffsets[] = src.getBandOffsets();
+        short[] srcData = src.getShortDataArray(0);
+        int[] srcBandOffsets = src.getBandOffsets();
         int srcLineStride = src.getScanlineStride();
         int srcPixelStride = src.getPixelStride();
 
