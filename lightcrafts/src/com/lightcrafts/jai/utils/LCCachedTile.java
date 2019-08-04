@@ -13,23 +13,23 @@
  */
 package com.lightcrafts.jai.utils;
 
+import lombok.Getter;
+
+import javax.media.jai.CachedTile;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.remote.SerializableRenderedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.lang.ref.WeakReference;
 import java.math.BigInteger;
-import javax.media.jai.CachedTile;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.remote.SerializableRenderedImage;
 
 /**
  * Information associated with a cached tile.
  *
- * <p> This class is used by SunTileCache to create an object that
+ * <p> This class is used by LCTileCache to create an object that
  * includes all the information associated with a tile, and is put
  * into the tile cache.
- *
- * <p> It also serves as a double linked list.
  *
  * @see LCTileCache
  *
@@ -40,23 +40,27 @@ final class LCCachedTile implements CachedTile {
     // never get garbage collected.   The OpImage finalize
     // method calls removeTiles().  It was suggested, that
     // the owner be a weak reference.
-    Raster tile;                // the tile to be cached
-    WeakReference owner;        // the RenderedImage this tile belongs to
+    @Getter
+    private final Raster tile;                // the tile to be cached
 
-    int tileX;			// tile X index
-    int tileY;			// tile Y index
+    private final WeakReference<RenderedImage> owner;        // the RenderedImage this tile belongs to
 
-    Object tileCacheMetric;     // Metric for weighting tile computation cost
-    long timeStamp;		// the last time this tile is accessed
+    private final int tileX;			// tile X index
+    private final int tileY;			// tile Y index
 
-    Object key;			// the key used to hash this tile
-    long memorySize;		// the memory used by this tile in bytes
+    @Getter
+    private final Object tileCacheMetric;     // Metric for weighting tile computation cost
 
-    LCCachedTile previous;	// the SunCachedTile before this tile
-    LCCachedTile next;		// the SunCachedTile after this tile
+    @Getter
+    long tileTimeStamp;		// the last time this tile is accessed
 
+    final Object key;			// the key used to hash this tile
+
+    @Getter
+    long tileSize;		// the memory used by this tile in bytes
+
+    @Getter
     int action = 0;             // add, remove, update from tile cache
-
 
     /**
      * Constructor that takes a tile cache metric
@@ -68,7 +72,7 @@ final class LCCachedTile implements CachedTile {
                   Raster tile,
                   Object tileCacheMetric) {
 
-        this.owner = new WeakReference(owner);
+        this.owner = new WeakReference<>(owner);
         this.tile  = tile;
         this.tileX = tileX;
         this.tileY = tileY;
@@ -79,7 +83,7 @@ final class LCCachedTile implements CachedTile {
 
         // tileMemorySize(Raster tile) inlined for performance
         DataBuffer db = tile.getDataBuffer();
-        memorySize = db.getDataTypeSize(db.getDataType()) / 8L *
+        tileSize = DataBuffer.getDataTypeSize(db.getDataType()) / 8L *
                      db.getSize() * db.getNumBanks();
 
     }
@@ -87,7 +91,7 @@ final class LCCachedTile implements CachedTile {
     static Object fastHashKey(RenderedImage owner,
                               int tileX,
                               int tileY) {
-        return new Integer(((Object) owner).hashCode() + tileY * owner.getNumXTiles() + tileX);
+        return owner.hashCode() + tileY * owner.getNumXTiles() + tileX;
     }
 
     /**
@@ -121,15 +125,15 @@ final class LCCachedTile implements CachedTile {
         }
 
         idx = idx & 0x00000000ffffffffL;
-        return new Long(((long)owner.hashCode() << 32) | idx);
+        return ((long) owner.hashCode() << 32) | idx;
     }
 
-    /**
-     *  Special version of hashKey for use in SunTileCache.removeTiles().
+    /*
+     *  Special version of hashKey for use in LCTileCache.removeTiles().
      *  Minimizes the overhead of repeated calls to
      *  hashCode and getNumTiles(). Note that this causes a
-     *  linkage between the CachedTile and SunTileCache classes
-     *  in that SunTileCache now has to understand how the
+     *  linkage between the CachedTile and LCTileCache classes
+     *  in that LCTileCache now has to understand how the
      *  tileIndex is calculated.
      */
 /*
@@ -140,14 +144,14 @@ final class LCCachedTile implements CachedTile {
         return new Long(((long)ownerHashCode << 32) | idx);
     }
 */
-    /** Returns the owner's hash code. */
+    /* Returns the owner's hash code. */
 /*    static long getOwnerHashCode(Long key) {
         return key.longValue() >>> 32;
     }
 */
     /** Returns a string representation of the class object. */
     public String toString() {
-        RenderedImage o = (RenderedImage) getOwner();
+        RenderedImage o = getOwner();
         String ostring = o == null ? "null" : o.toString();
 
         Raster t = getTile();
@@ -155,43 +159,16 @@ final class LCCachedTile implements CachedTile {
 
         return getClass().getName() + "@" + Integer.toHexString(hashCode()) +
                ": owner = " + ostring +
-               " tileX = " + Integer.toString(tileX) +
-               " tileY = " + Integer.toString(tileY) +
+               " tileX = " + tileX +
+               " tileY = " + tileY +
                " tile = " + tstring +
-               " key = " + ((key instanceof Long)? Long.toHexString(((Long)key).longValue()) : key.toString()) +
-               " memorySize = " + Long.toString(memorySize) +
-               " timeStamp = " + Long.toString(timeStamp);
-    }
-
-    /** Returns the cached tile. */
-    public Raster getTile() {
-        return tile;
+               " key = " + ((key instanceof Long)? Long.toHexString((Long) key) : key.toString()) +
+               " tileSize = " + tileSize +
+               " timeStamp = " + tileTimeStamp;
     }
 
     /** Returns the owner of the cached tile. */
     public RenderedImage getOwner() {
-        return (RenderedImage)owner.get();
-    }
-
-    /** Returns the current time stamp */
-    public long getTileTimeStamp() {
-        return timeStamp;
-    }
-
-    /** Returns the tileCacheMetric object */
-    public Object getTileCacheMetric() {
-        return tileCacheMetric;
-    }
-
-    /** Returns the tile memory size */
-    public long getTileSize() {
-        return memorySize;
-    }
-
-    /** Returns information about the method that
-     *  triggered the notification event.
-     */
-    public int getAction() {
-        return action;
+        return owner.get();
     }
 }
