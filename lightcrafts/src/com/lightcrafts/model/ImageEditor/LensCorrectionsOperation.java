@@ -61,7 +61,6 @@ public class LensCorrectionsOperation extends BlendedOperation {
     private float focal = 0f;
     private float aperture = 0f;
 
-    @NotNull
     private Lensfun lf;
 
     static final OperationType type = new OperationTypeImpl("Lens Corrections");
@@ -91,6 +90,13 @@ public class LensCorrectionsOperation extends BlendedOperation {
         tca_r_offset_config  = new SliderConfig(-2, 2, tca_r_offset, 0.1, false, format);
         tca_b_offset_config  = new SliderConfig(-2, 2, tca_b_offset, 0.1, false, format);
         addSliderKeys();
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        lf.dispose();
+        lf = null;
     }
 
     private void addSliderKeys() {

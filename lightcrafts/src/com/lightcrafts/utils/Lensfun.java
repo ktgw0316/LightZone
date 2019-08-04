@@ -49,13 +49,9 @@ public class Lensfun {
         return instance;
     }
 
-    @Override
-    public void finalize() throws Throwable {
-        try {
-            super.finalize();
-        } finally {
-            destroy(_handle);
-        }
+    public void dispose() {
+        destroy(_handle);
+        instance = null;
     }
 
     public synchronized List<String> getLensNamesFor(

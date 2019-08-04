@@ -63,7 +63,7 @@ Java_com_lightcrafts_utils_Lensfun_destroy
 {
     // Set the Java field to zero before delete the corresponding object
     const jclass cls = env->GetObjectClass(obj);
-    const jfieldID field = env->GetFieldID(cls, "handle", "L");
+    const jfieldID field = env->GetFieldID(cls, "_handle", "J");
     if (!field) {
         return;
     }
