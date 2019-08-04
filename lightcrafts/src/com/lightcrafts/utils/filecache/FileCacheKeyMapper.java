@@ -2,6 +2,8 @@
 
 package com.lightcrafts.utils.filecache;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 
 /**
@@ -27,7 +29,7 @@ public interface FileCacheKeyMapper {
      * returned file exists.
      * @return Returns said {@link File}.
      */
-    File mapKeyToFile( String key, boolean ensurePathExists );
+    File mapKeyToFile(@NotNull String key, boolean ensurePathExists );
 
 }
 /* vim:set et sw=4 ts=4: */

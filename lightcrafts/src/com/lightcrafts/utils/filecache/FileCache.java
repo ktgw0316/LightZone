@@ -2,11 +2,12 @@
 
 package com.lightcrafts.utils.filecache;
 
+import com.lightcrafts.utils.file.FileIterator;
+import com.lightcrafts.utils.file.FileUtil;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.*;
 import java.nio.channels.FileChannel;
-
-import com.lightcrafts.utils.file.FileUtil;
-import com.lightcrafts.utils.file.FileIterator;
 
 /**
  * A <code>FileCache</code> is used to cache files until a maximum capacity is
@@ -68,7 +69,10 @@ public final class FileCache {
      * @return Returns <code>true</code> only if there is a cache entry for the
      * given key.
      */
-    public boolean contains( String key ) {
+    public boolean contains(@Nullable String key ) {
+        if (key == null) {
+            return false;
+        }
         final File file = m_mapper.mapKeyToFile( key, false );
         synchronized ( this ) {
             //

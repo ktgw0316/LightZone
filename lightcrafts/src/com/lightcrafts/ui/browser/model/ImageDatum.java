@@ -48,6 +48,7 @@ public class ImageDatum {
      * The XMP file which extends the metadata in this ImageDatum.  This
      * may be null, if there was an error reading image file metadata.
      */
+    @Nullable
     @Getter
     private File xmpFile;
 
@@ -560,11 +561,12 @@ public class ImageDatum {
             System.err.println("file time cache error: " + e.getMessage());
         }
         String xmpFileTimeKey = getXmpFileTimeCacheKey();
-        try (ObjectOutputStream out = new ObjectOutputStream(cache.putToStream(xmpFileTimeKey))) {
-            out.writeObject(xmpFileCacheTime);
-        }
-        catch (IOException e) {
-            System.err.println("XMP file time cache error: " + e.getMessage());
+        if (xmpFileTimeKey != null) {
+            try (ObjectOutputStream out = new ObjectOutputStream(cache.putToStream(xmpFileTimeKey))) {
+                out.writeObject(xmpFileCacheTime);
+            } catch (IOException e) {
+                System.err.println("XMP file time cache error: " + e.getMessage());
+            }
         }
     }
 
@@ -659,7 +661,7 @@ public class ImageDatum {
     }
 
     private String getXmpFileTimeCacheKey() {
-        return xmpFile.getAbsolutePath() + "_cache_time";
+        return xmpFile != null ? xmpFile.getAbsolutePath() + "_cache_time" : null;
     }
 
     private void clearPreview() {
