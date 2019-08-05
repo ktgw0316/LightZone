@@ -14,7 +14,7 @@ class TemplateDeployer {
     // Don't perform the Template copy operation more than once per VM instance,
     // no matter what.
     private static boolean hasDeployed;
-    
+
     /**
      * Perform the mass copy of predefined Templates from resources to files.
      */
@@ -35,7 +35,7 @@ class TemplateDeployer {
     /**
      * Copy one predefined Template from resources to a file.
      */
-    static void migrateTemplate(String template) throws IOException {
+    private static void migrateTemplate(String template) throws IOException {
         File dir = TemplateDatabase.TemplateDir;
         File file = new File(dir, template);
         ClassLoader loader = TemplateDeployer.class.getClassLoader();
@@ -47,24 +47,17 @@ class TemplateDeployer {
                 "Couldn't find resource for template " + template
             );
         }
-        OutputStream out = new FileOutputStream(file);
         byte[] buffer = new byte[10000];    // bigger than any template
-        try {
-            int count;
+        int count;
+        try (OutputStream out = new FileOutputStream(file)) {
             do {
                 count = in.read(buffer);
                 if (count > 0) {
                     out.write(buffer, 0, count);
                 }
             } while (count >= 0);
-        }
-        finally {
-            try {
-                out.close();
-            }
-            catch (IOException e) {
-                System.out.println("Failed to close template " + template);
-            }
+        } catch (IOException e) {
+            System.out.println("Failed to close template " + template);
         }
     }
 
@@ -80,6 +73,9 @@ class TemplateDeployer {
         File dir = TemplateDatabase.TemplateDir;
         if (dir.isDirectory()) {
             File[] files = dir.listFiles();
+            if (files == null) {
+                return true;
+            }
             for (File file : files) {
                 String name = file.getName();
                 names.remove(name);
@@ -88,7 +84,7 @@ class TemplateDeployer {
         return names.isEmpty();
     }
 
-    static Collection<String> getPredefinedTemplateNames() {
+    private static Collection<String> getPredefinedTemplateNames() {
         InputStream in = TemplateDeployer.class.getResourceAsStream(
             "resources/TemplateList"
         );

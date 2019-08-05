@@ -243,7 +243,11 @@ endif	# UNIVERSAL
 # Windows-specific
 ##
 ifeq ($(PLATFORM),Windows)
-  WINDRES:=	$(shell echo $(CC) | sed 's/gcc/windres/')
+  ifeq ($(CYGWIN),1)
+    WINDRES:=	$(shell echo $(CC) | sed 's/gcc/windres/')
+  else
+    WINDRES:=	windres
+  endif
 
 %.res : %.rc
 	$(WINDRES) $< -o temp.RES

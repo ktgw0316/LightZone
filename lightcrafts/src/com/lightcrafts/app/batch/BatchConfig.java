@@ -63,12 +63,10 @@ public class BatchConfig {
         String path = directory.getAbsolutePath();
         Prefs.put(DirectoryKey + context, path);
 
-        try {
-            XmlDocument doc = new XmlDocument(ExportKey);
-            export.write(doc.getRoot());
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
+        XmlDocument doc = new XmlDocument(ExportKey);
+        export.write(doc.getRoot());
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             doc.write(out);
-            out.close();
             String text = out.toString("UTF-8");
             Prefs.put(ExportKey + context, text);
         }

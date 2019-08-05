@@ -92,17 +92,6 @@ In the Project Explorer view, do the following:
     - Choose Properties
     - Resource: Text file encoding: Other: UTF-8 (not the default MacRoman)
     - Hit OK
-- Right-click the project again
-    - Choose New -> Folder
-    - Choose Advanced -> Link to alternate location
-    - Browse and select "extsrc" folder 
-    - Hit Finish
-- Right-click the extsrc folder
-    - Choose New -> Source folder
-    - Enter "extsrc" in the Folder name
-    - Hit Finish
-- Right-click the extbuild folder
-    - Delete the folder.
 
 # Build Setup and Preparation
 

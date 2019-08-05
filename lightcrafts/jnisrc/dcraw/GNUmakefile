@@ -6,14 +6,16 @@ TARGET_BASE:=		DCRaw
 # Uncomment to compile in debug mode.
 #DEBUG:=			true
 
-JNI_EXTRA_CFLAGS+=	-fopenmp
+JNI_WINDOWS_CFLAGS:=	-fopenmp
+JNI_LINUX_CFLAGS:=	$(JNI_WINDOWS_CFLAGS)
+JNI_MACOSX_CFLAGS:=	-Xpreprocessor -fopenmp
 
 JNI_EXTRA_DEFINES:=	-DNO_JPEG -DNO_LCMS
 JNI_LINUX_DEFINES:=	-Dfgetc=getc_unlocked
 JNI_MACOSX_DEFINES:=	$(JNI_LINUX_DEFINES)
 
 JNI_WINDOWS_LINK:=      -lgomp.dll
-JNI_MACOSX_LINK:=	-lstdc++ -single_module
+JNI_MACOSX_LINK:=	-lstdc++ -single_module -lomp
 
 ##
 # Altivec stuff is specified in JNI_PPC_DEFINES rather than JNI_PPC_CFLAGS

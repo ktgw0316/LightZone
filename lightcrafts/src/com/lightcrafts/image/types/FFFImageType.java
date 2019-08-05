@@ -65,8 +65,8 @@ public final class FFFImageType extends RawImageType {
      * All the possible filename extensions for FFF files.  All must be lower
      * case and the preferred one must be first.
      */
-    private static final String EXTENSIONS[] = {
-        "fff"
+    private static final String[] EXTENSIONS = {
+            "fff"
     };
 }
 /* vim:set et sw=4 ts=4: */

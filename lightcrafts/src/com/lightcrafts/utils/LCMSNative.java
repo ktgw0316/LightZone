@@ -14,10 +14,10 @@ public class LCMSNative {
 
     protected synchronized native static long cmsCreateLab2Profile();
 
-    protected synchronized native static long cmsOpenProfileFromMem(byte data[], int size);
+    protected synchronized native static long cmsOpenProfileFromMem(byte[] data, int size);
 
-    protected synchronized native static long cmsCreateRGBProfile(double WhitePoint[],
-                                                                  double Primaries[],
+    protected synchronized native static long cmsCreateRGBProfile(double[] WhitePoint,
+                                                                  double[] Primaries,
                                                                   double gamma);
 
     protected synchronized native static boolean cmsCloseProfile(long hProfile);

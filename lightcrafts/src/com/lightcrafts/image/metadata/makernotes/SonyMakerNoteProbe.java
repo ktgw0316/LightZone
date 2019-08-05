@@ -1,38 +1,24 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2017-     Masahiro Kitagawa */
 
 package com.lightcrafts.image.metadata.makernotes;
 
-import com.lightcrafts.image.metadata.ImageMetadata;
+import lombok.NoArgsConstructor;
 
 /**
  * {@code SonyMakerNoteProbe} is-a {@link MakerNoteProbe} for determining
  * whether the maker notes are by Sony.
  *
  * @author Paul J. Lucas [paul@lightcrafts.com]
+ * @author Masahiro Kitagawa [arctica0316@gmail.com]
  */
-final class SonyMakerNoteProbe extends MakerNoteProbe {
-
-    /** The singleton instance of {@code SonyMakerNoteProbe}. */
-    static final MakerNoteProbe INSTANCE = new SonyMakerNoteProbe();
-
-    ////////// protected //////////////////////////////////////////////////////
-
-    /**
-     * {@inheritDoc}
-     */
+@NoArgsConstructor(staticName = "create")
+final class SonyMakerNoteProbe extends MakerNoteProbe<SonyDirectory>
+{
     @Override
-    protected Class<? extends MakerNotesDirectory>
-    match( ImageMetadata metadata ) {
-        return matchUsingMake( metadata, "SONY", SonyDirectory.class );
-    }
-
-    ////////// private ////////////////////////////////////////////////////////
-
-    /**
-     * Constructs the singleton instance of {@code SonyMakerNoteProbe}.
-     */
-    private SonyMakerNoteProbe() {
-        // do nothing
+    protected Class<SonyDirectory> getDirClass() {
+        return SonyDirectory.class;
     }
 }
 /* vim:set et sw=4 ts=4: */
+

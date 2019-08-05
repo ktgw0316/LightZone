@@ -7,7 +7,7 @@ import com.lightcrafts.image.types.ImageType;
 import com.lightcrafts.image.types.JPEGImageType;
 import com.lightcrafts.image.types.TIFFImageType;
 import com.lightcrafts.platform.Platform;
-import com.lightcrafts.utils.ColorProfileInfo;
+import com.lightcrafts.image.color.ColorProfileInfo;
 
 import static com.lightcrafts.ui.export.Locale.LOCALE;
 import com.lightcrafts.ui.toolkit.WidePopupComboBox;

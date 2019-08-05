@@ -28,15 +28,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.lightcrafts.mediax.jai.OpImage;
-import com.lightcrafts.mediax.jai.PlanarImage;
-import com.lightcrafts.mediax.jai.TileCache;
-import com.lightcrafts.mediax.jai.TileComputationListener;
-import com.lightcrafts.mediax.jai.TileRequest;
-import com.lightcrafts.mediax.jai.TileScheduler;
-import com.lightcrafts.mediax.jai.util.ImagingException;
-import com.lightcrafts.mediax.jai.util.ImagingListener;
-import com.lightcrafts.media.jai.util.ImageUtil;
+import javax.media.jai.OpImage;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.TileCache;
+import javax.media.jai.TileComputationListener;
+import javax.media.jai.TileRequest;
+import javax.media.jai.TileScheduler;
+import javax.media.jai.util.ImagingException;
+import javax.media.jai.util.ImagingListener;
+import com.sun.media.jai.util.ImageUtil;
 
 /**
  * A class representing a request for non-prefetch background computation
@@ -463,11 +463,11 @@ class WorkerThread extends Thread {
 
 /**
  * This is Sun Microsystems' reference implementation of the
- * <code>com.lightcrafts.mediax.jai.TileScheduler</code> interface.  It provides
+ * <code>javax.media.jai.TileScheduler</code> interface.  It provides
  * a mechanism for scheduling tile calculation.  Multi-threading is
  * used whenever possible.
  *
- * @see com.lightcrafts.mediax.jai.TileScheduler
+ * @see javax.media.jai.TileScheduler
  */
 public final class LCTileScheduler implements TileScheduler {
 
@@ -1095,7 +1095,7 @@ public final class LCTileScheduler implements TileScheduler {
      * @return  An array of computed tiles.
      */
     public Raster[] scheduleTiles(OpImage owner,
-                                  Point tileIndices[]) {
+                                  Point[] tileIndices) {
         if (owner == null || tileIndices == null) {
             throw new IllegalArgumentException("Null owner or TileIndices");
         }

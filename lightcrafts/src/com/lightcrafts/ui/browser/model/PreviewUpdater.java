@@ -20,6 +20,7 @@ import com.lightcrafts.image.metadata.ImageMetadata;
 import com.lightcrafts.image.types.ImageType;
 import com.lightcrafts.image.types.LZNImageType;
 import com.lightcrafts.image.types.RawImageType;
+import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.utils.filecache.FileCache;
 import com.lightcrafts.utils.filecache.FileCacheFactory;
 
@@ -106,25 +107,21 @@ public class PreviewUpdater extends Thread {
         }
         // Write the given preview to the cache
         final String key = getImageKey(file);
-        try {
-            final OutputStream out = cache.putToStream(key);
-            final OutputStreamImageDataReceiver receiver =
-                new OutputStreamImageDataReceiver(out);
+        try (OutputStream out = cache.putToStream(key)) {
+            final OutputStreamImageDataReceiver receiver = new OutputStreamImageDataReceiver(out);
             try {
                 final LCJPEGWriter writer = new LCJPEGWriter(
-                    receiver, 32 * 1024,
-                    image.getWidth(), image.getHeight(),
-                    image.getColorModel().getNumComponents(),
-                    CS_RGB, 90
+                        receiver, 32 * 1024,
+                        image.getWidth(), image.getHeight(),
+                        image.getColorModel().getNumComponents(),
+                        CS_RGB, 90
                 );
                 writer.putImage(image);
                 writer.dispose();
-            }
-            catch (LCImageLibException e) {
+            } catch (LCImageLibException e) {
                 logNonFatalStatic(file, e, "caching preview");
                 cache.remove(key);
             }
-            out.close();
             receiver.dispose();
         }
         catch (IOException e) {
@@ -233,7 +230,7 @@ public class PreviewUpdater extends Thread {
                 cachedImage = readCache();
             if ( cachedImage != null ) {
                 image = Thumbnailer.rotate( cachedImage, meta );
-                image = FastImageFactory.systemColorSpaceImage( image );
+                image = Functions.systemColorSpaceImage( image );
                 done = true;
             } else {
                 start();
@@ -338,7 +335,7 @@ public class PreviewUpdater extends Thread {
                         }
                     }
                     preview = Thumbnailer.rotate(preview, meta);
-                    preview = FastImageFactory.systemColorSpaceImage(preview);
+                    preview = Functions.systemColorSpaceImage(preview);
                     updateImage(preview);
                 }
             }
@@ -383,25 +380,21 @@ public class PreviewUpdater extends Thread {
         }
         // Write the preview to the cache
         final String key = getImageKey();
-        try {
-            final OutputStream out = cache.putToStream(key);
-            OutputStreamImageDataReceiver receiver =
-                new OutputStreamImageDataReceiver(out);
+        try (OutputStream out = cache.putToStream(key)) {
+            OutputStreamImageDataReceiver receiver = new OutputStreamImageDataReceiver(out);
             try {
                 final LCJPEGWriter writer = new LCJPEGWriter(
-                    receiver, 32 * 1024,
-                    image.getWidth(), image.getHeight(),
-                    image.getColorModel().getNumComponents(),
-                    CS_RGB, 90
+                        receiver, 32 * 1024,
+                        image.getWidth(), image.getHeight(),
+                        image.getColorModel().getNumComponents(),
+                        CS_RGB, 90
                 );
                 writer.putImage(image);
                 writer.dispose();
-            }
-            catch (LCImageLibException e) {
+            } catch (LCImageLibException e) {
                 logNonFatal(e, "caching preview");
                 cache.remove(key);
             }
-            out.close();
             receiver.dispose();
         }
         catch (IOException e) {
@@ -415,19 +408,13 @@ public class PreviewUpdater extends Thread {
         if ((cache == null) || ! cache.contains(key)) {
             return null;
         }
-        try {
-            final InputStream in = cache.getStreamFor( key );
-            try {
-                ImageProviderReceiver provRecv = new ImageProviderReceiver();
-                provRecv.fill(in);
-                final LCJPEGReader jpeg = new LCJPEGReader(
+        try (InputStream in = cache.getStreamFor(key)) {
+            ImageProviderReceiver provRecv = new ImageProviderReceiver();
+            provRecv.fill(in);
+            final LCJPEGReader jpeg = new LCJPEGReader(
                     provRecv, PreviewSize, PreviewSize
-                );
-                return jpeg.getImage();
-            }
-            finally {
-                in.close();
-            }
+            );
+            return jpeg.getImage();
         }
         catch (Throwable t1) {
             logNonFatal(t1, "reading cached preview");

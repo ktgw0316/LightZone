@@ -3,12 +3,14 @@ package com.lightcrafts.model.ImageEditor;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.opimage.BilateralFilterRGBOpImage;
 import com.lightcrafts.jai.utils.Transform;
-import com.lightcrafts.mediax.jai.BorderExtender;
-import com.lightcrafts.mediax.jai.PlanarImage;
+import javax.media.jai.BorderExtender;
+import javax.media.jai.PlanarImage;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
 
 import java.text.DecimalFormat;
+
+import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_NOISE_REDUCTION;
 
 /**
  * Copyright (C) 2010 Light Crafts, Inc.
@@ -26,6 +28,8 @@ public class AdvancedNoiseReductionOperationV4 extends BlendedOperation {
     public AdvancedNoiseReductionOperationV4(Rendering rendering, OperationType type) {
         super(rendering, type);
         colorInputOnly = true;
+
+        setHelpTopic(HELP_TOOL_NOISE_REDUCTION);
 
         DecimalFormat format = new DecimalFormat("0.0");
 

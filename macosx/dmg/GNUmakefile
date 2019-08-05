@@ -29,7 +29,7 @@ DMG_DOC_FOLDER:=	$(APP_NAME) Documentation
 DMG_FS:=	HFS+
 
 # This is a temporary size, not the final .dmg size, so just make it big.
-DMG_SIZE:=	256m
+DMG_SIZE:=	512m
 
 ASR:=		/usr/sbin/asr
 MKDIR:=		mkdir -p

@@ -1,9 +1,14 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
-/* Copyright (C) 2017-     Masahiro Kitagawa */
+/* Copyright (C) 2016-     Masahiro Kitagawa */
 
 package com.lightcrafts.image.metadata.makernotes;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+import lombok.NonNull;
+import lombok.val;
 
 import com.lightcrafts.image.metadata.ImageMetadata;
 import com.lightcrafts.image.metadata.ImageMetadataDirectory;
@@ -15,8 +20,9 @@ import com.lightcrafts.image.metadata.ImageMetadataDirectory;
  * are.
  *
  * @author Paul J. Lucas [paul@lightcrafts.com]
+ * @author Masahiro Kitagawa [arctica0316@gmail.com]
  */
-public abstract class MakerNoteProbe {
+public abstract class MakerNoteProbe<T extends MakerNotesDirectory> {
 
     ////////// public /////////////////////////////////////////////////////////
 
@@ -29,11 +35,10 @@ public abstract class MakerNoteProbe {
      * could not be determined.
      */
     public static Class<? extends MakerNotesDirectory>
-    determineMakerNotesFrom( ImageMetadata metadata ) {
-        for ( MakerNoteProbe probe : m_makerNoteProbes ) {
-            final Class<? extends MakerNotesDirectory> dirClass =
-                probe.match( metadata );
-            if ( dirClass != null )
+    determineMakerNotesFrom(ImageMetadata metadata) {
+        for (val probe : m_makerNoteProbes) {
+            val dirClass = probe.match(metadata);
+            if (dirClass != null)
                 return dirClass;
         }
         return null;
@@ -46,7 +51,9 @@ public abstract class MakerNoteProbe {
      * global static list of all <code>MakerNoteProbe</code>s.
      */
     protected MakerNoteProbe() {
-        m_makerNoteProbes.add( this );
+        m_dir = getDirClass();
+        m_make = m_dir.getName().toUpperCase();
+        m_makerNoteProbes.add(this);
     }
 
     /**
@@ -58,77 +65,53 @@ public abstract class MakerNoteProbe {
      * maker notes or <code>null</code> if the manufacturer of maker notes
      * could not be determined.
      */
-    protected abstract Class<? extends MakerNotesDirectory>
-    match( ImageMetadata metadata );
+    protected Class<T>
+    match(ImageMetadata metadata) {
+        return matchUsingMake(metadata);
+    }
 
     /**
      * Checks if the maker notes inside the given metadata matches a particular
      * maker notes class by using the camera make.
      *
      * @param metadata The {@link ImageMetadata} to probe.
-     * @param makeWanted The make of the camera used to photograph the image.
-     * @param dir The {@link MakerNotesDirectory} subclass to return if the
-     * make wanted matches the make found in the metadata.
      * @return Returns the class of the {@link MakerNotesDirectory} for the
      * maker notes or <code>null</code> if the manufacturer of maker notes
      * could not be determined.
      */
-    @Deprecated
-    protected static Class<? extends MakerNotesDirectory>
-    matchUsingMake( ImageMetadata metadata, String makeWanted,
-                    Class<? extends MakerNotesDirectory> dir ) {
-        return matchUsingMake(metadata, dir, makeWanted);
+    final Class<T> matchUsingMake(@NonNull ImageMetadata metadata) {
+        val make = metadata.getCameraMake(false);
+        if (make == null)
+            return null;
+        return make.contains(m_make) ? m_dir : null;
     }
 
-    /**
-     * Checks if the maker notes inside the given metadata matches a particular
-     * maker notes class by using the camera makes.
-     *
-     * @param metadata The {@link ImageMetadata} to probe.
-     * @param dir The {@link MakerNotesDirectory} subclass to return if the
-     * make wanted matches the make found in the metadata.
-     * @param makesWanted The camera makes.
-     * @return Returns the class of the {@link MakerNotesDirectory} for the
-     * maker notes or <code>null</code> if the manufacturer of maker notes
-     * could not be determined.
-     */
-    protected static Class<? extends MakerNotesDirectory>
-    matchUsingMake(ImageMetadata metadata,
-                   Class<? extends MakerNotesDirectory> dir,
-                   String... makesWanted)
-    {
-        final String make = metadata.getCameraMake( false );
-        if (make != null) {
-            for (String makeWanted : makesWanted) {
-                if (make.contains(makeWanted.toUpperCase())) {
-                    return dir;
-                }
-            }
-        }
-        return null;
-    }
+    protected abstract Class<T> getDirClass();
 
     ////////// private ////////////////////////////////////////////////////////
+
+    private Class<T> m_dir;
+    private final String m_make;
 
     /**
      * The global static list of all <code>MakerNoteProbe</code>s.
      */
-    private static final ArrayList<MakerNoteProbe> m_makerNoteProbes =
-        new ArrayList<MakerNoteProbe>();
+    private static final Set<MakerNoteProbe> m_makerNoteProbes =
+        new HashSet<MakerNoteProbe>();
 
     static {
         // TODO: is there a better way to do this?
-        final MakerNoteProbe probesToLoad[] = {
-            CanonMakerNoteProbe.INSTANCE,
-            FujiMakerNoteProbe.INSTANCE,
-            KodakMakerNoteProbe.INSTANCE,
-            MinoltaMakerNoteProbe.INSTANCE,
-            NikonMakerNoteProbe.INSTANCE,
-            OlympusMakerNoteProbe.INSTANCE,
-            PanasonicMakerNoteProbe.INSTANCE,
-            PentaxMakerNoteProbe.INSTANCE,
-            SonyMakerNoteProbe.INSTANCE,
-        };
+        Arrays.asList(
+                CanonMakerNoteProbe.create(),
+                FujiMakerNoteProbe.create(),
+                KodakMakerNoteProbe.create(),
+                MinoltaMakerNoteProbe.create(),
+                NikonMakerNoteProbe.create(),
+                OlympusMakerNoteProbe.create(),
+                PanasonicMakerNoteProbe.create(),
+                PentaxMakerNoteProbe.create(),
+                SonyMakerNoteProbe.create()
+        );
     }
 }
 /* vim:set et sw=4 ts=4: */

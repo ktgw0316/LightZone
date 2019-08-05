@@ -2,10 +2,10 @@
 
 package com.lightcrafts.jai.opimage;
 
-import com.lightcrafts.mediax.jai.PointOpImage;
-import com.lightcrafts.mediax.jai.ImageLayout;
-import com.lightcrafts.mediax.jai.RasterAccessor;
-import com.lightcrafts.mediax.jai.RasterFormatTag;
+import javax.media.jai.PointOpImage;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.RasterAccessor;
+import javax.media.jai.RasterFormatTag;
 
 import java.awt.image.*;
 import java.awt.*;
@@ -18,7 +18,7 @@ import java.util.Map;
  * Time: 5:31:50 PM
  */
 public class RedMaskBlackener extends PointOpImage {
-    private static short powTable[] = new short[0x10000];
+    private static short[] powTable = new short[0x10000];
 
     static {
         for (int i = 0; i < 0x10000; i++)
@@ -59,18 +59,18 @@ public class RedMaskBlackener extends PointOpImage {
         int width = src.getWidth();
         int height = src.getHeight();
 
-        short dstData[] = dst.getShortDataArray(0);
-        int dstBandOffsets[] = dst.getBandOffsets();
+        short[] dstData = dst.getShortDataArray(0);
+        int[] dstBandOffsets = dst.getBandOffsets();
         int dstLineStride = dst.getScanlineStride();
         int dstPixelStride = dst.getPixelStride();
 
-        short srcData[] = src.getShortDataArray(0);
-        int srcBandOffsets[] = src.getBandOffsets();
+        short[] srcData = src.getShortDataArray(0);
+        int[] srcBandOffsets = src.getBandOffsets();
         int srcLineStride = src.getScanlineStride();
         int srcPixelStride = src.getPixelStride();
 
-        byte maskData[] = mask.getByteDataArray(0);
-        int maskBandOffsets[] = mask.getBandOffsets();
+        byte[] maskData = mask.getByteDataArray(0);
+        int[] maskBandOffsets = mask.getBandOffsets();
         int maskLineStride = mask.getScanlineStride();
 
         int srcROffset = srcBandOffsets[0];

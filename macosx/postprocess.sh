@@ -35,4 +35,7 @@ done
 # jpeg=$(otool -L ${tiff} | grep -o "@executable_path/libjpeg.*\.dylib")
 # install_name_tool -change ${jpeg} @executable_path/${turbo} ${tiff}
 
+# Hack for older macOS than High Sierra
+install_name_tool -change /System/Library/Frameworks/ColorSync.framework/Versions/A/ColorSync /System/Library/Frameworks/ApplicationServices.framework/Frameworks/ColorSync.framework/Versions/A/ColorSync libMacOSX.jnilib
+
 # vim:set noet sw=8 ts=8:

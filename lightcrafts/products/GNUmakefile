@@ -3,8 +3,16 @@ include			$(ROOT)/lightcrafts/mk/platform.mk
 
 RM:=			rm -fr
 
-COMMON_LIBS:=		$(wildcard ../lib/*)
-DEST_COMMON_LIBS:=	$(notdir $(COMMON_LIBS))
+EXCLUDED_LIBS:=		$(wildcard \
+			../lib/ivy.jar \
+			../lib/lombok*.jar \
+			../lib/annotations*.jar \
+			../lib/*-javadoc.jar \
+			../lib/*-sources.jar \
+			)
+DEST_EXCLUDED_LIBS:=	$(notdir $(EXCLUDED_LIBS))
+COMMON_LIBS:=		$(wildcard ../lib/*.jar)
+DEST_COMMON_LIBS:=	$(filter-out $(DEST_EXCLUDED_LIBS),$(notdir $(COMMON_LIBS)))
 
 ##
 # Build rules

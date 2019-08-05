@@ -6,14 +6,14 @@ import com.lightcrafts.jai.operator.*;
 import com.lightcrafts.jai.opimage.*;
 import com.lightcrafts.jai.utils.LCTileCache;
 import com.lightcrafts.jai.utils.LCRecyclingTileFactory;
-import com.lightcrafts.utils.ColorScience;
-import com.lightcrafts.utils.ColorProfileInfo;
+import com.lightcrafts.image.color.ColorScience;
+import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.platform.Platform;
-import com.lightcrafts.media.jai.util.SunTileCache;
+import com.sun.media.jai.util.SunTileCache;
 
-import com.lightcrafts.mediax.jai.*;
-import com.lightcrafts.mediax.jai.registry.CRIFRegistry;
-import com.lightcrafts.mediax.jai.registry.RIFRegistry;
+import javax.media.jai.*;
+import javax.media.jai.registry.CRIFRegistry;
+import javax.media.jai.registry.RIFRegistry;
 import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.color.ICC_ColorSpace;
@@ -176,7 +176,7 @@ public class JAIContext {
 
         int processors = Runtime.getRuntime().availableProcessors();
 
-        String VMVersion[] = System.getProperty("java.version").split("[._]");
+        String[] VMVersion = System.getProperty("java.version").split("[._]");
         String OSArch = System.getProperty("os.arch");
 
         System.out.println("Running on " + processors + " processors");

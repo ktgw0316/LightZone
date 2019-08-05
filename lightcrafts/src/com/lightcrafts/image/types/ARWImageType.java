@@ -100,8 +100,8 @@ public final class ARWImageType extends RawImageType {
      * All the possible filename extensions for ARW files.  All must be lower
      * case and the preferred one must be first.
      */
-    private static final String EXTENSIONS[] = {
-        "arw"
+    private static final String[] EXTENSIONS = {
+            "arw"
     };
 }
 /* vim:set et sw=4 ts=4: */

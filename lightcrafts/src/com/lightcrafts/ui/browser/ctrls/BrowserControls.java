@@ -47,7 +47,7 @@ public class BrowserControls extends Box {
         BoxedButton rater     = new BoxedButton(LOCALE.get("RateBorderTitle"),      new RatingButton(browser));
         BoxedButton copyPaste = new BoxedButton(LOCALE.get("CopyToolsBorderTitle"), new CopyPasteButtons(browser));
 
-        SortCtrl sortCtrl = new SortCtrl(browser);
+        SortCtrl sortCtrl     = new SortCtrl(browser);
         BoxedButton sort      = new BoxedButton(LOCALE.get("SortBorderTitle"),      sortCtrl);
 
         SizeSlider sizeSlider = new SizeSlider(browser);
@@ -57,9 +57,11 @@ public class BrowserControls extends Box {
         // in scroll jumps:
         sizeSlider.addMouseListener(
             new MouseAdapter() {
+                @Override
                 public void mousePressed(MouseEvent e) {
                     browserScroll.setCenteringLayout(true);
                 }
+                @Override
                 public void mouseReleased(MouseEvent e) {
                     browserScroll.setCenteringLayout(false);
                 }
@@ -77,19 +79,22 @@ public class BrowserControls extends Box {
 
         browser.addBrowserListener(
             new ImageBrowserListener() {
+                @Override
                 public void selectionChanged(ImageBrowserEvent event) {
                     // Clear any lingering error messages from a prior events
                     browserError.setText("");
                 }
+                @Override
                 public void imageDoubleClicked(ImageBrowserEvent event) {
                 }
+                @Override
                 public void browserError(String message) {
                     browserError.setText(message);
                 }
             }
         );
 
-        final int space = 8;
+        final int space = 2;
         // add(Box.createHorizontalGlue());
         add(Box.createHorizontalStrut(space));
         add(rotator.box);

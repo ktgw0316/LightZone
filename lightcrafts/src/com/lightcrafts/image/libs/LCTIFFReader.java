@@ -6,9 +6,6 @@ package com.lightcrafts.image.libs;
 import com.lightcrafts.image.BadColorProfileException;
 import com.lightcrafts.image.types.TIFFConstants;
 import com.lightcrafts.jai.opimage.CachedImage;
-import com.lightcrafts.mediax.jai.ImageLayout;
-import com.lightcrafts.mediax.jai.PlanarImage;
-import com.lightcrafts.mediax.jai.TileCache;
 import com.lightcrafts.utils.ProgressIndicator;
 import com.lightcrafts.utils.UserCanceledException;
 import com.lightcrafts.utils.thread.ProgressThread;
@@ -32,6 +29,9 @@ import java.awt.image.Raster;
 import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
 import java.io.UnsupportedEncodingException;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.TileCache;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -68,7 +68,7 @@ import static com.lightcrafts.jai.JAIContext.sRGBColorSpace;
  * @author Paul J. Lucas [paul@lightcrafts.com]
  * @see <a href="http://www.remotesensing.org/libtiff/">LibTIFF</a>
  */
-public final class LCTIFFReader extends LCTIFFCommon {
+public final class LCTIFFReader extends LCTIFFCommon implements LCImageReader {
 
     /**
      * Construct an <code>LCTIFFReader</code> and open a TIFF file.
@@ -114,6 +114,16 @@ public final class LCTIFFReader extends LCTIFFCommon {
         } catch (IllegalArgumentException e) {
             throw new BadColorProfileException(null);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public PlanarImage getImage()
+            throws LCImageLibException, UserCanceledException
+    {
+        return getImage(null);
     }
 
     /**
@@ -508,7 +518,7 @@ public final class LCTIFFReader extends LCTIFFCommon {
 
         final ProgressIndicator indicator = ProgressIndicatorFactory.create(thread, tf.tiles);
 
-        final int bandList[] = new int[tf.samplesPerPixel];
+        final int[] bandList = new int[tf.samplesPerPixel];
         for (int i = 0; i < tf.samplesPerPixel; i++) {
             bandList[i] = i;
         }

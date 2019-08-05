@@ -118,17 +118,4 @@ done:
     CFRelease( cfURLRef );
     return jPath;
 }
-
-/**
- * Shows the given file in the Finder.
- */
-JNIEXPORT jboolean JNICALL MacOSXFileUtil_METHOD(showInFinder)
-    ( JNIEnv *env, jclass, jstring jPath )
-{
-    auto_obj<NSAutoreleasePool> pool;
-    NSString *const nsPath = LC_jstringToNSString( env, jPath );
-    return [[NSWorkspace sharedWorkspace]
-        selectFile:nsPath
-        inFileViewerRootedAtPath:[nsPath stringByDeletingLastPathComponent]];
-}
 /* vim:set et sw=4 ts=4: */

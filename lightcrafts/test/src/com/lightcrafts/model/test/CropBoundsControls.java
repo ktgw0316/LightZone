@@ -6,17 +6,16 @@ import com.lightcrafts.model.CropBounds;
 import com.lightcrafts.model.Scale;
 
 import javax.swing.*;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
-import java.util.LinkedList;
-import java.util.Iterator;
-import java.awt.geom.Rectangle2D;
-import java.awt.event.MouseListener;
+import javax.swing.event.ChangeListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.geom.Rectangle2D;
+import java.util.LinkedList;
 
 class CropBoundsControls extends Box implements ChangeListener, MouseListener {
 
-    static interface Listener {
+    interface Listener {
         void cropBoundsChanged(
             CropBounds bounds, Scale scale, boolean isChanging
         );
@@ -31,12 +30,12 @@ class CropBoundsControls extends Box implements ChangeListener, MouseListener {
 
     private boolean isChanging;
 
-    private LinkedList listeners;
+    private LinkedList<Listener> listeners;
 
     CropBoundsControls() {
         super(BoxLayout.Y_AXIS);
 
-        listeners = new LinkedList();
+        listeners = new LinkedList<Listener>();
 
         x = addSlider(0, 100);
         y = addSlider(0, 100);
@@ -64,8 +63,7 @@ class CropBoundsControls extends Box implements ChangeListener, MouseListener {
 
         Scale scale = new Scale(zoom.getValue() / 10f);
 
-        for (Iterator i=listeners.iterator(); i.hasNext(); ) {
-            Listener listener = (Listener) i.next();
+        for (Listener listener : listeners) {
             listener.cropBoundsChanged(bounds, scale, isChanging);
         }
     }

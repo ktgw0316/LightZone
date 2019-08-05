@@ -9,7 +9,7 @@ import java.util.stream.IntStream;
 class LCImageLibUtil {
 
     static void invert(DataBufferByte db) {
-        final byte data[] = db.getData();
+        final byte[] data = db.getData();
         IntStream.range(0, data.length).parallel().forEach(i -> data[i] = (byte) ~data[i]);
     }
 

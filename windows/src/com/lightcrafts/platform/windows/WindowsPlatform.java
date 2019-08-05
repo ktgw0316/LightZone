@@ -69,22 +69,7 @@ public final class WindowsPlatform extends Platform {
 
     @Override
     public String getDisplayNameOf( File file ) {
-        String displayName;
-
-        if ( file instanceof ShellFolder ) {
-            //
-            // This is a stupid hack fix when running on Vista that shows the
-            // GUID rather than the display name for the user's home directory
-            // (and a few other directories).
-            //
-            // See: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6488082
-            //
-            // It's apparently fixed for ShellFolder, but still broken for
-            // FileSystemView.
-            //
-            displayName = ((ShellFolder)file).getDisplayName();
-        } else
-            displayName = getFileSystemView().getSystemDisplayName( file );
+        String displayName = getFileSystemView().getSystemDisplayName( file );
 
         if ( displayName.endsWith( ".lnk" ) ) {
             //
@@ -132,18 +117,8 @@ public final class WindowsPlatform extends Platform {
     }
 
     @Override
-    public int getPhysicalMemoryInMB() {
-        return WindowsMemory.getPhysicalMemoryInMB();
-    }
-
-    @Override
     public Collection<ColorProfileInfo> getPrinterProfiles() {
         return getColorProfiles();
-    }
-
-    @Override
-    public boolean hasInternetConnectionTo( String hostName ) {
-        return WindowsInternetConnection.hasConnection();
     }
 
     @Override
@@ -197,11 +172,6 @@ public final class WindowsPlatform extends Platform {
     @Override
     public String resolveAliasFile( File file ) {
         return WindowsFileUtil.resolveShortcut( file.getAbsolutePath() );
-    }
-
-    @Override
-    public boolean showFileInFolder( String path ) {
-        return WindowsFileUtil.showInExplorer( path );
     }
 
     @Override

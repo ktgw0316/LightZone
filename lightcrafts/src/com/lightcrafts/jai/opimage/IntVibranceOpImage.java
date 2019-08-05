@@ -2,23 +2,23 @@
 
 package com.lightcrafts.jai.opimage;
 
-import com.lightcrafts.mediax.jai.PointOpImage;
-import com.lightcrafts.mediax.jai.ImageLayout;
-import com.lightcrafts.mediax.jai.RasterAccessor;
-import com.lightcrafts.mediax.jai.RasterFormatTag;
 import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.utils.LCMatrix;
+import lombok.val;
 
-import java.awt.image.DataBuffer;
-import java.awt.image.RenderedImage;
-import java.awt.image.Raster;
-import java.awt.image.WritableRaster;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.PointOpImage;
+import javax.media.jai.RasterAccessor;
+import javax.media.jai.RasterFormatTag;
 import java.awt.*;
-import java.awt.color.ICC_ProfileRGB;
-import java.awt.color.ICC_Profile;
 import java.awt.color.ColorSpace;
+import java.awt.color.ICC_Profile;
+import java.awt.color.ICC_ProfileRGB;
+import java.awt.image.DataBuffer;
+import java.awt.image.Raster;
+import java.awt.image.RenderedImage;
+import java.awt.image.WritableRaster;
 import java.util.Map;
-
-import Jama.Matrix;
 
 /**
  * Copyright (C) Light Crafts, Inc.
@@ -27,8 +27,8 @@ import Jama.Matrix;
  * Time: 4:32:46 PM
  */
 public class IntVibranceOpImage extends PointOpImage {
-    private final int transform[][] = new int[3][3];
-    private final int toLinearsRGB[][] = new int[3][3];
+    private final int[][] transform = new int[3][3];
+    private final int[][] toLinearsRGB = new int[3][3];
     private final boolean saturationIncrease;
 
     private static final int sMath_scale = 0x8000;
@@ -56,7 +56,7 @@ public class IntVibranceOpImage extends PointOpImage {
         return y < 0 ? -angle : angle;
     }
 
-    public IntVibranceOpImage(RenderedImage source, float transform[][], Map config) {
+    public IntVibranceOpImage(RenderedImage source, float[][] transform, Map config) {
         super(source, new ImageLayout(source), config, true);
         permitInPlaceOperation();
 
@@ -67,9 +67,9 @@ public class IntVibranceOpImage extends PointOpImage {
         saturationIncrease = transform[0][0] > 1;
 
         ICC_ProfileRGB linRGB = (ICC_ProfileRGB) ICC_Profile.getInstance(ColorSpace.CS_LINEAR_RGB);
-        Matrix XYZtoLinsRGB = new Matrix(linRGB.getMatrix()).inverse();
-        Matrix CIERGBtoXYZ = new Matrix(((ICC_ProfileRGB) JAIContext.linearProfile).getMatrix());
-        double CIERGBtoLinsRGB[][] = XYZtoLinsRGB.times(CIERGBtoXYZ).getArray();
+        val XYZtoLinsRGB = new LCMatrix(linRGB.getMatrix()).invert();
+        val CIERGBtoXYZ = new LCMatrix(((ICC_ProfileRGB) JAIContext.linearProfile).getMatrix());
+        double[][] CIERGBtoLinsRGB = LCMatrix.getArrayDouble(XYZtoLinsRGB.mult(CIERGBtoXYZ));
 
         for (int i = 0; i < 3; i++)
             for (int j = 0; j < 3; j++)
@@ -100,13 +100,13 @@ public class IntVibranceOpImage extends PointOpImage {
         int width = src.getWidth();
         int height = src.getHeight();
 
-        short dstData[] = dst.getShortDataArray(0);
-        int dstBandOffsets[] = dst.getBandOffsets();
+        short[] dstData = dst.getShortDataArray(0);
+        int[] dstBandOffsets = dst.getBandOffsets();
         int dstLineStride = dst.getScanlineStride();
         int dstPixelStride = dst.getPixelStride();
 
-        short srcData[] = src.getShortDataArray(0);
-        int srcBandOffsets[] = src.getBandOffsets();
+        short[] srcData = src.getShortDataArray(0);
+        int[] srcBandOffsets = src.getBandOffsets();
         int srcLineStride = src.getScanlineStride();
         int srcPixelStride = src.getPixelStride();
 

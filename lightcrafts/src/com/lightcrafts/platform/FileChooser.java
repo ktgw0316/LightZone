@@ -3,10 +3,10 @@
 package com.lightcrafts.platform;
 
 import com.lightcrafts.image.export.ImageExportOptions;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 import java.awt.*;
 import java.io.File;
-import java.io.FilenameFilter;
 
 public interface FileChooser {
 
@@ -21,7 +21,7 @@ public interface FileChooser {
      * @return A chosen File to open, or null to indicate the user cancelled.
      */
     File openFile(
-        String windowTitle, File directory, Frame parent, FilenameFilter filter
+        String windowTitle, File directory, Frame parent, ExtensionFilter... filter
     );
 
     /**
@@ -42,8 +42,6 @@ public interface FileChooser {
     /**
      * Conduct a save-file dialog, including warning messages for clobbering
      * existing Files.
-     * @param windowTitle The title to use for the save-file dialog, or null
-     * to get a default title.
      * @param file A default File for the dialog, or null to get some default
      * default.
      * @param parent A Frame owner for dialog boxes, or to get a dialog
@@ -56,9 +54,9 @@ public interface FileChooser {
     /**
      * Conduct an export-file dialog, including warning messages for clobbering
      * existing Files.
-     * @param parent A Frame owner for dialog boxes, or null.
      * @param options Some default ImageExportOptions to use to initialize the
      * dialog's controls.
+     * @param parent A Frame owner for dialog boxes, or null.
      * @return Some ImageExportOptions selected by the user, or null to
      * indicate the user cancelled.
      */

@@ -13,6 +13,7 @@ class CurveContour implements CloneContour {
     private Shape outer;
     private float width;
     private Point2D clonePt;
+    private Integer version;
 
     private Point2D translation;    // non-null means translated
 
@@ -20,6 +21,7 @@ class CurveContour implements CloneContour {
         outer = curve;
         width = curve.getWidth();
         clonePt = curve.getClonePoint();
+        version = curve.getVersion();
 
         // Clone, to be isolated from changes to the Curve:
         if (curve.isValidShape()) {
@@ -43,6 +45,10 @@ class CurveContour implements CloneContour {
     // had no clone point.
     public Point2D getClonePoint() {
         return clonePt;
+    }
+
+    public Integer getVersion() {
+        return version;
     }
 
     synchronized void addTranslation(Point2D p) {

@@ -5,6 +5,7 @@
 #include <string.h>
 #include <jni.h>
 #include "../include/mathlz.h"
+#include "include/omp_util.h"
 
 #ifdef __INTEL_COMPILER
 #include <fvec.h>
@@ -115,9 +116,7 @@ void rlm_separable_bf_mono_tile(
         }
         for (; x < width; x++) {
 #else
-#  if _OPENMP >= 201307
-#    pragma omp simd
-#  endif
+        OMP_SIMD
         for (int x=0; x < width; x++) {
 #endif
             const int idx = x + y*width;
@@ -135,9 +134,7 @@ void rlm_separable_bf_mono_tile(
         }
         for (; x < width - wr; x++) {
 #else
-#  if _OPENMP >= 201307
-#    pragma omp simd
-#  endif
+        OMP_SIMD
         for (int x=wr; x < width - wr; x++) {
 #endif
             const int idx = x + y*width;
@@ -369,9 +366,7 @@ void rlm_separable_bf_chroma_tile(
         }
         for (; x < width; x++) {
 #else
-#  if _OPENMP >= 201307
-#    pragma omp simd
-#  endif
+        OMP_SIMD
         for (int x=0; x < width; x++) {
 #endif
             const int src_idx = 3*x + y*srcStep;
@@ -387,9 +382,7 @@ void rlm_separable_bf_chroma_tile(
         //
         const int idx0 = y*width;
         if (y < wr || y >= height-wr) {
-#if _OPENMP >= 201307
-#   pragma omp simd
-#endif
+            OMP_SIMD
             for (int x=0; x < width; x++) {
                 // buf_L[idx0+x] = fsrc_L[idx0+x];
                 buf_a[idx0+x] = fsrc_a[idx0+x];
@@ -397,18 +390,14 @@ void rlm_separable_bf_chroma_tile(
             }
         }
         else {
-#if _OPENMP >= 201307
-#   pragma omp simd
-#endif
+            OMP_SIMD
             for (int x=0; x < wr; x++) {
                 // buf_L[idx0+x] = fsrc_L[idx0+x];
                 buf_a[idx0+x] = fsrc_a[idx0+x];
                 buf_b[idx0+x] = fsrc_b[idx0+x];
             }
 
-#if _OPENMP >= 201307
-#   pragma omp simd
-#endif
+            OMP_SIMD
             for (int x=width-wr; x < width; x++) {
                 // buf_L[idx0+x] = fsrc_L[idx0+x];
                 buf_a[idx0+x] = fsrc_a[idx0+x];
@@ -467,9 +456,7 @@ void rlm_separable_bf_chroma_tile(
         }
         for (; x < width - wr; x++) {
 #else
-#  if _OPENMP >= 201307
-#    pragma omp simd
-#  endif
+        OMP_SIMD
         for (int x=wr; x < width - wr; x++) {
 #endif
             // initialize central pixel
@@ -584,9 +571,7 @@ void rlm_separable_bf_chroma_tile(
         }
         for (; y < height - wr; y++) {
 #else
-#  if _OPENMP >= 201307
-#    pragma omp simd
-#  endif
+        OMP_SIMD
         for (int y=wr; y < height - wr; y++) {
 #endif
             // initialize central pixel

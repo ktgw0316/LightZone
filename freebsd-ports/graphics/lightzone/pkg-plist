@@ -15,12 +15,11 @@ bin/lightzone
 %%LIBDIR%%/libSegment.so
 %%LIBDIR%%/libfbf.so
 %%JAVASHAREDIR%%/lightzone/asm-all-2.2.2.jar
+%%JAVASHAREDIR%%/lightzone/jai_core-1.1.3.jar
 %%JAVASHAREDIR%%/lightzone/laf-widget.jar
-%%JAVASHAREDIR%%/lightzone/lcjai.jar
 %%JAVASHAREDIR%%/lightzone/lightcrafts-linux.jar
 %%JAVASHAREDIR%%/lightzone/lightcrafts.jar
 %%JAVASHAREDIR%%/lightzone/lightzonehelp.jar
-%%JAVASHAREDIR%%/lightzone/mlibwrapper_jai.jar
 %%JAVASHAREDIR%%/lightzone/substance-lite.jar
 share/applications/lightzone.desktop
 share/icons/hicolor/16x16/apps/lightzone.png

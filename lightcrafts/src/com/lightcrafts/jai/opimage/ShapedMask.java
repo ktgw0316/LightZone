@@ -1,15 +1,17 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2015-     Masahiro Kitagawa */
 
 package com.lightcrafts.jai.opimage;
 
+import com.lightcrafts.model.CloneContour;
 import com.lightcrafts.model.Region;
 import com.lightcrafts.model.Contour;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.LCROIShape;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.utils.SoftValueHashMap;
+import javax.media.jai.*;
 
-import com.lightcrafts.mediax.jai.*;
 import java.awt.image.*;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.color.ColorSpace;
@@ -30,9 +32,7 @@ public class ShapedMask extends PlanarImage {
 
     public static Rectangle getOuterBounds(Region region, AffineTransform transform) {
         Rectangle outerBounds = null;
-        for (Object o : region.getContours()) {
-            Contour c = (Contour) o;
-
+        for (final Contour c : region.getContours()) {
             AffineTransform combined = transform;
             if (c.getTranslation() != null) {
                 combined = AffineTransform.getTranslateInstance(c.getTranslation().getX(), c.getTranslation().getY());
@@ -78,21 +78,23 @@ public class ShapedMask extends PlanarImage {
         this.shape = shape;
     }
 
-    static private Shape[] createBlurs(Shape shape, int width) {
+    static private Shape[] createBlurs(Shape shape, int width, float padding) {
         java.util.List<Shape> blurs = new LinkedList<Shape>();
+        int feathering = (int) (width - 2 * padding);
         do {
-            Stroke stroke = new BasicStroke(2 * width, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+            Stroke stroke = new BasicStroke(2 * (padding + feathering),
+                                            BasicStroke.CAP_ROUND,
+                                            BasicStroke.JOIN_ROUND);
             Shape blur = stroke.createStrokedShape(shape);
             blurs.add(blur);
-            width /= 2;
-        } while (width > 0);
+            feathering /= 2;
+        } while (feathering > 0);
 
         int size = blurs.size();
         Shape[] result = new Shape[size];
-        Iterator it = blurs.iterator();
         int i = 0;
-        while (it.hasNext())
-            result[size - 1 - i++] = (Shape) it.next();
+        for (final Shape b : blurs)
+            result[size - 1 - i++] = b;
         return result;
     }
 
@@ -107,8 +109,7 @@ public class ShapedMask extends PlanarImage {
         PlanarImage image = null;
     }
 
-
-    private static void drawBlurs(Graphics2D g2d, Shape shape, float contourWidth) {
+    private static void drawBlurs(Graphics2D g2d, Shape shape, float contourWidth, float paddingWidth) {
         g2d.setColor(Color.white);
         g2d.fill(shape);
 
@@ -116,18 +117,21 @@ public class ShapedMask extends PlanarImage {
             return;
 
         // Draw the blurs in shades of gray:
-        int width = Math.round(contourWidth);
-        Shape[] blurs = createBlurs(shape, width);
-        int count = blurs.length;
-        Area shapeArea = new Area(shape);
-        for (int n = count - 1; n >= 0; n--) {
-            Shape blur = blurs[n];
-            Area semiBlur = new Area(blur);
-            semiBlur.intersect(shapeArea);
-            float value = n / (float) (count + 1);
-            Color color = new Color(value, value, value);
-            g2d.setColor(color);
-            g2d.fill(semiBlur);
+        if (contourWidth > 1) {
+            int width = (int) Math.floor(contourWidth);
+            Shape[] blurs = createBlurs(shape, width, paddingWidth);
+
+            int count = blurs.length;
+            Area shapeArea = new Area(shape);
+            for (int n = count - 1; n >= 0; n--) {
+                Shape blur = blurs[n];
+                Area semiBlur = new Area(blur);
+                semiBlur.intersect(shapeArea);
+                float value = n / (float) (count + 1);
+                Color color = new Color(value, value, value);
+                g2d.setColor(color);
+                g2d.fill(semiBlur);
+            }
         }
     }
 
@@ -159,7 +163,19 @@ public class ShapedMask extends PlanarImage {
 
         g2d.setTransform(AffineTransform.getTranslateInstance(-bounds.x, -bounds.y));
 
-        drawBlurs(g2d, shape, contourWidth);
+        final float paddingWidth;
+        final float kernelWidth;
+        if (contour instanceof CloneContour && ((CloneContour)contour).getVersion() != null) {
+            paddingWidth = contourWidth/6;
+            kernelWidth = paddingWidth;
+        }
+        else {
+            // make it backward compatible to LightZone v4.1.3 or earlier
+            paddingWidth = 0;
+            kernelWidth = contourWidth/4;
+        }
+
+        drawBlurs(g2d, shape, contourWidth, paddingWidth);
 
         g2d.dispose();
 
@@ -170,13 +186,7 @@ public class ShapedMask extends PlanarImage {
         ScaledImage contourImage = new ScaledImage();
 
         if (contourWidth > 1) {
-            KernelJAI kernel = Functions.getGaussKernel(contourWidth/4);
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(supportImage);
-            pb.add(kernel);
-            RenderingHints hints = new RenderingHints(JAI.KEY_BORDER_EXTENDER, extender);
-
-            contourImage.image = JAI.create("LCSeparableConvolve", pb, hints);
+            contourImage.image = Functions.fastGaussianBlur(supportImage, kernelWidth);
         } else {
             contourImage.image = (PlanarImage) supportImage;
         }
@@ -218,12 +228,13 @@ public class ShapedMask extends PlanarImage {
             raster = r;
         }
 
+        @Override
         public Raster getTile(int tileX, int tileY) {
             return raster;
         }
     }
 
-    private final static Map<AffinedImage, PlanarImage> expandedMasks =
+    private static final Map<AffinedImage, PlanarImage> expandedMasks =
             new SoftValueHashMap<AffinedImage, PlanarImage>();
 
     private static class AffinedImage {
@@ -235,6 +246,7 @@ public class ShapedMask extends PlanarImage {
             this.transform = transform;
         }
 
+        @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (!(o instanceof AffinedImage))
@@ -250,6 +262,7 @@ public class ShapedMask extends PlanarImage {
             return true;
         }
 
+        @Override
         public int hashCode() {
             int result;
             result = (image != null ? image.hashCode() : 0);
@@ -258,7 +271,9 @@ public class ShapedMask extends PlanarImage {
         }
     }
 
+    @Override
     public Raster getData(Rectangle rect) {
+        // SampleModel sampleModel = RasterFactory.createPixelInterleavedSampleModel(DataBuffer.TYPE_BYTE, rect.width, rect.height, 1);
         ColorModel colorModel = new ComponentColorModel(ColorSpace.getInstance(ColorSpace.CS_GRAY),
                                                         false, false,
                                                         Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
@@ -295,7 +310,6 @@ public class ShapedMask extends PlanarImage {
                 if (scaledImage.scale < 1) {
                     float scaleX = (float) Math.floor(maskImage.getWidth() / scaledImage.scale) / (float) maskImage.getWidth();
                     float scaleY = (float) Math.floor(maskImage.getHeight() / scaledImage.scale) / (float) maskImage.getHeight();
-
                     transform.concatenate(AffineTransform.getScaleInstance(scaleX, scaleY));
                 }
 
@@ -333,13 +347,13 @@ public class ShapedMask extends PlanarImage {
 
             Rectangle itx = maskImage.getBounds().intersection(rect);
 
-            byte resultData[];
+            byte[] resultData;
             if (!overlay) {
                 resultData = (byte[]) maskImage.getData(itx).getDataElements(itx.x, itx.y, itx.width, itx.height, null);
                 overlay = true;
             } else {
                 resultData = (byte[]) result.getDataElements(itx.x, itx.y, itx.width, itx.height, null);
-                byte currentData[] = (byte[]) maskImage.getData(itx).getDataElements(itx.x, itx.y, itx.width, itx.height, null);
+                byte[] currentData = (byte[]) maskImage.getData(itx).getDataElements(itx.x, itx.y, itx.width, itx.height, null);
 
                 // blend overlapping regions using Porter-Duff alpha compositing: ar = a1 * (1 - a2) + a2
                 for (int i = 0; i < resultData.length; i++) {
@@ -360,6 +374,7 @@ public class ShapedMask extends PlanarImage {
         return result;
     }
 
+    @Override
     public Raster getTile(int tileX, int tileY) {
         return getData(new Rectangle(tileXToX(tileX), tileYToY(tileY), getTileWidth(), getTileHeight()));
     }

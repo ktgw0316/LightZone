@@ -1,24 +1,24 @@
 <Template version="8">
-  <Scale Factor="0.2548291"/>
+  <Scale Denominator="3" Numerator="1"/>
   <Image path=""/>
   <Controls>
-    <ZoneOperation Locked="true" Active="true" Collapsed="true" Mode="Normal" Name="RAW Tone Curve" Opacity="100" regionsInverted="false" scale="0">
+    <ZoneOperation Active="true" Collapsed="true" Locked="true" Mode="Normal" Name="RAW Tone Curve NIKON D5600 J1" Opacity="100" layerControlsIndex="0" regionsInverted="false" scale="0">
+      <ColorSelection HueBlue="0.5" HueEnabled="true" HueGreen="0.5" HueRadius="-1.0" HueRed="0.5" Inverted="false" LuminosityEnabled="true" LuminosityLower="0.0" LuminosityLowerFeather="0.0" LuminosityUpper="1.0" LuminosityUpperFeather="0.0"/>
       <Points Size="16">
-        <Point X="4" Y="0.2579"/>
-        <Point X="5" Y="0.36585"/>
-        <Point X="6" Y="0.4738"/>
-        <Point X="7" Y="0.5655"/>
-        <Point X="8" Y="0.62635"/>
-        <Point X="9" Y="0.6872"/>
-        <Point X="10" Y="0.74715"/>
-        <Point X="11" Y="0.80703"/>
-        <Point X="12" Y="0.86924"/>
-        <Point X="13" Y="0.93769"/>
-        <Point X="14" Y="0.99835"/>
-        <Point X="15" Y="0.99918"/>
+        <Point X="5" Y="0.40707964601769914"/>
+        <Point X="6" Y="0.48672566371681414"/>
+        <Point X="7" Y="0.5619469026548672"/>
+        <Point X="8" Y="0.6327433628318584"/>
+        <Point X="9" Y="0.6902654867256637"/>
+        <Point X="10" Y="0.7433628318584071"/>
+        <Point X="11" Y="0.8008849557522124"/>
+        <Point X="12" Y="0.8761061946902655"/>
+        <Point X="13" Y="0.9292035398230089"/>
+        <Point X="14" Y="1.0"/>
       </Points>
     </ZoneOperation>
     <Region/>
     <Crop Angle="0.0"/>
   </Controls>
 </Template>
+<!-- Jacal 2018, CC0 -->

@@ -2,7 +2,7 @@
 #
 # LightZone startscript
 #
-echo Starting LightZone version 4.1.8 ...
+echo Starting LightZone version 4.1.9 ...
 echo with options : ${@}
 java -version
 
@@ -74,6 +74,14 @@ if [ ${maxmem} -le ${minmem} ]; then
       maxmem=${minmem}
   fi
 fi
+
+jvmopts=-XX:+UseG1GC \
+	-XX:MinHeapFreeRatio=30 \
+	-XX:MaxHeapFreeRatio=30 \
+	-Xmx${maxmem}k \
+	-classpath ".:${pkgjavadir}/*:${jhpath}" \
+	-Djava.library.path=$pkglibexecdir \
+	-Dfile.encoding=UTF8
 
 # IFS should be \n to handle filenames that include space.
 IFS="

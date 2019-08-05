@@ -11,6 +11,8 @@ import com.lightcrafts.utils.file.FileUtil;
 import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlDocument;
 
+import lombok.val;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,18 +41,20 @@ public class TemplateDatabase {
     }
 
     // The namespace that indicates a camera default Template.
-    final static String CameraDefaultNamespace = "CameraDefault";
+    private final static String CameraDefaultNamespace = "CameraDefault";
 
     // A namespace assigned to legacy Templates without a namespace.
-    final static String DefaultNamespace =
+    private final static String DefaultNamespace =
         LOCALE.get("DefaultTemplateNamespace");
+
+    private final static String TemplateSuffix = "Template_";
 
     static File TemplateDir;
 
-    private static LinkedList<TemplateDatabaseListener> listeners =
+    private final static LinkedList<TemplateDatabaseListener> listeners =
         new LinkedList<TemplateDatabaseListener>();
 
-    private static Preferences Prefs =
+    private final static Preferences Prefs =
         Preferences.userNodeForPackage(TemplateDatabase.class);
 
     /**
@@ -75,6 +79,7 @@ public class TemplateDatabase {
     public static List<TemplateKey> getTemplateKeys() throws TemplateException {
         checkTemplateDir();
         FileFilter filter = new FileFilter() {
+            @Override
             public boolean accept(File file) {
                 if (file.isFile()) {
                     String name = file.getName().toLowerCase();
@@ -83,7 +88,7 @@ public class TemplateDatabase {
                 return false;
             }
         };
-        File[] files = FileUtil.listFiles(TemplateDir, filter, false);
+        val files = FileUtil.listFiles(TemplateDir, filter, false);
         if (files == null) {
             throw new TemplateException(
                 "Couldn't read Template names from " +
@@ -91,7 +96,7 @@ public class TemplateDatabase {
             );
         }
         List<TemplateKey> keys = new ArrayList<TemplateKey>();
-        for (File file : files) {
+        for (val file : files) {
             TemplateKey key = new TemplateKey(file);
             keys.add(key);
         }
@@ -102,19 +107,16 @@ public class TemplateDatabase {
     public static XmlDocument getTemplateDocument(TemplateKey key)
         throws TemplateException
     {
-        try {
-            checkTemplateDir();
-            File file = key.getFile();
-            if (file == null) {
-                throw new TemplateException(
+        checkTemplateDir();
+        File file = key.getFile();
+        if (file == null) {
+            throw new TemplateException(
                     "No Template named \"" + key + "\" exists in " +
-                    TemplateDir.getAbsolutePath()
-                );
-            }
-            InputStream in = new FileInputStream(file);
-            XmlDocument doc = new XmlDocument(in);
-            in.close();
-            return doc;
+                            TemplateDir.getAbsolutePath()
+            );
+        }
+        try (InputStream in = new FileInputStream(file)) {
+            return new XmlDocument(in);
         }
         catch (XMLException e) {
             throw new TemplateException(
@@ -136,18 +138,16 @@ public class TemplateDatabase {
     public static void addTemplateDocument(
         XmlDocument doc, TemplateKey key, boolean force
     ) throws TemplateException {
-        try {
-            checkTemplateDir();
-            File file = key.getFile();
-            if (file.exists() && (! force)) {
-                throw new TemplateException(
+        checkTemplateDir();
+        File file = key.getFile();
+        if (file.exists() && (! force)) {
+            throw new TemplateException(
                     "A Template named \"" + key + "\" already exists in " +
-                    TemplateDir.getAbsolutePath()
-                );
-            }
-            OutputStream out = new FileOutputStream(file);
+                            TemplateDir.getAbsolutePath()
+            );
+        }
+        try (OutputStream out = new FileOutputStream(file)) {
             doc.write(out);
-            out.close();
         }
         catch (IOException e) {
             throw new TemplateException(
@@ -177,76 +177,77 @@ public class TemplateDatabase {
     public static void setDefaultTemplate(ImageMetadata meta, TemplateKey key)
         throws TemplateException
     {
-        String camera = meta.getCameraMake(true);
-        if (camera != null) {
-            if (key != null) {
-                XmlDocument xml = getTemplateDocument(key);
-                TemplateKey defaultKey =
-                    new TemplateKey(CameraDefaultNamespace, camera);
-                addTemplateDocument(xml, defaultKey, true);
-            }
-            else {
-                key = new TemplateKey(CameraDefaultNamespace, camera);
-                removeTemplateDocument(key);
-            }
+        val camera = meta.getCameraMake(true);
+        if (camera == null) {
+            return;
+        }
+        if (key != null) {
+            XmlDocument xml = getTemplateDocument(key);
+            TemplateKey defaultKey =
+                new TemplateKey(CameraDefaultNamespace, camera);
+            addTemplateDocument(xml, defaultKey, true);
+        }
+        else {
+            key = new TemplateKey(CameraDefaultNamespace, camera);
+            removeTemplateDocument(key);
         }
     }
 
     public static TemplateKey getDefaultTemplate(ImageMetadata meta) throws TemplateException {
         boolean isRaw = (meta.getImageType() instanceof RawImageType);
-        if (isRaw) {
-            String camera = meta.getCameraMake(true);
-            if (camera != null) {
-                // A default template is a template with the camera's name
-                // in the special namespace:
-                TemplateKey key =
-                    new TemplateKey(CameraDefaultNamespace, camera);
-                XmlDocument xml = null;
-                try {
-                    xml = getTemplateDocument(key);
-                }
-                catch (TemplateException e) {
-                    // Counts as a missing template.
-                    throw new TemplateException("Template error: " + e.getMessage(), e);
-                }
-                if (xml == null) {
-                    // Compatibility for users of the LightZone 2 beta:
-                    // search for default templates in preferences.
-                    return getDefaultFromPrefs(meta);
-                }
-                return key;
-            }
+        if (!isRaw) {
+            return null;
         }
-        return null;
+        val camera = meta.getCameraMake(true);
+        if (camera == null) {
+            return null;
+        }
+
+        val key = new TemplateKey(CameraDefaultNamespace, camera);
+        XmlDocument xml;
+        try {
+            xml = getTemplateDocument(key);
+        }
+        catch (TemplateException e) {
+            // Counts as a missing template.
+            throw new TemplateException("Template error: " + e.getMessage(), e);
+        }
+        if (xml == null) {
+            // Compatibility for users of the LightZone 2 beta:
+            // search for default templates in preferences.
+            return getDefaultFromPrefs(meta);
+        }
+        return key;
     }
 
     // Legacy preferences-based default mechanism.
     private static TemplateKey getDefaultFromPrefs(ImageMetadata meta) {
-        String camera = meta.getCameraMake(true);
-        if (camera != null) {
-            String name = Prefs.get(camera, null);
-            if (name != null) {
-                // Make sure the template has not been removed:
-                XmlDocument xml = null;
-                TemplateKey key = new TemplateKey(CameraDefaultNamespace, name);
-                try {
-                    xml = getTemplateDocument(key);
-                }
-                catch (TemplateException e) {
-                    // Counts as a missing template.
-                    System.err.println(
-                        "Default template not found: " + e.getMessage()
-                    );
-                }
-                if (xml == null) {
-                    // The template's gone, so remove the camera key also:
-                    Prefs.remove(camera);
-                    return null;
-                }
-                return key;
-            }
+        val camera = meta.getCameraMake(true);
+        if (camera == null) {
+            return null;
         }
-        return null;
+        val name = Prefs.get(camera, null);
+        if (name == null) {
+            return null;
+        }
+
+        XmlDocument xml = null;
+        val key = new TemplateKey(CameraDefaultNamespace, name);
+        try {
+            xml = getTemplateDocument(key);
+        }
+        catch (TemplateException e) {
+            // Counts as a missing template.
+            System.err.println(
+                "Default template not found: " + e.getMessage()
+            );
+        }
+        if (xml == null) {
+            // The template's gone, so remove the camera key also:
+            Prefs.remove(camera);
+            return null;
+        }
+        return key;
     }
 
     private static void notifyListeners() {
@@ -256,34 +257,35 @@ public class TemplateDatabase {
     }
 
     private static void checkTemplateDir() throws TemplateException {
-        if (TemplateDir == null) {
-            TemplateDir = new File(
-                Platform.getPlatform().getLightZoneDocumentsDirectory(),
-                "Templates"
-            );
-            if (! TemplateDir.isDirectory()) {
-                boolean success = TemplateDir.mkdirs();
-                if (! success) {
-                    String path = TemplateDir.getAbsolutePath();
-                    TemplateDir = null;
-                    throw new TemplateException(
-                        "Couldn't initialize Template directory at " + path
-                    );
-                }
-            }
-            if (System.getProperty("lightcrafts.debug") == null) {
-                if (! TemplateDeployer.hasDeployed()) {
-                    TemplateDeployer.deploy();
-                }
-            }
-            // Backwardsompatibility measures:
-            // migrate templates from preferences into files.
-            migratePrefsTemplates();
-            // migrate templates from an old folder to the correct folder:
-            migrateTemplateFolders();
-            // migrate old templates with no namespace to a default namespace:
-            migrateTemplateNamespace();
+        if (TemplateDir != null) {
+            return;
         }
+        TemplateDir = new File(
+            Platform.getPlatform().getLightZoneDocumentsDirectory(),
+            "Templates"
+        );
+        if (! TemplateDir.isDirectory()) {
+            boolean success = TemplateDir.mkdirs();
+            if (! success) {
+                String path = TemplateDir.getAbsolutePath();
+                TemplateDir = null;
+                throw new TemplateException(
+                    "Couldn't initialize Template directory at " + path
+                );
+            }
+        }
+        if (System.getProperty("lightcrafts.debug") == null) {
+            if (! TemplateDeployer.hasDeployed()) {
+                TemplateDeployer.deploy();
+            }
+        }
+        // Backwardsompatibility measures:
+        // migrate templates from preferences into files.
+        migratePrefsTemplates();
+        // migrate templates from an old folder to the correct folder:
+        migrateTemplateFolders();
+        // migrate old templates with no namespace to a default namespace:
+        migrateTemplateNamespace();
     }
 
     // In early pre-release versions of LightZone 2, Templates were stored in
@@ -292,8 +294,8 @@ public class TemplateDatabase {
     // successful, the preferences are erased.
     private static void migratePrefsTemplates() {
         try {
-            List<String> names = getPrefsTemplateNames();
-            for (String name : names) {
+            val names = getPrefsTemplateNames();
+            for (val name : names) {
                 try {
                     XmlDocument doc = getPrefsTemplateDocument(name);
                     TemplateKey newKey = new TemplateKey("", name);
@@ -338,60 +340,42 @@ public class TemplateDatabase {
             return;
         }
 
-        final String home = System.getProperty("user.home");
-        final File oldTemplateDir = new File(home, oldPath);
-
-        if (oldTemplateDir.isDirectory()) {
-            File[] oldFiles = FileUtil.listFiles(oldTemplateDir);
-            if (oldFiles != null) {
-                boolean copySucceeded = true;
-                for (File oldFile : oldFiles) {
-                    File newFile = new File(TemplateDir, oldFile.getName());
-                    try {
-                        FileUtil.copyFile(oldFile, newFile);
-                        System.out.println(
-                            "Copied a template from " +
-                            oldFile + " to " + newFile
-                        );
-                        boolean deleted = oldFile.delete();
-                        if (deleted) {
-                            System.out.println(
-                                "Deleted an old template at " + oldFile
-                            );
-                        }
-                        else {
-                            System.out.println(
-                                "Failed to delete an old template at " + oldFile
-                            );
-                        }
-                    }
-                    catch (IOException e) {
-                        System.out.println(
-                            "Failed to migrate a template from " +
-                            oldFile + " to " + newFile + ": " +
-                            e.getClass().getName() + " " + e.getMessage()
-                        );
-                        copySucceeded = false;
-                    }
-                }
-                if (copySucceeded) {
-                    // All files in the old folder were successfully copied.
-                    boolean deleted = oldTemplateDir.delete();
-                    if (deleted) {
-                        System.out.println(
-                            "Deleted old template folder " +
-                            oldTemplateDir.getAbsolutePath()
-                        );
-                    }
-                    else {
-                        System.out.println(
-                            "Failed to delete old template folder " +
-                            oldTemplateDir.getAbsolutePath()
-                        );
-                    }
-                }
+        val home = System.getProperty("user.home");
+        val oldTemplateDir = new File(home, oldPath);
+        if (!oldTemplateDir.isDirectory()) {
+            return;
+        }
+        val oldFiles = FileUtil.listFiles(oldTemplateDir);
+        if (oldFiles == null) {
+            return;
+        }
+        for (val oldFile : oldFiles) {
+            val newFile = new File(TemplateDir, oldFile.getName());
+            try {
+                FileUtil.copyFile(oldFile, newFile);
+                System.out.println(
+                    "Copied a template from " +
+                    oldFile + " to " + newFile
+                );
+                val msg = oldTemplateDir.delete()
+                        ? "Deleted an old template at "
+                        : "Failed to delete an old template at ";
+                System.out.println(msg + oldFile);
+            }
+            catch (IOException e) {
+                System.out.println(
+                    "Failed to migrate a template from " +
+                    oldFile + " to " + newFile + ": " +
+                    e.getClass().getName() + " " + e.getMessage()
+                );
+                return;
             }
         }
+        // All files in the old folder were successfully copied.
+        val msg = oldTemplateDir.delete()
+                ? "Deleted old template folder "
+                : "Failed to delete old template folder ";
+        System.out.println(msg + oldTemplateDir.getAbsolutePath());
     }
 
     // Older templates have no namespace.  Find templates whose namespace is
@@ -430,10 +414,10 @@ public class TemplateDatabase {
         throws TemplateException
     {
         try {
-            String[] keys = Prefs.keys();
+            val keys = Prefs.keys();
             ArrayList<String> names = new ArrayList<String>();
-            for (String key : keys) {
-                String name = getNameFromPrefsKey(key);
+            for (val key : keys) {
+                val name = getNameFromPrefsKey(key);
                 if (name != null) {
                     names.add(name);
                 }
@@ -451,17 +435,16 @@ public class TemplateDatabase {
         throws TemplateException
     {
         try {
-            String key = getPrefsKeyFromName(name);
-            String text = Prefs.get(key, null);
+            val key = getPrefsKeyFromName(name);
+            val text = Prefs.get(key, null);
             if (text == null) {
                 throw new TemplateException(
                     "No template named \"" + name + "\""
                 );
             }
-            byte[] bytes = text.getBytes();
-            InputStream in = new ByteArrayInputStream(bytes);
-            XmlDocument doc = new XmlDocument(in);
-            return doc;
+            val bytes = text.getBytes();
+            val in = new ByteArrayInputStream(bytes);
+            return new XmlDocument(in);
         }
         catch (IOException e) {
             throw new TemplateException(
@@ -471,17 +454,17 @@ public class TemplateDatabase {
     }
 
     private static void removePrefsTemplateDocument(String name) {
-        String key = getPrefsKeyFromName(name);
+        val key = getPrefsKeyFromName(name);
         Prefs.remove(key);
     }
 
     private static String getPrefsKeyFromName(String name) {
-        return "Template_" + name;
+        return TemplateSuffix + name;
     }
 
     private static String getNameFromPrefsKey(String key) {
-        if (key.startsWith("Template_")) {
-            return key.replaceFirst("Template_", "");
+        if (key.startsWith(TemplateSuffix)) {
+            return key.replaceFirst(TemplateSuffix, "");
         }
         return null;
     }

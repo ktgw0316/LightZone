@@ -13,6 +13,7 @@ import com.lightcrafts.utils.thread.ProgressThread;
 import de.dimaki.refuel.appcast.entity.Appcast;
 import de.dimaki.refuel.updater.boundary.Updater;
 import de.dimaki.refuel.updater.entity.ApplicationStatus;
+import lombok.val;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -267,22 +268,22 @@ public final class CheckForUpdate {
      * @return Returns <code>true</code> only if an update is available.
      */
     private static boolean checkIfUpdateIsAvailable() {
-        final String  currentVersion = Version.getVersionName();
+        val currentVersion = Version.getVersionName();
         return checkIfUpdateIsAvailable(currentVersion, CHECK_URL);
     }
 
     static boolean checkIfUpdateIsAvailable(String currentVersion, URL url) {
-        final Updater updater = new Updater();
+        val updater = new Updater();
         if (currentVersion.contains("alpha") || currentVersion.contains("beta") || currentVersion.contains("rc")) {
             // TODO:
         }
-        final ApplicationStatus applicationStatus = updater.getApplicationStatus(currentVersion, url);
+        val applicationStatus = updater.getApplicationStatus(currentVersion, url);
         if (!ApplicationStatus.UPDATE_AVAILABLE.equals(applicationStatus)) {
             // This also handles the case for development versions when the version
             // resource hasn't been populated.
             return false;
         }
-        final Appcast appcast = applicationStatus.getAppcast();
+        val appcast = applicationStatus.getAppcast();
         return parseAppcast(appcast);
     }
 
@@ -563,7 +564,7 @@ public final class CheckForUpdate {
     ////////// main() /////////////////////////////////////////////////////////
 
     public static void main( String[] args ) throws MalformedURLException {
-        final boolean isAvailable = checkIfUpdateIsAvailable(
+        val isAvailable = checkIfUpdateIsAvailable(
                 "4.1.9", new URL("file:///tmp/lightzone/appcast.xml"));
         System.exit(isAvailable ? 0 : 1);
     }

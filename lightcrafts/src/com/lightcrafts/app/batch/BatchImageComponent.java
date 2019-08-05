@@ -88,7 +88,7 @@ class BatchImageComponent extends JComponent {
             ImageInfo info = ImageInfo.getInstanceFor(file);
             try {
                 image = info.getImage(null);
-                image = systemColorSpaceImage(image);
+                image = Functions.systemColorSpaceImage(image);
             }
             catch (Throwable t) {
                 // BadImageFileException
@@ -138,18 +138,5 @@ class BatchImageComponent extends JComponent {
             xform.preConcatenate(trans);
         }
         return xform;
-    }
-
-    private static RenderedImage systemColorSpaceImage(RenderedImage image) {
-        ColorModel colors = image.getColorModel();
-        ColorSpace space = colors.getColorSpace();
-        if (space != null) {
-            if (! space.equals(JAIContext.systemColorSpace)) {
-                image = Functions.toColorSpace(
-                    image, JAIContext.systemColorSpace, null
-                );
-            }
-        }
-        return new Functions.sRGBWrapper(image);
     }
 }

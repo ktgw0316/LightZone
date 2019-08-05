@@ -1,40 +1,23 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
-/* Copyright (C) 2017-     Masahiro Kitagawa */
+/* Copyright (C) 2016-     Masahiro Kitagawa */
 
 package com.lightcrafts.image.metadata.makernotes;
 
-import com.lightcrafts.image.metadata.ImageMetadata;
+import lombok.NoArgsConstructor;
 
 /**
  * <code>PentaxMakerNoteProbe</code> is-a {@link MakerNoteProbe} for
  * determining whether a maker note is by Pentax.
  *
  * @author Paul J. Lucas [paul@lightcrafts.com]
+ * @author Masahiro Kitagawa [arctica0316@gmail.com]
  */
-final class PentaxMakerNoteProbe extends MakerNoteProbe {
-
-    /** The singleton instance of <code>PentaxMakerNoteProbe</code>. */
-    static final MakerNoteProbe INSTANCE = new PentaxMakerNoteProbe();
-
-    ////////// protected //////////////////////////////////////////////////////
-
-    /**
-     * {@inheritDoc}
-     */
+@NoArgsConstructor(staticName = "create")
+final class PentaxMakerNoteProbe extends MakerNoteProbe<PentaxDirectory>
+{
     @Override
-    protected Class<? extends MakerNotesDirectory>
-    match( ImageMetadata metadata ) {
-        return matchUsingMake( metadata, PentaxDirectory.class,
-                "PENTAX", "RICOH" );
-    }
-
-    ////////// private ////////////////////////////////////////////////////////
-
-    /**
-     * Construct the singleton instance of <code>PentaxMakerNoteProbe</code>.
-     */
-    private PentaxMakerNoteProbe() {
-        // do nothing
+    protected Class<PentaxDirectory> getDirClass() {
+        return PentaxDirectory.class;
     }
 }
 /* vim:set et sw=4 ts=4: */

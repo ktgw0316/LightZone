@@ -5,7 +5,7 @@ package com.lightcrafts.image.types;
 import java.awt.color.ICC_Profile;
 import java.awt.image.RenderedImage;
 import java.io.*;
-import com.lightcrafts.mediax.jai.PlanarImage;
+import javax.media.jai.PlanarImage;
 
 import org.w3c.dom.Document;
 
@@ -134,13 +134,8 @@ public final class LZNImageType extends ImageType
             final XmlNode cache = getCacheNode( xml );
             cache.setData( buf.toByteArray() );
 
-            final OutputStream out =
-                new FileOutputStream( imageInfo.getFile() );
-            try {
-                xml.write( out );
-            }
-            finally {
-                out.close();
+            try (OutputStream out = new FileOutputStream(imageInfo.getFile())) {
+                xml.write(out);
             }
         }
         catch ( LCImageLibException e ) {
@@ -223,8 +218,8 @@ public final class LZNImageType extends ImageType
      * All the possible filename extensions for LZN files.  All must be lower
      * case and the preferred one must be first.
      */
-    private static final String EXTENSIONS[] = {
-        "lzn"
+    private static final String[] EXTENSIONS = {
+            "lzn"
     };
 
     /**

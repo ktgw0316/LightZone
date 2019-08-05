@@ -22,7 +22,7 @@ public class LCMS_Profile {
     public LCMS_Profile(ICC_Profile iccProfile) {
         Long handle = profileCache.get(iccProfile);
         if (handle == null) {
-            byte data[] = iccProfile.getData();
+            byte[] data = iccProfile.getData();
             cmsProfileHandle = LCMSNative.cmsOpenProfileFromMem(data, data.length);
             profileCache.put(iccProfile, cmsProfileHandle);
         } else

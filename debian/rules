@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 
-JAVA_HOME=/usr/lib/jvm/default-java
+JAVA_HOME:=$(shell readlink -f /usr/bin/javac | sed "s:/bin/javac::")
 ANT_OPTIONS=-f $(CURDIR)/linux/build.xml
 
 configure: configure-stamp

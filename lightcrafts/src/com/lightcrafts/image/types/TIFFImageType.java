@@ -11,9 +11,9 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
-import com.lightcrafts.mediax.jai.PlanarImage;
-import com.lightcrafts.mediax.jai.JAI;
-import com.lightcrafts.mediax.jai.ImageLayout;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.JAI;
+import javax.media.jai.ImageLayout;
 
 import org.w3c.dom.Document;
 
@@ -29,7 +29,7 @@ import com.lightcrafts.image.metadata.values.UndefinedMetaValue;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.opimage.CachedImage;
 import com.lightcrafts.utils.bytebuffer.ByteBufferUtil;
-import com.lightcrafts.utils.ColorProfileInfo;
+import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.utils.file.FileUtil;
 import com.lightcrafts.utils.UserCanceledException;
 import com.lightcrafts.utils.thread.ProgressThread;
@@ -370,7 +370,8 @@ public class TIFFImageType extends ImageType implements TrueImageTypeProvider {
     /**
      * {@inheritDoc}
      */
-    public void putImage( ImageInfo imageInfo, PlanarImage image,
+    @Override
+    protected void putImage( ImageInfo imageInfo, PlanarImage image,
                           ImageExportOptions options, Document lznDoc,
                           ProgressThread thread ) throws IOException {
         final ExportOptions tiffOptions = (ExportOptions)options;
@@ -629,8 +630,8 @@ public class TIFFImageType extends ImageType implements TrueImageTypeProvider {
      * All the possible filename extensions for TIFF files.  All must be lower
      * case and the preferred one must be first.
      */
-    private static final String EXTENSIONS[] = {
-        "tif", "tiff", "iiq"
+    private static final String[] EXTENSIONS = {
+            "tif", "tiff", "iiq"
     };
 
     /**

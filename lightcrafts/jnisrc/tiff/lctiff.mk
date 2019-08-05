@@ -12,9 +12,12 @@ TARGET_BASE:=		LCTIFF
 # Uncomment to compile in debug mode.
 #DEBUG:=		true
 
-JNI_WINDOWS_LINK:=	-Wl,-Bdynamic -lLCJNI -ltiff.dll -Wl,-Bstatic -lstdc++
-JNI_LINUX_LINK:=	-lLCJNI -ltiff -lstdc++
-JNI_MACOSX_LINK:=	../jniutils/libLCJNI.a -ltiff
+JNI_EXTRA_INCLUDES:=	$(shell $(PKGCFG) --cflags libtiff-4)
+JNI_EXTRA_LINK:=	$(shell $(PKGCFG) --libs-only-l libtiff-4)
+JNI_EXTRA_LDFLAGS:=	$(shell $(PKGCFG) --libs-only-L libtiff-4)
+JNI_WINDOWS_LINK:=	-Wl,-Bdynamic -lLCJNI -Wl,-Bstatic -lstdc++
+JNI_LINUX_LINK:=	-lLCJNI -lstdc++
+JNI_MACOSX_LINK:=	../jniutils/libLCJNI.a
 JNI_MACOSX_INCLUDES:=	-I/usr/local/include
 JNI_MACOSX_LDFLAGS:=	-L/usr/local/lib
 

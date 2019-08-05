@@ -12,7 +12,6 @@ import com.lightcrafts.image.metadata.ImageMetadata;
 import com.lightcrafts.image.metadata.ImageMetadataDirectory;
 import com.lightcrafts.image.types.JPEGImageType;
 import com.lightcrafts.image.types.TIFFConstants;
-import com.lightcrafts.mediax.jai.PlanarImage;
 import com.lightcrafts.utils.ProgressIndicator;
 import com.lightcrafts.utils.bytebuffer.ByteBufferUtil;
 import com.lightcrafts.utils.thread.ProgressThread;
@@ -28,6 +27,7 @@ import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import javax.media.jai.PlanarImage;
 import org.w3c.dom.Document;
 
 import static com.lightcrafts.image.libs.LCJPEGConstants.CS_CMYK;
@@ -186,7 +186,7 @@ public final class LCJPEGWriter {
                 // read CYMK JPEG images will think the creator is Photoshop
                 // and thus know to invert the image data.
                 //
-                writeAdobeSegment();
+                writeAdobeSegment(ADOBE_CTT_UNKNOWN);
             }
             writeImage(image, thread);
         } finally {
@@ -410,17 +410,19 @@ public final class LCJPEGWriter {
      * </li>
      * </ul>
      *
+     * @param colorTransformationCode One of <code>ADOBE_CTT_UNKNOWN</code>,
+     * <code>ADOBE_CTT_YCBCR</code>, or <code>ADOBE_CTT_YCCK</code>.
      * @see "Adobe Technical Note #5116: Supporting the DCT Filters in PostScript Level 2, Adobe
      * Systems, Inc., November 24, 1992, p. 23."
      */
-    private void writeAdobeSegment()
+    private void writeAdobeSegment(byte colorTransformationCode)
             throws LCImageLibException {
         final ByteBuffer buf = ByteBuffer.allocate(ADOBE_APPE_SEGMENT_SIZE);
         ByteBufferUtil.put(buf, "Adobe", "ASCII");
         buf.putShort((short) 0x0064);  // version number
         buf.putShort((short) 0);       // flags0
         buf.putShort((short) 0);       // flags1
-        buf.put(ADOBE_CTT_UNKNOWN);
+        buf.put(colorTransformationCode);
         writeSegment(JPEG_APPE_MARKER, buf.array());
     }
 

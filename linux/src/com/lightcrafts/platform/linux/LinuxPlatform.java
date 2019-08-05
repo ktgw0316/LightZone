@@ -1,26 +1,21 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2013-     Masahiro Kitagawa */
 
 package com.lightcrafts.platform.linux;
 
 import com.lightcrafts.platform.AlertDialog;
-import com.lightcrafts.platform.FileChooser;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.ui.LightZoneSkin;
-import com.lightcrafts.utils.ColorProfileInfo;
+import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.utils.Version;
 
 import javax.help.HelpSet;
 import javax.help.HelpSetException;
 import javax.help.JHelp;
 import javax.swing.*;
-
 import java.awt.*;
 import java.awt.color.ICC_Profile;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
@@ -52,19 +47,17 @@ public class LinuxPlatform extends Platform {
         ProcessBuilder pb = new ProcessBuilder("xdg-user-dir", "PICTURES");
         try {
             Process p = pb.start();
-            BufferedReader br =
-                    new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String line = br.readLine();
-            br.close();
+            final String line;
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+                line = br.readLine();
+            }
             p.waitFor();
             p.destroy();
             if (p.exitValue() == 0 && line != null && ! line.equals(home)) {
                 return new File(line);
             }
         }
-        catch (IOException e) {
-        }
-        catch (InterruptedException e) {
+        catch (IOException | InterruptedException ignored) {
         }
 
         return new File( home, Version.getApplicationName() );
@@ -80,11 +73,6 @@ public class LinuxPlatform extends Platform {
     @Override
     public LookAndFeel getLookAndFeel() {
         return LightZoneSkin.getLightZoneLookAndFeel();
-    }
-
-    @Override
-    public FileChooser getFileChooser() {
-        return new LinuxFileChooser();
     }
 
     @Override
@@ -122,60 +110,11 @@ public class LinuxPlatform extends Platform {
 
     private static synchronized Collection<ColorProfileInfo> getColorProfiles() {
         if (Profiles == null) {
-            Profiles = new HashSet<ColorProfileInfo>();
+            Profiles = new HashSet<>();
             Profiles.addAll(getColorProfiles(SystemProfileDir));
             Profiles.addAll(getColorProfiles(UserProfileDir));
         }
         return Profiles;
-    }
-
-    @Override
-    public int getPhysicalMemoryInMB() {
-        final String osname = System.getProperty("os.name");
-
-        String[] cmd;
-        String regex;
-        if (osname.indexOf("Linux") >= 0) {
-            cmd = new String[] {"cat", "/proc/meminfo"};
-            regex = "MemTotal: *([0-9]*) .*";
-        } else if (osname.indexOf("SunOS") >= 0) {
-            cmd = new String[] {"prtconf"};
-            regex = "Memory size: *([0-9]*) .*";
-        } else {
-            cmd = new String[] {"dmesg"};
-            regex = "real memory *([0-9]*) .*";
-        }
-        Pattern pattern = Pattern.compile(regex);
-
-        try {
-            Process process = Runtime.getRuntime().exec(cmd);
-            InputStream in = process.getInputStream();
-            InputStreamReader reader = new InputStreamReader(in);
-            BufferedReader buffer = new BufferedReader(reader);
-            String line = buffer.readLine();
-            while (line != null) {
-                Matcher matcher = pattern.matcher(line);
-                if (matcher.matches()) {
-                    String text = matcher.replaceAll("$1");
-                    int i = Integer.parseInt(text);
-                    if (osname.indexOf("Linux") >= 0)
-                        return i / 1024;
-                    else if (osname.indexOf("SunOS") >= 0)
-                        return i;
-                    else
-                        return i / 1048576;
-                }
-                line = buffer.readLine();
-            }
-            buffer.close();
-        }
-        catch (IOException  e) {
-            System.err.println("Can't get memory size: " + e.getMessage());
-        }
-        catch (NumberFormatException e) {
-            System.err.println("Malformed memory size text: " + e.getMessage());
-        }
-        return super.getPhysicalMemoryInMB();
     }
 
     @Override
@@ -186,41 +125,6 @@ public class LinuxPlatform extends Platform {
     @Override
     public void makeModal(Dialog dialog) {
         dialog.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
-    }
-
-    public boolean showFileInFolder( String path ) {
-        // If the path points to a file, pop up to its enclosing folder.
-        File file = new File(path);
-        if (file.isFile()) {
-            path = file.getParent();
-        }
-        String[] fileManagers = new String[] {
-            "nautilus",  // Gnome
-            "dolphin",   // KDE
-            "konqueror", // KDE
-            "nemo",      // Cinnamon
-            "caja",      // MATE
-            "thunar",    // Xfce
-            "pcmanfm",   // LXDE
-            "rox-filer"  // RQX
-            // others?
-        };
-        try {
-            Runtime rt = Runtime.getRuntime();
-            for (String fileManager : fileManagers ) {
-                String[] args = new String[]{ "which", fileManager };
-                if (rt.exec(args).waitFor() == 0) {
-                    args = new String[] { fileManager, path };
-                    rt.exec(args);
-                    return true;
-                }
-            }
-        }
-        catch ( Exception e ) {
-            // do nothing
-            e.printStackTrace();
-        }
-        return false;
     }
 
     @Override

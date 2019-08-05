@@ -87,8 +87,8 @@ public final class PanasonicRawImageType extends RawImageType {
      * All the possible filename extensions for Panasonic raw files.  All must
      * be lower case and the preferred one must be first.
      */
-    private static final String EXTENSIONS[] = {
-        "raw"
+    private static final String[] EXTENSIONS = {
+            "raw"
     };
 }
 /* vim:set et sw=4 ts=4: */

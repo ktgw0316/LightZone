@@ -5,13 +5,16 @@ package com.lightcrafts.model.ImageEditor;
 import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.*;
 
-import com.lightcrafts.mediax.jai.*;
+import javax.media.jai.*;
 import com.lightcrafts.ui.editor.EditorMode;
+
+import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_SPOT;
 
 public class SpotOperationImpl extends BlendedOperation implements SpotOperation {
 
     public SpotOperationImpl(Rendering rendering) {
         super(rendering, type);
+        setHelpTopic(HELP_TOOL_SPOT);
     }
 
     @Override

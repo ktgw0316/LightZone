@@ -19,15 +19,15 @@ import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
-import com.lightcrafts.mediax.jai.ImageLayout;
-import com.lightcrafts.mediax.jai.PointOpImage;
-import com.lightcrafts.mediax.jai.RasterAccessor;
-import com.lightcrafts.mediax.jai.RasterFormatTag;
-import com.lightcrafts.mediax.jai.RasterFactory;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.PointOpImage;
+import javax.media.jai.RasterAccessor;
+import javax.media.jai.RasterFormatTag;
+import javax.media.jai.RasterFactory;
 import java.util.Map;
 
-import com.lightcrafts.media.jai.util.ImageUtil;
-import com.lightcrafts.media.jai.util.JDKWorkarounds;
+import com.sun.media.jai.util.ImageUtil;
+import com.sun.media.jai.util.JDKWorkarounds;
 
 final class UnSharpMaskOpImage extends PointOpImage {
 
@@ -227,20 +227,11 @@ final class UnSharpMaskOpImage extends PointOpImage {
     }
 
     static final int sigmoidTableLenght = 16 * 1024;
-    static final float sigmoidTable[] = new float[sigmoidTableLenght];
+    static final float[] sigmoidTable = new float[sigmoidTableLenght];
 
     static {
         for (int i = 0; i < sigmoidTableLenght; i++)
             sigmoidTable[i] = (float) sigmoid(0.02 * (i - sigmoidTableLenght / 2));
-
-        /* try {
-            FileOutputStream tableDump = new FileOutputStream("/Stuff/tableDump");
-            for (float entry : sigmoidTable)
-                tableDump.write((Float.toString(entry) + '\n').getBytes());
-            tableDump.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } */
     }
 
     private static double sigmoidT(double x) {

@@ -14,7 +14,7 @@ import com.lightcrafts.image.export.ImageExportOptions;
 import com.lightcrafts.image.export.ImageFileExportOptions;
 import com.lightcrafts.image.metadata.ImageMetadata;
 import com.lightcrafts.image.types.*;
-import com.lightcrafts.mediax.jai.PlanarImage;
+import javax.media.jai.PlanarImage;
 import com.lightcrafts.model.Engine;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.PrintSettings;
@@ -118,7 +118,7 @@ public class Application {
             LOCALE.get("OpenFileDialogTitle"),
             LastOpenPath,
             parent,
-            ImageFilenameFilter.INSTANCE
+            ImageExtensionFilter.getFilter()
         );
         if (file != null) {
             ComboFrame frame = getFrameForFile(file);
@@ -970,31 +970,35 @@ public class Application {
         final Engine engine = doc.getEngine();
         Dimension size = engine.getNaturalSize();
 
+        Preferences prefs = getPreferences();
+        boolean byOriginal = prefs.getBoolean("ExportByOriginal", true);
+
         ImageExportOptions newOptions;
-        if (oldOptions != null) {
-            // This Document has been exported before.
-            newOptions = ExportLogic.getDefaultExportOptions(
-                oldOptions, size
-            );
-        }
-        else if (LastExportOptions != null) {
-            // This Document has never been exported, but export has been used.
-            File file = doc.getFile();
-            if (file != null) {
-                // This Document has been saved:
+        if (!byOriginal && (oldOptions != null || LastExportOptions != null)) {
+            if (oldOptions != null) {
+                // This Document has been exported before.
                 newOptions = ExportLogic.getDefaultExportOptions(
-                    LastExportOptions, meta, size, file.getName()
-                );
+                        oldOptions, size
+                        );
             }
-            else {
-                // This Document not has been saved:
-                newOptions = ExportLogic.getDefaultExportOptions(
-                    LastExportOptions, meta, size
-                );
+            else { // LastExportOptions != null
+                // This Document has never been exported, but export has been used.
+                File file = doc.getFile();
+                if (file != null) {
+                    // This Document has been saved:
+                    newOptions = ExportLogic.getDefaultExportOptions(
+                            LastExportOptions, meta, size, file.getName()
+                            );
+                }
+                else {
+                    // This Document not has been saved:
+                    newOptions = ExportLogic.getDefaultExportOptions(
+                            LastExportOptions, meta, size
+                            );
+                }
             }
         }
         else {
-            // Export has never been used.
             newOptions = ExportLogic.getDefaultExportOptions(
                 meta, size
             );
@@ -1702,7 +1706,7 @@ public class Application {
 
     private static void verifyLibraries() {
         String[] libs = new String[] {
-            "DCRaw", "Segment", "JAI", "FASTJAI", "fbf", "LCJPEG", "LCTIFF"
+            "DCRaw", "Segment", "JAI", "FASTJAI", "fbf", "LCJPEG", "LCTIFF", "LCLENSFUN"
         };
         for (String lib : libs) {
             try {
@@ -1729,8 +1733,8 @@ public class Application {
 
             // preload jai_core.jar, jai_codec.jar, jai_imageio.jar:
             Startup.startupMessage(LOCALE.get("StartupClassesMessage"));
-            Class.forName("com.lightcrafts.mediax.jai.JAI");
-            Class.forName("com.lightcrafts.media.jai.codec.ImageCodec");
+            Class.forName("javax.media.jai.JAI");
+            Class.forName("com.sun.media.jai.codec.ImageCodec");
         }
         catch (ClassNotFoundException e) {
             showError(

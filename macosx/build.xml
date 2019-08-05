@@ -30,14 +30,16 @@
   <target name="common">
     <ant dir="${common-dir}" target="jar"/>
     <exec executable="make" dir="products" failonerror="true"
-          vmlauncher="false"/>
+          vmlauncher="false">
+      <arg value="-j"/>
+    </exec>
   </target>
 
   <target name="javac" depends="common">
     <mkdir dir="build"/>
     <mkdir dir="javah"/>
     <javac destdir="build" includeantruntime="false" debug="true"
-           source="1.8" target="1.8" nativeheaderdir="javah">
+           source="9" target="9" nativeheaderdir="javah">
       <src path="src"/>
       <compilerarg value="-XDignore.symbol.file"/>
       <classpath>
@@ -103,9 +105,6 @@
     <java classname="com.lightcrafts.platform.macosx.MacOSXLauncher"
           dir="products" failonerror="true" fork="true"
           maxmemory="${maxmemory}">
-      <!--
-      <jvmarg value="-XrunShark"/>
-      -->
       <classpath>
         <pathelement location="/System/Library/Java/"/>
         <fileset dir="products">
@@ -131,18 +130,7 @@
     <delete dir="${app-dir}" quiet="true"/>
   </target>
 
-  <condition property="jdk-provider" value="oracle">
-    <or>
-      <equals arg1="${ant.java.version}" arg2="1.7"/>
-      <equals arg1="${ant.java.version}" arg2="1.8"/>
-      <equals arg1="${ant.java.version}" arg2="1.9"/>
-    </or>
-  </condition>
-
-  <condition property="jdk-provider" value="apple">
-    <equals arg1="${ant.java.version}" arg2="1.6"/>
-  </condition>
-
+  <property name="jdk-provider" value="oracle"/>
   <import file="${jdk-provider}.xml"/>
 
   <!--===== Make a dmg file ================================================-->
@@ -154,28 +142,6 @@
       <arg value="UNIVERSAL=${UNIVERSAL}"/>
       <arg value="user"/>
     </exec>
-  </target>
-
-  <!--===== CruiseControl ==================================================-->
-
-  <property name="cc-dir" value="dmg/cruisecontrol"/>
-
-  <target name="cc-build">
-    <antcall target="cc-clean"/>
-    <exec executable="${common-dir}/tools/bin/lc-git-branch"
-          outputproperty="git-branch" vmlauncher="false" failonerror="true"/>
-    <exec executable="${common-dir}/tools/bin/lc-git-revision"
-          outputproperty="git-revision" vmlauncher="false" failonerror="true"/>
-
-    <mkdir dir="dmg/cruisecontrol"/>
-
-    <antcall target="dmg"/>
-    <move file="dmg/${app-name}.dmg"
-          tofile="${cc-dir}/${app-name}-${git-branch}-r${git-revision}.dmg"/>
-  </target>
-
-  <target name="cc-clean">
-    <delete dir="${cc-dir}"/>
   </target>
 
   <!--===== Make a zip file ================================================-->
@@ -204,21 +170,27 @@
 
   <target name="clean-up">
     <ant dir="${common-dir}" target="${clean-method}"/>
-    <delete dir="build"/>
-    <delete dir="javah"/>
-    <delete dir="${app-dir}"/>
+    <parallel>
+      <delete dir="build"/>
+      <delete dir="javah"/>
+      <delete dir="${app-dir}"/>
+    </parallel>
     <exec executable="make" dir="dmg">
+      <arg value="-j"/>
       <arg value="${clean-method}"/>
     </exec>
     <exec executable="make" dir="helpers">
+      <arg value="-j"/>
       <arg value="UNIVERSAL=1"/>
       <arg value="${clean-method}"/>
     </exec>
     <exec executable="make" dir="jnisrc">
+      <arg value="-j"/>
       <arg value="UNIVERSAL=1"/>
       <arg value="${clean-method}"/>
     </exec>
     <exec executable="make" dir="products">
+      <arg value="-j"/>
       <arg value="${clean-method}"/>
     </exec>
     <antcall target="cc-clean"/>

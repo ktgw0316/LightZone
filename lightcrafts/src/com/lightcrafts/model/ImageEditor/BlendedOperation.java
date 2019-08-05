@@ -2,6 +2,7 @@
 
 package com.lightcrafts.model.ImageEditor;
 
+import com.lightcrafts.image.color.ColorScience;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.LCROIShape;
 import com.lightcrafts.jai.operator.LCMSColorConvertDescriptor;
@@ -9,16 +10,16 @@ import com.lightcrafts.jai.opimage.BlendOpImage;
 import com.lightcrafts.jai.opimage.RGBColorSelectionMaskOpImage;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.utils.Transform;
-import com.lightcrafts.mediax.jai.*;
 import com.lightcrafts.model.*;
-import com.lightcrafts.utils.ColorScience;
-import com.lightcrafts.utils.LCMS_ColorSpace;
 import com.lightcrafts.utils.LCMS;
+import com.lightcrafts.utils.LCMS_ColorSpace;
 
+import javax.media.jai.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.Raster;
+import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
@@ -78,10 +79,10 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
 
     // Define the List of LayerModes statically so they can be vended
     // by ImageEditorEngine:
-    static List<LayerModeImpl> blendingModes;
+    static List<LayerMode> blendingModes;
 
     static {
-        blendingModes = new ArrayList<LayerModeImpl>();
+        blendingModes = new ArrayList<LayerMode>();
 
         for (BlendOpImage.BlendingMode b : BlendOpImage.BlendingMode.values())
             blendingModes.add(new LayerModeImpl(b.getName()));
@@ -205,7 +206,7 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
             Rectangle intersection = tileBounds.intersection(sampleRect);
 
             pixel = new int[]{0, 0, 0};
-            int currentPixel[] = new int[3];
+            int[] currentPixel = new int[3];
 
             for (int i = intersection.x; i < intersection.x + intersection.width; i++) {
                 for (int j = intersection.y; j < intersection.y + intersection.height; j++) {
@@ -327,7 +328,7 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
         @Override
         public PlanarImage update() {
             if (clickPoint != null) {
-                int pixel[] = pointToPixel(clickPoint);
+                int[] pixel = pointToPixel(clickPoint);
                 if (pixel != null) {
                     int r = pixel[0] / 256;
                     int g = pixel[1] / 256;
@@ -400,30 +401,8 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
                 pb.addSource(abImage);
                 PlanarImage maskImage = JAI.create("BandMerge", pb, layoutHints);
 
-                colorSelectionMask = new RGBColorSelectionMaskOpImage(maskImage, getColorSelection(), null);
-
-                ParameterBlock maskPB;
-
-//              KernelJAI morph = new KernelJAI(3, 3, new float[]{1, 1, 1, 1, 1, 1, 1, 1, 1});
-//
-//              maskPB = new ParameterBlock();
-//              maskPB.addSource(colorSelectionMask);
-//              maskPB.add(morph);
-//              colorSelectionMask = JAI.create("Erode", maskPB, null);
-//
-//              maskPB = new ParameterBlock();
-//              maskPB.addSource(colorSelectionMask);
-//              maskPB.add(morph);
-//              colorSelectionMask = JAI.create("Dilate", maskPB, null);
-
-                RenderingHints extenderHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
-                        BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-                KernelJAI kernel = Functions.getGaussKernel(0.5 * scale);
-                maskPB = new ParameterBlock();
-                maskPB.addSource(colorSelectionMask);
-                maskPB.add(kernel);
-                colorSelectionMask = JAI.create("Convolve", maskPB, extenderHints);
-
+                colorSelectionMask = Functions.fastGaussianBlur(
+                        new RGBColorSelectionMaskOpImage(maskImage, getColorSelection(), null), 0.5 * scale);
                 lastColorSelection = colorSelection;
             } else if (colorSelection == null || colorSelection.isAllSelected()) {
                 colorSelectionMask = null;
@@ -455,5 +434,17 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
     @Override
     public LayerConfig getDefaultLayerConfig() {
         return new LayerConfig(new LayerModeImpl("Normal"), 1.);
+    }
+
+    static RenderedImage createSingleChannel(RenderedImage source) {
+        if (source.getColorModel().getNumComponents() != 3) {
+            return source;
+        }
+
+        final double[][] yChannel = new double[][]{{ColorScience.Wr, ColorScience.Wg, ColorScience.Wb, 0}};
+        ParameterBlock pb = new ParameterBlock()
+                .addSource(source)
+                .add(yChannel);
+        return JAI.create("BandCombine", pb, null);
     }
 }

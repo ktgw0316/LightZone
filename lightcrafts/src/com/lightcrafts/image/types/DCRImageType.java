@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 
-import com.lightcrafts.mediax.jai.JAI;
-import com.lightcrafts.mediax.jai.operator.TransposeType;
+import javax.media.jai.JAI;
+import javax.media.jai.operator.TransposeType;
 
 import com.lightcrafts.image.BadImageFileException;
 import com.lightcrafts.image.ImageInfo;
@@ -84,8 +84,8 @@ public final class DCRImageType extends RawImageType {
      * All the possible filename extensions for DCR files.  All must be lower
      * case and the preferred one must be first.
      */
-    private static final String EXTENSIONS[] = {
-        "dcr"
+    private static final String[] EXTENSIONS = {
+            "dcr"
     };
 }
 /* vim:set et sw=4 ts=4: */

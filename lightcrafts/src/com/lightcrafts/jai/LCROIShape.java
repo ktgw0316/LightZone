@@ -5,9 +5,8 @@ package com.lightcrafts.jai;
 import com.lightcrafts.model.Region;
 import com.lightcrafts.model.Contour;
 import com.lightcrafts.jai.opimage.ShapedMask;
+import javax.media.jai.*;
 
-import com.lightcrafts.mediax.jai.*;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.awt.*;
@@ -41,10 +40,12 @@ public class LCROIShape extends ROIShape {
         return region;
     }
 
+    @Override
     public boolean intersects(Rectangle rect) {
         return intersects(new Rectangle2D.Double(rect.x, rect.y, rect.width, rect.height));
     }
 
+    @Override
     public boolean intersects(Rectangle2D rect) {
         for (final Contour c : region.getContours()) {
             AffineTransform combined = transform;
@@ -87,8 +88,9 @@ public class LCROIShape extends ROIShape {
             if (c.getTranslation() != null) {
                 if (contours.size() > (i+1) && c.getTranslation() != contours.get(i+1))
                     return true;
-                i+=2;
-            } else {
+                i += 2;
+            }
+            else {
                 i++;
             }
         }

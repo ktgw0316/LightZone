@@ -1,11 +1,17 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2019-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.metadata;
 
 import com.lightcrafts.image.metadata.ImageMetadataDirectory;
-import com.lightcrafts.image.metadata.values.ImageMetaValue;
+import lombok.Getter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * Represent an ImageMetadataDirectory as a String name plus a List of
@@ -13,47 +19,34 @@ import java.util.*;
  */
 class MetadataDirectoryModel {
 
+    @Getter
     private String name;
-    private ArrayList<KeyValuePair> pairs;
 
-    static Comparator<KeyValuePair> KeyValuePairComp =
-        new Comparator<KeyValuePair>() {
-            public int compare(KeyValuePair pair1, KeyValuePair pair2) {
-                String s1 = pair1.getKey();
-                String s2 = pair2.getKey();
-                return s1.compareTo(s2);
-            }
-        };
+    private List<KeyValuePair> pairs;
+
+    private static Comparator<KeyValuePair> KeyValuePairComp =
+            Comparator.comparing(p -> p.key);
+
+    private static Comparator<KeyValuePair> NoSortComp = (p1, p2) -> 0;
 
     MetadataDirectoryModel(
         ImageMetadataDirectory directory, boolean filter, boolean sort
     ) {
         name = directory.getName();
-        pairs = new ArrayList<KeyValuePair>();
-        Iterator<Map.Entry<Integer,ImageMetaValue>> i=directory.iterator();
-        while (i.hasNext()) {
-            Map.Entry<Integer,ImageMetaValue> entry = i.next();
-            Integer id = entry.getKey();
-            ImageMetaValue value = directory.getValue(id);
-            if ( value.isDisplayable() ) {
-                String key = directory.getTagLabelFor(id);
-                KeyValuePair pair = new KeyValuePair(id, key, value);
-                pairs.add(pair);
-            }
-        }
-        if (filter) {
-            pairs = MetaTagFilter.filter(directory, pairs);
-        }
-        if (sort) {
-            Collections.sort(pairs, KeyValuePairComp);
-        }
+        pairs = StreamSupport.stream(directory.spliterator(), false)
+                .map(Map.Entry::getKey)
+                .map(id -> new KeyValuePair(id, null, directory.getValue(id)))
+                .filter(p -> p.value != null && p.value.isDisplayable())
+                .map(p -> {
+                    String key = directory.getTagLabelFor(p.tagID);
+                    return new KeyValuePair(p.tagID, key, p.value);
+                })
+                .filter(p -> !filter || directory.shouldDisplayTag(p.tagID))
+                .sorted(sort ? KeyValuePairComp : NoSortComp)
+                .collect(Collectors.toList());
     }
 
     List<KeyValuePair> getPairs() {
-        return new ArrayList<KeyValuePair>(pairs);
-    }
-
-    String getName() {
-        return name;
+        return new ArrayList<>(pairs);
     }
 }

@@ -3,7 +3,7 @@
 package com.lightcrafts.ui.toolkit;
 
 import com.lightcrafts.platform.Platform;
-import com.lightcrafts.utils.ColorProfileInfo;
+import com.lightcrafts.image.color.ColorProfileInfo;
 
 import javax.swing.*;
 import java.awt.*;

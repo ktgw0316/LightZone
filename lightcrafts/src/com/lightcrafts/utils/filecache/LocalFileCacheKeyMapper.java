@@ -2,6 +2,8 @@
 
 package com.lightcrafts.utils.filecache;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 
 /**
@@ -35,7 +37,7 @@ public final class LocalFileCacheKeyMapper implements FileCacheKeyMapper {
     /**
      * {@inheritDoc}
      */
-    public File mapKeyToFile( String key, boolean ensurePathExists ) {
+    public File mapKeyToFile(@NotNull String key, boolean ensurePathExists ) {
         final int sep = key.lastIndexOf( File.separatorChar );
         if ( sep >= 0 )
             key = key.substring( sep + 1 );

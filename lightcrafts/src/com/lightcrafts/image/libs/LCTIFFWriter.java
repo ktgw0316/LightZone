@@ -15,7 +15,6 @@ import com.lightcrafts.image.metadata.TIFFMetadataReader;
 import com.lightcrafts.image.metadata.values.ImageMetaValue;
 import com.lightcrafts.image.types.TIFFConstants;
 import com.lightcrafts.image.types.TIFFImageType;
-import com.lightcrafts.mediax.jai.PlanarImage;
 import com.lightcrafts.utils.ProgressIndicator;
 import com.lightcrafts.utils.UserCanceledException;
 import com.lightcrafts.utils.Version;
@@ -37,6 +36,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Map;
+import javax.media.jai.PlanarImage;
 import org.w3c.dom.Document;
 
 import static com.lightcrafts.image.metadata.EXIFConstants.EXIF_FIELD_SIZE;

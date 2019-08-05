@@ -6,12 +6,14 @@ import com.lightcrafts.model.SliderConfig;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.jai.JAIContext;
-import com.lightcrafts.utils.ColorScience;
+import com.lightcrafts.image.color.ColorScience;
 
-import com.lightcrafts.mediax.jai.JAI;
-import com.lightcrafts.mediax.jai.PlanarImage;
+import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
+
+import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_BLACK_AND_WHITE;
 
 public class ChannelMixer extends BlendedOperation {
     private static final String Red = "Red";
@@ -21,6 +23,8 @@ public class ChannelMixer extends BlendedOperation {
     public ChannelMixer(Rendering rendering) {
         super(rendering, type);
         colorInputOnly = true;
+
+        setHelpTopic(HELP_TOOL_BLACK_AND_WHITE);
 
         addSliderKey(Red);
         addSliderKey(Green);

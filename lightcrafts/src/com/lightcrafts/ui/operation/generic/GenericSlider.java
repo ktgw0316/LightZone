@@ -30,7 +30,7 @@ import java.text.DecimalFormat;
   * GenericSlider.
   */
 
-class GenericSlider extends JPanel {
+public class GenericSlider extends JPanel {
 
     private ConfiguredBoundedRangeModel model;
     private JLabel label;
@@ -101,6 +101,13 @@ class GenericSlider extends JPanel {
     // Exposed for GenericSliderContainer's specialized layout:
     Component getText() {
         return text;
+    }
+
+    @Override
+    public void setEnabled(boolean b) {
+        super.setEnabled(b);
+        slider.setEnabled(b);
+        text.setEnabled(b);
     }
 
     void setConfiguredValue(double value) {

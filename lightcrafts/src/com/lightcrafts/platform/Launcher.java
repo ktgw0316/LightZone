@@ -28,7 +28,6 @@ public class Launcher {
     public void init(String[] args) {
         try {
             setSystemProperties();
-            enableTextAntiAliasing();
             showAppVersion();
             showJavaVersion();
             checkCpu();
@@ -55,34 +54,8 @@ public class Launcher {
     }
 
     protected void setSystemProperties() {
-        System.setProperty("awt.useSystemAAFontSettings", "on");
+        System.setProperty("awt.useSystemAAFontSettings", "lcd");
         System.setProperty("com.sun.media.jai.disableMediaLib", "true");
-    }
-
-    protected void enableTextAntiAliasing() {
-        try {
-            Class<?> clazz = Class.forName("sun.swing.SwingUtilities2$AATextInfo");
-            Method method = clazz.getMethod("getAATextInfo", boolean.class);
-            Object aaTextInfo = method.invoke(null, isLocalDisplay());
-
-            Class<?> clazz0 = Class.forName("sun.swing.SwingUtilities2");
-            Field field = clazz0.getField("AA_TEXT_PROPERTY_KEY");
-            Object aaTextPropertyKey = field.get(null);
-            UIManager.getDefaults().put(aaTextPropertyKey, aaTextInfo);
-        }
-        // Java 9 does not have the class SwingUtilities2.AATextInfo anymore,
-        // but text anti-aliasing is enabled by default.
-        catch (ClassNotFoundException    ignored) {}
-        catch (NoSuchMethodException     ignored) {}
-        catch (InvocationTargetException ignored) {}
-        catch (IllegalAccessException    ignored) {}
-        catch (NoSuchFieldException      ignored) {}
-    }
-
-    private static boolean isLocalDisplay() {
-        final GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        return (!(ge instanceof sun.java2d.SunGraphicsEnvironment))
-                || ((sun.java2d.SunGraphicsEnvironment) ge).isDisplayLocal();
     }
 
     protected void showAppVersion() {
