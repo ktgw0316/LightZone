@@ -535,38 +535,23 @@ public class ImageDatum {
         if (cache == null) {
             return;
         }
-        String metaKey = getMetadataKey();
-        try (ObjectOutputStream out = new ObjectOutputStream(cache.putToStream(metaKey))) {
-            out.writeObject(meta);
-        }
-        catch (IOException e) {
-            // metadata will be reread next time
-            System.err.println("metadata cache error: " + e.getMessage());
-        }
-        String fileTimeKey = getFileTimeCacheKey();
-        try (ObjectOutputStream out = new ObjectOutputStream(cache.putToStream(fileTimeKey))) {
-            out.writeObject(fileCacheTime);
-        }
-        catch (IOException e) {
-            System.err.println("file time cache error: " + e.getMessage());
-        }
+        writeToStream(getMetadataKey(), meta, "metadata cache error: ");
+        writeToStream(getFileTimeCacheKey(), fileCacheTime, "file time cache error: ");
         if (xmpFile == null) {
             return;
         }
-        String xmpFileKey = getXmpKey();
-        try (ObjectOutputStream out = new ObjectOutputStream(cache.putToStream(xmpFileKey))) {
-            out.writeObject(xmpFile);
+        writeToStream(getXmpKey(), xmpFile, "file time cache error: ");
+        writeToStream(getXmpFileTimeCacheKey(), xmpFileCacheTime, "XMP file time cache error: ");
+    }
+
+    private void writeToStream(@Nullable String key, Object obj, String errorMessage) {
+        if (key == null) {
+            return;
         }
-        catch (IOException e) {
-            System.err.println("file time cache error: " + e.getMessage());
-        }
-        String xmpFileTimeKey = getXmpFileTimeCacheKey();
-        if (xmpFileTimeKey != null) {
-            try (ObjectOutputStream out = new ObjectOutputStream(cache.putToStream(xmpFileTimeKey))) {
-                out.writeObject(xmpFileCacheTime);
-            } catch (IOException e) {
-                System.err.println("XMP file time cache error: " + e.getMessage());
-            }
+        try (val out = new ObjectOutputStream(cache.putToStream(key))) {
+            out.writeObject(obj);
+        } catch (IOException e) {
+            System.err.println(errorMessage + e.getMessage());
         }
     }
 
