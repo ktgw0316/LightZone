@@ -7,8 +7,8 @@ import com.lightcrafts.image.BadImageFileException;
 import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.image.UnknownImageTypeException;
 import com.lightcrafts.image.metadata.*;
-import com.lightcrafts.image.metadata.values.ImageMetaValue;
 import com.lightcrafts.utils.filecache.FileCache;
+import com.lightcrafts.utils.tuple.Pair;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.val;
@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.lightcrafts.image.metadata.CoreTags.*;
 import static com.lightcrafts.image.metadata.TIFFTags.TIFF_XMP_PACKET;
@@ -341,31 +342,24 @@ public class ImageDatum {
         val thisCore = this.meta.getDirectoryFor(CoreDirectory.class, true);
 
         // Tags used for presentation:
-        int[] tags = new int[] {
-            CORE_FILE_NAME,
-            CORE_DIR_NAME,
-            CORE_IMAGE_ORIENTATION,
-            CORE_RATING
-        };
-        for (int tag : tags) {
-            ImageMetaValue value = core.getValue(tag);
-            if (value != null) {
-                thisCore.putValue(tag, value);
-            }
-        }
+        Stream.of(
+                CORE_FILE_NAME,
+                CORE_DIR_NAME,
+                CORE_IMAGE_ORIENTATION,
+                CORE_RATING)
+                .map(tag -> Pair.of(tag, core.getValue(tag)))
+                .filter(p -> p.right != null)
+                .forEach(thisCore::putValue);
+
         // Tags used for sorting:
-        ImageDatumComparator[] comps = ImageDatumComparator.getAll();
-        for (ImageDatumComparator comp : comps) {
-            int tagId = comp.getTagId();
-            ImageMetaValue value = core.getValue(tagId);
-            if (value != null) {
-                thisCore.putValue(tagId, value);
-            }
-        }
+        Stream.of(ImageDatumComparator.getAll())
+                .map(ImageDatumComparator::getTagId)
+                .map(id -> Pair.of(id, core.getValue(id)))
+                .filter(p -> p.right != null)
+                .forEach(thisCore::putValue);
+
         // One more tag, used to determine the ImageDatumType for TIFFs
-        ImageMetaValue xmpValue = meta.getValue(
-            TIFFDirectory.class, TIFF_XMP_PACKET
-        );
+        val xmpValue = meta.getValue(TIFFDirectory.class, TIFF_XMP_PACKET);
         if (xmpValue != null) {
             ImageMetadataDirectory thisTiff =
                 this.meta.getDirectoryFor(TIFFDirectory.class, true);
