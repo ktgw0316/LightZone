@@ -6,6 +6,7 @@ package com.lightcrafts.ui.browser.folders;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.utils.directory.DirectoryMonitor;
 import com.lightcrafts.utils.file.FileUtil;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
@@ -23,7 +24,8 @@ class FolderTreeNode implements TreeNode {
     private final static FileSystemView FileSystemView =
         Platform.getPlatform().getFileSystemView();
 
-    private List<FolderTreeNode> children;
+    @NotNull
+    private List<FolderTreeNode> children = new ArrayList<>();
 
     private FolderTreeNode parent;
 
@@ -208,7 +210,7 @@ class FolderTreeNode implements TreeNode {
     // Compute (or recompute) the children of this node.  Useful in the TreeNode
     // methods, and also when folder modifications are detected.
     synchronized void updateChildren() {
-        children = new ArrayList<>();
+        children.clear();
         File[] files = FileSystemView.getFiles(resolvedFile, true);
         if (files != null && files.length > 0) {
             Arrays.sort(files);
@@ -229,7 +231,7 @@ class FolderTreeNode implements TreeNode {
     }
 
     List<FolderTreeNode> getChildren() {
-        if (children == null) {
+        if (children.isEmpty()) {
             updateChildren();
         }
         return children;
