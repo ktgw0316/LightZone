@@ -63,7 +63,6 @@ public abstract class DirectoryMonitor {
     public final synchronized void resume(boolean force) {
         if (force || --m_suspendCount < 0)
             m_suspendCount = 0;
-        //noinspection ConstantConditions
         if (DEBUG) {
             System.out.println(
                     "DirectoryMonitor: resuming (" + m_suspendCount + ')'
@@ -102,7 +101,6 @@ public abstract class DirectoryMonitor {
      */
     public final synchronized void suspend() {
         ++m_suspendCount;
-        //noinspection ConstantConditions
         if (DEBUG) {
             System.out.println(
                     "DirectoryMonitor: suspending (" + m_suspendCount + ')'
@@ -159,8 +157,7 @@ public abstract class DirectoryMonitor {
                     notifyListenersAbout(dir, file, kind);
                 }
                 if (! watchKey.reset()) {
-                    System.out.println("Invalid WatchKey: " + path);
-                    // removeDirectory(path.toFile());
+                    System.out.println("Disappeared: " + path);
                 }
             }
         }
@@ -193,13 +190,6 @@ public abstract class DirectoryMonitor {
      *
      * @param dir The directory to notify about.
      */
-    /*
-    private void notifyListenersAbout(File dir) {
-        synchronized (m_listeners) {
-            m_listeners.forEach(listener -> listener.directoryChanged(dir));
-        }
-    }
-    */
     private void notifyListenersAbout(Path dir, Path file, String kind) {
         synchronized (m_listeners) {
             m_listeners.forEach(listener -> listener.directoryChanged(dir, file, kind));

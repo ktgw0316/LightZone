@@ -57,13 +57,11 @@ public final class UnixDirectoryMonitor extends DirectoryMonitor {
      */
     @Override
     public boolean removeDirectory(File directory) {
-        boolean removed = false;
+        boolean removed;
         synchronized (watchKeyMap) {
-            for (WatchKey key : watchKeyMap.keySet()) {
-                if (getPathFor(key).equals(directory.toPath())) {
-                    removed = watchKeyMap.remove(key) != null;
-                }
-            }
+            removed = watchKeyMap.keySet().stream()
+                    .filter(key -> getPathFor(key).equals(directory.toPath()))
+                    .anyMatch(key -> watchKeyMap.remove(key) != null);
         }
         if (DEBUG && removed) {
             System.out.println("UnixDirectoryMonitor: removed " + directory);

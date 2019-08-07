@@ -31,10 +31,6 @@ class FolderTreeModel extends DefaultTreeModel implements DirectoryListener {
     public void directoryChanged(final Path dir, final Path file, final String kind) {
         final FolderTreeNode dirNode = index.get(dir.toFile());
         if (dirNode == null) {
-            // DEBUG
-            if (!dir.toString().contains("dev") && !dir.toString().contains("tmp"))
-                System.out.println("node is null for dir " + dir);
-
             return;
         }
         if (Files.exists(file) && ! Files.isDirectory(file)) {
@@ -63,29 +59,20 @@ class FolderTreeModel extends DefaultTreeModel implements DirectoryListener {
             if (nodeIndex < 0) {
                 return;
             }
-            SwingUtilities.invokeLater(
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            switch (kind) {
-                                case "ENTRY_CREATE":
-                                    nodesWereInserted(dirNode, new int[]{nodeIndex});
-                                    break;
-                                case "ENTRY_DELETE":
-                                    nodesWereRemoved(dirNode, new int[]{nodeIndex}, null);
-                                    break;
-                                case "ENTRY_MODIFY":
-                                    nodeChanged(childNode);
-                                    break;
-                                default:
-                            }
-                        }
-                    }
-            );
-
-            // DEBUG
-            if (! dir.toString().contains("dev") && ! dir.toString().contains("tmp"))
-                System.out.println(file + " " + kind);
+            SwingUtilities.invokeLater(() -> {
+                switch (kind) {
+                    case "ENTRY_CREATE":
+                        nodesWereInserted(dirNode, new int[]{nodeIndex});
+                        break;
+                    case "ENTRY_DELETE":
+                        nodesWereRemoved(dirNode, new int[]{nodeIndex}, null);
+                        break;
+                    case "ENTRY_MODIFY":
+                        nodeChanged(childNode);
+                        break;
+                    default:
+                }
+            });
         }
     }
 
