@@ -6,6 +6,7 @@ package com.lightcrafts.utils.directory;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.WatchKey;
 import java.util.HashMap;
@@ -37,14 +38,14 @@ public final class UnixDirectoryMonitor extends DirectoryMonitor {
      */
     @Override
     public void addDirectory(File directory) {
-        final Path dir = directory.toPath();
         try {
+            final Path dir = directory.toPath();
             WatchKey watchKey = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
             watchKeyMap.put(watchKey, dir);
-        } catch (IOException ignored) {
-        }
-        if (DEBUG) {
-            System.out.println("UnixDirectoryMonitor: added " + dir);
+            if (DEBUG) {
+                System.out.println("UnixDirectoryMonitor: added " + dir);
+            }
+        } catch (InvalidPathException | IOException ignored) {
         }
     }
 
