@@ -185,7 +185,6 @@
       <arg value="-j"/>
       <arg value="${clean-method}"/>
     </exec>
-    <antcall target="cc-clean"/>
   </target>
 
   <target name="distclean">

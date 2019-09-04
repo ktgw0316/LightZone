@@ -5,10 +5,10 @@ package com.lightcrafts.ui.browser.folders;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.ui.LightZoneSkin;
 
-import java.awt.*;
+import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
-import javax.swing.*;
+import java.awt.*;
 
 /**
  * A tree cell renderer that uses the specialized icons provided by
@@ -24,11 +24,12 @@ class FolderTreeCellRenderer extends DefaultTreeCellRenderer {
 
     private Font normalFont;
 
-    FolderTreeCellRenderer() {
+    private FolderTreeCellRenderer() {
         setBackgroundNonSelectionColor(LightZoneSkin.Colors.ToolPanesBackground);
         setTextNonSelectionColor(LightZoneSkin.Colors.ToolPanesForeground);
     }
 
+    @Override
     public Component getTreeCellRendererComponent(
          JTree tree,
          Object value,
