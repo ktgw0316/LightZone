@@ -27,8 +27,8 @@ import java.util.Map;
  * Time: 4:32:46 PM
  */
 public class IntVibranceOpImage extends PointOpImage {
-    private final int transform[][] = new int[3][3];
-    private final int toLinearsRGB[][] = new int[3][3];
+    private final int[][] transform = new int[3][3];
+    private final int[][] toLinearsRGB = new int[3][3];
     private final boolean saturationIncrease;
 
     private static final int sMath_scale = 0x8000;
@@ -56,7 +56,7 @@ public class IntVibranceOpImage extends PointOpImage {
         return y < 0 ? -angle : angle;
     }
 
-    public IntVibranceOpImage(RenderedImage source, float transform[][], Map config) {
+    public IntVibranceOpImage(RenderedImage source, float[][] transform, Map config) {
         super(source, new ImageLayout(source), config, true);
         permitInPlaceOperation();
 
@@ -69,7 +69,7 @@ public class IntVibranceOpImage extends PointOpImage {
         ICC_ProfileRGB linRGB = (ICC_ProfileRGB) ICC_Profile.getInstance(ColorSpace.CS_LINEAR_RGB);
         val XYZtoLinsRGB = new LCMatrix(linRGB.getMatrix()).invert();
         val CIERGBtoXYZ = new LCMatrix(((ICC_ProfileRGB) JAIContext.linearProfile).getMatrix());
-        double CIERGBtoLinsRGB[][] = LCMatrix.getArrayDouble(XYZtoLinsRGB.mult(CIERGBtoXYZ));
+        double[][] CIERGBtoLinsRGB = LCMatrix.getArrayDouble(XYZtoLinsRGB.mult(CIERGBtoXYZ));
 
         for (int i = 0; i < 3; i++)
             for (int j = 0; j < 3; j++)
@@ -100,13 +100,13 @@ public class IntVibranceOpImage extends PointOpImage {
         int width = src.getWidth();
         int height = src.getHeight();
 
-        short dstData[] = dst.getShortDataArray(0);
-        int dstBandOffsets[] = dst.getBandOffsets();
+        short[] dstData = dst.getShortDataArray(0);
+        int[] dstBandOffsets = dst.getBandOffsets();
         int dstLineStride = dst.getScanlineStride();
         int dstPixelStride = dst.getPixelStride();
 
-        short srcData[] = src.getShortDataArray(0);
-        int srcBandOffsets[] = src.getBandOffsets();
+        short[] srcData = src.getShortDataArray(0);
+        int[] srcBandOffsets = src.getBandOffsets();
         int srcLineStride = src.getScanlineStride();
         int srcPixelStride = src.getPixelStride();
 

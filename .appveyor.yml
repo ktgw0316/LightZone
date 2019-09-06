@@ -1,0 +1,35 @@
+version: 4.1.9.{build}-{branch}
+
+image:
+- Visual Studio 2017
+- ubuntu1804
+
+branches:
+  only:
+    - testing
+
+clone_depth: 1
+
+matrix:
+  fast_finish: true
+
+install:
+  - cmd: SET MINGW_PATH=mingw-w64/x86_64-7.2.0-posix-seh-rt_v5-rev1/mingw64
+  - cmd: SET MINGW_DIR=/c/%MINGW_PATH%/
+  - cmd: SET MINGW_ARCH=mingw-w64-x86_64
+  - cmd: SET PATH=C:/%MINGW_PATH%/bin/;C:/msys64/mingw64/bin/;C:/msys64/usr/bin/;%PATH%
+  - cmd: SET MSSDK_HOME=/c/Program Files (x86)/Windows Kits/10
+  - cmd: cinst ant html-help-workshop
+  - cmd: bash -lc 'cp "/c/Program Files (x86)/Windows Kits/10/Lib/10.0.14393.0/um/x64/Htmlhelp.Lib" /c/mingw-w64/x86_64-7.2.0-posix-seh-rt_v5-rev1/mingw64/lib/libhtmlhelp.a'
+  - cmd: bash -lc "pacman --needed --noconfirm -Syu"
+  - cmd: bash -lc "pacman --needed --noconfirm -Sy"
+  - cmd: bash -lc "pacman --noconfirm -S autoconf git make tar"
+  - cmd: bash -lc "pacman --noconfirm -S ${MINGW_ARCH}-lcms2 ${MINGW_ARCH}-lensfun ${MINGW_ARCH}-ntldd-git ${MINGW_ARCH}-pkg-config"
+
+init:
+  - sh: sudo apt-get update
+  - sh: sudo apt-get install -y ant autoconf javahelp2 tidy libglib2.0-dev liblensfun-dev liblcms2-dev libtiff-dev
+
+build_script:
+  - cmd: bash -lc "ant -f /c/projects/lightzone/windows/build.xml"
+  - sh: ant -f linux/build.xml

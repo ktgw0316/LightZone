@@ -20,8 +20,12 @@ public final class BilateralFilterRGBOpImage extends AreaOpImage {
 
     private final int y_wr, c_wr; /* window radius */
     private final int y_ws, c_ws; /* window size */
-    private final float y_kernel[], c_kernel[], y_scale_r, c_scale_r;
-    private final float rgb_to_yst[], yst_to_rgb[];
+    private final float[] y_kernel;
+    private final float[] c_kernel;
+    private final float y_scale_r;
+    private final float c_scale_r;
+    private final float[] rgb_to_yst;
+    private final float[] yst_to_rgb;
 
     private static float SQR(float s) { return s * s; }
 
@@ -120,16 +124,16 @@ public final class BilateralFilterRGBOpImage extends AreaOpImage {
         int swidth = src.getWidth();
         int sheight = src.getHeight();
 
-        short dstDataArrays[][] = dst.getShortDataArrays();
-        int dstBandOffsets[] = dst.getBandOffsets();
+        short[][] dstDataArrays = dst.getShortDataArrays();
+        int[] dstBandOffsets = dst.getBandOffsets();
         int dstScanlineStride = dst.getScanlineStride();
 
-        short srcDataArrays[][] = src.getShortDataArrays();
-        int srcBandOffsets[] = src.getBandOffsets();
+        short[][] srcDataArrays = src.getShortDataArrays();
+        int[] srcBandOffsets = src.getBandOffsets();
         int srcScanlineStride = src.getScanlineStride();
 
-        short dstData[] = dstDataArrays[0];
-        short srcData[] = srcDataArrays[0];
+        short[] dstData = dstDataArrays[0];
+        short[] srcData = srcDataArrays[0];
 
         if (src.getNumBands() == 3)
             bilateralFilterRGB(srcData, dstData,
@@ -143,13 +147,13 @@ public final class BilateralFilterRGBOpImage extends AreaOpImage {
                     srcScanlineStride, dstScanlineStride);
     }
 
-    static native void bilateralFilterRGB(short srcData[], short destData[],
-                                    int y_wr, int c_wr, int y_ws, int c_ws,
-                                    float y_scale_r, float c_scale_r,
-                                    float y_kernel[], float c_kernel[],
-                                    float rgb_to_yst[], float yst_to_rgb[],
-                                    int width, int height,
-                                    int srcROffset, int srcGOffset, int srcBOffset,
-                                    int destROffset, int destGOffset, int destBOffset,
-                                    int srcLineStride, int destLineStride);
+    static native void bilateralFilterRGB(short[] srcData, short[] destData,
+                                          int y_wr, int c_wr, int y_ws, int c_ws,
+                                          float y_scale_r, float c_scale_r,
+                                          float[] y_kernel, float[] c_kernel,
+                                          float[] rgb_to_yst, float[] yst_to_rgb,
+                                          int width, int height,
+                                          int srcROffset, int srcGOffset, int srcBOffset,
+                                          int destROffset, int destGOffset, int destBOffset,
+                                          int srcLineStride, int destLineStride);
 }

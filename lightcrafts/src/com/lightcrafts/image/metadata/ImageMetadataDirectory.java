@@ -545,6 +545,23 @@ public abstract class ImageMetadataDirectory implements
      * {@link #setValue(Integer,int)} or {@link #setValue(Integer,String...)}
      * instead.
      *
+     * @param entry The map entry of the metadata tag ID (the key) and the
+     * {@link ImageMetaValue} to put.
+     * @see #putValue(Integer,ImageMetaValue,boolean)
+     */
+    public void putValue(Map.Entry<Integer, ImageMetaValue> entry) {
+        putValue(entry.getKey(), entry.getValue(), true);
+    }
+
+    /**
+     * Puts a key/value pair into this directory.
+     *
+     * This method should be used if a value is being put into the directory
+     * for the first time, e.g., to populate it from metadata parsed from an
+     * image.  To change a value at some later time, use
+     * {@link #setValue(Integer,int)} or {@link #setValue(Integer,String...)}
+     * instead.
+     *
      * @param tagID The metadata tag ID (the key).
      * @param value The {@link ImageMetaValue} to put.
      * @see #putValue(Integer,ImageMetaValue,boolean)

@@ -146,8 +146,8 @@ public final class MRWImageType extends RawImageType {
      * All the possible filename extensions for MRW files.  All must be lower
      * case and the preferred one must be first.
      */
-    private static final String EXTENSIONS[] = {
-        "mrw"
+    private static final String[] EXTENSIONS = {
+            "mrw"
     };
 }
 /* vim:set et sw=4 ts=4: */

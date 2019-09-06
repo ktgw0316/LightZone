@@ -48,25 +48,25 @@ public class ColorSelectionMaskOpImage extends PointOpImage {
         int width = dst.getWidth();
         int height = dst.getHeight();
 
-        byte dstData[] = dst.getByteDataArray(0);
-        int dstBandOffsets[] = dst.getBandOffsets();
+        byte[] dstData = dst.getByteDataArray(0);
+        int[] dstBandOffsets = dst.getBandOffsets();
         int dstLineStride = dst.getScanlineStride();
 
-        short srcData[] = src.getShortDataArray(0);
-        int srcBandOffsets[] = src.getBandOffsets();
+        short[] srcData = src.getShortDataArray(0);
+        int[] srcBandOffsets = src.getBandOffsets();
         int srcLineStride = src.getScanlineStride();
 
         int dstOffset = dstBandOffsets[0];
 
-        float colorSelectionArray[] = {
-            colorSelection.isHueEnabled ? colorSelection.hueLower : 0,
-            colorSelection.isHueEnabled ? colorSelection.hueLowerFeather : 0,
-            colorSelection.isHueEnabled ? colorSelection.hueUpper : 1,
-            colorSelection.isHueEnabled ? colorSelection.hueUpperFeather : 0,
-            colorSelection.isLuminosityEnabled ? colorSelection.luminosityLower : 0,
-            colorSelection.isLuminosityEnabled ? colorSelection.luminosityLowerFeather : 0,
-            colorSelection.isLuminosityEnabled ? colorSelection.luminosityUpper : 1,
-            colorSelection.isLuminosityEnabled ? colorSelection.luminosityUpperFeather : 0
+        float[] colorSelectionArray = {
+                colorSelection.isHueEnabled ? colorSelection.hueLower : 0,
+                colorSelection.isHueEnabled ? colorSelection.hueLowerFeather : 0,
+                colorSelection.isHueEnabled ? colorSelection.hueUpper : 1,
+                colorSelection.isHueEnabled ? colorSelection.hueUpperFeather : 0,
+                colorSelection.isLuminosityEnabled ? colorSelection.luminosityLower : 0,
+                colorSelection.isLuminosityEnabled ? colorSelection.luminosityLowerFeather : 0,
+                colorSelection.isLuminosityEnabled ? colorSelection.luminosityUpper : 1,
+                colorSelection.isLuminosityEnabled ? colorSelection.luminosityUpperFeather : 0
         };
 
         float wr = ColorScience.Wr;
@@ -135,17 +135,17 @@ public class ColorSelectionMaskOpImage extends PointOpImage {
         return hue;
     }
 
-    private native void nativeUshortLoop(short srcData[], byte dstData[],
+    private native void nativeUshortLoop(short[] srcData, byte[] dstData,
                                          int width, int height,
-                                         int srcBandOffsets[], int dstOffset,
+                                         int[] srcBandOffsets, int dstOffset,
                                          int srcLineStride, int dstLineStride,
-                                         float colorSelection[], float wr, float wg, float wb);
+                                         float[] colorSelection, float wr, float wg, float wb);
 
-    private void ushortLoop(short srcData[], byte dstData[],
+    private void ushortLoop(short[] srcData, byte[] dstData,
                             int width, int height,
-                            int srcBandOffsets[], int dstOffset,
+                            int[] srcBandOffsets, int dstOffset,
                             int srcLineStride, int dstLineStride,
-                            float colorSelection[], float wr, float wg, float wb) {
+                            float[] colorSelection, float wr, float wg, float wb) {
         int srcROffset = srcBandOffsets[0];
         int srcGOffset = srcBandOffsets[1];
         int srcBOffset = srcBandOffsets[2];

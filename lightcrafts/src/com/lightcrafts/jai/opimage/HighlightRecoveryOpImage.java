@@ -43,30 +43,30 @@ public class HighlightRecoveryOpImage extends PointOpImage {
         ushortLoop(srcAccessor, dstAccessor);
     }
 
-    native private void floatNativeUshortLoop(short dstData[], short srcData[],
-                                              int dstBandOffsets[], int srcBandOffsets[],
+    native private void floatNativeUshortLoop(short[] dstData, short[] srcData,
+                                              int[] dstBandOffsets, int[] srcBandOffsets,
                                               int dstLineStride, int srcLineStride,
                                               int dstPixelStride, int srcPixelStride,
                                               int width, int height,
-                                              float preMul[], float[] csMatrix);
+                                              float[] preMul, float[] csMatrix);
 
     protected void ushortLoop(RasterAccessor src, RasterAccessor dst) {
         int width = src.getWidth();
         int height = src.getHeight();
 
-        short dstDataArrays[][] = dst.getShortDataArrays();
-        short dstData[] = dstDataArrays[0];
-        int dstBandOffsets[] = dst.getBandOffsets();
+        short[][] dstDataArrays = dst.getShortDataArrays();
+        short[] dstData = dstDataArrays[0];
+        int[] dstBandOffsets = dst.getBandOffsets();
         int dstLineStride = dst.getScanlineStride();
         int dstPixelStride = dst.getPixelStride();
 
-        short srcDataArrays[][] = src.getShortDataArrays();
-        short srcData[] = srcDataArrays[0];
-        int srcBandOffsets[] = src.getBandOffsets();
+        short[][] srcDataArrays = src.getShortDataArrays();
+        short[] srcData = srcDataArrays[0];
+        int[] srcBandOffsets = src.getBandOffsets();
         int srcLineStride = src.getScanlineStride();
         int srcPixelStride = src.getPixelStride();
 
-        float csArray[] = new float[9];
+        float[] csArray = new float[9];
 
         for (int i = 0; i < 3; i++)
             System.arraycopy(csMatrix[i], 0, csArray, 3*i, 3);

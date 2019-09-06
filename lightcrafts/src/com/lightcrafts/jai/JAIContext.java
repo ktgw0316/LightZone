@@ -176,7 +176,7 @@ public class JAIContext {
 
         int processors = Runtime.getRuntime().availableProcessors();
 
-        String VMVersion[] = System.getProperty("java.version").split("[._]");
+        String[] VMVersion = System.getProperty("java.version").split("[._]");
         String OSArch = System.getProperty("os.arch");
 
         System.out.println("Running on " + processors + " processors");

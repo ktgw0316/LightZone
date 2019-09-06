@@ -29,7 +29,6 @@
   </condition>
 
   <property name="installer-name" value="${app-name}-Installer-${jre-arch}.exe"/>
-  <property name="licensetype" value="ESD"/>
   <property name="windows-jar" value="products/lightcrafts-windows.jar"/>
 
   <!-- The default maxmemory for the run* targets. -->
@@ -166,48 +165,6 @@
   </target>
   <target name="build-installer" depends="jar, helpers, build-installer-only"/>
 
-  <target name="installer-esd">
-    <antcall target="build-installer">
-      <param name="licensetype" value="ESD"/>
-    </antcall>
-  </target>
-
-  <target name="installer-tb">
-    <antcall target="build-installer">
-      <param name="licensetype" value="TB"/>
-    </antcall>
-  </target>
-
-  <!--===== CruiseControl ==================================================-->
-
-  <property name="cc-dir" value="cruisecontrol"/>
-
-  <target name="cc-build">
-    <antcall target="cc-clean"/>
-    <exec executable="bash"
-          outputproperty="git-branch" failonerror="true" vmlauncher="false">
-      <arg path="${common-dir}/tools/bin/lc-git-branch"/>
-    </exec>
-    <exec executable="bash"
-          outputproperty="git-revision" failonerror="true" vmlauncher="false">
-      <arg path="${common-dir}/tools/bin/lc-git-revision"/>
-    </exec>
-
-    <mkdir dir="cruisecontrol"/>
-
-    <antcall target="installer-esd"/>
-    <move file="${installer-name}"
-          tofile="${cc-dir}/${app-name}-${git-branch}-r${git-revision}-ESD.exe"/>
-
-    <antcall target="installer-tb"/>
-    <move file="${installer-name}"
-          tofile="${cc-dir}/${app-name}-${git-branch}-r${git-revision}-TB.exe"/>
-  </target>
-
-  <target name="cc-clean">
-    <delete dir="${cc-dir}"/>
-  </target>
-
   <!--===== Clean up =======================================================-->
 
   <target name="clean-up">
@@ -228,7 +185,6 @@
       <arg value="-j"/>
       <arg value="${clean-method}"/>
     </exec>
-    <antcall target="cc-clean"/>
   </target>
 
   <target name="distclean">

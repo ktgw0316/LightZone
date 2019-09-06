@@ -146,13 +146,13 @@ public class Functions {
         return new ImageLayout(0, 0, tileWidth, tileHeight, cm.createCompatibleSampleModel(tileWidth, tileHeight), cm);
     }
 
-    public static float[] fromLinearToCS(ColorSpace target, float color[]) {
+    public static float[] fromLinearToCS(ColorSpace target, float[] color) {
         synchronized (ColorSpace.class) {
             return target.fromCIEXYZ(JAIContext.linearColorSpace.toCIEXYZ(color));
         }
     }
 
-    public static int[] fromLinearToCS(ColorSpace target, int color[]) {
+    public static int[] fromLinearToCS(ColorSpace target, int[] color) {
         float[] converted;
         synchronized (ColorSpace.class) {
             converted = target.fromCIEXYZ(JAIContext.linearColorSpace.toCIEXYZ(
@@ -180,7 +180,7 @@ public class Functions {
      * Generates the kernel from the current theta and kernel size.
      */
     public static float[] generateLoGKernel(double theta, int kernelSize) {
-        float logKernel[] = new float[kernelSize * kernelSize];
+        float[] logKernel = new float[kernelSize * kernelSize];
         int k = 0;
         double scale = 0;
         for (int j = 0; j < kernelSize; ++j) {
@@ -210,7 +210,7 @@ public class Functions {
 
         int size = 5;
 
-        float data[] = generateLoGKernel(radius, size);
+        float[] data = generateLoGKernel(radius, size);
 
         if (DEBUG) System.out.println("kernel data: (" + radius + ") ");
         for (int i = 0; i < size; i++) {
@@ -232,7 +232,7 @@ public class Functions {
 
         int size = 5;
 
-        float data[] = generateLoGKernel(radius, size);
+        float[] data = generateLoGKernel(radius, size);
 
         if (DEBUG) System.out.println("kernel data: (" + radius + ") ");
         for (int i = 0; i < size; i++) {
@@ -260,7 +260,7 @@ public class Functions {
 
         if (size < 3)
             size = 3;
-        float data[] = new float[size];
+        float[] data = new float[size];
         if (DEBUG) System.out.print("Radius: " + radius + ", kernel size: " + size + ", kernel data: ");
         float positive = 0;
         float negative = 0;
@@ -293,7 +293,7 @@ public class Functions {
 
         if (size < 3)
             size = 3;
-        float data[] = new float[size];
+        float[] data = new float[size];
         if (DEBUG) System.out.print("Radius: " + radius + ", kernel size: " + size + ", kernel data: ");
         float positive = 0;
         float negative = 0;
@@ -329,7 +329,7 @@ public class Functions {
 
         int size = 2 * (int) Math.ceil(sigma) + 1;
 
-        float data[] = new float[size];
+        float[] data = new float[size];
         int j = 0;
         float scale = 0;
 
@@ -354,7 +354,7 @@ public class Functions {
 
         if (size < 3)
             size = 3;
-        float data[] = new float[size];
+        float[] data = new float[size];
         if (DEBUG) System.out.print("Radius: " + sigma + ", kernel size: " + size + ", kernel data: ");
         int j = 0;
         float scale = 0;
@@ -399,7 +399,7 @@ public class Functions {
          */
         
         int samples = 4 * ratio + 1;
-        float data[] = new float[samples];
+        float[] data = new float[samples];
         float sum = 0;
         for (int i = 0; i < samples; i++)
             sum += data[i] = (float) lanczos2(i / (double) ratio - 2.);
@@ -419,7 +419,7 @@ public class Functions {
          */
 
         int samples = 4 * (int) (ratio+0.5) + 1;
-        float data[] = new float[samples];
+        float[] data = new float[samples];
         float sum = 0;
         for (int i = 0; i < samples; i++)
             sum += data[i] = - (float) lanczos2(i / ratio - 2.);
@@ -450,6 +450,15 @@ public class Functions {
         layout.setTileWidth(JAIContext.TILE_WIDTH);
         layout.setTileHeight(JAIContext.TILE_HEIGHT);
         return layout;
+    }
+
+    public static RenderedImage systemColorSpaceImage(RenderedImage image) {
+        ColorModel colors = image.getColorModel();
+        ColorSpace space = colors.getColorSpace();
+        if (space != null && !space.equals(JAIContext.systemColorSpace)) {
+            image = toColorSpace(image, JAIContext.systemColorSpace, null);
+        }
+        return new sRGBWrapper(image);
     }
 
     public static class sRGBWrapper extends PlanarImage {

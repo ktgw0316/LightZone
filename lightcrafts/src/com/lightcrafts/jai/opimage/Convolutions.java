@@ -15,64 +15,64 @@ public class Convolutions {
                                         int s1LineStride, int dLineStride,
                                         int s1PixelStride, int dPixelStride,
                                         int dheight, int dwidth, int kw, int kh,
-                                        float[] hValues, float vValues[]);
+                                        float[] hValues, float[] vValues);
 
     public static native void cShortLoop(short[] s1, short[] d,
                                          int s1LineOffset, int dLineOffset,
                                          int s1LineStride, int dLineStride,
                                          int s1PixelStride, int dPixelStride,
                                          int dheight, int dwidth, int kw, int kh,
-                                         float[] hValues, float vValues[]);
+                                         float[] hValues, float[] vValues);
 
     public static native void cUShortLoop(short[] s1, short[] d,
                                           int s1LineOffset, int dLineOffset,
                                           int s1LineStride, int dLineStride,
                                           int s1PixelStride, int dPixelStride,
                                           int dheight, int dwidth, int kw, int kh,
-                                          float[] hValues, float vValues[]);
+                                          float[] hValues, float[] vValues);
 
     public static native void cIntLoop(int[] s1, int[] d,
                                        int s1LineOffset, int dLineOffset,
                                        int s1LineStride, int dLineStride,
                                        int s1PixelStride, int dPixelStride,
                                        int dheight, int dwidth, int kw, int kh,
-                                       float[] hValues, float vValues[]);
+                                       float[] hValues, float[] vValues);
 
     public static native void cFloatLoop(float[] s1, float[] d,
                                          int s1LineOffset, int dLineOffset,
                                          int s1LineStride, int dLineStride,
                                          int s1PixelStride, int dPixelStride,
                                          int dheight, int dwidth, int kw, int kh,
-                                         float[] hValues, float vValues[]);
+                                         float[] hValues, float[] vValues);
 
     public static native void cDoubleLoop(double[] s1, double[] d,
                                           int s1LineOffset, int dLineOffset,
                                           int s1LineStride, int dLineStride,
                                           int s1PixelStride, int dPixelStride,
                                           int dheight, int dwidth, int kw, int kh,
-                                          float[] hValues, float vValues[]);
+                                          float[] hValues, float[] vValues);
 
     public static native void cInterleaved3ByteLoop(byte[] s1, byte[] d,
                                                     int s1LineOffset, int dLineOffset,
                                                     int s1LineStride, int dLineStride,
                                                     int dheight, int dwidth, int kw, int kh,
-                                                    float[] hValues, float vValues[]);
+                                                    float[] hValues, float[] vValues);
 
     public static native void cInterleaved3ShortLoop(short[] s1, short[] d,
                                                      int s1LineOffset, int dLineOffset,
                                                      int s1LineStride, int dLineStride,
                                                      int dheight, int dwidth, int kw, int kh,
-                                                     float[] hValues, float vValues[]);
+                                                     float[] hValues, float[] vValues);
 
     public static native void cInterleaved3UShortLoop(short[] s1, short[] d,
                                                       int s1LineOffset, int dLineOffset,
                                                       int s1LineStride, int dLineStride,
                                                       int dheight, int dwidth, int kw, int kh,
-                                                      float[] hValues, float vValues[]);
+                                                      float[] hValues, float[] vValues);
 
     public static native void cInterleaved3IntLoop(int[] s1, int[] d,
                                                    int s1LineOffset, int dLineOffset,
                                                    int s1LineStride, int dLineStride,
                                                    int dheight, int dwidth, int kw, int kh,
-                                                   float[] hValues, float vValues[]);
+                                                   float[] hValues, float[] vValues);
 }

@@ -24,8 +24,7 @@ JAVAH_CLASSES:=	com.lightcrafts.platform.windows.WindowsColorProfileManager \
 		com.lightcrafts.platform.windows.WindowsKeyUtil \
 		com.lightcrafts.platform.windows.WindowsHelp \
 		com.lightcrafts.platform.windows.WindowsPrintManager \
-		com.lightcrafts.platform.windows.WindowsSavedSearch \
-		com.lightcrafts.utils.directory.WindowsDirectoryMonitor
+		com.lightcrafts.platform.windows.WindowsSavedSearch
 
 include		$(ROOT)/lightcrafts/jnisrc/jni.mk
 

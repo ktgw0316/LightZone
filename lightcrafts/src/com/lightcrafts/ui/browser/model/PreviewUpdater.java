@@ -20,6 +20,7 @@ import com.lightcrafts.image.metadata.ImageMetadata;
 import com.lightcrafts.image.types.ImageType;
 import com.lightcrafts.image.types.LZNImageType;
 import com.lightcrafts.image.types.RawImageType;
+import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.utils.filecache.FileCache;
 import com.lightcrafts.utils.filecache.FileCacheFactory;
 
@@ -229,7 +230,7 @@ public class PreviewUpdater extends Thread {
                 cachedImage = readCache();
             if ( cachedImage != null ) {
                 image = Thumbnailer.rotate( cachedImage, meta );
-                image = FastImageFactory.systemColorSpaceImage( image );
+                image = Functions.systemColorSpaceImage( image );
                 done = true;
             } else {
                 start();
@@ -334,7 +335,7 @@ public class PreviewUpdater extends Thread {
                         }
                     }
                     preview = Thumbnailer.rotate(preview, meta);
-                    preview = FastImageFactory.systemColorSpaceImage(preview);
+                    preview = Functions.systemColorSpaceImage(preview);
                     updateImage(preview);
                 }
             }

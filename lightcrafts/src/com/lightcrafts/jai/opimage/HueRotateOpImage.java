@@ -27,8 +27,8 @@ import java.util.Map;
  */
 public class HueRotateOpImage extends PointOpImage {
     private float angle;
-    private float toSRGB[][];
-    private float toLinearRGB[][];
+    private float[][] toSRGB;
+    private float[][] toLinearRGB;
 
     public HueRotateOpImage(RenderedImage source, float angle, Map config) {
         super(source, new ImageLayout(source), config, true);
@@ -73,13 +73,13 @@ public class HueRotateOpImage extends PointOpImage {
         int width = src.getWidth();
         int height = src.getHeight();
 
-        short dstData[] = dst.getShortDataArray(0);
-        int dstBandOffsets[] = dst.getBandOffsets();
+        short[] dstData = dst.getShortDataArray(0);
+        int[] dstBandOffsets = dst.getBandOffsets();
         int dstLineStride = dst.getScanlineStride();
         int dstPixelStride = dst.getPixelStride();
 
-        short srcData[] = src.getShortDataArray(0);
-        int srcBandOffsets[] = src.getBandOffsets();
+        short[] srcData = src.getShortDataArray(0);
+        int[] srcBandOffsets = src.getBandOffsets();
         int srcLineStride = src.getScanlineStride();
         int srcPixelStride = src.getPixelStride();
 
@@ -91,8 +91,8 @@ public class HueRotateOpImage extends PointOpImage {
         int dstGOffset = dstBandOffsets[1];
         int dstBOffset = dstBandOffsets[2];
 
-        float rgb[] = new float[3];
-        float hsi[] = new float[3];
+        float[] rgb = new float[3];
+        float[] hsi = new float[3];
 
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {

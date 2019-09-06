@@ -17,7 +17,7 @@ public class ColorScience {
     public static final float Wr;
     public static final float Wg;
     public static final float Wb;
-    public static final float W[];
+    public static final float[] W;
 
     static final float[][] Cxy;
 
@@ -75,13 +75,13 @@ public class ColorScience {
     // TODO: we have to finish cleaning up this.
 
     public static class ICC_ProfileParameters {
-        public float rgbXYZ[][] = new float[3][3];
-        public float wtptXYZ[];
-        public float Cxy[][];
+        public float[][] rgbXYZ = new float[3][3];
+        public float[] wtptXYZ;
+        public float[][] Cxy;
         public float whitePointTemperature;
-        public float W[];
-        public float RGBToXYZMat[][];
-        public float XYZToRGBMat[][];
+        public float[] W;
+        public float[][] RGBToXYZMat;
+        public float[][] XYZToRGBMat;
 
         public ICC_ProfileParameters(ICC_ProfileRGB profile) {
             // Extract the rgbXYZ from the current linear color profile
@@ -104,9 +104,9 @@ public class ColorScience {
                 {rgbXYZ[2][0] / Cb, rgbXYZ[2][1] / Cb}
             };
 
-            float Zr[] = new float[] {Cxy[0][0], Cxy[0][1], 1 - Cxy[0][0] - Cxy[0][1]};
-            float Zg[] = new float[] {Cxy[1][0], Cxy[1][1], 1 - Cxy[1][0] - Cxy[1][1]};
-            float Zb[] = new float[] {Cxy[2][0], Cxy[2][1], 1 - Cxy[2][0] - Cxy[2][1]};
+            float[] Zr = new float[]{Cxy[0][0], Cxy[0][1], 1 - Cxy[0][0] - Cxy[0][1]};
+            float[] Zg = new float[]{Cxy[1][0], Cxy[1][1], 1 - Cxy[1][0] - Cxy[1][1]};
+            float[] Zb = new float[]{Cxy[2][0], Cxy[2][1], 1 - Cxy[2][0] - Cxy[2][1]};
 
             // wtptXYZ -> wtptxy
             final float[] wtptxy = XYZ2xy(wtptXYZ);
@@ -170,14 +170,14 @@ public class ColorScience {
         return W(T, Cxy);
     }
 
-    public static float[] W(float T, float Cxy[][]) {
-        float DT[] = D(T);
+    public static float[] W(float T, float[][] Cxy) {
+        float[] DT = D(T);
 
         // Compute z-coordinates
-        float R[] = {Cxy[0][0], Cxy[0][1], 1 - Cxy[0][0] - Cxy[0][1]};
-        float G[] = {Cxy[1][0], Cxy[1][1], 1 - Cxy[1][0] - Cxy[1][1]};
-        float B[] = {Cxy[2][0], Cxy[2][1], 1 - Cxy[2][0] - Cxy[2][1]};
-        float W[] = {DT[0], DT[1], 1 - DT[0] - DT[1]};
+        float[] R = {Cxy[0][0], Cxy[0][1], 1 - Cxy[0][0] - Cxy[0][1]};
+        float[] G = {Cxy[1][0], Cxy[1][1], 1 - Cxy[1][0] - Cxy[1][1]};
+        float[] B = {Cxy[2][0], Cxy[2][1], 1 - Cxy[2][0] - Cxy[2][1]};
+        float[] W = {DT[0], DT[1], 1 - DT[0] - DT[1]};
 
         // Compute luminance weights for the primaries using the white point
         val RGB = vec(R, G, B);
@@ -361,7 +361,7 @@ public class ColorScience {
     }
 
     public static double[][] strip(double[][] x) {
-        double r[][] = new double[3][];
+        double[][] r = new double[3][];
         r[0] = x[0];
         r[1] = x[1];
         r[2] = x[2];
@@ -415,7 +415,7 @@ public class ColorScience {
     }
 
     static float[][] matrix(float t) {
-        float matrix[][] = new float[3][3];
+        float[][] matrix = new float[3][3];
         float m = mixer(t);
 
         for (int i = 0; i < 3; i++)
@@ -493,7 +493,7 @@ public class ColorScience {
     private static SimpleMatrix RGBtoZYX = new LCMatrix(RGBtoZYX()).transpose();
     private static SimpleMatrix XYZtoRGB = RGBtoZYX.invert();
 
-    public static float[] neutralTemperature(float rgb[], float refT, CAMethod caMethod) {
+    public static float[] neutralTemperature(float[] rgb, float refT, CAMethod caMethod) {
         float sat = Float.MAX_VALUE;
         float minT = 0;
         double wbr = 0, wbg = 0, wbb = 0;
@@ -533,7 +533,7 @@ public class ColorScience {
         return Math.min(Math.max(0, x), 1);
     }
 
-    public static float findTemperature(float rgb[], float refT, CAMethod caMethod) {
+    public static float findTemperature(float[] rgb, float refT, CAMethod caMethod) {
         float minDiff = Float.MAX_VALUE;
         float minT = 0;
 
@@ -582,7 +582,7 @@ public class ColorScience {
         for (int i = 2000; i < 25000; i += 500)
             System.out.println("m(" + i + ") : " + mixer(i));
 
-        float D65[] = D(whitePointTemperature);
+        float[] D65 = D(whitePointTemperature);
 
         System.out.println("D65: " + D65[0] + ", " + D65[1] + ", " + (1 - D65[0] - D65[1]));
 

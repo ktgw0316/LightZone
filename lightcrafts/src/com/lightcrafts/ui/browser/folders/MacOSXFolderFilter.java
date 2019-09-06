@@ -21,20 +21,20 @@ final class MacOSXFolderFilter extends FolderFilter {
     /**
      * {@inheritDoc}
      */
-    public boolean accept( File file ) {
-        if ( !super.accept( file ) )
+    public boolean accept(File file) {
+        if (!super.accept(file))
             return false;
         final String parent = file.getParent();
-        if ( !("/".equals( parent ) ||
-             m_volumePattern.matcher( parent ).matches()) )
+        if (!("/".equals(parent) ||
+             m_volumePattern.matcher(parent).matches()))
             return true;
 
-        if ( m_volumePattern.matcher( parent ).matches() &&
-             file.getName().equals( "tmp" )
-        )
+        if (m_volumePattern.matcher(parent).matches() &&
+             file.getName().equals("tmp")
+       )
             return true;
 
-        return !m_hiddenDirectories.contains( file.getName() );
+        return !m_hiddenDirectories.contains(file.getName());
     }
 
     ////////// private ////////////////////////////////////////////////////////
@@ -42,8 +42,7 @@ final class MacOSXFolderFilter extends FolderFilter {
     /**
      * The set of directories that are hidden by the Finder.
      */
-    private static final HashSet<String> m_hiddenDirectories =
-        new HashSet<String>();
+    private static final HashSet<String> m_hiddenDirectories = new HashSet<>();
 
     /**
      * The {@link Pattern} used to match the parent directory of a candidate
@@ -53,7 +52,7 @@ final class MacOSXFolderFilter extends FolderFilter {
      * path matches {@code /Volumes/*}.
      */
     private static final Pattern m_volumePattern =
-        Pattern.compile( "^/Volumes/[^/]*$" );
+        Pattern.compile("^/Volumes/[^/]*$");
 
     static {
         final String[] hiddenDirectories = {
@@ -73,7 +72,7 @@ final class MacOSXFolderFilter extends FolderFilter {
             "var",
             "Volumes",
         };
-        m_hiddenDirectories.addAll( Arrays.asList( hiddenDirectories ) );
+        m_hiddenDirectories.addAll(Arrays.asList(hiddenDirectories));
     }
 
 }

@@ -78,7 +78,7 @@ public class ImageTask implements Runnable {
                 image = Thumbnailer.rotate(image, meta);
             }
             else {
-                datum.setBadFile();
+                datum.setBadFile(true);
             }
         }
         // If anything worked, scale and optimize for the ImageDatum.

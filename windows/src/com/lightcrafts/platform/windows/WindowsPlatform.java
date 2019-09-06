@@ -2,31 +2,21 @@
 
 package com.lightcrafts.platform.windows;
 
-import java.awt.color.ICC_Profile;
-import java.io.File;
-import java.io.InputStream;
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Stream;
-
-import javax.swing.filechooser.FileSystemView;
-import javax.swing.*;
-
-import sun.awt.shell.ShellFolder;
-
+import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.platform.FileChooser;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.platform.PrinterLayer;
-import com.lightcrafts.image.color.ColorProfileInfo;
-import com.lightcrafts.utils.directory.DirectoryMonitor;
-import com.lightcrafts.utils.directory.WindowsDirectoryMonitor;
-import com.lightcrafts.utils.file.FileUtil;
-import com.lightcrafts.utils.file.ICC_ProfileFileFilter;
 import com.lightcrafts.utils.Version;
+import com.lightcrafts.utils.file.FileUtil;
 
-import static com.lightcrafts.platform.windows.WindowsFileUtil.*;
+import javax.swing.filechooser.FileSystemView;
+import java.awt.color.ICC_Profile;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collection;
 
-import com.lightcrafts.ui.LightZoneSkin;
+import static com.lightcrafts.platform.windows.WindowsFileUtil.FOLDER_MY_PICTURES;
 
 public final class WindowsPlatform extends Platform {
 
@@ -37,11 +27,6 @@ public final class WindowsPlatform extends Platform {
         final String path =
             WindowsFileUtil.getFolderPathOf( FOLDER_MY_PICTURES );
         return path != null ? new File( path ) : null;
-    }
-
-    @Override
-    public DirectoryMonitor getDirectoryMonitor() {
-        return new WindowsDirectoryMonitor();
     }
 
     @Override

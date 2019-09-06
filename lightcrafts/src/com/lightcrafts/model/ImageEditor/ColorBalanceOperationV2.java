@@ -98,7 +98,7 @@ public class ColorBalanceOperationV2 extends BlendedOperation implements com.lig
                             int g = pixel[1] / 256;
                             int b = pixel[2] / 256;
 
-                            float matrix[][] = {
+                            float[][] matrix = {
                                     {1, 0, 0, 0},
                                     {0, 1, 0, 0},
                                     {0, 0, 1, 0},
@@ -119,7 +119,7 @@ public class ColorBalanceOperationV2 extends BlendedOperation implements com.lig
                             color = new Color(red, green, blue);
                         } else {
                             // Get the complementary color
-                            float hsb[] = new float[3];
+                            float[] hsb = new float[3];
                             hsb = Color.RGBtoHSB(pixel[0] / 256, pixel[1] / 256, pixel[2] / 256, hsb);
                             hsb[0] += 0.5;
                             if (hsb[0] >= 1)
@@ -140,25 +140,25 @@ public class ColorBalanceOperationV2 extends BlendedOperation implements com.lig
                 double tgreen = pixel[1] / 2 - pixel[0] / 4 - pixel[2] / 4;
                 double tblue = pixel[2] / 2 - pixel[0] / 4 - pixel[1] / 4;
 
-                double polygon[][] = {
-                    {0, 0},
-                    {midpoint, 0},
-                    {1, 0}
+                double[][] polygon = {
+                        {0, 0},
+                        {midpoint, 0},
+                        {1, 0}
                 };
 
                 polygon[1][1] = tred / 256.;
-                double redCurve[][] = new double[256][2];
+                double[][] redCurve = new double[256][2];
                 splines.bspline(2, polygon, redCurve);
 
                 polygon[1][1] = tgreen / 256.;
-                double greenCurve[][] = new double[256][2];
+                double[][] greenCurve = new double[256][2];
                 splines.bspline(2, polygon, greenCurve);
 
                 polygon[1][1] = tblue / 256.;
-                double blueCurve[][] = new double[256][2];
+                double[][] blueCurve = new double[256][2];
                 splines.bspline(2, polygon, blueCurve);
 
-                short table[][] = new short[3][0x10000];
+                short[][] table = new short[3][0x10000];
 
                 splines.Interpolator interpolator = new splines.Interpolator();
 

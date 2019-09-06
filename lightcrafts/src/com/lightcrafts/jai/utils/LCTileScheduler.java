@@ -1095,7 +1095,7 @@ public final class LCTileScheduler implements TileScheduler {
      * @return  An array of computed tiles.
      */
     public Raster[] scheduleTiles(OpImage owner,
-                                  Point tileIndices[]) {
+                                  Point[] tileIndices) {
         if (owner == null || tileIndices == null) {
             throw new IllegalArgumentException("Null owner or TileIndices");
         }

@@ -202,7 +202,7 @@ public class ZoneFinder extends Preview implements PaintListener {
     // requantize the segmented image to match the same lightness scale used in the zone mapper
     private static RenderedImage requantize(RenderedImage image, int focusZone) {
         int steps = 16;
-        int colors[] = new int[steps + 1];
+        int[] colors = new int[steps + 1];
         for (int i = 0; i < steps; i++) {
             float color = (float) ((Math.pow(2, i * 8.0 / (steps - 1)) - 1) / 255.);
             float[] srgbColor = Functions.fromLinearToCS(JAIContext.systemColorSpace, new float[] {color, color, color});
@@ -210,7 +210,7 @@ public class ZoneFinder extends Preview implements PaintListener {
         }
         colors[steps] = colors[steps - 1];
 
-        byte lut[][] = new byte[3][256];
+        byte[][] lut = new byte[3][256];
         int step = 0;
         for (int i = 0; i < colors[steps]; i++) {
             if (i > colors[step])
@@ -262,7 +262,7 @@ public class ZoneFinder extends Preview implements PaintListener {
     private RenderedImage segment(RenderedImage image) {
         Rectangle bounds = new Rectangle(image.getMinX(), image.getMinY(), image.getWidth(), image.getHeight());
 
-        byte pixels[] = ((DataBufferByte) image.getData(bounds).getDataBuffer()).getData();
+        byte[] pixels = ((DataBufferByte) image.getData(bounds).getDataBuffer()).getData();
         if (pixels.length != bounds.height * bounds.width * image.getSampleModel().getNumBands()) {
             pixels = (byte[]) image.getData(bounds).getDataElements(bounds.x, bounds.y, bounds.width, bounds.height, null);
         }

@@ -169,7 +169,7 @@ public class TIFFMetadataReader extends ImageMetadataReader {
         value = tiffDir.getValue( TIFF_PAGE_NUMBER );
         if ( value == null || value.getValueCount() != 2 )
             return false;
-        final String page[] = value.getValues();
+        final String[] page = value.getValues();
         try {
             return Integer.parseInt( page[1] ) == 2;
         }

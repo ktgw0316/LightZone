@@ -1405,7 +1405,7 @@ public class ComboFrame
     public static void enableFullScreenMode(Window window) {
         try {
             Class<?> clazz = Class.forName("com.apple.eawt.FullScreenUtilities");
-            Class<?> param[] = new Class<?>[] { Window.class, Boolean.TYPE };
+            Class<?>[] param = new Class<?>[]{Window.class, Boolean.TYPE};
             Method method = clazz.getMethod("setWindowCanFullScreen", param);
             method.invoke(clazz, window, true);
         }

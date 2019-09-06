@@ -106,25 +106,25 @@ public class ColorBalanceOperation extends BlendedOperation {
             double tgreen = green / 2 - red / 4 - blue / 4;
             double tblue = blue / 2 - red / 4 - green / 4;
 
-            double polygon[][] = {
-                {0,     0},
-                {midpoint, 0},
-                {1.0,   0},
+            double[][] polygon = {
+                    {0, 0},
+                    {midpoint, 0},
+                    {1.0, 0},
             };
 
             polygon[1][1] = tred;
-            double redCurve[][] = new double[256][2];
+            double[][] redCurve = new double[256][2];
             splines.bspline(3, polygon, redCurve);
 
             polygon[1][1] = tgreen;
-            double greenCurve[][] = new double[256][2];
+            double[][] greenCurve = new double[256][2];
             splines.bspline(3, polygon, greenCurve);
 
             polygon[1][1] = tblue;
-            double blueCurve[][] = new double[256][2];
+            double[][] blueCurve = new double[256][2];
             splines.bspline(3, polygon, blueCurve);
 
-            short table[][] = new short[3][0x10000];
+            short[][] table = new short[3][0x10000];
 
             splines.Interpolator interpolator = new splines.Interpolator();
 

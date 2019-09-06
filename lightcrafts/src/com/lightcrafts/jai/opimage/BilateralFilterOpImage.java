@@ -19,7 +19,8 @@ public final class BilateralFilterOpImage extends AreaOpImage {
 
     private int wr; /* window radius */
     private int ws; /* window size */
-    private float kernel[], scale_r;
+    private float[] kernel;
+    private float scale_r;
 
     private static float SQR(float x) { return x * x; }
 
@@ -92,16 +93,16 @@ public final class BilateralFilterOpImage extends AreaOpImage {
         int swidth = src.getWidth();
         int sheight = src.getHeight();
 
-        short dstDataArrays[][] = dst.getShortDataArrays();
-        int dstBandOffsets[] = dst.getBandOffsets();
+        short[][] dstDataArrays = dst.getShortDataArrays();
+        int[] dstBandOffsets = dst.getBandOffsets();
         int dstScanlineStride = dst.getScanlineStride();
 
-        short srcDataArrays[][] = src.getShortDataArrays();
-        int srcBandOffsets[] = src.getBandOffsets();
+        short[][] srcDataArrays = src.getShortDataArrays();
+        int[] srcBandOffsets = src.getBandOffsets();
         int srcScanlineStride = src.getScanlineStride();
 
-        short dstData[] = dstDataArrays[0];
-        short srcData[] = srcDataArrays[0];
+        short[] dstData = dstDataArrays[0];
+        short[] srcData = srcDataArrays[0];
 
         if (src.getNumBands() == 1)
             bilateralFilterMonoRLM(srcData, dstData,
@@ -119,17 +120,17 @@ public final class BilateralFilterOpImage extends AreaOpImage {
                                   srcScanlineStride, dstScanlineStride);
     }
 
-    static native void bilateralFilterChromaRLM(short srcData[], short destData[],
-                                    int wr, int ws, float scale_r, float kernel[],
-                                    int width, int height,
-                                    int srcROffset, int srcGOffset, int srcBOffset,
-                                    int destROffset, int destGOffset, int destBOffset,
-                                    int srcLineStride, int destLineStride);
+    static native void bilateralFilterChromaRLM(short[] srcData, short[] destData,
+                                                int wr, int ws, float scale_r, float[] kernel,
+                                                int width, int height,
+                                                int srcROffset, int srcGOffset, int srcBOffset,
+                                                int destROffset, int destGOffset, int destBOffset,
+                                                int srcLineStride, int destLineStride);
 
-    static native void bilateralFilterMonoRLM(short srcData[], short destData[],
-                                        int wr, int ws, float scale_r, float kernel[],
-                                        int width, int height,
-                                        int srcPixelStride, int destPixelStride,
-                                        int srcOffset, int destOffset,
-                                        int srcLineStride, int destLineStride);
+    static native void bilateralFilterMonoRLM(short[] srcData, short[] destData,
+                                              int wr, int ws, float scale_r, float[] kernel,
+                                              int width, int height,
+                                              int srcPixelStride, int destPixelStride,
+                                              int srcOffset, int destOffset,
+                                              int srcLineStride, int destLineStride);
 }

@@ -24,8 +24,8 @@ public class splines {
     knots[]  = knot vector
 */
 
-    static void basis(int order, double t, int vertices, int knots[], double nbasis[]) {
-        double temp[] = new double[knots.length - 1];
+    static void basis(int order, double t, int vertices, int[] knots, double[] nbasis) {
+        double[] temp = new double[knots.length - 1];
 
         /* calculate the first order basis functions n[i][1]	*/
 
@@ -74,7 +74,7 @@ public class splines {
     knots[]      = array containing the knot vector
 */
 
-    static void knot(int vertices, int order, int knots[]) {
+    static void knot(int vertices, int order, int[] knots) {
         knots[0] = 0;
         for (int i = 1; i < vertices + order; i++) {
             if ((i > order - 1) && (i < vertices + 1))
@@ -96,10 +96,10 @@ public class splines {
     curve and polygon can have an arbitrary number of dimensions
 */
 
-    public static void bspline(int order, double polygon[][], double curve[][]) {
+    public static void bspline(int order, double[][] polygon, double[][] curve) {
         assert(polygon[0].length == curve[0].length);
-        int knots[] = new int[polygon.length + order];
-        double nbasis[] = new double[polygon.length];
+        int[] knots = new int[polygon.length + order];
+        double[] nbasis = new double[polygon.length];
         int dimensions = polygon[0].length;
 
         /* generate the uniform open knot vector */
@@ -148,8 +148,8 @@ public class splines {
     x[]      = knot vector
 */
 
-    static void rbasis(int order, double t, int vertices, int knots[], double weights[], double nbasis[]) {
-        double temp[] = new double[knots.length - 1];
+    static void rbasis(int order, double t, int vertices, int[] knots, double[] weights, double[] nbasis) {
+        double[] temp = new double[knots.length - 1];
 
         /* calculate the first order basis functions n[i][1]	*/
 
@@ -221,11 +221,11 @@ public class splines {
     x[]         = array containing the knot vector
 */
 
-    public static void rbspline(int order, double polygon[][], double weights[], double curve[][]) {
+    public static void rbspline(int order, double[][] polygon, double[] weights, double[][] curve) {
         assert(polygon[0].length == curve[0].length);
         assert(polygon.length == weights.length);
-        int knots[] = new int[polygon.length + order];
-        double nbasis[] = new double[polygon.length];
+        int[] knots = new int[polygon.length + order];
+        double[] nbasis = new double[polygon.length];
         int dimensions = polygon[0].length;
 
         /* generate the uniform open knot vector */
@@ -264,13 +264,13 @@ public class splines {
         int order = 2;     /* second order, change to 4 to get fourth order */
         int points = 11;   /* eleven points on curve */
 
-        double polygon[][] = {
-            {1, 1, 1},
-            {2, 3, 1},
-            {4, 3, 1},
-            {3, 1, 1}
+        double[][] polygon = {
+                {1, 1, 1},
+                {2, 3, 1},
+                {4, 3, 1},
+                {3, 1, 1}
         };
-        double curve[][] = new double[points][3];
+        double[][] curve = new double[points][3];
 
         bspline(order, polygon, curve);
 
@@ -288,19 +288,19 @@ public class splines {
         order = 2;     /* second order, change to 4 to get fourth order */
         points = 11;   /* eleven points on curve */
 
-        double weights[] = new double[vertices];
+        double[] weights = new double[vertices];
 
         for (int i=0; i < vertices; i++)
             weights[i] = 1.0;
 
         weights[2] = 0.25; /*  vary the homogeneous weighting factor 0, 0.25, 1.0, 5.0 */
 
-        double polygon2[][] = {
-            {0, 0, 1},
-            {1, 2, 1},
-            {2.5, 0, 1},
-            {4, 2, 1},
-            {5, 0, 1}
+        double[][] polygon2 = {
+                {0, 0, 1},
+                {1, 2, 1},
+                {2.5, 0, 1},
+                {4, 2, 1},
+                {5, 0, 1}
         };
 
         curve = new double[points][3];
@@ -318,7 +318,7 @@ public class splines {
             System.out.print(" " + curve[i][0] + " " + curve[i][1] + " " + curve[i][2] + " \n");
     }
 
-    public static double[] interpolate(double min, double max, double step, double curve[][], double result[]) {
+    public static double[] interpolate(double min, double max, double step, double[][] curve, double[] result) {
         Interpolator interpolator = new Interpolator();
 
         if (result == null)
@@ -330,7 +330,7 @@ public class splines {
         return result;
     }
 
-    public static short[] interpolate(double min, double max, double step, double curve[][], short result[]) {
+    public static short[] interpolate(double min, double max, double step, double[][] curve, short[] result) {
         Interpolator interpolator = new Interpolator();
 
         if (result == null)
@@ -349,7 +349,7 @@ public class splines {
             lastIdx = 0;
         }
 
-        public double interpolate(double x, double curve[][]) {
+        public double interpolate(double x, double[][] curve) {
             if (x < curve[0][0])
                 return x * curve[0][1] / curve[0][0];
             int last = curve.length - 1;

@@ -104,16 +104,16 @@ public class RGBDemosaicOpImage extends AreaOpImage {
     }
 
     protected void ushortLoop(RasterAccessor src, RasterAccessor dst) {
-        short dstDataArrays[][] = dst.getShortDataArrays();
-        int dstBandOffsets[] = dst.getBandOffsets();
+        short[][] dstDataArrays = dst.getShortDataArrays();
+        int[] dstBandOffsets = dst.getBandOffsets();
         int dstScanlineStride = dst.getScanlineStride()/3;
 
-        short srcDataArrays[][] = src.getShortDataArrays();
-        int srcBandOffsets[] = src.getBandOffsets();
+        short[][] srcDataArrays = src.getShortDataArrays();
+        int[] srcBandOffsets = src.getBandOffsets();
         int srcScanlineStride = src.getScanlineStride();
 
-        short destData[] = dstDataArrays[0];
-        short srcData[] = srcDataArrays[0];
+        short[] destData = dstDataArrays[0];
+        short[] srcData = srcDataArrays[0];
 
         int srcOffset = srcBandOffsets[0];
 

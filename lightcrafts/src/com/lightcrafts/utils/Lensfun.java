@@ -49,13 +49,9 @@ public class Lensfun {
         return instance;
     }
 
-    @Override
-    public void finalize() throws Throwable {
-        try {
-            super.finalize();
-        } finally {
-            destroy(_handle);
-        }
+    public void dispose() {
+        destroy(_handle);
+        instance = null;
     }
 
     public synchronized List<String> getLensNamesFor(
@@ -109,7 +105,7 @@ public class Lensfun {
     //
 
     public void distortionColor(
-            short srcData[], short dstData[],
+            short[] srcData, short[] dstData,
             int srcRectX, int srcRectY, int srcRectWidth, int srcRectHeight,
             int dstRectX, int dstRectY, int dstRectWidth, int dstRectHeight,
             int srcPixelStride, int dstPixelStride,

@@ -63,12 +63,12 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
             System.out.println("daylightMultipliers: " + daylightMultipliers[0] + ", " + daylightMultipliers[1] + ", " + daylightMultipliers[2]);
             System.out.println("cameraMultipliers: " + cameraMultipliers[0] + ", " + cameraMultipliers[1] + ", " + cameraMultipliers[2]);
 
-            float RGBToXYZMat[][] = ColorScience.RGBToXYZMat;
+            float[][] RGBToXYZMat = ColorScience.RGBToXYZMat;
 
             if (false && daylightMultipliers[0] != 0) {
                 float max = Math.max(daylightMultipliers[0], Math.max(daylightMultipliers[1], daylightMultipliers[2]));
 
-                float xyz_dt[] = new float[3];
+                float[] xyz_dt = new float[3];
                 for (int i = 0; i < 3; i++)
                     for (int j = 0; j < 3; j++)
                         xyz_dt[i] += RGBToXYZMat[j][i] * daylightMultipliers[i]/max;
@@ -107,7 +107,7 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
             if (cameraMultipliers[0] != 0) {
                 float max = Math.max(cameraMultipliers[0], Math.max(cameraMultipliers[1], cameraMultipliers[2]));
 
-                float xyz_ct[] = new float[3];
+                float[] xyz_ct = new float[3];
                 for (int i = 0; i < 3; i++)
                     for (int j = 0; j < 3; j++)
                         xyz_ct[i] += RGBToXYZMat[j][i] * cameraMultipliers[i]/max;
@@ -211,7 +211,7 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
     private static SimpleMatrix RGBtoZYX = new LCMatrix(ColorScience.RGBtoZYX()).transpose();
     private static SimpleMatrix XYZtoRGB = RGBtoZYX.invert();
 
-    static float[] neutralize(int pixel[], ColorScience.CAMethod caMethod, float source, float REF_T) {
+    static float[] neutralize(int[] pixel, ColorScience.CAMethod caMethod, float source, float REF_T) {
         double r = pixel[0];
         double g = pixel[1];
         double b = pixel[2];
@@ -254,7 +254,7 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
         return whiteBalance(image, source, REF_T, tint, lightness, 1, null, caMethod);
     }
 
-    static public float[][] whiteBalanceMatrix(float source, float REF_T, float mult, float cameraRGB[][], ColorScience.CAMethod caMethod) {
+    static public float[][] whiteBalanceMatrix(float source, float REF_T, float mult, float[][] cameraRGB, ColorScience.CAMethod caMethod) {
         val B = new LCMatrix(ColorScience.chromaticAdaptation(REF_T, source, caMethod));
         SimpleMatrix combo = XYZtoRGB.mult(B.mult(RGBtoZYX));
 
@@ -279,25 +279,25 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
             double tgreen = tint / 2;
             double tblue = - tint / 4;
 
-            double polygon[][] = {
-                {0,     0},
-                {lightness, 0},
-                {1,     0}
+            double[][] polygon = {
+                    {0, 0},
+                    {lightness, 0},
+                    {1, 0}
             };
 
             polygon[1][1] = tred;
-            double redCurve[][] = new double[256][2];
+            double[][] redCurve = new double[256][2];
             splines.bspline(2, polygon, redCurve);
 
             polygon[1][1] = tgreen;
-            double greenCurve[][] = new double[256][2];
+            double[][] greenCurve = new double[256][2];
             splines.bspline(2, polygon, greenCurve);
 
             polygon[1][1] = tblue;
-            double blueCurve[][] = new double[256][2];
+            double[][] blueCurve = new double[256][2];
             splines.bspline(2, polygon, blueCurve);
 
-            short table[][] = new short[3][0x10000];
+            short[][] table = new short[3][0x10000];
 
             splines.Interpolator interpolator = new splines.Interpolator();
 
@@ -323,7 +323,7 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
     }
 
     static public PlanarImage whiteBalance(RenderedImage image, float source, float REF_T,
-                                           float tint, float lightness, float mult, float cameraRGB[][],
+                                           float tint, float lightness, float mult, float[][] cameraRGB,
                                            ColorScience.CAMethod caMethod) {
         float[][] b = whiteBalanceMatrix(source, REF_T, mult, cameraRGB, caMethod);
 
@@ -350,10 +350,10 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
             float lightness = 0.18f;
 
             if (p != null) {
-                int pixel[] = pointToPixel(p);
+                int[] pixel = pointToPixel(p);
 
                 if (pixel != null) {
-                    float n[] = neutralize(pixel, caMethod, source, REF_T);
+                    float[] n = neutralize(pixel, caMethod, source, REF_T);
                     if (n != null) {
                         lightness = pixel[1]/255.0f;
 

@@ -518,7 +518,7 @@ public final class LCTIFFReader extends LCTIFFCommon implements LCImageReader {
 
         final ProgressIndicator indicator = ProgressIndicatorFactory.create(thread, tf.tiles);
 
-        final int bandList[] = new int[tf.samplesPerPixel];
+        final int[] bandList = new int[tf.samplesPerPixel];
         for (int i = 0; i < tf.samplesPerPixel; i++) {
             bandList[i] = i;
         }

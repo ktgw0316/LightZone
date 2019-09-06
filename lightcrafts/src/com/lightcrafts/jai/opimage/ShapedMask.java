@@ -347,13 +347,13 @@ public class ShapedMask extends PlanarImage {
 
             Rectangle itx = maskImage.getBounds().intersection(rect);
 
-            byte resultData[];
+            byte[] resultData;
             if (!overlay) {
                 resultData = (byte[]) maskImage.getData(itx).getDataElements(itx.x, itx.y, itx.width, itx.height, null);
                 overlay = true;
             } else {
                 resultData = (byte[]) result.getDataElements(itx.x, itx.y, itx.width, itx.height, null);
-                byte currentData[] = (byte[]) maskImage.getData(itx).getDataElements(itx.x, itx.y, itx.width, itx.height, null);
+                byte[] currentData = (byte[]) maskImage.getData(itx).getDataElements(itx.x, itx.y, itx.width, itx.height, null);
 
                 // blend overlapping regions using Porter-Duff alpha compositing: ar = a1 * (1 - a2) + a2
                 for (int i = 0; i < resultData.length; i++) {

@@ -80,8 +80,8 @@ public final class KDCImageType extends RawImageType {
      * All the possible filename extensions for KDC files.  All must be lower
      * case and the preferred one must be first.
      */
-    private static final String EXTENSIONS[] = {
-        "kdc"
+    private static final String[] EXTENSIONS = {
+            "kdc"
     };
 }
 /* vim:set et sw=4 ts=4: */

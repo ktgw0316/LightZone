@@ -6,8 +6,7 @@ package com.lightcrafts.image.metadata;
 import com.lightcrafts.image.metadata.providers.GPSProvider;
 import com.lightcrafts.image.metadata.values.UnsignedRationalMetaValue;
 import com.lightcrafts.utils.Rational;
-
-import lombok.Data;
+import com.lightcrafts.utils.tuple.Pair;
 import lombok.Getter;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
@@ -141,12 +140,6 @@ public final class GPSDirectory extends ImageMetadataDirectory
     }
 
     ////////// private ////////////////////////////////////////////////////////
-
-    @Data(staticConstructor = "of")
-    static private class Pair<A, B> {
-        private final A left;
-        private final B right;
-    }
 
     @Getter
     private final String name = "GPS";

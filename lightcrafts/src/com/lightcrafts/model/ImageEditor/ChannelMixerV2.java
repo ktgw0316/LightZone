@@ -93,7 +93,7 @@ public class ChannelMixerV2 extends BlendedOperation implements com.lightcrafts.
 //        }
 
         PlanarImage setFrontV4() {
-            float filter[] = {color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f};
+            float[] filter = {color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f};
             filter = JAIContext.linearColorSpace.fromRGB(filter);
 
             float red = 1 - filter[0];

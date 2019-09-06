@@ -47,7 +47,7 @@ public class WhiteBalance extends BlendedOperation {
 
     private float original = 6500;
     private float target = 6500;
-    private float Wt[] = null;
+    private float[] Wt = null;
 
     @Override
     public void setSliderValue(String key, double value) {

@@ -128,8 +128,8 @@ public final class DNGImageType extends RawImageType implements TagHandler {
      * All the possible filename extensions for DNG files.  All must be lower
      * case and the preferred one must be first.
      */
-    private static final String EXTENSIONS[] = {
-        "dng"
+    private static final String[] EXTENSIONS = {
+            "dng"
     };
 }
 /* vim:set et sw=4 ts=4: */

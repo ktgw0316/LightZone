@@ -1,9 +1,11 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2018-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.browser.folders;
 
 import java.io.File;
-import java.util.*;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 // A lookup table for inverting FolderTreeNode.getFile().  Useful for
 // restoring selections from preferences, and identifying the changed node
@@ -14,12 +16,14 @@ class NodeFileIndex {
     private Map<File, FolderTreeNode> index;
 
     NodeFileIndex() {
-        index = new HashMap<File, FolderTreeNode>();
+        index = new ConcurrentHashMap<>();
     }
 
     void add(FolderTreeNode node) {
         File file = node.getFile();
-        index.put(file, node);
+        if (file != null && ! index.containsKey(file)) {
+            index.put(file, node);
+        }
     }
 
     FolderTreeNode get(File file) {
@@ -28,6 +32,8 @@ class NodeFileIndex {
 
     void remove(FolderTreeNode node) {
         File file = node.getFile();
-        index.remove(file);
+        if (file != null) {
+            index.remove(file);
+        }
     }
 }

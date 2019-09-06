@@ -9,7 +9,7 @@ package com.lightcrafts.image.color;
  * Time: 4:37:19 PM
  */
 public class HSB {
-    public static void fromRGB(float rgb[], float[] hsb) {
+    public static void fromRGB(float[] rgb, float[] hsb) {
         float hue, saturation, brightness;
         if (hsb == null)
             hsb = new float[3];
@@ -70,7 +70,7 @@ public class HSB {
         return hue;
     }
 
-    public static void toRGBSlow(float[] hsb, float rgb[]) {
+    public static void toRGBSlow(float[] hsb, float[] rgb) {
         if (hsb[1] == 0)
             rgb[0] = rgb[1] = rgb[2] = hsb[2];
         else {
@@ -117,7 +117,7 @@ public class HSB {
         }
     }
 
-    public static void toRGB(float[] hsb, float rgb[]) {
+    public static void toRGB(float[] hsb, float[] rgb) {
         if (hsb[2] == 0) {   // safety short circuit again
             rgb[0] = rgb[1] = rgb[2] = 0;
             return;

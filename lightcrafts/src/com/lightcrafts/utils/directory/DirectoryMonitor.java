@@ -1,9 +1,15 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2018-     Masahiro Kitagawa */
 
 package com.lightcrafts.utils.directory;
 
 import java.io.File;
-import java.util.*;
+import java.nio.file.Path;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * A <code>DirectoryMonitor</code> is a class that monitors a collection of
@@ -14,9 +20,9 @@ import java.util.*;
  */
 public abstract class DirectoryMonitor {
 
-    static final boolean DEBUG = false;
+    WatchService watcher;
 
-    ////////// public /////////////////////////////////////////////////////////
+    static final boolean DEBUG = false;
 
     /**
      * Add a directory to be monitored.  Adding the same directory more than
@@ -24,7 +30,7 @@ public abstract class DirectoryMonitor {
      *
      * @param directory The directory to be monitored.
      */
-    public abstract void addDirectory( File directory );
+    public abstract void addDirectory(File directory);
 
     /**
      * Add a {@link DirectoryListener} to the collection of
@@ -33,9 +39,9 @@ public abstract class DirectoryMonitor {
      *
      * @param listener The {@link DirectoryListener} to add.
      */
-    public final void addListener( DirectoryListener listener ) {
-        synchronized ( m_listeners ) {
-            m_listeners.add( listener );
+    public final void addListener(DirectoryListener listener) {
+        synchronized (m_listeners) {
+            m_listeners.add(listener);
         }
     }
 
@@ -54,14 +60,14 @@ public abstract class DirectoryMonitor {
      * @param force If <code>true</code>, force resumption and monitoring and
      * notification.
      */
-    public final synchronized void resume( boolean force ) {
-        if ( force || --m_suspendCount < 0 )
+    public final synchronized void resume(boolean force) {
+        if (force || --m_suspendCount < 0)
             m_suspendCount = 0;
-        //noinspection ConstantConditions
-        if ( DEBUG )
+        if (DEBUG) {
             System.out.println(
-                "DirectoryMonitor: resuming (" + m_suspendCount + ')'
+                    "DirectoryMonitor: resuming (" + m_suspendCount + ')'
             );
+        }
     }
 
     /**
@@ -71,7 +77,7 @@ public abstract class DirectoryMonitor {
      * @return Returns <code>true</code> only if the directory was being
      * monitored and thus removed.
      */
-    public abstract boolean removeDirectory( File directory );
+    public abstract boolean removeDirectory(File directory);
 
     /**
      * Remove a {@link DirectoryListener} from receiving notifications about
@@ -81,9 +87,9 @@ public abstract class DirectoryMonitor {
      * @return Returns <code>true</code> only if the {@link DirectoryListener}
      * was removed.
      */
-    public final boolean removeListener( DirectoryListener listener ) {
-        synchronized ( m_listeners ) {
-            return m_listeners.remove( listener );
+    public final boolean removeListener(DirectoryListener listener) {
+        synchronized (m_listeners) {
+            return m_listeners.remove(listener);
         }
     }
 
@@ -95,31 +101,12 @@ public abstract class DirectoryMonitor {
      */
     public final synchronized void suspend() {
         ++m_suspendCount;
-        //noinspection ConstantConditions
-        if ( DEBUG )
+        if (DEBUG) {
             System.out.println(
-                "DirectoryMonitor: suspending (" + m_suspendCount + ')'
+                    "DirectoryMonitor: suspending (" + m_suspendCount + ')'
             );
-    }
-
-    ////////// package ///////////////////////////////////////////////////////
-
-    /**
-     * This method is just like {@link Thread#sleep(long)} except it handles
-     * the annoying {@link InterruptedException}.
-     *
-     * @param millis The length of time to sleep in milliseconds.
-     */
-    static void doze( long millis ) {
-        try {
-            Thread.sleep( millis );
-        }
-        catch ( InterruptedException e ) {
-            // ignore
         }
     }
-
-    ////////// protected //////////////////////////////////////////////////////
 
     /**
      * Finalize this <code>DirectoryMonitor</code> by calling
@@ -131,22 +118,6 @@ public abstract class DirectoryMonitor {
     }
 
     /**
-     * Gets the set of monitored directories.
-     *
-     * @return Returns an array of said directories.
-     */
-    protected abstract File[] getMonitoredDirectories();
-
-    /**
-     * Checks whether the given directory has changed.
-     *
-     * @param directory The directory to check.  It must have been previously
-     * added via {@link #addDirectory(File)}.
-     * @return Returns <code>true</code> only if the directory changed.
-     */
-    protected abstract boolean hasChanged( File directory );
-
-    /**
      * Start monitoring.  This must be called by derived class constructors.
      * This can not be put into this class's constructor because then the
      * thread will start before the derived class has finished construction.
@@ -155,7 +126,7 @@ public abstract class DirectoryMonitor {
         m_monitorThread.start();
     }
 
-    ////////// private ////////////////////////////////////////////////////////
+    abstract Path getPathFor(WatchKey key);
 
     /**
      * A <code>MonitorThread</code> is-a {@link Thread} that monitors a
@@ -163,32 +134,33 @@ public abstract class DirectoryMonitor {
      */
     private final class MonitorThread extends Thread {
 
-        ////////// public /////////////////////////////////////////////////////
-
         /**
          * Monitor all the requested directories for changes.
          */
+        @Override
         public void run() {
-            while ( !m_stop ) {
-                final int suspendCount;
-                synchronized ( DirectoryMonitor.this ) {
-                    //
-                    // Make a copy of the current value of m_suspendCount so
-                    // the DirectoryMonitor object isn't locked the entire time
-                    // the directories are being checked below.
-                    //
-                    suspendCount = m_suspendCount;
+            while (!m_stop) {
+                final WatchKey watchKey;
+                try {
+                    watchKey = watcher.take();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    return;
                 }
-                if ( suspendCount == 0 ) {
-                    for ( File dir : getMonitoredDirectories() )
-                        if ( hasChanged( dir ) )
-                            notifyListenersAbout( dir );
+
+                final Path path = (Path) watchKey.watchable();
+                for (final WatchEvent event : watchKey.pollEvents()) {
+                    Path context = (Path) event.context();
+                    Path dir = getPathFor(watchKey);
+                    Path file = dir.resolve(context);
+                    String kind = event.kind().name();
+                    notifyListenersAbout(dir, file, kind);
                 }
-                doze( 3000 );
+                if (! watchKey.reset()) {
+                    System.out.println("Disappeared: " + path);
+                }
             }
         }
-
-        ////////// package ////////////////////////////////////////////////////
 
         /**
          * Stop this thread.
@@ -197,15 +169,13 @@ public abstract class DirectoryMonitor {
             m_stop = true;
         }
 
-        ////////// private ////////////////////////////////////////////////////
-
         /**
          * Construct a <code>MonitorThread</code>.
          */
         private MonitorThread() {
-            super( "DirectoryMonitor.MonitorThread" );
-            setDaemon( true );
-            setPriority( MIN_PRIORITY );
+            super("DirectoryMonitor.MonitorThread");
+            setDaemon(true);
+            setPriority(MIN_PRIORITY);
         }
 
         /**
@@ -220,10 +190,9 @@ public abstract class DirectoryMonitor {
      *
      * @param dir The directory to notify about.
      */
-    private void notifyListenersAbout( File dir ) {
-        synchronized ( m_listeners ) {
-            for ( DirectoryListener listener : m_listeners )
-                listener.directoryChanged( dir );
+    private void notifyListenersAbout(Path dir, Path file, String kind) {
+        synchronized (m_listeners) {
+            m_listeners.forEach(listener -> listener.directoryChanged(dir, file, kind));
         }
     }
 
@@ -231,8 +200,7 @@ public abstract class DirectoryMonitor {
      * The collection of listeners to notify whenever any monitored directory
      * changes.
      */
-    private final Collection<DirectoryListener> m_listeners =
-        new ArrayList<DirectoryListener>();
+    private final Collection<DirectoryListener> m_listeners = new ArrayList<>();
 
     /**
      * The <code>MonitorThread</code> we're using.

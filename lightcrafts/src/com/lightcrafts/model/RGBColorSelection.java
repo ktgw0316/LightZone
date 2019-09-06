@@ -57,12 +57,12 @@ public class RGBColorSelection {
         this.isLuminosityEnabled = isLuminosityEnabled;
     }
 
-    private static final float gm_blue[]    = { 0.0902f, 0.0471f, 0.2745f };
-    private static final float gm_green[]   = { 0.1294f, 0.2667f, 0.0824f };
-    private static final float gm_red[]     = { 0.2392f, 0.0706f, 0.0471f };
-    private static final float gm_yellow[]  = { 0.5882f, 0.5882f, 0.0863f };
-    private static final float gm_magenta[] = { 0.3529f, 0.1412f, 0.2980f };
-    private static final float gm_cyan[]    = { 0.1373f, 0.2275f, 0.3765f };
+    private static final float[] gm_blue = {0.0902f, 0.0471f, 0.2745f};
+    private static final float[] gm_green = {0.1294f, 0.2667f, 0.0824f};
+    private static final float[] gm_red = {0.2392f, 0.0706f, 0.0471f};
+    private static final float[] gm_yellow = {0.5882f, 0.5882f, 0.0863f};
+    private static final float[] gm_magenta = {0.3529f, 0.1412f, 0.2980f};
+    private static final float[] gm_cyan = {0.1373f, 0.2275f, 0.3765f};
 
     public RGBColorSelectionPreset getPreset() {
         if (radius == -1) {

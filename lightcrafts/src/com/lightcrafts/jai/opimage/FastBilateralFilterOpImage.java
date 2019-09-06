@@ -21,7 +21,7 @@ public final class FastBilateralFilterOpImage extends AreaOpImage {
 
     private static final BorderExtender copyExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
 
-    private static final float transform[] = new float[0x10000];
+    private static final float[] transform = new float[0x10000];
 
     static {
         for (int i = 0; i < 0x10000; i++) {
@@ -131,16 +131,16 @@ public final class FastBilateralFilterOpImage extends AreaOpImage {
         int swidth = src.getWidth();
         int sheight = src.getHeight();
 
-        short dstDataArrays[][] = dst.getShortDataArrays();
-        int dstBandOffsets[] = dst.getBandOffsets();
+        short[][] dstDataArrays = dst.getShortDataArrays();
+        int[] dstBandOffsets = dst.getBandOffsets();
         int dstScanlineStride = dst.getScanlineStride();
 
-        short srcDataArrays[][] = src.getShortDataArrays();
-        int srcBandOffsets[] = src.getBandOffsets();
+        short[][] srcDataArrays = src.getShortDataArrays();
+        int[] srcBandOffsets = src.getBandOffsets();
         int srcScanlineStride = src.getScanlineStride();
 
-        short dstData[] = dstDataArrays[0];
-        short srcData[] = srcDataArrays[0];
+        short[] dstData = dstDataArrays[0];
+        short[] srcData = srcDataArrays[0];
 
         if (src.getNumBands() == 1)
             fastBilateralFilterMono(srcData, dstData,
@@ -167,27 +167,27 @@ public final class FastBilateralFilterOpImage extends AreaOpImage {
                                      srcScanlineStride, dstScanlineStride);
     }
 
-    static native void fastBilateralFilterMono(short srcData[], short destData[],
+    static native void fastBilateralFilterMono(short[] srcData, short[] destData,
                                                float sigma_s, float sigma_r,
                                                int width, int height,
                                                int srcPixelStride, int destPixelStride,
                                                int srcOffset, int destOffset,
                                                int srcLineStride, int destLineStride,
-                                               float transform[]);
+                                               float[] transform);
 
-    static native void fastBilateralFilterChroma(short srcData[], short destData[],
-                                               float sigma_s, float sigma_r,
-                                               int width, int height,
-                                               int srcPixelStride, int destPixelStride,
-                                               int srcROffset, int srcGOffset, int srcBOffset,
-                                               int destROffset, int destGOffset, int destBOffset,
-                                               int srcLineStride, int destLineStride);
+    static native void fastBilateralFilterChroma(short[] srcData, short[] destData,
+                                                 float sigma_s, float sigma_r,
+                                                 int width, int height,
+                                                 int srcPixelStride, int destPixelStride,
+                                                 int srcROffset, int srcGOffset, int srcBOffset,
+                                                 int destROffset, int destGOffset, int destBOffset,
+                                                 int srcLineStride, int destLineStride);
 
-    static native void fastBilateralFilterColor(short srcData[], short destData[],
-                                               float sigma_s, float sigma_r,
-                                               int width, int height,
-                                               int srcPixelStride, int destPixelStride,
-                                               int srcROffset, int srcGOffset, int srcBOffset,
-                                               int destROffset, int destGOffset, int destBOffset,
-                                               int srcLineStride, int destLineStride);
+    static native void fastBilateralFilterColor(short[] srcData, short[] destData,
+                                                float sigma_s, float sigma_r,
+                                                int width, int height,
+                                                int srcPixelStride, int destPixelStride,
+                                                int srcROffset, int srcGOffset, int srcBOffset,
+                                                int destROffset, int destGOffset, int destBOffset,
+                                                int srcLineStride, int destLineStride);
 }

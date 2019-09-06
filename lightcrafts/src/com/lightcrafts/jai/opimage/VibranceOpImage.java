@@ -26,11 +26,11 @@ import java.util.Map;
  * Time: 4:32:46 PM
  */
 public class VibranceOpImage extends PointOpImage {
-    private final float transform[][];
+    private final float[][] transform;
     private final boolean saturationIncrease;
     private final float[][] toLinearsRGB;
 
-    public VibranceOpImage(RenderedImage source, float transform[][], Map config) {
+    public VibranceOpImage(RenderedImage source, float[][] transform, Map config) {
         super(source, new ImageLayout(source), config, true);
         permitInPlaceOperation();
         this.transform = transform;
@@ -91,13 +91,13 @@ public class VibranceOpImage extends PointOpImage {
         int width = src.getWidth();
         int height = src.getHeight();
 
-        short dstData[] = dst.getShortDataArray(0);
-        int dstBandOffsets[] = dst.getBandOffsets();
+        short[] dstData = dst.getShortDataArray(0);
+        int[] dstBandOffsets = dst.getBandOffsets();
         int dstLineStride = dst.getScanlineStride();
         int dstPixelStride = dst.getPixelStride();
 
-        short srcData[] = src.getShortDataArray(0);
-        int srcBandOffsets[] = src.getBandOffsets();
+        short[] srcData = src.getShortDataArray(0);
+        int[] srcBandOffsets = src.getBandOffsets();
         int srcLineStride = src.getScanlineStride();
         int srcPixelStride = src.getPixelStride();
 

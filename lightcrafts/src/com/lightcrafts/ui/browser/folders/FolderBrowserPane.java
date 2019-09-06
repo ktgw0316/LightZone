@@ -7,14 +7,13 @@ import com.lightcrafts.ui.browser.ctrls.NavigationPane;
 import com.lightcrafts.ui.datatips.xswing.DataTipManager;
 import com.lightcrafts.ui.toolkit.MenuButton;
 import com.lightcrafts.utils.directory.DirectoryMonitor;
+import lombok.Getter;
 
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.Stack;
 
@@ -32,6 +31,7 @@ public class FolderBrowserPane
 
     private Stack<FolderTreeNode> forwardStack;
 
+    @Getter
     private MenuButton pathButton;
 
     private boolean inSyntheticSelectionChange; // prevent recursion
@@ -39,8 +39,8 @@ public class FolderBrowserPane
     public FolderBrowserPane() {
         pathButton = new MenuButton();
         tree = new FolderTree();
-        backStack = new Stack<FolderTreeNode>();
-        forwardStack = new Stack<FolderTreeNode>();
+        backStack = new Stack<>();
+        forwardStack = new Stack<>();
 
         // setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, LightZoneSkin.Colors.FrameBackground));
         setBorder(null);
@@ -92,10 +92,6 @@ public class FolderBrowserPane
         return ((FolderTreeModel) tree.getModel()).getDirectoryMonitor();
     }
 
-    public MenuButton getPathPopupMenu() {
-        return pathButton;
-    }
-
     public void goBack() {
         if ( isBackAvailable() ) {
             FolderTreeNode node = tree.getSelectedNode();
@@ -142,19 +138,15 @@ public class FolderBrowserPane
             final FolderTreeNode menuCurrent = newNode;
             final FolderTreeNode menuSelection = node;
             final boolean modifyStack = newNode != node;
-            menuItem.addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        if (modifyStack) {
-                            backStack.push(menuCurrent);
-                            forwardStack.clear();
-                        }
-                        setSelectedNode(menuSelection);
-                    }
+            menuItem.addActionListener(e1 -> {
+                if (modifyStack) {
+                    backStack.push(menuCurrent);
+                    forwardStack.clear();
                 }
-            );
+                setSelectedNode(menuSelection);
+            });
             pathButton.add(menuItem);
-            node = (FolderTreeNode) node.getParent();
+            node = node.getParent();
         }
         if (! inSyntheticSelectionChange) {
             backStack.push(oldNode);

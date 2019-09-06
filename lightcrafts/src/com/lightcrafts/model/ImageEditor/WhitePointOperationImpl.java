@@ -97,7 +97,7 @@ class WhitePointOperationImpl extends BlendedOperation implements WhitePointOper
                             Rectangle intersection = tileBounds.intersection(sampleRect);
 
                             pixel = new int[] {0, 0, 0};
-                            int currentPixel[] = new int[3];
+                        int[] currentPixel = new int[3];
 
                             for (int i = intersection.x; i < intersection.x + intersection.width; i++)
                                 for (int j = intersection.y; j < intersection.y + intersection.height; j++) {
@@ -123,25 +123,25 @@ class WhitePointOperationImpl extends BlendedOperation implements WhitePointOper
 
                 double lum = (ColorScience.Wr * pixel[0] + ColorScience.Wg * pixel[1] + ColorScience.Wb * pixel[2]) / (double) 0xffff;
 
-                double polygon[][] = {
-                    {0,   0},
-                    {lum, 0},
-                    {1,   0}
+                double[][] polygon = {
+                        {0, 0},
+                        {lum, 0},
+                        {1, 0}
                 };
 
                 polygon[1][1] = - tred / 256.;
-                double redCurve[][] = new double[256][2];
+                double[][] redCurve = new double[256][2];
                 splines.bspline(2, polygon, redCurve);
 
                 polygon[1][1] = - tgreen / 256.;
-                double greenCurve[][] = new double[256][2];
+                double[][] greenCurve = new double[256][2];
                 splines.bspline(2, polygon, greenCurve);
 
                 polygon[1][1] = - tblue / 256.;
-                double blueCurve[][] = new double[256][2];
+                double[][] blueCurve = new double[256][2];
                 splines.bspline(2, polygon, blueCurve);
 
-                short table[][] = new short[3][0x10000];
+                short[][] table = new short[3][0x10000];
 
                 splines.Interpolator interpolator = new splines.Interpolator();
 
