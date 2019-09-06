@@ -33,6 +33,13 @@ public class HiDpi {
     public static void resetTransformScaleOf(Graphics2D g) {
         final AffineTransform tx = g.getTransform();
         tx.concatenate(HiDpi.inverseDefaultTransform);
+
+        // Translation values must be integer; otherwise shapes drawn on the g
+        // will be 1 pixel smaller and will cause gaps between the shapes.
+        final double dX = tx.getTranslateX() % 1;
+        final double dY = tx.getTranslateY() % 1;
+        tx.translate(-dX, -dY);
+
         g.setTransform(tx);
     }
 
