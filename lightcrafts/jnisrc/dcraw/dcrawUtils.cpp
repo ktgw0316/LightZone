@@ -46,47 +46,45 @@ JNIEXPORT void JNICALL DCRaw_METHOD(interpolateGreen)
         for (int x = 0; x < width; x++) {
             const bool colorPixel = (x & 1) == (x0 & 1);
             const int offset = colorPixel ? cOffset : gOffset;
-            
+
             int value = srcDatum(x, y);
             if (x >= 2 && x < width-2 && y >= 2 && y < height-2) {
-                int v[12];
-                int n;
-                if (!colorPixel) {
-                    n = 8;
-                    v[0] = srcDatum(x-1, y-1);
-                    v[1] = srcDatum(x+1, y-1);
-                    v[2] = srcDatum(x-1, y+1);
-                    v[3] = srcDatum(x+1, y+1);
-
-                    v[4] = 2 * srcDatum(x, y-1);
-                    v[5] = 2 * srcDatum(x, y+1);
-                    v[6] = 2 * srcDatum(x-1, y);
-                    v[7] = 2 * srcDatum(x+1, y);
-                } else {
-                    n = 12;
-                    v[0] = srcDatum(x, y-2);
-                    v[1] = srcDatum(x, y+2);
-                    v[2] = srcDatum(x-2, y);
-                    v[3] = srcDatum(x+2, y);
-                    
-                    v[4] = 2 * srcDatum(x-1, y-1);
-                    v[5] = 2 * srcDatum(x+1, y-1);
-                    v[6] = 2 * srcDatum(x-1, y+1);
-                    v[7] = 2 * srcDatum(x+1, y+1);
-
-                    v[8]  = 2 * srcDatum(x, y-1);
-                    v[9]  = 2 * srcDatum(x, y+1);
-                    v[10] = 2 * srcDatum(x-1, y);
-                    v[11] = 2 * srcDatum(x+1, y);
-                };
+                int v[4];
                 bool replace = true;
-                for (int i = 0; i < n; i++)
-                    if (value < 2 * v[i]) {
+                if (colorPixel) {
+                    if (value < 2 * (v[0] = srcDatum(x, y-2))
+                            || value < 2 * (v[1] = srcDatum(x, y+2))
+                            || value < 2 * (v[2] = srcDatum(x-2, y))
+                            || value < 2 * (v[3] = srcDatum(x+2, y))
+
+                            || value < 2 * 2 * srcDatum(x-1, y-1)
+                            || value < 2 * 2 * srcDatum(x, y-1)
+                            || value < 2 * 2 * srcDatum(x+1, y-1)
+
+                            || value < 2 * 2 * srcDatum(x-1, y)
+                            || value < 2 * 2 * srcDatum(x+1, y)
+
+                            || value < 2 * 2 * srcDatum(x-1, y+1)
+                            || value < 2 * 2 * srcDatum(x, y+1)
+                            || value < 2 * 2 * srcDatum(x+1, y+1)) {
                         replace = false;
-                        break;
                     }
-                if (replace)
+                } else {
+                    if (value < 2 * (v[0] = srcDatum(x-1, y-1))
+                            || value < 2 * (v[1] = srcDatum(x+1, y-1))
+                            || value < 2 * (v[2] = srcDatum(x-1, y+1))
+                            || value < 2 * (v[3] = srcDatum(x+1, y+1))
+
+                            || value < 2 * 2 * srcDatum(x, y-1)
+                            || value < 2 * 2 * srcDatum(x-1, y)
+                            || value < 2 * 2 * srcDatum(x+1, y)
+                            || value < 2 * 2 * srcDatum(x, y+1)) {
+                        replace = false;
+                    }
+                }
+                if (replace) {
                     value = (v[0] + v[1] + v[2] + v[3]) / 4;
+                }
             }
             dstDatum(x, y, offset) = static_cast<unsigned short>(value);
         }
@@ -270,49 +268,58 @@ JNIEXPORT void JNICALL DCRaw_METHOD(interpolateRedBlue)
             cOffset = bOffset;
         }
 
-#pragma omp parallel for shared (data) schedule (dynamic)
-        for (int y = 1; y < height-1; y++) {
-            for (int x = 1; x < width-1; x++) {
-                if (((x+cx0)&1) != (cx0&1) || ((y+cy0)&1) != (cy0&1)) {
-                    int sample;
-                    const int cg = datum(x + cx0, y + cy0, gOffset);
+#pragma omp parallel shared (data) 
+{
+#pragma omp for schedule (dynamic) nowait
+        for (int y = 1; y < height-2; y += 2) {
+            for (int x = 1; x < width-2; x += 2) {
+                const int cg = datum(x + cx0, y + cy0, gOffset);
 
-                    if (((x+cx0)&1) != (cx0&1) && ((y+cy0)&1) != (cy0&1)) {
-                        // Pixel at the other color location
-                        const int gne = datum(x + cx0 - 1, y + cy0 + 1, gOffset);
-                        const int gnw = datum(x + cx0 + 1, y + cy0 + 1, gOffset);
-                        const int gsw = datum(x + cx0 + 1, y + cy0 - 1, gOffset);
-                        const int gse = datum(x + cx0 - 1, y + cy0 - 1, gOffset);
+                // Pixel at the other color location
+                const int gne = datum(x + cx0 - 1, y + cy0 + 1, gOffset);
+                const int gnw = datum(x + cx0 + 1, y + cy0 + 1, gOffset);
+                const int gsw = datum(x + cx0 + 1, y + cy0 - 1, gOffset);
+                const int gse = datum(x + cx0 - 1, y + cy0 - 1, gOffset);
 
-                        const int cne = gne - datum(x + cx0 - 1, y + cy0 + 1, cOffset);
-                        const int cnw = gnw - datum(x + cx0 + 1, y + cy0 + 1, cOffset);
-                        const int csw = gsw - datum(x + cx0 + 1, y + cy0 - 1, cOffset);
-                        const int cse = gse - datum(x + cx0 - 1, y + cy0 - 1, cOffset);
+                const int cne = gne - datum(x + cx0 - 1, y + cy0 + 1, cOffset);
+                const int cnw = gnw - datum(x + cx0 + 1, y + cy0 + 1, cOffset);
+                const int csw = gsw - datum(x + cx0 + 1, y + cy0 - 1, cOffset);
+                const int cse = gse - datum(x + cx0 - 1, y + cy0 - 1, cOffset);
 
-                        sample = cg - (cne + csw + cnw + cse) / 4;
-                    } else if (((x+cx0)&1) == (cx0&1) && ((y+cy0)&1) != (cy0&1)) {
-                        // Pixel at green location - vertical
-                        const int gu = datum(x + cx0, y + cy0 - 1, gOffset);
-                        const int gd = datum(x + cx0, y + cy0 + 1, gOffset);
+                const int sample = cg - (cne + csw + cnw + cse) / 4;
+                datum(x + cx0, y + cy0, cOffset) = clampUShort(sample);
+            }
+            for (int x = 0; x < width-1; x += 2) {
+                const int cg = datum(x + cx0, y + cy0, gOffset);
 
-                        const int cu = gu - datum(x + cx0, y + cy0 - 1, cOffset);
-                        const int cd = gd - datum(x + cx0, y + cy0 + 1, cOffset);
+                // Pixel at green location - vertical
+                const int gu = datum(x + cx0, y + cy0 - 1, gOffset);
+                const int gd = datum(x + cx0, y + cy0 + 1, gOffset);
 
-                        sample = cg - (cu + cd) / 2;
-                    } else {
-                        // Pixel at green location - horizontal
-                        const int gl = datum(x + cx0 - 1, y + cy0, gOffset);
-                        const int gr = datum(x + cx0 + 1, y + cy0, gOffset);
+                const int cu = gu - datum(x + cx0, y + cy0 - 1, cOffset);
+                const int cd = gd - datum(x + cx0, y + cy0 + 1, cOffset);
 
-                        const int cl = gl - datum(x + cx0 - 1, y + cy0, cOffset);
-                        const int cr = gr - datum(x + cx0 + 1, y + cy0, cOffset);
-
-                        sample = cg - (cl + cr) / 2;
-                    }
-                    datum(x + cx0, y + cy0, cOffset) = clampUShort(sample);
-                }
+                const int sample = cg - (cu + cd) / 2;
+                datum(x + cx0, y + cy0, cOffset) = clampUShort(sample);
             }
         }
+#pragma omp for schedule (dynamic)
+        for (int y = 0; y < height-1; y += 2) {
+            for (int x = 1; x < width-2; x += 2) {
+                const int cg = datum(x + cx0, y + cy0, gOffset);
+
+                // Pixel at green location - horizontal
+                const int gl = datum(x + cx0 - 1, y + cy0, gOffset);
+                const int gr = datum(x + cx0 + 1, y + cy0, gOffset);
+
+                const int cl = gl - datum(x + cx0 - 1, y + cy0, cOffset);
+                const int cr = gr - datum(x + cx0 + 1, y + cy0, cOffset);
+
+                const int sample = cg - (cl + cr) / 2;
+                datum(x + cx0, y + cy0, cOffset) = clampUShort(sample);
+            }
+        }
+} // #pragma omp parallel
     }
     env->ReleasePrimitiveArrayCritical(jdata, data, 0);
 }
