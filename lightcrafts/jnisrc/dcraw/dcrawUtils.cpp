@@ -1,74 +1,83 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2014-     Masahir Kitagawa */
 
 #include <jni.h>
-#include <stdlib.h>
-#include <math.h>
+#include <climits>
+#include <cstdlib>
+
 #ifndef AUTO_DEP
 #include "javah/com_lightcrafts_utils_DCRaw.h"
 #endif
 
 #include "LC_JNIUtils.h"
+#include "../include/mathlz.h"
 
 #define DCRaw_METHOD(method) \
         name4(Java_,com_lightcrafts_utils_DCRaw,_,method)
 
-#include<limits.h>
-#include<omp.h>
+#define srcDatum(x, y) \
+        srcData[(y) * srcLineStride + (x) + srcOffset]
+
+#define dstDatum(x, y, offset) \
+        dstData[3 * ((y) * dstLineStride + (x)) + (offset)]
+
+#define datum(x, y, offset) \
+        data[3 * ((y) * lineStride + (x)) + (offset)]
 
 JNIEXPORT void JNICALL DCRaw_METHOD(interpolateGreen)
 ( JNIEnv *env, jclass cls,
-  jshortArray jsrcData, jshortArray jdestData, jint width, jint height,
-  jint srcLineStride, jint destLineStride,
+  jshortArray jsrcData, jshortArray jdstData, jint width, jint height,
+  jint srcLineStride, jint dstLineStride,
   jint srcOffset, jint rOffset, jint gOffset, jint bOffset,
   jint gx, jint gy, jint ry )
 {
-    unsigned short *srcData = (unsigned short *) env->GetPrimitiveArrayCritical(jsrcData, 0);
-    unsigned short *destData = (unsigned short *) env->GetPrimitiveArrayCritical(jdestData, 0);
+    auto srcData = static_cast<unsigned short*>(env->GetPrimitiveArrayCritical(jsrcData, 0));
+    auto dstData = static_cast<unsigned short*>(env->GetPrimitiveArrayCritical(jdstData, 0));
 
-#pragma omp parallel shared (srcData, destData)
+#pragma omp parallel shared (srcData, dstData)
 {
 
     // copy RAW data to RGB layer and remove hot pixels
 
 #pragma omp for schedule (dynamic)
     for (int y = 0; y < height; y++) {
-        int cOffset = (y&1) == (ry&1) ? rOffset : bOffset;
-        int x0 = (y&1) == (gy&1) ? gx+1 : gx;
+        const int cOffset = (y&1) == (ry&1) ? rOffset : bOffset;
+        const int x0 = (y&1) == (gy&1) ? gx+1 : gx;
         for (int x = 0; x < width; x++) {
-            bool colorPixel = (x & 1) == (x0 & 1);
-            int offset = colorPixel ? cOffset : gOffset;
+            const bool colorPixel = (x & 1) == (x0 & 1);
+            const int offset = colorPixel ? cOffset : gOffset;
             
-            int value = srcData[y * srcLineStride + x + srcOffset];
+            int value = srcDatum(x, y);
             if (x >= 2 && x < width-2 && y >= 2 && y < height-2) {
                 int v[12];
                 int n;
                 if (!colorPixel) {
                     n = 8;
-                    v[0] = srcData[(y-1) * srcLineStride + x-1 + srcOffset];
-                    v[1] = srcData[(y-1) * srcLineStride + x+1 + srcOffset];
-                    v[2] = srcData[(y+1) * srcLineStride + x-1 + srcOffset];
-                    v[3] = srcData[(y+1) * srcLineStride + x+1 + srcOffset];
+                    v[0] = srcDatum(x-1, y-1);
+                    v[1] = srcDatum(x+1, y-1);
+                    v[2] = srcDatum(x-1, y+1);
+                    v[3] = srcDatum(x+1, y+1);
 
-                    v[4] = 2 * srcData[(y-1) * srcLineStride + x + srcOffset];
-                    v[5] = 2 * srcData[(y+1) * srcLineStride + x + srcOffset];
-                    v[6] = 2 * srcData[y * srcLineStride + x-1 + srcOffset];
-                    v[7] = 2 * srcData[y * srcLineStride + x+1 + srcOffset];
+                    v[4] = 2 * srcDatum(x, y-1);
+                    v[5] = 2 * srcDatum(x, y+1);
+                    v[6] = 2 * srcDatum(x-1, y);
+                    v[7] = 2 * srcDatum(x+1, y);
                 } else {
                     n = 12;
-                    v[0] = srcData[(y-2) * srcLineStride + x + srcOffset];
-                    v[1] = srcData[(y+2) * srcLineStride + x + srcOffset];
-                    v[2] = srcData[y * srcLineStride + x-2 + srcOffset];
-                    v[3] = srcData[y * srcLineStride + x+2 + srcOffset];
+                    v[0] = srcDatum(x, y-2);
+                    v[1] = srcDatum(x, y+2);
+                    v[2] = srcDatum(x-2, y);
+                    v[3] = srcDatum(x+2, y);
                     
-                    v[4] = 2 * srcData[(y-1) * srcLineStride + x-1 + srcOffset];
-                    v[5] = 2 * srcData[(y-1) * srcLineStride + x+1 + srcOffset];
-                    v[6] = 2 * srcData[(y+1) * srcLineStride + x-1 + srcOffset];
-                    v[7] = 2 * srcData[(y+1) * srcLineStride + x+1 + srcOffset];
+                    v[4] = 2 * srcDatum(x-1, y-1);
+                    v[5] = 2 * srcDatum(x+1, y-1);
+                    v[6] = 2 * srcDatum(x-1, y+1);
+                    v[7] = 2 * srcDatum(x+1, y+1);
 
-                    v[8] = 2 * srcData[(y-1) * srcLineStride + x + srcOffset];
-                    v[9] = 2 * srcData[(y+1) * srcLineStride + x + srcOffset];
-                    v[10] = 2 * srcData[y * srcLineStride + x-1 + srcOffset];
-                    v[11] = 2 * srcData[y * srcLineStride + x+1 + srcOffset];
+                    v[8]  = 2 * srcDatum(x, y-1);
+                    v[9]  = 2 * srcDatum(x, y+1);
+                    v[10] = 2 * srcDatum(x-1, y);
+                    v[11] = 2 * srcDatum(x+1, y);
                 };
                 bool replace = true;
                 for (int i = 0; i < n; i++)
@@ -79,7 +88,7 @@ JNIEXPORT void JNICALL DCRaw_METHOD(interpolateGreen)
                 if (replace)
                     value = (v[0] + v[1] + v[2] + v[3]) / 4;
             }
-            destData[3 * (y * destLineStride + x) + offset] = value;
+            dstDatum(x, y, offset) = static_cast<unsigned short>(value);
         }
     }
 
@@ -87,26 +96,26 @@ JNIEXPORT void JNICALL DCRaw_METHOD(interpolateGreen)
 
 #pragma omp for schedule (dynamic)
     for (int y = 2; y < height-2; y++) {
-        int cOffset = (y&1) == (ry&1) ? rOffset : bOffset;
-        int x0 = (y&1) == (gy&1) ? gx+1 : gx;
+        const int cOffset = (y&1) == (ry&1) ? rOffset : bOffset;
+        const int x0 = (y&1) == (gy&1) ? gx+1 : gx;
         
-        int hl = destData[3 * (y * destLineStride + (x0-1)) + gOffset];
-        int cxy = destData[3 * (y * destLineStride + x0) + cOffset];
-        int chl = destData[3 * (y * destLineStride + (x0-2)) + cOffset];
+        int hl = dstDatum(x0-1, y, gOffset);
+        int cxy = dstDatum(x0, y, cOffset);
+        int chl = dstDatum(x0-2, y, cOffset);
         
         const int x_min = (x0 & 1) ? 3 : 2; 
         for (int x = x_min; x < width-2; x += 2) {
-            int hr = destData[3 * (y * destLineStride + (x+1)) + gOffset];
-            int vu = destData[3 * ((y-1) * destLineStride + x) + gOffset];
-            int vd = destData[3 * ((y+1) * destLineStride + x) + gOffset];
-            int dh = abs(hl - hr);
-            int dv = abs(vu - vd);
+            const int hr = dstDatum(x+1, y, gOffset);
+            const int vu = dstDatum(x, y-1, gOffset);
+            const int vd = dstDatum(x, y+1, gOffset);
+            const int dh = abs(hl - hr);
+            const int dv = abs(vu - vd);
 
-            int chr = destData[3 * (y * destLineStride + (x+2)) + cOffset];
-            int cvu = destData[3 * ((y-2) * destLineStride + x) + cOffset];
-            int cvd = destData[3 * ((y+2) * destLineStride + x) + cOffset];
-            int cdh = abs(chl + chr - 2 * cxy);
-            int cdv = abs(cvu + cvd - 2 * cxy);
+            const int chr = dstDatum(x+2, y, cOffset);
+            const int cvu = dstDatum(x, y-2, cOffset);
+            const int cvd = dstDatum(x, y+2, cOffset);
+            const int cdh = abs(chl + chr - 2 * cxy);
+            const int cdv = abs(cvu + cvd - 2 * cxy);
 
             // we're doing edge directed bilinear interpolation on the green channel,
             // which is a low pass operation (averaging), so we add some signal from the
@@ -126,10 +135,7 @@ JNIEXPORT void JNICALL DCRaw_METHOD(interpolateGreen)
                 if (sample < 4 * cxy && cxy < 4 * sample)
                     sample += (cxy - (chl + chr + cvu + cvd)/4) / 8;
             }
-
-            int value = sample < 0 ? 0 : sample > 0xffff ? 0xffff : sample;
-
-            destData[3 * (y * destLineStride + x) + gOffset] = (unsigned short) value;
+            dstDatum(x, y, gOffset) = clampUShort(sample);
 
             hl = hr;
             chl = cxy;
@@ -142,48 +148,53 @@ JNIEXPORT void JNICALL DCRaw_METHOD(interpolateGreen)
     
 #pragma omp for schedule (dynamic)
     for (int y = 2; y < height-2; y++) {
-        int cOffset = (y&1) == (ry&1) ? rOffset : bOffset;
-        int x0 = (y&1) == (gy&1) ? gx+1 : gx;
+        const int cOffset = (y&1) == (ry&1) ? rOffset : bOffset;
+        const int x0 = (y&1) == (gy&1) ? gx+1 : gx;
         
-        int xy = destData[3 * (y * destLineStride + x0) + gOffset];
-        int hl = destData[3 * (y * destLineStride + x0-2) + gOffset];
-        int ul = destData[3 * ((y-2) * destLineStride + x0-2) + gOffset];
-        int bl = destData[3 * ((y+2) * destLineStride + x0-2) + gOffset];
+        int xy = dstDatum(x0, y, gOffset);
+        int hl = dstDatum(x0-2, y, gOffset);
+        int ul = dstDatum(x0-2, y-2, gOffset);
+        int bl = dstDatum(x0-2, y+2, gOffset);
         
-        int cxy = destData[3 * (y * destLineStride + x0) + cOffset];
-        int chl = destData[3 * (y * destLineStride + x0-2) + cOffset];
-        int cul = destData[3 * ((y-2) * destLineStride + x0-2) + cOffset];
-        int cbl = destData[3 * ((y+2) * destLineStride + x0-2) + cOffset];
+        int cxy = dstDatum(x0, y, cOffset);
+        int chl = dstDatum(x0-2, y, cOffset);
+        int cul = dstDatum(x0-2, y-2, cOffset);
+        int cbl = dstDatum(x0-2, y+2, cOffset);
         
         for (int x = 2; x < width-2; x+=2) {
-            int hr = destData[3 * (y * destLineStride + x+2) + gOffset];
-            int ur = destData[3 * ((y-2) * destLineStride + x+2) + gOffset];
-            int br = destData[3 * ((y+2) * destLineStride + x+2) + gOffset];
-            int vu = destData[3 * ((y-2) * destLineStride + x) + gOffset];
-            int vd = destData[3 * ((y+2) * destLineStride + x) + gOffset];
+            const int hr = dstDatum(x+2, y, gOffset);
+            const int ur = dstDatum(x+2, y-2, gOffset);
+            const int br = dstDatum(x+2, y+2, gOffset);
+            int vu = dstDatum(x, y-2, gOffset);
+            int vd = dstDatum(x, y+2, gOffset);
             
-            int chr = destData[3 * (y * destLineStride + x+2) + cOffset];
-            int cur = destData[3 * ((y-2) * destLineStride + x+2) + cOffset];
-            int cbr = destData[3 * ((y+2) * destLineStride + x+2) + cOffset];
-            int cvu = destData[3 * ((y-2) * destLineStride + x) + cOffset];
-            int cvd = destData[3 * ((y+2) * destLineStride + x) + cOffset];
+            const int chr = dstDatum(x+2, y, cOffset);
+            const int cur = dstDatum(x+2, y-2, cOffset);
+            const int cbr = dstDatum(x+2, y+2, cOffset);
+            int cvu = dstDatum(x, y-2, cOffset);
+            int cvd = dstDatum(x, y+2, cOffset);
 
             // Only work on the pixels that have a strong enough correlation between channels
             
             if (xy < 4 * cxy && cxy < 4 * xy) {
-                int dh = xy - (hl + hr)/2;
-                int dv = xy - (vu + vd)/2;
-                int ne = xy - (ul + br)/2;
-                int nw = xy - (ur + bl)/2;
+                const int dh = xy - (hl + hr)/2;
+                const int dv = xy - (vu + vd)/2;
+                const int ne = xy - (ul + br)/2;
+                const int nw = xy - (ur + bl)/2;
+
+                const int cdh = cxy - (chl + chr)/2;
+                const int cdv = cxy - (cvu + cvd)/2;
+                const int cne = cxy - (cul + cbr)/2;
+                const int cnw = cxy - (cur + cbl)/2;
                 
-                int cdh = cxy - (chl + chr)/2;
-                int cdv = cxy - (cvu + cvd)/2;
-                int cne = cxy - (cul + cbr)/2;
-                int cnw = cxy - (cur + cbl)/2;
+                const int gradients[4] = {
+                    abs(dh) + abs(cdh),
+                    abs(dv) + abs(cdv),
+                    abs(ne) + abs(cne),
+                    abs(nw) + abs(cnw)
+                };
                 
-                int gradients[4] = {abs(dh)+abs(cdh), abs(dv)+abs(cdv), abs(ne)+abs(cne), abs(nw)+abs(cnw)};
-                
-                int mind = 4, maxd = 4;
+                int mind = 4;
                 int ming = INT_MAX;
                 for (int i = 0; i < 4; i++) {
                     if (gradients[i] < ming) {
@@ -213,9 +224,7 @@ JNIEXPORT void JNICALL DCRaw_METHOD(interpolateGreen)
                             // nothing to do
                             break;
                     }
-
-                    int value = sample < 0 ? 0 : sample > 0xffff ? 0xffff : sample;
-                    destData[3 * (y * destLineStride + x) + gOffset] = (unsigned short) value;
+                    dstDatum(x, y, gOffset) = clampUShort(sample);
                 }
             }
             
@@ -237,7 +246,7 @@ JNIEXPORT void JNICALL DCRaw_METHOD(interpolateGreen)
 } // #pragma omp parallel
 
     env->ReleasePrimitiveArrayCritical(jsrcData, srcData, 0);
-    env->ReleasePrimitiveArrayCritical(jdestData, destData, 0);
+    env->ReleasePrimitiveArrayCritical(jdstData, dstData, 0);
 }
 
 JNIEXPORT void JNICALL DCRaw_METHOD(interpolateRedBlue)
@@ -247,7 +256,7 @@ JNIEXPORT void JNICALL DCRaw_METHOD(interpolateRedBlue)
   jint rOffset, jint gOffset, jint bOffset,
   jint rx0, jint ry0, jint bx0, jint by0 )
 {
-    unsigned short *data = (unsigned short *) env->GetPrimitiveArrayCritical(jdata, 0);
+    auto data = static_cast<unsigned short*>(env->GetPrimitiveArrayCritical(jdata, 0));
 
     for (int i = 0; i < 2; i++) {
         int cx0, cy0, cOffset;
@@ -266,46 +275,41 @@ JNIEXPORT void JNICALL DCRaw_METHOD(interpolateRedBlue)
             for (int x = 1; x < width-1; x++) {
                 if (((x+cx0)&1) != (cx0&1) || ((y+cy0)&1) != (cy0&1)) {
                     int sample;
-                    int cg = data[3 * (x + cx0 + (y + cy0) * lineStride) + gOffset];
+                    const int cg = datum(x + cx0, y + cy0, gOffset);
 
                     if (((x+cx0)&1) != (cx0&1) && ((y+cy0)&1) != (cy0&1)) {
                         // Pixel at the other color location
-                        int gne = data[3 * (x + cx0 - 1 + (y + cy0 + 1) * lineStride) + gOffset];
-                        int gnw = data[3 * (x + cx0 + 1 + (y + cy0 + 1) * lineStride) + gOffset];
-                        int gsw = data[3 * (x + cx0 + 1 + (y + cy0 - 1) * lineStride) + gOffset];
-                        int gse = data[3 * (x + cx0 - 1 + (y + cy0 - 1) * lineStride) + gOffset];
+                        const int gne = datum(x + cx0 - 1, y + cy0 + 1, gOffset);
+                        const int gnw = datum(x + cx0 + 1, y + cy0 + 1, gOffset);
+                        const int gsw = datum(x + cx0 + 1, y + cy0 - 1, gOffset);
+                        const int gse = datum(x + cx0 - 1, y + cy0 - 1, gOffset);
 
-                        int cne = gne - data[3 * (x + cx0 - 1 + (y + cy0 + 1) * lineStride) + cOffset];
-                        int cnw = gnw - data[3 * (x + cx0 + 1 + (y + cy0 + 1) * lineStride) + cOffset];
-                        int csw = gsw - data[3 * (x + cx0 + 1 + (y + cy0 - 1) * lineStride) + cOffset];
-                        int cse = gse - data[3 * (x + cx0 - 1 + (y + cy0 - 1) * lineStride) + cOffset];
+                        const int cne = gne - datum(x + cx0 - 1, y + cy0 + 1, cOffset);
+                        const int cnw = gnw - datum(x + cx0 + 1, y + cy0 + 1, cOffset);
+                        const int csw = gsw - datum(x + cx0 + 1, y + cy0 - 1, cOffset);
+                        const int cse = gse - datum(x + cx0 - 1, y + cy0 - 1, cOffset);
 
                         sample = cg - (cne + csw + cnw + cse) / 4;
                     } else if (((x+cx0)&1) == (cx0&1) && ((y+cy0)&1) != (cy0&1)) {
                         // Pixel at green location - vertical
-                        int gu = data[3 * (x + cx0 + (y + cy0 - 1) * lineStride) + gOffset];
-                        int gd = data[3 * (x + cx0 + (y + cy0 + 1) * lineStride) + gOffset];
+                        const int gu = datum(x + cx0, y + cy0 - 1, gOffset);
+                        const int gd = datum(x + cx0, y + cy0 + 1, gOffset);
 
-                        int cu = gu - data[3 * (x + cx0 + (y + cy0 - 1) * lineStride) + cOffset];
-                        int cd = gd - data[3 * (x + cx0 + (y + cy0 + 1) * lineStride) + cOffset];
+                        const int cu = gu - datum(x + cx0, y + cy0 - 1, cOffset);
+                        const int cd = gd - datum(x + cx0, y + cy0 + 1, cOffset);
 
                         sample = cg - (cu + cd) / 2;
                     } else {
                         // Pixel at green location - horizontal
-                        int gl = data[3 * (x + cx0 - 1 + (y + cy0) * lineStride) + gOffset];
-                        int gr = data[3 * (x + cx0 + 1 + (y + cy0) * lineStride) + gOffset];
+                        const int gl = datum(x + cx0 - 1, y + cy0, gOffset);
+                        const int gr = datum(x + cx0 + 1, y + cy0, gOffset);
 
-                        int cl = gl - data[3 * (x + cx0 - 1 + (y + cy0) * lineStride) + cOffset];
-                        int cr = gr - data[3 * (x + cx0 + 1 + (y + cy0) * lineStride) + cOffset];
+                        const int cl = gl - datum(x + cx0 - 1, y + cy0, cOffset);
+                        const int cr = gr - datum(x + cx0 + 1, y + cy0, cOffset);
 
                         sample = cg - (cl + cr) / 2;
                     }
-
-                    data[3 * (x + cx0 + (y + cy0) * lineStride) + cOffset] = (unsigned short) (sample < 0
-                            ? 0
-                            : sample > 0xffff
-                            ? 0xffff
-                            : sample);
+                    datum(x + cx0, y + cy0, cOffset) = clampUShort(sample);
                 }
             }
         }
