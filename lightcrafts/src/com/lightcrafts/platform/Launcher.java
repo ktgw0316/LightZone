@@ -11,11 +11,8 @@ import com.lightcrafts.utils.ForkDaemon;
 import com.lightcrafts.utils.Version;
 
 import javax.swing.*;
-import java.awt.GraphicsEnvironment;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.io.IOException;
+import java.util.prefs.Preferences;
 
 /**
  * Launch LightZone.
@@ -32,6 +29,15 @@ public class Launcher {
             showJavaVersion();
             checkCpu();
             UIManager.setLookAndFeel(Platform.getPlatform().getLookAndFeel());
+
+            // TODO
+            String Package = "/com/lightcrafts/app";
+            String Key = "Locale";
+            Preferences Prefs = Preferences.userRoot().node(Package);
+            String lang = Prefs.get(Key, "");
+            if (!lang.isEmpty()) {
+                java.util.Locale.setDefault(new java.util.Locale(lang));
+            }
 
             CheckForUpdate.start();
 
