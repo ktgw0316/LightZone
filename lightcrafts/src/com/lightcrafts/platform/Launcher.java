@@ -5,6 +5,7 @@ package com.lightcrafts.platform;
 import com.lightcrafts.app.Application;
 import com.lightcrafts.app.CheckForUpdate;
 import com.lightcrafts.app.ExceptionDialog;
+import com.lightcrafts.prefs.LocaleModel;
 import com.lightcrafts.splash.SplashImage;
 import com.lightcrafts.splash.SplashWindow;
 import com.lightcrafts.utils.ForkDaemon;
@@ -12,7 +13,6 @@ import com.lightcrafts.utils.Version;
 
 import javax.swing.*;
 import java.io.IOException;
-import java.util.prefs.Preferences;
 
 /**
  * Launch LightZone.
@@ -30,14 +30,7 @@ public class Launcher {
             checkCpu();
             UIManager.setLookAndFeel(Platform.getPlatform().getLookAndFeel());
 
-            // TODO
-            String Package = "/com/lightcrafts/app";
-            String Key = "Locale";
-            Preferences Prefs = Preferences.userRoot().node(Package);
-            String lang = Prefs.get(Key, "");
-            if (!lang.isEmpty()) {
-                java.util.Locale.setDefault(new java.util.Locale(lang));
-            }
+            LocaleModel.setDefaultFromPreference();
 
             CheckForUpdate.start();
 

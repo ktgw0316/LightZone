@@ -7,54 +7,33 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.event.MouseEvent;
-import java.util.Locale;
-import java.util.*;
-import java.util.prefs.Preferences;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-class LocaleItem extends PreferencesItem {
+import static com.lightcrafts.prefs.LocalePresenter.LanguageItemConverter.availableLanguageItems;
 
-    private final static String Package = "/com/lightcrafts/app";
-    private final static String Key = "Locale";
-
-    private final static Preferences Prefs = Preferences.userRoot().node(Package);
-
-    private final static String DefaultItem = "(System Default)";
-
-    static final private Map<String, String> availableLanguageItems;
-
-    static {
-        val availableLanguages = Stream.of(
-                "", // system default
-                "en", "da", "de", "es", "fr", "hu", "it", "ja", "nl", "pl"
-        );
-        availableLanguageItems = availableLanguages
-                .map(l -> Map.entry(languageToItem(l), l))
-                .sorted(Map.Entry.comparingByKey(String.CASE_INSENSITIVE_ORDER))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
-                        (e1, e2) -> e1, LinkedHashMap::new));
-    }
+class LocaleItem extends PreferencesItem implements LocaleContract.LocaleView {
 
     private JComboBox<String> combo;
+    private LocalePresenter presenter;
 
     LocaleItem(JTextArea help) {
         super(help);
         combo = new JComboBox<>();
         availableLanguageItems.forEach((item, lang) -> combo.addItem(item));
-        // combo.setSelectedItem(DefaultItem);
         combo.setEditable(false);
         addHelpListeners();
+
+        presenter = new LocalePresenter();
+        presenter.attachView(this);
     }
 
     @Override
     public String getLabel() {
-        return "Language"; // TODO: localize
+        return "Language"; // Do not localize this.
     }
 
     @Override
     public String getHelp(MouseEvent e) {
-        return "Change the user interface language."; // TODO: localize
+        return "Change the user interface language."; // Do not localize this.
     }
 
     @Override
@@ -72,32 +51,21 @@ class LocaleItem extends PreferencesItem {
 
     @Override
     public void commit() {
-        val item = (String) combo.getSelectedItem();
-        if (item == null || item.equals(DefaultItem)) {
-            Prefs.remove(Key);
-        } else {
-            val lang = availableLanguageItems.get(item);
-            Prefs.put(Key, lang);
-            Locale.setDefault(new Locale(lang));
-        }
-        ResourceBundle.clearCache();
+        presenter.commit();
     }
 
     @Override
     public void restore() {
-        val lang = Prefs.get(Key, "");
-        combo.setSelectedItem(languageToItem(lang));
-        if (!lang.isEmpty()) {
-            Locale.setDefault(new Locale(lang));
-        }
+        presenter.restore();
     }
 
-    @NotNull
-    private static String languageToItem(@NotNull String language) {
-        if (language.isEmpty()) {
-            return DefaultItem;
-        }
-        val locale = new Locale(language);
-        return locale.getDisplayLanguage(locale);
+    @Override
+    public void setSelectedItem(@NotNull String item) {
+        combo.setSelectedItem(item);
+    }
+
+    @Override
+    public String getSelectedItem() {
+        return (String) combo.getSelectedItem();
     }
 }
