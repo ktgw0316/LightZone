@@ -2,11 +2,17 @@
 
 package com.lightcrafts.utils;
 
+import com.lightcrafts.platform.Platform;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,11 +33,30 @@ public class Lensfun {
     private int _fullWidth;
     private int _fullHeight;
 
-    @Getter (lazy = true)
-    private static final List<String> allCameraNames = Arrays.asList(getCameraNames());
+    private static String pathName = "";
+    static {
+        if (!Platform.isLinux()) {
+            final String baseDirName = System.getProperty("user.dir")
+                    + File.separator + "share"
+                    + File.separator + "lensfun";
+            try {
+                pathName = Files.find(Paths.get(baseDirName), 1,
+                        (path, attr) -> attr.isDirectory() && path.getFileName().toString().startsWith("version_"))
+                        .findFirst()
+                        .orElse(Path.of(""))
+                        .toString();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    private long _handle = init(pathName);
 
     @Getter (lazy = true)
-    private static final List<String> allLensNames = Arrays.asList(getLensNames());
+    private final List<String> allCameraNames = Arrays.asList(getCameraNames(_handle));
+
+    @Getter (lazy = true)
+    private final List<String> allLensNames = Arrays.asList(getLensNames(_handle));
 
     public static Lensfun updateInstance(
             String cameraMaker, String cameraModel,
@@ -80,14 +105,12 @@ public class Lensfun {
         return instance;
     }
 
-    private long _handle = init();
-
-    private native long init();
+    private native long init(String path);
     private native void destroy(long handle);
 
-    private static native String[] getCameraNames();
-    private static native String[] getLensNames();
-    private static native String[] getLensNamesForCamera(
+    private native String[] getCameraNames(long lfHandle);
+    private native String[] getLensNames(long lfHandle);
+    private native String[] getLensNamesForCamera(
             long lfHandle, String cameraMaker, String cameraModel);
 
     private native void initModifier(long lfHandle, int fullWidth, int fullHeight,

@@ -50,9 +50,10 @@ inline jobjectArray createJArray(JNIEnv *env, const T list, int size = -1)
 extern "C"
 JNIEXPORT jlong JNICALL
 Java_com_lightcrafts_utils_Lensfun_init
-(JNIEnv *env, jobject obj)
+(JNIEnv *env, jobject obj, jstring pathStr)
 {
-    auto lf = new LC_lensfun();
+    const auto path = env->GetStringUTFChars(pathStr, NULL);
+    auto lf = new LC_lensfun(path);
     return reinterpret_cast<uintptr_t>(lf);
 }
 
@@ -76,29 +77,27 @@ Java_com_lightcrafts_utils_Lensfun_destroy
 extern "C"
 JNIEXPORT jobjectArray JNICALL
 Java_com_lightcrafts_utils_Lensfun_getCameraNames
-(JNIEnv *env, jclass cls)
+(JNIEnv *env, jobject obj, jlong handle)
 {
-    auto lf = new LC_lensfun();
+    auto lf = reinterpret_cast<LC_lensfun*>(handle);
     const auto jarr = createJArray(env, lf->getCameras());
-    delete lf;
     return jarr;
 }
 
 extern "C"
 JNIEXPORT jobjectArray JNICALL
 Java_com_lightcrafts_utils_Lensfun_getLensNames
-(JNIEnv *env, jclass cls)
+(JNIEnv *env, jobject obj, jlong handle)
 {
-    auto lf = new LC_lensfun();
+    auto lf = reinterpret_cast<LC_lensfun*>(handle);
     const auto jarr = createJArray(env, lf->getLenses());
-    delete lf;
     return jarr;
 }
 
 extern "C"
 JNIEXPORT jobjectArray JNICALL
 Java_com_lightcrafts_utils_Lensfun_getLensNamesForCamera
-(JNIEnv *env, jclass cls,
+(JNIEnv *env, jobject obj,
  jlong handle, jstring cameraMakerStr, jstring cameraModelStr)
 {
     auto lf = reinterpret_cast<LC_lensfun*>(handle);
@@ -248,10 +247,16 @@ Java_com_lightcrafts_utils_Lensfun_backwardMapRect
 // LC_lensfun
 //
 
-LC_lensfun::LC_lensfun()
+LC_lensfun::LC_lensfun(const char* path)
 {
     ldb = new lfDatabase();
-    if (ldb->Load() != LF_NO_ERROR) {
+    std::cout << "Lensfun: loading database from " << path << std::endl;
+#if (LF_VERSION >= 0x00035f00) // 0.3.95
+    if (ldb->Load(path) != LF_NO_ERROR)
+#else
+    if (!ldb->LoadDirectory(path))
+#endif
+    {
         std::cerr << "Lensfun database could not be loaded" << std::endl;
     }
 }
