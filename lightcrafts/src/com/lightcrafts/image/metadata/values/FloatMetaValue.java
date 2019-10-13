@@ -128,8 +128,8 @@ public final class FloatMetaValue extends NumericMetaValue {
     /**
      * {@inheritDoc}
      */
-    public long getLongValue() {
-        return (long)getFloatValue();
+    public long getLongValueAt(int index) {
+        return (long)m_value[index];
     }
 
     /**

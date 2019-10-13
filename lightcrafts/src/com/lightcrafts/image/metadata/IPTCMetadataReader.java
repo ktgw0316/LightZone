@@ -2,21 +2,22 @@
 
 package com.lightcrafts.image.metadata;
 
-import java.io.File;
-import java.io.IOException;
-
 import com.lightcrafts.image.BadImageFileException;
 import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.image.metadata.values.*;
 import com.lightcrafts.image.types.AdobeResourceParserEventHandler;
-import com.lightcrafts.image.types.JPEGAPPDParser;
 import com.lightcrafts.image.types.ImageType;
+import com.lightcrafts.image.types.JPEGAPPDParser;
 import com.lightcrafts.image.types.JPEGImageType;
 import com.lightcrafts.utils.bytebuffer.LCByteBuffer;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+
 import static com.lightcrafts.image.metadata.IPTCConstants.*;
 import static com.lightcrafts.image.metadata.IPTCTags.*;
-import static com.lightcrafts.image.types.AdobeConstants.*;
+import static com.lightcrafts.image.types.AdobeConstants.PHOTOSHOP_IPTC_RESOURCE_ID;
 
 /**
  * An <code>IPTCMetadataReader</code> is-an {@link ImageMetadataReader} for
@@ -56,6 +57,7 @@ public final class IPTCMetadataReader extends ImageMetadataReader
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean gotResource( int blockID, String name, int dataLength,
                                 File file, LCByteBuffer buf ) {
         if ( blockID == PHOTOSHOP_IPTC_RESOURCE_ID ) {
@@ -75,6 +77,7 @@ public final class IPTCMetadataReader extends ImageMetadataReader
     /**
      * Read the metadata from all directories.
      */
+    @Override
     protected void readAllDirectories() throws IOException {
         if ( m_iptcLength == 0 ) {
             //
@@ -94,6 +97,7 @@ public final class IPTCMetadataReader extends ImageMetadataReader
     /**
      * Read the image header.
      */
+    @Override
     protected void readHeader() throws BadImageFileException, IOException {
         if ( m_fromType instanceof JPEGImageType ) {
             //
@@ -101,12 +105,11 @@ public final class IPTCMetadataReader extends ImageMetadataReader
             // set of Adobe resource blocks, one of which may be an IPTC block.
             //
             JPEGAPPDParser.parse( this, m_imageInfo.getFile(), m_buf );
-        } else {
-            //
-            // For other image types, there is nothing to do since the buffer
-            // contains the IPTC metadata directly with no header of any kind.
-            //
         }
+        //
+        // For other image types, there is nothing to do since the buffer
+        // contains the IPTC metadata directly with no header of any kind.
+        //
     }
 
     ////////// private ////////////////////////////////////////////////////////
@@ -171,13 +174,13 @@ public final class IPTCMetadataReader extends ImageMetadataReader
         }
 
         final ImageMetaValue value = readValue( dir, tagID, byteCount );
-        if ( value != null )
+        if ( value != null ) {
             try {
-                dir.putValue( tagID, value );
-            }
-            catch ( IllegalArgumentException e ) {
+                dir.putValue(tagID, value);
+            } catch (IllegalArgumentException e) {
                 logBadImageMetadata();
             }
+        }
         return true;
     }
 
@@ -191,10 +194,8 @@ public final class IPTCMetadataReader extends ImageMetadataReader
     private ImageMetaValue readValue( ImageMetadataDirectory dir, int tagID,
                                       int byteCount ) throws IOException {
         switch ( tagID ) {
-
             case IPTC_RECORD_VERSION:
-                final short value = (short)(m_buf.get() << 8 | m_buf.get());
-                return new UnsignedShortMetaValue( value );
+                return new UnsignedShortMetaValue((short)(m_buf.get() << 8 | m_buf.get()));
 
             case IPTC_URGENCY:
                 return new UnsignedByteMetaValue( m_buf.get() );
@@ -204,38 +205,23 @@ public final class IPTCMetadataReader extends ImageMetadataReader
             case IPTC_DIGITAL_CREATION_DATE:
             case IPTC_EXPIRATION_DATE:
             case IPTC_RELEASE_DATE:
-                if ( byteCount >= IPTC_DATE_SIZE ) {
-                    final String s = m_buf.getString( byteCount, "UTF-8" );
-                    return new DateMetaValue( s );
-                }
-                break;
+                return (byteCount >= IPTC_DATE_SIZE)
+                        ? new DateMetaValue(m_buf.getString(byteCount, "UTF-8"))
+                        : null;
 
             case IPTC_DIGITAL_CREATION_TIME:
             case IPTC_EXPIRATION_TIME:
             case IPTC_RELEASE_TIME:
             case IPTC_TIME_CREATED:
             case IPTC_TIME_SENT:
-                // no break;
-
             default:
                 if ( byteCount < 1 )
-                    break;
+                    return null;
 
-                String c = "ISO-8859-1";
-                final ImageMetaValue oldCharset = dir.getValue( IPTC_CODED_CHARACTER_SET );
-                if ( oldCharset != null ) {
-                    byte[] utf8 = {0x1B, 0x25, 0x47}; // ESC, "%", "G"
-                    if ( oldCharset.getStringValue().getBytes() == utf8 )
-                        c = "UTF-8";
-                }
-                String s = m_buf.getString( byteCount, c );
+                String s = getStringValue(dir, byteCount);
+                if (s.isEmpty())
+                    return null;
 
-                final int nullByte = s.indexOf( '\0' );
-                if ( nullByte >= 0 ) {
-                    s = s.substring( 0, nullByte );
-                    if ( s.length() == 0 )
-                        break;
-                }
                 final ImageMetaValue oldValue = dir.getValue( tagID );
                 if ( oldValue == null )
                     return new StringMetaValue( s );
@@ -244,7 +230,18 @@ public final class IPTCMetadataReader extends ImageMetadataReader
                 oldValue.setIsChangeable( old );
                 return oldValue;
         }
-        return null;
+    }
+
+    private String getStringValue(ImageMetadataDirectory dir, int byteCount) throws IOException {
+        final ImageMetaValue oldCharset = dir.getValue(IPTC_CODED_CHARACTER_SET);
+        final byte[] utf8 = {0x1B, 0x25, 0x47}; // ESC, "%", "G"
+        String charset =
+                (oldCharset != null && Arrays.equals(oldCharset.getStringValue().getBytes(), utf8))
+                        ? "UTF-8"
+                        : "ISO-8859-1";
+        String s = m_buf.getString(byteCount, charset);
+        final int nullByte = s.indexOf('\0');
+        return (nullByte < 0) ? s : s.substring(0, nullByte);
     }
 
     /**

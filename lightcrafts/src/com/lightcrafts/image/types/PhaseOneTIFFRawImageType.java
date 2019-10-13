@@ -50,6 +50,6 @@ public final class PhaseOneTIFFRawImageType extends RawImageType {
      * extensions of {@link TIFFImageType}.  Therefore, just have an empty
      * array.
      */
-    private static final String EXTENSIONS[] = { };
+    private static final String[] EXTENSIONS = {};
 }
 /* vim:set et sw=4 ts=4: */

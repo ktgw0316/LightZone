@@ -1,0 +1,30 @@
+<lensdatabase version="1">
+
+    <camera>
+        <maker>Samsung Techwin Co.</maker>
+        <maker lang="en">Samsung</maker>
+        <model>SAMSUNG GX10</model>
+        <model lang="en">GX10</model>
+        <mount>Pentax KAF2</mount>
+        <cropfactor>1.531</cropfactor>
+    </camera>
+
+    <camera>
+        <maker>Samsung Techwin Co.</maker>
+        <maker lang="en">Samsung</maker>
+        <model>GX20</model>
+        <model lang="en">GX20</model>
+        <mount>Pentax KAF2</mount>
+        <cropfactor>1.538</cropfactor>
+    </camera>
+
+    <camera>
+        <maker>Samsung Techwin</maker>
+        <maker lang="en">Samsung</maker>
+        <model>GX-1S</model>
+        <model lang="en">GX-1S</model>
+        <mount>Pentax KAF2</mount>
+        <cropfactor>1.531</cropfactor>
+    </camera>
+
+</lensdatabase>

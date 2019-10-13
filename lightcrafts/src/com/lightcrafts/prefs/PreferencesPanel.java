@@ -26,11 +26,11 @@ public class PreferencesPanel extends JPanel {
         addItem(this, items, new HeapLimitItem(help));
         addItem(this, items, new UpdateInteractiveItem(help));
         addItem(this, items, new ScratchFileItem(help));
-        if (Platform.getType() == Platform.Linux) {
+        if (Platform.isLinux()) {
             addItem(this, items, new DisplayProfileItem(help));
         }
         addItem(this, items, new BrowserCacheItem(help));
-//        addItem(this, items, new CheckForUpdateItem(help));
+        addItem(this, items, new CheckForUpdateItem(help));
         addItem(this, items, new ExportDirectoryItem(help));
         addItem(this, items, new SaveDirectoryItem(help));
         addItem(this, items, new AutoSaveItem(help));

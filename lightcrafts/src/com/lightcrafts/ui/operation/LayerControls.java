@@ -5,8 +5,6 @@ package com.lightcrafts.ui.operation;
 import com.lightcrafts.model.LayerConfig;
 import com.lightcrafts.model.LayerMode;
 import com.lightcrafts.model.Operation;
-import com.lightcrafts.ui.layout.Box;
-import com.lightcrafts.ui.layout.BoxLayout;
 
 import static com.lightcrafts.ui.operation.Locale.LOCALE;
 

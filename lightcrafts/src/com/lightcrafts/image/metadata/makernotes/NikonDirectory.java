@@ -8,6 +8,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.image.BadImageFileException;
@@ -36,13 +38,14 @@ import static com.lightcrafts.image.types.TIFFConstants.*;
  */
 @SuppressWarnings({"CloneableClassWithoutClone"})
 public final class NikonDirectory extends MakerNotesDirectory implements
-    FocalLengthProvider, ISOProvider, LensProvider, PreviewImageProvider {
+    FocalLengthProvider, ISOProvider, PreviewImageProvider {
 
     ////////// public /////////////////////////////////////////////////////////
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public float getFocalLength() {
         final ImageMetaValue value = getValue( NIKON_LD21_FOCAL_LENGTH );
         return value != null ? value.getFloatValue() : 0;
@@ -51,6 +54,7 @@ public final class NikonDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getISO() {
         ImageMetaValue value = getValue( NIKON_ISO );
         if ( value == null )
@@ -67,33 +71,16 @@ public final class NikonDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getLens() {
-        ImageMetaValue lensValue =
-            getLensData( NIKON_LD1X_LENS_ID, NIKON_LD21_LENS_ID );
-        //
-        // Here, we always use the NIKON_LD1X_LENS_ID tag ID because the
-        // resources file doesn't have the lens labels duplicated for
-        // NIKON_LD21_LENS_ID.  This is done to eliminate redundancy since the
-        // labels are the same for both versions.
-        //
-        final String label = hasTagValueLabelFor( NIKON_LD1X_LENS_ID, lensValue );
-        if ( label != null )
-            return label;
-
-        lensValue = getValue( NIKON_LENS );
-        if ( lensValue != null )
-            return lensValue.toString();
-        return makeLensLabelFrom(
-            getLensData(
-                NIKON_LD1X_MIN_FOCAL_LENGTH,
-                NIKON_LD21_MIN_FOCAL_LENGTH
-            ),
-            getLensData(
-                NIKON_LD1X_MAX_FOCAL_LENGTH,
-                NIKON_LD21_MAX_FOCAL_LENGTH
-            ),
-            null
-        );
+        final ImageMetaValue value = getValue(NIKON_LENS);
+        if (value != null) {
+            final String name = valueToString(value);
+            if (name != null) {
+                return name;
+            }
+        }
+        return super.getLens();
     }
 
     /**
@@ -104,6 +91,7 @@ public final class NikonDirectory extends MakerNotesDirectory implements
      * @return If the maker-notes are either versions 1 or 2, returns said
      * adjustments; otherwise returns <code>null</code>.
      */
+    @Override
     public int[] getMakerNotesAdjustments( LCByteBuffer buf, int offset )
         throws IOException
     {
@@ -123,6 +111,7 @@ public final class NikonDirectory extends MakerNotesDirectory implements
      *
      * @return Always returns &quot;Nikon&quot;.
      */
+    @Override
     public String getName() {
         return "Nikon";
     }
@@ -130,6 +119,7 @@ public final class NikonDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public RenderedImage getPreviewImage( ImageInfo imageInfo, int maxWidth,
                                           int maxHeight )
         throws BadImageFileException, IOException, UnknownImageTypeException
@@ -142,6 +132,7 @@ public final class NikonDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageMetaTagInfo getTagInfoFor( Integer id ) {
         return m_tagsByID.get( id );
     }
@@ -149,6 +140,7 @@ public final class NikonDirectory extends MakerNotesDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageMetaTagInfo getTagInfoFor( String name ) {
         return m_tagsByName.get( name );
     }
@@ -160,6 +152,7 @@ public final class NikonDirectory extends MakerNotesDirectory implements
      * @param tagID The metadata tag ID (the key).
      * @param value The value to put.
      */
+    @Override
     public void putValue( Integer tagID, ImageMetaValue value ) {
 switch_tagID:
         switch ( tagID ) {
@@ -262,8 +255,9 @@ switch_tagID:
                         explodeSubfields( tagID << 8 | 0x10, data, 4 );
                         break;
                     case 0x0201:
+                    case 0x0204:
                         //
-                        // This version of lens data is encrypted.  To decrypt
+                        // These versions of lens data are encrypted. To decrypt
                         // it, the serial-number and shutter-count metadata are
                         // needed but they might not have been encountered yet
                         // so just increment a counter for now.
@@ -337,25 +331,31 @@ switch_tagID:
             // We've got all the pieces needed to decrypt the encrypted lens
             // data so do it now.
             //
-            final byte[] lensData =
-                ((UndefinedMetaValue)removeValue( NIKON_LENS_DATA )).getUndefinedValue();
-            final long serialNumber =
-                getValue( NIKON_SERIAL_NUMBER ).getLongValue();
-            final long shutterCount =
-                getValue( NIKON_SHUTTER_COUNT ).getLongValue();
-            decrypt( lensData, 4, serialNumber, shutterCount );
-            m_decryptCount = Integer.MIN_VALUE; // never do this "if" again
-            //
-            // Since we support two version of Nikon lens data, we use
-            // NIKON_LENS_DATA << 8 | 0x21 for this version.
-            //
-            explodeSubfields( NIKON_LENS_DATA << 8 | 0x21, lensData, 4 );
+            final ImageMetaValue lensDataValue = removeValue(NIKON_LENS_DATA);
+            final ImageMetaValue serialNumberValue = getValue(NIKON_SERIAL_NUMBER);
+            final ImageMetaValue shutterCountValue = getValue(NIKON_SHUTTER_COUNT);
+            if (lensDataValue != null && serialNumberValue != null
+                    && shutterCountValue != null) {
+                final byte[] lensData =
+                        ((UndefinedMetaValue) lensDataValue).getUndefinedValue();
+                final long serialNumber = serialNumberValue.getLongValue();
+                final long shutterCount = shutterCountValue.getLongValue();
+                decrypt(lensData, 4, serialNumber, shutterCount);
+                m_decryptCount = Integer.MIN_VALUE; // never do this "if" again
+                //
+                // Since we support two version of Nikon lens data, we use
+                // NIKON_LENS_DATA << 8 | 0x21 for this version.
+                //
+                // TODO: support tag version 0x0204
+                explodeSubfields(NIKON_LENS_DATA << 8 | 0x21, lensData, 4);
+            }
         }
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public String valueToString( ImageMetaValue value ) {
         switch ( value.getOwningTagID() ) {
             case NIKON_CROP_HIGH_SPEED: {
@@ -372,6 +372,8 @@ switch_tagID:
             }
             case NIKON_FLASH_EXPOSURE_BRACKET_VALUE:
             case NIKON_FLASH_EXPOSURE_COMPENSATION: {
+                if ( !(value instanceof LongMetaValue) )
+                    return "?";
                 final long n = value.getLongValue() >>> 24;
                 return TextUtil.tenths( n / 6.0 );
             }
@@ -409,24 +411,57 @@ switch_tagID:
     ////////// protected //////////////////////////////////////////////////////
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ImageMetaValue getLensNamesValue() {
+        //
+        // Here, we always use the NIKON_LD1X_LENS_ID tag ID because the
+        // resources file doesn't have the lens labels duplicated for
+        // NIKON_LD21_LENS_ID.  This is done to eliminate redundancy since the
+        // labels are the same for both versions.
+        //
+        return getValue( NIKON_LD1X_LENS_ID );
+    }
+
+    @Override
+    protected ImageMetaValue getLongFocalValue() {
+        return getLensData( NIKON_LD1X_MAX_FOCAL_LENGTH,
+                            NIKON_LD21_MAX_FOCAL_LENGTH,
+                            NIKON_LD24_MAX_FOCAL_LENGTH );
+    }
+
+    @Override
+    protected ImageMetaValue getShortFocalValue() {
+        return getLensData( NIKON_LD1X_MIN_FOCAL_LENGTH,
+                            NIKON_LD21_MIN_FOCAL_LENGTH,
+                            NIKON_LD24_MIN_FOCAL_LENGTH );
+    }
+
+    @Override
+    protected ImageMetaValue getMaxApertureValue() {
+        return getLensData( NIKON_LD1X_APERTURE_AT_MAX_FOCAL,
+                            NIKON_LD21_EFFECTIVE_MAX_APERTURE,
+                            NIKON_LD24_EFFECTIVE_MAX_APERTURE );
+    }
+
+    /**
      * Gets the priority of this directory for providing the metadata supplied
      * by implementing the given provider interface.
      * <p>
-     * By default, the priority for maker notes directories is higher than
-     * {@link ImageMetadataDirectory#getProviderPriorityFor(Class)} because
-     * they have more detailed metadata about a given image.
-     * <p>
-     * However, an exception is made for {@link FocalLengthProvider} for Nikon
+     * The priority for {@link ShutterSpeedProvider} for Nikon is the lowest
      * because it yields weird values.
      *
      * @param provider The provider interface to get the priority for.
      * @return Returns said priority.
      */
+    @Override
     protected int getProviderPriorityFor(
         Class<? extends ImageMetadataProvider> provider )
     {
-        return provider == FocalLengthProvider.class ? 0 :
-            super.getProviderPriorityFor( provider );
+        return (provider == FocalLengthProvider.class)
+                ? PROVIDER_PRIORITY_MIN
+                : super.getProviderPriorityFor( provider );
     }
 
     /**
@@ -434,6 +469,7 @@ switch_tagID:
      *
      * @return Returns said {@link ResourceBundle}.
      */
+    @Override
     protected ResourceBundle getTagLabelBundle() {
         return m_tagBundle;
     }
@@ -441,6 +477,7 @@ switch_tagID:
     /**
      * {@inheritDoc}
      */
+    @Override
     protected Class<? extends ImageMetaTags> getTagsInterface() {
         return NikonTags.class;
     }
@@ -566,18 +603,27 @@ switch_tagID:
      *
      * @param tag0100 The tag ID for versions 0x0100 and 0x0101.
      * @param tag0201 The tag ID for version 0x0201.
+     * @param tag0204 The tag ID for version 0x0204.
      * @return Returns the metadata or <code>null</code> if there is no such
      * metadata.
      */
-    private ImageMetaValue getLensData( int tag0100, int tag0201 ) {
+    private ImageMetaValue getLensData( int tag0100, int tag0201, int tag0204 ) {
         final ImageMetaValue version = getValue( NIKON_LD_VERSION );
         if ( version != null )
             switch ( version.getUnsignedShortValue() ) {
-                case 0x0100:
-                case 0x0101:
+                case 0x0100: // D100, D1X
+                case 0x0101: // D70, D70s
                     return getValue( tag0100 );
-                case 0x0201:
+                case 0x0201: // D200, D2Hs, D2X, D2Xs
+                case 0x0202: // D40, D40X, D80
+                case 0x0203: // D300
                     return getValue( tag0201 );
+                case 0x0204: // D90, D7000
+                    return getValue( tag0204 );
+                case 0x0400: // 1J1, 1V1
+                    // TODO:
+                default:
+                    break;
             }
         return null;
     }

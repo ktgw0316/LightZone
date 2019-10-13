@@ -5,7 +5,6 @@ package com.lightcrafts.ui.operation.colorbalance;
 import com.lightcrafts.model.ColorPickerOperation;
 import com.lightcrafts.model.Operation;
 import com.lightcrafts.ui.help.HelpConstants;
-import com.lightcrafts.ui.layout.Box;
 import com.lightcrafts.ui.operation.OpStack;
 import static com.lightcrafts.ui.operation.colorbalance.Locale.LOCALE;
 import com.lightcrafts.ui.operation.generic.GenericControl;

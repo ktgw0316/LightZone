@@ -1,6 +1,15 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2018-     Masahiro Kitagawa */
 
 package com.lightcrafts.image.metadata;
+
+import com.lightcrafts.image.metadata.providers.GPSProvider;
+import com.lightcrafts.image.metadata.values.UnsignedRationalMetaValue;
+import com.lightcrafts.utils.Rational;
+import com.lightcrafts.utils.tuple.Pair;
+import lombok.Getter;
+import lombok.val;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,24 +23,18 @@ import static com.lightcrafts.image.metadata.ImageMetaType.*;
  * GPS metadata.
  *
  * @author Paul J. Lucas [paul@lightcrafts.com]
+ * @author Masahiro Kitagawa [arctica0316@gmail.com]
  */
 @SuppressWarnings({"CloneableClassWithoutClone"})
-public final class GPSDirectory extends ImageMetadataDirectory {
+public final class GPSDirectory extends ImageMetadataDirectory
+        implements GPSProvider {
 
     ////////// public /////////////////////////////////////////////////////////
 
     /**
-     * Gets the name of this directory.
-     *
-     * @return Always returns &quot;GPSF&quot;.
-     */
-    public String getName() {
-        return "GPS";
-    }
-
-    /**
      * {@inheritDoc}
      */
+    @Override
     public ImageMetaTagInfo getTagInfoFor( Integer id ) {
         return m_tagsByID.get( id );
     }
@@ -39,8 +42,81 @@ public final class GPSDirectory extends ImageMetadataDirectory {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageMetaTagInfo getTagInfoFor( String name ) {
         return m_tagsByName.get( name );
+    }
+
+    @Override
+    public Double getGPSLatitude() {
+        return readGPSCoordinate(GPS_LATITUDE, GPS_LATITUDE_REF, "N");
+    }
+
+    @Override
+    public Double getGPSLongitude() {
+        return readGPSCoordinate(GPS_LONGITUDE, GPS_LONGITUDE_REF, "E");
+    }
+
+    @NotNull
+    @Override
+    public String getGPSLatitudeDMS() {
+        return readGPSCoordinateDMS(GPS_LATITUDE, GPS_LATITUDE_REF);
+    }
+
+    @NotNull
+    @Override
+    public String getGPSLongitudeDMS() {
+        return readGPSCoordinateDMS(GPS_LONGITUDE, GPS_LONGITUDE_REF);
+    }
+
+    private Double readGPSCoordinate(int tagID, int refTagID, String orientation) {
+        val metadata = readMetadata(tagID, refTagID);
+        if (metadata == null) {
+            return null;
+        }
+        val values = metadata.left;
+        val refString = metadata.right;
+
+        val sign = (refString.equalsIgnoreCase(orientation)) ? 1 : -1;
+
+        return sign * (values[0].doubleValue()
+                + values[1].doubleValue() / 60
+                + values[2].doubleValue() / 3600);
+    }
+
+    @NotNull
+    private String readGPSCoordinateDMS(int tagID, int refTagID) {
+        val metadata = readMetadata(tagID, refTagID);
+        if (metadata == null) {
+            return "";
+        }
+        val values = metadata.left;
+        val refString = metadata.right;
+
+        return values[0].intValue() + "\u00B0"
+                + values[1].intValue() + "'"
+                + values[2].floatValue() + "\""
+                + refString;
+    }
+
+    private Pair<Rational[], String> readMetadata(int tagID, int refTagID) {
+        val metaValue = getValue(tagID);
+        if (metaValue == null) {
+            return null;
+        }
+        val values = ((UnsignedRationalMetaValue) metaValue).getRationalValues();
+        if (values.length != 3) {
+            return null;
+        }
+        val refMetaValue = getValue(refTagID);
+        if (refMetaValue == null) {
+            return null;
+        }
+        val refString = refMetaValue.getStringValue();
+        if (refString == null) {
+            return null;
+        }
+        return Pair.of(values, refString);
     }
 
     ////////// protected //////////////////////////////////////////////////////
@@ -50,6 +126,7 @@ public final class GPSDirectory extends ImageMetadataDirectory {
      *
      * @return Returns said {@link ResourceBundle}.
      */
+    @Override
     protected ResourceBundle getTagLabelBundle() {
         return m_tagBundle;
     }
@@ -57,11 +134,15 @@ public final class GPSDirectory extends ImageMetadataDirectory {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected Class<? extends ImageMetaTags> getTagsInterface() {
         return GPSTags.class;
     }
 
     ////////// private ////////////////////////////////////////////////////////
+
+    @Getter
+    private final String name = "GPS";
 
     /**
      * Add the tag mappings.
@@ -71,8 +152,7 @@ public final class GPSDirectory extends ImageMetadataDirectory {
      * @param type The tag's {@link ImageMetaType}.
      */
     private static void add( int id, String name, ImageMetaType type ) {
-        final ImageMetaTagInfo tagInfo =
-            new ImageMetaTagInfo( id, name, type, false );
+        val tagInfo = new ImageMetaTagInfo( id, name, type, false );
         m_tagsByID.put( id, tagInfo );
         m_tagsByName.put( name, tagInfo );
     }

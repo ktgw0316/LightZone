@@ -2,18 +2,23 @@
 
 package com.lightcrafts.utils;
 
-import java.io.*;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.MalformedURLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.ResourceBundle;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 
 /** A container and accessor for static version data, either configured in
@@ -24,8 +29,6 @@ import java.util.regex.Pattern;
   * places the stdout into lightcrafts/resources/com/lightcrafts/app/resources.
   */
 public final class Version {
-
-    ////////// public /////////////////////////////////////////////////////////
 
     /**
      * Gets the application's name.
@@ -55,7 +58,7 @@ public final class Version {
     }
 
     public static Map<String, URL> getVideoURLs() {
-        Map<String, URL> map = new HashMap<String, URL>();
+        Map<String, URL> map = new HashMap<>();
         // TODO put in final video URLs
         map.put("Introduction to Relight", getVideoLearningCenterURL());
         map.put("Advanced Relight", getVideoLearningCenterURL());
@@ -72,13 +75,10 @@ public final class Version {
         if ( GITInfo == null )
             return "";
         try {
-            String text =
-                RevisionPattern.matcher( GITInfo ).replaceAll( "$1" );
-			if (text != null)
-                if (7 < text.length()) {
-                    text = text.substring(0,7);
-                } else
-                    text = text.substring(0);
+            String text = RevisionPattern.matcher( GITInfo ).replaceAll( "$1" );
+            if (text != null && 7 < text.length()) {
+                text = text.substring(0,7);
+            }
             return text;
         }
         catch ( NumberFormatException e ) {
@@ -86,7 +86,7 @@ public final class Version {
         }
     }
 
-    public static Date getChangeDate() {
+    private static Date getChangeDate() {
         if ( GITInfo == null )
             return null;
         try {
@@ -118,75 +118,40 @@ public final class Version {
     /**
      * Gets the user-presentable version String.
      */
+    @NotNull
     public static String getVersionName() {
-        return Version;
+        return Version != null ? Version : "";
     }
-
-    /**
-     * Get the Light Crafts homepage URL, or null if the URL text is not
-     * configured or is invalid.
-     */
-    public static URL getHomepageURL() {
-        try {
-            return new URL( m_properties.getString( "company-URL" ) );
-        }
-        catch ( MalformedURLException e ) {
-            return null;
-        }
-    }
-
-    /**
-     * Get the application help URL, or null if the URL text is not
-     * configured or is invalid.
-     */
-    public static URL getHelpURL() {
-        try {
-            return new URL( m_properties.getString( "help-URL" ) );
-        }
-        catch (MalformedURLException e) {
-            return null;
-        }
-    }
-
-    ////////// private ////////////////////////////////////////////////////////
 
     /**
      * Reads a given resource.
      *
      * @param name The name of the resource file to read.
-     * @return Returns the contents of saif resource file as a string.
+     * @return Returns the contents of said resource file as a string.
      */
     private static String readResource( String name ) {
-        InputStream in = null;
         try {
             final URL url = Version.class.getResource( "resources/" + name );
-            if ( url == null )
-                throw new FileNotFoundException( "Revision resource" );
-            in = url.openStream();
-            final BufferedReader reader =
-                new BufferedReader( new InputStreamReader( in ) );
-            final StringBuilder sb = new StringBuilder();
-            String line;
-            do {
-                line = reader.readLine();
-                if ( line != null ) {
-                    sb.append( line );
-                    sb.append( '\n' );
-                }
-            } while ( line != null );
-            return sb.toString();
+            if ( url == null ) {
+                throw new FileNotFoundException("Revision resource");
+            }
+            try (InputStream in = url.openStream()) {
+                final BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                final StringBuilder sb = new StringBuilder();
+                String line;
+                do {
+                    line = reader.readLine();
+                    if ( line != null ) {
+                        sb.append( line );
+                        sb.append( '\n' );
+                    }
+                } while ( line != null );
+
+                return sb.toString();
+            }
         }
         catch ( Throwable t ) {
             System.err.println( "Failed to read " + name + " resource" );
-        }
-        finally {
-            if ( in != null )
-                try {
-                    in.close();
-                }
-                catch ( IOException e ) {
-                    // ignore
-                }
         }
         return null;
     }
@@ -235,7 +200,7 @@ public final class Version {
 
     ////////// main() for testing /////////////////////////////////////////////
 
-    public static void main( String[] args ) throws Exception {
+    public static void main( String[] args ) {
         System.out.println( getApplicationName() );
         System.out.println( getUri() );
         System.out.println( getRevisionNumber() );

@@ -2,25 +2,26 @@
 
 package com.lightcrafts.model.ImageEditor;
 
-import Jama.Matrix;
+import com.lightcrafts.image.color.ColorScience;
+import com.lightcrafts.image.types.AuxiliaryImageInfo;
+import com.lightcrafts.image.types.RawImageInfo;
 import com.lightcrafts.jai.utils.Transform;
+import com.lightcrafts.model.ColorDropperOperation;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
-import com.lightcrafts.model.ColorDropperOperation;
-import com.lightcrafts.utils.ColorScience;
-import com.lightcrafts.utils.splines;
 import com.lightcrafts.utils.DCRaw;
+import com.lightcrafts.utils.LCMatrix;
+import com.lightcrafts.utils.splines;
+import lombok.val;
+import org.ejml.simple.SimpleMatrix;
 
-import com.lightcrafts.mediax.jai.JAI;
-import com.lightcrafts.mediax.jai.LookupTableJAI;
-import com.lightcrafts.mediax.jai.PlanarImage;
-import com.lightcrafts.mediax.jai.RenderedOp;
-import com.lightcrafts.image.types.RawImageInfo;
-import com.lightcrafts.image.types.AuxiliaryImageInfo;
-
+import javax.media.jai.JAI;
+import javax.media.jai.LookupTableJAI;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.RenderedOp;
 import java.awt.geom.Point2D;
-import java.awt.image.renderable.ParameterBlock;
 import java.awt.image.RenderedImage;
+import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.TreeMap;
@@ -33,7 +34,7 @@ import java.util.TreeMap;
  * To change this template use File | Settings | File Templates.
  */
 public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOperation {
-    static final String SOURCE = "Temperature";
+    private static final String SOURCE = "Temperature";
     private final String TINT = "Tint";
     private float tint = 0;
     private Point2D p = null;
@@ -62,12 +63,12 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
             System.out.println("daylightMultipliers: " + daylightMultipliers[0] + ", " + daylightMultipliers[1] + ", " + daylightMultipliers[2]);
             System.out.println("cameraMultipliers: " + cameraMultipliers[0] + ", " + cameraMultipliers[1] + ", " + cameraMultipliers[2]);
 
-            float RGBToXYZMat[][] = ColorScience.RGBToXYZMat;
+            float[][] RGBToXYZMat = ColorScience.RGBToXYZMat;
 
             if (false && daylightMultipliers[0] != 0) {
                 float max = Math.max(daylightMultipliers[0], Math.max(daylightMultipliers[1], daylightMultipliers[2]));
 
-                float xyz_dt[] = new float[3];
+                float[] xyz_dt = new float[3];
                 for (int i = 0; i < 3; i++)
                     for (int j = 0; j < 3; j++)
                         xyz_dt[i] += RGBToXYZMat[j][i] * daylightMultipliers[i]/max;
@@ -106,7 +107,7 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
             if (cameraMultipliers[0] != 0) {
                 float max = Math.max(cameraMultipliers[0], Math.max(cameraMultipliers[1], cameraMultipliers[2]));
 
-                float xyz_ct[] = new float[3];
+                float[] xyz_ct = new float[3];
                 for (int i = 0; i < 3; i++)
                     for (int j = 0; j < 3; j++)
                         xyz_ct[i] += RGBToXYZMat[j][i] * cameraMultipliers[i]/max;
@@ -170,16 +171,18 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
         setSliderConfig(TINT, new SliderConfig(-20, 20, tint, 0.1, false, new DecimalFormat("0.0")));
     }
 
+    @Override
     public boolean neutralDefault() {
         return false;
     }
 
+    @Override
     public void setSliderValue(String key, double value) {
         value = roundValue(key, value);
 
-        if (key == SOURCE && source != value) {
+        if (key.equals(SOURCE) && source != value) {
             source = (float) value;
-        } else if (key == TINT && tint != value) {
+        } else if (key.equals(TINT) && tint != value) {
             tint = (float) value;
         } else
             return;
@@ -187,12 +190,13 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
         super.setSliderValue(key, value);
     }
 
-    static float[] W(float original, float target) {
+    static private float[] W(float original, float target) {
         float[] originalW = ColorScience.W(original);
         float[] targetW = ColorScience.W(target);
         return new float[]{originalW[0] / targetW[0], originalW[1] / targetW[1], originalW[2] / targetW[2]};
     }
 
+    @Override
     public Map<String, Float> setColor(Point2D p) {
         this.p = p;
         settingsChanged();
@@ -204,10 +208,10 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
         return result;
     }
 
-    static Matrix RGBtoZYX = new Matrix(ColorScience.RGBtoZYX()).transpose();
-    static Matrix XYZtoRGB = RGBtoZYX.inverse();
+    private static SimpleMatrix RGBtoZYX = new LCMatrix(ColorScience.RGBtoZYX()).transpose();
+    private static SimpleMatrix XYZtoRGB = RGBtoZYX.invert();
 
-    static float[] neutralize(int pixel[], ColorScience.CAMethod caMethod, float source, float REF_T) {
+    static float[] neutralize(int[] pixel, ColorScience.CAMethod caMethod, float source, float REF_T) {
         double r = pixel[0];
         double g = pixel[1];
         double b = pixel[2];
@@ -216,18 +220,17 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
         double wbr = 0, wbg = 0, wbb = 0;
 
         for (int t = 1000; t < 40000; t+= 0.001 * t) {
-            Matrix B = new Matrix(ColorScience.chromaticAdaptation(REF_T, t, caMethod));
-            Matrix combo = XYZtoRGB.times(B.times(RGBtoZYX));
+            val B = new LCMatrix(ColorScience.chromaticAdaptation(REF_T, t, caMethod));
+            val combo = XYZtoRGB.mult(B.mult(RGBtoZYX));
 
-            Matrix color = new Matrix(new double[][]{{pixel[0]}, {pixel[1]}, {pixel[2]}});
-
-            color = combo.times(color);
+            SimpleMatrix color = new LCMatrix(new float[][]{{pixel[0]}, {pixel[1]}, {pixel[2]}});
+            color = combo.mult(color);
 
             r = color.get(0, 0);
             g = color.get(1, 0);
             b = color.get(2, 0);
 
-            double tSat = ColorScience.saturation(r, g, b);
+            val tSat = ColorScience.saturation(r, g, b);
 
             if (tSat < sat) {
                 sat = tSat;
@@ -251,23 +254,23 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
         return whiteBalance(image, source, REF_T, tint, lightness, 1, null, caMethod);
     }
 
-    static public float[][] whiteBalanceMatrix(float source, float REF_T, float mult, float cameraRGB[][], ColorScience.CAMethod caMethod) {
-        Matrix B = new Matrix(ColorScience.chromaticAdaptation(REF_T, source, caMethod));
-        Matrix combo = XYZtoRGB.times(B.times(RGBtoZYX));
+    static public float[][] whiteBalanceMatrix(float source, float REF_T, float mult, float[][] cameraRGB, ColorScience.CAMethod caMethod) {
+        val B = new LCMatrix(ColorScience.chromaticAdaptation(REF_T, source, caMethod));
+        SimpleMatrix combo = XYZtoRGB.mult(B.mult(RGBtoZYX));
 
-        Matrix m = combo.times(new Matrix(new double[][]{{1},{1},{1}}));
+        val m = combo.mult(new LCMatrix(new float[][]{{1},{1},{1}}));
 
-        double max = m.get(1, 0); // Math.max(m.get(1, 0), Math.max(m.get(1, 0), m.get(2, 0)));
+        val max = (float) m.get(1, 0); // Math.max(m.get(1, 0), Math.max(m.get(1, 0), m.get(2, 0)));
         if (max != 1)
-            combo = combo.times(new Matrix(new double[][]{{1/max, 0, 0},{0, 1/max, 0},{0, 0, 1/max}}));
+            combo = combo.mult(new LCMatrix(new float[][]{{1/max, 0, 0},{0, 1/max, 0},{0, 0, 1/max}}));
 
         if (cameraRGB != null)
-            combo = combo.times(new Matrix(cameraRGB));
+            combo = combo.mult(new LCMatrix(cameraRGB));
 
         if (mult != 1)
-            combo = combo.times(mult);
+            combo = combo.scale(mult);
 
-        return combo.getArrayFloat();
+        return LCMatrix.getArrayFloat(combo);
     }
 
     static public PlanarImage tintCast(PlanarImage image, float tint, float lightness) {
@@ -276,25 +279,25 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
             double tgreen = tint / 2;
             double tblue = - tint / 4;
 
-            double polygon[][] = {
-                {0,     0},
-                {lightness, 0},
-                {1,     0}
+            double[][] polygon = {
+                    {0, 0},
+                    {lightness, 0},
+                    {1, 0}
             };
 
             polygon[1][1] = tred;
-            double redCurve[][] = new double[256][2];
+            double[][] redCurve = new double[256][2];
             splines.bspline(2, polygon, redCurve);
 
             polygon[1][1] = tgreen;
-            double greenCurve[][] = new double[256][2];
+            double[][] greenCurve = new double[256][2];
             splines.bspline(2, polygon, greenCurve);
 
             polygon[1][1] = tblue;
-            double blueCurve[][] = new double[256][2];
+            double[][] blueCurve = new double[256][2];
             splines.bspline(2, polygon, blueCurve);
 
-            short table[][] = new short[3][0x10000];
+            short[][] table = new short[3][0x10000];
 
             splines.Interpolator interpolator = new splines.Interpolator();
 
@@ -320,7 +323,7 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
     }
 
     static public PlanarImage whiteBalance(RenderedImage image, float source, float REF_T,
-                                           float tint, float lightness, float mult, float cameraRGB[][],
+                                           float tint, float lightness, float mult, float[][] cameraRGB,
                                            ColorScience.CAMethod caMethod) {
         float[][] b = whiteBalanceMatrix(source, REF_T, mult, cameraRGB, caMethod);
 
@@ -347,10 +350,10 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
             float lightness = 0.18f;
 
             if (p != null) {
-                int pixel[] = pointToPixel(p);
+                int[] pixel = pointToPixel(p);
 
                 if (pixel != null) {
-                    float n[] = neutralize(pixel, caMethod, source, REF_T);
+                    float[] n = neutralize(pixel, caMethod, source, REF_T);
                     if (n != null) {
                         lightness = pixel[1]/255.0f;
 

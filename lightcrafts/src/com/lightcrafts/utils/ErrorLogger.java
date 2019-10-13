@@ -23,9 +23,9 @@ public class ErrorLogger {
             String message = createMessage(t);
             HttpURLConnection conn = connect(message);
             OutputStream out = conn.getOutputStream();
-            Writer writer = new OutputStreamWriter(out);
-            writer.write(message);
-            writer.close();
+            try (Writer writer = new OutputStreamWriter(out)) {
+                writer.write(message);
+            }
             conn.disconnect();
             int error = conn.getResponseCode();
             if (error != HttpURLConnection.HTTP_OK) {
@@ -75,11 +75,12 @@ public class ErrorLogger {
     // Translate a Throwable into an in-memory stack trace:
     private static String createMessage(Throwable t) {
         try {
-            StringWriter writer = new StringWriter();
-            PrintWriter printer = new PrintWriter(writer);
-            t.printStackTrace(printer);
-            writer.close();
-            String trace = writer.toString();
+            final String trace;
+            try (StringWriter writer = new StringWriter()) {
+                PrintWriter printer = new PrintWriter(writer);
+                t.printStackTrace(printer);
+                trace = writer.toString();
+            }
 
             StringBuffer buffer = new StringBuffer();
             appendVersion(buffer);

@@ -2,21 +2,23 @@
 
 package com.lightcrafts.model.ImageEditor;
 
-import com.lightcrafts.mediax.jai.*;
-import com.lightcrafts.model.OperationType;
-import com.lightcrafts.model.SliderConfig;
+import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.opimage.FastBilateralFilterOpImage;
 import com.lightcrafts.jai.opimage.HDROpImage2;
-import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.jai.utils.Functions;
-import com.lightcrafts.jai.JAIContext;
-import com.lightcrafts.utils.ColorScience;
+import com.lightcrafts.jai.utils.Transform;
+import com.lightcrafts.model.OperationType;
+import com.lightcrafts.model.SliderConfig;
 
-import java.text.DecimalFormat;
+import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.RenderedOp;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
-import java.awt.*;
 import java.lang.ref.SoftReference;
+import java.text.DecimalFormat;
+
+import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_RELIGHT;
 
 /**
  * Copyryght (C) 2007 Light Crafts, Inc.
@@ -39,6 +41,8 @@ public class HDROperationV3 extends BlendedOperation {
 
     public HDROperationV3(Rendering rendering, OperationType type) {
         super(rendering, type);
+
+        setHelpTopic(HELP_TOOL_RELIGHT);
 
         DecimalFormat format = new DecimalFormat("0.00");
 
@@ -99,39 +103,18 @@ public class HDROperationV3 extends BlendedOperation {
         @Override
         public PlanarImage setFront() {
             if (lastBack.get() != back || mask.get() == null || depth != last_radius || fuzz != last_fuzz) {
-                RenderedImage singleChannel;
-                if (back.getColorModel().getNumComponents() == 3) {
-                    double[][] yChannel = new double[][]{{ColorScience.Wr, ColorScience.Wg, ColorScience.Wb, 0}};
-
-                    ParameterBlock pb = new ParameterBlock();
-                    pb.addSource( back );
-                    pb.add( yChannel );
-                    singleChannel = JAI.create("BandCombine", pb, null);
-                } else
-                    singleChannel = back;
-
-                BorderExtender copyExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
-                RenderingHints extenderHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER, copyExtender);
+                final RenderedImage singleChannel = createSingleChannel(back);
 
                 PlanarImage maskImage = new FastBilateralFilterOpImage(singleChannel,
                                                                        JAIContext.fileCacheHint,
                                                                        (float) (depth * scale), 0.1f);
-
-//                ParameterBlock pb = new ParameterBlock();
-//                pb.addSource(maskImage);
-//                pb.add(new int[]{1});
-//                maskImage = JAI.create("bandselect", pb, null);
 
                 ParameterBlock pb = new ParameterBlock();
                 pb.addSource(maskImage);
                 pb.add(new int[]{0});
                 RenderedOp bfMask = JAI.create("bandselect", pb, null);
 
-                KernelJAI kernel = Functions.getGaussKernel(10 * fuzz * scale);
-                pb = new ParameterBlock();
-                pb.addSource(bfMask);
-                pb.add(kernel);
-                RenderedOp blurredMask = JAI.create("LCSeparableConvolve", pb, extenderHints);
+                RenderedOp blurredMask = Functions.fastGaussianBlur(bfMask, 10 * fuzz * scale);
 
                 pb = new ParameterBlock();
                 pb.addSource( maskImage );

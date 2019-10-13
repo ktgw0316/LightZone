@@ -19,7 +19,7 @@ Download and install (or unpack) following:
     -    __git__
     -    __make__
     -    __libiconv__ for iconv
-    -    __mingw64-i686-gcc-core__ (32-bit) or __mingw64-x86_64-gcc-core__ (64-bit)
+    -    __mingw64-i686-gcc-core__ (32-bit) or __mingw64-x86_64-gcc-core__ (64-bit), version 4.4 or later
     -    __mingw64-i686-gcc-g++__ (32-bit) or __mingw64-x86_64-gcc-g++__ (64-bit)
     -    __mingw64-i686-pkg-config__ (32-bit) or __mingw64-x86_64-pkg-config__ (64-bit)
     -    __mingw64-i686-zlib__ (32-bit) or __mingw64-x86_64-zlib__ (64-bit)

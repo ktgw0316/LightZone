@@ -1,5 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
-/* Copyright (C) 2016 Masahiro Kitagawa */
+/* Copyright (C) 2016- Masahiro Kitagawa */
 
 package com.lightcrafts.platform.macosx;
 
@@ -15,17 +15,18 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import com.apple.eawt.AboutHandler;
-import com.apple.eawt.AppReOpenedListener;
-import com.apple.eawt.PreferencesHandler;
-import com.apple.eawt.OpenFilesHandler;
-import com.apple.eawt.QuitHandler;
-import com.apple.eawt.QuitResponse;
-import com.apple.eawt.AppEvent.AboutEvent;
-import com.apple.eawt.AppEvent.AppReOpenedEvent;
-import com.apple.eawt.AppEvent.PreferencesEvent;
-import com.apple.eawt.AppEvent.OpenFilesEvent;
-import com.apple.eawt.AppEvent.QuitEvent;
+import java.awt.Desktop;
+import java.awt.desktop.AboutEvent;
+import java.awt.desktop.AboutHandler;
+import java.awt.desktop.AppReopenedEvent;
+import java.awt.desktop.AppReopenedListener;
+import java.awt.desktop.PreferencesEvent;
+import java.awt.desktop.PreferencesHandler;
+import java.awt.desktop.OpenFilesEvent;
+import java.awt.desktop.OpenFilesHandler;
+import java.awt.desktop.QuitEvent;
+import java.awt.desktop.QuitHandler;
+import java.awt.desktop.QuitResponse;
 
 import static com.lightcrafts.platform.macosx.Locale.LOCALE;
 
@@ -48,16 +49,6 @@ public final class MacOSXLauncher extends Launcher {
     public static native void readyToOpenFiles();
 
     ////////// protected //////////////////////////////////////////////////////
-
-    @Override
-    protected void setSystemProperties() {
-        // System.setProperty("apple.awt.graphics.UseQuartz", "false");
-    }
-
-    @Override
-    protected void enableTextAntiAliasing() {
-        // Do nothing.
-    }
 
     @Override
     protected String showJavaVersion() {
@@ -263,11 +254,9 @@ public final class MacOSXLauncher extends Launcher {
         System.setProperty( "apple.awt.showGrowBox"     , "true" );
         // System.setProperty( "apple.awt.textantialiasing", "true" );
         // System.setProperty( "apple.awt.antialiasing"    , "false" );
-        System.setProperty( "swing.aatext", "true" );
         System.setProperty( "apple.awt.graphics.UseQuartz", "false" );
 
-        com.apple.eawt.Application app =
-            com.apple.eawt.Application.getApplication(); 
+        final Desktop app = Desktop.getDesktop(); 
         app.setAboutHandler(new AboutHandler() {
             @Override
             public void handleAbout(AboutEvent e) {
@@ -293,9 +282,9 @@ public final class MacOSXLauncher extends Launcher {
                 qr.cancelQuit();
             }
         });
-        app.addAppEventListener(new AppReOpenedListener() {
+        app.addAppEventListener(new AppReopenedListener() {
             @Override
-            public void appReOpened(AppReOpenedEvent e) {
+            public void appReopened(AppReopenedEvent e) {
                 reOpen();
             }
         });

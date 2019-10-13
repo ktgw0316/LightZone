@@ -448,6 +448,66 @@ public interface NikonTags extends ImageMetaTags {
     int NIKON_LD21_MCU_VERSION              = NIKON_LENS_DATA << 16 | 0x2111;
 
     /**
+     * Lens data version 0204: auto-focus aperture.
+     */
+    int NIKON_LD24_AF_APERTURE              = NIKON_LENS_DATA << 16 | 0x2405;
+
+    /**
+     * Lens data version 0204: aperture at maximum focal length.
+     */
+    int NIKON_LD24_APERTURE_AT_MAX_FOCAL    = NIKON_LENS_DATA << 16 | 0x2411;
+
+    /**
+     * Lens data version 0204: aperture at minimum focal length.
+     */
+    int NIKON_LD24_APERTURE_AT_MIN_FOCAL    = NIKON_LENS_DATA << 16 | 0x2410;
+
+    /**
+     * Lens data version 0204: effective maximum aperture.
+     */
+    int NIKON_LD24_EFFECTIVE_MAX_APERTURE   = NIKON_LENS_DATA << 16 | 0x2413;
+
+    /**
+     * Lens data version 0204: focal length.
+     */
+    int NIKON_LD24_FOCAL_LENGTH             = NIKON_LENS_DATA << 16 | 0x240B;
+
+    /**
+     * Lens data version 0204: focus distance.
+     */
+    int NIKON_LD24_FOCUS_DISTANCE           = NIKON_LENS_DATA << 16 | 0x240A;
+
+    /**
+     * Lens data version 0204: focus position.
+     */
+    int NIKON_LD24_FOCUS_POSITION           = NIKON_LENS_DATA << 16 | 0x2408;
+
+    /**
+     * Lens data version 0204: F-stops.
+     */
+    int NIKON_LD24_LENS_FSTOPS              = NIKON_LENS_DATA << 16 | 0x240D;
+
+    /**
+     * Lens data version 0204: lens ID (name).
+     */
+    int NIKON_LD24_LENS_ID                  = NIKON_LENS_DATA << 16 | 0x240C;
+
+    /**
+     * Lens data version 0204: maximum focal length.
+     */
+    int NIKON_LD24_MAX_FOCAL_LENGTH         = NIKON_LENS_DATA << 16 | 0x240F;
+
+    /**
+     * Lens data version 0204: minimum focal length.
+     */
+    int NIKON_LD24_MIN_FOCAL_LENGTH         = NIKON_LENS_DATA << 16 | 0x240E;
+
+    /**
+     * Lens data version 0204: MCU version.
+     */
+    int NIKON_LD24_MCU_VERSION              = NIKON_LENS_DATA << 16 | 0x2412;
+
+    /**
      * Lens F-stops.
      * <p>
      * Type: Undefined.

@@ -14,7 +14,7 @@ import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.image.metadata.ImageMetadata;
 import com.lightcrafts.image.types.ImageType;
 import com.lightcrafts.image.types.TIFFImageType;
-import com.lightcrafts.utils.ColorProfileInfo;
+import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.utils.LightCraftsException;
 
 import static com.lightcrafts.image.metadata.providers.ResolutionProvider.*;

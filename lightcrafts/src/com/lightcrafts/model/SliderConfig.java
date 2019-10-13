@@ -1,8 +1,11 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2017-     Masahiro Kitagawa */
 
 package com.lightcrafts.model;
 
 import java.text.DecimalFormat;
+
+import lombok.Getter;
 
 /** This is a struct to bundle together options for sliders generated from
   * GenericOperation.
@@ -26,12 +29,23 @@ import java.text.DecimalFormat;
 
 public class SliderConfig {
 
+    @Getter
     private double minValue;
+
+    @Getter
     private double maxValue;
+
+    @Getter
     private double defaultValue;
+
+    @Getter
     private double increment;
+
+    @Getter
     private boolean isLogScale;
-    private DecimalFormat format;
+
+    @Getter
+    private DecimalFormat decimalFormat;
 
     /** Generate a default SliderConfig with minimum 0, maximum 1, and
       * default 0.5.  Log scale and text options are off by default.
@@ -73,7 +87,7 @@ public class SliderConfig {
         double defaultValue,
         double increment,
         boolean isLogScale,
-        DecimalFormat format
+        DecimalFormat decimalFormat
     ) {
         boolean valid = true;
         valid &= minValue < maxValue;
@@ -90,35 +104,11 @@ public class SliderConfig {
         this.defaultValue = defaultValue;
         this.increment = increment;
         this.isLogScale = isLogScale;
-        this.format = format;
-    }
-
-    public double getMinValue() {
-        return minValue;
-    }
-
-    public double getMaxValue() {
-        return maxValue;
-    }
-
-    public double getDefaultValue() {
-        return defaultValue;
-    }
-
-    public double getIncrement() {
-        return increment;
-    }
-
-    public boolean isLogScale() {
-        return isLogScale;
-    }
-
-    public DecimalFormat getDecimalFormat() {
-        return format;
+        this.decimalFormat = decimalFormat;
     }
 
     public boolean hasText() {
-        return format != null;
+        return decimalFormat != null;
     }
 
     private static double getDefaultIncrement(double min, double max) {

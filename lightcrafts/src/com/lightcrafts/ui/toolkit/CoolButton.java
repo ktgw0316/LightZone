@@ -116,7 +116,7 @@ public class CoolButton extends JButton {
         setBorder(border);
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         if (args.length < 1) {
             System.err.println("usage: (file)");
             System.exit(1);

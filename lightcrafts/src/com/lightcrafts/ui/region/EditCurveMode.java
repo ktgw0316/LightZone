@@ -2,6 +2,7 @@
 
 package com.lightcrafts.ui.region;
 
+import com.lightcrafts.utils.awt.geom.HiDpi;
 import com.lightcrafts.utils.xml.XmlNode;
 import com.lightcrafts.utils.xml.XMLException;
 
@@ -88,7 +89,7 @@ class EditCurveMode extends MajorRegionMode {
         if (event.isPopupTrigger() || event.getButton() != MouseEvent.BUTTON1) {
             return;     // popups are handled in CurveComponent
         }
-        Point p = event.getPoint();
+        final Point p = HiDpi.imageSpacePointFrom(event.getPoint());
         Curve c = comp.getCurveAt(p);
 
         if (comp.isClonePointAt(curve, p)) {
@@ -147,7 +148,7 @@ class EditCurveMode extends MajorRegionMode {
 
     private void updateCursor(MouseEvent event) {
         Cursor newCursor;
-        Point p = event.getPoint();
+        final Point p = HiDpi.imageSpacePointFrom(event.getPoint());
         if (comp.isClonePointAt(curve, p)) {
             newCursor = MovePointCursor;
         }

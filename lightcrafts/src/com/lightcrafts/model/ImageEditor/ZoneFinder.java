@@ -2,30 +2,33 @@
 
 package com.lightcrafts.model.ImageEditor;
 
-import static com.lightcrafts.model.ImageEditor.Locale.LOCALE;
-import com.lightcrafts.model.*;
-import com.lightcrafts.jai.utils.*;
+import com.lightcrafts.image.color.ColorScience;
 import com.lightcrafts.jai.JAIContext;
-import com.lightcrafts.utils.Segment;
-import com.lightcrafts.utils.ColorScience;
-
-import com.lightcrafts.mediax.jai.*;
+import com.lightcrafts.jai.utils.Functions;
+import com.lightcrafts.model.Operation;
+import com.lightcrafts.model.Preview;
+import com.lightcrafts.model.Region;
+import com.lightcrafts.model.ZoneOperation;
 import com.lightcrafts.ui.LightZoneSkin;
+import com.lightcrafts.utils.Segment;
 
+import javax.media.jai.*;
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.color.ColorSpace;
 import java.awt.color.ICC_ColorSpace;
-import java.awt.color.ICC_ProfileRGB;
 import java.awt.color.ICC_Profile;
+import java.awt.color.ICC_ProfileRGB;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.image.*;
 import java.awt.image.renderable.ParameterBlock;
-import java.awt.geom.AffineTransform;
+
+import static com.lightcrafts.model.ImageEditor.Locale.LOCALE;
 
 public class ZoneFinder extends Preview implements PaintListener {
-    static final boolean ADJUST_GRAYSCALE = true;
-    final boolean colorMode;
+    private static final boolean ADJUST_GRAYSCALE = true;
+    private final boolean colorMode;
     final ImageEditorEngine engine;
 
     @Override
@@ -86,7 +89,7 @@ public class ZoneFinder extends Preview implements PaintListener {
             transform.setToTranslation(dx, dy);
             try {
                 g.drawRenderedImage(zones, transform);
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 e.printStackTrace();
             }
         }
@@ -96,7 +99,7 @@ public class ZoneFinder extends Preview implements PaintListener {
 
     private BufferedImage lastPreview = null;
 
-    public void setFocusedZone(int index) {
+    void setFocusedZone(int index) {
         currentFocusZone = index;
 
         if (!colorMode && ADJUST_GRAYSCALE && lastPreview != null) {
@@ -105,7 +108,7 @@ public class ZoneFinder extends Preview implements PaintListener {
         }
     }
 
-    RenderedImage zones;
+    private RenderedImage zones;
 
     ZoneFinder(ImageEditorEngine engine) {
         this(engine, false);
@@ -199,7 +202,7 @@ public class ZoneFinder extends Preview implements PaintListener {
     // requantize the segmented image to match the same lightness scale used in the zone mapper
     private static RenderedImage requantize(RenderedImage image, int focusZone) {
         int steps = 16;
-        int colors[] = new int[steps + 1];
+        int[] colors = new int[steps + 1];
         for (int i = 0; i < steps; i++) {
             float color = (float) ((Math.pow(2, i * 8.0 / (steps - 1)) - 1) / 255.);
             float[] srgbColor = Functions.fromLinearToCS(JAIContext.systemColorSpace, new float[] {color, color, color});
@@ -207,7 +210,7 @@ public class ZoneFinder extends Preview implements PaintListener {
         }
         colors[steps] = colors[steps - 1];
 
-        byte lut[][] = new byte[3][256];
+        byte[][] lut = new byte[3][256];
         int step = 0;
         for (int i = 0; i < colors[steps]; i++) {
             if (i > colors[step])
@@ -259,7 +262,7 @@ public class ZoneFinder extends Preview implements PaintListener {
     private RenderedImage segment(RenderedImage image) {
         Rectangle bounds = new Rectangle(image.getMinX(), image.getMinY(), image.getWidth(), image.getHeight());
 
-        byte pixels[] = ((DataBufferByte) image.getData(bounds).getDataBuffer()).getData();
+        byte[] pixels = ((DataBufferByte) image.getData(bounds).getDataBuffer()).getData();
         if (pixels.length != bounds.height * bounds.width * image.getSampleModel().getNumBands()) {
             pixels = (byte[]) image.getData(bounds).getDataElements(bounds.x, bounds.y, bounds.width, bounds.height, null);
         }

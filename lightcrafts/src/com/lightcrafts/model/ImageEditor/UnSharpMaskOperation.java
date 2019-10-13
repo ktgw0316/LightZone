@@ -2,20 +2,19 @@
 
 package com.lightcrafts.model.ImageEditor;
 
+import com.lightcrafts.image.color.ColorScience;
+import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.jai.utils.Functions;
+import com.lightcrafts.jai.utils.Transform;
+import com.lightcrafts.model.Operation;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
-import com.lightcrafts.model.Operation;
-import com.lightcrafts.jai.utils.Transform;
-import com.lightcrafts.jai.utils.Functions;
-import com.lightcrafts.jai.JAIContext;
-import com.lightcrafts.utils.ColorScience;
 
-import com.lightcrafts.mediax.jai.*;
-import java.awt.image.renderable.ParameterBlock;
-import java.awt.image.RenderedImage;
+import javax.media.jai.*;
 import java.awt.*;
+import java.awt.image.RenderedImage;
+import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
-import java.text.StringCharacterIterator;
 import java.util.LinkedList;
 
 public class UnSharpMaskOperation extends BlendedOperation {
@@ -24,9 +23,9 @@ public class UnSharpMaskOperation extends BlendedOperation {
     private static final String THRESHOLD = "Threshold";
     private static final String RGB = "RGB";
 
-    static final OperationTypeImpl typeV1 = new OperationTypeImpl("UnSharp Mask");
-    static final OperationTypeImpl typeV2 = new OperationTypeImpl("UnSharp Mask V2");
-    static final OperationTypeImpl typeV3 = new OperationTypeImpl("UnSharp Mask V3");
+    static final OperationType typeV1 = new OperationTypeImpl("UnSharp Mask");
+    static final OperationType typeV2 = new OperationTypeImpl("UnSharp Mask V2");
+    static final OperationType typeV3 = new OperationTypeImpl("UnSharp Mask V3");
 
     public UnSharpMaskOperation(Rendering rendering, OperationType type) {
         super(rendering, type);
@@ -90,8 +89,8 @@ public class UnSharpMaskOperation extends BlendedOperation {
         return x * (1 - 1 / Math.exp(x * x / 5.0)) / 10.0;
     }
 
-    private static short tableData[] = new short[0x10000];
-    private static short invTableData[] = new short[0x10000];
+    private static short[] tableData = new short[0x10000];
+    private static short[] invTableData = new short[0x10000];
     private static LookupTableJAI table, invTable;
 
     private static synchronized LookupTableJAI getTable() {

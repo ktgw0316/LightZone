@@ -7,9 +7,9 @@ import com.lightcrafts.image.metadata.ImageMetadata;
 import com.lightcrafts.image.metadata.ImageOrientation;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.utils.Functions;
-import com.lightcrafts.mediax.jai.*;
-import com.lightcrafts.mediax.jai.operator.TransposeDescriptor;
-import com.lightcrafts.mediax.jai.operator.TransposeType;
+import javax.media.jai.*;
+import javax.media.jai.operator.TransposeDescriptor;
+import javax.media.jai.operator.TransposeType;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

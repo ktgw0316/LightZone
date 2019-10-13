@@ -1,12 +1,18 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2018-     Masahiro Kitagawa */
 
 package com.lightcrafts.utils.directory;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStreamReader;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.WatchKey;
 import java.util.HashMap;
 import java.util.Map;
+
+import static java.nio.file.StandardWatchEventKinds.*;
 
 /**
  * A <code>UnixDirectoryMonitor</code> is-a {@link DirectoryMonitor} for
@@ -16,12 +22,11 @@ import java.util.Map;
  */
 public final class UnixDirectoryMonitor extends DirectoryMonitor {
 
-    ////////// public /////////////////////////////////////////////////////////
-
-    /**
-     * Construct a <code>UnixDirectoryMonitor</code>.
-     */
     public UnixDirectoryMonitor() {
+        try {
+            watcher = FileSystems.getDefault().newWatchService();
+        } catch (IOException ignored) {
+        }
         start();
     }
 
@@ -31,15 +36,17 @@ public final class UnixDirectoryMonitor extends DirectoryMonitor {
      *
      * @param directory The directory to be monitored.
      */
-    @SuppressWarnings({"ConstantConditions"})
-    public void addDirectory( File directory ) {
-        final Long value = directory.lastModified();
-        final boolean added;
-        synchronized ( m_dirMap ) {
-            added = m_dirMap.put( directory, value ) != null;
+    @Override
+    public void addDirectory(File directory) {
+        try {
+            final Path dir = directory.toPath();
+            WatchKey watchKey = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+            watchKeyMap.put(watchKey, dir);
+            if (DEBUG) {
+                System.out.println("UnixDirectoryMonitor: added " + dir);
+            }
+        } catch (InvalidPathException | IOException ignored) {
         }
-        if ( DEBUG && added )
-            System.out.println( "UnixDirectoryMonitor: added " + directory );
     }
 
     /**
@@ -49,77 +56,38 @@ public final class UnixDirectoryMonitor extends DirectoryMonitor {
      * @return Returns <code>true</code> only if the directory was being
      * monitored and thus removed.
      */
-    @SuppressWarnings({"ConstantConditions"})
-    public boolean removeDirectory( File directory ) {
-        final boolean removed;
-        synchronized ( m_dirMap ) {
-            removed = m_dirMap.remove( directory ) != null;
+    @Override
+    public boolean removeDirectory(File directory) {
+        boolean removed;
+        synchronized (watchKeyMap) {
+            removed = watchKeyMap.keySet().stream()
+                    .filter(key -> getPathFor(key).equals(directory.toPath()))
+                    .anyMatch(key -> watchKeyMap.remove(key) != null);
         }
-        if ( DEBUG && removed )
-            System.out.println( "UnixDirectoryMonitor: removed " + directory );
+        if (DEBUG && removed) {
+            System.out.println("UnixDirectoryMonitor: removed " + directory);
+        }
         return removed;
     }
 
-    ////////// protected //////////////////////////////////////////////////////
-
-    /**
-     * {@inheritDoc}
-     */
-    protected File[] getMonitoredDirectories() {
-        synchronized ( m_dirMap ) {
-            return m_dirMap.keySet().toArray( new File[0] );
-        }
+    @Override
+    Path getPathFor(WatchKey key) {
+        return watchKeyMap.get(key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    protected boolean hasChanged( File dir ) {
-        if ( dir.exists() ) {
-            //
-            // The directory still exists: check to see whether its changed
-            // since the last time we checked.
-            //
-            synchronized ( m_dirMap ) {
-                final Long prevValue = m_dirMap.get( dir );
-                if ( prevValue != null ) {
-                    final long newValue = dir.lastModified();
-                    if ( newValue != prevValue.longValue() ) {
-                        //
-                        // The contents of the directory have changed.
-                        //
-                        m_dirMap.put( dir, newValue );
-                        return true;
-                    }
-                }
-            }
-        } else {
-            //
-            // The directory has disappeared from the filesystem: remove it
-            // from the collection of directories we're monitoring.
-            //
-            return removeDirectory( dir );
-        }
-        return false;
-    }
-
-    ////////// private ////////////////////////////////////////////////////////
-
-    /**
-     * The collection of directories to monitor.  The key is the full path to a
-     * directory and the value is the directory's modification time.
-     */
-    private final Map<File,Long> m_dirMap = new HashMap<File,Long>();
+    private final Map<WatchKey, Path> watchKeyMap = new HashMap<>();
 
     ////////// main() /////////////////////////////////////////////////////////
 
+    /*
     private static final class TestListener implements DirectoryListener {
+        @Override
         public void directoryChanged( File dir ) {
             System.out.println( dir.getAbsolutePath() );
         }
     }
 
-    public static void main( String[] args ) throws Exception {
+    public static void main( String[] args ) throws IOException {
         final DirectoryMonitor monitor = new UnixDirectoryMonitor();
         final DirectoryListener listener = new TestListener();
         monitor.addListener( listener );
@@ -145,5 +113,6 @@ public final class UnixDirectoryMonitor extends DirectoryMonitor {
             System.err.println( "Unknown command" );
         }
     }
+    */
 }
 /* vim:set et sw=4 ts=4: */

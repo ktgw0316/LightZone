@@ -18,11 +18,20 @@ TARGET_HELP_DIR:=	/tmp/$(HELP)
 
 # check for 64 bit version of windows
 # to determine path to HTML Help Workshop
-UNAME:= $(shell uname -ms | grep -e 64 -e WOW)
+include			$(COMMON_DIR)/mk/platform0.mk
+UNAME:=			$(shell uname -ms | grep -e 64 -e WOW)
 ifeq ($(strip $(UNAME)),)
-HTML_HELP_DIR:=	/cygdrive/c/Program\ Files
+  ifeq ($(CYGWIN),1)
+    HTML_HELP_DIR:=	/cygdrive/c/Program\ Files
+  else
+    HTML_HELP_DIR:=	/c/Program\ Files
+  endif
 else
-HTML_HELP_DIR:=	/cygdrive/c/Program\ Files\ \(x86\)
+  ifeq ($(CYGWIN),1)
+    HTML_HELP_DIR:=	/cygdrive/c/Program\ Files\ \(x86\)
+  else
+    HTML_HELP_DIR:=	/c/Program\ Files\ \(x86\)
+  endif
 endif
 HTML_HELP_COMPILER:=	$(HTML_HELP_DIR)/HTML\ Help\ Workshop/hhc
 

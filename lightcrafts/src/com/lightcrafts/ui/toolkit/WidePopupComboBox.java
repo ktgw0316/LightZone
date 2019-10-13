@@ -3,13 +3,9 @@
 package com.lightcrafts.ui.toolkit;
 
 import com.lightcrafts.platform.Platform;
-import com.lightcrafts.utils.ColorProfileInfo;
-import com.sun.java.swing.plaf.windows.WindowsComboBoxUI;
+import com.lightcrafts.image.color.ColorProfileInfo;
 
 import javax.swing.*;
-import javax.swing.plaf.basic.BasicComboPopup;
-import javax.swing.plaf.basic.ComboPopup;
-import javax.swing.plaf.metal.MetalComboBoxUI;
 import java.awt.*;
 import java.util.*;
 import java.util.List;

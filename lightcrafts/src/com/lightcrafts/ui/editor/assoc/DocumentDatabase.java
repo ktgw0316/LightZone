@@ -304,23 +304,20 @@ public class DocumentDatabase {
      */
     public static XmlDocument getDefaultDocument(ImageMetadata meta) {
         URL url = DefaultDocuments.getDefaultDocumentUrl(meta);
-        if (url != null) {
-            try {
-                InputStream in = url.openStream();
-                XmlDocument doc = new XmlDocument(in);
-                in.close();
-                return doc;
-            }
-            catch (IOException e) {
-                if (DefaultDocuments.Debug) {
-                    System.err.print(
-                        "Error reading default document at " + url + ": "
-                    );
-                    System.err.println(e.getMessage());
-                }
-                return null;
-            }
+        if (url == null) {
+            return null;
         }
-        return null;
+        try (InputStream in = url.openStream()) {
+            return new XmlDocument(in);
+        }
+        catch (IOException e) {
+            if (DefaultDocuments.Debug) {
+                System.err.print(
+                    "Error reading default document at " + url + ": "
+                );
+                System.err.println(e.getMessage());
+            }
+            return null;
+        }
     }
 }

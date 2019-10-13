@@ -1,7 +1,9 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2017-     Masahiro Kitagawa */
 
 package com.lightcrafts.model;
 
+import java.awt.Dimension;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
@@ -300,11 +302,30 @@ public class CropBounds {
     }
 
     public CropBounds createInvertedAspect() {
-        CropBounds copy = new CropBounds();
-        copy.angle = angle;
-        copy.center = (Point2D) center.clone();
-        copy.width = height;
-        copy.height = width;
-        return copy;
+        return new CropBounds(center, height, width, angle);
+    }
+
+    public Dimension getDimensionToFit(Dimension bounds) {
+        if (width <= 0 || height <= 0) {
+            return new Dimension(bounds.width, bounds.height);
+        }
+
+        // Fit longer sides
+        double scale = (width > height)
+                ? bounds.width / width
+                : bounds.height / height;
+        int newWidth = (int) (scale * width);
+        int newHeight = (int) (scale * height);
+
+        // Fit shorter sides only when the longer sides gave a wrong dimension
+        if (newWidth > bounds.width || newHeight > bounds.height) {
+            scale = (width < height)
+                    ? bounds.width / width
+                    : bounds.height / height;
+            newWidth = (int) (scale * width);
+            newHeight = (int) (scale * height);
+        }
+
+        return new Dimension(newWidth, newHeight);
     }
 }

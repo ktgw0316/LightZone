@@ -2,24 +2,22 @@
 
 package com.lightcrafts.jai.utils;
 
-import com.lightcrafts.mediax.jai.*;
-import java.awt.image.*;
-import java.awt.image.renderable.ParameterBlock;
-import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.awt.color.ColorSpace;
-import java.awt.color.ICC_Profile;
-import java.io.IOException;
-import java.text.NumberFormat;
-import java.text.DecimalFormat;
-
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.operator.LCMSColorConvertDescriptor;
-import com.lightcrafts.utils.ColorProfileInfo;
-import com.lightcrafts.model.ImageEditor.Rendering;
 import com.lightcrafts.model.ImageEditor.ImageProcessor;
+import com.lightcrafts.model.ImageEditor.Rendering;
 import com.lightcrafts.model.Operation;
-import com.lightcrafts.media.jai.util.ImageUtil;
+import com.sun.media.jai.util.ImageUtil;
+
+import javax.media.jai.*;
+import java.awt.*;
+import java.awt.color.ColorSpace;
+import java.awt.color.ICC_Profile;
+import java.awt.geom.AffineTransform;
+import java.awt.image.*;
+import java.awt.image.renderable.ParameterBlock;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 /**
  * Created by IntelliJ IDEA.
@@ -29,6 +27,22 @@ import com.lightcrafts.media.jai.util.ImageUtil;
  */
 public class Functions {
     public static boolean DEBUG = false;
+
+    public static LookupTableJAI computeGammaTable(int dataType, double gamma) {
+        if (dataType == DataBuffer.TYPE_BYTE) {
+            byte[] tableDataByte = new byte[0x100];
+            for (int i = 0; i < tableDataByte.length; i++) {
+                tableDataByte[i] = (byte) (0xFF * Math.pow(i / (double) 0xFF, gamma) + 0.5);
+            }
+            return new LookupTableJAI(tableDataByte);
+        } else {
+            short[] tableDataUShort = new short[0x10000];
+            for (int i = 0; i < tableDataUShort.length; i++) {
+                tableDataUShort[i] = (short) (0xFFFF * Math.pow(i / (double) 0xFFFF, gamma) + 0.5);
+            }
+            return new LookupTableJAI(tableDataUShort, true);
+        }
+    }
 
     static public RenderedOp crop(RenderedImage image, float x, float y, float width, float height, RenderingHints hints) {
         ParameterBlock pb = new ParameterBlock();
@@ -58,50 +72,53 @@ public class Functions {
         double newRadius = radius;
         float rescale = 1;
 
-        int size = Math.min(image.getWidth(), image.getHeight());
+        final int size = Math.min(image.getWidth(), image.getHeight());
+        final int tileSize = Math.max(JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT);
 
-        if (size > 256) {
+        if (size > tileSize) {
             while (newRadius > 32) {
                 newRadius /= 2;
                 rescale /= 2;
             }
         }
 
-        RenderingHints extenderHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
-                                                  BorderExtender.createInstance(BorderExtender.BORDER_COPY));
+        RenderedImage scaleDown = (rescale != 1) ? scaledRendering(rendering, op, rescale, true) : image;
+        if (processor != null) {
+            scaleDown = processor.process(scaleDown);
+        }
 
-        Interpolation interp = Interpolation.getInstance(Interpolation.INTERP_BICUBIC);
-
-        RenderedImage scaleDown;
-        if (rescale != 1) {
-            scaleDown = scaledRendering(rendering, op, rescale, true);
-            if (processor != null)
-                scaleDown = processor.process(scaleDown);
-        } else
-            scaleDown = processor != null ? processor.process(image) : image;
-
-        KernelJAI kernel = Functions.getGaussKernel(newRadius);
-        ParameterBlock pb = new ParameterBlock();
-        pb.addSource(scaleDown);
-        pb.add(kernel);
-        RenderedOp blur = JAI.create("LCSeparableConvolve", pb, extenderHints);
+        final RenderedOp blur = fastGaussianBlur(scaleDown, newRadius);
 
         if (rescale != 1) {
-            pb = new ParameterBlock();
+            ParameterBlock pb = new ParameterBlock();
             pb.addSource(blur);
             pb.add(AffineTransform.getScaleInstance(image.getWidth() / (double) blur.getWidth(),
                                                     image.getHeight() / (double) blur.getHeight()));
-            pb.add(interp);
+            pb.add(Interpolation.getInstance(Interpolation.INTERP_BICUBIC));
             RenderingHints sourceLayoutHints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT,
                                                                   new ImageLayout(0, 0,
                                                                                   JAIContext.TILE_WIDTH,
                                                                                   JAIContext.TILE_HEIGHT,
                                                                                   null, null));
+            RenderingHints extenderHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
+                    BorderExtender.createInstance(BorderExtender.BORDER_COPY));
             sourceLayoutHints.add(extenderHints);
             // sourceLayoutHints.add(JAIContext.noCacheHint);
             return JAI.create("Affine", pb, sourceLayoutHints);
-        } else
+        } else {
             return blur;
+        }
+    }
+
+    public static RenderedOp fastGaussianBlur(RenderedImage image, double radius) {
+        // TODO: Make this fast
+        RenderingHints extenderHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
+                BorderExtender.createInstance(BorderExtender.BORDER_COPY));
+        KernelJAI kernel = getGaussKernel(radius);
+        ParameterBlock pb = new ParameterBlock()
+                .addSource(image)
+                .add(kernel);
+        return JAI.create("LCSeparableConvolve", pb, extenderHints);
     }
 
     public static ImageLayout getImageLayout(RenderedImage image) {
@@ -129,13 +146,13 @@ public class Functions {
         return new ImageLayout(0, 0, tileWidth, tileHeight, cm.createCompatibleSampleModel(tileWidth, tileHeight), cm);
     }
 
-    public static float[] fromLinearToCS(ColorSpace target, float color[]) {
+    public static float[] fromLinearToCS(ColorSpace target, float[] color) {
         synchronized (ColorSpace.class) {
             return target.fromCIEXYZ(JAIContext.linearColorSpace.toCIEXYZ(color));
         }
     }
 
-    public static int[] fromLinearToCS(ColorSpace target, int color[]) {
+    public static int[] fromLinearToCS(ColorSpace target, int[] color) {
         float[] converted;
         synchronized (ColorSpace.class) {
             converted = target.fromCIEXYZ(JAIContext.linearColorSpace.toCIEXYZ(
@@ -163,7 +180,7 @@ public class Functions {
      * Generates the kernel from the current theta and kernel size.
      */
     public static float[] generateLoGKernel(double theta, int kernelSize) {
-        float logKernel[] = new float[kernelSize * kernelSize];
+        float[] logKernel = new float[kernelSize * kernelSize];
         int k = 0;
         double scale = 0;
         for (int j = 0; j < kernelSize; ++j) {
@@ -193,7 +210,7 @@ public class Functions {
 
         int size = 5;
 
-        float data[] = generateLoGKernel(radius, size);
+        float[] data = generateLoGKernel(radius, size);
 
         if (DEBUG) System.out.println("kernel data: (" + radius + ") ");
         for (int i = 0; i < size; i++) {
@@ -215,7 +232,7 @@ public class Functions {
 
         int size = 5;
 
-        float data[] = generateLoGKernel(radius, size);
+        float[] data = generateLoGKernel(radius, size);
 
         if (DEBUG) System.out.println("kernel data: (" + radius + ") ");
         for (int i = 0; i < size; i++) {
@@ -243,7 +260,7 @@ public class Functions {
 
         if (size < 3)
             size = 3;
-        float data[] = new float[size];
+        float[] data = new float[size];
         if (DEBUG) System.out.print("Radius: " + radius + ", kernel size: " + size + ", kernel data: ");
         float positive = 0;
         float negative = 0;
@@ -276,7 +293,7 @@ public class Functions {
 
         if (size < 3)
             size = 3;
-        float data[] = new float[size];
+        float[] data = new float[size];
         if (DEBUG) System.out.print("Radius: " + radius + ", kernel size: " + size + ", kernel data: ");
         float positive = 0;
         float negative = 0;
@@ -312,7 +329,7 @@ public class Functions {
 
         int size = 2 * (int) Math.ceil(sigma) + 1;
 
-        float data[] = new float[size];
+        float[] data = new float[size];
         int j = 0;
         float scale = 0;
 
@@ -337,7 +354,7 @@ public class Functions {
 
         if (size < 3)
             size = 3;
-        float data[] = new float[size];
+        float[] data = new float[size];
         if (DEBUG) System.out.print("Radius: " + sigma + ", kernel size: " + size + ", kernel data: ");
         int j = 0;
         float scale = 0;
@@ -382,7 +399,7 @@ public class Functions {
          */
         
         int samples = 4 * ratio + 1;
-        float data[] = new float[samples];
+        float[] data = new float[samples];
         float sum = 0;
         for (int i = 0; i < samples; i++)
             sum += data[i] = (float) lanczos2(i / (double) ratio - 2.);
@@ -402,7 +419,7 @@ public class Functions {
          */
 
         int samples = 4 * (int) (ratio+0.5) + 1;
-        float data[] = new float[samples];
+        float[] data = new float[samples];
         float sum = 0;
         for (int i = 0; i < samples; i++)
             sum += data[i] = - (float) lanczos2(i / ratio - 2.);
@@ -433,6 +450,15 @@ public class Functions {
         layout.setTileWidth(JAIContext.TILE_WIDTH);
         layout.setTileHeight(JAIContext.TILE_HEIGHT);
         return layout;
+    }
+
+    public static RenderedImage systemColorSpaceImage(RenderedImage image) {
+        ColorModel colors = image.getColorModel();
+        ColorSpace space = colors.getColorSpace();
+        if (space != null && !space.equals(JAIContext.systemColorSpace)) {
+            image = toColorSpace(image, JAIContext.systemColorSpace, null);
+        }
+        return new sRGBWrapper(image);
     }
 
     public static class sRGBWrapper extends PlanarImage {
@@ -505,7 +531,7 @@ public class Functions {
                 BufferedImage srgbImage = new BufferedImage(sRGBColorModel,
                                                             ((BufferedImage) image).getRaster(), false, null);
                 big.drawRenderedImage(srgbImage, new AffineTransform());
-                // Functions.copyData(goodImage.getRaster(), ((BufferedImage) image).getRaster());
+                // copyData(goodImage.getRaster(), ((BufferedImage) image).getRaster());
             }
             big.dispose();
             return goodImage;
@@ -650,33 +676,9 @@ public class Functions {
             return image;
 
         if (image.getSampleModel().getDataType() == DataBuffer.TYPE_BYTE)
-            return Functions.toColorSpace(Functions.fromByteToUShort(image, JAIContext.noCacheHint), linearCS, hints);
+            return toColorSpace(fromByteToUShort(image, JAIContext.noCacheHint), linearCS, hints);
         else
-            return Functions.toColorSpace(image, linearCS, hints);
-    }
-
-    public static void intToBigEndian(int value, byte[] array, int index) {
-            array[index]   = (byte) (value >> 24);
-            array[index+1] = (byte) (value >> 16);
-            array[index+2] = (byte) (value >>  8);
-            array[index+3] = (byte) (value);
-    }
-
-    // Hack to extract a color profile and write it into a file as an output profile
-    public static void extractProfile(ICC_Profile profile, String path) {
-        if (profile.getProfileClass() != ICC_Profile.CLASS_OUTPUT) {
-            byte[] theHeader = profile.getData(ICC_Profile.icSigHead);
-            intToBigEndian (ICC_Profile.icSigOutputClass, theHeader, ICC_Profile.icHdrDeviceClass);
-            profile.setData (ICC_Profile.icSigHead, theHeader);
-        }
-
-        String profileName = ColorProfileInfo.getNameOf(profile);
-
-        try {
-            profile.write(path + profileName + ".icc");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            return toColorSpace(image, linearCS, hints);
     }
 
     public static WritableRaster copyData(WritableRaster raster, Raster source) {

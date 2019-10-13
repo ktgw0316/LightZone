@@ -4,7 +4,7 @@ package com.lightcrafts.ui.print;
 
 import com.lightcrafts.model.PrintSettings;
 import com.lightcrafts.model.RenderingIntent;
-import com.lightcrafts.utils.ColorProfileInfo;
+import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlNode;
 import com.lightcrafts.platform.PrinterLayer;

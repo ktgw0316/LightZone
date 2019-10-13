@@ -118,6 +118,11 @@ public interface FujiTags extends ImageMetaTags {
      */
     int FUJI_MACRO_MODE         = 0x1020;
 
+    int FUJI_MAX_FOCAL_LENGTH   = 0x1405;
+    int FUJI_MAX_APER_AT_MIN_FL = 0x1406;
+    int FUJI_MAX_APER_AT_MAX_FL = 0x1407;
+    int FUJI_MIN_FOCAL_LENGTH   = 0x1404;
+
     /**
      * Picture mode.
      *  <blockquote>

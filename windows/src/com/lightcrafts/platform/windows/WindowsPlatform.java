@@ -2,32 +2,21 @@
 
 package com.lightcrafts.platform.windows;
 
-import java.awt.color.ICC_Profile;
-import java.io.File;
-import java.io.InputStream;
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Stream;
-
-import javax.swing.filechooser.FileSystemView;
-import javax.swing.*;
-
-import sun.awt.shell.ShellFolder;
-
+import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.platform.FileChooser;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.platform.PrinterLayer;
-import com.lightcrafts.utils.ColorProfileInfo;
-import com.lightcrafts.utils.directory.DirectoryMonitor;
-import com.lightcrafts.utils.directory.WindowsDirectoryMonitor;
-import com.lightcrafts.utils.file.FileUtil;
-import com.lightcrafts.utils.file.ICC_ProfileFileFilter;
 import com.lightcrafts.utils.Version;
+import com.lightcrafts.utils.file.FileUtil;
 
-import static com.lightcrafts.platform.windows.WindowsFileUtil.*;
+import javax.swing.filechooser.FileSystemView;
+import java.awt.color.ICC_Profile;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collection;
 
-import com.lightcrafts.ui.LightZoneSkin;
-import com.sun.java.swing.plaf.windows.WindowsLookAndFeel;
+import static com.lightcrafts.platform.windows.WindowsFileUtil.FOLDER_MY_PICTURES;
 
 public final class WindowsPlatform extends Platform {
 
@@ -38,11 +27,6 @@ public final class WindowsPlatform extends Platform {
         final String path =
             WindowsFileUtil.getFolderPathOf( FOLDER_MY_PICTURES );
         return path != null ? new File( path ) : null;
-    }
-
-    @Override
-    public DirectoryMonitor getDirectoryMonitor() {
-        return new WindowsDirectoryMonitor();
     }
 
     @Override
@@ -77,22 +61,7 @@ public final class WindowsPlatform extends Platform {
 
     @Override
     public String getDisplayNameOf( File file ) {
-        String displayName;
-
-        if ( file instanceof ShellFolder ) {
-            //
-            // This is a stupid hack fix when running on Vista that shows the
-            // GUID rather than the display name for the user's home directory
-            // (and a few other directories).
-            //
-            // See: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6488082
-            //
-            // It's apparently fixed for ShellFolder, but still broken for
-            // FileSystemView.
-            //
-            displayName = ((ShellFolder)file).getDisplayName();
-        } else
-            displayName = getFileSystemView().getSystemDisplayName( file );
+        String displayName = getFileSystemView().getSystemDisplayName( file );
 
         if ( displayName.endsWith( ".lnk" ) ) {
             //
@@ -110,36 +79,6 @@ public final class WindowsPlatform extends Platform {
         final File myDocuments =
             FileSystemView.getFileSystemView().getDefaultDirectory();
         return new File( myDocuments, Version.getApplicationName() );
-    }
-
-    @Override
-    public LookAndFeel getLookAndFeel() {
-        LookAndFeel laf = LightZoneSkin.getLightZoneLookAndFeel();
-
-        boolean addWindows = false;
-
-        if (addWindows) {
-            WindowsLookAndFeel quaqua = new WindowsLookAndFeel();
-
-            UIDefaults quaquaDefaults = quaqua.getDefaults();
-            Set<Object> quaquaKeys = quaquaDefaults.keySet();
-
-            String[] fromQuaqua = new String[] {
-                    "FileChooser",
-            };
-
-            Stream.of(fromQuaqua).forEach(qk -> {
-                quaquaKeys.stream()
-                    .filter(key -> key instanceof String &&
-                            ((String) key).startsWith(qk))
-                    .forEach(key -> {
-                        Object value = quaquaDefaults.get(key);
-                        UIManager.put(key, value);
-                    });
-            });
-        }
-
-        return laf;
     }
 
     @Override
@@ -170,18 +109,8 @@ public final class WindowsPlatform extends Platform {
     }
 
     @Override
-    public int getPhysicalMemoryInMB() {
-        return WindowsMemory.getPhysicalMemoryInMB();
-    }
-
-    @Override
     public Collection<ColorProfileInfo> getPrinterProfiles() {
         return getColorProfiles();
-    }
-
-    @Override
-    public boolean hasInternetConnectionTo( String hostName ) {
-        return WindowsInternetConnection.hasConnection();
     }
 
     @Override
@@ -238,11 +167,6 @@ public final class WindowsPlatform extends Platform {
     }
 
     @Override
-    public boolean showFileInFolder( String path ) {
-        return WindowsFileUtil.showInExplorer( path );
-    }
-
-    @Override
     public void showHelpTopic( String topic ) {
         WindowsHelp.showHelpTopic( topic );
     }
@@ -257,44 +181,15 @@ public final class WindowsPlatform extends Platform {
     ////////// private ////////////////////////////////////////////////////////
 
     private static synchronized Collection<ColorProfileInfo> getColorProfiles() {
-        if ( m_profiles != null )
-            return m_profiles;
-        m_profiles = new ArrayList<ColorProfileInfo>();
+        if (m_profiles == null) {
+            String windir = System.getenv("WINDIR");
+            if (windir == null)
+                windir = "C:\\WINDOWS";
 
-        String windir = System.getenv( "WINDIR" );
-        if ( windir == null )
-            windir = "C:\\WINDOWS";
-
-        final File profileDir = new File(
-            windir + "\\system32\\spool\\drivers\\color"
-        );
-        if ( !profileDir.isDirectory() )
-            return m_profiles;
-
-        final File[] files =
-            profileDir.listFiles( ICC_ProfileFileFilter.INSTANCE );
-        for ( File file : files ) {
-            final String path = file.getAbsolutePath();
-            try {
-                final ICC_Profile profile = ICC_Profile.getInstance( path );
-                final String name = ColorProfileInfo.getNameOf( profile );
-                m_profiles.add( new ColorProfileInfo( name, path ) );
-            }
-            catch ( IOException e ) {
-                // Trouble reading the file
-                System.err.println(
-                    "Can't read a color profile from " + path + ": "
-                    + e.getMessage()
-                );
-            }
-            catch ( Throwable t ) {
-                // Invalid color profile data
-                System.err.println(
-                    "Bad color profile at " + path + ": " + t.getMessage()
-                );
-            }
+            final File profileDir = new File(
+                    windir + "\\system32\\spool\\drivers\\color");
+            m_profiles = getColorProfiles(profileDir);
         }
-        Collections.sort( m_profiles );
         return m_profiles;
     }
 
@@ -332,6 +227,6 @@ public final class WindowsPlatform extends Platform {
      * The ICC profiles from
      * <code>$WINDIR\system32\spool\drivers\color</code>.
      */
-    private static List<ColorProfileInfo> m_profiles;
+    private static Collection<ColorProfileInfo> m_profiles;
 }
 /* vim:set et sw=4 ts=4: */

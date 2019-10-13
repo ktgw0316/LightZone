@@ -5,7 +5,7 @@ package com.lightcrafts.jai;
 import com.lightcrafts.model.Region;
 import com.lightcrafts.model.Contour;
 import com.lightcrafts.jai.opimage.ShapedMask;
-import com.lightcrafts.mediax.jai.*;
+import javax.media.jai.*;
 
 import java.util.LinkedList;
 import java.util.List;

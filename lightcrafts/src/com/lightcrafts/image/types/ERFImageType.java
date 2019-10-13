@@ -95,7 +95,7 @@ public final class ERFImageType extends RawImageType {
      * All the possible filename extensions for ERF files.  All must be lower
      * case and the preferred one must be first.
      */
-    private static final String EXTENSIONS[] = {
-        "erf"
+    private static final String[] EXTENSIONS = {
+            "erf"
     };
 }

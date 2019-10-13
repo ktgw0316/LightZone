@@ -8,6 +8,7 @@ import com.lightcrafts.model.Preview;
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.ui.editor.EditorControls;
 import com.lightcrafts.ui.operation.OpControl;
+import com.lightcrafts.utils.awt.geom.HiDpi;
 import com.lightcrafts.utils.xml.XmlNode;
 
 import javax.swing.*;
@@ -105,7 +106,8 @@ class TemplatePreview extends JPanel {
         Component comp = comps[0];
         if (editControls != null) {
             // The Engine Component needs centering.
-            editEngine.setScale(new Rectangle(0, 0, size.width, size.height));
+            final Rectangle scale = new Rectangle(0, 0, size.width, size.height);
+            editEngine.setScale(scale);
             Dimension naturalSize = editEngine.getNaturalSize();
             double imageRatio = naturalSize.width / (double) naturalSize.height;
             double containerRatio = size.width / (double) size.height;
@@ -118,6 +120,8 @@ class TemplatePreview extends JPanel {
                 x = (size.width - naturalSize.width) / 2;
                 y = 0;
             }
+            editEngine.setScale(HiDpi.imageSpaceRectFrom(scale));
+            naturalSize = editEngine.getNaturalSize(); // again
             comp.setSize(naturalSize);
             comp.setLocation(x, y);
         }

@@ -2,11 +2,12 @@
 
 package com.lightcrafts.utils.filecache;
 
+import com.lightcrafts.utils.file.FileIterator;
+import com.lightcrafts.utils.file.FileUtil;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.*;
 import java.nio.channels.FileChannel;
-
-import com.lightcrafts.utils.file.FileUtil;
-import com.lightcrafts.utils.file.FileIterator;
 
 /**
  * A <code>FileCache</code> is used to cache files until a maximum capacity is
@@ -68,7 +69,10 @@ public final class FileCache {
      * @return Returns <code>true</code> only if there is a cache entry for the
      * given key.
      */
-    public boolean contains( String key ) {
+    public boolean contains(@Nullable String key ) {
+        if (key == null) {
+            return false;
+        }
         final File file = m_mapper.mapKeyToFile( key, false );
         synchronized ( this ) {
             //
@@ -293,31 +297,24 @@ public final class FileCache {
      * old.
      */
     private static boolean checkVersion( File file ) throws IOException {
-        final FileInputStream fis;
-        try {
-            fis = new FileInputStream( file );
+        final String versionString;
+        try (FileInputStream fis = new FileInputStream(file)) {
+            int fileLength = (int)file.length();
+            if ( fileLength > MAX_SANE_VERSION_FILE_SIZE ) {
+                //
+                // Something is funny: the file shouldn't be bigger than the
+                // maximum sane size.
+                //
+                fileLength = MAX_SANE_VERSION_FILE_SIZE;
+            }
+            final byte[] buf = new byte[ fileLength ];
+            fis.read( buf );
+            versionString = new String( buf );
         }
         catch ( FileNotFoundException e ) {
             return false;
         }
 
-        int fileLength = (int)file.length();
-        if ( fileLength > MAX_SANE_VERSION_FILE_SIZE ) {
-            //
-            // Something is funny: the file shouldn't be bigger than the
-            // maximum sane size.
-            //
-            fileLength = MAX_SANE_VERSION_FILE_SIZE;
-        }
-        final byte[] buf = new byte[ fileLength ];
-        try {
-            fis.read( buf );
-        }
-        finally {
-            fis.close();
-        }
-
-        final String versionString = new String( buf );
         try {
             final int version = Integer.parseInt( versionString );
             if ( version == CACHE_VERSION )
@@ -335,12 +332,8 @@ public final class FileCache {
      * @param file The {@link File} to create.
      */
     private static void createVersionFile( File file ) throws IOException {
-        final FileOutputStream fos = new FileOutputStream( file );
-        try {
+        try (FileOutputStream fos = new FileOutputStream( file )) {
             fos.write( Integer.toString( CACHE_VERSION ).getBytes( "UTF-8" ) );
-        }
-        finally {
-            fos.close();
         }
     }
 
@@ -411,14 +404,16 @@ public final class FileCache {
         for ( FileIterator i = new FileIterator( new File( args[0] ), false );
               i.hasNext(); ) {
             final File file = i.next();
+            if (file == null) {
+                return;
+            }
             System.err.println( "main(): putting " + file.getAbsolutePath() + ", size = " + (file.length() / (1024*1024)) + " MB" );
-            final FileInputStream fis = new FileInputStream( file );
-            final FileChannel fic = fis.getChannel();
-            final FileOutputStream fos = cache.putToStream( file.getAbsolutePath() );
-            final FileChannel foc = fos.getChannel();
-            fic.transferTo( 0, fic.size(), foc );
-            fos.close();
-            fis.close();
+            try (FileInputStream fis = new FileInputStream(file);
+                 FileOutputStream fos = cache.putToStream(file.getAbsolutePath())) {
+                final FileChannel fic = fis.getChannel();
+                final FileChannel foc = fos.getChannel();
+                fic.transferTo(0, fic.size(), foc);
+            }
         }
     }
 }

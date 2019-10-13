@@ -174,7 +174,7 @@ class BrowserMenu extends UpdatableDisposableMenu {
             JMenuItem item = menu.add(action);
             String name = (String) action.getValue(Action.NAME);
             // On Windogs only the core fonts seem to see stars
-            if (Platform.getType() == Platform.Windows) {
+            if (Platform.isWindows()) {
                 char star = '\u2605';
                 if (name.length() > 0 && name.charAt(0) == star)
                     item.setFont(new Font("Serif", Font.PLAIN, 14));

@@ -107,19 +107,16 @@ public class TemplateDatabase {
     public static XmlDocument getTemplateDocument(TemplateKey key)
         throws TemplateException
     {
-        try {
-            checkTemplateDir();
-            File file = key.getFile();
-            if (file == null) {
-                throw new TemplateException(
+        checkTemplateDir();
+        File file = key.getFile();
+        if (file == null) {
+            throw new TemplateException(
                     "No Template named \"" + key + "\" exists in " +
-                    TemplateDir.getAbsolutePath()
-                );
-            }
-            InputStream in = new FileInputStream(file);
-            XmlDocument doc = new XmlDocument(in);
-            in.close();
-            return doc;
+                            TemplateDir.getAbsolutePath()
+            );
+        }
+        try (InputStream in = new FileInputStream(file)) {
+            return new XmlDocument(in);
         }
         catch (XMLException e) {
             throw new TemplateException(
@@ -141,18 +138,16 @@ public class TemplateDatabase {
     public static void addTemplateDocument(
         XmlDocument doc, TemplateKey key, boolean force
     ) throws TemplateException {
-        try {
-            checkTemplateDir();
-            File file = key.getFile();
-            if (file.exists() && (! force)) {
-                throw new TemplateException(
+        checkTemplateDir();
+        File file = key.getFile();
+        if (file.exists() && (! force)) {
+            throw new TemplateException(
                     "A Template named \"" + key + "\" already exists in " +
-                    TemplateDir.getAbsolutePath()
-                );
-            }
-            OutputStream out = new FileOutputStream(file);
+                            TemplateDir.getAbsolutePath()
+            );
+        }
+        try (OutputStream out = new FileOutputStream(file)) {
             doc.write(out);
-            out.close();
         }
         catch (IOException e) {
             throw new TemplateException(
@@ -332,12 +327,15 @@ public class TemplateDatabase {
     // of "~/.local/share/LightZone/Templates".
     // This method copies templates from the old folder to the new one.
     private static void migrateTemplateFolders() {
-        val platform = Platform.getType();
-        val oldPath =
-                  (platform == Platform.Windows) ? "Application Data\\LightZone\\Templates"
-                : (platform == Platform.Linux)   ? "LightZone/Templates"
-                                                 : "";
-        if (oldPath.equals("")) {
+        final String oldPath;
+
+        if (Platform.isWindows()) {
+            oldPath = "Application Data\\LightZone\\Templates";
+        }
+        else if (Platform.isLinux()) {
+            oldPath = "LightZone/Templates";
+        }
+        else {
             // Only on Windows and Linux did we move the template folder.
             return;
         }

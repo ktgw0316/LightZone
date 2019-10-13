@@ -27,7 +27,7 @@ class MetadataTableModel extends AbstractTableModel {
         ImageMetadataDirectory dir, boolean filter, boolean sort, boolean showIDs
     ) {
         this.showIDs = showIDs;
-        pairs = new ArrayList<KeyValuePair>();
+        pairs = new ArrayList<>();
         MetadataDirectoryModel dirModel =
             new MetadataDirectoryModel(dir, filter, sort);
         pairs.addAll(dirModel.getPairs());
@@ -48,13 +48,13 @@ class MetadataTableModel extends AbstractTableModel {
     public Object getValueAt(int row, int col) {
         KeyValuePair pair = pairs.get(row);
         if (col == KeyColumn) {
-            return pair.getKey();
+            return pair.key;
         }
         if (col == ValueColumn) {
-            return pair.getValue();
+            return pair.value;
         }
         if ((col == IdColumn) && (showIDs)) {
-            int id = pair.getTagID();
+            int id = pair.tagID;
             return hexStringOf(id);
         }
         return null;

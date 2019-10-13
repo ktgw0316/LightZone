@@ -5,7 +5,7 @@
 Name:           lightzone
 # Do not use hyphens in Version tag. OBS doesn't handle it properly.
 # Use 4.1.0.beta2 for betas and 4.1.0.0 for final, since RPM sorts A-Z before 0-9.
-Version:	4.1.2
+Version:	4.1.9
 Release:	0%{?dist}
 License:	BSD-3-Clause
 Summary:	Open-source professional-level digital darkroom software
@@ -15,7 +15,7 @@ Source:		%{name}-%{version}.tar.bz2
 
 %if 0%{?rhel}
 %if 0%{?rhel} >= 7
-%define java_version 1.7.0-openjdk
+%define java_version 1.8.0-openjdk
 %else
 %define java_version 1.6.0-openjdk
 %endif
@@ -23,6 +23,7 @@ Source:		%{name}-%{version}.tar.bz2
 %define libjpeg_devel libjpeg-turbo-devel
 %define libX11_devel libX11-devel
 %define pkg_config pkgconfig
+%define xmllint libxml2
 %define debug_package %{nil}
 %endif
 
@@ -36,21 +37,23 @@ Source:		%{name}-%{version}.tar.bz2
 %define libjpeg_devel libjpeg-turbo-devel
 %define libX11_devel libX11-devel
 %define pkg_config pkgconfig
+%define xmllint libxml2
 %define debug_package %{nil}
 %endif
 
 %if 0%{?sles_version}
-%define java_version 1_7_0-openjdk
+%define java_version 1_8_0-openjdk
 %define lcms2_devel liblcms2-devel
 %define libjpeg_devel libjpeg8-devel
 %define libX11_devel xorg-x11-libX11-devel
 %define pkg_config pkg-config
+%define xmllint libxml2
 BuildRequires: update-desktop-files
 %endif
 
 %if 0%{?suse_version}
 %if 0%{?suse_version} > 1210
-%define java_version 1_7_0-openjdk
+%define java_version 1_8_0-openjdk
 %define libX11_devel libX11-devel
 %else
 %define java_version 1_6_0-openjdk
@@ -59,6 +62,7 @@ BuildRequires: update-desktop-files
 %define lcms2_devel liblcms2-devel
 %define libjpeg_devel libjpeg8-devel
 %define pkg_config pkg-config
+%define xmllint libxml2-tools
 %endif
 
 %if 0%{?mdkversion} || 0%{?pclinuxos}
@@ -67,14 +71,15 @@ BuildRequires: update-desktop-files
 %define libjpeg_devel libjpeg8-devel
 %define libX11_devel libX11-devel
 %define pkg_config pkg-config
+%define xmllint libxml2-utils
 %endif
 
-BuildRequires:	java-%{java_version}-devel, %{libX11_devel}, ant, autoconf, gcc, gcc-c++, make, git, javahelp2, %{lcms2_devel}, %{libjpeg_devel}, libtiff-devel, %{pkg_config}, rsync
+BuildRequires:	java-%{java_version}-devel, %{libX11_devel}, ant, autoconf, gcc, gcc-c++, make, git, javahelp2, %{lcms2_devel}, lensfun-devel, %{libjpeg_devel}, libtiff-devel, %{pkg_config}, rsync
 %if 0%{?mdkversion} || 0%{?pclinuxos}
 BuildRequires:	java-rpmbuild, libgomp-devel
 %endif
 
-Requires:	java-%{java_version}, javahelp2, lcms2
+Requires:	java-%{java_version}, javahelp2, lcms2, lensfun, %{xmllint}
 %if 0%{?suse_version} >= 1320
 Requires:	xerces-j2-xml-apis
 %else

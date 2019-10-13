@@ -4,18 +4,20 @@ package com.lightcrafts.model.ImageEditor;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.opimage.NonLocalMeansFilterOpImage;
 import com.lightcrafts.jai.utils.Transform;
-import com.lightcrafts.mediax.jai.BorderExtender;
-import com.lightcrafts.mediax.jai.PlanarImage;
+import javax.media.jai.BorderExtender;
+import javax.media.jai.PlanarImage;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
 
 import java.text.DecimalFormat;
 
+import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_NOISE_REDUCTION;
+
 public class AdvancedNoiseReductionOperationV5 extends BlendedOperation {
-    static final String COLOR_RADIUS = "Color_Radius";
-    static final String COLOR_INTENSITY = "Color_Intensity";
-    static final String GRAIN_RADIUS = "Grain_Radius";
-    static final String GRAIN_INTENSITY = "Grain_Intensity";
+    private static final String COLOR_RADIUS = "Color_Radius";
+    private static final String COLOR_INTENSITY = "Color_Intensity";
+    private static final String GRAIN_RADIUS = "Grain_Radius";
+    private static final String GRAIN_INTENSITY = "Grain_Intensity";
     static final OperationType type = new OperationTypeImpl("Advanced Noise Reduction V5");
 
     private int chroma_radius = 2;
@@ -27,19 +29,21 @@ public class AdvancedNoiseReductionOperationV5 extends BlendedOperation {
         super(rendering, type);
         colorInputOnly = true;
 
+        setHelpTopic(HELP_TOOL_NOISE_REDUCTION);
+
         DecimalFormat format = new DecimalFormat("0.0");
 
-        this.addSliderKey(COLOR_RADIUS);
-        this.setSliderConfig(COLOR_RADIUS, new SliderConfig(0, 5,  chroma_radius, 1, false, format));
+        addSliderKey(COLOR_RADIUS);
+        setSliderConfig(COLOR_RADIUS, new SliderConfig(0, 5,  chroma_radius, 1, false, format));
 
-        this.addSliderKey(COLOR_INTENSITY);
-        this.setSliderConfig(COLOR_INTENSITY, new SliderConfig(0, 10, chroma_intensity, 0.1, false, format));
+        addSliderKey(COLOR_INTENSITY);
+        setSliderConfig(COLOR_INTENSITY, new SliderConfig(0, 10, chroma_intensity, 0.1, false, format));
 
-        this.addSliderKey(GRAIN_RADIUS);
-        this.setSliderConfig(GRAIN_RADIUS, new SliderConfig(0, 5, luma_radius, 1, false, format));
+        addSliderKey(GRAIN_RADIUS);
+        setSliderConfig(GRAIN_RADIUS, new SliderConfig(0, 5, luma_radius, 1, false, format));
 
-        this.addSliderKey(GRAIN_INTENSITY);
-        this.setSliderConfig(GRAIN_INTENSITY, new SliderConfig(0, 10, luma_intensity, 0.1, false, format));
+        addSliderKey(GRAIN_INTENSITY);
+        setSliderConfig(GRAIN_INTENSITY, new SliderConfig(0, 10, luma_intensity, 0.1, false, format));
     }
 
     public boolean neutralDefault() {

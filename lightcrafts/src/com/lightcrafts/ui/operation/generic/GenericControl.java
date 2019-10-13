@@ -1,13 +1,11 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2017-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.operation.generic;
 
 import com.lightcrafts.model.GenericOperation;
 import com.lightcrafts.model.Operation;
-import com.lightcrafts.model.OperationType;
-import com.lightcrafts.model.SliderConfig;
-import com.lightcrafts.ui.help.HelpConstants;
-import com.lightcrafts.ui.layout.Box;
+import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.ui.operation.OpControl;
 import com.lightcrafts.ui.operation.OpStack;
 import com.lightcrafts.utils.xml.XMLException;
@@ -16,8 +14,11 @@ import com.lightcrafts.utils.xml.XmlNode;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+
+import lombok.val;
 
 public class GenericControl extends OpControl {
 
@@ -36,13 +37,13 @@ public class GenericControl extends OpControl {
         "com/lightcrafts/ui/operation/generic/GenericControl"
     );
 
-    private GenericOperation op;
+    protected GenericOperation op;
 
     // GenericOperation settings keys mapped to their control Components:
 
-    private Map sliders = new HashMap();        // Strings to GenericSliders
-    private Map checkboxes = new HashMap();     // Strings to JCheckBoxes
-    private Map choices = new HashMap();        // Strings to JComboBoxes
+    protected Map<String, GenericSlider> sliders = new HashMap<String, GenericSlider>();
+    protected Map<String, JCheckBox> checkboxes = new HashMap<String, JCheckBox>();
+    protected Map<String, JComboBox> choices = new HashMap<String, JComboBox>();
 
     public GenericControl(GenericOperation op, OpStack stack) {
         super(op, stack);
@@ -55,71 +56,61 @@ public class GenericControl extends OpControl {
 
         this.op = (GenericOperation) operation;
 
-        Box box = Box.createVerticalBox();
+        val box = Box.createVerticalBox();
 
         box.add(Box.createVerticalStrut(6));
 
-        // Add all the sliders:
+        // Add all the choices:
 
-        // A special layout that aligns the GenericSlider pieces in rows
-        // and columns:
-        GenericSliderContainer sliderContainer = new GenericSliderContainer();
-
-        List sliderKeys = op.getSliderKeys();
-        for (Iterator i=sliderKeys.iterator(); i.hasNext(); ) {
-            final String key = (String) i.next();
-            final String userKey = getUserPresentableKey(key);
-            final SliderConfig config = op.getSliderConfig(key);
-            final GenericSlider slider = new GenericSlider(userKey, config);
-            slider.addChangeListener(
-                new ChangeListener() {
-                    public void stateChanged(ChangeEvent event) {
-                        double value = slider.getConfiguredValue();
-                        op.setSliderValue(key, value);
+        val choiceKeys = op.getChoiceKeys();
+        for (val key : choiceKeys) {
+            val values = new Vector<String>(op.getChoiceValues(key));
+            val choice = new JComboBox(values);
+            choice.addActionListener(choiceActionListener(key, choice));
+            choice.addMouseWheelListener(
+                    new MouseWheelListener() {
+                        @Override
+                        public void mouseWheelMoved(MouseWheelEvent e) {
+                            val source = (JComboBox) e.getComponent();
+                            if (!source.hasFocus()) {
+                                return;
+                            }
+                            val ni = source.getSelectedIndex() + e.getWheelRotation();
+                            if (ni >= 0 && ni < source.getItemCount()) {
+                                source.setSelectedIndex(ni);
+                            }
+                        }
                     }
-                }
             );
-            GenericSlider oldSlider = (GenericSlider) sliders.get(key);
-            if (oldSlider != null) {
-                slider.setConfiguredValue(oldSlider.getConfiguredValue());
+            val oldChoice = choices.get(key);
+            if (oldChoice != null) {
+                choice.setSelectedItem(oldChoice.getSelectedItem());
             }
-            slider.addSliderMouseListener(
-                new MouseAdapter() {
-                    public void mousePressed(MouseEvent event) {
-                        op.changeBatchStarted();
-                    }
-                    public void mouseReleased(MouseEvent event) {
-                        op.changeBatchEnded();
-                        undoSupport.postEdit(key + " Slider");
-                    }
-                }
-            );
-            slider.setBackgroundRecurse(Background);
-            slider.setFontRecurse(ControlFont);
-            sliderContainer.addGenericSlider(slider);
+            choice.setBackground(Background);
+            choice.setFont(ControlFont);
+            choice.setPreferredSize(new Dimension(280, 15));
 
-            sliders.put(key, slider);
+            val panel = new JPanel();
+            val label = new JLabel(key + ":", JLabel.CENTER);
+            label.setPreferredSize(new Dimension(50, 15));
+            label.setHorizontalAlignment(JLabel.RIGHT);
+            label.setForeground(LightZoneSkin.Colors.ToolPanesForeground);
+            panel.setBackground(LightZoneSkin.Colors.ToolPanesBackground);
+            panel.add(label);
+            panel.add(choice);
+            box.add(panel);
+
+            choices.put(key, choice);
         }
-        sliderContainer.setBackground(Background);
-        box.add(sliderContainer);
 
         // Add all the checkboxes:
 
-        List checkboxKeys = op.getCheckboxKeys();
-        for (Iterator i=checkboxKeys.iterator(); i.hasNext(); ) {
-            final String key = (String) i.next();
-            final String userKey = getUserPresentableKey(key);
-            final JCheckBox checkbox = new JCheckBox(userKey);
-            checkbox.addItemListener(
-                new ItemListener() {
-                    public void itemStateChanged(ItemEvent event) {
-                        boolean value = checkbox.isSelected();
-                        op.setCheckboxValue(key, value);
-                        undoSupport.postEdit(key + " Checkbox");
-                    }
-                }
-            );
-            JCheckBox oldCheckbox = (JCheckBox) checkboxes.get(key);
+        val checkboxKeys = op.getCheckboxKeys();
+        for (val key : checkboxKeys) {
+            val userKey = getUserPresentableKey(key);
+            val checkbox = new JCheckBox(userKey);
+            checkbox.addItemListener(checkboxItemListener(key, checkbox));
+            val oldCheckbox = checkboxes.get(key);
             if (oldCheckbox != null) {
                 checkbox.setSelected(oldCheckbox.isSelected());
             }
@@ -130,46 +121,45 @@ public class GenericControl extends OpControl {
             checkboxes.put(key, checkbox);
         }
 
-        // Add all the choices:
+        // Add all the sliders:
 
-        List choiceKeys = op.getChoiceKeys();
-        for (Iterator i=choiceKeys.iterator(); i.hasNext(); ) {
-            final String key = (String) i.next();
-            Vector values = new Vector(op.getChoiceValues(key));
-            final JComboBox choice = new JComboBox(values);
-            choice.addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent event) {
-                        String value = (String) choice.getSelectedItem();
-                        op.setChoiceValue(key, value);
-                        undoSupport.postEdit(key + " Choice");
-                    }
-                }
-            );
-            choice.addMouseWheelListener(
-                new MouseWheelListener() {
-                    public void mouseWheelMoved(MouseWheelEvent e) {
-                        JComboBox source = (JComboBox) e.getComponent();
-                        if (!source.hasFocus()) {
-                            return;
-                        }
-                        int ni = source.getSelectedIndex() + e.getWheelRotation();
-                        if (ni >= 0 && ni < source.getItemCount()) {
-                            source.setSelectedIndex(ni);
-                        }
-                    }
-                }
-            );
-            JComboBox oldChoice = (JComboBox) choices.get(key);
-            if (oldChoice != null) {
-                choice.setSelectedItem(oldChoice.getSelectedItem());
+        // A special layout that aligns the GenericSlider pieces in rows
+        // and columns:
+        val sliderContainer = new GenericSliderContainer();
+
+        val sliderKeys = op.getSliderKeys();
+        for (val key : sliderKeys) {
+            val userKey = getUserPresentableKey(key);
+            val config = op.getSliderConfig(key);
+            val slider = new GenericSlider(userKey, config);
+            slider.addChangeListener(sliderChangeListener(key, slider));
+            val oldSlider = sliders.get(key);
+            if (oldSlider != null) {
+                slider.setConfiguredValue(oldSlider.getConfiguredValue());
             }
-            choice.setBackground(Background);
-            choice.setFont(ControlFont);
-            box.add(choice);
+            slider.addSliderMouseListener(
+                    new MouseAdapter() {
+                        @Override
+                        public void mousePressed(MouseEvent event) {
+                            op.changeBatchStarted();
+                        }
 
-            choices.put(key, choice);
+                        @Override
+                        public void mouseReleased(MouseEvent event) {
+                            op.changeBatchEnded();
+                            undoSupport.postEdit(key + " Slider");
+                        }
+                    }
+            );
+            slider.setBackgroundRecurse(Background);
+            slider.setFontRecurse(ControlFont);
+            sliderContainer.addGenericSlider(slider);
+
+            sliders.put(key, slider);
         }
+        sliderContainer.setBackground(Background);
+        box.add(sliderContainer);
+
         box.add(Box.createVerticalStrut(6));
 
         setContent(box);
@@ -177,8 +167,43 @@ public class GenericControl extends OpControl {
         undoSupport.initialize();
     }
 
+    protected ChangeListener sliderChangeListener(
+            final String key, final GenericSlider slider) {
+        return new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent event) {
+                val value = slider.getConfiguredValue();
+                op.setSliderValue(key, value);
+            }
+        };
+    }
+
+    protected ItemListener checkboxItemListener(
+            final String key, final JCheckBox checkbox) {
+        return new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent event) {
+                val value = checkbox.isSelected();
+                op.setCheckboxValue(key, value);
+                undoSupport.postEdit(key + " Checkbox");
+            }
+        };
+    }
+
+    protected ActionListener choiceActionListener(
+            final String key, final JComboBox choice) {
+        return new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                val value = (String) choice.getSelectedItem();
+                op.setChoiceValue(key, value);
+                undoSupport.postEdit(key + " Choice");
+            }
+        };
+    }
+
     protected void slewSlider(String key, double value) {
-        GenericSlider slider = (GenericSlider) sliders.get(key);
+        val slider = sliders.get(key);
         if (slider != null) {
             slider.setConfiguredValue(value);
         }
@@ -188,11 +213,10 @@ public class GenericControl extends OpControl {
     // checkbox key in the properties.  If none is configured, just
     // return the given String.
     private String getUserPresentableKey(String key) {
-        OperationType type = op.getType();
-        String name = type.getName();
-        name = name.replaceAll(" ", "").replaceAll("V[0-9]+\\Z", "");
-        String propKey = name + "-" + key;
+        val type = op.getType();
+        val name = type.getName().replaceAll(" ", "").replaceAll("V[0-9]+\\Z", "");
         try {
+            val propKey = name + "-" + key;
             return Resources.getString(propKey);
         }
         catch (MissingResourceException e) {
@@ -204,83 +228,73 @@ public class GenericControl extends OpControl {
     private final static String CheckBoxTag = "Checkbox";
     private final static String ChoiceTag = "Choice";
 
+    @Override
     public void save(XmlNode node) {
         super.save(node);
-        Set keys;
-        XmlNode sliderNode = node.addChild(SliderTag);
-        keys = sliders.keySet();
-        for (Iterator i=keys.iterator(); i.hasNext(); ) {
-            String key = (String) i.next();
-            GenericSlider slider = (GenericSlider) sliders.get(key);
-            double value = slider.getConfiguredValue();
+        val sliderNode = node.addChild(SliderTag);
+        val sliderKeys = sliders.keySet();
+        for (val key : sliderKeys) {
+            val slider = sliders.get(key);
+            val value = slider.getConfiguredValue();
             sliderNode.setAttribute(key, Double.toString(value));
         }
-        XmlNode checkboxNode = node.addChild(CheckBoxTag);
-        keys = checkboxes.keySet();
-        for (Iterator i=keys.iterator(); i.hasNext(); ) {
-            String key = (String) i.next();
-            JCheckBox checkbox = (JCheckBox) checkboxes.get(key);
-            boolean value = checkbox.isSelected();
+        val checkboxNode = node.addChild(CheckBoxTag);
+        val checkboxKeys = checkboxes.keySet();
+        for (val key : checkboxKeys) {
+            val checkbox = checkboxes.get(key);
+            val value = checkbox.isSelected();
             checkboxNode.setAttribute(key, value ? "True" : "False");
         }
-        XmlNode choiceNode = node.addChild(ChoiceTag);
-        keys = choices.keySet();
-        for (Iterator i=keys.iterator(); i.hasNext(); ) {
-            String key = (String) i.next();
-            JComboBox choice = (JComboBox) choices.get(key);
-            String value = (String) choice.getSelectedItem();
+        val choiceNode = node.addChild(ChoiceTag);
+        val choiceKeys = choices.keySet();
+        for (val key : choiceKeys) {
+            val choice = choices.get(key);
+            val value = (String) choice.getSelectedItem();
             choiceNode.setAttribute(key, value);
         }
     }
 
+    @Override
     public void restore(XmlNode node) throws XMLException {
         super.restore(node);
         undoSupport.restoreStart();
         op.changeBatchStarted();
-        Set keys;
         if (node.hasChild(SliderTag)) {
-            XmlNode sliderNode = node.getChild(SliderTag);
-            keys = sliders.keySet();
-            for (Iterator i=keys.iterator(); i.hasNext(); ) {
-                String key = (String) i.next();
-                GenericSlider slider = (GenericSlider) sliders.get(key);
+            val sliderNode = node.getChild(SliderTag);
+            val keys = sliders.keySet();
+            for (val key : keys) {
+                val slider = sliders.get(key);
                 try {
-                    int version = sliderNode.getVersion();
+                    val version = sliderNode.getVersion();
                     if ((version >= 3) || (version < 0)) {
-                        double value = Double.parseDouble(
-                            sliderNode.getAttribute(key)
-                        );
+                        val value = Double.parseDouble(sliderNode.getAttribute(key));
                         slider.setConfiguredValue(value);
-                    }
-                    else {
-                        int value = Integer.parseInt(sliderNode.getAttribute(key));
+                    } else {
+                        val value = Integer.parseInt(sliderNode.getAttribute(key));
                         slider.setSliderPosition(value);
                     }
-                }
-                catch (NumberFormatException e) {
+                } catch (NumberFormatException e) {
                     throw new XMLException(
-                        "Value at attribute \"" + key + "\" is not a number", e
+                            "Value at attribute \"" + key + "\" is not a number", e
                     );
                 }
             }
         }
         if (node.hasChild(CheckBoxTag)) {
-            XmlNode checkboxNode = node.getChild(CheckBoxTag);
-            keys = checkboxes.keySet();
-            for (Iterator i=keys.iterator(); i.hasNext(); ) {
-                String key = (String) i.next();
-                JCheckBox checkbox = (JCheckBox) checkboxes.get(key);
-                String value = checkboxNode.getAttribute(key);
+            val checkboxNode = node.getChild(CheckBoxTag);
+            val keys = checkboxes.keySet();
+            for (val key : keys) {
+                val checkbox = checkboxes.get(key);
+                val value = checkboxNode.getAttribute(key);
                 checkbox.setSelected(value.equals("True"));
             }
         }
         if (node.hasChild(ChoiceTag)) {
-            XmlNode choiceNode = node.getChild(ChoiceTag);
-            keys = choices.keySet();
-            for (Iterator i=keys.iterator(); i.hasNext(); ) {
-                String key = (String) i.next();
-                JComboBox choice = (JComboBox) choices.get(key);
-                String value = choiceNode.getAttribute(key);
+            val choiceNode = node.getChild(ChoiceTag);
+            val keys = choices.keySet();
+            for (val key : keys) {
+                val choice = choices.get(key);
+                val value = choiceNode.getAttribute(key);
                 choice.setSelectedItem(value);
             }
         }
@@ -288,54 +302,8 @@ public class GenericControl extends OpControl {
         undoSupport.restoreEnd();
     }
 
-    // This is a crude mapping from GenericOperation OperationType names
-    // (as found, for instance, in opActions.properties) into help topics
-    // (as defined in HelpConstants).
-    //
-    // This mapping needs maintenance, as tools come and go.
+    @Override
     protected String getHelpTopic() {
-        OperationType type = op.getType();
-        String name = type.getName();
-        if (name.startsWith("ZoneMapper")) {
-            return HelpConstants.HELP_TOOL_ZONEMAPPER;
-        }
-        if (name.startsWith("UnSharp Mask")) {
-            return HelpConstants.HELP_TOOL_SHARPEN;
-        }
-        if (name.startsWith("Gaussian Blur")) {
-            return HelpConstants.HELP_TOOL_BLUR;
-        }
-        if (name.startsWith("Hue/Saturation")) {
-            return HelpConstants.HELP_TOOL_HUE_SATURATION;
-        }
-        if (name.startsWith("Color Balance")) {
-            return HelpConstants.HELP_TOOL_COLOR_BALANCE;
-        }
-        if (name.startsWith("White Point")) {
-            return HelpConstants.HELP_TOOL_WHITE_BALANCE;
-        }
-        if (name.startsWith("Channel Mixer")) {
-            return HelpConstants.HELP_TOOL_BLACK_AND_WHITE;
-        }
-        if (name.startsWith("Advanced Noise Reduction")) {
-            return HelpConstants.HELP_TOOL_NOISE_REDUCTION;
-        }
-        if (name.startsWith("Clone")) {
-            return HelpConstants.HELP_TOOL_CLONE;
-        }
-        if (name.startsWith("Spot")) {
-            return HelpConstants.HELP_TOOL_SPOT;
-        }
-        if (name.startsWith("RAW Adjustments")) {
-            return HelpConstants.HELP_TOOL_RAW_ADJUSTMENTS;
-        }
-        if (name.startsWith("Relight") || name.startsWith("Tone")) {
-            return HelpConstants.HELP_TOOL_RELIGHT;
-        }
-        if (name.startsWith("Red Eyes")) {
-            return HelpConstants.HELP_TOOL_RED_EYE;
-        }
-        // This null leads to the help home page.
-        return null;
+        return op.getHelpTopic();
     }
 }

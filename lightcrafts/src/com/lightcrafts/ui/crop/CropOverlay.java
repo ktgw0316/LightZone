@@ -4,11 +4,12 @@
 
 package com.lightcrafts.ui.crop;
 
-import com.lightcrafts.mediax.jai.Interpolation;
-import com.lightcrafts.mediax.jai.RenderedOp;
-import com.lightcrafts.mediax.jai.operator.RotateDescriptor;
+import javax.media.jai.Interpolation;
+import javax.media.jai.RenderedOp;
+import javax.media.jai.operator.RotateDescriptor;
 import com.lightcrafts.model.CropBounds;
 import com.lightcrafts.platform.Platform;
+import com.lightcrafts.utils.awt.geom.HiDpi;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -232,6 +233,9 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
         Shape shape = getCropAsShape();
         if (shape != null) {
             Graphics2D g = (Graphics2D) graphics;
+
+            HiDpi.resetTransformScaleOf(g);
+
             Color oldColor = g.getColor();
             Stroke oldStroke = g.getStroke();
             RenderingHints oldHints = g.getRenderingHints();
@@ -241,7 +245,8 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
                 RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON
             );
-            Area complement = new Area(getBounds());
+            Shape bound = HiDpi.defaultTransform.createTransformedShape(getBounds());
+            Area complement = new Area(bound);
             complement.subtract(new Area(shape));
             g.fill(complement);
 
@@ -603,7 +608,7 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        Point p = e.getPoint();
+        final Point p = HiDpi.imageSpacePointFrom(e.getPoint());
 
         if (isInRect(p)) {
             if (isRotateOnly) {
@@ -649,7 +654,7 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
         if (e.isPopupTrigger()) {
             return;
         }
-        Point p = e.getPoint();
+        Point p = HiDpi.imageSpacePointFrom(e.getPoint());
 
         if (isRotateOnly) {
             if (crop == null) {
@@ -739,7 +744,7 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
     public void mouseDragged(MouseEvent e) {
         updateHighlight(e);
 
-        Point p = e.getPoint();
+        Point p = HiDpi.imageSpacePointFrom(e.getPoint());
 
         // Backup the current crop, so we can back out changes if it turns
         // out they exceed the underlay constraint.
@@ -1010,7 +1015,7 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
     }
 
     private void updateHighlight(MouseEvent e) {
-        Point p = e.getPoint();
+        final Point p = HiDpi.imageSpacePointFrom(e.getPoint());
         boolean hadHighlight = hasHighlight;
         hasHighlight = isAdjusting() || isInRect(p) || isOnRect(p);
         if (hadHighlight != hasHighlight) {
@@ -1027,7 +1032,7 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
                 return CropCursor;
             }
         }
-        Point p = e.getPoint();
+        final Point p = HiDpi.imageSpacePointFrom(e.getPoint());
         if (! isRotateOnly) {
             double angle = crop.getAngle();
             if (isOnNorth(p)) {
@@ -1394,7 +1399,7 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
         // the most recent angle within roundoff, then send back the recent
         // cursor.
 
-        if (Platform.getType() == Platform.Windows) {
+        if (Platform.isWindows()) {
             int cursorType = Cursor.DEFAULT_CURSOR;
             double a = Math.PI/4;
             if (Math.abs(angle) < a)
@@ -1478,13 +1483,13 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
 
         new KeyEventPostProcessor() {
 
-            int RotateKeyCode = Platform.getType().equals(
-                Platform.Type.MacOSX
-            ) ? KeyEvent.VK_META : KeyEvent.VK_CONTROL;
+            int RotateKeyCode = Platform.isMac()
+                    ? KeyEvent.VK_META
+                    : KeyEvent.VK_CONTROL;
 
-            int RotateModifierMask = Platform.getType().equals(
-                Platform.Type.MacOSX
-            ) ? MouseEvent.META_DOWN_MASK : MouseEvent.CTRL_DOWN_MASK;
+            int RotateModifierMask = Platform.isMac()
+                    ? MouseEvent.META_DOWN_MASK
+                    : MouseEvent.CTRL_DOWN_MASK;
 
             @Override
             public boolean postProcessKeyEvent(KeyEvent e) {

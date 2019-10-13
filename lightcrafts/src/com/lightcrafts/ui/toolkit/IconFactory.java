@@ -2,20 +2,16 @@
 
 package com.lightcrafts.ui.toolkit;
 
-import com.lightcrafts.mediax.jai.BorderExtender;
-import com.lightcrafts.mediax.jai.Interpolation;
-import com.lightcrafts.mediax.jai.JAI;
-import com.lightcrafts.mediax.jai.RenderedOp;
-import com.lightcrafts.mediax.jai.operator.AffineDescriptor;
-import com.lightcrafts.mediax.jai.operator.BandMergeDescriptor;
-import com.lightcrafts.mediax.jai.operator.BandSelectDescriptor;
-import com.lightcrafts.mediax.jai.operator.InvertDescriptor;
-import com.lightcrafts.ui.LightZoneSkin;
+import javax.media.jai.RenderedOp;
+import javax.media.jai.operator.BandMergeDescriptor;
+import javax.media.jai.operator.BandSelectDescriptor;
+import javax.media.jai.operator.InvertDescriptor;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 
@@ -97,19 +93,14 @@ public class IconFactory {
         int maxSize = Math.max(image.getWidth(), image.getHeight());
         if (maxSize > limit) {
             if (true) {
-                double scale = limit / (float) maxSize;
-                AffineTransform transform =
+                final double scale = limit / (float) maxSize;
+                final AffineTransform transform =
                         AffineTransform.getScaleInstance(scale, scale);
-                RenderingHints extenderHint = new RenderingHints(
-                        JAI.KEY_BORDER_EXTENDER,
-                        BorderExtender.createInstance(BorderExtender.BORDER_COPY)
-                );
-                Interpolation interp = Interpolation.getInstance(
-                        Interpolation.INTERP_BILINEAR
-                );
-                image = AffineDescriptor.create(
-                        image, transform, interp, null, extenderHint
-                ).getAsBufferedImage();
+                final int interp = AffineTransformOp.TYPE_BILINEAR;
+                final AffineTransformOp op = new AffineTransformOp(transform, interp);
+                final BufferedImage rescaled = op.createCompatibleDestImage(image, null);
+                op.filter(image, rescaled);
+                image = rescaled;
             } else {
                 BufferedImage rescaled = new BufferedImage(limit, limit, BufferedImage.TYPE_4BYTE_ABGR);
                 Graphics2D g = (Graphics2D) rescaled.getGraphics();

@@ -2,25 +2,25 @@
 
 package com.lightcrafts.ui.browser.ctrls;
 
-import static com.lightcrafts.ui.browser.ctrls.Locale.LOCALE;
+import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.ui.browser.folders.FolderBrowserPane;
 import com.lightcrafts.ui.browser.folders.FolderTreeListener;
 import com.lightcrafts.ui.toolkit.CoolButton;
 import com.lightcrafts.ui.toolkit.IconFactory;
 import com.lightcrafts.ui.toolkit.MenuButton;
-import com.lightcrafts.ui.LightZoneSkin;
+import org.jvnet.substance.SubstanceLookAndFeel;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import org.jvnet.substance.SubstanceLookAndFeel;
+import static com.lightcrafts.ui.browser.ctrls.Locale.LOCALE;
 
 public class NavigationButtons extends JPanel {
 
@@ -61,7 +61,7 @@ public class NavigationButtons extends JPanel {
     private void createComponents() {
         btnBack = new CoolButton(/*CoolButton.ButtonStyle.LEFT*/);
         btnForward = new CoolButton(/*CoolButton.ButtonStyle.RIGHT*/);
-        btnPath = browser.getPathPopupMenu();
+        btnPath = browser.getPathButton();
     }
 
     private void initComponents() {

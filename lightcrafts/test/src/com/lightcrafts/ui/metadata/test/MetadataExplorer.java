@@ -24,7 +24,7 @@ public class MetadataExplorer {
         }
         // The ImageInfo thumbnails mechanism needs dcraw for raw files:
         System.loadLibrary("DCRaw");
-        if ( Platform.getType() == Platform.MacOSX ) {
+        if ( Platform.isMac() ) {
             System.loadLibrary("MacOSX");
         }
 

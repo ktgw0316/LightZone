@@ -7,7 +7,7 @@ import com.lightcrafts.model.*;
 import com.lightcrafts.jai.utils.*;
 import com.lightcrafts.jai.JAIContext;
 
-import com.lightcrafts.mediax.jai.*;
+import javax.media.jai.*;
 import com.lightcrafts.ui.LightZoneSkin;
 
 import java.awt.*;
@@ -81,20 +81,17 @@ public class ColorSelectionPreview extends Preview implements PaintListener {
         if (preview == null)
             return;
 
-        int dx, dy;
         AffineTransform transform = new AffineTransform();
-        if (getSize().width > preview.getWidth())
-            dx = (getSize().width - preview.getWidth()) / 2;
-        else
-            dx = 0;
-        if (getSize().height > preview.getHeight())
-            dy = (getSize().height - preview.getHeight()) / 2;
-        else
-            dy = 0;
+        final int dx = (getSize().width > preview.getWidth())
+                ? (getSize().width - preview.getWidth()) / 2
+                : 0;
+        final int dy = (getSize().height > preview.getHeight())
+                ? (getSize().height - preview.getHeight()) / 2
+                : 0;
         transform.setToTranslation(dx, dy);
         try {
             g.drawRenderedImage(preview, transform);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             e.printStackTrace();
         }
     }

@@ -2,7 +2,6 @@
 
 package com.lightcrafts.image.metadata;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.ByteOrder;
 import java.util.HashMap;
@@ -40,7 +39,7 @@ public class EXIFMetadataReader extends ImageMetadataReader
                                boolean isSubdirectory ) {
         super( imageInfo, exifSegBuf );
         m_exifParser = new EXIFParser(
-            this, imageInfo.getFile(), exifSegBuf, isSubdirectory
+            this, imageInfo, exifSegBuf, isSubdirectory
         );
     }
 
@@ -63,16 +62,36 @@ public class EXIFMetadataReader extends ImageMetadataReader
     /**
      * {@inheritDoc}
      */
+    @Override
     public void readAllDirectories() throws IOException {
         m_exifParser.parseAllDirectories();
         mergeEXIFDirectories();
+        readMakerNotes();
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void readHeader() throws BadImageFileException, IOException {
         m_exifParser.parseHeader();
+    }
+
+    /**
+     * Reads the maker notes metadata, if any.  This should be called after
+     * calling {@link #readDirectory(int,int,ImageMetadataDirectory)} but
+     * <b>not</b> after calling {@link #readAllDirectories()} -- the latter
+     * calls it automatically.
+     */
+    public void readMakerNotes() throws IOException {
+        if ( m_makerNotesByteCount > 0 ) {
+            final Class<? extends MakerNotesDirectory> dirClass =
+                    MakerNoteProbe.determineMakerNotesFrom( m_metadata );
+            if ( dirClass != null )
+                readMakerNotes(
+                        m_makerNotesValueOffset, m_makerNotesByteCount, dirClass
+                );
+        }
     }
 
     ////////// EXIFParserEventHandler methods /////////////////////////////////
@@ -80,6 +99,7 @@ public class EXIFMetadataReader extends ImageMetadataReader
     /**
      * {@inheritDoc}
      */
+    @Override
     public void gotBadMetadata( String message ) {
         logBadImageMetadata( message );
     }
@@ -87,6 +107,7 @@ public class EXIFMetadataReader extends ImageMetadataReader
     /**
      * {@inheritDoc}
      */
+    @Override
     public void gotBadMetadata( Throwable cause ) {
         logBadImageMetadata( cause );
     }
@@ -94,6 +115,7 @@ public class EXIFMetadataReader extends ImageMetadataReader
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageMetadataDirectory gotDirectory() {
         ++m_ifdIndex;
         return createDirectoryFor( EXIFDirectory.class, "IFD" );
@@ -102,12 +124,21 @@ public class EXIFMetadataReader extends ImageMetadataReader
     /**
      * {@inheritDoc}
      */
+    @Override
     public void gotTag( int tagID, int fieldType, int numValues, int byteCount,
                         int valueOffset, int valueOffsetAdjustment,
-                        int subdirOffset, File imageFile, LCByteBuffer buf,
+                        int subdirOffset, ImageInfo imageInfo, LCByteBuffer buf,
                         ImageMetadataDirectory dir )
         throws IOException
     {
+        if ( m_tagHandler != null ) {
+            final boolean handledTag = m_tagHandler.handleTag(
+                    tagID, fieldType, numValues, byteCount, valueOffset,
+                    valueOffsetAdjustment, subdirOffset, imageInfo, buf, dir
+            );
+            if ( handledTag )
+                return;
+        }
         switch ( tagID ) {
             case EXIF_GPS_IFD_POINTER:
                 final ImageMetadataDirectory gpsDir =
@@ -121,13 +152,14 @@ public class EXIFMetadataReader extends ImageMetadataReader
                 // TODO: handle this case
                 return;
             case EXIF_MAKER_NOTE:
-                final Class<? extends MakerNotesDirectory> notesClass =
-                    MakerNoteProbe.determineMakerNotesFrom( m_metadata );
-                if ( notesClass != null ) {
-                    final ImageMetadataDirectory notesDir =
-                        m_metadata.getDirectoryFor( notesClass, true );
-                    readMakerNotes( valueOffset, byteCount, notesDir );
-                }
+                //
+                // We have to defer reading maker notes until after all the
+                // rest of the metadata is read since reading the maker notes
+                // requires probing.  That in turn requires tags like the
+                // camera make to be present.
+                //
+                m_makerNotesByteCount = byteCount;
+                m_makerNotesValueOffset = valueOffset;
                 return;
             case EXIF_USER_COMMENT:
                 // TODO: handle this case
@@ -170,11 +202,9 @@ public class EXIFMetadataReader extends ImageMetadataReader
      */
     private static void copyValuesFromTo( ImageMetadataDirectory fromDir,
                                           ImageMetadataDirectory toDir ) {
-        for ( Iterator<Map.Entry<Integer,ImageMetaValue>>
-              i = fromDir.iterator(); i.hasNext(); ) {
-            final Map.Entry<Integer,ImageMetaValue> me = i.next();
+        for (final Map.Entry<Integer, ImageMetaValue> me : fromDir) {
             final int tagID = me.getKey();
-            switch ( tagID ) {
+            switch (tagID) {
                 case EXIF_BITS_PER_SAMPLE:
                 case EXIF_CFA_PATTERN:
                 case EXIF_COLOR_SPACE:
@@ -216,9 +246,9 @@ public class EXIFMetadataReader extends ImageMetadataReader
                 case EXIF_Y_RESOLUTION:
                     continue;
                 default:
-                    final ImageMetaValue toValue = toDir.getValue( tagID );
-                    if ( toValue == null )
-                        toDir.putValue( tagID, me.getValue() );
+                    final ImageMetaValue toValue = toDir.getValue(tagID);
+                    if (toValue == null)
+                        toDir.putValue(tagID, me.getValue());
             }
         }
     }
@@ -241,8 +271,11 @@ public class EXIFMetadataReader extends ImageMetadataReader
             dir.setOwningMetadata( m_metadata );
             m_dirMap.put( name + m_ifdIndex, dir );
             return dir;
-        }
-        catch ( Exception e ) {
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException( e );
+        } catch (InstantiationException e) {
+            throw new IllegalStateException( e );
+        } catch ( RuntimeException e ) {
             throw new IllegalStateException( e );
         }
     }
@@ -270,11 +303,14 @@ public class EXIFMetadataReader extends ImageMetadataReader
      *
      * @param offset The offset from the beginning of the buffer of the maker
      * @param byteCount The total number of bytes for the maker notes data.
+     * @param dirClass The {@link Class} of the maker notes directory.
      */
-    public void readMakerNotes( int offset, int byteCount,
-                                ImageMetadataDirectory dir )
+    public void readMakerNotes(int offset, int byteCount,
+                               Class<? extends MakerNotesDirectory> dirClass )
         throws IOException
     {
+        final ImageMetadataDirectory dir =
+                m_metadata.getDirectoryFor( dirClass, true );
         int valueOffsetAdjustment = 0;
         final int[] adjustments = dir.getMakerNotesAdjustments( m_buf, offset );
         if ( adjustments != null ) {
@@ -298,5 +334,11 @@ public class EXIFMetadataReader extends ImageMetadataReader
      * A sequential index used to form the names of the IFDs.
      */
     private int m_ifdIndex = -1;
+
+    /** The number of bytes in the maker notes data. */
+    private int m_makerNotesByteCount;
+
+    /** The offset of the maker notes data. */
+    private int m_makerNotesValueOffset;
 }
 /* vim:set et sw=4 ts=4: */

@@ -97,8 +97,8 @@
         <array>
             <string>.</string>
             <string>asm-all-2.2.2.jar</string>
+            <string>jai_core-1.1.3.jar</string>
             <string>laf-widget.jar</string>
-            <string>lcjai.jar</string>
             <string>lightcrafts-apple.jar</string>
             <string>lightcrafts.jar</string>
             <string>quaqua.jar</string>
@@ -108,6 +108,9 @@
         <key>VMOptions</key>
         <array>
             <string>-Xrs</string>
+            <string>-XX:UseG1GC</string>
+            <string>-XX:MinHeapFreeRatio=30</string>
+            <string>-XX:MaxHeapFreeRatio=30</string>
         </array>
         <key>Properties</key>
         <dict>

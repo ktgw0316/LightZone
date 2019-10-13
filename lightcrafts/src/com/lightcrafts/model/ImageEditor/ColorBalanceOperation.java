@@ -7,11 +7,13 @@ import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
 import com.lightcrafts.utils.splines;
 
-import com.lightcrafts.mediax.jai.JAI;
-import com.lightcrafts.mediax.jai.LookupTableJAI;
-import com.lightcrafts.mediax.jai.PlanarImage;
+import javax.media.jai.JAI;
+import javax.media.jai.LookupTableJAI;
+import javax.media.jai.PlanarImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
+
+import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_COLOR_BALANCE;
 
 /**
  * Created by IntelliJ IDEA.
@@ -40,6 +42,8 @@ public class ColorBalanceOperation extends BlendedOperation {
     public ColorBalanceOperation(Rendering rendering) {
         super(rendering, type);
         colorInputOnly = true;
+
+        setHelpTopic(HELP_TOOL_COLOR_BALANCE);
 
         DecimalFormat format = new DecimalFormat("0.0");
 
@@ -102,25 +106,25 @@ public class ColorBalanceOperation extends BlendedOperation {
             double tgreen = green / 2 - red / 4 - blue / 4;
             double tblue = blue / 2 - red / 4 - green / 4;
 
-            double polygon[][] = {
-                {0,     0},
-                {midpoint, 0},
-                {1.0,   0},
+            double[][] polygon = {
+                    {0, 0},
+                    {midpoint, 0},
+                    {1.0, 0},
             };
 
             polygon[1][1] = tred;
-            double redCurve[][] = new double[256][2];
+            double[][] redCurve = new double[256][2];
             splines.bspline(3, polygon, redCurve);
 
             polygon[1][1] = tgreen;
-            double greenCurve[][] = new double[256][2];
+            double[][] greenCurve = new double[256][2];
             splines.bspline(3, polygon, greenCurve);
 
             polygon[1][1] = tblue;
-            double blueCurve[][] = new double[256][2];
+            double[][] blueCurve = new double[256][2];
             splines.bspline(3, polygon, blueCurve);
 
-            short table[][] = new short[3][0x10000];
+            short[][] table = new short[3][0x10000];
 
             splines.Interpolator interpolator = new splines.Interpolator();
 

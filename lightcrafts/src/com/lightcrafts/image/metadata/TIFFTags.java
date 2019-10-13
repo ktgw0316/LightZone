@@ -1662,7 +1662,7 @@ public interface TIFFTags extends ImageMetaTags {
      *    TilesPerImage = TilesAcross * TilesDown
      *  </blockquote>
      * These computed values are not TIFF fields; they are simply values
-     * determined by the {@link #TIFF_IMAGE_WIDTH}, {@link #TIFF_TILE_WIDTH},
+     * determined by the {@link #TIFF_IMAGE_WIDTH}, TIFF_TILE_WIDTH,
      * {@link #TIFF_IMAGE_LENGTH}, and {@link #TIFF_TILE_LENGTH} fields.
      * <p>
      * TileWidth and {@link #TIFF_IMAGE_WIDTH} together determine the number of

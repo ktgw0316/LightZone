@@ -1,15 +1,24 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2013-     Masahiro Kitagawa */
 
 package com.lightcrafts.utils.file;
 
-import java.io.*;
-import java.util.Collection;
-import java.util.ArrayList;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.nio.channels.FileChannel;
 
 import com.lightcrafts.platform.Platform;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A <code>FileUtil</code> is a set of utility functions for files.
@@ -30,19 +39,14 @@ public final class FileUtil {
      * at least one {@link File} that has been accepted by the given
      * {@link FileFilter}.
      */
-    public static boolean containsAtLeastOne( File dir, FileFilter filter ) {
-        dir = Platform.getPlatform().isSpecialFile( dir );
-        final File[] allFiles = dir.listFiles();
-        if ( allFiles != null && allFiles.length > 0 ) {
-            if ( filter == null )
-                return true;
-            for ( File file : allFiles ) {
-                final File file2 = Platform.getPlatform().isSpecialFile( file );
-                if ( filter.accept( file2 ) )
-                    return true;
-            }
-        }
-        return false;
+    public static boolean containsAtLeastOne(File dir, @NotNull FileFilter filter)
+            throws IOException {
+        final Platform platform = Platform.getPlatform();
+        final Path dirPath = platform.isSpecialFile(dir).toPath();
+        return Files.list(dirPath)
+                .map(Path::toFile)
+                .map(platform::isSpecialFile)
+                .anyMatch(filter::accept);
     }
 
     /**
@@ -53,42 +57,7 @@ public final class FileUtil {
      * @throws IOException if anything goes wrong.
      */
     public static void copyFile( File source, File target ) throws IOException {
-        final FileChannel sourceChannel =
-            new FileInputStream( source ).getChannel();
-        final FileChannel targetChannel =
-            new FileOutputStream( target ).getChannel();
-        try {
-            sourceChannel.transferTo( 0, sourceChannel.size(), targetChannel );
-        }
-        finally {
-            try {
-                targetChannel.close();
-            }
-            finally {
-                sourceChannel.close();
-            }
-        }
-    }
-
-    /**
-     * Delete a file.  If the file is actually a directory, delete the files it
-     * contains as well.  If the directory contains subdirectories, they are
-     * also deleted only if they are either empty or <code>recursive</code> is
-     * <code>true</code>.
-     *
-     * @param dir The {@link File} to delete.
-     * @param filter The {@link FileFilter} to use, or <code>null</code>.
-     * @param recursive If <code>true</code>, also delete all encountered
-     * subdirectories and their contents.
-     * @return Returns <code>false</code> only if at least one delete attempt
-     * fails.
-     */
-    public static boolean delete( File dir, FileFilter filter,
-                                  boolean recursive ) {
-        if ( dir.isDirectory() && !(dir instanceof SmartFolder) && recursive &&
-             !delete( listFiles( dir, filter, recursive ), filter, recursive ) )
-            return false;
-        return dir.delete();
+        Files.copy(source.toPath(), target.toPath(), StandardCopyOption.COPY_ATTRIBUTES);
     }
 
     /**
@@ -189,7 +158,8 @@ public final class FileUtil {
      * not be obtained.
      */
     public static long getLastAccessTimeOf( File file ) throws IOException {
-        return getLastAccessTime( file.getAbsolutePath() ) * 1000;
+        return Files.readAttributes(file.toPath().toAbsolutePath(), BasicFileAttributes.class)
+                .lastAccessTime().toMillis();
     }
 
     /**
@@ -225,25 +195,47 @@ public final class FileUtil {
      * returns that file.
      */
     public static File getNoncollidingFileFor( File file ) {
-        while ( true ) {
-            if ( !file.exists() )
-                return file;
-            final String name = file.getName();
-            final Matcher m = NUMBERED_FILE_PATTERN.matcher( name );
-            final String newName;
-            if ( m.matches() ) {
-                final int next = Integer.parseInt( m.group(1) ) + 1;
-                newName =
-                    name.substring( 0, m.start(1) ) + '-' + next +
-                    name.substring( m.end(1) );
-            } else {
-                final int dot = name.lastIndexOf( '.' );
-                newName =
-                    name.substring( 0, dot ) + "-1" +
-                    name.substring( dot );
-            }
-            file = new File( file.getParentFile(), newName );
+        if ( !file.exists() )
+            return file;
+        final String name = file.getName();
+        final Matcher m = NUMBERED_FILE_PATTERN.matcher( name );
+
+        final String basename;
+        final int next;
+        if (m.matches()) {
+            next = Integer.parseInt(m.group(1)) + 1;
+            basename = name.substring(0, m.start(1));
+        } else {
+            next = 1;
+            basename = trimExtensionOf(name);
         }
+        return getNoncollidingFileFor(file.getParentFile(), basename, next, getExtensionOf(file));
+    }
+
+    /**
+     * Gets a {@link File} in the file's directory that doesn't collide with
+     * any existing files by appending a numbered suffix and a "temp" extension
+     * <p>
+     * For example, if the file <code>/tmp/foo.jpg</code> exists, returns
+     * <code>/tmp/foo.jpg-1.temp</code>; if <code>/tmp/foo.jpg-1.temp</code> exists,
+     * returns <code>/tmp/foo.jpg-2.temp</code>; and so on.
+     *
+     * @param file The {@link File} to start with.
+     * @return Returns said file.  Note that if the given file doesn't exist,
+     * returns that file.
+     */
+    private static File getNoncollidingTempFileFor(File file) {
+        return !file.exists()
+                ? file
+                : getNoncollidingFileFor(file.getParentFile(), file.getName(), 1, "temp");
+    }
+
+    private static File getNoncollidingFileFor(File parent, String basename,
+                                               int index, String extension) {
+        final File file = new File(parent, basename + "-" + index + "." + extension);
+        return !file.exists()
+                ? file
+                : getNoncollidingFileFor(parent, basename, ++index, extension);
     }
 
     /**
@@ -259,8 +251,9 @@ public final class FileUtil {
             return temp.getParentFile();
         }
         finally {
-            if ( temp != null )
-                temp.delete();
+            if ( temp != null && !temp.delete()) {
+                temp.deleteOnExit();
+            }
         }
     }
 
@@ -364,10 +357,12 @@ public final class FileUtil {
                                     boolean includeDirs ) {
         dir = Platform.getPlatform().isSpecialFile( dir );
         final File[] files = dir.listFiles(filter);
-        if (! includeDirs)
+        if (! includeDirs || files == null)
             return files;
 
         final File[] dirs = dir.listFiles(dirFilter);
+        if (dirs == null)
+            return null;
         File[] dirsAndFiles = new File[files.length + dirs.length];
         System.arraycopy(files, 0, dirsAndFiles, 0, files.length);
         System.arraycopy(dirs,  0, dirsAndFiles, files.length, dirs.length);
@@ -382,12 +377,8 @@ public final class FileUtil {
      * @see #readEntireStream(InputStream)
      */
     public static String readEntireFile( File file ) throws IOException {
-        final InputStream is = new FileInputStream( file );
-        try {
-            return readEntireStream( is );
-        }
-        finally {
-            is.close();
+        try (InputStream is = new FileInputStream(file)) {
+            return readEntireStream(is);
         }
     }
 
@@ -417,20 +408,32 @@ public final class FileUtil {
      * @throws IOException if the rename fails.
      */
     public static void renameFile( File from, File to ) throws IOException {
+        File backup = null;
         try {
-            //
-            // Windows doesn't allow renaming a file to an existing file, so we
-            // have to delete it first.
-            //
-            to.delete();
-
-            if ( !from.renameTo( to ) )
-                throw new IOException();
+            if (to.exists()) {
+                //
+                // Windows doesn't allow renaming a file to an existing file, so we
+                // have to move it first.
+                //
+                backup = getNoncollidingTempFileFor(to);
+                if (!to.renameTo(backup)) {
+                    throw new IOException("Failed to backup " + to.getName());
+                }
+            }
+            if (!from.renameTo(to)) {
+                String msg = "Failed to rename " + from.getName() + " to " + to.getName();
+                if (backup != null && !backup.renameTo(to)) {
+                    msg += ", and failed to recover the " + from.getName()
+                            + " from backup " + backup.getName();
+                }
+                throw new IOException(msg);
+            }
+            if (backup != null && !backup.delete()) {
+                backup.deleteOnExit();
+            }
         }
-        catch ( SecurityException e ) {
-            final IOException ioe = new IOException();
-            ioe.initCause( e );
-            throw ioe;
+        catch (SecurityException e) {
+            throw  new IOException(e);
         }
     }
 
@@ -493,8 +496,8 @@ public final class FileUtil {
      *
      * @param file The {@link File} to touch.
      */
-    public static void touch( File file ) {
-        file.setLastModified( System.currentTimeMillis() );
+    public static boolean touch( File file ) {
+        return file.setLastModified( System.currentTimeMillis() );
     }
 
     /**
@@ -533,25 +536,6 @@ public final class FileUtil {
     ////////// private ////////////////////////////////////////////////////////
 
     /**
-     * Gets the last access time of a file.
-     *
-     * @param fileName The full path to the file.
-     * @return Returns the number of seconds since epoch of the last access
-     * time.
-     * @throws IOException if the file doesn't exist or the access time could
-     * not be obtained.
-     */
-    private static long getLastAccessTime( String fileName )
-        throws IOException, UnsupportedEncodingException
-    {
-        byte[] fileNameUtf8 = ( fileName + '\000' ).getBytes( "UTF-8" );
-        return getLastAccessTime( fileNameUtf8 );
-    }
-
-    private static native long getLastAccessTime( byte[] fileNameUtf8 )
-        throws IOException;
-
-    /**
      * The set of characters that are illegal in filenames comprising Linux,
      * Mac OS X, and Windows.  Additionally, the '%' character, although not
      * illegal, is included first so it will be encoded first by
@@ -561,10 +545,6 @@ public final class FileUtil {
 
     private static final Pattern NUMBERED_FILE_PATTERN =
         Pattern.compile( "^.*-(\\d+)\\.[a-z]{3,4}$" );
-
-    static {
-        System.loadLibrary( "LCFileUtil" );
-    }
 
     private static final FileFilter dirFilter = new FileFilter() {
         public boolean accept(File file) {

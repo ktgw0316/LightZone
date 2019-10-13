@@ -14,12 +14,6 @@
     <arg value="${common-dir}/version.txt"/>
   </exec>
 
-  <!-- Workaround for Java9. -->
-  <!--
-  <condition property="JVMARG" value="-XaddExports:java.desktop/sun.awt.image=ALL-UNNAMED,java.desktop/sun.java2d=ALL-UNNAMED,java.desktop/sun.print=ALL-UNNAMED,java.base/sun.nio.ch=ALL-UNNAMED,java.base/jdk.internal.ref=ALL-UNNAMED" else="">
-    <equals arg1="${ant.java.version}" arg2="1.9" />
-  </condition>
-  -->
   <property name="JVMARG" value=""/>
 
   <!--===== Application build ==============================================-->
@@ -42,19 +36,19 @@
   <target name="common">
     <ant dir="${common-dir}" target="jar"/>
     <exec executable="${MAKE}" dir="products" failonerror="true"
-          vmlauncher="true"/>
+          vmlauncher="true">
+      <arg value="-j"/>
+    </exec>
   </target>
 
   <target name="javac" depends="common">
     <mkdir dir="build"/>
-    <javac destdir="build" includeantruntime="false"
-           source="1.6" target="1.6" debug="true">
+    <mkdir dir="javah"/>
+    <javac destdir="build" includeantruntime="false" debug="true"
+           source="1.8" target="1.8" nativeheaderdir="javah">
       <src path="src"/>
       <classpath>
         <fileset dir="${common-dir}/products">
-          <include name="*.jar"/>
-        </fileset>
-        <fileset dir="lib">
           <include name="*.jar"/>
         </fileset>
         <fileset dir="/usr">
@@ -153,8 +147,6 @@
     <signjar jar="products/lightcrafts.jar" storetype="${storetype}" keystore="${keystore}" alias="${alias}" storepass="${storepass}"/>
     <signjar jar="products/lightcrafts-linux.jar" storetype="${storetype}" keystore="${keystore}" alias="${alias}" storepass="${storepass}"/>
     <signjar jar="products/linux-so.jar" storetype="${storetype}" keystore="${keystore}" alias="${alias}" storepass="${storepass}"/>
-    <signjar jar="products/lcjai.jar" storetype="${storetype}" keystore="${keystore}" alias="${alias}" storepass="${storepass}"/>
-    <signjar jar="products/mlibwrapper_jai.jar" storetype="${storetype}" keystore="${keystore}" alias="${alias}" storepass="${storepass}"/>
   </target>
 
   <!--===== Assemble the WebStart Site =====================================-->
@@ -187,14 +179,18 @@
   <target name="distclean">
     <ant dir="${common-dir}" target="distclean"/>
     <ant dir="help" target="clean"/>
-    <delete dir="archive"/>
-    <delete dir="build"/>
-    <delete dir="webstart"/>
-    <delete file="LightZone.tar.gz"/>
+    <parallel>
+      <delete dir="archive"/>
+      <delete dir="build"/>
+      <delete dir="javah"/>
+      <delete dir="webstart"/>
+      <delete file="LightZone.tar.gz"/>
+    </parallel>
     <exec executable="${MAKE}" dir="products">
       <arg value="distclean"/>
     </exec>
     <exec executable="${MAKE}" dir="jnisrc">
+      <arg value="-j"/>
       <arg value="distclean"/>
     </exec>
   </target>

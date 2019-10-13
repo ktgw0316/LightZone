@@ -23,6 +23,9 @@
 #	JNI_EXTRA_LDFLAGS	Specify extra -L directives.
 #	JNI_EXTRA_LINK		Specify extra -l directives.
 #
+#	JNI_EXTRA_PKGCFG	Specify extra package name to set -I, _L,
+#				and -l directives using pkg-config.
+#
 #	JNI_EXTRA_CLEAN		Specify extra files to clean.
 #	JNI_EXTRA_DISTCLEAN	Specify extra files to distclean.
 #
@@ -46,12 +49,8 @@
 ##
 # Undefine all this stuff so we don't get any defaults.
 ##
-CC:=
-CFLAGS=
-CXX:=
 DEFINES:=
 INCLUDES:=
-LDFLAGS:=
 LINK:=
 
 COMMON_DIR:=		$(ROOT)/lightcrafts
@@ -66,10 +65,17 @@ endif
 
 DEFINES:=		-DJNILIB $(JNI_EXTRA_DEFINES)
 INCLUDES:=		$(PLATFORM_INCLUDES) $(JAVA_INCLUDES) \
+			-I$(COMMON_DIR) \
 			-I$(COMMON_DIR)/jnisrc/jniutils $(JNI_EXTRA_INCLUDES)
 LDFLAGS:=		$(PLATFORM_LDFLAGS) $(JAVA_LDFLAGS) \
 			-L$(COMMON_DIR)/products $(JNI_EXTRA_LDFLAGS)
 LINK:=			$(JNI_EXTRA_LINK)
+
+ifdef JNI_EXTRA_PKGCFG
+  LINK+=		$(shell $(PKGCFG) --libs-only-l $(JNI_EXTRA_PKGCFG))
+  INCLUDES+=		$(shell $(PKGCFG) --cflags-only-I $(JNI_EXTRA_PKGCFG))
+  LDFLAGS+=		$(shell $(PKGCFG) --libs-only-L $(JNI_EXTRA_PKGCFG))
+endif
 
 TARGET_DIR:=		../../products
 
@@ -112,7 +118,7 @@ ifeq ($(PLATFORM),Windows)
   CFLAGS+=		$(JNI_WINDOWS_CFLAGS)
   DEFINES+=		$(JNI_WINDOWS_DEFINES)
   INCLUDES+=		$(JNI_WINDOWS_INCLUDES)
-  LDFLAGS+=		-shared -Wl,--add-stdcall-alias -static-libgcc -static-libstdc++ $(JNI_WINDOWS_LDFLAGS)
+  LDFLAGS+=		-shared -Wl,--add-stdcall-alias $(JNI_WINDOWS_LDFLAGS)
   ifdef JNI_WINDOWS_IMPLIB
     TARGET_IMPLIB:=	$(TARGET_DIR)/$(TARGET_BASE)-implib.a
     ifeq ($(USE_ICC),1)
@@ -151,8 +157,6 @@ endif
 
 include			$(COMMON_DIR)/mk/sources.mk
 
-JAVAH_HEADERS:=	$(foreach class,$(subst .,_,$(JAVAH_CLASSES)),javah/$(class).h)
-
 LOCAL_LIBS:=	$(filter-out %-ranlib.a,$(wildcard *.a))
 LOCAL_RANLIBS:=	$(foreach lib,$(LOCAL_LIBS),$(lib:.a=-ranlib.a))
 
@@ -187,12 +191,7 @@ ifndef mk_target
 # mk_target that recursively calls make with mk_target=true that will build the
 # real target.
 ##
-all: $(JAVAH_HEADERS) mk_target
-
-$(JAVAH_HEADERS):
-	-$(MKDIR) javah
-	javah -classpath "$(COMMON_DIR)/build$(CLASSPATH_SEP)$(COMMON_DIR)/extbuild$(CLASSPATH_SEP)$(PLATFORM_DIR)/build" \
-	      -d javah $(basename $(subst _,.,$(@F)))
+all: mk_target
 
 .PHONY: mk_target
 mk_target:
@@ -206,6 +205,11 @@ all: $(TARGET) $(POST_TARGET)
 include		$(COMMON_DIR)/mk/auto_dep.mk
 endif
 
+ifeq ($(PLATFORM),MacOSX)
+ifdef JNI_MACOSX_SHAREDLIB
+	USE_AR_RANLIB=yes
+endif
+endif
 
 ifeq ($(UNIVERSAL),1)
 
@@ -217,7 +221,7 @@ ifeq ($(PLATFORM),MacOSX)
 endif
 
 ifndef JNI_MANUAL_TARGET
-ifdef JNI_MACOSX_SHAREDLIB
+ifdef USE_AR_RANLIB
 $(TARGET_PPC): $(OBJECTS_PPC) $(BUILT_LIBS)
 	ar -rc $@ *-ppc.o
 	-ranlib $@
@@ -226,7 +230,7 @@ $(TARGET_PPC): $(OBJECTS_PPC) $(LOCAL_RANLIBS) $(BUILT_LIBS)
 	$(CC_LINK) $(CFLAGS_PPC) $(LDFLAGS) -o $@ *-ppc.o $(LINK)
 endif
 
-ifdef JNI_MACOSX_SHAREDLIB
+ifdef USE_AR_RANLIB
 $(TARGET_X86): $(OBJECTS_X86) $(BUILT_LIBS)
 	ar -rc $@ *-x86.o
 	-ranlib $@
@@ -234,12 +238,12 @@ else
 $(TARGET_X86): $(OBJECTS_X86) $(LOCAL_RANLIBS) $(BUILT_LIBS)
 	$(CC_LINK) $(CFLAGS_X86) $(LDFLAGS) -o $@ *-x86.o $(LINK)
 endif
-endif
+endif	# JNI_MANUAL_TARGET
 
 else	# UNIVERSAL
 
 ifndef JNI_MANUAL_TARGET
-ifdef JNI_MACOSX_SHAREDLIB
+ifdef USE_AR_RANLIB
 $(TARGET): $(OBJECTS) $(RC_OBJECTS) $(BUILT_LIBS)
 	-$(MKDIR) $(TARGET_DIR)
 	ar -rc $@ *.o
@@ -252,7 +256,7 @@ ifeq ($(PLATFORM),MacOSX)
 	cp -p $@ $(TARGET_DIR)
 endif
 endif
-endif
+endif	# JNI_MANUAL_TARGET
 
 endif	# UNIVERSAL
 

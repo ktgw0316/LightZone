@@ -10,7 +10,7 @@ import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.LCROIShape;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.utils.SoftValueHashMap;
-import com.lightcrafts.mediax.jai.*;
+import javax.media.jai.*;
 
 import java.awt.image.*;
 import java.awt.image.renderable.ParameterBlock;
@@ -186,13 +186,7 @@ public class ShapedMask extends PlanarImage {
         ScaledImage contourImage = new ScaledImage();
 
         if (contourWidth > 1) {
-            KernelJAI kernel = Functions.getGaussKernel(kernelWidth);
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(supportImage);
-            pb.add(kernel);
-            RenderingHints hints = new RenderingHints(JAI.KEY_BORDER_EXTENDER, extender);
-
-            contourImage.image = JAI.create("LCSeparableConvolve", pb, hints);
+            contourImage.image = Functions.fastGaussianBlur(supportImage, kernelWidth);
         } else {
             contourImage.image = (PlanarImage) supportImage;
         }
@@ -316,34 +310,7 @@ public class ShapedMask extends PlanarImage {
                 if (scaledImage.scale < 1) {
                     float scaleX = (float) Math.floor(maskImage.getWidth() / scaledImage.scale) / (float) maskImage.getWidth();
                     float scaleY = (float) Math.floor(maskImage.getHeight() / scaledImage.scale) / (float) maskImage.getHeight();
-
-                    if (scaledImage.tx != 0 || scaledImage.ty != 0)
-                        transform.concatenate(AffineTransform.getTranslateInstance(scaledImage.tx, scaledImage.ty));
-
-                    Rectangle scaledBounds = transform.createTransformedShape(maskImage.getBounds()).getBounds();
-
-                    // Avoid scaling underflows resulting into exeptions
-                    if (scaledBounds.width < 3 || scaledBounds.height < 3)
-                        continue;
-
-                    synchronized (expandedMasks) {
-                        AffinedImage key = new AffinedImage(maskImage, transform);
-                        PlanarImage affinedImage = expandedMasks.get(key);
-                        if (affinedImage == null) {
-                            RenderingHints hints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
-                                                                      BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-                            // hints.add(JAIContext.noCacheHint);
-                            Interpolation interp = Interpolation.getInstance(Interpolation.INTERP_BILINEAR);
-                            ParameterBlock params = new ParameterBlock();
-                            params.addSource(maskImage);
-                            params.add(transform);
-                            params.add(interp);
-                            maskImage = JAI.create("Affine", params, hints);
-                            expandedMasks.put(key, maskImage);
-                        } else {
-                            maskImage = affinedImage;
-                        }
-                    }
+                    transform.concatenate(AffineTransform.getScaleInstance(scaleX, scaleY));
                 }
 
                 if (scaledImage.tx != 0 || scaledImage.ty != 0)
@@ -380,13 +347,13 @@ public class ShapedMask extends PlanarImage {
 
             Rectangle itx = maskImage.getBounds().intersection(rect);
 
-            byte resultData[];
+            byte[] resultData;
             if (!overlay) {
                 resultData = (byte[]) maskImage.getData(itx).getDataElements(itx.x, itx.y, itx.width, itx.height, null);
                 overlay = true;
             } else {
                 resultData = (byte[]) result.getDataElements(itx.x, itx.y, itx.width, itx.height, null);
-                byte currentData[] = (byte[]) maskImage.getData(itx).getDataElements(itx.x, itx.y, itx.width, itx.height, null);
+                byte[] currentData = (byte[]) maskImage.getData(itx).getDataElements(itx.x, itx.y, itx.width, itx.height, null);
 
                 // blend overlapping regions using Porter-Duff alpha compositing: ar = a1 * (1 - a2) + a2
                 for (int i = 0; i < resultData.length; i++) {

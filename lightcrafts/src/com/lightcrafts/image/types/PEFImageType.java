@@ -96,8 +96,8 @@ public final class PEFImageType extends RawImageType {
      * All the possible filename extensions for PEF files.  All must be lower
      * case and the preferred one must be first.
      */
-    private static final String EXTENSIONS[] = {
-        "pef"
+    private static final String[] EXTENSIONS = {
+            "pef"
     };
 }
 /* vim:set et sw=4 ts=4: */

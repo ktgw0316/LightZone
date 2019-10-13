@@ -6,10 +6,10 @@ SUBDIRS:=	jniutils \
 		cache \
 		dcraw \
 		EDISON \
-		fileutil \
 		jai \
 		fast_jai \
 		fast_bilateral \
+		lensfun \
 		jpeg \
 		lcms \
 		tiff

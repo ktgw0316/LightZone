@@ -4,15 +4,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es-ES" xml:lang="es-ES">
 
   <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <title>LightZone: Zone System</title><!--[if lt IE 7]>
-    <script defer type="text/javascript" src="IE_PNG.js"></script>
-    <link rel="stylesheet" type="text/css" href="IE.css" media="all"/>
-    <![endif]-->
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <title>LightZone: Zone System</title>
     <meta name="description" content="Description of the Zone System."/>
     <link rel="stylesheet" type="text/css" href="Help.css" media="all"/>
     <link rel="stylesheet" type="text/css" href="Platform.css" media="all"/>
-    
+    <!--[if lt IE 7]>
+    <script defer type="text/javascript" src="IE_PNG.js"></script>
+    <link rel="stylesheet" type="text/css" href="IE.css" media="all"/>
+    <![endif]-->
   </head>
 
   <body>
@@ -21,19 +21,17 @@
         <a href="index.html">Ayuda de LightZone</a>
       </div>
       <div id="banner_right">
-        <a href="index/index.html">Index</a>
+        <a href="index/index.html">Indice</a>
       </div>
-    </div><!-- LC_Index: Zone System --><!-- LC_Index: ZoneFinder > Zone System, differences from --><!-- LC_Index: ZoneMapper > Zone System, differences from -->
+    </div>
 
-    
-    
-    
-    <a name="Zone_System"></a>
-    <img src="images/app_icon-32.png" width="32" height="32"
-      class="title_icon"/>
+    <!-- LC_Index: Zone System -->
+    <!-- LC_Index: ZoneFinder > Zone System, differences from -->
+    <!-- LC_Index: ZoneMapper > Zone System, differences from -->
+    <a name="Zone_System"/>
+    <img src="images/app_icon-32.png" width="32" height="32" class="title_icon"/>
     <h1>The Zone System</h1>
     <p>
-      
       The <b>Zone System</b> was developed by Ansel Adams and Fred Archer
       in the 1940s as a method for achieving consistent results
       from exposing negative film all the way to paper prints.
@@ -43,10 +41,8 @@
       and perform meaningful operations on them,
       such as altering exposure, contrast,
       and most all other visual aspects of a photo.
-    
     </p>
     <p>
-      
       With the <a href="ZoneFinder.html">ZoneFinder</a> and
       <a href="Tool-ZoneMapper.html">ZoneMapper</a> tool,
       LightZone offers a unique implementation of the Zone System
@@ -56,35 +52,28 @@
       If you are familiar with the Zone System,
       you probably have noticed that there are differences
       between the traditional Zone System and LightZone.
-    
     </p>
 
     <table class="chapter_box" width="100%">
       <tr>
         <td class="chapter_box_header" colspan="2">
-          
           The Traditional Zone System
-        
         </td>
-        </tr><tr valign="top">
+        <tr valign="top">
           <td>
             <p>
-              
               The traditional Zone System was developed for negative film
               and has 11 zones where each zone
               differs by one <em>exposure value</em>
-              (one "EV" which is equivalent to one f-stop).
+              (one &quot;EV&quot; which is equivalent to one f-stop).
               Middle (or 18%) gray falls onto zone 5.
-            
             </p>
             <p>
-              
               The traditional Zone System takes into account
               the nonlinear nature of both film and photographic paper
               that compresses the tonal values of highlights and shadows
-              (the "shoulder" and "toe"
+              (the &quot;shoulder&quot; and &quot;toe&quot;
               of photographic media).
-            
             </p>
           </td>
         </tr>
@@ -96,22 +85,17 @@
     <table class="chapter_box" width="100%">
       <tr>
         <td class="chapter_box_header" colspan="2">
-          
           LightZone's Digital Adaptation of the Zone System
-        
         </td>
-        </tr><tr valign="top">
+        <tr valign="top">
           <td>
             <p>
-              
               LightZone instead was developed for digital cameras and computers
               and has 16 zones where each zone
               differs by <i>half</i> an EV.
               Middle gray falls onto the fifth zone from the top.
-            
             </p>
             <p>
-              
               The reason for the differences
               are that digital cameras and computers
               use a linear representation for values of light
@@ -119,7 +103,6 @@
               that is less than 8 EVs.
               Using half EV spacing for zones in LightZone results in 16 zones
               and gives the best compromise between screen space and precision.
-            
             </p>
           </td>
         </tr>
@@ -128,4 +111,3 @@
 
   </body>
 </html><!-- vim:set et sw=2 ts=2: -->
-

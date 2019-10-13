@@ -1,63 +1,99 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2017-     Masahiro Kitagawa */
 
 package com.lightcrafts.platform;
 
 import com.lightcrafts.image.ImageFilenameFilter;
 import com.lightcrafts.image.export.ImageExportOptions;
-import static com.lightcrafts.platform.Locale.LOCALE;
 import com.lightcrafts.ui.export.ExportDialog;
 import com.lightcrafts.utils.file.FileUtil;
 
-import javax.swing.*;
+import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
+
 import java.awt.*;
 import java.io.File;
-import java.io.FilenameFilter;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+
+import static com.lightcrafts.platform.Locale.LOCALE;
 
 /**
  * This FileChooser is public so it can be used by WindowsPlatform and
  * LinuxPlatform.
  */
-public class DefaultFileChooser implements FileChooser {
+public class DefaultFileChooser implements com.lightcrafts.platform.FileChooser {
 
+    // Initializer for JavaFX
+    @SuppressWarnings("unused")
+    static private JFXPanel fxPanel = new JFXPanel();
+
+    @Override
     public File openFile(
-        String windowTitle, File directory, Frame parent, FilenameFilter filter
+        final String windowTitle, final File directory, Frame parent, final ExtensionFilter... filter
     ) {
-        File file = null;
-        FileDialog fileDialog = new FileDialog(
-            parent, windowTitle, FileDialog.LOAD
-        );
-        if (directory != null)
-            fileDialog.setDirectory(directory.getAbsolutePath());
-        if (filter != null) {
-            fileDialog.setFilenameFilter(filter);
-        }
-        fileDialog.setVisible(true);
-        String chosenDirectory = fileDialog.getDirectory();
-        String chosenFile = fileDialog.getFile();
-        if (chosenDirectory != null && chosenFile != null) {
-            file = new File(chosenDirectory, chosenFile);
-        }
-        return file;
-    }
+        final FutureTask<File> query = new FutureTask<File>(new Callable<File>() {
+            @Override
+            public File call() throws Exception {
+                final FileChooser chooser = new FileChooser();
+                if (windowTitle != null) {
+                    chooser.setTitle(windowTitle);
+                }
+                chooser.setInitialDirectory(directory);
+                if (filter != null) {
+                    chooser.getExtensionFilters().addAll(filter);
+                }
+                return chooser.showOpenDialog(null);
+            }
+        });
+        Platform.runLater(query);
 
-    public File chooseDirectory(
-        String windowTitle, File directory, Window parent, boolean showHidden
-    ) {
-        JFileChooser chooser = new JFileChooser(directory);
-        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        chooser.setDialogTitle(windowTitle);
-        int option = chooser.showSaveDialog(parent);
-        if (option == JFileChooser.APPROVE_OPTION) {
-            File file = chooser.getSelectedFile();
-            return file;
+        try {
+            return query.get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
         }
         return null;
     }
 
+    @Override
+    public File chooseDirectory(
+        final String windowTitle, final File directory, Window parent, final boolean showHidden
+    ) {
+        final FutureTask<File> query = new FutureTask<File>(new Callable<File>() {
+            @Override
+            public File call() throws Exception {
+                final DirectoryChooser chooser = new DirectoryChooser();
+                if (windowTitle != null) {
+                    chooser.setTitle(windowTitle);
+                }
+                chooser.setInitialDirectory(directory);
+                return chooser.showDialog(null);
+            }
+        });
+        Platform.runLater(query);
+
+        try {
+            return query.get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
     public ImageExportOptions exportFile(
         ImageExportOptions options, Frame parent
     ) {
-        options =  ExportDialog.showDialog(options, parent);
+        options = ExportDialog.showDialog(options, parent);
         if (options != null) {
             File file = options.getExportFile();
             if ((file != null) && file.exists()) {
@@ -70,6 +106,7 @@ public class DefaultFileChooser implements FileChooser {
         return options;
     }
 
+    @Override
     public File saveFile(File file, Frame parent) {
         // Note the initial file name extension, to ensure it's enforced
         // after the dialog.
@@ -107,7 +144,7 @@ public class DefaultFileChooser implements FileChooser {
     }
 
     private static boolean askToReplace( File file, Frame parent ) {
-        int result = Platform.getPlatform().getAlertDialog().showAlert(
+        int result = com.lightcrafts.platform.Platform.getPlatform().getAlertDialog().showAlert(
             parent,
             LOCALE.get("ReplaceMessageMajor", file.getName()),
             LOCALE.get("ReplaceMessageMinor"),

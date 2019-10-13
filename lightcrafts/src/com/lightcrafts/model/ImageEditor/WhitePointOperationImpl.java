@@ -7,15 +7,17 @@ import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.WhitePointOperation;
 import com.lightcrafts.utils.splines;
-import com.lightcrafts.utils.ColorScience;
+import com.lightcrafts.image.color.ColorScience;
 
-import com.lightcrafts.mediax.jai.JAI;
-import com.lightcrafts.mediax.jai.LookupTableJAI;
-import com.lightcrafts.mediax.jai.PlanarImage;
+import javax.media.jai.JAI;
+import javax.media.jai.LookupTableJAI;
+import javax.media.jai.PlanarImage;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.image.Raster;
+
+import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_WHITE_BALANCE;
 
 class WhitePointOperationImpl extends BlendedOperation implements WhitePointOperation  {
     private static final OperationType type = new OperationTypeImpl("White Dropper");
@@ -26,6 +28,8 @@ class WhitePointOperationImpl extends BlendedOperation implements WhitePointOper
 
     WhitePointOperationImpl(Rendering rendering) {
         super(rendering, type);
+        setHelpTopic(HELP_TOOL_WHITE_BALANCE);
+
         this.rendering = rendering;
         colorInputOnly = true;
     }
@@ -93,7 +97,7 @@ class WhitePointOperationImpl extends BlendedOperation implements WhitePointOper
                             Rectangle intersection = tileBounds.intersection(sampleRect);
 
                             pixel = new int[] {0, 0, 0};
-                            int currentPixel[] = new int[3];
+                        int[] currentPixel = new int[3];
 
                             for (int i = intersection.x; i < intersection.x + intersection.width; i++)
                                 for (int j = intersection.y; j < intersection.y + intersection.height; j++) {
@@ -119,25 +123,25 @@ class WhitePointOperationImpl extends BlendedOperation implements WhitePointOper
 
                 double lum = (ColorScience.Wr * pixel[0] + ColorScience.Wg * pixel[1] + ColorScience.Wb * pixel[2]) / (double) 0xffff;
 
-                double polygon[][] = {
-                    {0,   0},
-                    {lum, 0},
-                    {1,   0}
+                double[][] polygon = {
+                        {0, 0},
+                        {lum, 0},
+                        {1, 0}
                 };
 
                 polygon[1][1] = - tred / 256.;
-                double redCurve[][] = new double[256][2];
+                double[][] redCurve = new double[256][2];
                 splines.bspline(2, polygon, redCurve);
 
                 polygon[1][1] = - tgreen / 256.;
-                double greenCurve[][] = new double[256][2];
+                double[][] greenCurve = new double[256][2];
                 splines.bspline(2, polygon, greenCurve);
 
                 polygon[1][1] = - tblue / 256.;
-                double blueCurve[][] = new double[256][2];
+                double[][] blueCurve = new double[256][2];
                 splines.bspline(2, polygon, blueCurve);
 
-                short table[][] = new short[3][0x10000];
+                short[][] table = new short[3][0x10000];
 
                 splines.Interpolator interpolator = new splines.Interpolator();
 

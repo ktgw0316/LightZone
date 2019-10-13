@@ -2,24 +2,22 @@
 
 package com.lightcrafts.ui.browser.ctrls;
 
-import com.lightcrafts.ui.toolkit.PaneTitle;
-import com.lightcrafts.ui.toolkit.IconFactory;
-import com.lightcrafts.ui.toolkit.MenuButton;
-import com.lightcrafts.ui.toolkit.CoolButton;
 import com.lightcrafts.ui.browser.folders.FolderBrowserPane;
 import com.lightcrafts.ui.browser.folders.FolderTreeListener;
-import static com.lightcrafts.ui.browser.ctrls.Locale.LOCALE;
-import com.lightcrafts.ui.LightZoneSkin;
+import com.lightcrafts.ui.toolkit.CoolButton;
+import com.lightcrafts.ui.toolkit.IconFactory;
+import com.lightcrafts.ui.toolkit.MenuButton;
+import com.lightcrafts.ui.toolkit.PaneTitle;
 
-import javax.swing.*;
 import javax.imageio.ImageIO;
-import java.io.IOException;
-import java.io.File;
-import java.awt.event.ActionListener;
+import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
-import org.jvnet.substance.SubstanceLookAndFeel;
+import static com.lightcrafts.ui.browser.ctrls.Locale.LOCALE;
 
 /**
  * Copyright (C) 2007 Light Crafts, Inc.
@@ -49,7 +47,7 @@ public class NavigationPane extends PaneTitle {
     public NavigationPane(final FolderBrowserPane browser) {
         final JButton btnBack = new CoolButton(/*CoolButton.ButtonStyle.LEFT*/);
         final JButton btnForward = new CoolButton(/*CoolButton.ButtonStyle.RIGHT*/);
-        final MenuButton btnPath = browser.getPathPopupMenu();
+        final MenuButton btnPath = browser.getPathButton();
 
         btnBack.setIcon(ImgBack);
         btnBack.setToolTipText(LOCALE.get("BackToolTip"));

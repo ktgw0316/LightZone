@@ -8,10 +8,10 @@ import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.JAIContext;
 
-import com.lightcrafts.mediax.jai.KernelJAI;
-import com.lightcrafts.mediax.jai.JAI;
-import com.lightcrafts.mediax.jai.BorderExtender;
-import com.lightcrafts.mediax.jai.PlanarImage;
+import javax.media.jai.KernelJAI;
+import javax.media.jai.JAI;
+import javax.media.jai.BorderExtender;
+import javax.media.jai.PlanarImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.*;
 import java.text.DecimalFormat;

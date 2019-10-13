@@ -5,6 +5,8 @@ package com.lightcrafts.ui.browser.view;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.ui.browser.model.*;
+import com.lightcrafts.utils.awt.geom.HiDpi;
+
 import static com.lightcrafts.ui.browser.view.Locale.LOCALE;
 
 import javax.swing.*;
@@ -32,7 +34,7 @@ public abstract class AbstractImageBrowser
     int count;
 
     // Shared with derived classes, for painting logic:
-    
+
     ImageDatumRenderer renderer;
 
     ImageBrowserSelectionModel selection;
@@ -160,7 +162,7 @@ public abstract class AbstractImageBrowser
     Rectangle getBounds(ImageDatum datum) {
         Integer index = datumIndex.get(datum);
         if (index != null) {
-            Rectangle bounds = getBounds(index);
+            Rectangle bounds = HiDpi.imageSpaceRectFrom(getBounds(index));
             return bounds;
         }
         return null;
@@ -690,7 +692,7 @@ public abstract class AbstractImageBrowser
             JMenuItem ratingItem = new JMenuItem(action);
             String name = (String) action.getValue(Action.NAME);
             // On Windogs only the core fonts seem to see stars
-            if (Platform.getType() == Platform.Windows) {
+            if (Platform.isWindows()) {
                 char star = '\u2605';
                 if (name.length() > 0 && name.charAt(0) == star)
                     ratingItem.setFont(new Font("Serif", Font.PLAIN, 14));

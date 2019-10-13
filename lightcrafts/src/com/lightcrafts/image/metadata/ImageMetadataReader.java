@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2017-     Masahiro Kitagawa */
 
 package com.lightcrafts.image.metadata;
 
@@ -19,18 +20,16 @@ import com.lightcrafts.utils.bytebuffer.LCByteBuffer;
  */
 public abstract class ImageMetadataReader {
 
-    ////////// public /////////////////////////////////////////////////////////
-
     /**
      * The log level at which metadata exceptions are logged.
      */
-    public static final Level LOG_LEVEL = Level.WARNING;
+    private static final Level LOG_LEVEL = Level.INFO;
 
     /**
      * The {@link Logger} to which {@link BadImageMetadataException}s are
      * logged.
      */
-    public static final Logger m_logger =
+    private static final Logger m_logger =
         Logger.getLogger( "com.lightcrafts.image.metadata" );
 
     /**
@@ -45,38 +44,18 @@ public abstract class ImageMetadataReader {
     {
         try {
             readHeader();
-        }
-        catch ( IOException e ) {
-            //
-            // An IOException means something is seriously wrong with the file,
-            // disk, etc.
-            //
-            throw e;
-        }
-        catch ( Exception e ) {
-            //
+        } catch ( BadImageMetadataException e ) {
             // Assume that any other exception is the result of a bad image
             // file.
-            //
             throw new BadImageFileException( m_imageInfo.getFile(), e );
         }
 
         try {
             readAllDirectories();
-        }
-        catch ( IOException e ) {
-            //
-            // An IOException means something is seriously wrong with the file,
-            // disk, etc.
-            //
-            throw e;
-        }
-        catch ( Exception e ) {
-            //
+        } catch ( RuntimeException e ) {
             // Assume that any other exception is the result of a bad image
             // file.  However, that said, ignore it and try to forge ahead
             // anyway.
-            //
             logBadImageMetadata( e );
         }
         return m_metadata;
@@ -88,8 +67,11 @@ public abstract class ImageMetadataReader {
      *
      * @param e The {@link Exception} to log.
      */
-    public static void logException( Exception e ) {
-        m_logger.log( LOG_LEVEL, "", e );
+    private static void logException(Exception e) {
+        final String msg = e.toString();
+        if (msg != null) {
+            m_logger.log(LOG_LEVEL, msg);
+        }
     }
 
     /**
@@ -100,8 +82,6 @@ public abstract class ImageMetadataReader {
     public final void setTagHandler( TagHandler handler ) {
         m_tagHandler = handler;
     }
-
-    ////////// protected /////////////////////////////////////////////////////
 
     /**
      * Construct an <code>ImageMetadataReader</code> and read the metadata.
@@ -122,7 +102,7 @@ public abstract class ImageMetadataReader {
      * This is a convenience method for giving a
      * {@link BadImageMetadataException} to the logger.
      */
-    protected void logBadImageMetadata() {
+    void logBadImageMetadata() {
         logException( new BadImageMetadataException( m_imageInfo.getFile() ) );
     }
 
@@ -132,7 +112,7 @@ public abstract class ImageMetadataReader {
      *
      * @param message An informational message.
      */
-    protected void logBadImageMetadata( String message ) {
+    void logBadImageMetadata( String message ) {
         logException(
             new BadImageMetadataException( m_imageInfo.getFile(), message )
         );
@@ -144,7 +124,7 @@ public abstract class ImageMetadataReader {
      *
      * @param cause The original exception.
      */
-    protected void logBadImageMetadata( Throwable cause ) {
+    void logBadImageMetadata( Throwable cause ) {
         /* logException(
             new BadImageMetadataException( m_imageInfo.getFile(), cause )
         ); */
@@ -179,11 +159,11 @@ public abstract class ImageMetadataReader {
     /**
      * The metadata is put here.
      */
-    protected final ImageMetadata m_metadata;
+    final ImageMetadata m_metadata;
 
     /**
      * The {@link TagHandler}, if any, to use.
      */
-    protected TagHandler m_tagHandler;
+    TagHandler m_tagHandler;
 }
 /* vim:set et sw=4 ts=4: */

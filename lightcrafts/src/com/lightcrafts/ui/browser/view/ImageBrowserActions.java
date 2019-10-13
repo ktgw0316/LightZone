@@ -5,8 +5,9 @@ package com.lightcrafts.ui.browser.view;
 
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.ui.action.ToggleAction;
-import static com.lightcrafts.ui.browser.view.Locale.LOCALE;
 import com.lightcrafts.utils.file.FileUtil;
+import lombok.Getter;
+import lombok.val;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -14,8 +15,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.Getter;
-import lombok.val;
+import static com.lightcrafts.ui.browser.view.Locale.LOCALE;
 
 /**
  * This class defines all the actions the browser wants to export.  They are
@@ -190,7 +190,7 @@ public class ImageBrowserActions {
 
         // This accelerator key setup should be localized and maybe unified
         // with the centralized menu configuration in MenuFactory.
-        val modifier = Platform.getType() == Platform.MacOSX ? "meta" : "ctrl";
+        val modifier = Platform.isMac() ? "meta" : "ctrl";
         selectAllAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
                 modifier + " " + "A"
         ));

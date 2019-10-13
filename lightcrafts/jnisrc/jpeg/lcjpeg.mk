@@ -10,9 +10,12 @@ TARGET_BASE:=		LCJPEG
 #DEBUG:=		true
 
 JNI_EXTRA_CFLAGS:=	-fexceptions -std=c++0x
-JNI_WINDOWS_LINK:=	-ljpeg.dll -lLCJNI
-JNI_LINUX_LINK:=	-ljpeg -lLCJNI
-JNI_MACOSX_LINK:=	-ljpeg ../jniutils/libLCJNI.a
+JNI_EXTRA_INCLUDES:=	$(shell $(PKGCFG) --cflags libjpeg)
+JNI_EXTRA_LINK:=	$(shell $(PKGCFG) --libs-only-l libjpeg)
+JNI_EXTRA_LDFLAGS:=	$(shell $(PKGCFG) --libs-only-L libjpeg)
+JNI_WINDOWS_LINK:=	-lLCJNI
+JNI_LINUX_LINK:=	-lLCJNI
+JNI_MACOSX_LINK:=	../jniutils/libLCJNI.a
 JNI_MACOSX_LDFLAGS:=	-L/usr/local/opt/jpeg-turbo/lib
 JNI_MACOSX_INCLUDES:=	-I/usr/local/opt/jpeg-turbo/include
 

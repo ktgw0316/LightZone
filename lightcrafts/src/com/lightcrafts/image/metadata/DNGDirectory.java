@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2017-     Masahiro Kitagawa */
 
 package com.lightcrafts.image.metadata;
 
@@ -7,11 +8,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import com.lightcrafts.image.metadata.providers.FocalLengthProvider;
+import com.lightcrafts.image.metadata.providers.ISOProvider;
 import com.lightcrafts.image.metadata.values.ImageMetaValue;
 import com.lightcrafts.image.metadata.values.ByteMetaValue;
 import com.lightcrafts.image.metadata.providers.LensProvider;
 
 import static com.lightcrafts.image.metadata.DNGTags.*;
+import static com.lightcrafts.image.metadata.EXIFTags.*;
 import static com.lightcrafts.image.metadata.ImageMetaType.*;
 
 /**
@@ -21,13 +25,15 @@ import static com.lightcrafts.image.metadata.ImageMetaType.*;
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */
 @SuppressWarnings({"CloneableClassWithoutClone"})
-public final class DNGDirectory extends TIFFDirectory implements LensProvider {
+public final class DNGDirectory extends TIFFDirectory implements
+        LensProvider, FocalLengthProvider, ISOProvider {
 
     ////////// public /////////////////////////////////////////////////////////
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getCameraMake( boolean includeModel ) {
         //
         // First try the TIFF Make (and Model) fields.
@@ -48,8 +54,30 @@ public final class DNGDirectory extends TIFFDirectory implements LensProvider {
     /**
      * {@inheritDoc}
      */
+    @Override
+    public float getFocalLength() {
+        final ImageMetaValue value = getValue( EXIF_FOCAL_LENGTH );
+        return value != null ? value.getFloatValue() : 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getISO() {
+        final ImageMetaValue value = getValue( EXIF_ISO_SPEED_RATINGS );
+        return value != null ? value.getIntValue() : 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String getLens() {
-        final ImageMetaValue lens = getValue( DNG_LENS_INFO );
+        ImageMetaValue lens = getValue( DNG_LENS_INFO );
+        if (lens == null) {
+            lens = getValue( EXIF_LENS_MODEL );
+        }
         return lens != null ? lens.toString() : null;
     }
 
@@ -58,6 +86,7 @@ public final class DNGDirectory extends TIFFDirectory implements LensProvider {
      *
      * @return Always returns &quot;DNG&quot;.
      */
+    @Override
     public String getName() {
         return "DNG";
     }
@@ -65,6 +94,7 @@ public final class DNGDirectory extends TIFFDirectory implements LensProvider {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageMetaTagInfo getTagInfoFor( Integer id ) {
         return m_tagsByID.get( id );
     }
@@ -72,6 +102,7 @@ public final class DNGDirectory extends TIFFDirectory implements LensProvider {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageMetaTagInfo getTagInfoFor( String name ) {
         return m_tagsByName.get( name );
     }
@@ -79,6 +110,7 @@ public final class DNGDirectory extends TIFFDirectory implements LensProvider {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String valueToString( ImageMetaValue value ) {
         final int tagID = value.getOwningTagID();
         switch ( tagID ) {
@@ -112,6 +144,7 @@ public final class DNGDirectory extends TIFFDirectory implements LensProvider {
     /**
      * {@inheritDoc}.
      */
+    @Override
     protected ResourceBundle getTagLabelBundle() {
         return m_tagBundle;
     }
@@ -119,6 +152,7 @@ public final class DNGDirectory extends TIFFDirectory implements LensProvider {
     /**
      * {@inheritDoc}
      */
+    @Override
     protected Class<? extends ImageMetaTags> getTagsInterface() {
         return DNGTags.class;
     }
@@ -296,6 +330,12 @@ public final class DNGDirectory extends TIFFDirectory implements LensProvider {
         add( DNG_Y_CLIP_PATH_UNITS, "YClipPathUnits", META_ULONG, false );
         add( DNG_Y_POSITION, "YPosition", META_URATIONAL, false );
         add( DNG_Y_RESOLUTION, "YResolution", META_URATIONAL, false );
+
+        ////////// Copied from EXIF ///////////////////////////////////////////
+
+        add( EXIF_FOCAL_LENGTH, "FocalLength", META_URATIONAL, false );
+        add( EXIF_ISO_SPEED_RATINGS, "ISOSpeedRatings", META_USHORT, false );
+        add( EXIF_LENS_MODEL, "LensModel", META_STRING, false );
     }
 }
 /* vim:set et sw=4 ts=4: */

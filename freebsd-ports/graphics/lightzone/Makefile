@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	lightzone
-DISTVERSION=	4.1.7
+DISTVERSION=	4.1.9
 PORTREVISION=	0
 CATEGORIES=	graphics java
 DIST_SUBDIR=	${PORTNAME}
@@ -18,6 +18,7 @@ BUILD_DEPENDS=	ant:${PORTSDIR}/devel/apache-ant \
 		jhindexer:${PORTSDIR}/java/javahelp \
 		rsync:${PORTSDIR}/net/rsync
 LIB_DEPENDS=	liblcms2.so:${PORTSDIR}/graphics/lcms2 \
+		liblensfun.so:${PORTSDIR}/graphics/lensfun \
 		libtiff.so:${PORTSDIR}/graphics/tiff
 
 USE_GITHUB=	yes
@@ -31,7 +32,7 @@ USE_GCC=	yes
 USE_LDCONFIG=	yes
 USE_XORG=	x11
 JAVA_VENDOR=	openjdk
-JAVA_VERSION=	1.6+
+JAVA_VERSION=	1.8+
 JAVA_BUILD=	yes
 JAVA_RUN=	yes
 INSTALLS_ICONS=	yes

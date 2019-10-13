@@ -41,7 +41,7 @@ public class AboutDialog extends JDialog {
 
         // OS X 10.11 does not detect mouse click,
         // so we need a close button
-        if (Platform.getType() != Platform.MacOSX) {
+        if (!Platform.isMac()) {
             setUndecorated(true);
         }
 

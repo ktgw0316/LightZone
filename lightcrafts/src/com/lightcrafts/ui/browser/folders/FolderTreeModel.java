@@ -1,19 +1,23 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2017-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.browser.folders;
 
 import com.lightcrafts.utils.directory.DirectoryListener;
 import com.lightcrafts.utils.directory.DirectoryMonitor;
 
+import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
-import java.awt.*;
-import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 class FolderTreeModel extends DefaultTreeModel implements DirectoryListener {
 
     private NodeFileIndex index;
 
     private DirectoryMonitor monitor;
+
+    private SwingWorker<Void, Void> worker;
 
     FolderTreeModel() {
         super(FolderTreeNode.createRoot());
@@ -23,37 +27,62 @@ class FolderTreeModel extends DefaultTreeModel implements DirectoryListener {
         monitor.addListener(this);
     }
 
-    // A folder's contents have changed or a folder has been deleted.
-    public void directoryChanged(final File dir ) {
-        if (! EventQueue.isDispatchThread()) {
-            EventQueue.invokeLater(
-                new Runnable() {
-                    public void run() {
-                        directoryChanged(dir);
-                    }
+    @Override
+    public void directoryChanged(final Path dir, final Path file, final String kind) {
+        final FolderTreeNode dirNode = index.get(dir.toFile());
+        if (dirNode == null) {
+            return;
+        }
+        if (Files.exists(file) && ! Files.isDirectory(file)) {
+            return;
+        }
+        synchronized (dirNode) {
+            final FolderTreeNode childNode;
+            final int nodeIndex;
+
+            switch (kind) {
+                case "ENTRY_CREATE":
+                case "ENTRY_MODIFY":
+                    dirNode.updateChildren();
+                    childNode = index.get(file.toFile());
+                    nodeIndex = dirNode.getIndex(childNode);
+                    break;
+                case "ENTRY_DELETE":
+                    childNode = index.get(file.toFile());
+                    nodeIndex = dirNode.getIndex(childNode);
+                    dirNode.updateChildren();
+                    break;
+                default:
+                    childNode = null;
+                    nodeIndex = -1;
+            }
+            if (nodeIndex < 0) {
+                return;
+            }
+            SwingUtilities.invokeLater(() -> {
+                switch (kind) {
+                    case "ENTRY_CREATE":
+                        nodesWereInserted(dirNode, new int[]{nodeIndex});
+                        break;
+                    case "ENTRY_DELETE":
+                        nodesWereRemoved(dirNode, new int[]{nodeIndex}, null);
+                        break;
+                    case "ENTRY_MODIFY":
+                        nodeChanged(childNode);
+                        break;
+                    default:
                 }
-            );
-            return;
-        }
-        FolderTreeNode node = index.get(dir);
-        if (node == null) {
-            return;
-        }
-        // If the directory exists, then update its node's children.
-        // If the directory does not exist, then update its parent's children.
-        if (dir.isDirectory()) {
-            node.updateChildren();
-            nodeStructureChanged(node);
-        }
-        else {
-            FolderTreeNode parent = (FolderTreeNode) node.getParent();
-            parent.updateChildren();
-            nodeStructureChanged(parent);
+            });
         }
     }
 
     public void dispose() {
-        monitor.removeListener( this );
+        if (worker != null && !worker.isDone()) {
+            worker.cancel(true);
+        }
+        worker = null;
+
+        monitor.removeListener(this);
         monitor.dispose();
     }
 

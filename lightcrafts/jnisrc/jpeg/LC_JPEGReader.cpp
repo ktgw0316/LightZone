@@ -44,17 +44,18 @@ LC_JPEGReader::~LC_JPEGReader() {
 #ifdef DEBUG
     cerr << "~LC_JPEGReader()" << endl;
 #endif
-    try {
-        if ( m_startedDecompress )
+    if ( m_startedDecompress ) {
+        try {
             jpeg_finish_decompress( &cinfo );
-        jpeg_destroy_decompress( &cinfo );
+        }
+        catch ( LC_JPEGException const& ) {
+            //
+            // We will have thrown a Java exception by this point, but we want to
+            // finish our clean-up, so keep going.
+            //
+        }
     }
-    catch ( LC_JPEGException const& ) {
-        //
-        // We will have thrown a Java exception by this point, but we want to
-        // finish our clean-up, so keep going.
-        //
-    }
+    jpeg_destroy_decompress( &cinfo );
     if ( m_file )
         ::fclose( m_file );
     delete m_src;

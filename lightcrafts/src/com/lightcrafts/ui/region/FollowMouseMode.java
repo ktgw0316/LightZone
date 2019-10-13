@@ -2,6 +2,7 @@
 
 package com.lightcrafts.ui.region;
 
+import com.lightcrafts.utils.awt.geom.HiDpi;
 import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlNode;
 
@@ -87,7 +88,7 @@ class FollowMouseMode extends MajorRegionMode {
             finish();
         }
         else if (event.getClickCount() == 1) {
-            lastMousePress = event.getPoint();
+            lastMousePress = HiDpi.imageSpacePointFrom(event.getPoint());
         }
     }
 
@@ -112,8 +113,8 @@ class FollowMouseMode extends MajorRegionMode {
         }
         long t1 = click.getWhen();
         long t2 = recentClick.getWhen();
-        Point p1 = click.getPoint();
-        Point p2 = recentClick.getPoint();
+        final Point p1 = HiDpi.imageSpacePointFrom(click.getPoint());
+        final Point p2 = HiDpi.imageSpacePointFrom(recentClick.getPoint());
 
         recentClick = click;
 
@@ -141,14 +142,14 @@ class FollowMouseMode extends MajorRegionMode {
     }
 
     public void mouseMoved(MouseEvent event) {
-        Point p = event.getPoint();
+        final Point p = HiDpi.imageSpacePointFrom(event.getPoint());
         maybeAddPoint(p);
         update(p);
         autoscroll(event);
     }
 
     public void mouseDragged(MouseEvent event) {
-        Point p = event.getPoint();
+        final Point p = HiDpi.imageSpacePointFrom(event.getPoint());
         maybeAddPoint(p);
         update(p);
         autoscroll(event);
@@ -156,7 +157,7 @@ class FollowMouseMode extends MajorRegionMode {
 
     public void mouseExited(MouseEvent event) {
         // If the mouse exits, the MagneticPoint wants to stick:
-        Point p = event.getPoint();
+        final Point p = HiDpi.imageSpacePointFrom(event.getPoint());
         update(p);
     }
 

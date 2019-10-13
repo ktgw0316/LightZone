@@ -1,6 +1,6 @@
 package com.lightcrafts.image.libs;
 
-import com.lightcrafts.mediax.jai.PlanarImage;
+import javax.media.jai.PlanarImage;
 import com.lightcrafts.utils.UserCanceledException;
 
 import java.awt.image.RenderedImage;

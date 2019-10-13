@@ -2,11 +2,11 @@
 
 package com.lightcrafts.jai.operator;
 
-import com.lightcrafts.mediax.jai.OperationDescriptorImpl;
-import com.lightcrafts.mediax.jai.RenderedOp;
-import com.lightcrafts.mediax.jai.ParameterBlockJAI;
-import com.lightcrafts.mediax.jai.JAI;
-import com.lightcrafts.mediax.jai.registry.RenderedRegistryMode;
+import javax.media.jai.OperationDescriptorImpl;
+import javax.media.jai.RenderedOp;
+import javax.media.jai.ParameterBlockJAI;
+import javax.media.jai.JAI;
+import javax.media.jai.registry.RenderedRegistryMode;
 import java.awt.image.RenderedImage;
 import java.awt.*;
 

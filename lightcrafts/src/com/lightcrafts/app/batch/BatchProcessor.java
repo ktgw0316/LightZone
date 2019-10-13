@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2017-     Masahiro Kitagawa */
 
 package com.lightcrafts.app.batch;
 
@@ -64,6 +65,7 @@ public class BatchProcessor {
     ) {
         Thread = new Thread(
             new Runnable() {
+                @Override
                 public void run() {
                     frame.pause();
                     try {
@@ -135,6 +137,7 @@ public class BatchProcessor {
         Dialog = new JDialog(frame);
 
         ActionListener disposeAction = new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (!Finished) {
                     Canceled = true;
@@ -154,6 +157,7 @@ public class BatchProcessor {
 
         Dialog.addComponentListener(
             new ComponentAdapter() {
+                @Override
                 public void componentHidden(ComponentEvent e) {
                     Interrupted = true;
                 }
@@ -189,12 +193,14 @@ public class BatchProcessor {
         }
     }
 
-    // Conduct the export and template processes, in the background under the dialog.
-    static void processTemplate(
-        File[] files, XmlDocument template, BatchConfig conf
+    /**
+     * Conduct the export and template processes, in the background under the dialog.
+     */
+    private static void processTemplate(
+            File[] files, XmlDocument template, BatchConfig conf
     ) {
-        ImageFileExportOptions export = conf.export;
-        boolean ignoreResize =
+        final ImageFileExportOptions export = conf.export;
+        final boolean ignoreResize =
             export.resizeWidth.getValue() == 0 &&
                 export.resizeHeight.getValue() == 0;
 
@@ -203,10 +209,12 @@ public class BatchProcessor {
         //     createTemplateSaveOptions()
         //     conformExportOptions()
         //     Engine.write()
-        int exportWidth = export.resizeWidth.getValue();
-        int exportHeight = export.resizeHeight.getValue();
+        final int exportWidth = export.resizeWidth.getValue();
+        final int exportHeight = export.resizeHeight.getValue();
 
-        for (int n=0; n<files.length; n++) {
+        int n = 0;
+        for (final File file : files) {
+
             if (Canceled)
                 break;
 
@@ -218,14 +226,12 @@ public class BatchProcessor {
             }
 
             try {
-                File file = files[n];
-
                 Image.setCachedFile(file);
 
                 logStart(file);
-                Document doc = Application.createDocumentHeadless(file);
-                File outFile;
-                String outName;
+                final Document doc = Application.createDocumentHeadless(file);
+                final File outFile;
+                final String outName;
 
                 // Enforce the original requested output dimensions, since
                 // the ImageExportOptions may have been mutated on a previous
@@ -291,7 +297,7 @@ public class BatchProcessor {
                 logError(LOCALE.get("BatchLogUnknownError"), e);
                 e.printStackTrace();
             }
-            updateLabel(n + 1, files.length);
+            updateLabel(++n, files.length);
         }
         synchronized(Thread) {
             Finished = true;
@@ -300,28 +306,27 @@ public class BatchProcessor {
         }
     }
 
-    // Construct SaveOptions for processed images that have never been saved.
-    // Save back to the same directory as the original image,
-    // with a unique file name, with the given export options, except
-    // the resize dimensions, which are set to the document's "natural"
-    // dimensions.
+    /**
+     * Construct SaveOptions for processed images that have never been saved.
+     * Save back to the same directory as the original image,
+     * with a unique file name, with the given export options, except
+     * the resize dimensions, which are set to the document's "natural"
+     * dimensions.
+     */
     private static SaveOptions createTemplateSaveOptions(
         Document doc, ImageFileExportOptions export, boolean ignoreResize
     ) {
-        ImageMetadata meta = doc.getMetadata();
+        final ImageMetadata meta = doc.getMetadata();
         File file = meta.getFile();
-        ImageType type = export.getImageType();
-        String ext = type.getExtensions()[0];
-        file = ExportNameUtility.setFileExtension(file, ext);
-        file = ExportNameUtility.ensureNotExists(file);
+        final ImageType type = export.getImageType();
+        final String ext = type.getExtensions()[0];
         if (type == LZNImageType.INSTANCE) {
-            SaveOptions options = SaveOptions.createLzn(file);
-            return options;
+            file = ExportNameUtility.setFileExtension(file, ext);
+            file = ExportNameUtility.ensureNotExists(file);
+            return SaveOptions.createLzn(file);
         }
-        SaveOptions options;
-        Engine engine = doc.getEngine();
-        Dimension size = engine.getNaturalSize();
 
+        final SaveOptions options;
         if (type instanceof TIFFImageType) {
             options = SaveOptions.createSidecarTiff(export);
         }
@@ -333,61 +338,58 @@ public class BatchProcessor {
                 "Can't save to image type \"" + type.getName() + "\""
             );
         }
+        final Engine engine = doc.getEngine();
+        final Dimension size = engine.getNaturalSize();
         if (ignoreResize) {
             export.resizeWidth.setValue(size.width);
             export.resizeHeight.setValue(size.height);
         }
+        file = new File(ExportNameUtility.getBaseName(file) + "_lzn." + ext);
+        file = ExportNameUtility.ensureNotExists(file);
         options.setFile(file);
 
         return options;
     }
 
-    // Ensure that the given ImageExportOptions agrees with the given
-    // TemplateBatchConfigurator about the output folder, the batch name,
-    // and the output file type extension, and agrees with the given Document
-    // and the configurator about the output image size.
+    /**
+     * Ensure that the given ImageExportOptions agrees with the given
+     * TemplateBatchConfigurator about the output folder, the batch name,
+     * and the output file type extension, and agrees with the given Document
+     * and the configurator about the output image size.
+     */
     private static void conformExportOptions(
         Document doc, BatchConfig conf, boolean ignoreResize
     ) {
-        ImageMetadata meta = doc.getMetadata();
-        File file = meta.getFile();
-        String name = file.getName();
-        File directory = conf.directory;
+        final ImageMetadata meta = doc.getMetadata();
+        final File file = meta.getFile();
+        final String name = file.getName();
+        final File directory = conf.directory;
         File outFile = new File(directory, name);
 
         // Mutate the default file into a conformant name:
-        String outLabel = conf.name;
-        String outName = ExportNameUtility.trimFileExtension(
+        final String outLabel = conf.name;
+        final String outName = ExportNameUtility.trimFileExtension(
             outFile.getName()
         );
-        ImageFileExportOptions export = conf.export;
+        final ImageFileExportOptions export = conf.export;
 
-        String outSuffix = export.getImageType().getExtensions()[0];
-        if (outLabel.length() > 0) {
-            outFile = new File(
-                directory,
-                outName + outLabel + "." + outSuffix
-            );
-        }
-        else {
-            outFile = new File(
-                directory, outName + "." + outSuffix
-            );
-        }
+        final String outSuffix = export.getImageType().getExtensions()[0];
+        outFile = (outLabel.length() > 0)
+                ? new File(directory, outName + outLabel + "." + outSuffix)
+                : new File(directory, outName + "." + outSuffix);
         outFile = ExportNameUtility.ensureNotExists(outFile);
         export.setExportFile(outFile);
 
         if (ignoreResize) {
-            Engine engine = doc.getEngine();
-            Dimension size = engine.getNaturalSize();
+            final Engine engine = doc.getEngine();
+            final Dimension size = engine.getNaturalSize();
             export.resizeWidth.setValue(size.width);
             export.resizeHeight.setValue(size.height);
         }
     }
 
     private static void logStart(File file) {
-        String path = file.getName();
-        Text.appendStart(path);
+        Text.appendStart(file.getName());
     }
 
     private static void logEnd(String message) {
@@ -395,41 +397,36 @@ public class BatchProcessor {
     }
 
     private static void logError(String message, Throwable e) {
-        StringBuffer buffer = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         if (message != null) {
-            buffer.append("--");
-            buffer.append(message);
+            sb.append("--")
+              .append(message);
         }
         if (e != null) {
-            buffer.append(": ");
-            buffer.append(e.getClass().getName());
-            buffer.append(" ");
-            buffer.append(e.getMessage());
+            sb.append(": ")
+              .append(e.getClass().getName())
+              .append(" ")
+              .append(e.getMessage());
         }
-        buffer.append("\n");
-        Text.appendError(buffer.toString());
+        sb.append("\n");
+        Text.appendError(sb.toString());
     }
 
     private static void initLabel(int max) {
-        String text;
-        if (max == 1) {
-            text = LOCALE.get("BatchInitEstimateMessageSingular");
-        }
-        else {
-            text = LOCALE.get(
-                "BatchInitEstimateMessagePlural", Integer.toString(max)
-            );
-        }
+        final String text = (max == 1)
+                ? LOCALE.get("BatchInitEstimateMessageSingular")
+                : LOCALE.get("BatchInitEstimateMessagePlural", Integer.toString(max));
         Label.setText(text);
         Start = System.currentTimeMillis();
     }
 
     private static void updateLabel(final int count, final int max) {
-        long now = System.currentTimeMillis();
-        long end = Start + max * (now - Start) / count;
+        final long now = System.currentTimeMillis();
+        final long end = Start + max * (now - Start) / count;
         final long remaining = end - now;
         EventQueue.invokeLater(
             new Runnable() {
+                @Override
                 public void run() {
                     int remainingSeconds = (int) (remaining / 1000);
                     int remainingMinutes = remainingSeconds / 60;

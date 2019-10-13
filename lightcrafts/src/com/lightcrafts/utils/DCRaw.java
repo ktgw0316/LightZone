@@ -5,6 +5,7 @@ package com.lightcrafts.utils;
 
 import com.lightcrafts.image.BadImageFileException;
 import com.lightcrafts.image.UnknownImageTypeException;
+import com.lightcrafts.image.libs.LCImageLibException;
 import com.lightcrafts.image.libs.LCImageReaderFactory;
 import com.lightcrafts.image.metadata.providers.*;
 import com.lightcrafts.image.metadata.MetadataUtil;
@@ -40,7 +41,7 @@ public final class DCRaw implements
     //////////  public ////////////////////////////////////////////////////////
 
     static private Map<String,DCRaw> dcrawCache =
-        new LRUHashMap<String,DCRaw>(100);
+        new LRUHashMap<>(100);
 
     public static synchronized DCRaw getInstanceFor( String fileName ) {
         DCRaw instance = dcrawCache.get(fileName);
@@ -194,34 +195,33 @@ public final class DCRaw implements
         final int error;
 
         synchronized (DCRaw.class) {
-            Process p = null;
-            final InputStream dcrawStdOut;
-            if (ForkDaemon.INSTANCE != null) {
-                ForkDaemon.INSTANCE.invoke(secondary ? secondaryInfo : info);
-                dcrawStdOut = ForkDaemon.INSTANCE.getStdOut();
-            } else {
-                p = Runtime.getRuntime().exec(secondary ? secondaryInfo : info);
-                dcrawStdOut = p.getInputStream();
-            }
-
-            // output expected on stdout
-            String line;
-            while ((line = readln(dcrawStdOut)) != null) {
-                // System.out.println(line);
-                parseDCRawInfo(line, secondary);
-            }
-
-            if (p != null) {
-                dcrawStdOut.close();
-                try {
-                    p.waitFor();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+            final Process p = execProcess(secondary ? secondaryInfo : info);
+            final InputStream dcrawStdErr = getDcrawStdErr(p);
+            final InputStream dcrawStdOut = getDcrawStdOut(p);
+            try {
+                String line;
+                while ((line = readln(dcrawStdOut)) != null) {
+                    // System.out.println(line);
+                    parseDCRawInfo(line, secondary);
                 }
-                error = p.exitValue();
-                p.destroy();
-            } else {
-                error = 0;
+
+                // Flush stderr just in case...
+                while ((line = readln(dcrawStdErr)) != null)
+                    ; // System.out.println(line);
+            } finally {
+                if (p != null) {
+                    dcrawStdErr.close();
+                    dcrawStdOut.close();
+                    try {
+                        p.waitFor();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    error = p.exitValue();
+                    p.destroy();
+                } else {
+                    error = 0;
+                }
             }
         }
         return error;
@@ -343,6 +343,27 @@ public final class DCRaw implements
         }
     }
 
+    private InputStream getDcrawStdOut(Process p) {
+        return p == null
+                ? ForkDaemon.INSTANCE.getStdOut()
+                : p.getInputStream();
+    }
+
+    private InputStream getDcrawStdErr(Process p) {
+        return p == null
+                ? ForkDaemon.INSTANCE.getStdErr()
+                : new BufferedInputStream(p.getErrorStream());
+    }
+
+    private Process execProcess(String[] cmd) throws IOException {
+        if (ForkDaemon.INSTANCE != null) {
+            ForkDaemon.INSTANCE.invoke(cmd);
+            return null;
+        } else {
+            return Runtime.getRuntime().exec(cmd);
+        }
+    }
+
     private static class ImageData {
         final int width, height, bands, dataType;
         final Object data;
@@ -358,12 +379,10 @@ public final class DCRaw implements
         }
     }
 
-    private static ImageData readPPM(File file) throws IOException, BadImageFileException {
-        val s = new FileInputStream(file);
-
-        try {
+    private static ImageData readPPM(File file) throws BadImageFileException {
+        try (FileInputStream s = new FileInputStream(file)) {
             val S1 = readln(s);
-            if (S1 == null || !(S1.equals("P5") || S1.equals("P6") || S1.equals("P7"))) {
+            if (S1 == null) {
                 throw new BadImageFileException(file);
             }
 
@@ -371,48 +390,46 @@ public final class DCRaw implements
             final int height;
             final int bands;
             final int dataType;
-            if (S1.equals("P5") || S1.equals("P6")) {
-                bands = S1.equals("P5") ? 1 : 3;
-                val S2 = readln(s);
-                val S3 = readln(s);
-                if (S2 == null || S3 == null) {
+            switch (S1) {
+                case "P5":
+                case "P6":
+                    bands = S1.equals("P5") ? 1 : 3;
+                    val S2 = readln(s);
+                    val S3 = readln(s);
+                    if (S2 == null || S3 == null) {
+                        throw new BadImageFileException(file);
+                    }
+                    val dimensions = S2.split("\\s");
+                    width = Integer.parseInt(dimensions[0]);
+                    height = Integer.parseInt(dimensions[1]);
+                    dataType = S3.equals("255") ? DataBuffer.TYPE_BYTE : DataBuffer.TYPE_USHORT;
+                    break;
+                case "P7":
+                    val SWIDTH = readln(s);
+                    val SHEIGHT = readln(s);
+                    val SDEPTH = readln(s);
+                    val SMAXVAL = readln(s);
+                    if (SWIDTH == null || SHEIGHT == null || SDEPTH == null || SMAXVAL == null) {
+                        throw new BadImageFileException(file);
+                    }
+                    val WIDTH = "WIDTH ";
+                    width = Integer.parseInt(SWIDTH.substring(WIDTH.length()));
+                    val HEIGHT = "HEIGHT ";
+                    height = Integer.parseInt(SHEIGHT.substring(HEIGHT.length()));
+                    val DEPTH = "DEPTH ";
+                    bands = Integer.parseInt(SDEPTH.substring(DEPTH.length()));
+                    val MAXVAL = "MAXVAL ";
+                    dataType = SMAXVAL.substring(MAXVAL.length()).equals("65535")
+                            ? DataBuffer.TYPE_USHORT
+                            : DataBuffer.TYPE_BYTE;
+                    break;
+                default:
                     throw new BadImageFileException(file);
-                }
-
-                val dimensions = S2.split("\\s");
-                width = Integer.parseInt(dimensions[0]);
-                height = Integer.parseInt(dimensions[1]);
-
-                dataType = S3.equals("255") ? DataBuffer.TYPE_BYTE : DataBuffer.TYPE_USHORT;
-            } else { // S1.equals("P7")
-                val SWIDTH  = readln(s);
-                val SHEIGHT = readln(s);
-                val SDEPTH  = readln(s);
-                val SMAXVAL = readln(s);
-                // val STUPLTYPE = readln(s);
-                // val SENDHDR = readln(s);
-                if (SWIDTH == null || SHEIGHT == null || SDEPTH == null || SMAXVAL == null) {
-                    throw new BadImageFileException(file);
-                }
-
-                val WIDTH = "WIDTH ";
-                width = Integer.parseInt(SWIDTH.substring(WIDTH.length()));
-                val HEIGHT = "HEIGHT ";
-                height = Integer.parseInt(SHEIGHT.substring(HEIGHT.length()));
-                val DEPTH = "DEPTH ";
-                bands = Integer.parseInt(SDEPTH.substring(DEPTH.length()));
-                val MAXVAL = "MAXVAL ";
-                dataType = SMAXVAL.substring(MAXVAL.length()).equals("65535")
-                           ? DataBuffer.TYPE_USHORT
-                           : DataBuffer.TYPE_BYTE;
-                // val TUPLTYPE = "TUPLTYPE ";
-                // val ENDHDR = "ENDHDR";
             }
             val imageData = new ImageData(width, height, bands, dataType);
             val totalData = width * height * bands * (dataType == DataBuffer.TYPE_BYTE ? 1 : 2);
 
-            val c = s.getChannel();
-            try {
+            try (FileChannel c = s.getChannel()) {
                 if (file.length() != totalData + c.position()) {
                     throw new BadImageFileException(file);
                 }
@@ -435,16 +452,11 @@ public final class DCRaw implements
                 }
 
                 ByteBufferUtil.clean(bb);
-            } finally {
-                c.close();
             }
-
             return imageData;
         } catch (Exception e) {
             e.printStackTrace();
             throw new BadImageFileException(file, e);
-        } finally {
-            s.close();
         }
     }
 
@@ -487,7 +499,7 @@ public final class DCRaw implements
                     val readerFactory = new LCImageReaderFactory();
                     val reader = readerFactory.create(of);
                     result = reader.getImage();
-                } catch (Exception e) {
+                } catch (LCImageLibException | UserCanceledException e) {
                     e.printStackTrace();
                 }
                 if (result == null) {
@@ -495,27 +507,24 @@ public final class DCRaw implements
                 }
                 t2 = System.currentTimeMillis();
                 totalData = result.getWidth() *
-                            result.getHeight() *
-                            result.getColorModel().getNumColorComponents() *
-                            (result.getColorModel().getTransferType() == DataBuffer.TYPE_BYTE ? 1 : 2);
+                        result.getHeight() *
+                        result.getColorModel().getNumColorComponents() *
+                        (result.getColorModel().getTransferType() == DataBuffer.TYPE_BYTE ? 1 : 2);
             } else {
                 val imageData = readPPM(of);
                 t2 = System.currentTimeMillis();
                 totalData = imageData.width *
-                            imageData.height *
-                            imageData.bands * (imageData.dataType == DataBuffer.TYPE_BYTE ? 1 : 2);
-
+                        imageData.height *
+                        imageData.bands * (imageData.dataType == DataBuffer.TYPE_BYTE ? 1 : 2);
                 val cm = getColorModel(mode, imageData.bands, imageData.dataType);
-
                 val bufSize = imageData.bands * imageData.width * imageData.height;
-                val buf = imageData.dataType == DataBuffer.TYPE_BYTE
+                final DataBuffer buf = imageData.dataType == DataBuffer.TYPE_BYTE
                         ? new DataBufferByte(   (byte[]) imageData.data, bufSize)
                         : new DataBufferUShort((short[]) imageData.data, bufSize);
-
                 val bandOffsets = imageData.bands == 3 ? new int[]{0, 1, 2} : new int[]{0};
                 val raster = Raster.createInterleavedRaster(
-                    buf, imageData.width, imageData.height,
-                    imageData.bands * imageData.width, imageData.bands, bandOffsets, null);
+                        buf, imageData.width, imageData.height,
+                        imageData.bands * imageData.width, imageData.bands, bandOffsets, null);
 
                 result = new BufferedImage(cm, raster, false, null);
             }
@@ -627,7 +636,7 @@ public final class DCRaw implements
             throw new IllegalArgumentException("Unknown mode " + mode);
         }
         cmd.add(m_fileName);
-        return cmd.toArray(new String[cmd.size()]);
+        return cmd.toArray(new String[0]);
     }
 
     private ColorModel getColorModel(dcrawMode mode, int bands, int dataType)
@@ -718,7 +727,7 @@ public final class DCRaw implements
     private float[] m_xyz_cam;
     private float[] m_secondary_cam_mul = new float[4];
 
-    private static final Set<String> four_color_cameras = new HashSet<String>(Arrays.asList(
+    private static final Set<String> four_color_cameras = new HashSet<>(Arrays.asList(
             // "OLYMPUS E-3",
             "OLYMPUS E-1",
             "OLYMPUS E-300",

@@ -96,6 +96,9 @@ public final class NEFImageType extends RawImageType implements TagHandler {
                               ImageMetadataDirectory dir )
         throws IOException
     {
+        if (!(dir instanceof NikonDirectory)) {
+            return false;
+        }
         switch ( tagID ) {
             case NIKON_PREVIEW_IMAGE_IFD_POINTER: {
                 //
@@ -179,8 +182,8 @@ public final class NEFImageType extends RawImageType implements TagHandler {
      * All the possible filename extensions for NEF files.  All must be lower
      * case and the preferred one must be first.
      */
-    private static final String EXTENSIONS[] = {
-        "nef", "nrw"
+    private static final String[] EXTENSIONS = {
+            "nef", "nrw"
     };
 }
 /* vim:set et sw=4 ts=4: */

@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2017-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.crop;
 
@@ -17,6 +18,10 @@ class AspectConstraint {
     private int numerator;
     private int denominator;
     private String name;
+    private String description;
+
+    private static final Pattern pattern =
+            Pattern.compile("([0-9]+) x ([0-9]+)");
 
     // The default constructor makes a no-constraint object that accepts
     // any rectangle.
@@ -27,7 +32,12 @@ class AspectConstraint {
     AspectConstraint(int numerator, int denominator) {
         this.numerator = numerator;
         this.denominator = denominator;
-        name = "" + denominator + " x " + numerator;
+        name = denominator + " x " + numerator;
+    }
+
+    AspectConstraint(int numerator, int denominator, String description) {
+        this(numerator, denominator);
+        this.description = description;
     }
 
     AspectConstraint getInverse() {
@@ -37,6 +47,15 @@ class AspectConstraint {
         return new AspectConstraint(denominator, numerator);
     }
 
+    String getNameWithDescription() {
+        String s = String.format("%.2f", 1 / getAspectRatio()) + " | " + name;
+        if (description != null && !description.isEmpty()) {
+            s += " (" + description + ")";
+        }
+        return s;
+    }
+
+    @Override
     public String toString() {
         return name;
     }
@@ -46,7 +65,6 @@ class AspectConstraint {
         if (s.equals(NoConstraintName)) {
             return new AspectConstraint();
         }
-        Pattern pattern = Pattern.compile("([0-9]+) x ([0-9]+)");
         Matcher matcher = pattern.matcher(s);
         if (! matcher.matches()) {
             return null;

@@ -27,7 +27,7 @@ class FolderFilter implements FileFilter {
 
     /** The singleton instance. */
     static final FolderFilter INSTANCE =
-        Platform.getType() == Platform.MacOSX ?
+        Platform.isMac() ?
             new MacOSXFolderFilter() :
             new FolderFilter();
 

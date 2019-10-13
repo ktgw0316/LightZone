@@ -12,19 +12,19 @@
  * $State: Exp $
  */
 package com.lightcrafts.jai.opimage;
-import com.lightcrafts.media.jai.opimage.RIFUtil;
+import com.sun.media.jai.opimage.RIFUtil;
 
 import java.awt.RenderingHints;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
-import com.lightcrafts.mediax.jai.CRIFImpl;
-import com.lightcrafts.mediax.jai.ImageLayout;
+import javax.media.jai.CRIFImpl;
+import javax.media.jai.ImageLayout;
 
 /**
  * A <code>CRIF</code> supporting the "BandCombine" operation in the
  * rendered and renderable image layers.
  *
- * @see com.lightcrafts.mediax.jai.operator.BandCombineDescriptor
+ * @see javax.media.jai.operator.BandCombineDescriptor
  * @see LCBandCombineOpImage
  *
  *

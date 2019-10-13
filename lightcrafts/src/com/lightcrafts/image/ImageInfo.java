@@ -7,7 +7,7 @@ import java.io.*;
 import java.lang.ref.WeakReference;
 import java.util.LinkedList;
 import java.util.ResourceBundle;
-import com.lightcrafts.mediax.jai.PlanarImage;
+import javax.media.jai.PlanarImage;
 
 import org.w3c.dom.Document;
 
@@ -72,8 +72,7 @@ public final class ImageInfo {
         //
         // Therefore, under Windows, we don't do this check at all.
         //
-        if ( Platform.getType() != Platform.Windows &&
-             !m_imageFile.getParentFile().canWrite() )
+        if ( !Platform.isWindows() && !m_imageFile.getParentFile().canWrite() )
             return false;
         try {
             final ImageType t = getImageType();
@@ -484,10 +483,7 @@ public final class ImageInfo {
         void closeAllBut( int n ) throws IOException {
             synchronized ( m_closeableList ) {
                 while ( m_closeableList.size() > n ) {
-                    final Closeable closeable = m_closeableList.removeFirst();
-                    synchronized ( closeable ) {
-                        closeable.close();
-                    }
+                    m_closeableList.removeFirst().close();
                 }
             }
         }

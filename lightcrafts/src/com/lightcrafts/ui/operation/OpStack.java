@@ -1,8 +1,10 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2016-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.operation;
 
 import com.lightcrafts.model.*;
+import com.lightcrafts.model.ImageEditor.LensCorrectionsOperation;
 import com.lightcrafts.ui.operation.clone.CloneControl;
 import com.lightcrafts.ui.operation.clone.SpotControl;
 import com.lightcrafts.ui.operation.colorbalance.ColorPickerControl;
@@ -143,7 +145,7 @@ public class OpStack extends DraggableStack
     }
 
     // Get disabled Actions from resources, for the no-Document display mode:
-    public static List getStaticAddActions() {
+    public static List<Action> getStaticAddActions() {
         return OpActions.createStaticAddActions();
     }
 
@@ -178,6 +180,21 @@ public class OpStack extends DraggableStack
         int index = getOpControlCount();
         WhitePointOperation op = engine.insertWhitePointOperation(index);
         OpControl control = new WhitePointControl(op, this);
+        addControl(control, index);
+        return control;
+    }
+
+    // The LensCorrections should be placed above the RAW Correction tools.
+    public OpControl addLensCorrectionsControl() {
+        int index = 0;
+        for (final OpControl op : opControls) {
+            if (!op.isRawCorrection()) {
+                break;
+            }
+            index++;
+        }
+        LensCorrectionsOperation op = engine.insertLensCorrectionsOperation(index);
+        OpControl control = new LensCorrectionsControl(op, this);
         addControl(control, index);
         return control;
     }
@@ -229,7 +246,7 @@ public class OpStack extends DraggableStack
     }
 
     // OpControls use this to populate the layer choices in LayerControls:
-    List getLayerModes() {
+    List<LayerMode> getLayerModes() {
         return engine.getLayerModes();
     }
 
@@ -246,6 +263,11 @@ public class OpStack extends DraggableStack
     }
 
     private void addControl(final OpControl control, final int index) {
+        if ((control.isRawCorrection() || control.isSingleton()) &&
+            getMatchingControl(control, new LinkedList<OpControl>()) != null) {
+            return;
+        }
+
         opControls.add(index, control);
 
         push(control, index);
@@ -363,6 +385,9 @@ public class OpStack extends DraggableStack
         else if (control instanceof WhitePointControl) {
             // WhitePointOperation is deprecated.
             op = engine.insertWhitePointOperation(index);
+        }
+        else if (control instanceof LensCorrectionsControl) {
+            op = engine.insertLensCorrectionsOperation(index);
         }
         else {
             op = engine.insertOperation(type, index);
@@ -720,6 +745,7 @@ public class OpStack extends DraggableStack
     private final static String CloneTag = "CloneOperation";
     private final static String SpotTag = "SpotOperation";
     private final static String WhitePointTag = "WhitePointOperation";
+    private final static String LensCorrectionsTag = "LensCorrectionsOperation";
     private final static String GenericTag = "GenericOperation";
     private final static String OpTypeTag = "OperationType";
 
@@ -741,6 +767,9 @@ public class OpStack extends DraggableStack
             else if (control instanceof WhitePointControl) {
                 // WhitePointOperation is deprecated.
                 child = node.addChild(WhitePointTag);
+            }
+            else if (control instanceof LensCorrectionsControl) {
+                child = node.addChild(LensCorrectionsTag);
             }
             else {
                 child = node.addChild(GenericTag);
@@ -790,6 +819,9 @@ public class OpStack extends DraggableStack
             }
             else if (tag.equals(WhitePointTag)) {
                 control = addWhitePointControl();
+            }
+            else if (tag.equals(LensCorrectionsTag)) {
+                control = addLensCorrectionsControl();
             }
             else if (tag.equals(GenericTag)) {
                 String typeTag = child.getAttribute(OpTypeTag);

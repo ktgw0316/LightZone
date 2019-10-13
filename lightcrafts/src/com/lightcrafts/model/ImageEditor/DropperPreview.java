@@ -2,21 +2,22 @@
 
 package com.lightcrafts.model.ImageEditor;
 
-import static com.lightcrafts.model.ImageEditor.Locale.LOCALE;
+import com.lightcrafts.image.color.ColorScience;
+import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.model.Preview;
 import com.lightcrafts.model.Region;
-import com.lightcrafts.utils.ColorScience;
-import com.lightcrafts.utils.LCMS;
-import com.lightcrafts.jai.utils.Functions;
-import com.lightcrafts.jai.JAIContext;
-import com.lightcrafts.ui.toolkit.ShadowFactory;
 import com.lightcrafts.ui.LightZoneSkin;
+import com.lightcrafts.ui.toolkit.ShadowFactory;
+import com.lightcrafts.utils.LCMS;
 
-import com.lightcrafts.mediax.jai.IHSColorSpace;
+import javax.media.jai.IHSColorSpace;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.awt.font.TextLayout;
+import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
+
+import static com.lightcrafts.model.ImageEditor.Locale.LOCALE;
 
 /** A Preview that shows formatted text derived from a given
   * ImageEditorDisplay and a mouse location, like color channel values.
@@ -143,11 +144,11 @@ class DropperPreview extends Preview {
 
         gg.drawAlignedString(LOCALE.get("Sampler_ZoneLabel"), format.format(16 * zone), minx + gap + 50, miny + 2 + 2 * textHeight);
 
-        float xyzColor[] = JAIContext.linearColorSpace.toCIEXYZ(new float[]{(float) (red / 255.),
-                                                                            (float) (green / 255.),
-                                                                            (float) (blue / 255.)});
+        float[] xyzColor = JAIContext.linearColorSpace.toCIEXYZ(new float[]{(float) (red / 255.),
+                (float) (green / 255.),
+                (float) (blue / 255.)});
 
-        float ihsColor[] = ihsCS.fromCIEXYZ(xyzColor);
+        float[] ihsColor = ihsCS.fromCIEXYZ(xyzColor);
 
         gg.drawAlignedString(LOCALE.get("Sampler_IntensityLabel"),  (int) (100 * ihsColor[0]) + "%",                        minx + gap + 50, miny + 12 + 3 * textHeight);
         gg.drawAlignedString(LOCALE.get("Sampler_HueLabel"),        (int) (360 * (ihsColor[1] / (2 * Math.PI))) + "\u00B0", minx + gap + 50, miny + 12 + 4 * textHeight);
@@ -158,7 +159,7 @@ class DropperPreview extends Preview {
         LCMS.Transform ts = new LCMS.Transform(new LCMS.Profile(JAIContext.linearProfile), LCMS.TYPE_RGB_16,
                                               new LCMS.Profile(JAIContext.labProfile), LCMS.TYPE_Lab_16,
                                               LCMS.INTENT_RELATIVE_COLORIMETRIC, 0);
-        short labColors[] = new short[3];
+        short[] labColors = new short[3];
 
         ts.doTransform(new short[] {(short) (red * 256), (short) (green * 256), (short) (blue * 256)}, labColors);
 
@@ -170,7 +171,7 @@ class DropperPreview extends Preview {
         gg.drawAlignedString("a", a, minx + 50, miny + 12 + 8 * textHeight);
         gg.drawAlignedString("b", b, minx + 50, miny + 12 + 9 * textHeight);
 
-        float components[] = color.getRGBComponents(null);
+        float[] components = color.getRGBComponents(null);
 
         components = Functions.fromLinearToCS(JAIContext.systemColorSpace, components);
 

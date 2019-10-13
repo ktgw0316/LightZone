@@ -1,0 +1,26 @@
+Index: dcraw/dcraw_lz.c
+===================================================================
+--- dcraw.orig/dcraw_lz.c
++++ dcraw/dcraw_lz.c
+@@ -2100,9 +2100,7 @@ void CLASS canon_crx_load_raw()
+ {
+ }
+ 
+-void CLASS fuji_xtrans_load_raw()
+-{
+-}
++#include "fuji_compressed.h"
+ 
+ void CLASS minolta_rd175_load_raw()
+ {
+@@ -6421,8 +6419,8 @@ void CLASS apply_tiff()
+ 			tiff_ifd[raw].bytes*7 > raw_width*raw_height)
+ 		     load_raw = &CLASS olympus_load_raw;
+ 	}
+-	if (filters == 9 && tiff_ifd[raw].bytes*8 < raw_width*raw_height*tiff_bps)
+-	  load_raw = &CLASS fuji_xtrans_load_raw;
++	if (!strcmp(make,"FUJIFILM") && tiff_ifd[raw].bytes*8 < raw_width*raw_height*tiff_bps)
++	  parse_fuji_compressed_header();
+ 	break;
+       case 6:  case 7:  case 99:
+ 	load_raw = &CLASS lossless_jpeg_load_raw;		break;

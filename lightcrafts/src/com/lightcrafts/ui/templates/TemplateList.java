@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
 
+import javafx.stage.FileChooser.ExtensionFilter;
+
 /**
  * A list component for showing, selecting, importing, exporting, and deleting
  * templates.  Also offers display in a modal dialog.
@@ -59,11 +61,8 @@ public class TemplateList extends JPanel implements ListSelectionListener {
                 public void actionPerformed(ActionEvent e) {
                     Frame frame = getAncestorFrame();
                     File dir = getRecentImportDir();
-                    FilenameFilter lztFilter = new FilenameFilter() {
-                        public boolean accept(File file, String name) {
-                            return name.toLowerCase().endsWith(".lzt");
-                        }
-                    };
+                    ExtensionFilter lztFilter =
+                            new ExtensionFilter("LightZone Template", "*.LZT", "*.lzt");
                     File file = chooser.openFile(
                         LOCALE.get("TemplateImportDialogTitle"),
                         dir, frame, lztFilter
@@ -192,10 +191,8 @@ public class TemplateList extends JPanel implements ListSelectionListener {
                 continue;
             }
             File file = new File(dir, key + ".lzt");
-            try {
-                OutputStream out = new FileOutputStream(file);
+            try (OutputStream out = new FileOutputStream(file)) {
                 doc.write(out);
-                out.close();
             }
             catch (IOException e) {
                 showError(

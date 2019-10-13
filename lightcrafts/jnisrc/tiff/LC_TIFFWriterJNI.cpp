@@ -117,10 +117,14 @@ JNIEXPORT jboolean JNICALL LCTIFFWriter_METHOD(setByteField)
         case TIFFTAG_JPEGTABLES:
         case TIFFTAG_LIGHTZONE:
         case TIFFTAG_PHOTOSHOP:
-        case TIFFTAG_RICHTIFFIPTC:
         case TIFFTAG_XMLPACKET:
             value.vp = cArray;
             return TIFFSetField( tiff, tagID, cArray.length(), value.vp );
+
+        // readcount is uint32 value in libtiff
+        case TIFFTAG_RICHTIFFIPTC:
+            value.vp = cArray;
+            return TIFFSetField( tiff, tagID, cArray.length() / 4, value.vp );
 
         default:
             LC_throwIllegalArgumentException( env, "unsupported tagID" );

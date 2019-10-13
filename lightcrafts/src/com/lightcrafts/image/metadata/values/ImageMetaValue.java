@@ -185,7 +185,17 @@ public abstract class ImageMetaValue implements
      * @return Returns said value.
      */
     public final int getIntValue() {
-        return (int)getLongValue();
+        return getIntValueAt(0);
+    }
+
+    /**
+     * Gets the metadata value at the given index as a {@code long}.
+     *
+     * @param index The index of the value to get.
+     * @return Returns said value.
+     */
+    public int getIntValueAt(int index) {
+        return (int) getLongValueAt(index);
     }
 
     /**
@@ -193,7 +203,17 @@ public abstract class ImageMetaValue implements
      *
      * @return Returns said value.
      */
-    public abstract long getLongValue();
+    public final long getLongValue() {
+        return getLongValueAt(0);
+    }
+
+    /**
+     * Gets the metadata value at the given index as a {@code long}.
+     *
+     * @param index The index of the value to get.
+     * @return Returns said value.
+     */
+    public abstract long getLongValueAt(int index);
 
     /**
      * Returns the {@link ImageMetadataDirectory} to which this
@@ -229,8 +249,17 @@ public abstract class ImageMetaValue implements
      * @return Returns said value.
      */
     public final String getStringValue() {
+        return getStringValueAt(0);
+    }
+
+    /**
+     * Gets this metadata value at the given index as a <code>String</code>.
+     *
+     * @return Returns said value.
+     */
+    public final String getStringValueAt(int index) {
         final String[] values = getValues();
-        return values != null ? values[0] : null;
+        return values != null ? values[index] : null;
     }
 
     /**
@@ -329,6 +358,17 @@ public abstract class ImageMetaValue implements
         if ( m_owningDirectory != null )
             return m_owningDirectory.isLegalValue( m_owningTagID, value );
         return true;
+    }
+
+    /**
+     * Returns true if this metadata value is null or its length is 0.
+     *
+     * @return Returns true if this metadata value is null or its length is 0,
+     * otherwise false
+     */
+    public boolean isEmpty() {
+        String value = getStringValue();
+        return value == null || value.isEmpty();
     }
 
     /**

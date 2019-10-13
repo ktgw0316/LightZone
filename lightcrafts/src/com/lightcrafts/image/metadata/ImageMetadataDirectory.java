@@ -2,22 +2,25 @@
 
 package com.lightcrafts.image.metadata;
 
-import java.io.*;
+import com.lightcrafts.image.metadata.providers.ImageMetadataProvider;
+import com.lightcrafts.image.metadata.values.*;
+import com.lightcrafts.utils.Rational;
+import com.lightcrafts.utils.TextUtil;
+import com.lightcrafts.utils.bytebuffer.LCByteBuffer;
+import com.lightcrafts.utils.xml.ElementPrefixFilter;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.util.*;
 
-import org.w3c.dom.Element;
-import org.w3c.dom.Document;
-
-import com.lightcrafts.image.metadata.values.*;
-import com.lightcrafts.utils.bytebuffer.LCByteBuffer;
-import com.lightcrafts.utils.Rational;
-import com.lightcrafts.utils.TextUtil;
-import com.lightcrafts.utils.xml.ElementPrefixFilter;
-
-import static com.lightcrafts.image.metadata.EXIFTags.*;
-import com.lightcrafts.image.metadata.providers.ImageMetadataProvider;
+import static com.lightcrafts.image.metadata.EXIFTags.TIFFCommonTags;
+import static com.lightcrafts.image.metadata.ImageMetadata.unexportedTags;
 
 /**
  * An <code>ImageMetadataDirectory</code> contains all the metadata
@@ -26,8 +29,8 @@ import com.lightcrafts.image.metadata.providers.ImageMetadataProvider;
  *
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */
-public abstract class ImageMetadataDirectory
-    implements Cloneable, Externalizable {
+public abstract class ImageMetadataDirectory implements
+        Cloneable, Externalizable, Iterable<Map.Entry<Integer,ImageMetaValue>> {
 
     ////////// public /////////////////////////////////////////////////////////
 
@@ -52,6 +55,7 @@ public abstract class ImageMetadataDirectory
      *
      * @return Returns said clone.
      */
+    @Override
     public final ImageMetadataDirectory clone() {
         final ImageMetadataDirectory copy;
         try {
@@ -500,6 +504,7 @@ public abstract class ImageMetadataDirectory
      *
      * @return Returns said {@link Iterator}.
      */
+    @Override
     public final synchronized Iterator<Map.Entry<Integer,ImageMetaValue>>
     iterator() {
         return m_tagIDToValueMap.entrySet().iterator();
@@ -512,10 +517,8 @@ public abstract class ImageMetadataDirectory
      * @param fromDir The other {@link ImageMetadataDirectory} to merge from.
      */
     public void mergeFrom( ImageMetadataDirectory fromDir ) {
-        for ( Iterator<Map.Entry<Integer,ImageMetaValue>> i =
-              fromDir.iterator(); i.hasNext(); ) {
-            final Map.Entry<Integer,ImageMetaValue> me = i.next();
-            putValue( me.getKey(), me.getValue() );
+        for (final Map.Entry<Integer, ImageMetaValue> me : fromDir) {
+            putValue(me.getKey(), me.getValue());
         }
     }
 
@@ -531,6 +534,23 @@ public abstract class ImageMetadataDirectory
     public boolean parseXMP( ImageMetaTagInfo tagInfo, Element element,
                              ElementPrefixFilter dirPrefixFilter ) {
         return false;
+    }
+
+    /**
+     * Puts a key/value pair into this directory.
+     *
+     * This method should be used if a value is being put into the directory
+     * for the first time, e.g., to populate it from metadata parsed from an
+     * image.  To change a value at some later time, use
+     * {@link #setValue(Integer,int)} or {@link #setValue(Integer,String...)}
+     * instead.
+     *
+     * @param entry The map entry of the metadata tag ID (the key) and the
+     * {@link ImageMetaValue} to put.
+     * @see #putValue(Integer,ImageMetaValue,boolean)
+     */
+    public void putValue(Map.Entry<Integer, ImageMetaValue> entry) {
+        putValue(entry.getKey(), entry.getValue(), true);
     }
 
     /**
@@ -734,17 +754,16 @@ public abstract class ImageMetadataDirectory
      *
      * @return Returns said {@link String}.
      */
+    @Override
     public final String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append( getName() );
         sb.append( "\n----------------------------------------\n" );
-        for ( Iterator<Map.Entry<Integer,ImageMetaValue>> i = iterator();
-              i.hasNext(); ) {
-            final Map.Entry<Integer,ImageMetaValue> me = i.next();
-            sb.append( getTagNameFor( me.getKey() ) );
-            sb.append( '=' );
-            sb.append( me.getValue() );
-            sb.append( '\n' );
+        for (final Map.Entry<Integer, ImageMetaValue> me : this) {
+            sb.append(getTagNameFor(me.getKey()));
+            sb.append('=');
+            sb.append(me.getValue());
+            sb.append('\n');
         }
         return sb.toString();
     }
@@ -792,6 +811,7 @@ public abstract class ImageMetadataDirectory
     /**
      * {@inheritDoc}
      */
+    @Override
     public void readExternal( ObjectInput in ) throws IOException {
         for ( int size = in.readShort(); size > 0; --size ) {
             final int tagID = in.readInt();
@@ -809,16 +829,15 @@ public abstract class ImageMetadataDirectory
      * (<code>int</code>), the metadata type (<code>short</code), and the
      * {@link ImageMetaValue}.
      */
+    @Override
     public void writeExternal( ObjectOutput out ) throws IOException {
         out.writeShort( size() );
-        for ( Iterator<Map.Entry<Integer,ImageMetaValue>> i = iterator();
-              i.hasNext(); ) {
-            final Map.Entry<Integer,ImageMetaValue> me = i.next();
+        for (final Map.Entry<Integer, ImageMetaValue> me : this) {
             final int tagID = me.getKey();
             final ImageMetaValue value = me.getValue();
-            out.writeInt( tagID );
-            out.writeShort( value.getType().getTIFFConstant() );
-            value.writeExternal( out );
+            out.writeInt(tagID);
+            out.writeShort(value.getType().getTIFFConstant());
+            value.writeExternal(out);
         }
     }
 
@@ -839,22 +858,15 @@ public abstract class ImageMetadataDirectory
               i = sourceDir.iterator(); i.hasNext(); ) {
             final Map.Entry<Integer,ImageMetaValue> me = i.next();
             final int tagID = me.getKey();
-            switch ( tagID ) {
-                case EXIF_ARTIST:
-                case EXIF_COPYRIGHT:
-                case EXIF_DATE_TIME:
-                case EXIF_IMAGE_DESCRIPTION:
-                case EXIF_MAKE:
-                case EXIF_MODEL:
-                case EXIF_MS_RATING:
-                case EXIF_RESOLUTION_UNIT:
-                case EXIF_X_RESOLUTION:
-                case EXIF_Y_RESOLUTION:
-                    targetDir.putValue( tagID, me.getValue() );
-                    i.remove();
-                    break;
+            if (TIFFCommonTags.contains(tagID)
+                    && !unexportedTags.contains(tagID)) {
+                final ImageMetaValue oldValue = targetDir.getValue(tagID);
+                if (oldValue == null || oldValue.isEmpty()) {
+                targetDir.putValue(tagID, me.getValue());
+                i.remove();
             }
         }
+    }
     }
 
     /**
@@ -960,7 +972,7 @@ public abstract class ImageMetadataDirectory
     protected int getProviderPriorityFor(
         Class<? extends ImageMetadataProvider> provider )
     {
-        return 1;
+        return PROVIDER_PRIORITY_DEFAULT;
     }
 
     /**
@@ -1094,17 +1106,15 @@ public abstract class ImageMetadataDirectory
     protected Collection<Element> toXMP( Document xmpDoc, String nsURI,
                                          String prefix ) {
         Element rdfDescElement = null;
-        for ( Iterator<Map.Entry<Integer,ImageMetaValue>> i = iterator();
-              i.hasNext(); ) {
-            final Map.Entry<Integer,ImageMetaValue> me = i.next();
+        for (final Map.Entry<Integer, ImageMetaValue> me : this) {
             final ImageMetaValue value = me.getValue();
-            final Element valueElement = value.toXMP( xmpDoc, nsURI, prefix );
-            if ( valueElement != null ) {
-                if ( rdfDescElement == null )
+            final Element valueElement = value.toXMP(xmpDoc, nsURI, prefix);
+            if (valueElement != null) {
+                if (rdfDescElement == null)
                     rdfDescElement = XMPUtil.createRDFDescription(
-                        xmpDoc, nsURI, prefix
+                            xmpDoc, nsURI, prefix
                     );
-                rdfDescElement.appendChild( valueElement );
+                rdfDescElement.appendChild(valueElement);
             }
         }
         if ( rdfDescElement != null ) {
@@ -1114,6 +1124,24 @@ public abstract class ImageMetadataDirectory
         }
         return null;
     }
+
+    /**
+     * The default provider priority.
+     * @see #getProviderPriorityFor(Class)
+     */
+    protected static final int PROVIDER_PRIORITY_DEFAULT = 1;
+
+    /**
+     * The maximum provider priority.
+     * @see #getProviderPriorityFor(Class)
+     */
+    protected static final int PROVIDER_PRIORITY_MAX = 10000;
+
+    /**
+     * The minumum provider priority.
+     * @see #getProviderPriorityFor(Class)
+     */
+    protected static final int PROVIDER_PRIORITY_MIN = -10000;
 
     ////////// private ////////////////////////////////////////////////////////
 

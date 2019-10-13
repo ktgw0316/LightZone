@@ -1,21 +1,36 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2016-     Masahiro Kitagawa */
 
 package com.lightcrafts.platform;
 
-import com.lightcrafts.utils.ColorProfileInfo;
+import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.utils.Version;
 import com.lightcrafts.utils.directory.DirectoryMonitor;
 import com.lightcrafts.utils.directory.UnixDirectoryMonitor;
+import com.lightcrafts.utils.file.ICC_ProfileFileFilter;
 
+import javax.management.AttributeNotFoundException;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
+import javax.management.ReflectionException;
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 import java.awt.color.ICC_Profile;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.regex.Pattern;
 
 /**
@@ -60,8 +75,6 @@ public class Platform {
                     || osName.startsWith( "openbsd" )
                     || osName.startsWith( "sunos" ) )
                 return Linux;
-            if ( osName.startsWith( "sunos" ) )
-                return Linux;
             if ( osName.equals( "mac os x" ) )
                 return MacOSX;
             if ( osName.startsWith( "windows" ) )
@@ -77,20 +90,12 @@ public class Platform {
          * @param implementationClassName The fully qualified name of the class
          * that extends {@link Platform} for the new type.
          */
-        private Type( String implementationClassName ) {
+        Type( String implementationClassName ) {
             m_implementationClassName = implementationClassName;
         }
 
         private final String m_implementationClassName;
     }
-
-    //
-    // These are declared for backwards compatibility.
-    //
-    public static final Type Linux   = Type.Linux;
-    public static final Type MacOSX  = Type.MacOSX;
-    public static final Type Windows = Type.Windows;
-    public static final Type Other   = Type.Other;
 
     /**
      * Bring the given application to the front.
@@ -199,7 +204,18 @@ public class Platform {
      * @return Returns the amount of memory in megabytes.
      */
     public int getPhysicalMemoryInMB() {
-        return 0;
+        long totalPhysicalMemory = 0;
+        final MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
+        try {
+            final Object attribute = mBeanServer.getAttribute(
+                    new ObjectName("java.lang", "type", "OperatingSystem"),
+                    "TotalPhysicalMemorySize");
+            totalPhysicalMemory = Long.parseLong(attribute.toString());
+        } catch (AttributeNotFoundException | MBeanException | InstanceNotFoundException
+                | ReflectionException | MalformedObjectNameException e) {
+            e.printStackTrace();
+        }
+        return (int) (totalPhysicalMemory / 1048576);
     }
 
     /**
@@ -209,9 +225,17 @@ public class Platform {
      * from the root folder shown in the folder tree (not the root of the
      * filesystem).
      */
+    @Deprecated
     public String[] getPathComponentsToPicturesFolder() {
+        return getPathComponentsTo(getDefaultImageDirectory());
+    }
+
+    public String[] getPathComponentsTo(File file) {
+        if (file == null || !file.exists()) {
+            return null;
+        }
         final String sep = Pattern.quote(File.separator);
-        return getDefaultImageDirectory().toString().split(sep);
+        return file.getAbsolutePath().split(sep);
     }
 
     /**
@@ -242,6 +266,33 @@ public class Platform {
     }
 
     /**
+     * Check if the current platform is Linux.
+     *
+     * @return Returns <code>true</code> only if the current platform is Linux.
+     */
+    public static boolean isLinux() {
+        return m_type == Type.Linux;
+    }
+
+    /**
+     * Check if the current platform is macOS.
+     *
+     * @return Returns <code>true</code> only if the current platform is macOS.
+     */
+    public static boolean isMac() {
+        return m_type == Type.MacOSX;
+    }
+
+    /**
+     * Check if the current platform is Windows.
+     *
+     * @return Returns <code>true</code> only if the current platform is Windows.
+     */
+    public static boolean isWindows() {
+        return m_type == Type.Windows;
+    }
+
+    /**
      * Gets the type of the current platform.
      *
      * @return Returns said type.
@@ -256,13 +307,12 @@ public class Platform {
      * @param hostName The fully qualified name of the desired host to connect
      * to.
      * @return Returns <code>true</code> only if this computer currently has
-     * an active internet connection and thus can reach the specified host.
+     * an active internet connection and can reach the specified host.
      */
-    @SuppressWarnings({"ResultOfMethodCallIgnored"})
     public boolean hasInternetConnectionTo( String hostName ) {
         try {
-            InetAddress.getByName( hostName );
-            return true;
+            final InetAddress address = InetAddress.getByName(hostName);
+            return address.isReachable(2000);
         }
         catch (Throwable t) {
             return false;
@@ -369,6 +419,24 @@ public class Platform {
      * successfully.
      */
     public boolean showFileInFolder( String path ) {
+        if (!Desktop.isDesktopSupported()) {
+            return false;
+        }
+        final Desktop desktop = Desktop.getDesktop();
+        if(!desktop.isSupported(Desktop.Action.OPEN)) {
+            return false;
+        }
+
+        try {
+            Path p = Paths.get(path).toRealPath(LinkOption.NOFOLLOW_LINKS);
+            if (!Files.isDirectory(p)) {
+                p = p.getParent();
+            }
+            desktop.open(p.toFile());
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
@@ -386,6 +454,53 @@ public class Platform {
 
     public PrinterLayer getPrinterLayer() {
         return printerLayer;
+    }
+
+    ////////// protected ////////////////////////////////////////////////////////
+
+    protected static Collection<ColorProfileInfo> getColorProfiles(
+            File profileDir
+    ) {
+        HashSet<ColorProfileInfo> profiles = new HashSet<>();
+
+        if (! profileDir.isDirectory()) {
+            return profiles;
+        }
+
+        File[] files = profileDir.listFiles(ICC_ProfileFileFilter.INSTANCE);
+        if (files == null) {
+            return Collections.emptyList(); // Just in case of I/O error
+        }
+
+        for (File file : files) {
+            if (file.isDirectory()) {
+                profiles.addAll(getColorProfiles(file));
+            }
+            else if (file.isFile()) {
+                String path = file.getAbsolutePath();
+                try {
+                    final ICC_Profile profile = ICC_Profile.getInstance(path);
+                    final String name = ColorProfileInfo.getNameOf(profile);
+                    final ColorProfileInfo info = new ColorProfileInfo(name, path);
+                    profiles.add(info);
+                }
+                catch (IOException e) {
+                    // Trouble reading the file
+                    System.err.println(
+                            "Can't read a color profile from " + path + ": "
+                                    + e.getMessage()
+                    );
+                }
+                catch (Throwable e) {
+                    // Invalid color profile data
+                    System.err.println(
+                            "Not a valid color profile at " + path + ": "
+                                    + e.getMessage()
+                    );
+                }
+            }
+        }
+        return profiles;
     }
 
     ////////// private ////////////////////////////////////////////////////////

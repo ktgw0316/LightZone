@@ -61,6 +61,7 @@ public final class IPTCDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getArtist() {
         final ImageMetaValue value = getValue( IPTC_CREATOR );
         return value != null ? value.getStringValue() : null;
@@ -69,6 +70,7 @@ public final class IPTCDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public Date getCaptureDateTime() {
         final ImageMetaValue value = getValue( IPTC_DATE_CREATED );
         return  value instanceof DateMetaValue ?
@@ -78,6 +80,7 @@ public final class IPTCDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getCopyright() {
         final ImageMetaValue value = getValue( IPTC_COPYRIGHT_NOTICE );
         return value != null ? value.getStringValue() : null;
@@ -88,6 +91,7 @@ public final class IPTCDirectory extends ImageMetadataDirectory implements
      *
      * @return Always returns &quot;IPTC&quot;.
      */
+    @Override
     public String getName() {
         return "IPTC";
     }
@@ -95,6 +99,7 @@ public final class IPTCDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageMetaTagInfo getTagInfoFor( Integer id ) {
         return m_tagsByID.get( id );
     }
@@ -102,6 +107,7 @@ public final class IPTCDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public ImageMetaTagInfo getTagInfoFor( String name ) {
         return m_tagsByName.get( name );
     }
@@ -109,6 +115,7 @@ public final class IPTCDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getTitle() {
         final ImageMetaValue value = getValue( IPTC_OBJECT_NAME );
         return value != null ? value.getStringValue() : null;
@@ -117,6 +124,7 @@ public final class IPTCDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isLegalValue( Integer tagID, String value ) {
         if ( !super.isLegalValue( tagID, value ) )
             return false;
@@ -203,6 +211,7 @@ public final class IPTCDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean parseXMP( ImageMetaTagInfo tagInfo, Element element,
                              ElementPrefixFilter dirPrefixFilter ) {
         if ( tagInfo.getID() != IPTC_CREATOR_CONTACT_INFO )
@@ -240,6 +249,7 @@ public final class IPTCDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public Collection<Element> toXMP( Document xmpDoc ) {
         return toXMP( xmpDoc, XMP_IPTC_NS, XMP_IPTC_PREFIX );
     }
@@ -247,6 +257,7 @@ public final class IPTCDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public String valueToString( ImageMetaValue value ) {
         switch ( value.getOwningTagID() ) {
             case IPTC_DATE_CREATED:
@@ -289,6 +300,7 @@ public final class IPTCDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     protected int getProviderPriorityFor(
         Class<? extends ImageMetadataProvider> provider )
     {
@@ -296,7 +308,7 @@ public final class IPTCDirectory extends ImageMetadataDirectory implements
                 provider == CaptionProvider.class   ||
                 provider == CopyrightProvider.class ||
                 provider == TitleProvider.class ?
-                    Integer.MAX_VALUE - 1 :
+                    PROVIDER_PRIORITY_DEFAULT + 1000 :
                     super.getProviderPriorityFor( provider );
     }
 
@@ -305,6 +317,7 @@ public final class IPTCDirectory extends ImageMetadataDirectory implements
      *
      * @return Returns said {@link ResourceBundle}.
      */
+    @Override
     protected ResourceBundle getTagLabelBundle() {
         return m_tagBundle;
     }
@@ -312,6 +325,7 @@ public final class IPTCDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     protected Class<? extends ImageMetaTags> getTagsInterface() {
         return IPTCTags.class;
     }
@@ -319,6 +333,7 @@ public final class IPTCDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     protected Collection<Element> toXMP( Document xmpDoc, String nsURI,
                                          String prefix ) {
         Element rdfDescElement = null;

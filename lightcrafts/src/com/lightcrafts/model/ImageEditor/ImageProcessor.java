@@ -2,7 +2,7 @@
 
 package com.lightcrafts.model.ImageEditor;
 
-import com.lightcrafts.mediax.jai.RenderedOp;
+import javax.media.jai.RenderedOp;
 import java.awt.image.RenderedImage;
 
 /**

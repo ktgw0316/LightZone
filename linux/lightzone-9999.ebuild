@@ -24,6 +24,7 @@ DEPEND="virtual/jdk
 	dev-java/javahelp
 	dev-util/pkgconfig
 	dev-vcs/git
+	media-libs/lensfun
 	media-libs/lcms
 	media-libs/libjpeg-turbo
 	media-libs/tiff
@@ -33,6 +34,8 @@ DEPEND="virtual/jdk
 
 RDEPEND="virtual/jre
 	dev-java/javahelp
+	dev-libs/libxml2
+	media-libs/lensfun
 	media-libs/lcms
 	media-libs/libjpeg-turbo
 	media-libs/tiff"

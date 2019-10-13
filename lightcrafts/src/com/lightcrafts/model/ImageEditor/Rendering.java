@@ -9,7 +9,7 @@ import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.opimage.CachedImage;
 
-import com.lightcrafts.mediax.jai.*;
+import javax.media.jai.*;
 
 import lombok.Getter;
 import lombok.val;
@@ -55,7 +55,7 @@ public class Rendering implements Cloneable {
             object.transform = buildTransform(false);
             object.xformedSourceImage = null;
             object.pipeline = new LinkedList<Operation>();
-            for (Operation op : pipeline) {
+            for (val op : pipeline) {
                 object.pipeline.add(((BlendedOperation) op).clone(object));
             }
             return object;
@@ -125,17 +125,22 @@ public class Rendering implements Cloneable {
     }
 
     public void setCropAndScale(CropBounds cropBounds, float scaleFactor) {
-        if (cropBounds != null && !cropBounds.equals(this.cropBounds)) {
-            this.cropBounds = cropBounds;
-        }
-        if (scaleFactor != this.scaleFactor) {
-            this.scaleFactor = scaleFactor;
-        }
-        inputTransform = buildTransform(true);
-        transform = buildTransform(false);
-        if (xformedSourceImage != null) {
-            xformedSourceImage.dispose();
-            xformedSourceImage = null;
+        val shouldUpdatBounds = (cropBounds != null && !cropBounds.equals(this.cropBounds));
+        val shouldUpdateScale = (scaleFactor != this.scaleFactor);
+
+        if (shouldUpdatBounds || shouldUpdateScale) {
+            if (shouldUpdatBounds) {
+                this.cropBounds = cropBounds;
+            }
+            if (shouldUpdateScale) {
+                this.scaleFactor = scaleFactor;
+            }
+            inputTransform = buildTransform(true);
+            transform = buildTransform(false);
+            if (xformedSourceImage != null) {
+                xformedSourceImage.dispose();
+                xformedSourceImage = null;
+            }
         }
     }
 
@@ -153,13 +158,13 @@ public class Rendering implements Cloneable {
             return processedImage;
         }
 
-        for (Operation op : pipeline) {
+        for (val op : pipeline) {
             val operation = (OperationImpl) op;
             if (stopBefore-- == 0)
                 break;
 
             if (operation.isActive() && !(inactive && operation.isDeactivatable())) {
-                PlanarImage result = operation.render(processedImage, scaleFactor < 1 ? scaleFactor : 1);
+                val result = operation.render(processedImage, scaleFactor < 1 ? scaleFactor : 1);
                 if (result != null)
                     processedImage = result;
             }
@@ -173,8 +178,7 @@ public class Rendering implements Cloneable {
             return;
         }
 
-        PlanarImage processedImage = getXformedSourceImage();
-        processedImage = cropSourceImage(processedImage);
+        PlanarImage processedImage = cropSourceImage(getXformedSourceImage());
 
         for (val operation : pipeline) {
             if (!operation.isActive()) {
@@ -212,10 +216,14 @@ public class Rendering implements Cloneable {
         return getRendering(false, stopBefore);
     }
 
+    public Rectangle getSourceBounds() {
+        // NOTE: we must clone PlanarImage.getBounds() since it returns a reference to an object
+        return new Rectangle(sourceImage.getBounds());
+    }
+
     public Dimension getRenderingSize() {
         if (cropBounds.isAngleOnly()) {
-            // NOTE: we must clone PlanarImage.getBounds() since it returns a reference to an object
-            Rectangle sourceBounds = new Rectangle(sourceImage.getBounds());
+            Rectangle sourceBounds = getSourceBounds();
 
             if (cropBounds.getAngle() != 0) {
                 val center = new Point2D.Double(sourceBounds.getCenterX(), sourceBounds.getCenterY());
@@ -231,10 +239,8 @@ public class Rendering implements Cloneable {
     }
 
     private AffineTransform buildTransform(boolean isInputTransform) {
-        // NOTE: we must clone PlanarImage.getBounds() since it returns a reference to an object
-        Rectangle sourceBounds = new Rectangle(sourceImage.getBounds());
-
-        AffineTransform transform = new AffineTransform();
+        val sourceBounds = getSourceBounds();
+        val transform = new AffineTransform();
 
         // Scale
         if (scaleFactor < 1 || !isInputTransform) {
@@ -331,17 +337,38 @@ public class Rendering implements Cloneable {
         return xformedSourceImage;
     }
 
+    float getScaleToFit(Dimension bounds) {
+        val newDimension = cropBounds.getDimensionToFit(bounds);
+        val dimension = getRenderingSize();
+        return (float) Math.min(
+                newDimension.getWidth() / dimension.getWidth(),
+                newDimension.getHeight() / dimension.getHeight());
+    }
+
     private PlanarImage cropSourceImage(PlanarImage xformedSourceImage) {
         if (!cropBounds.isAngleOnly()) {
             val actualCropBounds = CropBounds.transform(inputTransform, cropBounds);
             val bounds = new Rectangle(
                     xformedSourceImage.getMinX(), xformedSourceImage.getMinY(),
                     xformedSourceImage.getWidth(), xformedSourceImage.getHeight());
-            val finalBounds = bounds.intersection(new Rectangle(
-                    0, 0,
-                    (int) Math.round(actualCropBounds.getWidth()),
-                    (int) Math.round(actualCropBounds.getHeight())));
+
+            // Calculate inner width and height for actualCropBounds,
+            // while keeping the actualCropBound's aspect ratio as precisely as possible.
+            val actualWidth  = actualCropBounds.getWidth();
+            val actualHeight = actualCropBounds.getHeight();
+            int intWidth  = (int) Math.round(actualWidth);
+            int intHeight = (int) Math.round(actualHeight);
+
+            val finalBounds = bounds.intersection(new Rectangle(0, 0, intWidth, intHeight));
+
             if (finalBounds.width > 0 && finalBounds.height > 0) {
+                val ratio = actualWidth / actualHeight;
+                if (intWidth > finalBounds.width) {
+                    finalBounds.height = (int) (finalBounds.width / ratio);
+                }
+                if (intHeight > finalBounds.height) {
+                    finalBounds.width = (int) (finalBounds.height * ratio);
+                }
                 xformedSourceImage = Functions.crop(
                         xformedSourceImage,
                         finalBounds.x, finalBounds.y,

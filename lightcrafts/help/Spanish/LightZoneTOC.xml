@@ -41,25 +41,25 @@
             <tocitem text="Converting images" target="Converting"/>
             <tocitem text="Printing" target="Printing"/>
             <tocitem text="Copy &amp; paste tools" target="Tools-Copy_and_Paste"/>
-            <tocitem text="Estilos" target="Styles"/>
+            <tocitem text="Styles" target="Styles"/>
         </tocitem>
         <tocitem text="Editing Tools" expand="false">
             <tocitem text="Black &amp; White" target="Tool-Black_and_White"/>
             <tocitem text="Blur" target="Tool-Blur"/>
-            <tocitem text="Clonar" target="Tool-Clone"/>
-            <tocitem text="Balance de Color" target="Tool-Color_Balance"/>
-            <tocitem text="Recorte" target="Tool-Crop"/>
-            <tocitem text="Matiz/Saturacion" target="Tool-Hue_Saturation"/>
-            <tocitem text="Reduccion de ruido" target="Tool-Noise_Reduction"/>
-            <tocitem text="Prueba" target="Tool-Proof"/>
+            <tocitem text="Clone" target="Tool-Clone"/>
+            <tocitem text="Color Balance" target="Tool-Color_Balance"/>
+            <tocitem text="Crop" target="Tool-Crop"/>
+            <tocitem text="Hue/Saturation" target="Tool-Hue_Saturation"/>
+            <tocitem text="Noise Reduction" target="Tool-Noise_Reduction"/>
+            <tocitem text="Proof" target="Tool-Proof"/>
             <tocitem text="Raw Adjustments" target="Tool-Raw_Adjustments"/>
             <tocitem text="Red-Eye" target="Tool-Red-Eye"/>
-            <tocitem text="Reiluminar" target="Tool-Relight"/>
-            <tocitem text="Rotar" target="Tool-Rotate"/>
-            <tocitem text="Enfocar" target="Tool-Sharpen"/>
-            <tocitem text="Mota" target="Tool-Spot"/>
-            <tocitem text="Balance de blancos" target="Tool-White_Balance"/>
-            <tocitem text="Mapa de Zonas" target="Tool-ZoneMapper"/>
+            <tocitem text="Relight" target="Tool-Relight"/>
+            <tocitem text="Rotate" target="Tool-Rotate"/>
+            <tocitem text="Sharpen" target="Tool-Sharpen"/>
+            <tocitem text="Spot" target="Tool-Spot"/>
+            <tocitem text="White Balance" target="Tool-White_Balance"/>
+            <tocitem text="ZoneMapper" target="Tool-ZoneMapper"/>
         </tocitem>
         <tocitem text="Other" expand="false">
             <tocitem text="Acknowledgments" target="Acknowledgments"/>

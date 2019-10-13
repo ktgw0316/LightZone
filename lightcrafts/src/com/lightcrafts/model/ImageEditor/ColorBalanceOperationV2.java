@@ -2,23 +2,25 @@
 
 package com.lightcrafts.model.ImageEditor;
 
+import com.lightcrafts.image.color.ColorMatrix2;
+import com.lightcrafts.image.color.ColorScience;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
-import com.lightcrafts.utils.ColorScience;
 import com.lightcrafts.utils.splines;
-import com.lightcrafts.utils.ColorMatrix2;
 
-import com.lightcrafts.mediax.jai.JAI;
-import com.lightcrafts.mediax.jai.LookupTableJAI;
-import com.lightcrafts.mediax.jai.PlanarImage;
+import javax.media.jai.JAI;
+import javax.media.jai.LookupTableJAI;
+import javax.media.jai.PlanarImage;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.Map;
+
+import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_COLOR_BALANCE;
 
 public class ColorBalanceOperationV2 extends BlendedOperation implements com.lightcrafts.model.ColorPickerDropperOperation {
     static final OperationType typeV2 = new OperationTypeImpl("Color Balance V2");
@@ -33,6 +35,8 @@ public class ColorBalanceOperationV2 extends BlendedOperation implements com.lig
     public ColorBalanceOperationV2(Rendering rendering, OperationType type) {
         super(rendering, type);
         colorInputOnly = true;
+
+        setHelpTopic(HELP_TOOL_COLOR_BALANCE);
 
         DecimalFormat format = new DecimalFormat("0.00");
         addSliderKey(MIDPOINT);
@@ -94,7 +98,7 @@ public class ColorBalanceOperationV2 extends BlendedOperation implements com.lig
                             int g = pixel[1] / 256;
                             int b = pixel[2] / 256;
 
-                            float matrix[][] = {
+                            float[][] matrix = {
                                     {1, 0, 0, 0},
                                     {0, 1, 0, 0},
                                     {0, 0, 1, 0},
@@ -115,7 +119,7 @@ public class ColorBalanceOperationV2 extends BlendedOperation implements com.lig
                             color = new Color(red, green, blue);
                         } else {
                             // Get the complementary color
-                            float hsb[] = new float[3];
+                            float[] hsb = new float[3];
                             hsb = Color.RGBtoHSB(pixel[0] / 256, pixel[1] / 256, pixel[2] / 256, hsb);
                             hsb[0] += 0.5;
                             if (hsb[0] >= 1)
@@ -136,25 +140,25 @@ public class ColorBalanceOperationV2 extends BlendedOperation implements com.lig
                 double tgreen = pixel[1] / 2 - pixel[0] / 4 - pixel[2] / 4;
                 double tblue = pixel[2] / 2 - pixel[0] / 4 - pixel[1] / 4;
 
-                double polygon[][] = {
-                    {0, 0},
-                    {midpoint, 0},
-                    {1, 0}
+                double[][] polygon = {
+                        {0, 0},
+                        {midpoint, 0},
+                        {1, 0}
                 };
 
                 polygon[1][1] = tred / 256.;
-                double redCurve[][] = new double[256][2];
+                double[][] redCurve = new double[256][2];
                 splines.bspline(2, polygon, redCurve);
 
                 polygon[1][1] = tgreen / 256.;
-                double greenCurve[][] = new double[256][2];
+                double[][] greenCurve = new double[256][2];
                 splines.bspline(2, polygon, greenCurve);
 
                 polygon[1][1] = tblue / 256.;
-                double blueCurve[][] = new double[256][2];
+                double[][] blueCurve = new double[256][2];
                 splines.bspline(2, polygon, blueCurve);
 
-                short table[][] = new short[3][0x10000];
+                short[][] table = new short[3][0x10000];
 
                 splines.Interpolator interpolator = new splines.Interpolator();
 
