@@ -1,9 +1,8 @@
-package com.lightcrafts.ui.toolkit;
+/*
+ * Copyright (c) 2019. Masahiro Kitagawa
+ */
 
-import java.awt.Color;
-import java.util.HashMap;
-import java.util.Map;
-import javax.swing.*;
+package com.lightcrafts.ui.toolkit;
 
 import jiconfont.IconCode;
 import jiconfont.icons.FontAwesome;
@@ -11,24 +10,48 @@ import jiconfont.icons.GoogleMaterialDesignIcons;
 import jiconfont.swing.IconFontSwing;
 import lombok.val;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by Masahiro Kitagawa on 2017/01/02.
  */
 public final class IconFontFactory {
     private static final Color COLOR = Color.LIGHT_GRAY;
-    private static final float SIZE = 20f;
+    private static final float DEFAULT_SIZE = 20f;
 
     public static Icon buildIcon(String name) {
+        return buildIcon(name, DEFAULT_SIZE);
+    }
+
+    public static Icon buildIcon(String name, float size) {
         val code = iconCodeMap.get(name);
-        return code != null ? buildIcon(code) : new ImageIcon();
+        return code != null ? buildIcon(code, size) : new ImageIcon();
+    }
+
+    public static BufferedImage buildIconImage(String name, float size) {
+        val icon = buildIcon(name, size);
+        final int width = icon.getIconWidth();
+        final int height = icon.getIconHeight();
+        if (width < 0 || height < 0) {
+            return null;
+        }
+        val bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        val g = bi.createGraphics();
+        icon.paintIcon(null, g, 0, 0);
+        g.dispose();
+        return bi;
     }
 
     public static Icon buildIcon(IconCode code) {
-        return IconFontSwing.buildIcon(code, SIZE, COLOR);
+        return buildIcon(code, DEFAULT_SIZE);
     }
 
-    public static Icon buildHighlightedIcon(IconCode code) {
-        return IconFontSwing.buildIcon(code, SIZE, COLOR.brighter());
+    public static Icon buildIcon(IconCode code, float size) {
+        return IconFontSwing.buildIcon(code, size, COLOR);
     }
 
     static {
@@ -77,5 +100,8 @@ public final class IconFontFactory {
                 // put("stacked", );
                 // put("unstacked", );
                 put("info", FontAwesome.QUESTION_CIRCLE);
+
+                // ui.operation.resources
+                put("FilmGrain", FontAwesome.FILM);
             }};
 }
