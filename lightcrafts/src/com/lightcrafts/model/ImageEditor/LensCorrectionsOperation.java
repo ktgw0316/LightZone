@@ -77,7 +77,7 @@ public class LensCorrectionsOperation extends BlendedOperation {
         addChoiceKey(CAMERA_NAME);
         addChoiceKey(LENS_NAME);
         addChoiceValue(CAMERA_NAME, "(Automatic)" + SEPARATOR);
-        addChoiceValues(CAMERA_NAME, Lensfun.getAllCameraNames());
+        addChoiceValues(CAMERA_NAME, lf.getAllCameraNames());
         addChoiceValue(LENS_NAME, "(Automatic)" + SEPARATOR);
         addChoiceValues(LENS_NAME, lf.getLensNamesFor(cameraMaker, cameraModel));
 
@@ -205,7 +205,7 @@ public class LensCorrectionsOperation extends BlendedOperation {
     private void updateLenses() {
         clearChoiceValues(LENS_NAME);
         final List<String> values = (cameraModel.isEmpty())
-                ? Lensfun.getAllLensNames()
+                ? lf.getAllLensNames()
                 : lf.getLensNamesFor(cameraMaker, cameraModel);
         addChoiceValue(LENS_NAME, "(Automatic)" + SEPARATOR);
         addChoiceValues(LENS_NAME, values);

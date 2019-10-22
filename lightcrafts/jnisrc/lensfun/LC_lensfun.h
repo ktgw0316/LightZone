@@ -7,7 +7,7 @@ class LC_lensfun
 public:
     lfModifier* mod = nullptr;
 
-    LC_lensfun();
+    LC_lensfun(const char* path);
     ~LC_lensfun();
 
     const lfCamera* findCamera(
