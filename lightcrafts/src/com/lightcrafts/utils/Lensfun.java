@@ -62,8 +62,9 @@ public class Lensfun {
             String cameraMaker, String cameraModel,
             String lensMaker, String lensModel,
             float focal, float aperture) {
-        // We don't check cameraMaker and lensMaker
+        // We don't check cameraMaker
         if (instance == null
+                || lensMaker.isEmpty()
                 || !cameraModel.equals(instance.cameraModel)
                 || !lensModel.equals(instance.lensModel)
                 || instance.focal != focal

@@ -85,10 +85,10 @@ public class LensCorrectionsOperation extends BlendedOperation {
         setCheckboxValue(MANUAL_MODE, false);
 
         val format = new DecimalFormat("0.0");
-        distortion_k1_config = new SliderConfig(-200, 200, distortion_k1, 1, false, format);
-        distortion_k2_config = new SliderConfig(-200, 200, distortion_k2, 1, false, format);
-        tca_r_offset_config  = new SliderConfig(-2, 2, tca_r_offset, 0.1, false, format);
-        tca_b_offset_config  = new SliderConfig(-2, 2, tca_b_offset, 0.1, false, format);
+        distortion_k1_config = new SliderConfig(-50, 50, distortion_k1, 1, false, format);
+        distortion_k2_config = new SliderConfig(-50, 50, distortion_k2, 1, false, format);
+        tca_r_offset_config  = new SliderConfig(-5, 5, tca_r_offset, 0.1, false, format);
+        tca_b_offset_config  = new SliderConfig(-5, 5, tca_b_offset, 0.1, false, format);
         addSliderKeys();
     }
 
