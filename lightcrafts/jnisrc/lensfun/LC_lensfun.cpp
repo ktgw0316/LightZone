@@ -177,6 +177,7 @@ Java_com_lightcrafts_utils_Lensfun_initModifierWithPoly5Lens
 #else
     lfLensCalibDistortion dc = {LF_DIST_MODEL_POLY5, focal, {k1, k2}};
 #endif
+    // FIXME: Wrong autoscale, cf. https://github.com/lensfun/lensfun/issues/945
     lens->AddCalibDistortion(&dc);
 
     lfLensCalibTCA tcac = {LF_TCA_MODEL_LINEAR, focal, {kr, kb}};
@@ -250,13 +251,22 @@ Java_com_lightcrafts_utils_Lensfun_backwardMapRect
 LC_lensfun::LC_lensfun(const char* path)
 {
     ldb = new lfDatabase();
-    std::cout << "Lensfun: loading database from " << path << std::endl;
+    lfError err;
+
+    std::cout << "Lensfun: loading database";
+    if (strlen(path) > 0) {
+        std::cout << " from " << path;
 #if (LF_VERSION >= 0x00035f00) // 0.3.95
-    if (ldb->Load(path) != LF_NO_ERROR)
+        err = ldb->Load(path);
 #else
-    if (!ldb->LoadDirectory(path))
+        err = ldb->LoadDirectory(path) ? LF_NO_ERROR : LF_NO_DATABASE;
 #endif
-    {
+    } else {
+        err = ldb->Load();
+    }
+    std::cout << std::endl;
+
+    if (err != LF_NO_ERROR) {
         std::cerr << "Lensfun database could not be loaded" << std::endl;
     }
 }
@@ -377,8 +387,12 @@ void LC_lensfun::initModifier
     constexpr float scale = 0; // automatic scaling
     const lfLensType targeom = lens->Type;
 
+    if (mod) {
+        delete mod;
+        mod = nullptr;
+    }
 #if (LF_VERSION >= 0x00035f00) // 0.3.95
-    mod = new lfModifier(crop, fullWidth, fullHeight, LF_PF_U16);
+    mod = new lfModifier(lens, focal, crop, fullWidth, fullHeight, LF_PF_U16);
 #else
     mod = new lfModifier(lens, crop, fullWidth, fullHeight);
 #endif
@@ -388,10 +402,10 @@ void LC_lensfun::initModifier
         return;
     }
 #if (LF_VERSION >= 0x00035f00) // 0.3.95
-    mod->EnableDistortionCorrection(lens, focal);
-    mod->EnableTCACorrection(lens, focal);
-    mod->EnableVignettingCorrection(lens, focal, aperture, distance);
-    mod->EnableProjectionTransform(lens, focal, targeom);
+    mod->EnableDistortionCorrection();
+    mod->EnableTCACorrection();
+    mod->EnableVignettingCorrection(aperture, distance);
+    mod->EnableProjectionTransform(targeom);
     mod->EnableScaling(scale);
 #else
     mod->Initialize(lens, LF_PF_U16, focal, aperture, distance, scale, targeom,
