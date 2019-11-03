@@ -21,8 +21,11 @@
 #define dstDatum(x, y, offset) \
         dstData[3 * ((y) * dstLineStride + (x)) + (offset)]
 
-#define datum(x, y, offset) \
-        data[3 * ((y) * lineStride + (x)) + (offset)]
+#define cDatum(xOffset, yOffset) \
+        data[3 * ((y + cy0 + (yOffset)) * lineStride + x + cx0 + (xOffset)) + cOffset]
+
+#define gDatum(xOffset, yOffset) \
+        data[3 * ((y + cy0 + (yOffset)) * lineStride + x + cx0 + (xOffset)) + gOffset]
 
 JNIEXPORT void JNICALL DCRaw_METHOD(interpolateGreen)
 ( JNIEnv *env, jclass cls,
@@ -268,58 +271,41 @@ JNIEXPORT void JNICALL DCRaw_METHOD(interpolateRedBlue)
             cOffset = bOffset;
         }
 
-#pragma omp parallel shared (data) 
-{
-#pragma omp for schedule (dynamic) nowait
+#pragma omp parallel for schedule (guided) shared (data)
         for (int y = 1; y < height-2; y += 2) {
-            for (int x = 1; x < width-2; x += 2) {
-                const int cg = datum(x + cx0, y + cy0, gOffset);
+            int x = 1;
+            int gne = gDatum(-1, 1);
+            int gse = gDatum(-1, -1);
+            int cne = gne - cDatum(-1, 1);
+            int cse = gse - cDatum(-1, -1);
+
+            for (; x < width-2; x += 2) {
+                const int gnw = gDatum(1, 1);
+                const int gsw = gDatum(1, -1);
+                const int cnw = gnw - cDatum(1, 1);
+                const int csw = gsw - cDatum(1, -1);
 
                 // Pixel at the other color location
-                const int gne = datum(x + cx0 - 1, y + cy0 + 1, gOffset);
-                const int gnw = datum(x + cx0 + 1, y + cy0 + 1, gOffset);
-                const int gsw = datum(x + cx0 + 1, y + cy0 - 1, gOffset);
-                const int gse = datum(x + cx0 - 1, y + cy0 - 1, gOffset);
-
-                const int cne = gne - datum(x + cx0 - 1, y + cy0 + 1, cOffset);
-                const int cnw = gnw - datum(x + cx0 + 1, y + cy0 + 1, cOffset);
-                const int csw = gsw - datum(x + cx0 + 1, y + cy0 - 1, cOffset);
-                const int cse = gse - datum(x + cx0 - 1, y + cy0 - 1, cOffset);
-
-                const int sample = cg - (cne + csw + cnw + cse) / 4;
-                datum(x + cx0, y + cy0, cOffset) = clampUShort(sample);
-            }
-            for (int x = 0; x < width-1; x += 2) {
-                const int cg = datum(x + cx0, y + cy0, gOffset);
+                const int gc = gDatum(0, 0);
+                const int sample_c = gc - (cne + csw + cnw + cse) / 4;
+                cDatum(0, 0) = clampUShort(sample_c);
 
                 // Pixel at green location - vertical
-                const int gu = datum(x + cx0, y + cy0 - 1, gOffset);
-                const int gd = datum(x + cx0, y + cy0 + 1, gOffset);
-
-                const int cu = gu - datum(x + cx0, y + cy0 - 1, cOffset);
-                const int cd = gd - datum(x + cx0, y + cy0 + 1, cOffset);
-
-                const int sample = cg - (cu + cd) / 2;
-                datum(x + cx0, y + cy0, cOffset) = clampUShort(sample);
-            }
-        }
-#pragma omp for schedule (dynamic)
-        for (int y = 0; y < height-1; y += 2) {
-            for (int x = 1; x < width-2; x += 2) {
-                const int cg = datum(x + cx0, y + cy0, gOffset);
+                const int gw = gDatum(1, 0);
+                const int sample_w = gw - (csw + cnw) / 2;
+                cDatum(1, 0) = clampUShort(sample_w);
 
                 // Pixel at green location - horizontal
-                const int gl = datum(x + cx0 - 1, y + cy0, gOffset);
-                const int gr = datum(x + cx0 + 1, y + cy0, gOffset);
+                const int gs = gDatum(0, -1);
+                const int sample_s = gs - (cse + csw) / 2;
+                cDatum(0, -1) = clampUShort(sample_s);
 
-                const int cl = gl - datum(x + cx0 - 1, y + cy0, cOffset);
-                const int cr = gr - datum(x + cx0 + 1, y + cy0, cOffset);
-
-                const int sample = cg - (cl + cr) / 2;
-                datum(x + cx0, y + cy0, cOffset) = clampUShort(sample);
+                gne = gnw;
+                gse = gsw;
+                cne = cnw;
+                cse = csw;
             }
         }
-} // #pragma omp parallel
     }
     env->ReleasePrimitiveArrayCritical(jdata, data, 0);
 }
