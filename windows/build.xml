@@ -71,13 +71,14 @@
     <exec executable="make" dir="jnisrc" failonerror="true" vmlauncher="false"/>
   </target>
 
-  <target name="helpers">
-    <exec executable="make" dir="helpers" failonerror="true" vmlauncher="false">
+  <target name="build" depends="javac, jni"/>
+
+  <target name="help">
+    <exec executable="make" dir="resources/help" failonerror="true"
+          vmlauncher="false">
       <arg value="APP_NAME=${app-name}"/>
     </exec>
   </target>
-
-  <target name="build" depends="javac, jni"/>
 
   <!--===== Make a jar file ================================================-->
 
@@ -129,25 +130,6 @@
   <!--===== Make a Windows installer =======================================-->
 
   <target name="build-installer-only">
-
-    <copy file="helpers/JavaAppLauncher/${app-name}.exe"
-          tofile="products/${app-name}.exe" overwrite="true"/>
-    <chmod file="products/${app-name}.exe" perm="775"/>
-
-    <exec executable="make" dir="resources/sign" failonerror="true"
-          vmlauncher="false">
-      <arg value="EXE_TO_SIGN=../../products/${app-name}.exe"/>
-    </exec>
-
-    <copy file="helpers/JavaAppLauncher/lightzone.jvmargs" todir="products"
-          overwrite="true">
-    </copy>
-
-    <exec executable="make" dir="resources/help" failonerror="true"
-          vmlauncher="false">
-      <arg value="APP_NAME=${app-name}"/>
-    </exec>
-
     <exec executable="install4jc.exe" failonerror="true">
       <!-- The "-D LC_VERSION=..." has to be given to install4j as two seperate
            arguments, hence the use of line= rather than value= since the
@@ -156,14 +138,8 @@
       <arg line="-D LC_VERSION=${app-version}"/>
       <arg file="lightzone-${jre-arch}.install4j"/>
     </exec>
-
-    <exec executable="make" dir="resources/sign" failonerror="true"
-          vmlauncher="false">
-      <arg value="EXE_TO_SIGN=../../${installer-name}"/>
-    </exec>
-
   </target>
-  <target name="build-installer" depends="jar, helpers, build-installer-only"/>
+  <target name="build-installer" depends="jar, help, build-installer-only"/>
 
   <!--===== Clean up =======================================================-->
 
@@ -175,9 +151,6 @@
       <delete file="${installer-name}"/>
       <delete file="products/lightzone.jvmargs"/>
     </parallel>
-    <exec executable="make" dir="helpers">
-      <arg value="${clean-method}"/>
-    </exec>
     <exec executable="make" dir="jnisrc">
       <arg value="${clean-method}"/>
     </exec>
