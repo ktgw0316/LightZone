@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2019-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.editor;
 
@@ -15,6 +16,7 @@ import com.lightcrafts.ui.operation.OpControlModeListener;
 import com.lightcrafts.ui.operation.OpStackListener;
 import com.lightcrafts.ui.operation.SelectableControl;
 import com.lightcrafts.ui.region.RegionOverlay;
+import com.lightcrafts.utils.awt.geom.HiDpi;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,7 +25,6 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
-import java.awt.geom.Rectangle2D;
 
 /**
  * Handle switching among all the Modes.  Lots of special mode-transition
@@ -511,14 +512,12 @@ public class ModeManager
     // Get a default CropBounds for the CropMode overlay, in image
     // coordinates.
     private CropBounds getInitialCropBounds() {
-        double x = underlayBounds.getX();
-        double y = underlayBounds.getY();
-        double width = underlayBounds.getWidth();
-        double height = underlayBounds.getHeight();
-        Rectangle2D inset = new Rectangle2D.Double(
-            x, y, width, height
-        );
-        CropBounds crop = new CropBounds(inset);
+        final int x = underlayBounds.x;
+        final int y = underlayBounds.y;
+        final int width = underlayBounds.width;
+        final int height = underlayBounds.height;
+        Rectangle inset = new Rectangle(x, y, width, height);
+        CropBounds crop = new CropBounds(HiDpi.imageSpaceRectFrom(inset));
         try {
             AffineTransform inverse = getOverlayTransform().createInverse();
             crop = CropBounds.transform(inverse, crop);
