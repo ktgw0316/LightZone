@@ -454,21 +454,43 @@ public class ModeManager
         }
         // See if that did the trick, to avoid duplicate pushes.
         val oldMode = overlay.peekMode();
-        if (oldMode == newMode) {
-            return;
-        }
-        // If the current Mode is one of ours, pop it before pushing the next:
-        if (oldMode == regionMode || oldMode == cropMode || oldMode == rotateMode) {
-            // If we are in region mode make sure we exit edit mode
-            if (oldMode == regionMode && regionMode instanceof RegionOverlay) {
-                ((RegionOverlay) regionMode).finishEditingCurve();
-            }
-            overlay.popMode();
+        if (oldMode == newMode) return;
 
-            // The CropModes need setup and teardown:
-            if (oldMode == cropMode || oldMode == rotateMode) {
-                ((CropMode) oldMode).doCrop();
-            }
+        if (oldMode == cropMode) transitFromCropMode(newMode);
+        else if (oldMode == rotateMode) transitFromRotateMode(newMode);
+        else if (oldMode == regionMode) transitFromRegionMode(newMode);
+        else transit(null, newMode);
+    }
+
+    private void transitFromRegionMode(final Mode newMode) {
+        // If we are in region mode make sure we exit edit mode
+        if (regionMode instanceof RegionOverlay) {
+            ((RegionOverlay) regionMode).finishEditingCurve();
+        }
+        overlay.popMode();
+        transit(regionMode, newMode);
+    }
+
+    private void transitFromCropMode(final Mode newMode) {
+        overlay.popMode();
+        cropMode.doCrop();
+        transit(cropMode, newMode);
+
+        // The CropModes need to be kept in sync with each other:
+        rotateMode.setCrop(cropMode.getCrop());
+    }
+
+    private void transitFromRotateMode(final Mode newMode) {
+        overlay.popMode();
+        rotateMode.doCrop();
+        transit(rotateMode, newMode);
+
+        // The CropModes need to be kept in sync with each other:
+        cropMode.setCrop(rotateMode.getCrop());
+    }
+
+    private void transit(final Mode oldMode, final Mode newMode) {
+        if (oldMode != null) {
             oldMode.exit();
         }
         if (newMode != null) {
@@ -479,13 +501,6 @@ public class ModeManager
             if (newMode == cropMode || newMode == rotateMode) {
                 ((CropMode) newMode).resetCrop();
             }
-        }
-        // The CropModes need to be kept in sync with each other:
-        if (oldMode == cropMode) {
-            rotateMode.setCrop(cropMode.getCrop());
-        }
-        else if (oldMode == rotateMode) {
-            cropMode.setCrop(rotateMode.getCrop());
         }
     }
 
