@@ -392,11 +392,11 @@ public interface TIFFConstants {
     short TIFF_ORIENTATION_90CCW        = 6;
 
     /**
-     * TIFF orientation: the image is rotated 90 CW and horizontally flipped.
+     * TIFF orientation: the image is rotated 90 CW and vertically flipped.
      * This is one of the possible values for the
      * {@link TIFFTags#TIFF_ORIENTATION} metadata tag.
      */
-    short TIFF_ORIENTATION_90CW_HFLIP   = 7;
+    short TIFF_ORIENTATION_90CW_VFLIP   = 7;
 
     /**
      * TIFF orientation: the image is rotated 90 CW.

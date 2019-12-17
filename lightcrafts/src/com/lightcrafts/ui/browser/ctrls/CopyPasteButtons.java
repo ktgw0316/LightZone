@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2016-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.browser.ctrls;
 
@@ -6,6 +7,7 @@ import com.lightcrafts.ui.browser.view.AbstractImageBrowser;
 import com.lightcrafts.ui.browser.view.ImageBrowserActions;
 import static com.lightcrafts.ui.browser.ctrls.Locale.LOCALE;
 import com.lightcrafts.ui.toolkit.CoolButton;
+import com.lightcrafts.ui.toolkit.IconFontFactory;
 
 import javax.swing.*;
 
@@ -25,13 +27,13 @@ public class CopyPasteButtons extends Box {
         Action copyAction = actions.getCopyAction();
         JButton copy = new CoolButton(/*CoolButton.ButtonStyle.LEFT*/);
         copy.setAction(copyAction);
-        copy.setIcon(ButtonFactory.getIconByName("copy"));
+        copy.setIcon(IconFontFactory.buildIcon("copy"));
         copy.setToolTipText(CopyToolTip);
 
         Action pasteAction = actions.getPasteAction();
         JButton paste = new CoolButton(/*CoolButton.ButtonStyle.RIGHT*/);
         paste.setAction(pasteAction);
-        paste.setIcon(ButtonFactory.getIconByName("paste"));
+        paste.setIcon(IconFontFactory.buildIcon("paste"));
         paste.setToolTipText(PasteToolTip);
 
         add(copy);

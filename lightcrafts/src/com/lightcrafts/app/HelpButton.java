@@ -1,11 +1,12 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2017-     Masahiro Kitagawa */
 
 package com.lightcrafts.app;
 
 import static com.lightcrafts.app.Locale.LOCALE;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.ui.toolkit.CoolButton;
-import com.lightcrafts.ui.toolkit.IconFactory;
+import com.lightcrafts.ui.toolkit.IconFontFactory;
 import com.lightcrafts.ui.help.HelpConstants;
 
 import javax.swing.*;
@@ -16,8 +17,7 @@ class HelpButton extends CoolButton {
 
     enum Mode { Browse, Edit, Combo, Basic }
 
-    private final static Icon Icon =
-        IconFactory.createInvertedIcon(HelpButton.class, "info.png");
+    private final static Icon Icon = IconFontFactory.buildIcon("info");
 
     private final static String ToolTip = LOCALE.get("HelpButtonToolTip");
 
@@ -29,6 +29,7 @@ class HelpButton extends CoolButton {
         setMode(Mode.Combo);
         addActionListener(
             new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent event) {
                     Platform platform = Platform.getPlatform();
                     platform.showHelpTopic(topic);
