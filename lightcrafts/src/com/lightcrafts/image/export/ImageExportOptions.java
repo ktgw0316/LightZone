@@ -2,14 +2,14 @@
 
 package com.lightcrafts.image.export;
 
+import com.lightcrafts.image.types.ImageType;
+import com.lightcrafts.utils.xml.XMLException;
+import com.lightcrafts.utils.xml.XmlNode;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.lightcrafts.image.types.ImageType;
-import com.lightcrafts.utils.xml.XMLException;
-import com.lightcrafts.utils.xml.XmlNode;
 
 /**
  * An <code>ImageExportOptions</code> is a collection of options that can be
@@ -259,17 +259,13 @@ public abstract class ImageExportOptions {
         m_imageType = imageType;
     }
 
-    /**
-     * @deprecated
-     */
+    @Deprecated
     protected void save( XmlNode node ) {
         originalWidth.save( node );
         originalHeight.save( node );
     }
 
-    /**
-     * @deprecated
-     */
+    @Deprecated
     protected void restore( XmlNode node ) throws XMLException {
         originalWidth.restore( node );
         originalHeight.restore( node );

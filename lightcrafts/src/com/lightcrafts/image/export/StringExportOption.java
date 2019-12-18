@@ -2,10 +2,10 @@
 
 package com.lightcrafts.image.export;
 
-import java.io.IOException;
-
-import com.lightcrafts.utils.xml.XmlNode;
 import com.lightcrafts.utils.xml.XMLException;
+import com.lightcrafts.utils.xml.XmlNode;
+
+import java.io.IOException;
 
 /**
  * An <code>StringExportOption</code> is-an {@link ImageExportOption} for
@@ -46,17 +46,13 @@ public class StringExportOption extends ImageExportOption {
         m_value = newValue;
     }
 
-    /**
-     * @deprecated
-     */
+    @Deprecated
     public void save( XmlNode node ) {
         node = node.addChild( getName() );
         node.setAttribute( ValueTag, getValue() );
     }
 
-    /**
-     * @deprecated
-     */
+    @Deprecated
     public void restore( XmlNode node ) throws XMLException {
         node = node.getChild( getName() );
         m_value = node.getAttribute( ValueTag );

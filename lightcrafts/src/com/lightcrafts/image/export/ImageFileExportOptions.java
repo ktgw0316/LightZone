@@ -2,11 +2,11 @@
 
 package com.lightcrafts.image.export;
 
-import java.io.IOException;
-
 import com.lightcrafts.image.types.ImageType;
 import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlNode;
+
+import java.io.IOException;
 
 /**
  * A <code>ImageFileExportOptions</code> is-a {@link ImageExportOptions} that
@@ -83,9 +83,7 @@ public abstract class ImageFileExportOptions extends ImageExportOptions {
         resolutionUnit          = new ResolutionUnitOption( this );
     }
 
-    /**
-     * @deprecated
-     */
+    @Deprecated
     protected void save( XmlNode node ) {
         super.save( node );
         blackPointCompensation.save( node );
@@ -97,9 +95,7 @@ public abstract class ImageFileExportOptions extends ImageExportOptions {
         resolutionUnit.save( node );
     }
 
-    /**
-     * @deprecated
-     */
+    @Deprecated
     protected void restore( XmlNode node ) throws XMLException {
         super.restore( node );
         if ( node.hasChild( blackPointCompensation.getName() ) ) {

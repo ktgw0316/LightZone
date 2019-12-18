@@ -2,30 +2,28 @@
 
 package com.lightcrafts.image.types;
 
-import java.awt.color.ICC_Profile;
-import java.awt.image.*;
+import com.lightcrafts.image.BadImageFileException;
+import com.lightcrafts.image.ColorProfileException;
+import com.lightcrafts.image.ImageInfo;
+import com.lightcrafts.image.UnknownImageTypeException;
+import com.lightcrafts.image.export.ImageExportOptions;
+import com.lightcrafts.utils.UserCanceledException;
+import com.lightcrafts.utils.file.FileUtil;
+import com.lightcrafts.utils.thread.ProgressThread;
+import com.lightcrafts.utils.xml.XMLUtil;
+import lombok.Getter;
+import org.w3c.dom.Document;
+
+import javax.media.jai.PlanarImage;
 import java.awt.*;
+import java.awt.color.ICC_Profile;
+import java.awt.image.RenderedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-
-import javax.media.jai.PlanarImage;
-
-import lombok.Getter;
-import org.w3c.dom.Document;
-
-import com.lightcrafts.image.BadImageFileException;
-import com.lightcrafts.image.ColorProfileException;
-import com.lightcrafts.image.export.ImageExportOptions;
-import com.lightcrafts.image.ImageInfo;
-import com.lightcrafts.image.UnknownImageTypeException;
-import com.lightcrafts.utils.file.FileUtil;
-import com.lightcrafts.utils.thread.ProgressThread;
-import com.lightcrafts.utils.UserCanceledException;
-import com.lightcrafts.utils.xml.XMLUtil;
 
 /**
  * An <code>ImageType</code> is an abstract base class used to get information
@@ -244,8 +242,8 @@ public abstract class ImageType {
      * @throws UnsupportedOperationException if this method is called for an
      * image type that can not be exported to.
      * @see #canExport()
-     * @deprecated
      */
+    @Deprecated
     public final void putImage( ImageInfo imageInfo, PlanarImage image,
                                 ImageExportOptions options, byte[] lznData,
                                 ProgressThread thread ) throws IOException {
