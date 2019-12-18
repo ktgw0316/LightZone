@@ -39,7 +39,7 @@
     <mkdir dir="build"/>
     <mkdir dir="javah"/>
     <javac destdir="build" includeantruntime="false" debug="true"
-           source="9" target="9" nativeheaderdir="javah">
+           release="11" nativeheaderdir="javah">
       <src path="src"/>
       <compilerarg value="-XDignore.symbol.file"/>
       <classpath>
