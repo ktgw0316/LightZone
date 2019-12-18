@@ -2,22 +2,20 @@
 
 package com.lightcrafts.platform;
 
-import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.lang.reflect.InvocationTargetException;
-
-import javax.swing.*;
-
-import com.lightcrafts.utils.ProgressListener;
+import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.utils.ProgressIndicator;
+import com.lightcrafts.utils.ProgressListener;
 import com.lightcrafts.utils.Version;
-import com.lightcrafts.utils.swing.NoIcon;
 import com.lightcrafts.utils.thread.CancelableThread;
 import com.lightcrafts.utils.thread.CancelableThreadMonitor;
 import com.lightcrafts.utils.thread.ProgressThread;
-import com.lightcrafts.ui.LightZoneSkin;
 import org.jvnet.substance.SubstanceLookAndFeel;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * A <code>DefaultProgressDialog</code> implements {@link ProgressDialog} for
@@ -194,8 +192,8 @@ public final class DefaultProgressDialog implements ProgressDialog {
             final JButton cancelButton = new JButton( "Cancel ");
 
             final JOptionPane panel = new JOptionPane(
-                layoutPanel, JOptionPane.INFORMATION_MESSAGE,
-                0, NoIcon.INSTANCE, new Object[]{ cancelButton }
+                layoutPanel, JOptionPane.PLAIN_MESSAGE,
+                JOptionPane.DEFAULT_OPTION, null, new Object[]{ cancelButton }
             );
 
             if ( hasCancelButton ) {
