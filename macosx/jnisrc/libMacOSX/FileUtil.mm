@@ -56,22 +56,6 @@ JNIEXPORT jboolean JNICALL MacOSXFileUtil_METHOD(isAlias)
 }
 
 /**
- * Moves a set of files to the Trash.
- */
-JNIEXPORT jboolean JNICALL MacOSXFileUtil_METHOD(moveToTrash)
-    ( JNIEnv *env, jclass, jstring jDirectory, jobjectArray jFiles )
-{
-    auto_obj<NSAutoreleasePool> pool;
-    NSInteger tag;
-    BOOL const result =
-        [[NSWorkspace sharedWorkspace]
-            performFileOperation:NSWorkspaceRecycleOperation
-            source:LC_jstringToNSString( env, jDirectory ) destination:@""
-            files:LC_jStringArrayToNSArray( env, jFiles ) tag:&tag];
-    return result ? JNI_TRUE : JNI_FALSE;
-}
-
-/**
  * Resolve a Mac OS X alias file.
  * Returns the resolved file (or the original file if it wasn't an alias), or
  * null if there was an error.

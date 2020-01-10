@@ -2,15 +2,19 @@
 
 package com.lightcrafts.ui.browser.view;
 
+import com.lightcrafts.image.BadImageFileException;
 import com.lightcrafts.image.ImageInfo;
+import com.lightcrafts.image.UnknownImageTypeException;
 import com.lightcrafts.platform.AlertDialog;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.ui.export.ExportNameUtility;
+import lombok.val;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
 import static com.lightcrafts.ui.browser.view.Locale.LOCALE;
 
@@ -41,32 +45,37 @@ class FileActions {
             AlertDialog.WARNING_ALERT,
             okButton, cancelButton
         );
-        if (option == 0) {
-            Platform platform = Platform.getPlatform();
-            for (File file : files) {
-                String path = file.getAbsolutePath();
-                boolean deleted;
-                try {
-                    ImageInfo.closeAll();
-                    deleted = platform.moveFilesToTrash(new String[] { path });
-                }
-                catch (IOException e) {
-                    deleted = false;
-                }
-                if (! deleted) {
-                    String error =
-                        LOCALE.get("DeleteFailed", file.getName());
-                    option = alert.showAlert(
-                        frame, error, "", AlertDialog.ERROR_ALERT,
-                        LOCALE.get( "ContinueButton" ),
-                        LOCALE.get( "CancelButton" )
-                    );
-                    if (option > 0) {
-                        break;
-                    }
+        if (option != 0) return;
+
+        val desktop = getAwtDesktop();
+
+        for (File file : files) {
+            boolean deleted = desktop.map(d -> d.moveToTrash(file)).orElse(false);
+            if (! deleted) {
+                deleted = file.delete();
+            }
+            if (! deleted) {
+                String error =
+                    LOCALE.get("DeleteFailed", file.getName());
+                option = alert.showAlert(
+                    frame, error, "", AlertDialog.ERROR_ALERT,
+                    LOCALE.get( "ContinueButton" ),
+                    LOCALE.get( "CancelButton" )
+                );
+                if (option > 0) {
+                    break;
                 }
             }
         }
+    }
+
+    private static Optional<Desktop> getAwtDesktop() {
+        if (! Desktop.isDesktopSupported())
+            return Optional.empty();
+        val desktop = Desktop.getDesktop();
+        return desktop.isSupported(Desktop.Action.MOVE_TO_TRASH)
+                ? Optional.of(desktop)
+                : Optional.empty();
     }
 
     static void renameFile(File file, Component parent) {

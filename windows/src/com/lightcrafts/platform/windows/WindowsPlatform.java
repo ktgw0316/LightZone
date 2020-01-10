@@ -140,11 +140,6 @@ public final class WindowsPlatform extends Platform {
     }
 
     @Override
-    public boolean moveFilesToTrash( String[] pathNames ) {
-        return WindowsFileUtil.moveToRecycleBin( pathNames );
-    }
-
-    @Override
     public String resolveAliasFile( File file ) {
         return WindowsFileUtil.resolveShortcut( file.getAbsolutePath() );
     }

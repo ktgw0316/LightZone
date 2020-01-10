@@ -373,22 +373,6 @@ public class Platform {
     }
 
     /**
-     * Move a set of files to the Trash.
-     *
-     * @param pathNames An array of full paths of files to be moved to the
-     * Trash.
-     * @return Returns <code>true</code> only if all the file were moved.
-     */
-    public boolean moveFilesToTrash( String[] pathNames ) {
-        for ( String pathName : pathNames ) {
-            final File file = new File( pathName );
-            if ( !file.delete() )
-                return false;
-        }
-        return true;
-    }
-
-    /**
      * Assert that we are now ready to handle opening image files.
      */
     public void readyToOpenFiles() {
