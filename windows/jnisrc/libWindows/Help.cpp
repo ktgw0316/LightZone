@@ -12,15 +12,17 @@
 #include "htmlhelp.h"
 
 #ifndef _MSC_VER
-// HTML Help libs from recent MS SDKs are compiled with /GS, so link in the following.
+// HTML Help libs from recent MS SDKs are compiled with /GS and /guard:cf,
+// so link in the following.
 #ifdef _WIN64
 #define HH_GS_CALL __cdecl
 #else
 #define HH_GS_CALL __fastcall
 #endif
 extern "C" {
-	void HH_GS_CALL __GSHandlerCheck() { }
-	void HH_GS_CALL __security_check_cookie(uintptr_t) { }
+    void HH_GS_CALL __GSHandlerCheck() { }
+    void HH_GS_CALL __security_check_cookie(uintptr_t) { }
+    void _guard_check_icall_nop(uintptr_t) { }
 }
 #undef HH_GS_CALL
 #endif
