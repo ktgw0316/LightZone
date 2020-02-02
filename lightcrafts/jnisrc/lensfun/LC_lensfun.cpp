@@ -392,7 +392,7 @@ void LC_lensfun::initModifier
         mod = nullptr;
     }
 #if (LF_VERSION >= 0x00035f00) // 0.3.95
-    mod = new lfModifier(lens, focal, crop, fullWidth, fullHeight, LF_PF_U16);
+    mod = new lfModifier(crop, fullWidth, fullHeight, LF_PF_U16);
 #else
     mod = new lfModifier(lens, crop, fullWidth, fullHeight);
 #endif
@@ -402,10 +402,10 @@ void LC_lensfun::initModifier
         return;
     }
 #if (LF_VERSION >= 0x00035f00) // 0.3.95
-    mod->EnableDistortionCorrection();
-    mod->EnableTCACorrection();
-    mod->EnableVignettingCorrection(aperture, distance);
-    mod->EnableProjectionTransform(targeom);
+    mod->EnableDistortionCorrection(lens, focal);
+    mod->EnableTCACorrection(lens, focal);
+    mod->EnableVignettingCorrection(lens, focal, aperture, distance);
+    mod->EnableProjectionTransform(lens, focal, targeom);
     mod->EnableScaling(scale);
 #else
     mod->Initialize(lens, LF_PF_U16, focal, aperture, distance, scale, targeom,
