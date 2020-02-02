@@ -6,6 +6,7 @@ TARGET_BASE:=		DCRaw
 # Uncomment to compile in debug mode.
 #DEBUG:=			true
 
+JNI_EXTRA_CFLAGS:=	-std=c++11
 JNI_WINDOWS_CFLAGS:=	-fopenmp
 JNI_LINUX_CFLAGS:=	$(JNI_WINDOWS_CFLAGS)
 JNI_MACOSX_CFLAGS:=	-Xpreprocessor -fopenmp
