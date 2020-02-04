@@ -3,6 +3,7 @@
 **/build
 **/javah
 **/products
+**/release
 *.0
 *.a
 *.cache
@@ -30,6 +31,7 @@
 *~
 -
 .idea/**
+Java.runtime
 debian/*.debhelper
 debian/*.substvars
 debian/DEBIAN
