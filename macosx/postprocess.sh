@@ -21,6 +21,14 @@ for DEP in ${DEPS}; do
   install_name_tool -id ${LIB} ${LIB}
 done
 
+DEPS=$(otool -L *.dylib | egrep -v "/(usr/lib|System)" | grep -o "/.*dylib" | sort -u)
+for DEP in ${DEPS}; do
+  LIB=$(basename ${DEP})
+  cp -f ${DEP} ${LIB}
+  chmod 755 ${LIB}
+  install_name_tool -id ${LIB} ${LIB}
+done
+
 # Change the local library paths in each file
 FILES=$(find . -name "*.jnilib" -a ! -name "libquaqua*" -o -name "*.dylib" -o -name "dcraw_lz")
 for FILE in ${FILES}; do
