@@ -18,8 +18,9 @@ import com.lightcrafts.ui.operation.whitepoint.WhitePointControl;
 import com.lightcrafts.ui.operation.zone.ZoneControl;
 import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlNode;
-
-import static com.lightcrafts.ui.operation.Locale.LOCALE;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
 
 import javax.swing.*;
 import javax.swing.event.UndoableEditEvent;
@@ -30,9 +31,11 @@ import javax.swing.undo.UndoableEditSupport;
 import java.awt.*;
 import java.awt.event.AWTEventListener;
 import java.awt.event.MouseEvent;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.prefs.Preferences;
+
+import static com.lightcrafts.ui.operation.Locale.LOCALE;
 
 public class OpStack extends DraggableStack
     implements Scrollable, UndoableEditListener
@@ -205,36 +208,45 @@ public class OpStack extends DraggableStack
     }
 
     public OpControl addGenericControl(OperationType type, int index) {
-        GenericOperation op =
-            (GenericOperation) engine.insertOperation(type, index);
-        OpControl control;
-        if (op instanceof ColorPickerDropperOperation) {
-            control = new ColorPickerDropperControl(
-                (ColorPickerDropperOperation) op, this
-            );
-        }
-        else if (op instanceof ColorDropperOperation) {
-            if (op instanceof RawAdjustmentOperation) {
-                control = new RawAdjustmentControl(
-                    (RawAdjustmentOperation) op, this
-                );
-            }
-            else {
-                control = new ColorDropperControl(
-                    (ColorDropperOperation) op, this
-                );
-            }
-        }
-        else if (op instanceof ColorPickerOperation) {
-            control = new ColorPickerControl(
-                (ColorPickerOperation) op, this
-            );
-        }
-        else {
-            control = new GenericControl(op, this);
-        }
+        val op = (GenericOperation) engine.insertOperation(type, index);
+        val visitor = new VisitorImpl(this);
+        op.accept(visitor);
+        val control = visitor.getOpControl();
         addControl(control, index);
         return control;
+    }
+
+    @RequiredArgsConstructor
+    private static class VisitorImpl implements GenericOperationVisitor {
+        private final OpStack stack;
+
+        @Getter
+        private OpControl opControl;
+
+        @Override
+        public void visitColorPickerDropperOperation(ColorPickerDropperOperation op) {
+            opControl = new ColorPickerDropperControl(op, stack);
+        }
+
+        @Override
+        public void visitRawAdjustmentOperation(RawAdjustmentOperation op) {
+            opControl = new RawAdjustmentControl(op, stack);
+        }
+
+        @Override
+        public void visitColorDropperOperation(ColorDropperOperation op) {
+            opControl = new ColorDropperControl(op, stack);
+        }
+
+        @Override
+        public void visitColorPickerOperation(ColorPickerOperation op) {
+            opControl = new ColorPickerControl(op, stack);
+        }
+
+        @Override
+        public void visitGenericOperation(GenericOperation op) {
+            opControl = new GenericControl(op, stack);
+        }
     }
 
     public void addControl(SelectableControl control) {
