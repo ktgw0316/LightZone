@@ -60,7 +60,7 @@
   <launchers>
     <launcher name="LightZone" id="2" menuName="${compiler:sys.fullName}">
       <executable name="LightZone" iconSet="true" executableDir="." executableMode="gui" />
-      <java mainClass="com.lightcrafts.platform.windows.WindowsLauncher" vmParameters="-Xrs -XX:+UseG1GC -XX:MinHeapFreeRatio=30 -XX:MaxHeapFreeRatio=30 -Dfile.encoding=UTF8">
+      <java mainClass="com.lightcrafts.platform.windows.WindowsLauncher" vmParameters="-Xrs -XX:+UseG1GC -XX:MinHeapFreeRatio=30 -XX:MaxHeapFreeRatio=30 -Dfile.encoding=UTF8" -Dlensfun.dir=${launcher:sys.launcherDirectory}/share/lensfun">
         <classPath>
           <scanDirectory location="." failOnError="false" />
         </classPath>

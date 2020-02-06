@@ -124,6 +124,7 @@
       <sysproperty key="lightcrafts.debug" value="1"/>
       <sysproperty key="IDE" value="1"/>
       <sysproperty key="file.encoding" value="UTF8"/>
+      <sysproperty key="lensfun.dir" value="./share/lensfun"/>
     </java>
   </target>
 

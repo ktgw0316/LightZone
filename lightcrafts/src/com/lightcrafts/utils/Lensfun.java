@@ -36,9 +36,7 @@ public class Lensfun {
     private static String pathName = "";
     static {
         if (!Platform.isLinux()) {
-            final String baseDirName = System.getProperty("user.dir")
-                    + File.separator + "share"
-                    + File.separator + "lensfun";
+            final String baseDirName = System.getProperty("lensfun.dir");
             try {
                 pathName = Files.find(Paths.get(baseDirName), 1,
                         (path, attr) -> attr.isDirectory() && path.getFileName().toString().startsWith("version_"))

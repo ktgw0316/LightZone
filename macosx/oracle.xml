@@ -29,6 +29,7 @@
     <copy todir="${app-dir}">
       <fileset dir="products" excludes=".git">
         <exclude name="**/appbundler*.jar"/>
+        <exclude name="share"/>
         <include name="dcraw_lz"/>
         <include name="LightZone-forkd"/>
         <include name="**/*.dylib"/>
@@ -68,6 +69,7 @@
       <option value="-Dcom.apple.macos.useScreenMenuBar=true"/>
       <option value="-Dapple.awt.graphics.UseQuartz=false"/>
       <option value="-Dfile.encoding=utf-8"/>
+      <option value="-Dlensfun.dir=$APP_ROOT/Contents/Resources/share/lensfun"/>
 
       <bundledocument
         extensions="jpe,jpg,jpeg"
@@ -114,6 +116,9 @@
     </copy>
     <copy todir="${bundle-contents}/Resources">
       <fileset dir="helpers/JavaAppLauncher/Resources" excludes=".git"/>
+    </copy>
+    <copy todir="${bundle-contents}/Resources/share">
+      <fileset dir="products/share" excludes=".git"/>
     </copy>
 
     <exec executable="./postprocess.sh" dir="." failonerror="true" vmlauncher="false">
