@@ -39,7 +39,7 @@ public class ImageMetadata implements
     CaptureDateTimeProvider, Cloneable, ColorTemperatureProvider,
     CopyrightProvider, Externalizable, FileDateTimeProvider, FlashProvider,
     FocalLengthProvider, GPSProvider, ISOProvider, LensProvider, MakeModelProvider,
-    OrientationProvider, OriginalWidthHeightProvider, RatingProvider,
+    OrientationProvider, OriginalWidthHeightProvider, RatingProvider, ColorLabelProvider,
     ResolutionProvider, ShutterSpeedProvider, TitleProvider,
     WidthHeightProvider {
 
@@ -611,11 +611,23 @@ public class ImageMetadata implements
      */
     public int getRating() {
         final Collection<ImageMetadataDirectory> dirs =
-            findProvidersOf( RatingProvider.class );
+                findProvidersOf( RatingProvider.class );
         for ( ImageMetadataDirectory dir : dirs ) {
             final int rating = ((RatingProvider)dir).getRating();
             if ( rating != 0 )
                 return rating;
+        }
+        return 0;
+    }
+
+    @Override
+    public int getColorLabel() {
+        final Collection<ImageMetadataDirectory> dirs =
+            findProvidersOf( ColorLabelProvider.class );
+        for ( ImageMetadataDirectory dir : dirs ) {
+            final int colorLabel = ((ColorLabelProvider)dir).getColorLabel();
+            if ( colorLabel != 0 )
+                return colorLabel;
         }
         return 0;
     }

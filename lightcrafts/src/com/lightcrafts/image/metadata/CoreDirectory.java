@@ -2,29 +2,30 @@
 
 package com.lightcrafts.image.metadata;
 
-import java.awt.color.ICC_Profile;
-import java.awt.*;
-import java.io.File;
-import java.util.*;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.Document;
-
 import com.lightcrafts.image.ImageInfo;
-import com.lightcrafts.image.metadata.values.*;
+import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.image.metadata.providers.*;
+import com.lightcrafts.image.metadata.values.*;
 import com.lightcrafts.image.types.AuxiliaryImageInfo;
 import com.lightcrafts.image.types.ImageType;
 import com.lightcrafts.image.types.RawImageInfo;
-import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.utils.DCRaw;
 import com.lightcrafts.utils.TextUtil;
 import com.lightcrafts.utils.Version;
 import com.lightcrafts.utils.xml.XMLUtil;
+import org.jetbrains.annotations.NotNull;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import java.awt.*;
+import java.awt.color.ICC_Profile;
+import java.io.File;
+import java.util.*;
 
 import static com.lightcrafts.image.metadata.CoreTags.*;
 import static com.lightcrafts.image.metadata.ImageMetaType.*;
-import static com.lightcrafts.image.metadata.ImageOrientation.*;
+import static com.lightcrafts.image.metadata.ImageOrientation.ORIENTATION_LANDSCAPE;
+import static com.lightcrafts.image.metadata.ImageOrientation.ORIENTATION_UNKNOWN;
 import static com.lightcrafts.image.metadata.XMPConstants.*;
 
 /**
@@ -70,6 +71,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
         dir.addShutterSpeed( metadata );
 
         dir.addRating( metadata );
+        dir.addColorLabel( metadata );
         syncEditableMetadata( metadata );
     }
 
@@ -379,6 +381,8 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
                 break;
             case CORE_SHUTTER_SPEED:
                 return MetadataUtil.shutterSpeedString( value.getFloatValue() );
+            case CORE_COLOR_LABEL:
+                return Integer.toString(value.getIntValue());
         }
         return super.valueToString( value );
     }
@@ -507,11 +511,54 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
             xapRDFDescElement.appendChild( ratingElement );
         }
 
+        ////////// Color Label
+
+        final ImageMetaValue colorLabel = getValue( CORE_COLOR_LABEL );
+        if (colorLabel != null) {
+            final String colorLabelString = colorLabel.getStringValue();
+
+            final Element digiKamColorLabelElement = xmpDoc.createElementNS(
+                    XMP_DIGIKAM_NS, XMP_DIGIKAM_PREFIX + ":ColorLabel"
+            );
+            XMLUtil.setTextContentOf(digiKamColorLabelElement, colorLabelString);
+            xapRDFDescElement.appendChild( digiKamColorLabelElement );
+
+            final Element photoshopUrgencyElement = xmpDoc.createElementNS(
+                    XMP_PHOTOSHOP_NS, XMP_PHOTOSHOP_PREFIX + ":Urgency"
+            );
+            XMLUtil.setTextContentOf(photoshopUrgencyElement, colorLabelString);
+            xapRDFDescElement.appendChild( photoshopUrgencyElement );
+
+            final Element labelElement = xmpDoc.createElementNS(
+                    XMP_XAP_NS, XMP_XAP_PREFIX + ":Label"
+            );
+            XMLUtil.setTextContentOf( labelElement, convertToColorName(colorLabelString) );
+            xapRDFDescElement.appendChild( labelElement );
+        }
+
         elements.add( xapRDFDescElement );
         return elements;
     }
 
     ////////// private ////////////////////////////////////////////////////////
+
+    @NotNull
+    private String convertToColorName(@NotNull String c) {
+        switch (c) {
+            case "1":
+                return "Red";
+            case "3":
+                return "Yellow";
+            case "4":
+                return "Green";
+            case "5":
+                return "Blue";
+            case "6":
+                return "Purple";
+            default:
+                return "";
+        }
+    }
 
     /**
      * Adds the tag mappings.
@@ -812,6 +859,17 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     }
 
     /**
+     * Adds color label information to the <code>CoreDirectory</code>'s metadata.
+     *
+     * @param metadata The {@link ImageMetadata} to add into.
+     */
+    private void addColorLabel( ImageMetadata metadata ) {
+        final int colorLabel = metadata.getColorLabel();
+        if ( colorLabel > 0 )
+            putValue( CORE_COLOR_LABEL, new UnsignedShortMetaValue( colorLabel ) );
+    }
+
+    /**
      * Adds resolution information to the <code>CoreDirectory</code>'s metadata.
      *
      * @param metadata The {@link ImageMetadata} to add into.
@@ -910,6 +968,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
         add( CORE_CAMERA, "Camera", META_STRING, false );
         add( CORE_CAPTION, "Caption", META_STRING, true );
         add( CORE_CAPTURE_DATE_TIME, "CaptureDateTime", META_DATE, false );
+        add( CORE_COLOR_LABEL, "ColorLabel", META_USHORT, true );
         add( CORE_COLOR_PROFILE, "ColorProfile", META_STRING, false );
         add( CORE_COLOR_TEMPERATURE, "ColorTemperature", META_USHORT, false );
         add( CORE_COPYRIGHT, "Copyright", META_STRING, true );

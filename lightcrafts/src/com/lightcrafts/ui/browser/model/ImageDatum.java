@@ -378,7 +378,8 @@ public class ImageDatum {
                 CORE_FILE_NAME,
                 CORE_DIR_NAME,
                 CORE_IMAGE_ORIENTATION,
-                CORE_RATING)
+                CORE_RATING,
+                CORE_COLOR_LABEL)
                 .map(tag -> Pair.of(tag, core.getValue(tag)))
                 .filter(p -> p.right != null)
                 .forEach(thisCore::putValue);

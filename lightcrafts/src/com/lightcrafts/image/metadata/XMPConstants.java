@@ -2,9 +2,9 @@
 
 package com.lightcrafts.image.metadata;
 
-import java.text.SimpleDateFormat;
-
 import com.lightcrafts.app.Application;
+
+import java.text.SimpleDateFormat;
 
 /**
  * <code>XMPConstants</code> defines constants for XMP.
@@ -65,6 +65,18 @@ public interface XMPConstants {
     /** The XAP namespace prefix. */
     // String XMP_XAP_PREFIX = "xap";
     String XMP_XAP_PREFIX = "xmp";
+
+    /** The DigiKam namespace URI. */
+    String XMP_DIGIKAM_NS = "http://www.digikam.org/ns/1.0/";
+
+    /** The DigiKam namespace prefix. */
+    String XMP_DIGIKAM_PREFIX = "digiKam";
+
+    /** The PhotoShop namespace URI. */
+    String XMP_PHOTOSHOP_NS = "http://ns.adobe.com/photoshop/1.0/";
+
+    /** The PhotoShop namespace prefix. */
+    String XMP_PHOTOSHOP_PREFIX = "photoshop";
 
     /** The XMP XPacket begin processing instruction. */
     String XMP_XPACKET_BEGIN =
