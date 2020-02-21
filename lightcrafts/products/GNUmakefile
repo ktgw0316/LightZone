@@ -7,6 +7,7 @@ EXCLUDED_LIBS:=		$(wildcard \
 			../lib/ivy.jar \
 			../lib/lombok*.jar \
 			../lib/annotations*.jar \
+			../lib/jsr305*.jar \
 			../lib/*-javadoc.jar \
 			../lib/*-sources.jar \
 			)
