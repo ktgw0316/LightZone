@@ -2,31 +2,21 @@
 
 package com.lightcrafts.platform.windows;
 
-import java.awt.color.ICC_Profile;
-import java.io.File;
-import java.io.InputStream;
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Stream;
-
-import javax.swing.filechooser.FileSystemView;
-import javax.swing.*;
-
-import sun.awt.shell.ShellFolder;
-
+import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.platform.FileChooser;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.platform.PrinterLayer;
-import com.lightcrafts.utils.ColorProfileInfo;
-import com.lightcrafts.utils.directory.DirectoryMonitor;
-import com.lightcrafts.utils.directory.WindowsDirectoryMonitor;
-import com.lightcrafts.utils.file.FileUtil;
-import com.lightcrafts.utils.file.ICC_ProfileFileFilter;
 import com.lightcrafts.utils.Version;
+import com.lightcrafts.utils.file.FileUtil;
 
-import static com.lightcrafts.platform.windows.WindowsFileUtil.*;
+import javax.swing.filechooser.FileSystemView;
+import java.awt.color.ICC_Profile;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collection;
 
-import com.lightcrafts.ui.LightZoneSkin;
+import static com.lightcrafts.platform.windows.WindowsFileUtil.FOLDER_MY_PICTURES;
 
 public final class WindowsPlatform extends Platform {
 
@@ -37,11 +27,6 @@ public final class WindowsPlatform extends Platform {
         final String path =
             WindowsFileUtil.getFolderPathOf( FOLDER_MY_PICTURES );
         return path != null ? new File( path ) : null;
-    }
-
-    @Override
-    public DirectoryMonitor getDirectoryMonitor() {
-        return new WindowsDirectoryMonitor();
     }
 
     @Override
@@ -76,22 +61,7 @@ public final class WindowsPlatform extends Platform {
 
     @Override
     public String getDisplayNameOf( File file ) {
-        String displayName;
-
-        if ( file instanceof ShellFolder ) {
-            //
-            // This is a stupid hack fix when running on Vista that shows the
-            // GUID rather than the display name for the user's home directory
-            // (and a few other directories).
-            //
-            // See: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6488082
-            //
-            // It's apparently fixed for ShellFolder, but still broken for
-            // FileSystemView.
-            //
-            displayName = ((ShellFolder)file).getDisplayName();
-        } else
-            displayName = getFileSystemView().getSystemDisplayName( file );
+        String displayName = getFileSystemView().getSystemDisplayName( file );
 
         if ( displayName.endsWith( ".lnk" ) ) {
             //
@@ -139,18 +109,8 @@ public final class WindowsPlatform extends Platform {
     }
 
     @Override
-    public int getPhysicalMemoryInMB() {
-        return WindowsMemory.getPhysicalMemoryInMB();
-    }
-
-    @Override
     public Collection<ColorProfileInfo> getPrinterProfiles() {
         return getColorProfiles();
-    }
-
-    @Override
-    public boolean hasInternetConnectionTo( String hostName ) {
-        return WindowsInternetConnection.hasConnection();
     }
 
     @Override

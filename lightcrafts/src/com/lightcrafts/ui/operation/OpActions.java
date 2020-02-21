@@ -1,10 +1,12 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2016-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.operation;
 
 import com.lightcrafts.model.Engine;
 import com.lightcrafts.model.Operation;
 import com.lightcrafts.model.OperationType;
+import com.lightcrafts.ui.toolkit.IconFontFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -121,6 +123,23 @@ public class OpActions {
         action.putValue(OpKeyPropertyKey, key);
         actions.add(action);
 
+        // Add an Action for the LensCorrections:
+
+        key = "LensCorrections";
+        name = getName(key);
+        image = getImage(key);
+        icon = new ImageIcon(image);
+        tooltip = Resources.getString(key + "_Tooltip");
+        action = new AbstractAction(name, icon) {
+            public void actionPerformed(ActionEvent event) {
+                stack.addLensCorrectionsControl();
+            }
+        };
+        action.putValue(IconImageKey, image);
+        action.putValue(Action.SHORT_DESCRIPTION, tooltip);
+        action.putValue(OpKeyPropertyKey, key);
+        actions.add(action);
+
         // Add an Action for each OperationType supported by the Engine:
 
         Collection<OperationType> types = engine.getGenericOperationTypes();
@@ -217,6 +236,10 @@ public class OpActions {
     }
 
     private static BufferedImage getImage(String key) {
+        final BufferedImage bi = IconFontFactory.buildIconImage(key, 26);
+        if (bi != null) {
+            return bi;
+        }
         String iconName;
         try {
             iconName = Resources_ALL.getString(key + "_Icon");

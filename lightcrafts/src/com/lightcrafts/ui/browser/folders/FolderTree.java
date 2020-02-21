@@ -6,15 +6,11 @@ import com.lightcrafts.platform.Platform;
 import com.lightcrafts.ui.LightZoneSkin;
 
 import javax.swing.*;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.event.TreeSelectionEvent;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import java.awt.dnd.DropTarget;
 import java.io.File;
-import java.util.TooManyListenersException;
-import java.util.List;
-import java.util.LinkedList;
+import java.util.*;
 
 /**
  * A tree component representing folders in all file systems, with specialized
@@ -50,14 +46,8 @@ class FolderTree extends JTree {
             // Doesn't seem to happen
             e.printStackTrace();
         }
-        addTreeSelectionListener(
-            new TreeSelectionListener() {
-                public void valueChanged(TreeSelectionEvent e) {
-                    notifyFolderSelected();
-                }
-            }
-        );
-        listeners = new LinkedList<FolderTreeListener>();
+        addTreeSelectionListener(e -> notifyFolderSelected());
+        listeners = new LinkedList<>();
     }
 
     void addFolderTreeListener(FolderTreeListener listener) {
@@ -89,46 +79,35 @@ class FolderTree extends JTree {
         if (components == null || components.length == 0)
             return false;
         FolderTreeNode node = getRoot();
-        for ( String component : components ) {
+        for (String component : components) {
             if (component.isEmpty())
                 continue;
-            boolean matchedComponent = false;
-            for ( final FolderTreeNode child : node.getChildren() ) {
-                if ( child.toString().equals( component ) ) {
-                    node = child;
-                    matchedComponent = true;
-                    break;
-                }
-            }
-            if ( !matchedComponent )
+            node = node.getChildren().stream()
+                    .filter(child -> child.toString().equals(component))
+                    .findFirst()
+                    .orElse(null);
+            if (node == null)
                 return false;
         }
-        setSelectionPath( node.getTreePath() );
+        setSelectionPath(node.getTreePath());
         return true;
     }
 
     void notifyDropAccepted(List<File> files, File folder) {
-        for (FolderTreeListener listener : listeners) {
-            listener.folderDropAccepted(files, folder);
-        }
+        listeners.forEach(listener -> listener.folderDropAccepted(files, folder));
     }
 
     void notifyFolderSelected() {
         FolderTreeNode node = getSelectedNode();
         if (node != null) {
             File file = node.getFile();
-            for (FolderTreeListener listener : listeners) {
-                listener.folderSelectionChanged(file);
-            }
+            listeners.forEach(listener -> listener.folderSelectionChanged(file));
         }
     }
 
     FolderTreeNode getSelectedNode() {
         TreePath path = getSelectionPath();
-        if (path != null) {
-            return (FolderTreeNode) path.getLastPathComponent();
-        }
-        return null;
+        return path != null ? (FolderTreeNode) path.getLastPathComponent() : null;
     }
 
     void dispose() {

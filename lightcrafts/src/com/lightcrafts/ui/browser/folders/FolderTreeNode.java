@@ -1,10 +1,13 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2018-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.browser.folders;
 
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.utils.directory.DirectoryMonitor;
 import com.lightcrafts.utils.file.FileUtil;
+import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
@@ -22,13 +25,17 @@ class FolderTreeNode implements TreeNode {
     private final static FileSystemView FileSystemView =
         Platform.getPlatform().getFileSystemView();
 
-    private List<FolderTreeNode> children;
+    @NotNull
+    private List<FolderTreeNode> children = new ArrayList<>();
 
+    @Getter
     private FolderTreeNode parent;
 
+    @Getter
     private NodeFileIndex index;  // Maintain the tree-wide index
 
-    private DirectoryMonitor monitor;   // Update the watched folder list
+    @Getter
+    private DirectoryMonitor directoryMonitor;   // Update the watched folder list
 
     private File file;            // Determines the icon, node identity
 
@@ -44,38 +51,33 @@ class FolderTreeNode implements TreeNode {
 
     static FolderTreeNode createRoot() {
         NodeFileIndex index = new NodeFileIndex();
-        DirectoryMonitor monitor =
-            Platform.getPlatform().getDirectoryMonitor();
+        DirectoryMonitor monitor = Platform.getPlatform().getDirectoryMonitor();
         if (Platform.isMac()) {
             return new MacOSXRootTreeNode(index, monitor);
-        }
-        else {
+        } else {
             File[] roots = FileSystemView.getRoots();
             return new FolderTreeNode(roots[0], null, index, monitor);
         }
     }
 
-    FolderTreeNode(
-        File file,
+    FolderTreeNode(File file,
         FolderTreeNode parent,
         NodeFileIndex index,
-        DirectoryMonitor monitor
-    ) {
+        DirectoryMonitor directoryMonitor) {
         this.file = file;
         this.parent = parent;
         this.index = index;
-        this.monitor = monitor;
+        this.directoryMonitor = directoryMonitor;
         resolvedFile = FileUtil.resolveAliasFile(this.file);
         try {
-            File canonicalFile = resolvedFile.getCanonicalFile();
-            resolvedFile = canonicalFile;
+            resolvedFile = resolvedFile.getCanonicalFile();
         }
         catch (IOException e) {
             // Accept the non-canonical instance
             e.printStackTrace();
         }
         index.add(this);
-        monitor.addDirectory(resolvedFile);
+        directoryMonitor.addDirectory(resolvedFile);
     }
 
     void setIsDropTarget(boolean isTarget) {
@@ -86,18 +88,23 @@ class FolderTreeNode implements TreeNode {
         return isDropTarget;
     }
 
+    @Override
     public Enumeration<FolderTreeNode> children() {
         final Iterator<FolderTreeNode> i = getChildren().iterator();
         return new Enumeration<FolderTreeNode>() {
+            @Override
             public boolean hasMoreElements() {
                 return i.hasNext();
             }
+
+            @Override
             public FolderTreeNode nextElement() {
                 return i.next();
             }
         };
     }
 
+    @Override
     public boolean equals(Object o) {
         if (! (o instanceof FolderTreeNode)) {
             return false;
@@ -106,30 +113,33 @@ class FolderTreeNode implements TreeNode {
         return file.equals(node.file);
     }
 
+    @Override
     public boolean getAllowsChildren() {
         return !isLeaf();
     }
 
-    public TreeNode getChildAt( int index ) {
-        return getChildren().get( index );
+    @Override
+    public TreeNode getChildAt(int index) {
+        return getChildren().get(index);
     }
 
+    @Override
     public int getChildCount() {
         return getChildren().size();
     }
 
+    @Override
     public int getIndex(TreeNode node) {
+        assert node instanceof FolderTreeNode;
         return getChildren().indexOf(node);
     }
 
-    public TreeNode getParent() {
-        return parent;
-    }
-
+    @Override
     public int hashCode() {
         return file.hashCode();
     }
 
+    @Override
     public boolean isLeaf() {
         if (isLeaf == null) {
             isLeaf = isLeaf(file);
@@ -141,9 +151,10 @@ class FolderTreeNode implements TreeNode {
      * Returns the name of the folder this node represents as it would be
      * displayed in the native file browser of the OS.
      */
+    @Override
     public String toString() {
         if (name == null) {
-            name = Platform.getPlatform().getDisplayNameOf( file );
+            name = Platform.getPlatform().getDisplayNameOf(file);
         }
         return name;
     }
@@ -153,12 +164,10 @@ class FolderTreeNode implements TreeNode {
      * reconstructing tree paths from their serialized form.
      */
     FolderTreeNode getChildByName(String name) {
-        for (FolderTreeNode child : getChildren()) {
-            if (name.equals(child.toString())) {
-                return child;
-            }
-        }
-        return null;
+        return getChildren().stream()
+                .filter(child -> name.equals(child.toString()))
+                .findFirst()
+                .orElse(null);
     }
 
     File getFile() {
@@ -176,7 +185,7 @@ class FolderTreeNode implements TreeNode {
             try {
                 icon = FileSystemView.getSystemIcon(file);
             }
-            catch ( Throwable t ) {
+            catch (Throwable t) {
                 // ignore
             }
         }
@@ -184,14 +193,15 @@ class FolderTreeNode implements TreeNode {
     }
 
     TreePath getTreePath() {
-        ArrayList<TreeNode> path = new ArrayList<TreeNode>();
+        ArrayList<TreeNode> path = new ArrayList<>();
         //
         // Construct the TreePath in reverse, i.e., from the current node back
         // to the root, because it's easier.
         //
-        for ( TreeNode node = this; node != null; node = node.getParent() )
-            path.add( 0, node );
-        return new TreePath( path.toArray() );
+        for (TreeNode node = this; node != null; node = node.getParent()) {
+            path.add(0, node);
+        }
+        return new TreePath(path.toArray());
     }
 
     /**
@@ -199,45 +209,26 @@ class FolderTreeNode implements TreeNode {
      * the Windows tree cell renderer.
      */
     boolean hasSpecialIcon() {
-        return  FileSystemView.isDrive(file) ||
-                FileSystemView.isFileSystem(file) ||
-                FileSystemView.isRoot(file);
+        return  FileSystemView.isDrive(file)
+                || FileSystemView.isFileSystem(file)
+                || FileSystemView.isRoot(file);
     }
 
-    // Compute (or recompute) the chilren of this node.  Useful in the TreeNode
+    // Compute (or recompute) the children of this node.  Useful in the TreeNode
     // methods, and also when folder modifications are detected.
-    void updateChildren() {
-        if (children != null) {
-            for (FolderTreeNode child : children) {
-                // don't bother recursing; leak a little
-                monitor.removeDirectory(child.resolvedFile);
-                index.remove(child);
-                child.parent = null;
-            }
-        }
-        children = new ArrayList<FolderTreeNode>();
-
-        File[] files = FileSystemView.getFiles(resolvedFile, true);
-        if (files != null && files.length > 0) {
-            Arrays.sort(files);
-            for (File file : files) {
-                if (file.isDirectory())
-                    children.add(new FolderTreeNode(file, this, index, monitor));
-            }
-        }
-        Collections.sort(children, FolderTreeNodeComparator.INSTANCE);
-    }
-
-    NodeFileIndex getIndex() {
-        return index;
-    }
-
-    DirectoryMonitor getDirectoryMonitor() {
-        return monitor;
+    synchronized void updateChildren() {
+        children.clear();
+        final File[] files = FileSystemView.getFiles(resolvedFile, true);
+        assert files != null;
+        Arrays.stream(files)
+                .sorted()
+                .filter(File::isDirectory)
+                .forEach(it -> children.add(new FolderTreeNode(it, this, index, directoryMonitor)));
+        children.sort(FolderTreeNodeComparator.INSTANCE);
     }
 
     List<FolderTreeNode> getChildren() {
-        if (children == null) {
+        if (children.isEmpty()) {
             updateChildren();
         }
         return children;
@@ -248,19 +239,18 @@ class FolderTreeNode implements TreeNode {
      * node must be a file and not an alias to a folder.
      */
     private static boolean isLeaf(File file) {
-        if (FileSystemView.isDrive(file )         ||
-            FileSystemView.isFileSystemRoot(file) ||
-            FileSystemView.isFloppyDrive(file)    ||
-            FileSystemView.isRoot(file)
-        ) {
+        if (FileSystemView.isDrive(file)
+                || FileSystemView.isFileSystemRoot(file)
+                || FileSystemView.isFloppyDrive(file)
+                || FileSystemView.isRoot(file)) {
             return false;
         }
-        file = FileUtil.isFolder( file );
+        file = FileUtil.isFolder(file);
         return file == null;
 /*
-        if ( file == null )
+        if (file == null)
             return true;
-        if ( file instanceof SmartFolder ) {
+        if (file instanceof SmartFolder) {
             //
             // Always consider a SmartFolder to be a non-leaf node because
             // determining whether it contains subfolders via listFiles() may
@@ -268,7 +258,7 @@ class FolderTreeNode implements TreeNode {
             //
             return false;
         }
-        return !FileUtil.containsAtLeastOne( file, FolderFilter.INSTANCE );
+        return !FileUtil.containsAtLeastOne(file, FolderFilter.INSTANCE);
 */
     }
 }

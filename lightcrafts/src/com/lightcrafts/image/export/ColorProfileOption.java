@@ -5,7 +5,7 @@ package com.lightcrafts.image.export;
 import java.awt.color.ICC_Profile;
 
 import com.lightcrafts.jai.JAIContext;
-import com.lightcrafts.utils.ColorProfileInfo;
+import com.lightcrafts.image.color.ColorProfileInfo;
 
 /**
  * A <code>ColorProfileOption</code> is-an {@link IntegerExportOption} for

@@ -2,9 +2,9 @@
 
 package com.lightcrafts.model.ImageEditor;
 
-import com.lightcrafts.mediax.jai.TileComputationListener;
-import com.lightcrafts.mediax.jai.TileRequest;
-import com.lightcrafts.mediax.jai.PlanarImage;
+import javax.media.jai.TileComputationListener;
+import javax.media.jai.TileRequest;
+import javax.media.jai.PlanarImage;
 import java.awt.image.Raster;
 import java.awt.*;
 import java.util.*;
@@ -30,7 +30,7 @@ class PaintRequest implements PaintContext {
     private Set<Point> handledTiles = new HashSet<Point>();
     private boolean cancelled = false;
 
-    PaintRequest(PlanarImage image, int epoch, Point tileIndices[], boolean syncronous, boolean prefetch, TileHandler handler) {
+    PaintRequest(PlanarImage image, int epoch, Point[] tileIndices, boolean syncronous, boolean prefetch, TileHandler handler) {
         this.image = image;
         this.epoch = epoch;
         this.synchronous = syncronous;
@@ -178,7 +178,7 @@ public class TileManager implements TileComputationListener {
         }
 
         if (!tiles.isEmpty()) {
-            Point tileIndices[] = new Point[tiles.size()];
+            Point[] tileIndices = new Point[tiles.size()];
 
             int i = 0;
             for (final Point p : tiles)

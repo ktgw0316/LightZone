@@ -3,18 +3,26 @@
 
 package com.lightcrafts.platform;
 
-import com.lightcrafts.utils.ColorProfileInfo;
+import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.utils.Version;
 import com.lightcrafts.utils.directory.DirectoryMonitor;
 import com.lightcrafts.utils.directory.UnixDirectoryMonitor;
 import com.lightcrafts.utils.file.ICC_ProfileFileFilter;
 
+import javax.management.AttributeNotFoundException;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
+import javax.management.ReflectionException;
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 import java.awt.color.ICC_Profile;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -196,7 +204,18 @@ public class Platform {
      * @return Returns the amount of memory in megabytes.
      */
     public int getPhysicalMemoryInMB() {
-        return 0;
+        long totalPhysicalMemory = 0;
+        final MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
+        try {
+            final Object attribute = mBeanServer.getAttribute(
+                    new ObjectName("java.lang", "type", "OperatingSystem"),
+                    "TotalPhysicalMemorySize");
+            totalPhysicalMemory = Long.parseLong(attribute.toString());
+        } catch (AttributeNotFoundException | MBeanException | InstanceNotFoundException
+                | ReflectionException | MalformedObjectNameException e) {
+            e.printStackTrace();
+        }
+        return (int) (totalPhysicalMemory / 1048576);
     }
 
     /**
@@ -288,13 +307,12 @@ public class Platform {
      * @param hostName The fully qualified name of the desired host to connect
      * to.
      * @return Returns <code>true</code> only if this computer currently has
-     * an active internet connection and thus can reach the specified host.
+     * an active internet connection and can reach the specified host.
      */
-    @SuppressWarnings({"ResultOfMethodCallIgnored"})
     public boolean hasInternetConnectionTo( String hostName ) {
         try {
-            InetAddress.getByName( hostName );
-            return true;
+            final InetAddress address = InetAddress.getByName(hostName);
+            return address.isReachable(2000);
         }
         catch (Throwable t) {
             return false;

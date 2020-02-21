@@ -19,7 +19,7 @@ public class ScaleModel {
     private final static Scale MaxScale = new Scale(12, 1);
 
     private Engine engine;
-    private ArrayList<Scale> scales;   // A copy of engine.getPreferredScales();
+    private List<Scale> scales;   // A copy of engine.getPreferredScales();
 
     private int index;          // The current scale from the scales List
     private Scale offScale;     // The current Scale if it is not from the List
@@ -37,8 +37,8 @@ public class ScaleModel {
     ScaleModel(Engine engine, Scale scale) {
         this.engine = engine;
 
-        scales = new ArrayList(engine.getPreferredScales());
-        Collections.sort(scales);
+        scales = engine.getPreferredScales();
+        // Collections.sort(scales);
         listeners = new LinkedList<ScaleListener>();
 
         setScale(scale);

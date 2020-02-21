@@ -25,20 +25,20 @@ import java.awt.image.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import com.lightcrafts.mediax.jai.ColorSpaceJAI;
-import com.lightcrafts.mediax.jai.ImageLayout;
-import com.lightcrafts.mediax.jai.PointOpImage;
-import com.lightcrafts.mediax.jai.RasterFactory;
+import javax.media.jai.ColorSpaceJAI;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.PointOpImage;
+import javax.media.jai.RasterFactory;
 import java.lang.ref.SoftReference;
 
 /**
  * An <code>OpImage</code> implementing the "LCColorConvert" operation as
- * described in <code>com.lightcrafts.mediax.jai.operator.ColorConvertDescriptor</code>.
+ * described in <code>javax.media.jai.operator.ColorConvertDescriptor</code>.
  *
  * @since EA4
  *
- * @see com.lightcrafts.mediax.jai.PointOpImage
- * @see com.lightcrafts.mediax.jai.operator.ColorConvertDescriptor
+ * @see javax.media.jai.PointOpImage
+ * @see javax.media.jai.operator.ColorConvertDescriptor
  *
  */
 final class LCColorConvertOpImage extends PointOpImage {
@@ -134,11 +134,11 @@ final class LCColorConvertOpImage extends PointOpImage {
                 // ICC_Profile srcProfile = ((ICC_ColorSpace) src).getProfile();
                 ICC_Profile dstProfile = ((ICC_ColorSpace) dst).getProfile();
 
-                // srcProfile = ICC_Profile.getInstance(srcProfile.getData());
+                // srcProfile = ICC_Profile.updateInstance(srcProfile.getData());
                 dstProfile = ICC_Profile.getInstance(dstProfile.getData());
 
                 /*if (getRenderingIntent(srcProfile) != renderingIntent.getValue()) {
-                    srcProfile = ICC_Profile.getInstance(srcProfile.getData());
+                    srcProfile = ICC_Profile.updateInstance(srcProfile.getData());
                     setRenderingIntent(srcProfile, renderingIntent.getValue());
                     src = new ICC_ColorSpace(srcProfile);
                 }*/

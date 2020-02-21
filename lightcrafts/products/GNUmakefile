@@ -5,6 +5,8 @@ RM:=			rm -fr
 
 EXCLUDED_LIBS:=		$(wildcard \
 			../lib/ivy.jar \
+			../lib/lombok*.jar \
+			../lib/annotations*.jar \
 			../lib/*-javadoc.jar \
 			../lib/*-sources.jar \
 			)

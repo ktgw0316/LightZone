@@ -2,12 +2,12 @@
 
 package com.lightcrafts.jai;
 
-import com.lightcrafts.utils.ColorScience;
+import com.lightcrafts.image.color.ColorScience;
 
-import com.lightcrafts.mediax.jai.LookupTableJAI;
-import com.lightcrafts.mediax.jai.RasterFactory;
-import com.lightcrafts.mediax.jai.RasterAccessor;
-import com.lightcrafts.mediax.jai.RasterFormatTag;
+import javax.media.jai.LookupTableJAI;
+import javax.media.jai.RasterFactory;
+import javax.media.jai.RasterAccessor;
+import javax.media.jai.RasterFormatTag;
 import java.awt.image.WritableRaster;
 import java.awt.image.Raster;
 import java.awt.image.SampleModel;

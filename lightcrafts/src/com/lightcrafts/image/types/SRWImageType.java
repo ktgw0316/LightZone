@@ -126,7 +126,7 @@ public final class SRWImageType extends RawImageType {
      * All the possible filename extensions for SRW files.  All must be lower
      * case and the preferred one must be first.
      */
-    private static final String EXTENSIONS[] = {
-        "srw"
+    private static final String[] EXTENSIONS = {
+            "srw"
     };
 }

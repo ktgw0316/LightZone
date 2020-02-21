@@ -51,16 +51,6 @@ public final class MacOSXLauncher extends Launcher {
     ////////// protected //////////////////////////////////////////////////////
 
     @Override
-    protected void setSystemProperties() {
-        // System.setProperty("apple.awt.graphics.UseQuartz", "false");
-    }
-
-    @Override
-    protected void enableTextAntiAliasing() {
-        // Do nothing.
-    }
-
-    @Override
     protected String showJavaVersion() {
         String javaVersion = super.showJavaVersion();
         checkJavaVersion(javaVersion);
@@ -264,7 +254,6 @@ public final class MacOSXLauncher extends Launcher {
         System.setProperty( "apple.awt.showGrowBox"     , "true" );
         // System.setProperty( "apple.awt.textantialiasing", "true" );
         // System.setProperty( "apple.awt.antialiasing"    , "false" );
-        System.setProperty( "swing.aatext", "true" );
         System.setProperty( "apple.awt.graphics.UseQuartz", "false" );
 
         final Desktop app = Desktop.getDesktop(); 

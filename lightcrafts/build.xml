@@ -8,8 +8,6 @@
 
   <property name="common-jar" value="products/lightcrafts.jar"/>
 
-  <property name="lcjai-jar" value="products/lcjai.jar"/>
-
 	<exec executable="cat" vmlauncher="true" failonerror="true"
 	      outputproperty="app-version">
 		<arg value="version.txt"/>
@@ -39,7 +37,20 @@
     </or>
   </condition>
 
-  <property name="jai-classpath" value="lib/mlibwrapper_jai.jar"/>
+  <condition property="javafx.platform" value="linux">
+    <not>
+      <or>
+        <os family="mac"/>
+        <os family="windows"/>
+      </or>
+    </not>
+  </condition>
+  <condition property="javafx.platform" value="mac">
+    <os family="mac"/>
+  </condition>
+  <condition property="javafx.platform" value="win">
+    <os family="windows"/>
+  </condition>
 
   <target name="resolve" depends="init-ivy">
     <ivy:resolve file="${basedir}/ivy.xml"/>
@@ -71,19 +82,12 @@
           vmlauncher="true">
       <arg value="-j"/>
     </exec>
-
-    <mkdir dir="extbuild"/>
-    <javac srcdir="extsrc" destdir="extbuild" includeantruntime="false"
-           source="1.6" target="1.6"
-           debug="true" classpath="${jai-classpath}"/>
-
     <mkdir dir="build"/>
     <mkdir dir="javah"/>
     <javac destdir="build" includeantruntime="false" debug="true"
-           source="1.8" target="1.8" nativeheaderdir="javah">
+           release="11" nativeheaderdir="javah">
       <src path="src"/>
       <classpath>
-        <pathelement path="extbuild"/>
         <fileset dir="lib">
           <include name="*.jar"/>
         </fileset>
@@ -140,18 +144,6 @@
       <manifest>
         <attribute name="Built-By" value="${user.name}"/>
         <attribute name="Main-Class" value="com.lightcrafts.app.Application"/>
-        <attribute name="Implementation-Title" value="${app-name}"/>
-        <attribute name="Implementation-Vendor" value="Light Crafts, Inc."/>
-        <attribute name="Implementation-Version"
-                   value="${app-version} ${TODAY}"/>
-      </manifest>
-    </jar>
-
-    <delete file="${lcjai-jar}"/>
-    <jar jarfile="${lcjai-jar}">
-      <fileset dir="extbuild"/>
-      <manifest>
-        <attribute name="Built-By" value="${user.name}"/>
         <attribute name="Implementation-Title" value="${app-name}"/>
         <attribute name="Implementation-Vendor" value="Light Crafts, Inc."/>
         <attribute name="Implementation-Version"
@@ -228,7 +220,6 @@
     <parallel>
       <delete dir="build"/>
       <delete dir="javah"/>
-      <delete dir="extbuild"/>
     </parallel>
     <exec executable="${MAKE}" dir="jnisrc">
       <arg value="-j"/>

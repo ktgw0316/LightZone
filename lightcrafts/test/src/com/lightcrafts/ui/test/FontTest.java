@@ -55,7 +55,8 @@ public class FontTest extends JPanel {
         Panel choicePanel = new Panel();
         choicePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-        String[] fontNames = getToolkit().getFontList();
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        String[] fontNames = ge.getAvailableFontFamilyNames();
         String defaultFontName = getFont().getName();
         fontChoice = new Choice();
         fontChoice.addItem("");

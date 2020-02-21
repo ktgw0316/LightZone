@@ -44,8 +44,8 @@ public final class X3FImageType extends RawImageType {
      * All the possible filename extensions for X3F files.  All must be lower
      * case and the preferred one must be first.
      */
-    private static final String EXTENSIONS[] = {
-        "x3f"
+    private static final String[] EXTENSIONS = {
+            "x3f"
     };
 }
 /* vim:set et sw=4 ts=4: */

@@ -1,9 +1,12 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2016-     Masahiro Kitagawa */
 
 package com.lightcrafts.utils.xml;
 
 import com.lightcrafts.utils.TextUtil;
 import com.lightcrafts.utils.file.FileUtil;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.*;
 import org.xml.sax.ErrorHandler;
@@ -16,7 +19,7 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
-import java.util.ArrayList;
+import java.util.*;
 
 import static com.lightcrafts.image.metadata.XMPConstants.XMP_XAP_NS;
 
@@ -160,11 +163,9 @@ public final class XMLUtil {
      * satisfy the given filter.
      */
     public static Node[] getChildrenOf( Element parent, XMLFilter filter ) {
-        final ArrayList<Node> result = new ArrayList<Node>();
-        final NodeList children = parent.getChildNodes();
-        final int numChildren = children.getLength();
-        for ( int i = 0; i < numChildren; ++i ) {
-            final Node child = children.item( i );
+        val result = new ArrayList<Node>();
+        val children = asList(parent.getChildNodes());
+        for (val child : children) {
             if ( filter.accept( child ) )
                 result.add( child );
         }
@@ -179,11 +180,9 @@ public final class XMLUtil {
      * @return Returns the coalesced text.
      */
     public static String getCoalescedTextChildrenOf( Element parent ) {
-        final StringBuilder buf = new StringBuilder();
-        final NodeList children = parent.getChildNodes();
-        final int numChildren = children.getLength();
-        for ( int i = 0; i < numChildren; ++i ) {
-            final Node child = children.item( i );
+        val buf = new StringBuilder();
+        val children = asList(parent.getChildNodes());
+        for (val child : children) {
             if ( child instanceof Text )
                 buf.append( ((CharacterData)child).getData() );
         }
@@ -201,10 +200,8 @@ public final class XMLUtil {
      * filter.
      */
     public static Node getFirstChildOf( Element parent, XMLFilter filter ) {
-        final NodeList children = parent.getChildNodes();
-        final int numChildren = children.getLength();
-        for ( int i = 0; i < numChildren; ++i ) {
-            final Node child = children.item( i );
+        val children = asList(parent.getChildNodes());
+        for (val child : children) {
             if ( filter.accept( child ) )
                 return child;
         }
@@ -233,10 +230,8 @@ public final class XMLUtil {
      * child node that satisfies the given filter.
      */
     public static boolean hasChild( Element parent, XMLFilter filter ) {
-        final NodeList children = parent.getChildNodes();
-        final int numChildren = children.getLength();
-        for ( int i = 0; i < numChildren; ++i ) {
-            final Node child = children.item( i );
+        val children = asList(parent.getChildNodes());
+        for (val child : children) {
             if ( filter.accept( child ) )
                 return true;
         }
@@ -287,9 +282,7 @@ public final class XMLUtil {
             }
         }
         catch ( SAXException e ) {
-            final IOException ioe = new IOException( "Couldn't read XML" );
-            ioe.initCause( e );
-            throw ioe;
+            throw new IOException("Couldn't read XML", e);
         }
     }
 
@@ -301,7 +294,7 @@ public final class XMLUtil {
      */
     public static void removeChildrenFrom( Element parent ) {
         while ( true ) {
-            final Node child = parent.getFirstChild();
+            val child = parent.getLastChild();
             if ( child == null )
                 return;
             parent.removeChild( child );
@@ -317,16 +310,11 @@ public final class XMLUtil {
      * @see #removeChildrenFrom(Element)
      */
     public static void removeChildrenFrom( Element parent, XMLFilter filter ) {
-        final NodeList children = parent.getChildNodes();
-        int i = 0;
-        while ( true ) {
-            final Node child = children.item( i );
-            if ( child == null )
-                return;
-            if ( filter.accept( child ) )
-                parent.removeChild( child );
-            else
-                ++i;
+        val children = asReversedArray(parent.getChildNodes());
+        for (val child : children) {
+            if (filter.accept(child)) {
+                parent.removeChild(child);
+            }
         }
     }
 
@@ -389,6 +377,38 @@ public final class XMLUtil {
         }
     }
 
+    /**
+     * Create a {@link List} of {@link Node}s from {@link NodeList}.
+     * @param nodes The {@link NodeList}.
+     * @return Said {@link List} of Nodes.
+     */
+    static List<Node> asList(NodeList nodes) {
+        return nodes.getLength() == 0
+                ? Collections.<Node>emptyList()
+                : new NodeListWrapper(nodes, false);
+    }
+
+    /**
+     * Create a reversed {@link List} of {@link Node}s from {@link NodeList}.
+     * @param nodes The {@link NodeList}.
+     * @return Said {@link List} of Nodes.
+     */
+    static List<Node> asListReversed(NodeList nodes) {
+        return nodes.getLength() == 0
+                ? Collections.<Node>emptyList()
+                : new NodeListWrapper(nodes, true);
+    }
+
+    /**
+     * Create a reversed array of {@link Node}s from {@link NodeList}.
+     * @param nodes The {@link NodeList}.
+     * @return Said array of Nodes.
+     */
+    static Node[] asReversedArray(NodeList nodes) {
+        val list = asListReversed(nodes);
+        return list.toArray(new Node[list.size()]);
+    }
+
     ////////// private ////////////////////////////////////////////////////////
 
     /**
@@ -412,7 +432,26 @@ public final class XMLUtil {
         return xform;
     }
 
-    private static DocumentBuilder m_builder;
+    @RequiredArgsConstructor
+    private static class NodeListWrapper
+            extends AbstractList<Node> implements RandomAccess {
+        private final NodeList nodes;
+        private final boolean isReversed;
+
+        @Override
+        public Node get(int index) {
+            return isReversed
+                    ? nodes.item(nodes.getLength() - 1 - index)
+                    : nodes.item(index);
+        }
+
+        @Override
+        public int size() {
+            return nodes.getLength();
+        }
+    }
+
+    private static final DocumentBuilder m_builder;
 
     private static final XMLFilter m_textNodeTypeFilter =
         new NodeTypeFilter( Node.TEXT_NODE );

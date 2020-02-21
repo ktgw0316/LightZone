@@ -9,7 +9,7 @@ import com.lightcrafts.image.metadata.providers.ResolutionProvider;
 import com.lightcrafts.image.types.ImageType;
 import com.lightcrafts.image.types.RawImageType;
 import com.lightcrafts.image.types.TIFFImageType;
-import com.lightcrafts.utils.ColorProfileInfo;
+import com.lightcrafts.image.color.ColorProfileInfo;
 
 import java.awt.*;
 import java.awt.color.ICC_Profile;

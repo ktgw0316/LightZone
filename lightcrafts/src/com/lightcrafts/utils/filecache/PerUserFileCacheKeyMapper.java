@@ -2,11 +2,12 @@
 
 package com.lightcrafts.utils.filecache;
 
-import java.io.File;
-import java.io.IOException;
-
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.utils.Version;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * A <code>PerUserFileCacheKeyMapper</code> is-a {@link FileCacheKeyMapper}
@@ -43,7 +44,7 @@ public final class PerUserFileCacheKeyMapper implements FileCacheKeyMapper {
      * returned file exists.
      * @return Returns said {@link File}.
      */
-    public File mapKeyToFile( String key, boolean ensurePathExists ) {
+    public File mapKeyToFile(@NotNull String key, boolean ensurePathExists ) {
         final File keyAsFile = new File( key );
         String dirOfFile = keyAsFile.getParent();
         if ( dirOfFile == null )

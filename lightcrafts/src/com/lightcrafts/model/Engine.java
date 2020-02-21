@@ -1,10 +1,13 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2016-     Masahiro Kitagawa */
 
 package com.lightcrafts.model;
 
 import com.lightcrafts.image.export.ImageExportOptions;
+import com.lightcrafts.model.ImageEditor.LensCorrectionsOperation;
 import com.lightcrafts.utils.thread.ProgressThread;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.RenderedImage;
@@ -108,6 +111,13 @@ public interface Engine {
     WhitePointOperation insertWhitePointOperation(int position);
 
     /**
+     * Add a LensCorrectionsOperation to the current pipeline at the bottom.
+     * @return A LensCorrectionsOperation instance that can control the inserted
+     * transformation.
+     */
+    LensCorrectionsOperation insertLensCorrectionsOperation(int position);
+
+    /**
      * Get the special OperationType of the "RAW Adjustments" singleton
      * Operation that controls RAW conversion settings.
      */
@@ -130,7 +140,7 @@ public interface Engine {
      * arguments for the LayerConfig constructor.
      * @return A List of LayerModes.
      */
-    List getLayerModes();
+    List<LayerMode> getLayerModes();
 
     /**
      * Interchange the Operation at the given position with its neighbor
@@ -155,7 +165,9 @@ public interface Engine {
      * values it prefers for some reason.
      * @return A List of Scale objects.
      */
-    List getPreferredScales();
+    List<Scale> getPreferredScales();
+
+    Scale getScale();
 
     /**
      * Force the Engine to adopt a given Scale.
@@ -230,8 +242,6 @@ public interface Engine {
      * Print the current image.
      * @param thread A ProgressIndicator to provide user feedback during
      * rendering.
-     * @param printJob A PrinterJob on which to call setPrintable() and
-     * print().
      * @param format The orientation, paper, and margin info for PrinterJob.
      * @param settings Layout information for the image within the paper's
      * imageable area.
@@ -261,7 +271,7 @@ public interface Engine {
      * development and testing.
      * @return A List of JMenuItems.
      */
-    List getDebugItems();
+    List<JMenuItem> getDebugItems();
 
     /**
      * Clean up whatever resources this Engine is holding.  Call this only

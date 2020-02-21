@@ -1,43 +1,47 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2016-     Masahiro Kitagawa */
 
 package com.lightcrafts.image.metadata.makernotes;
 
 import com.lightcrafts.image.metadata.ImageMetadata;
+
+import lombok.NoArgsConstructor;
+import lombok.val;
 
 /**
  * <code>KodakMakerNoteProbe</code> is-a {@link MakerNoteProbe} for determining
  * whether a maker note is by Kodak.
  *
  * @author Paul J. Lucas [paul@lightcrafts.com]
+ * @author Masahiro Kitagawa [arctica0316@gmail.com]
  */
-final class KodakMakerNoteProbe extends MakerNoteProbe {
-
-    /** The singleton instance of <code>KodakMakerNoteProbe</code>. */
-    static final MakerNoteProbe INSTANCE = new KodakMakerNoteProbe();
-
-    ////////// protected //////////////////////////////////////////////////////
+@NoArgsConstructor(staticName = "create")
+final class KodakMakerNoteProbe extends MakerNoteProbe<KodakDirectory>
+{
+    @Override
+    protected Class<KodakDirectory> getDirClass() {
+        return KodakDirectory.class;
+    }
 
     /**
      * {@inheritDoc}
      */
-    protected Class<? extends MakerNotesDirectory>
-    match( ImageMetadata metadata ) {
-        if ( matchUsingMake( metadata, "KODAK", KodakDirectory.class ) == null )
+    @Override
+    protected Class<KodakDirectory>
+    match(ImageMetadata metadata) {
+        if (matchUsingMake(metadata) == null) {
             return null;
-        final String cameraMakeModel = metadata.getCameraMake( true );
-        for ( String model : m_models )
-            if ( cameraMakeModel.contains( model ) )
+        }
+        val cameraMakeModel = metadata.getCameraMake(true);
+        if (cameraMakeModel == null) {
+            return null;
+        }
+        for (val model : m_models) {
+            if (cameraMakeModel.contains(model)) {
                 return KodakDirectory.class;
+            }
+        }
         return null;
-    }
-
-    ////////// private ////////////////////////////////////////////////////////
-
-    /**
-     * Construct the singleton instance of <code>KodakMakerNoteProbe</code>.
-     */
-    private KodakMakerNoteProbe() {
-        // do nothing
     }
 
     /**

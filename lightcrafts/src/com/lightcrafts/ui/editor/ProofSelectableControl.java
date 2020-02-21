@@ -8,7 +8,7 @@ import com.lightcrafts.model.RenderingIntent;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.ui.operation.SelectableControl;
 import com.lightcrafts.ui.toolkit.WidePopupComboBox;
-import com.lightcrafts.utils.ColorProfileInfo;
+import com.lightcrafts.image.color.ColorProfileInfo;
 
 import static com.lightcrafts.ui.editor.Locale.LOCALE;
 import com.lightcrafts.ui.help.HelpConstants;

@@ -6,8 +6,6 @@ import com.lightcrafts.platform.AlertDialog;
 import com.lightcrafts.platform.FileChooser;
 import com.lightcrafts.platform.Platform;
 
-import static com.lightcrafts.prefs.Locale.LOCALE;
-
 import javax.swing.*;
 import java.awt.color.ICC_Profile;
 import java.awt.event.ActionEvent;
@@ -16,6 +14,8 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.prefs.Preferences;
+
+import static com.lightcrafts.prefs.Locale.LOCALE;
 
 class DisplayProfileItem extends PreferencesItem implements ActionListener {
 
@@ -40,18 +40,22 @@ class DisplayProfileItem extends PreferencesItem implements ActionListener {
         addHelpListeners();
     }
 
+    @Override
     public String getLabel() {
         return LOCALE.get("DisplayProfileItemLabel");
     }
 
+    @Override
     public String getHelp(MouseEvent e) {
         return LOCALE.get("DisplayProfileItemHelp");
     }
 
+    @Override
     public boolean requiresRestart() {
         return true;
     }
 
+    @Override
     public JComponent getComponent() {
         Box box = Box.createHorizontalBox();
         box.add(text);
@@ -60,11 +64,13 @@ class DisplayProfileItem extends PreferencesItem implements ActionListener {
         return box;
     }
 
+    @Override
     public void commit() {
         String path = text.getText();
         Prefs.put(Key, path);
     }
 
+    @Override
     public void restore() {
         String path = Prefs.get(Key, null);
         if (path != null) {
@@ -79,6 +85,7 @@ class DisplayProfileItem extends PreferencesItem implements ActionListener {
 
     // TODO: l10n
     // Conduct the dialog to accept a new color profile.
+    @Override
     public void actionPerformed(ActionEvent event) {
         FileChooser chooser = Platform.getPlatform().getFileChooser();
         AlertDialog alert = Platform.getPlatform().getAlertDialog();
@@ -91,7 +98,8 @@ class DisplayProfileItem extends PreferencesItem implements ActionListener {
         }
         File file = new File(path);
         file = chooser.openFile(
-            LOCALE.get("DisplayProfileDialogTitle"), file, null, null
+            LOCALE.get("DisplayProfileDialogTitle"), file, null,
+                (javafx.stage.FileChooser.ExtensionFilter) null
         );
         if (file != null) {
             if (! file.isFile()) {

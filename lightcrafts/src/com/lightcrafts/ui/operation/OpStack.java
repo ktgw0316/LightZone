@@ -1,8 +1,10 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2016-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.operation;
 
 import com.lightcrafts.model.*;
+import com.lightcrafts.model.ImageEditor.LensCorrectionsOperation;
 import com.lightcrafts.ui.operation.clone.CloneControl;
 import com.lightcrafts.ui.operation.clone.SpotControl;
 import com.lightcrafts.ui.operation.colorbalance.ColorPickerControl;
@@ -16,8 +18,9 @@ import com.lightcrafts.ui.operation.whitepoint.WhitePointControl;
 import com.lightcrafts.ui.operation.zone.ZoneControl;
 import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlNode;
-
-import static com.lightcrafts.ui.operation.Locale.LOCALE;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
 
 import javax.swing.*;
 import javax.swing.event.UndoableEditEvent;
@@ -28,9 +31,11 @@ import javax.swing.undo.UndoableEditSupport;
 import java.awt.*;
 import java.awt.event.AWTEventListener;
 import java.awt.event.MouseEvent;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.prefs.Preferences;
+
+import static com.lightcrafts.ui.operation.Locale.LOCALE;
 
 public class OpStack extends DraggableStack
     implements Scrollable, UndoableEditListener
@@ -143,7 +148,7 @@ public class OpStack extends DraggableStack
     }
 
     // Get disabled Actions from resources, for the no-Document display mode:
-    public static List getStaticAddActions() {
+    public static List<Action> getStaticAddActions() {
         return OpActions.createStaticAddActions();
     }
 
@@ -182,42 +187,66 @@ public class OpStack extends DraggableStack
         return control;
     }
 
+    // The LensCorrections should be placed above the RAW Correction tools.
+    public OpControl addLensCorrectionsControl() {
+        int index = 0;
+        for (final OpControl op : opControls) {
+            if (!op.isRawCorrection()) {
+                break;
+            }
+            index++;
+        }
+        LensCorrectionsOperation op = engine.insertLensCorrectionsOperation(index);
+        OpControl control = new LensCorrectionsControl(op, this);
+        addControl(control, index);
+        return control;
+    }
+
     public OpControl addGenericControl(OperationType type) {
         int index = getOpControlCount();
         return addGenericControl(type, index);
     }
 
     public OpControl addGenericControl(OperationType type, int index) {
-        GenericOperation op =
-            (GenericOperation) engine.insertOperation(type, index);
-        OpControl control;
-        if (op instanceof ColorPickerDropperOperation) {
-            control = new ColorPickerDropperControl(
-                (ColorPickerDropperOperation) op, this
-            );
-        }
-        else if (op instanceof ColorDropperOperation) {
-            if (op instanceof RawAdjustmentOperation) {
-                control = new RawAdjustmentControl(
-                    (RawAdjustmentOperation) op, this
-                );
-            }
-            else {
-                control = new ColorDropperControl(
-                    (ColorDropperOperation) op, this
-                );
-            }
-        }
-        else if (op instanceof ColorPickerOperation) {
-            control = new ColorPickerControl(
-                (ColorPickerOperation) op, this
-            );
-        }
-        else {
-            control = new GenericControl(op, this);
-        }
+        val op = (GenericOperation) engine.insertOperation(type, index);
+        val visitor = new VisitorImpl(this);
+        op.accept(visitor);
+        val control = visitor.getOpControl();
         addControl(control, index);
         return control;
+    }
+
+    @RequiredArgsConstructor
+    private static class VisitorImpl implements GenericOperationVisitor {
+        private final OpStack stack;
+
+        @Getter
+        private OpControl opControl;
+
+        @Override
+        public void visitColorPickerDropperOperation(ColorPickerDropperOperation op) {
+            opControl = new ColorPickerDropperControl(op, stack);
+        }
+
+        @Override
+        public void visitRawAdjustmentOperation(RawAdjustmentOperation op) {
+            opControl = new RawAdjustmentControl(op, stack);
+        }
+
+        @Override
+        public void visitColorDropperOperation(ColorDropperOperation op) {
+            opControl = new ColorDropperControl(op, stack);
+        }
+
+        @Override
+        public void visitColorPickerOperation(ColorPickerOperation op) {
+            opControl = new ColorPickerControl(op, stack);
+        }
+
+        @Override
+        public void visitGenericOperation(GenericOperation op) {
+            opControl = new GenericControl(op, stack);
+        }
     }
 
     public void addControl(SelectableControl control) {
@@ -229,7 +258,7 @@ public class OpStack extends DraggableStack
     }
 
     // OpControls use this to populate the layer choices in LayerControls:
-    List getLayerModes() {
+    List<LayerMode> getLayerModes() {
         return engine.getLayerModes();
     }
 
@@ -246,6 +275,11 @@ public class OpStack extends DraggableStack
     }
 
     private void addControl(final OpControl control, final int index) {
+        if ((control.isRawCorrection() || control.isSingleton()) &&
+            getMatchingControl(control, new LinkedList<OpControl>()) != null) {
+            return;
+        }
+
         opControls.add(index, control);
 
         push(control, index);
@@ -363,6 +397,9 @@ public class OpStack extends DraggableStack
         else if (control instanceof WhitePointControl) {
             // WhitePointOperation is deprecated.
             op = engine.insertWhitePointOperation(index);
+        }
+        else if (control instanceof LensCorrectionsControl) {
+            op = engine.insertLensCorrectionsOperation(index);
         }
         else {
             op = engine.insertOperation(type, index);
@@ -720,6 +757,7 @@ public class OpStack extends DraggableStack
     private final static String CloneTag = "CloneOperation";
     private final static String SpotTag = "SpotOperation";
     private final static String WhitePointTag = "WhitePointOperation";
+    private final static String LensCorrectionsTag = "LensCorrectionsOperation";
     private final static String GenericTag = "GenericOperation";
     private final static String OpTypeTag = "OperationType";
 
@@ -741,6 +779,9 @@ public class OpStack extends DraggableStack
             else if (control instanceof WhitePointControl) {
                 // WhitePointOperation is deprecated.
                 child = node.addChild(WhitePointTag);
+            }
+            else if (control instanceof LensCorrectionsControl) {
+                child = node.addChild(LensCorrectionsTag);
             }
             else {
                 child = node.addChild(GenericTag);
@@ -790,6 +831,9 @@ public class OpStack extends DraggableStack
             }
             else if (tag.equals(WhitePointTag)) {
                 control = addWhitePointControl();
+            }
+            else if (tag.equals(LensCorrectionsTag)) {
+                control = addLensCorrectionsControl();
             }
             else if (tag.equals(GenericTag)) {
                 String typeTag = child.getAttribute(OpTypeTag);

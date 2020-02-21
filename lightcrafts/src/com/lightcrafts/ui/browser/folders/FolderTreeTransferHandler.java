@@ -8,6 +8,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 class FolderTreeTransferHandler extends TransferHandler {
@@ -19,12 +20,8 @@ class FolderTreeTransferHandler extends TransferHandler {
     }
 
     public boolean canImport(JComponent comp, DataFlavor[] flavs) {
-        for (DataFlavor flav : flavs) {
-            if (flav.equals(DataFlavor.javaFileListFlavor)) {
-                return true;
-            }
-        }
-        return false;
+        return Arrays.stream(flavs)
+                .anyMatch((it -> it.equals(DataFlavor.javaFileListFlavor)));
     }
 
     public boolean importData(JComponent comp, Transferable trans) {
@@ -33,10 +30,9 @@ class FolderTreeTransferHandler extends TransferHandler {
             List<File> files = (List<File>) trans.getTransferData(
                 DataFlavor.javaFileListFlavor
             );
-            for (Object o : files) {
-                File file = (File) o;
-                System.out.println(file.getAbsolutePath());
-            }
+            files.stream()
+                    .map(File::getAbsolutePath)
+                    .forEach(System.out::println);
             FolderTreeSelectionModel selection =
                 (FolderTreeSelectionModel) tree.getSelectionModel();
             File folder = selection.getDropFolder();
@@ -46,10 +42,7 @@ class FolderTreeTransferHandler extends TransferHandler {
             tree.notifyDropAccepted(files, folder);
             return true;
         }
-        catch (UnsupportedFlavorException e) {
-            e.printStackTrace();
-        }
-        catch (IOException e) {
+        catch (UnsupportedFlavorException | IOException e) {
             e.printStackTrace();
         }
         return false;

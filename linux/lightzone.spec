@@ -5,7 +5,7 @@
 Name:           lightzone
 # Do not use hyphens in Version tag. OBS doesn't handle it properly.
 # Use 4.1.0.beta2 for betas and 4.1.0.0 for final, since RPM sorts A-Z before 0-9.
-Version:	4.1.9
+Version:	4.2.0
 Release:	0%{?dist}
 License:	BSD-3-Clause
 Summary:	Open-source professional-level digital darkroom software
@@ -74,12 +74,12 @@ BuildRequires: update-desktop-files
 %define xmllint libxml2-utils
 %endif
 
-BuildRequires:	java-%{java_version}-devel, %{libX11_devel}, ant, autoconf, gcc, gcc-c++, make, git, javahelp2, %{lcms2_devel}, %{libjpeg_devel}, libtiff-devel, %{pkg_config}, rsync
+BuildRequires:	java-%{java_version}-devel, %{libX11_devel}, ant, autoconf, gcc, gcc-c++, make, git, javahelp2, %{lcms2_devel}, lensfun-devel, %{libjpeg_devel}, libtiff-devel, %{pkg_config}, rsync
 %if 0%{?mdkversion} || 0%{?pclinuxos}
 BuildRequires:	java-rpmbuild, libgomp-devel
 %endif
 
-Requires:	java-%{java_version}, javahelp2, lcms2, %{xmllint}
+Requires:	java-%{java_version}, javahelp2, lcms2, lensfun, %{xmllint}
 %if 0%{?suse_version} >= 1320
 Requires:	xerces-j2-xml-apis
 %else

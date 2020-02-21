@@ -5,7 +5,7 @@ package com.lightcrafts.ui.print;
 import com.lightcrafts.model.RenderingIntent;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.ui.toolkit.WidePopupComboBox;
-import com.lightcrafts.utils.ColorProfileInfo;
+import com.lightcrafts.image.color.ColorProfileInfo;
 
 import static com.lightcrafts.ui.print.Locale.LOCALE;
 

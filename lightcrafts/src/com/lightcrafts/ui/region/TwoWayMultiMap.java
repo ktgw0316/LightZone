@@ -9,100 +9,96 @@ import java.util.*;
   * Set of left-values for a right-key.
   */
 
-class TwoWayMultiMap {
+class TwoWayMultiMap<L, R> {
 
-    // The two assocations (must be kept consistent):
-
-    private Map leftToRight = new HashMap();
-
-    private Map rightToLeft = new HashMap();
+    // The two associations (must be kept consistent):
+    private Map<L, Set<R>> leftToRight = new HashMap<L, Set<R>>();
+    private Map<R, Set<L>> rightToLeft = new HashMap<R, Set<L>>();
 
     void clear() {
         leftToRight.clear();
         rightToLeft.clear();
     }
-    
-    Set getLeft(Object right) {
-        Set lefts = (Set) rightToLeft.get(right);
+
+    Set<L> getLeft(R right) {
+        Set<L> lefts = rightToLeft.get(right);
         if (lefts != null) {
-            return new HashSet(lefts);
+            return new HashSet<L>(lefts);
         }
         return null;
     }
 
-    Set getRight(Object left) {
-        Set rights = (Set) leftToRight.get(left);
+    Set<R> getRight(L left) {
+        Set<R> rights = leftToRight.get(left);
         if (rights != null) {
-            return new HashSet(rights);
+            return new HashSet<R>(rights);
         }
         return null;
     }
 
-    Set getAllLeft() {
-        return new HashSet(leftToRight.keySet());
+    Set<L> getAllLeft() {
+        return new HashSet<L>(leftToRight.keySet());
     }
 
-    Set getAllRight() {
-        return new HashSet(rightToLeft.keySet());
+    Set<R> getAllRight() {
+        return new HashSet<R>(rightToLeft.keySet());
     }
 
-    void addLeft(Object left) {
+    void addLeft(L left) {
         if (! leftToRight.containsKey(left)) {
-            leftToRight.put(left, new HashSet());
+            leftToRight.put(left, new HashSet<R>());
         }
     }
 
-    void addRight(Object right) {
+    void addRight(R right) {
         if (! rightToLeft.containsKey(right)) {
-            rightToLeft.put(right, new HashSet());
+            rightToLeft.put(right, new HashSet<L>());
         }
     }
 
-    void put(Object left, Object right) {
-        Set rights = (Set) leftToRight.get(left);
+    void put(L left, R right) {
+        Set<R> rights = leftToRight.get(left);
         if (rights == null) {
-            rights = new HashSet();
+            rights = new HashSet<R>();
             leftToRight.put(left, rights);
         }
         rights.add(right);
-        Set lefts = (Set) rightToLeft.get(right);
+        Set<L> lefts = rightToLeft.get(right);
         if (lefts == null) {
-            lefts = new HashSet();
+            lefts = new HashSet<L>();
             rightToLeft.put(right, lefts);
         }
         lefts.add(left);
     }
 
-    void remove(Object left, Object right) {
-        Set rights = (Set) leftToRight.get(left);
+    void remove(L left, R right) {
+        Set<R> rights = leftToRight.get(left);
         if (rights != null) {
             rights.remove(right);
         }
-        Set lefts = (Set) rightToLeft.get(right);
+        Set<L> lefts = rightToLeft.get(right);
         if (lefts != null) {
             lefts.remove(left);
         }
     }
 
-    void removeLeft(Object left) {
-        Set rights = getRight(left);
+    void removeLeft(L left) {
+        Set<R> rights = getRight(left);
         if (rights == null) {
             return;
         }
-        for (Iterator i=rights.iterator(); i.hasNext(); ) {
-            Object right = i.next();
+        for (R right : rights) {
             remove(left, right);
         }
         leftToRight.remove(left);
     }
 
-    void removeRight(Object right) {
-        Set lefts = getLeft(right);
+    void removeRight(R right) {
+        Set<L> lefts = getLeft(right);
         if (lefts == null) {
             return;
         }
-        for (Iterator i=lefts.iterator(); i.hasNext(); ) {
-            Object left = i.next();
+        for (L left : lefts) {
             remove(left, right);
         }
         rightToLeft.remove(right);

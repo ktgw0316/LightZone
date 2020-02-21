@@ -113,8 +113,8 @@ public final class CIFFImageType extends RawImageType {
      * All the possible filename extensions for CIFF files.  All must be lower
      * case and the preferred one must be first.
      */
-    private static final String EXTENSIONS[] = {
-        "crw"
+    private static final String[] EXTENSIONS = {
+            "crw"
     };
 }
 /* vim:set et sw=4 ts=4: */

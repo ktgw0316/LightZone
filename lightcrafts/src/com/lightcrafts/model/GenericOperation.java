@@ -24,25 +24,25 @@ public interface GenericOperation extends Operation {
       * controls in the UI for this Operation.
       * @return A List of Strings.
       */
-    List getSliderKeys();
+    List<String> getSliderKeys();
 
     /** Get the keys for checkbox values.  These Strings will label checkbox
       * controls in the UI for this Operation.
       * @return A List of Strings.
       */
-    List getCheckboxKeys();
+    List<String> getCheckboxKeys();
 
     /** Get the keys for choice values.  These Strings will label choice
       * controls in the UI for this Operation.
       * @return A List of Strings.
       */
-    List getChoiceKeys();
+    List<String> getChoiceKeys();
 
     /** Get the Strings to use as choices for the given choice key.
       * @param key A choice key returned from <code>getChoiceKeys()</code>
       * @return A List of Strings.
       */
-    List getChoiceValues(String key);
+    List<String> getChoiceValues(String key);
 
     /** Set the value for a slider key.
       * @param key A key from <code>getSliderKeys().</code>
@@ -68,6 +68,15 @@ public interface GenericOperation extends Operation {
       * @param key A key from <code>getSliderKeys()</code>
       * @return A SliderConfig with user interface details, or null if a
       * default slider configuration is OK.
-      */ 
+      */
     SliderConfig getSliderConfig(String key);
+
+    /**
+      * Get a help topic name, as defined in HelpConstants.
+      */
+    String getHelpTopic();
+
+    default void accept(GenericOperationVisitor visitor) {
+        visitor.visitGenericOperation(this);
+    }
 }

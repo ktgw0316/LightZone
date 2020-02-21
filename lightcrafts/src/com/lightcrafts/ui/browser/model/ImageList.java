@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2019-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.browser.model;
 
@@ -11,6 +12,11 @@ import java.awt.*;
 import java.io.File;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import lombok.Getter;
+import lombok.val;
 
 /**
  * A dynamic data model for an image browser, consisting of a sorted list of
@@ -33,9 +39,10 @@ import java.util.List;
 public class ImageList {
 
     // The List of ImageDatums.
-    private List<ImageDatum> list;
+    private final List<ImageDatum> list;
 
     // The uniform size for ImageDatum images.
+    @Getter
     private int size;
 
     // A task queue, where ImageDatum updates are run serially
@@ -56,7 +63,14 @@ public class ImageList {
     // Listeners for add/remove/change of ImageDatums
     private LinkedList<ImageListListener> listeners;
 
-    // Calls to pause() and resume() are balanced.
+    /**
+     * Calls to pause() and resume() are balanced.
+     * The pause depth must be externally accessible, because the life cycle
+     * of a browser's container may be greater than the life cycle of the
+     * browser itself.  (The current folder may change while this ImageList
+     * is paused.)
+     */
+    @Getter
     private int pauseDepth;
 
     // True if the constructor scan was cancelled before it completed.
@@ -96,33 +110,28 @@ public class ImageList {
         this.size = size;
         this.cache = cache;
         this.comp = comp;
-
-        list = Collections.synchronizedList(new LinkedList<ImageDatum>());
-
+        list = Collections.synchronizedList(new LinkedList<>());
         queue = new ImageTaskQueue();
         poller = new ImageListPoller(this, directory);
-
-        listeners = new LinkedList<ImageListListener>();
+        listeners = new LinkedList<>();
 
         synchronized(list) {
             // Perform a synchronous, one-pass scan of the directory, to
             // preempt an avalanche of access to the ImageList when the
             // ImageTaskQueue thread starts.
-            File[] files =
-                FileUtil.listFiles(directory, ImageFileFilter.INSTANCE, false);
+            val files = FileUtil.listFiles(directory, ImageFileFilter.INSTANCE, false);
             if (files != null) {
                 progress.setMinimum(0);
                 progress.setMaximum(files.length);
-                for (int n=0; n<files.length && !cancel; n++) {
-                    File file = files[n];
-                    ImageDatum datum = new ImageDatum(file, size, queue, cache);
-                    // Just get metadata, let painting pull out thumbnails:
-                    datum.getMetadata(useCache);
-                    list.add(datum);
-                    progress.incrementBy(1);
-                }
-            }
-            else {
+                // Just get metadata, let painting pull out thumbnails:
+                Arrays.stream(files)
+                        .map(file -> new ImageDatum(file, size, queue, cache))
+                        .forEach(datum -> {
+                            datum.getMetadata(useCache);
+                            list.add(datum);
+                            progress.incrementBy(1);
+                        });
+            } else {
                 cancel = true;
             }
             if (cancel) {
@@ -160,11 +169,9 @@ public class ImageList {
     public void pause() {
         // Debug code for checking pause/resume balance.
 //        showPauseContext();
-        if (pauseDepth++ == 0) {
-            if (! wasCancelled) {
-                queue.pause();
-                poller.pause();
-            }
+        if (pauseDepth++ == 0 && ! wasCancelled) {
+            queue.pause();
+            poller.pause();
         }
     }
 
@@ -175,22 +182,10 @@ public class ImageList {
         // Debug code for checking pause/resume balance.
 //        showResumeContext();
         assert (pauseDepth > 0) : "Unbalanced browser resume";
-        if (--pauseDepth == 0) {
-            if (! wasCancelled) {
-                queue.resume();
-                poller.resume();
-            }
+        if (--pauseDepth == 0 && ! wasCancelled) {
+            queue.resume();
+            poller.resume();
         }
-    }
-
-    /**
-     * The pause depth must be externally accessible, because the life cycle
-     * of a browser's container may be greater than the life cycle of the
-     * browser itself.  (The current folder may change while this ImageList
-     * is paused.)
-     */
-    public int getPauseDepth() {
-        return pauseDepth;
     }
 
     /**
@@ -262,9 +257,7 @@ public class ImageList {
     public void setSize(int size) {
         this.size = size;
         synchronized(list) {
-            for (ImageDatum datum : list) {
-                datum.setSize(size);
-            }
+            list.forEach(datum -> datum.setSize(size));
         }
     }
 
@@ -275,15 +268,8 @@ public class ImageList {
      */
     public ArrayList<ImageDatum> getAllImageData() {
         synchronized(list) {
-            return new ArrayList<ImageDatum>(list);
+            return new ArrayList<>(list);
         }
-    }
-
-    /**
-     * Get the current size of thumbnail images, for presentation and layout.
-     */
-    public int getSize() {
-        return size;
     }
 
     public void addQueueListener(ImageTaskQueueListener listener) {
@@ -296,19 +282,13 @@ public class ImageList {
 
     // Used in ImageListPoller when a new File is discovered.
     void addFile(File file) {
-        final ImageDatum datum = new ImageDatum(file, size, queue, cache);
+        val datum = new ImageDatum(file, size, queue, cache);
         datum.refresh(false); // reads metadata, enqueues thumbnailing
         synchronized(list) {
             list.add(datum);
             sort();
-            final int index = list.indexOf(datum);
-            EventQueue.invokeLater(
-                new Runnable() {
-                    public void run() {
-                        notifyAdded(datum, index);
-                    }
-                }
-            );
+            val index = list.indexOf(datum);
+            EventQueue.invokeLater(() -> notifyAdded(datum, index));
         }
     }
 
@@ -316,16 +296,10 @@ public class ImageList {
     // no longer exists.
     void removeImageData(final ImageDatum datum) {
         synchronized(list) {
-            final int index = list.indexOf(datum);
+            val index = list.indexOf(datum);
             list.remove(datum);
             sort();
-            EventQueue.invokeLater(
-                new Runnable() {
-                    public void run() {
-                        notifyRemoved(datum, index);
-                    }
-                }
-            );
+            EventQueue.invokeLater(() -> notifyRemoved(datum, index));
         }
     }
 
@@ -338,13 +312,7 @@ public class ImageList {
             newIndex = list.indexOf(datum);
         }
         if (oldIndex != newIndex) {
-            EventQueue.invokeLater(
-                new Runnable() {
-                    public void run() {
-                        notifyReordered();
-                    }
-                }
-            );
+            EventQueue.invokeLater(this::notifyReordered);
         }
     }
 
@@ -361,108 +329,62 @@ public class ImageList {
             // generating bogus ImageGroup assignments:
 //            ImageGroup.checkConsistency(list);
 
-            // Identify the distinct ImageGroups:
-            Set<ImageGroup> groups = new HashSet<ImageGroup>();
-            for (ImageDatum datum : list) {
-                ImageGroup group = datum.getGroup();
-                groups.add(group);
-            }
-            // Put the leaders into a sortable list:
-            List<ImageDatum> leaders = new LinkedList<ImageDatum>();
-            for (ImageGroup group : groups) {
-                ImageDatum leader = group.getLeader();
-                if (leaders.contains(leader)) {
-                    System.out.println("redundant leader");
-                }
-                leaders.add(leader);
-            }
-            // Sort the leaders:
-            Collections.sort(leaders, comp);
+            // Sort group members by file modification time:
+            final Comparator<ImageDatum> modificationTimeComparator =
+                    Comparator.comparing((ImageDatum m) -> m.getFile().lastModified()).reversed();
 
-            // Rebuild the list, putting members by leaders:
+            final List<ImageDatum> newList = list.stream()
+                    .map(ImageDatum::getGroup)
+                    .distinct()
+                    .map(ImageGroup::getLeader)
+                    .sorted(comp)
+                    .distinct()
+                    .flatMap(leader -> {
+                        val members = leader.getGroup().getImageDatums();
+                        return Stream.concat(Stream.of(leader),
+                                members.stream()
+                                        .filter(m -> !m.equals(leader))
+                                        .sorted(modificationTimeComparator));
+                    })
+                    .collect(Collectors.toList());
             list.clear();
-            for (ImageDatum leader : leaders) {
-                list.add(leader);
-                ImageGroup group = leader.getGroup();
-                List<ImageDatum> members = group.getImageDatums();
-
-                // Sort group members by file modification time:
-                Collections.sort(
-                    members,
-                    new Comparator<ImageDatum>() {
-                        public int compare(ImageDatum left, ImageDatum right) {
-                            File leftFile = left.getFile();
-                            File rightFile = right.getFile();
-                            long leftTime = leftFile.lastModified();
-                            long rightTime = rightFile.lastModified();
-                            return (int) Math.signum(leftTime - rightTime);
-                        }
-                    }
-                );
-                for (ImageDatum member : members) {
-                    if (! member.equals(leader)) {
-                        list.add(member);
-                    }
-                }
-            }
+            list.addAll(newList);
         }
     }
 
     private void notifyAdded(ImageDatum datum, int index) {
-        for (ImageListListener listener : listeners) {
-            listener.imageAdded(this, datum, index);
-        }
+        listeners.forEach(listener -> listener.imageAdded(this, datum, index));
     }
 
     private void notifyRemoved(ImageDatum datum, int index) {
-        for (ImageListListener listener : listeners) {
-            listener.imageRemoved(this, datum, index);
-        }
+        listeners.forEach(listener -> listener.imageRemoved(this, datum, index));
     }
 
     private void notifyReordered() {
-        for (ImageListListener listener : listeners) {
-            listener.imagesReordered(this);
-        }
+        listeners.forEach(listener -> listener.imagesReordered(this));
     }
 
     // Debug code for checking pause/resume balance.
     private void showPauseContext() {
-        System.out.println("PAUSE " + (pauseDepth + 1));
-        System.out.println('\t' + Thread.currentThread().getName());
-        System.out.println('\t' + this.toString());
-        Throwable t = new Throwable();
-        StackTraceElement[] stack = t.getStackTrace();
-        int n = 0;
-        for (StackTraceElement frame : stack) {
-            if (++n < 4) {
-                continue;
-            }
-            String name = frame.getClassName();
-            if (name.contains("java.awt.") || name.contains("javax.swing.")) {
-                continue;
-            }
-            System.out.println("\tat " + frame);
-        }
+        showContext("PAUSE ");
     }
 
-    // Debug code for checking pause/resume balance.
     private void showResumeContext() {
-        System.out.println("RESUME " + pauseDepth);
+        showContext("RESUME");
+    }
+
+    private void showContext(String msg) {
+        System.out.println(msg + " " + pauseDepth);
         System.out.println('\t' + Thread.currentThread().getName());
         System.out.println('\t' + this.toString());
-        Throwable t = new Throwable();
-        StackTraceElement[] stack = t.getStackTrace();
-        int n = 0;
-        for (StackTraceElement frame : stack) {
-            if (++n < 4) {
-                continue;
-            }
-            String name = frame.getClassName();
-            if (name.contains("java.awt.") || name.contains("javax.swing.")) {
-                continue;
-            }
-            System.out.println("\tat " + frame);
-        }
+        val t = new Throwable();
+        val stack = t.getStackTrace();
+        Arrays.stream(stack)
+                .skip(3)
+                .filter(frame -> {
+                    val name = frame.getClassName();
+                    return (!name.contains("java.awt.") && !name.contains("javax.swing."));
+                })
+                .forEach(frame -> System.out.println("\tat " + frame));
     }
 }

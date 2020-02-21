@@ -4,24 +4,18 @@
 package com.lightcrafts.platform.linux;
 
 import com.lightcrafts.platform.AlertDialog;
-import com.lightcrafts.platform.FileChooser;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.ui.LightZoneSkin;
-import com.lightcrafts.utils.ColorProfileInfo;
+import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.utils.Version;
 
 import javax.help.HelpSet;
 import javax.help.HelpSetException;
 import javax.help.JHelp;
 import javax.swing.*;
-
 import java.awt.*;
 import java.awt.color.ICC_Profile;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
@@ -82,11 +76,6 @@ public class LinuxPlatform extends Platform {
     }
 
     @Override
-    public FileChooser getFileChooser() {
-        return new LinuxFileChooser();
-    }
-
-    @Override
     public ICC_Profile getDisplayProfile() {
         Preferences prefs = Preferences.userRoot().node(
             "/com/lightcrafts/platform/linux"
@@ -126,55 +115,6 @@ public class LinuxPlatform extends Platform {
             Profiles.addAll(getColorProfiles(UserProfileDir));
         }
         return Profiles;
-    }
-
-    @Override
-    public int getPhysicalMemoryInMB() {
-        final String osname = System.getProperty("os.name");
-
-        String[] cmd;
-        String regex;
-        if (osname.contains("Linux")) {
-            cmd = new String[] {"cat", "/proc/meminfo"};
-            regex = "MemTotal: *([0-9]*) .*";
-        } else if (osname.contains("SunOS")) {
-            cmd = new String[] {"prtconf"};
-            regex = "Memory size: *([0-9]*) .*";
-        } else {
-            cmd = new String[] {"dmesg"};
-            regex = "real memory *([0-9]*) .*";
-        }
-        Pattern pattern = Pattern.compile(regex);
-
-        try {
-            Process process = Runtime.getRuntime().exec(cmd);
-            try (InputStream in = process.getInputStream();
-                 InputStreamReader reader = new InputStreamReader(in);
-                 BufferedReader buffer = new BufferedReader(reader)) {
-                String line = buffer.readLine();
-                while (line != null) {
-                    Matcher matcher = pattern.matcher(line);
-                    if (matcher.matches()) {
-                        String text = matcher.replaceAll("$1");
-                        int i = Integer.parseInt(text);
-                        if (osname.contains("Linux"))
-                            return i / 1024;
-                        else if (osname.contains("SunOS"))
-                            return i;
-                        else
-                            return i / 1048576;
-                    }
-                    line = buffer.readLine();
-                }
-            }
-        }
-        catch (IOException  e) {
-            System.err.println("Can't get memory size: " + e.getMessage());
-        }
-        catch (NumberFormatException e) {
-            System.err.println("Malformed memory size text: " + e.getMessage());
-        }
-        return super.getPhysicalMemoryInMB();
     }
 
     @Override

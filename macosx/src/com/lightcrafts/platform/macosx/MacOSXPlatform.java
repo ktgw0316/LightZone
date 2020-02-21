@@ -14,7 +14,7 @@ import ch.randelshofer.quaqua.filechooser.QuaquaFileSystemView;
 import ch.randelshofer.quaqua.QuaquaLookAndFeel;
 
 import com.lightcrafts.platform.*;
-import com.lightcrafts.utils.ColorProfileInfo;
+import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.utils.file.FileUtil;
 import com.lightcrafts.utils.Version;
 
@@ -128,11 +128,6 @@ public final class MacOSXPlatform extends Platform {
     }
 
     @Override
-    public int getPhysicalMemoryInMB() {
-        return MacOSXMemory.getPhysicalMemoryInMB();
-    }
-
-    @Override
     public Collection<ColorProfileInfo> getPrinterProfiles() {
         return getExportProfiles();
         /* return MacOSXColorProfileManager.getProfilesFor(
@@ -143,11 +138,6 @@ public final class MacOSXPlatform extends Platform {
     @Override
     public ProgressDialog getProgressDialog() {
         return new DefaultProgressDialog(); // new MacOSXProgressDialog();
-    }
-
-    @Override
-    public boolean hasInternetConnectionTo( String hostName ) {
-        return MacOSXInternetConnection.hasConnectionTo( hostName );
     }
 
     @Override

@@ -34,14 +34,6 @@ public final class WindowsLauncher extends Launcher {
     ////////// protected //////////////////////////////////////////////////////
 
     @Override
-    protected void setSystemProperties() {
-        System.setProperty("awt.useSystemAAFontSettings", "on");
-        if (System.getProperty("os.arch").endsWith("64")) {
-            System.setProperty("com.sun.media.jai.disableMediaLib", "true");
-        }
-    }
-
-    @Override
     protected void startForkDaemon() {
         // Do nothing.
     }

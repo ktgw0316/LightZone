@@ -1,23 +1,33 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2019-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.browser.model;
 
 import com.lightcrafts.image.BadImageFileException;
 import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.image.UnknownImageTypeException;
-import static com.lightcrafts.image.metadata.CoreTags.*;
 import com.lightcrafts.image.metadata.*;
-import static com.lightcrafts.image.metadata.TIFFTags.TIFF_XMP_PACKET;
-import com.lightcrafts.image.metadata.values.ImageMetaValue;
-import static com.lightcrafts.ui.browser.model.Locale.LOCALE;
 import com.lightcrafts.utils.filecache.FileCache;
+import com.lightcrafts.utils.tuple.Pair;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.val;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.awt.image.RenderedImage;
 import java.io.*;
 import java.lang.ref.SoftReference;
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.lightcrafts.image.metadata.CoreTags.*;
+import static com.lightcrafts.image.metadata.TIFFTags.TIFF_XMP_PACKET;
+import static com.lightcrafts.ui.browser.model.Locale.LOCALE;
 
 /**
  * A holder for all data that are derived from an image for browser purposes,
@@ -25,13 +35,22 @@ import java.util.LinkedList;
  */
 public class ImageDatum {
 
-    // The File defining the image
+    /**
+     * The image File backing the data in this ImageDatum.  This File is
+     * an immutable property of its ImageDatum.
+     */
+    @Getter
     private File file;
 
     // The file's modification time when metadata were last cached
     private long fileCacheTime;
 
-    // The XMP File updating the image metadata
+    /**
+     * The XMP file which extends the metadata in this ImageDatum.  This
+     * may be null, if there was an error reading image file metadata.
+     */
+    @Nullable
+    @Getter
     private File xmpFile;
 
     // The XMP file's modification time when metadata were last cached
@@ -68,8 +87,11 @@ public class ImageDatum {
     private LinkedList<PreviewUpdater> previews;
 
     // ImageDatums can be logically associated into groups
+    @Getter
     private ImageGroup group;
 
+    @Getter
+    @Setter
     private boolean badFile = false;
 
     public ImageDatum(
@@ -82,34 +104,10 @@ public class ImageDatum {
 
         markDirty();
 
-        observers = new LinkedList<ImageDatumObserver>();
-        previews = new LinkedList<PreviewUpdater>();
+        observers = new LinkedList<>();
+        previews = new LinkedList<>();
 
         group = new ImageGroup(this);
-    }
-
-    /**
-     * Get the image File backing the data in this ImageDatum.  This File is
-     * an immutable property of its ImageDatum.
-     */
-    public File getFile() {
-        return file;
-    }
-
-    /**
-     * Get the XMP file which extends the metadata in this ImageDatum.  This
-     * may be null, if there was an error reading image file metadata.
-     */
-    public File getXmpFile() {
-        return xmpFile;
-    }
-
-    public boolean isBadFile() {
-        return badFile;
-    }
-
-    void setBadFile() {
-        badFile = true;
     }
 
     /**
@@ -142,6 +140,38 @@ public class ImageDatum {
         ImageMetadata meta = info.getMetadata();
         meta.setOrientation(meta.getOrientation().get90CW());
         commitRotate(info, 1);
+    }
+
+    /**
+     * Flip the image horizontally, unless this image
+     * has LZN data, in which case throw an IOException.
+     */
+    public void flipHorizontal()
+            throws IOException, BadImageFileException, UnknownImageTypeException
+    {
+        if ((type == null) || type.hasLznData()) {
+            throw new IOException(LOCALE.get("CantFlipLzn"));
+        }
+        val info = ImageInfo.getInstanceFor(file);
+        val meta = info.getMetadata();
+        meta.setOrientation(meta.getOrientation().getHFlip());
+        commitFlip(info, true, false);
+    }
+
+    /**
+     * Flip the image vertically, unless this image
+     * has LZN data, in which case throw an IOException.
+     */
+    public void flipVertical()
+            throws IOException, BadImageFileException, UnknownImageTypeException
+    {
+        if ((type == null) || type.hasLznData()) {
+            throw new IOException(LOCALE.get("CantFlipLzn"));
+        }
+        val info = ImageInfo.getInstanceFor(file);
+        val meta = info.getMetadata();
+        meta.setOrientation(meta.getOrientation().getVFlip());
+        commitFlip(info, false, true);
     }
 
     /**
@@ -231,15 +261,14 @@ public class ImageDatum {
 
     // Synchronized because the ImageTask modifies the taskCache and the image.
     public synchronized PreviewUpdater getPreview(
-        PreviewUpdater.Provider provider    // null is OK
+            @Nullable PreviewUpdater.Provider provider
     ) {
         // First, find the best preview currently available:
         RenderedImage preview = getImage(null);
 
         // Don't assume that our metadata member "meta" is non-null--
         // this method may get called after a refresh and before our task runs.
-        PreviewUpdater updater =
-            new PreviewUpdater(cache, preview, getMetadata(true), provider);
+        val updater = new PreviewUpdater(cache, preview, getMetadata(true), provider);
 
         previews.add(updater);
 
@@ -247,15 +276,13 @@ public class ImageDatum {
     }
 
     public void disposePreviews() {
-        for (PreviewUpdater preview : previews) {
-            preview.dispose();
-        }
+        previews.forEach(PreviewUpdater::dispose);
         previews.clear();
     }
 
     // Called from ImageTask when a thumbnail is ready
     synchronized void setImage(RenderedImage image) {
-        this.image = new SoftReference<RenderedImage>(image);
+        this.image = new SoftReference<>(image);
     }
 
     long getFileCacheTime() {
@@ -307,10 +334,6 @@ public class ImageDatum {
         return meta;
     }
 
-    public ImageGroup getGroup() {
-        return group;
-    }
-
     public void setGroup(ImageGroup group) {
         this.group.removeImageDatum(this);
         this.group = group;
@@ -340,50 +363,35 @@ public class ImageDatum {
     void markClean() {
         isDirty = false;
         updatePreviews();
-        EventQueue.invokeLater(
-            new Runnable() {
-                public void run() {
-                    notifyImageObservers();
-                }
-            }
-        );
+        EventQueue.invokeLater(this::notifyImageObservers);
     }
 
     // Keep only the metadata fields used for sorting and display.
     private void updateMetadata(ImageMetadata meta) {
         this.meta = new ImageMetadata();
 
-        ImageMetadataDirectory core =
-            meta.getDirectoryFor(CoreDirectory.class, true);
-        ImageMetadataDirectory thisCore =
-            this.meta.getDirectoryFor(CoreDirectory.class, true);
+        val core = meta.getDirectoryFor(CoreDirectory.class, true);
+        val thisCore = this.meta.getDirectoryFor(CoreDirectory.class, true);
 
         // Tags used for presentation:
-        int[] tags = new int[] {
-            CORE_FILE_NAME,
-            CORE_DIR_NAME,
-            CORE_IMAGE_ORIENTATION,
-            CORE_RATING
-        };
-        for (int tag : tags) {
-            ImageMetaValue value = core.getValue(tag);
-            if (value != null) {
-                thisCore.putValue(tag, value);
-            }
-        }
+        Stream.of(
+                CORE_FILE_NAME,
+                CORE_DIR_NAME,
+                CORE_IMAGE_ORIENTATION,
+                CORE_RATING)
+                .map(tag -> Pair.of(tag, core.getValue(tag)))
+                .filter(p -> p.right != null)
+                .forEach(thisCore::putValue);
+
         // Tags used for sorting:
-        ImageDatumComparator[] comps = ImageDatumComparator.getAll();
-        for (ImageDatumComparator comp : comps) {
-            int tagId = comp.getTagId();
-            ImageMetaValue value = core.getValue(tagId);
-            if (value != null) {
-                thisCore.putValue(tagId, value);
-            }
-        }
+        Stream.of(ImageDatumComparator.getAll())
+                .map(ImageDatumComparator::getTagId)
+                .map(id -> Pair.of(id, core.getValue(id)))
+                .filter(p -> p.right != null)
+                .forEach(thisCore::putValue);
+
         // One more tag, used to determine the ImageDatumType for TIFFs
-        ImageMetaValue xmpValue = meta.getValue(
-            TIFFDirectory.class, TIFF_XMP_PACKET
-        );
+        val xmpValue = meta.getValue(TIFFDirectory.class, TIFF_XMP_PACKET);
         if (xmpValue != null) {
             ImageMetadataDirectory thisTiff =
                 this.meta.getDirectoryFor(TIFFDirectory.class, true);
@@ -391,70 +399,81 @@ public class ImageDatum {
         }
     }
 
-    // Perform the operations common to rotateLeft() and rotateRight():
-    // rotate the in-memory thumbnail; notify observers, so the display will
-    // update; and write the modified metadata to XMP.
-    private synchronized void commitRotate(ImageInfo info, int multiple)
-        throws IOException, BadImageFileException, UnknownImageTypeException
+    // Perform the operations common to rotateLeft() and rotateRight().
+    private void commitRotate(ImageInfo info, int multiple)
+            throws IOException, BadImageFileException, UnknownImageTypeException {
+        commitRotateFlip(info, multiple, false, false);
+    }
+
+    // Perform the operations common to flipHorizontal() and flipVertical().
+    private void commitFlip(ImageInfo info, boolean horizontal, boolean vertical)
+            throws IOException, BadImageFileException, UnknownImageTypeException {
+        commitRotateFlip(info, 0, horizontal, vertical);
+    }
+
+    // Rotate and flip the in-memory thumbnail; notify observers, so the display
+    // will update; and write the modified metadata to XMP.
+    private synchronized void commitRotateFlip(ImageInfo info, int multiple,
+                                           boolean horizontal, boolean vertical)
+            throws IOException, BadImageFileException, UnknownImageTypeException
     {
         // Update the in-memory image immediately, for interactive response.
-        rotateInMemory(multiple);
+        rotateFlipInMemory(multiple, horizontal, vertical);
         // This triggers a refresh through the file modification polling
         try {
+            // This triggers a refresh through the file modification polling
             writeToXmp(info);
         }
         // If the XMP write didn't work out, we better undo the rotation:
+        // TODO: Java7 multi-catch
         catch (IOException e) {
-            rotateInMemory(- multiple);
+            rotateFlipInMemory(-multiple, horizontal, vertical);
             throw e;
         }
         catch (BadImageFileException e) {
-            rotateInMemory(- multiple);
+            rotateFlipInMemory(-multiple, horizontal, vertical);
             throw e;
         }
         catch (UnknownImageTypeException e) {
-            rotateInMemory(- multiple);
+            rotateFlipInMemory(-multiple, horizontal, vertical);
             throw e;
         }
     }
 
-    // Rotate the in-memory thumbnail image directly.  This is called from
-    // commitRotate() to update the painted image quickly, until the polling
+    // Rotate and flip the in-memory thumbnail image directly. This is called from
+    // commitRotateFlip() to update the painted image quickly, until the polling
     // can catch up with an authoritative image.
-    private void rotateInMemory(int multiple) {
-        RenderedImage image = (this.image != null) ? this.image.get() : null;
-        if (image != null) {
-            image = Thumbnailer.rotateNinetyTimes(image, multiple);
-            this.image = new SoftReference<RenderedImage>(image);
-            EventQueue.invokeLater(
-                new Runnable() {
-                    public void run() {
-                        notifyImageObservers();
-                    }
-                }
-            );
+    private void rotateFlipInMemory(int multiple,
+                                    boolean horizontal, boolean vertical) {
+        if (this.image == null) {
+            return;
         }
+
+        final RenderedImage image = Thumbnailer.rotateNinetyTimesThenFlip(
+                this.image.get(), multiple, horizontal, vertical);
+        this.image = new SoftReference<RenderedImage>(image);
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                notifyImageObservers();
+            }
+        });
     }
 
     // Set the in-memory rating value directly.  This is called from
     // setRating() to update the painted image quickly, until the polling
     // can catch up with the authoritative metadata.
     private void rateInMemory(int rating) {
-        if (meta != null) {
-            if (rating > 0) {
-                meta.setRating(rating);
-            }
-            else {
-                meta.clearRating();
-            }
-            EventQueue.invokeLater(
-                new Runnable() {
-                    public void run() {
-                        notifyImageObservers();
-                    }
-                }
-            );
+        if (meta == null) {
+            return;
         }
+        try {
+            meta.setRating(rating);
+        }
+        catch (IllegalArgumentException e) {
+            meta.clearRating();
+        }
+        EventQueue.invokeLater(this::notifyImageObservers);
     }
 
     private void restartTask(boolean useCache) {
@@ -467,27 +486,24 @@ public class ImageDatum {
     }
 
     private synchronized void updatePreviews() {
-        // Push a rotation change out to all running PreviewUpdaters.
-        LinkedList<PreviewUpdater> newRefs = new LinkedList<PreviewUpdater>();
-        for (Iterator<PreviewUpdater> i=previews.iterator(); i.hasNext(); ) {
-            PreviewUpdater updater = i.next();
-            if (updater != null) {
-                RenderedImage image =
-                    (this.image != null) ? this.image.get() : null;
-                if (image != null) {
-                    i.remove();
-                    updater = new PreviewUpdater(updater, image, meta);
-                    newRefs.add(updater);
-                }
-            }
+        if (image == null) {
+            return;
         }
+        val img = image.get();
+        if (img == null) {
+            return;
+        }
+        // Push a rotation change out to all running PreviewUpdaters.
+        val newRefs = previews.stream()
+                .filter(Objects::nonNull) // Just in case
+                .map(updater -> new PreviewUpdater(updater, img, meta))
+                .collect(Collectors.toList());
+        previews.clear();
         previews.addAll(newRefs);
     }
 
     private void notifyImageObservers() {
-        for (ImageDatumObserver observer : observers) {
-            observer.imageChanged(this);
-        }
+        observers.forEach(o -> o.imageChanged(this));
     }
 
     // Detect legacy user-commanded orientation changes, for files that were
@@ -512,61 +528,62 @@ public class ImageDatum {
     // called from getMetadata(), and exists for backwards compatibility.
     private void migrateRotateCacheToXmp() {
         int rotate = readRotateCache();
-        if (rotate != 0) {
-            try {
-                ImageInfo info = ImageInfo.getInstanceFor(file);
-                ImageMetadata meta = info.getMetadata();
-                ImageOrientation orient = meta.getOrientation();
-                switch (rotate) {
-                    case 1:
-                        orient = orient.get90CW();
-                        break;
-                    case 2:
-                        orient = orient.get180();
-                        break;
-                    case 3:
-                        orient = orient.get90CCW();
-                }
-                meta.setOrientation(orient);
-                // Don't let migration clobber a preexisting XMP file.
-                File xmpFile = new File(info.getXMPFilename());
-                if (! xmpFile.isFile()) {
-                    writeToXmp(info);
-                    System.out.println(
-                        "Migrated rotate cache to XMP for " +
-                        file.getAbsolutePath()
-                    );
-                }
-                else {
-                    System.out.println(
-                        "Rotate cache migration aborted for " +
-                        file.getAbsolutePath() +
-                        " (" + xmpFile.getAbsolutePath() + " already exists)"
-                    );
-                }
+        if (rotate == 0) {
+            return;
+        }
+        try {
+            ImageInfo info = ImageInfo.getInstanceFor(file);
+            ImageMetadata meta = info.getMetadata();
+            ImageOrientation orient = meta.getOrientation();
+            switch (rotate) {
+                case 1:
+                    orient = orient.get90CW();
+                    break;
+                case 2:
+                    orient = orient.get180();
+                    break;
+                case 3:
+                    orient = orient.get90CCW();
             }
-            catch (Throwable t) {
-                // BadImageFileException, IOException, UnknownImageTypeException
-                System.err.println(
-                    "Failed to migrate rotate cache to XMP for " +
+            meta.setOrientation(orient);
+            // Don't let migration clobber a preexisting XMP file.
+            File xmpFile = new File(info.getXMPFilename());
+            if (! xmpFile.isFile()) {
+                writeToXmp(info);
+                System.out.println(
+                    "Migrated rotate cache to XMP for " +
                     file.getAbsolutePath()
                 );
-                t.printStackTrace();
             }
-            String key = getRotateKey();
-            try {
-                cache.remove(key);
+            else {
                 System.out.println(
-                    "Cleared rotate cache to XMP for " + file.getAbsolutePath()
+                    "Rotate cache migration aborted for " +
+                    file.getAbsolutePath() +
+                    " (" + xmpFile.getAbsolutePath() + " already exists)"
                 );
             }
-            catch (IOException e) {
-                // Try again next time.
-                System.err.println(
-                    "Failed to clear rotate cache for " + file.getAbsolutePath()
-                );
-                e.printStackTrace();
-            }
+        }
+        catch (Throwable t) {
+            // BadImageFileException, IOException, UnknownImageTypeException
+            System.err.println(
+                "Failed to migrate rotate cache to XMP for " +
+                file.getAbsolutePath()
+            );
+            t.printStackTrace();
+        }
+        String key = getRotateKey();
+        try {
+            cache.remove(key);
+            System.out.println(
+                "Cleared rotate cache to XMP for " + file.getAbsolutePath()
+            );
+        }
+        catch (IOException e) {
+            // Try again next time.
+            System.err.println(
+                "Failed to clear rotate cache for " + file.getAbsolutePath()
+            );
+            e.printStackTrace();
         }
     }
 
@@ -574,37 +591,23 @@ public class ImageDatum {
         if (cache == null) {
             return;
         }
-        String metaKey = getMetadataKey();
-        try (ObjectOutputStream out = new ObjectOutputStream(cache.putToStream(metaKey))) {
-            out.writeObject(meta);
-        }
-        catch (IOException e) {
-            // metadata will be reread next time
-            System.err.println("metadata cache error: " + e.getMessage());
-        }
-        String fileTimeKey = getFileTimeCacheKey();
-        try (ObjectOutputStream out = new ObjectOutputStream(cache.putToStream(fileTimeKey))) {
-            out.writeObject(fileCacheTime);
-        }
-        catch (IOException e) {
-            System.err.println("file time cache error: " + e.getMessage());
-        }
+        writeToStream(getMetadataKey(), meta, "metadata cache error: ");
+        writeToStream(getFileTimeCacheKey(), fileCacheTime, "file time cache error: ");
         if (xmpFile == null) {
             return;
         }
-        String xmpFileKey = getXmpKey();
-        try (ObjectOutputStream out = new ObjectOutputStream(cache.putToStream(xmpFileKey))) {
-            out.writeObject(xmpFile);
+        writeToStream(getXmpKey(), xmpFile, "file time cache error: ");
+        writeToStream(getXmpFileTimeCacheKey(), xmpFileCacheTime, "XMP file time cache error: ");
+    }
+
+    private void writeToStream(@Nullable String key, Object obj, String errorMessage) {
+        if (key == null) {
+            return;
         }
-        catch (IOException e) {
-            System.err.println("file time cache error: " + e.getMessage());
-        }
-        String xmpFileTimeKey = getXmpFileTimeCacheKey();
-        try (ObjectOutputStream out = new ObjectOutputStream(cache.putToStream(xmpFileTimeKey))) {
-            out.writeObject(xmpFileCacheTime);
-        }
-        catch (IOException e) {
-            System.err.println("XMP file time cache error: " + e.getMessage());
+        try (val out = new ObjectOutputStream(cache.putToStream(key))) {
+            out.writeObject(obj);
+        } catch (IOException e) {
+            System.err.println(errorMessage + e.getMessage());
         }
     }
 
@@ -612,62 +615,31 @@ public class ImageDatum {
         if (cache == null) {
             return;
         }
-        String fileTimeKey = getFileTimeCacheKey();
-        if (cache.contains(fileTimeKey)) {
-            try (InputStream in = cache.getStreamFor(fileTimeKey)) {
-                if (in != null) {
-                    try (ObjectInputStream oin = new ObjectInputStream(in)) {
-                        fileCacheTime = (Long) oin.readObject();
-                    }
-                }
-            }
-            catch (IOException | ClassNotFoundException e) {
-                fileCacheTime = 0;
-            }
-        }
-        String xmpFileKey = getXmpKey();
-        if (cache.contains(xmpFileKey)) {
-            try (InputStream in = cache.getStreamFor(xmpFileKey)) {
-                if (in != null) {
-                    try (ObjectInputStream oin = new ObjectInputStream(in)) {
-                        xmpFile = (File) oin.readObject();
-                    }
-                }
-            }
-            catch (IOException | ClassNotFoundException e) {
-                xmpFile = null;
-            }
-        }
+        readMetadataCache(getFileTimeCacheKey(), o -> fileCacheTime = o, 0L);
+        readMetadataCache(getXmpKey(), o -> xmpFile = (File) o, null);
         if (xmpFile != null) {
-            String xmpFileTimeKey = getXmpFileTimeCacheKey();
-            if (cache.contains(xmpFileTimeKey)) {
-                try (InputStream in = cache.getStreamFor(xmpFileTimeKey)) {
-                    if (in != null) {
-                        try (ObjectInputStream oin = new ObjectInputStream(in)) {
-                            xmpFileCacheTime = (Long) oin.readObject();
-                        }
-                    }
-                }
-                catch (IOException | ClassNotFoundException e) {
-                    xmpFileCacheTime = 0;
-                }
-            }
+            readMetadataCache(getXmpFileTimeCacheKey() , o -> xmpFileCacheTime = o, 0L);
         }
         else {
             xmpFileCacheTime = 0;
         }
-        String metaKey = getMetadataKey();
-        if (cache.contains(metaKey)) {
-            try (InputStream in = cache.getStreamFor(metaKey)) {
-                if (in != null) {
-                    try (ObjectInputStream oin = new ObjectInputStream(in)) {
-                        meta = (ImageMetadata) oin.readObject();
-                    }
+        readMetadataCache(getMetadataKey() , o -> meta = o, meta);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> void readMetadataCache(String key, Consumer<T> consumer, T fallbackValue) {
+        if (!cache.contains(key)) {
+            return;
+        }
+        try (InputStream in = cache.getStreamFor(key)) {
+            if (in != null) {
+                try (ObjectInputStream oin = new ObjectInputStream(in)) {
+                    consumer.accept((T) oin.readObject());
                 }
             }
-            catch (IOException | ClassNotFoundException e) {
-                // getMetadata() will fall back to parsing out metadata
-            }
+        }
+        catch (IOException | ClassNotFoundException e) {
+            consumer.accept(fallbackValue);
         }
     }
 
@@ -675,61 +647,33 @@ public class ImageDatum {
         if (cache == null) {
             return;
         }
-        String key = getMetadataKey();
-        if (cache.contains(key)) {
-            try {
-                cache.remove(key);
-            }
-            catch (IOException e) {
-                System.err.println(
-                    "metadata cache clear error: " + e.getMessage()
-                );
-            }
-        }
-        String fileTimeKey = getFileTimeCacheKey();
-        if (cache.contains(fileTimeKey)) {
-            try {
-                cache.remove(fileTimeKey);
-            }
-            catch (IOException e) {
-                System.err.println(
-                    "metadata cache clear error: " + e.getMessage()
-                );
-            }
-        }
-        String xmpFileKey = getXmpKey();
-        if (cache.contains(xmpFileKey)) {
-            try {
-                cache.remove(xmpFileKey);
-            }
-            catch (IOException e) {
-                System.err.println(
-                    "metadata cache clear error: " + e.getMessage()
-                );
-            }
-        }
+        removeFromCache(
+                getMetadataKey(),
+                getFileTimeCacheKey(),
+                getXmpKey(),
+                getXmpFileTimeCacheKey()
+        );
         if (xmpFile == null) {
             return;
         }
-        String xmpFileTimeKey = getXmpFileTimeCacheKey();
-        if (cache.contains(xmpFileTimeKey)) {
-            try {
-                cache.remove(xmpFileTimeKey);
-            }
-            catch (IOException e) {
-                System.err.println(
-                    "metadata cache clear error: " + e.getMessage()
-                );
-            }
-        }
+        removeFromCache(getXmpFileTimeCacheKey());
+    }
+
+    private void removeFromCache(String... keys) {
+        Arrays.stream(keys)
+                .filter(key -> cache.contains(key))
+                .forEach(key -> {
+                    try {
+                        cache.remove(key);
+                    } catch (IOException e) {
+                        System.err.println("metadata cache clear error: " + e.getMessage());
+                    }
+                });
     }
 
     // The cache key for the rotate value.
     private String getRotateKey() {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append(file.getAbsolutePath());
-        buffer.append("_rotate");
-        return buffer.toString();
+        return file.getAbsolutePath() + "_rotate";
     }
 
     // The cache key for metadata.
@@ -750,12 +694,7 @@ public class ImageDatum {
             return;
         }
         fileCacheTime = file.lastModified();
-        if (xmpFile != null) {
-            xmpFileCacheTime = xmpFile.lastModified();
-        }
-        else {
-            xmpFileCacheTime = 0;
-        }
+        xmpFileCacheTime = xmpFile != null ? xmpFile.lastModified() : 0;
     }
 
     private String getFileTimeCacheKey() {
@@ -763,7 +702,7 @@ public class ImageDatum {
     }
 
     private String getXmpFileTimeCacheKey() {
-        return xmpFile.getAbsolutePath() + "_cache_time";
+        return xmpFile != null ? xmpFile.getAbsolutePath() + "_cache_time" : null;
     }
 
     private void clearPreview() {
@@ -787,11 +726,11 @@ public class ImageDatum {
     {
         info.getImageType().writeMetadata(info);
         try {
-            this.xmpFile = new File(info.getXMPFilename());
+            xmpFile = new File(info.getXMPFilename());
         }
         catch (Throwable e) {
             logMetadataError(e);
-            this.xmpFile = null;
+            xmpFile = null;
         }
     }
 }

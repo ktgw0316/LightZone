@@ -1,20 +1,35 @@
 <project name="oracle">
+  <property environment="env"/>
+  <property name="jre-dir" value="../Java.runtime/Contents"/>
+
+  <target name="build-jre" depends="delete-jre">
+    <mkdir dir="${jre-dir}"/>
+    <exec executable="${env.JAVA_HOME}/bin/jlink" dir="${jre-dir}" failonerror="true" vmlauncher="false">
+      <arg line="--compress=2 --module-path ${env.JAVA_HOME}/jmods --add-modules java.base,java.desktop,java.logging,java.management,java.prefs,java.rmi,jdk.management --output Home --no-header-files --no-man-pages --strip-debug"/>
+    </exec>
+    <mkdir dir="${jre-dir}/MacOS"/>
+    <copy todir="${jre-dir}/MacOS" file="${env.JAVA_HOME}/lib/jli/libjli.dylib"/>
+    <copy todir="${jre-dir}" file="${env.JAVA_HOME}/../Info.plist"/>
+  </target>
+
+  <target name="delete-jre">
+    <delete dir="${jre-dir}" quiet="true"/>
+  </target>
 
   <!--===== Oracle appbundler ==============================================-->
-  <property environment="env"/>
-
   <taskdef
     name="bundleapp"
     classname="com.oracle.appbundler.AppBundlerTask"
     classpath="lib/appbundler-1.0ea.jar"/>
 
   <target name="build-bundle"
-    depends="jar, delete-bundle">
+    depends="jar, delete-bundle, build-jre">
     <exec executable="${common-dir}/tools/bin/lc-git-revision"
           outputproperty="git-revision" vmlauncher="false" failonerror="true"/>
     <copy todir="${app-dir}">
       <fileset dir="products" excludes=".git">
         <exclude name="**/appbundler*.jar"/>
+        <exclude name="share"/>
         <include name="dcraw_lz"/>
         <include name="LightZone-forkd"/>
         <include name="**/*.dylib"/>
@@ -33,12 +48,12 @@
       shortversion="${app-version}"
       version="${git-revision}"
       signature="LCLZ"
-      copyright="${app-name} ${app-version} (${git-revision}), Copyright 2005-20011 Light Crafts, Inc. All Rights Reserved. Copyright 2013- The LightZone Project. All Rights Reserved."
+      copyright="${app-name} ${app-version} (${git-revision}), Copyright 2005-2011 Light Crafts, Inc. All Rights Reserved. Copyright 2013- The LightZone Project. All Rights Reserved."
       icon="resources/Resources/${app-name}.icns"
       applicationCategory="public.app-category.photography"
       mainclassname="com.lightcrafts.platform.macosx.MacOSXLauncher">
 
-      <runtime dir="${env.JAVA_HOME}"/>
+      <runtime dir="${jre-dir}/Home"/>
       <librarypath file="${app-dir}/dcraw_lz"/>
       <librarypath file="${app-dir}/LightZone-forkd"/>
       <librarypath file="${app-dir}/*.dylib"/>
@@ -54,6 +69,7 @@
       <option value="-Dcom.apple.macos.useScreenMenuBar=true"/>
       <option value="-Dapple.awt.graphics.UseQuartz=false"/>
       <option value="-Dfile.encoding=utf-8"/>
+      <option value="-Dlensfun.dir=$APP_ROOT/Contents/Resources/share/lensfun"/>
 
       <bundledocument
         extensions="jpe,jpg,jpeg"
@@ -100,6 +116,9 @@
     </copy>
     <copy todir="${bundle-contents}/Resources">
       <fileset dir="helpers/JavaAppLauncher/Resources" excludes=".git"/>
+    </copy>
+    <copy todir="${bundle-contents}/Resources/share">
+      <fileset dir="products/share" excludes=".git"/>
     </copy>
 
     <exec executable="./postprocess.sh" dir="." failonerror="true" vmlauncher="false">

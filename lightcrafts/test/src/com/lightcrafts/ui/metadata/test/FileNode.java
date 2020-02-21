@@ -2,18 +2,18 @@
 
 package com.lightcrafts.ui.metadata.test;
 
-import javax.swing.tree.TreeNode;
+import com.lightcrafts.platform.Platform;
+import com.lightcrafts.utils.file.FileUtil;
+
 import javax.swing.*;
-import java.io.File;
-import java.util.Enumeration;
-import java.util.ArrayList;
-import java.util.Iterator;
+import javax.swing.tree.TreeNode;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
-import com.lightcrafts.platform.Platform;
-import com.lightcrafts.utils.file.FileUtil;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Iterator;
 
 /** A simple TreeNode implementation based on File, to make JTrees out of
   * file system trees.
@@ -22,7 +22,7 @@ import com.lightcrafts.utils.file.FileUtil;
 class FileNode implements TreeNode {
 
     File file_;
-    ArrayList children_;
+    ArrayList<TreeNode> children_;
     FileNode parent_;
 
     FileNode(File file) {
@@ -30,17 +30,17 @@ class FileNode implements TreeNode {
 //        getChildren();
     }
 
-    ArrayList getChildren() {
+    ArrayList<TreeNode> getChildren() {
         if (children_ != null) {
             return children_;
         }
-        children_ = new ArrayList();
+        children_ = new ArrayList<TreeNode>();
         File[] files = FileUtil.listFiles( file_ );
         if (files == null) {
             return children_;
         }
-        for (int n=0; n<files.length; n++) {
-            FileNode child = new FileNode(files[n]);
+        for (File file : files) {
+            FileNode child = new FileNode(file);
             child.parent_ = this;
             children_.add(child);
         }
@@ -89,7 +89,7 @@ class FileNode implements TreeNode {
     }
 
     public TreeNode getChildAt(int childIndex) {
-        return (TreeNode) getChildren().get(childIndex);
+        return getChildren().get(childIndex);
     }
 
     public int getIndex(TreeNode node) {

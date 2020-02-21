@@ -2,11 +2,11 @@
 
 package com.lightcrafts.jai.opimage;
 
-import com.lightcrafts.mediax.jai.PointOpImage;
-import com.lightcrafts.mediax.jai.ImageLayout;
-import com.lightcrafts.mediax.jai.RasterFormatTag;
-import com.lightcrafts.mediax.jai.RasterAccessor;
-import com.lightcrafts.media.jai.util.ImageUtil;
+import javax.media.jai.PointOpImage;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.RasterFormatTag;
+import javax.media.jai.RasterAccessor;
+import com.sun.media.jai.util.ImageUtil;
 
 import java.awt.image.*;
 import java.awt.*;
@@ -23,8 +23,8 @@ public class HDROpImage extends PointOpImage {
     private static final int c = 0x10000 / div;
 
     private final double detail;
-    private short intensityTable[] = new short[c+1];
-    private short gammaTable[] = new short[0x10000];
+    private short[] intensityTable = new short[c + 1];
+    private short[] gammaTable = new short[0x10000];
     private final double intensity;
 
     private double sigmoid(double x) {
@@ -91,7 +91,7 @@ public class HDROpImage extends PointOpImage {
         d.copyDataToRaster();
     }
 
-    private static int softLightBlendPixelsIntensity(int front, int back, short intensityTable[]) {
+    private static int softLightBlendPixelsIntensity(int front, int back, short[] intensityTable) {
         int m = front * back / c;
         int s = c - (c - front) * (c - back) / c;
         int p = 0xffff & intensityTable[back];

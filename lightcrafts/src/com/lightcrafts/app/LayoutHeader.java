@@ -48,6 +48,8 @@ class LayoutHeader extends Box {
 
     private Box buttonBox;    // container for them
 
+    private static final int space = 2;
+
     static class LogoComponent extends JComponent {
         private final static Icon lzLogo;
 
@@ -58,7 +60,7 @@ class LayoutHeader extends Box {
                 URL url = LayoutHeader.class.getResource("resources/LZLogo.png");
                 BufferedImage image = ImageIO.read(url);
                 tmp = new ImageIcon(image);
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
 
             lzLogo = tmp;
@@ -70,10 +72,12 @@ class LayoutHeader extends Box {
             setMaximumSize(getPreferredSize());
         }
 
+        @Override
         protected void paintComponent(Graphics g) {
             lzLogo.paintIcon(this, g, 0, 8);
         }
 
+        @Override
         public Dimension getPreferredSize() {
             return new Dimension(lzLogo.getIconWidth(), lzLogo.getIconHeight() + 12);
         }
@@ -90,13 +94,13 @@ class LayoutHeader extends Box {
 
         add(Box.createHorizontalStrut(22));
         add(modes);
-        add(Box.createHorizontalStrut(64));
+        add(Box.createHorizontalStrut(40));
         add(buttonBox);
         add(Box.createHorizontalGlue());
         add(logoButton);
         add(Box.createHorizontalStrut(16));
         add(help.box);
-        add(Box.createHorizontalStrut(4));
+        add(Box.createHorizontalStrut(space));
 
         buttonList = new LinkedList<BoxedButton>();
 
@@ -127,7 +131,7 @@ class LayoutHeader extends Box {
         JSeparator separator = new JSeparator(JSeparator.VERTICAL);
         separator.setMaximumSize(new Dimension(3, 32));
         buttonBox.add(separator);
-        buttonBox.add(Box.createHorizontalStrut(8));
+        buttonBox.add(Box.createHorizontalStrut(space));
 
         addButton(styles.box);
         addButton(send.box);
@@ -160,7 +164,7 @@ class LayoutHeader extends Box {
 
     private void addButton(JComponent button) {
         buttonBox.add(button);
-        buttonBox.add(Box.createHorizontalStrut(8));
+        buttonBox.add(Box.createHorizontalStrut(space));
     }
 
     // Called when things in the ComboFrame change (browser, document, etc.)

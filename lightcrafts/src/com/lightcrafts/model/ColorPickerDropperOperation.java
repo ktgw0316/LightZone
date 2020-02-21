@@ -19,4 +19,9 @@ public interface ColorPickerDropperOperation extends ColorPickerOperation {
      * implications this color change will have on other settings.
      */
     Map<String, Double> setColor(Point2D p);
+
+    @Override
+    default void accept(GenericOperationVisitor visitor) {
+        visitor.visitColorPickerDropperOperation(this);
+    }
 }

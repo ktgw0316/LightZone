@@ -2,10 +2,10 @@
 
 package com.lightcrafts.jai.opimage;
 
-import com.lightcrafts.media.jai.opimage.RIFUtil;
+import com.sun.media.jai.opimage.RIFUtil;
 
-import com.lightcrafts.mediax.jai.ImageLayout;
-import com.lightcrafts.mediax.jai.BorderExtender;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.BorderExtender;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.image.renderable.RenderedImageFactory;

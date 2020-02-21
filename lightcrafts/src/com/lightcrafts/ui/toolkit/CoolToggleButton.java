@@ -118,7 +118,7 @@ public class CoolToggleButton extends JToggleButton {
         setBorder(border);
     }
 
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         if (args.length < 1) {
             System.err.println("usage: (file)");
         }

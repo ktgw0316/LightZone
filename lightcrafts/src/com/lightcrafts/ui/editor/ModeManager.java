@@ -1,9 +1,9 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2019-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.editor;
 
 import com.lightcrafts.model.CropBounds;
-import com.lightcrafts.model.Operation;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.ui.crop.CropListener;
 import com.lightcrafts.ui.crop.CropMode;
@@ -15,6 +15,10 @@ import com.lightcrafts.ui.operation.OpControlModeListener;
 import com.lightcrafts.ui.operation.OpStackListener;
 import com.lightcrafts.ui.operation.SelectableControl;
 import com.lightcrafts.ui.region.RegionOverlay;
+import com.lightcrafts.utils.awt.geom.HiDpi;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,7 +27,6 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
-import java.awt.geom.Rectangle2D;
 
 /**
  * Handle switching among all the Modes.  Lots of special mode-transition
@@ -34,6 +37,7 @@ import java.awt.geom.Rectangle2D;
  * temporary Modes defined by OpControls are added and removed here too.
  */
 
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ModeManager
     implements OpStackListener, OpControlModeListener, XFormListener
 {
@@ -47,8 +51,10 @@ public class ModeManager
     private KeyEventPostProcessor panModeKeyProcessor =
         new KeyEventPostProcessor() {
             private boolean isPanMode;
+
+            @Override
             public boolean postProcessKeyEvent(KeyEvent e) {
-                final boolean wasPanMode = (overlay.peekMode() == transientPanMode);
+                val wasPanMode = (overlay.peekMode() == transientPanMode);
                 if (e.getKeyCode() == PanKeyCode) {
                     if (e.getID() == KeyEvent.KEY_PRESSED) {
                         isPanMode = true;
@@ -59,11 +65,7 @@ public class ModeManager
                         }
                         else {
                             // Detect and ignore auto-repeat release events
-                            final boolean isReallyPressed =
-                                Platform.getPlatform().isKeyPressed(
-                                    PanKeyCode
-                                );
-                            isPanMode = isReallyPressed;
+                            isPanMode = Platform.getPlatform().isKeyPressed(PanKeyCode);
                         }
                     }
                 }
@@ -77,20 +79,19 @@ public class ModeManager
             }
         };
 
-    private Document doc;
-
-    private ModeOverlay overlay;
-
     private AffineTransform xform;
 
-    private Mode regionMode;
-    private CropMode cropMode;
-    private AbstractMode transientPanMode; // works with other modes (space key)
-    private AbstractMode permanentPanMode; // present in "no mode" (arrow cursor)
-    private CropMode rotateMode;
+    private final Mode regionMode;
+    private final CropMode cropMode;
+    private final AbstractMode transientPanMode; // works with other modes (space key)
+    private final CropMode rotateMode;
+
+    private final ModeOverlay overlay;
 
     // The "extras" component for the region mode
-    private JComponent regionExtras;
+    private final JComponent regionExtras;
+
+    private final Document doc;
 
     // If someone clicks "Commit" in crop mode, we must update the mode buttons
     private ModeButtons modeButtons;
@@ -106,30 +107,23 @@ public class ModeManager
     ModeManager(
         Mode regionMode,
         CropMode cropMode,
-        AbstractMode transientPanMode,// After spacebar
-        AbstractMode permanentPanMode,// Always-on
+        AbstractMode transientPanMode, // After space-bar
+        AbstractMode permanentPanMode, // present in "no mode" (arrow cursor)
         CropMode rotateMode,
         ModeOverlay overlay,
         Component underlay,
         JComponent regionExtras,    // The curve-type buttons
         Document doc                // For zoom-to-fit around the crop mode
     ) {
-        this.overlay = overlay;
-        this.regionExtras = regionExtras;
-        this.doc = doc;
-
+        this(regionMode, cropMode, transientPanMode, rotateMode, overlay,
+                regionExtras, doc);
         xform = new AffineTransform();
-
-        this.regionMode = regionMode;
-        this.cropMode = cropMode;
-        this.transientPanMode = transientPanMode;
-        this.permanentPanMode = permanentPanMode;
-        this.rotateMode = rotateMode;
 
         // The AffineTransform in the Modes sometimes depends on the size
         // of the ModeOverlay:
         overlay.addComponentListener(
             new ComponentAdapter() {
+                @Override
                 public void componentResized(ComponentEvent event) {
                     setTransform(xform);
                 }
@@ -139,10 +133,12 @@ public class ModeManager
         // their underlay:
         underlay.addComponentListener(
             new ComponentAdapter() {
+                @Override
                 public void componentResized(ComponentEvent event) {
                     Rectangle bounds = event.getComponent().getBounds();
                     setUnderlayBounds(bounds);
                 }
+                @Override
                 public void componentMoved(ComponentEvent event) {
                     Rectangle bounds = event.getComponent().getBounds();
                     setUnderlayBounds(bounds);
@@ -152,53 +148,45 @@ public class ModeManager
         // The crop and rotate modes likes to end themselves:
         cropMode.addCropListener(
             new CropListener() {
+                @Override
                 public void cropCommitted(CropBounds bounds) {
                     // This may be called because someone already switched
                     // away from the crop mode, but it may also be called
                     // from the "Commit" crop mode popup menu item, in which
                     // case we must handle the mode switch ourselves.
-                    EventQueue.invokeLater(
-                        new Runnable() {
-                            public void run() {
-                                if (modeButtons != null) {
-                                    if (modeButtons.isCropSelected()) {
-                                        setEditorMode( EditorMode.ARROW );
-                                    }
-                                }
-                            }
+                    EventQueue.invokeLater(() -> {
+                        if (modeButtons != null && modeButtons.isCropSelected()) {
+                            setEditorMode( EditorMode.ARROW );
                         }
-                    );
+                    });
                 }
+                @Override
                 public void unCrop() {
                 }
             }
         );
         rotateMode.addCropListener(
             new CropListener() {
+                @Override
                 public void cropCommitted(CropBounds bounds) {
                     // This may be called because someone already switched
                     // away from the rotate mode, but it may also be called
                     // from the "Commit" crop mode popup menu item, in which
                     // case we must handle the mode switch ourselves.
-                    EventQueue.invokeLater(
-                        new Runnable() {
-                            public void run() {
-                                if (modeButtons != null) {
-                                    if (modeButtons.isRotateSelected()) {
-                                        setEditorMode( EditorMode.ARROW );
-                                    }
-                                }
-                            }
+                    EventQueue.invokeLater(() -> {
+                        if (modeButtons != null && modeButtons.isRotateSelected()) {
+                            setEditorMode( EditorMode.ARROW );
                         }
-                    );
+                    });
                 }
+                @Override
                 public void unCrop() {
                 }
             }
         );
         registerPanModeListener();
 
-        setMode(this.permanentPanMode);
+        setMode(permanentPanMode);
     }
 
     public EditorMode getMode() {
@@ -211,85 +199,80 @@ public class ModeManager
 
     // Start OpStackListener:
 
+    @Override
     public void opAdded(OpControl control) {
     }
 
+    @Override
     public void opChanged(OpControl control) {
         if (isControlModeActive()) {
             exitMode(null);
         }
         if (this.control != null) {
             this.control.removeModeListener(this);
-        } else
-            setEditorMode( EditorMode.ARROW );
+        } else {
+            setEditorMode(EditorMode.ARROW);
+        }
         this.control = control;
-
-        if (control != null && ! control.isLocked()) {
+        if (control == null) {
+            modeButtons.setRegionsEnabled(true);
+            return;
+        }
+        if (! control.isLocked()) {
             control.addModeListener(this);
         }
         // Some OpControls don't get regions.
-        final boolean isLocked = (control != null) && control.isLocked();
-        final boolean isRaw = (control != null) && control.isRawCorrection();
-        if (isLocked || isRaw) {
-            modeButtons.setRegionsEnabled(false);
-        } else {
-            modeButtons.setRegionsEnabled(true);
-        }
+        val isLocked = control.isLocked();
+        val isRaw = control.isRawCorrection();
+        modeButtons.setRegionsEnabled(! (isLocked || isRaw));
 
-        if ( control != null ) {
-            final Operation op = control.getOperation();
-            final EditorMode prefMode = op.getPreferredMode();
-            if ( isLocked || isRaw ||
-                 prefMode != EditorMode.ARROW ||
-                 m_editorMode == EditorMode.ARROW )
-                setEditorMode( prefMode );
+        val op = control.getOperation();
+        val prefMode = op.getPreferredMode();
+        if (isLocked || isRaw ||
+                prefMode != EditorMode.ARROW ||
+                m_editorMode == EditorMode.ARROW ) {
+            setEditorMode(prefMode);
         }
     }
 
+    @Override
     public void opChanged(SelectableControl control) {
         if (this.control != null) {
             this.control.removeModeListener(this);
             this.control = null;
         }
-        if ( control instanceof ProofSelectableControl )
-            setMode( null );
-        if ( control == null )
-            setMode( null );
+        if (control == null || control instanceof ProofSelectableControl) {
+            setMode(null);
+        }
     }
 
+    @Override
     public void opLockChanged(OpControl control) {
         if (this.control == control) {
             opChanged(control);
         }
     }
 
+    @Override
     public void opRemoved(OpControl control) {
         // Since region mode interacts with the tool stack selection,
         // be sure to pop out of that mode if it's the current mode at
         // the time a tool is deleted.
-        if (overlay.peekMode() == regionMode) {
-            if (this.control != null) {
-                Operation op = this.control.getOperation();
-                if (op.getPreferredMode() != EditorMode.REGION) {
-                    EventQueue.invokeLater(
-                        new Runnable() {
-                            public void run() {
-                                setEditorMode( EditorMode.ARROW );
-                            }
-                        }
-                    );
-                }
+        if (overlay.peekMode() == regionMode && this.control != null) {
+            val op = this.control.getOperation();
+            if (op.getPreferredMode() != EditorMode.REGION) {
+                EventQueue.invokeLater(() -> setEditorMode(EditorMode.ARROW));
             }
         }
     }
 
     // End OpStackListener.
 
-    public void setEditorMode( EditorMode mode ) {
+    void setEditorMode(EditorMode mode) {
         if ( mode == m_editorMode )
             return;
-        if ( modeButtons != null )
-            switch ( mode ) {
+        if ( modeButtons != null ) {
+            switch (mode) {
                 case ARROW:
                     modeButtons.clickNoMode();
                     break;
@@ -302,11 +285,13 @@ public class ModeManager
                 case ROTATE:
                     modeButtons.clickRotateButton();
             }
+        }
         m_editorMode = mode;
     }
 
     // Start OpControlModeListener:
 
+    @Override
     public void enterMode(Mode mode) {
         mode.enter();
         assert (! isControlModeActive());
@@ -315,6 +300,7 @@ public class ModeManager
         overlay.pushMode(controlMode);
     }
 
+    @Override
     public void exitMode(Mode mode) {
         assert isControlModeActive();
         if ( mode != null )
@@ -327,14 +313,15 @@ public class ModeManager
 
     // Start XFormListener:
 
+    @Override
     public void xFormChanged(AffineTransform xform) {
         // First, validate from the overlay's validate root, because the
         // overlay bounds partly determine the overlay affine transform.
-        JScrollPane scroll = (JScrollPane) SwingUtilities.getAncestorOfClass(
+        val scroll = (JScrollPane) SwingUtilities.getAncestorOfClass(
             JScrollPane.class, overlay
         );
-        if (scroll != null){
-            overlay.invalidate();   // mark the overay as needing to update
+        if (scroll != null) {
+            overlay.invalidate();   // mark the overlay as needing to update
             scroll.validate();      // update the layout under the scroll pane
         }
         setTransform(xform);
@@ -352,7 +339,7 @@ public class ModeManager
 
     private void setTransform(AffineTransform xform) {
         //
-        // The given AffineTranform maps original image coordinates to the
+        // The given AffineTransform maps original image coordinates to the
         // coordinates of the image component on the screen.  The Modes
         // require an AffineTransform mapping original image coordinates to
         // coordinates of the Mode overlay component.
@@ -368,7 +355,7 @@ public class ModeManager
         //
         this.xform = xform;
 
-        AffineTransform overlayTransform = getOverlayTransform();
+        val overlayTransform = getOverlayTransform();
 
         regionMode.setTransform(overlayTransform);
         cropMode.setTransform(overlayTransform);
@@ -381,8 +368,8 @@ public class ModeManager
 
     // Also used from DocPanel to forward mouse motion to the Previews.
     AffineTransform getOverlayTransform() {
-        AffineTransform overlayXform = overlay.getTransform();
-        AffineTransform totalXform = (AffineTransform) xform.clone();
+        val overlayXform = overlay.getTransform();
+        val totalXform = (AffineTransform) xform.clone();
         totalXform.preConcatenate(overlayXform);
         return totalXform;
     }
@@ -400,30 +387,33 @@ public class ModeManager
             controlMode.setUnderlayBounds(bounds);
         }
         // The default crop bounds depend on the underlay bounds.
-        CropBounds crop = cropMode.getCrop();
-        CropBounds initCrop = getInitialCropBounds();
+        val crop = cropMode.getCrop();
+        val initCrop = getInitialCropBounds();
         if (crop == null) {
             cropMode.setCropWithConstraints(initCrop);
         }
         cropMode.setResetCropBounds(initCrop);
     }
 
+    private boolean isFitMode() {
+        return doc.popFitMode();
+    }
+
+    private boolean wasCrop() {
+        val peekMode = overlay.peekMode();
+        return peekMode == cropMode || peekMode == rotateMode;
+    }
+
     JComponent setNoMode() {
-        boolean wasCrop =
-            ((overlay.peekMode() == cropMode) ||
-             (overlay.peekMode() == rotateMode));
         setMode(null);
         m_editorMode = EditorMode.ARROW;
-        if (wasCrop) {
-            boolean isFitMode = doc.popFitMode();
-            if (! isFitMode) {
-                doc.zoomToFit();
-            }
+        if (wasCrop() && !isFitMode()) {
+            doc.zoomToFit();
         }
         return null;
     }
 
-    EditorMode m_editorMode;
+    private EditorMode m_editorMode;
 
     JComponent setCropMode() {
         doc.markDirty();
@@ -441,88 +431,87 @@ public class ModeManager
         doc.pushFitMode();
         doc.zoomToFit();
         // The "reset" button in rotate mode depends on the initial crop:
-        CropBounds crop = cropMode.getCrop();
+        val crop = cropMode.getCrop();
         rotateMode.setCrop(crop);
         rotateMode.setResetCropBounds(crop);
         return rotateMode.getControl().getResetButton();
     }
 
     JComponent setRegionMode() {
-        boolean wasCrop =
-            ((overlay.peekMode() == cropMode) ||
-             (overlay.peekMode() == rotateMode));
         setMode(regionMode);
         m_editorMode = EditorMode.REGION;
-        if (wasCrop) {
-            boolean isFitMode = doc.popFitMode();
-            if (! isFitMode) {
-                doc.zoomToFit();
-            }
+        if (wasCrop() && !isFitMode()) {
+            doc.zoomToFit();
         }
         return regionExtras;
     }
 
-    private void setMode(Mode newMode) {
+    private void setMode(final Mode newMode) {
         // Peel off any temporary Modes we may have pushed.
         while (isControlModeActive() || isTransientPanModeActive()) {
             overlay.popMode();
             controlMode = null;
         }
         // See if that did the trick, to avoid duplicate pushes.
-        Mode oldMode = overlay.peekMode();
-        if (oldMode == newMode) {
-            return;
+        val oldMode = overlay.peekMode();
+        if (oldMode == newMode) return;
+
+        if (oldMode == cropMode) transitFromCropMode(newMode);
+        else if (oldMode == rotateMode) transitFromRotateMode(newMode);
+        else if (oldMode == regionMode) transitFromRegionMode(newMode);
+        else transit(null, newMode);
+    }
+
+    private void transitFromRegionMode(final Mode newMode) {
+        // If we are in region mode make sure we exit edit mode
+        if (regionMode instanceof RegionOverlay) {
+            ((RegionOverlay) regionMode).finishEditingCurve();
         }
-        // If the current Mode is one of ours, pop it before pushing the next:
-        if (oldMode == regionMode ||
-            oldMode == cropMode ||
-            oldMode == rotateMode) {
-            // If we are in region mode make sure we exit edit mode
-            if (oldMode == regionMode && regionMode instanceof RegionOverlay)
-                ((RegionOverlay) regionMode).finishEditingCurve();
+        overlay.popMode();
+        transit(regionMode, newMode);
+    }
 
-            overlay.popMode();
+    private void transitFromCropMode(final Mode newMode) {
+        overlay.popMode();
+        cropMode.doCrop();
+        transit(cropMode, newMode);
 
-            // The CropModes need setup and teardown:
-            if ((oldMode == cropMode) || (oldMode == rotateMode)) {
-                CropMode crop = (CropMode) oldMode;
-                crop.doCrop();
-            }
+        // The CropModes need to be kept in sync with each other:
+        rotateMode.setCrop(cropMode.getCrop());
+    }
+
+    private void transitFromRotateMode(final Mode newMode) {
+        overlay.popMode();
+        rotateMode.doCrop();
+        transit(rotateMode, newMode);
+
+        // The CropModes need to be kept in sync with each other:
+        cropMode.setCrop(rotateMode.getCrop());
+    }
+
+    private void transit(final Mode oldMode, final Mode newMode) {
+        if (oldMode != null) {
             oldMode.exit();
         }
         if (newMode != null) {
             overlay.pushMode(newMode);
             newMode.enter();
-        }
-        // The CropModes need setup and teardown:
-        if ((newMode == cropMode) || (newMode == rotateMode)) {
-            CropMode crop = (CropMode) newMode;
-            crop.resetCrop();
-        }
-        // The CropModes need to be kept in sync with each other:
-        if (oldMode == cropMode) {
-            rotateMode.setCrop(cropMode.getCrop());
-        }
-        if (oldMode == rotateMode) {
-            cropMode.setCrop(rotateMode.getCrop());
+
+            // The CropModes need setup and teardown:
+            if (newMode == cropMode || newMode == rotateMode) {
+                ((CropMode) newMode).resetCrop();
+            }
         }
     }
 
     // Get a default CropBounds for the CropMode overlay, in image
     // coordinates.
     private CropBounds getInitialCropBounds() {
-        double x = underlayBounds.getX();
-        double y = underlayBounds.getY();
-        double width = underlayBounds.getWidth();
-        double height = underlayBounds.getHeight();
-        Rectangle2D inset = new Rectangle2D.Double(
-            x, y, width, height
-        );
-        CropBounds crop = new CropBounds(inset);
+        val inset = new Rectangle(underlayBounds);
+        val crop = new CropBounds(HiDpi.imageSpaceRectFrom(inset));
         try {
-            AffineTransform inverse = getOverlayTransform().createInverse();
-            crop = CropBounds.transform(inverse, crop);
-            return crop;
+            val inverse = getOverlayTransform().createInverse();
+            return CropBounds.transform(inverse, crop);
         }
         catch (NoninvertibleTransformException e) {
             // Leave the crop overlay uninitialized.
@@ -534,14 +523,12 @@ public class ModeManager
     // Instead, postprocess unclaimed key events:
 
     private void registerPanModeListener() {
-        KeyboardFocusManager focus =
-            KeyboardFocusManager.getCurrentKeyboardFocusManager();
-        focus.addKeyEventPostProcessor(panModeKeyProcessor);
+        KeyboardFocusManager.getCurrentKeyboardFocusManager()
+                .addKeyEventPostProcessor(panModeKeyProcessor);
     }
 
     void dispose() {
-        KeyboardFocusManager focus =
-            KeyboardFocusManager.getCurrentKeyboardFocusManager();
-        focus.removeKeyEventPostProcessor(panModeKeyProcessor);
+        KeyboardFocusManager.getCurrentKeyboardFocusManager()
+                .removeKeyEventPostProcessor(panModeKeyProcessor);
     }
 }

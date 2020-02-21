@@ -172,8 +172,8 @@ public final class ORFImageType extends RawImageType implements TagHandler {
      * All the possible filename extensions for ORF files.  All must be lower
      * case and the preferred one must be first.
      */
-    private static final String EXTENSIONS[] = {
-        "orf"
+    private static final String[] EXTENSIONS = {
+            "orf"
     };
 }
 /* vim:set et sw=4 ts=4: */

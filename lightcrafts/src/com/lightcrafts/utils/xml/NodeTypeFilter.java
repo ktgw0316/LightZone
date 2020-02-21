@@ -2,6 +2,7 @@
 
 package com.lightcrafts.utils.xml;
 
+import lombok.RequiredArgsConstructor;
 import org.w3c.dom.Node;
 
 /**
@@ -10,28 +11,18 @@ import org.w3c.dom.Node;
  *
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */
+@RequiredArgsConstructor
 public class NodeTypeFilter implements XMLFilter {
 
-    ////////// public /////////////////////////////////////////////////////////
-
-    /**
-     * Construct a <code>NodeTypeFilter</code>.
-     *
-     * @param nodeType The type of node to match.
-     */
-    public NodeTypeFilter( short nodeType ) {
-        m_nodeType = nodeType;
-    }
+    // The type of node to match.
+    private final short nodeType;
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean accept( Node node ) {
-        return node.getNodeType() == m_nodeType;
+        return node.getNodeType() == nodeType;
     }
-
-    ////////// private ////////////////////////////////////////////////////////
-
-    private final short m_nodeType;
 }
 /* vim:set et sw=4 ts=4: */

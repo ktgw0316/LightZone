@@ -2,26 +2,27 @@
 
 package com.lightcrafts.model.ImageEditor;
 
-import com.lightcrafts.model.SliderConfig;
-import com.lightcrafts.model.OperationType;
-import com.lightcrafts.model.Operation;
-import com.lightcrafts.model.RedEyeOperation;
-import com.lightcrafts.jai.utils.Transform;
-import com.lightcrafts.jai.utils.Functions;
-import com.lightcrafts.jai.opimage.RedMaskOpImage;
-import com.lightcrafts.jai.opimage.RedMaskBlackener;
 import com.lightcrafts.jai.operator.LCMSColorConvertDescriptor;
-
-import com.lightcrafts.mediax.jai.PlanarImage;
-import com.lightcrafts.mediax.jai.JAI;
-import com.lightcrafts.mediax.jai.KernelJAI;
+import com.lightcrafts.jai.opimage.RedMaskBlackener;
+import com.lightcrafts.jai.opimage.RedMaskOpImage;
+import com.lightcrafts.jai.utils.Functions;
+import com.lightcrafts.jai.utils.Transform;
+import com.lightcrafts.model.Operation;
+import com.lightcrafts.model.OperationType;
+import com.lightcrafts.model.RedEyeOperation;
+import com.lightcrafts.model.SliderConfig;
+import com.lightcrafts.ui.editor.EditorMode;
 import com.lightcrafts.utils.LCMS;
 import com.lightcrafts.utils.LCMS_ColorSpace;
-import com.lightcrafts.ui.editor.EditorMode;
 
-import java.text.DecimalFormat;
-import java.awt.image.renderable.ParameterBlock;
+import javax.media.jai.JAI;
+import javax.media.jai.KernelJAI;
+import javax.media.jai.PlanarImage;
 import java.awt.image.RenderedImage;
+import java.awt.image.renderable.ParameterBlock;
+import java.text.DecimalFormat;
+
+import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_RED_EYE;
 
 /**
  * Copyright (C) 2007 Light Crafts, Inc.
@@ -35,6 +36,8 @@ public class RedEyesOperation extends BlendedOperation implements RedEyeOperatio
 
     public RedEyesOperation(Rendering rendering) {
         super(rendering, type);
+        setHelpTopic(HELP_TOOL_RED_EYE);
+
         addSliderKey(TOLERANCE);
 
         DecimalFormat format = new DecimalFormat("0.00");
@@ -81,34 +84,19 @@ public class RedEyesOperation extends BlendedOperation implements RedEyeOperatio
             if (hasMask()) {
                 PlanarImage labImage = Functions.toColorSpace(back, new LCMS_ColorSpace(new LCMS.LABProfile()),
                                                               LCMSColorConvertDescriptor.RELATIVE_COLORIMETRIC, null);
-                // PlanarImage labImage = Functions.toColorSpace(back, JAIContext.labColorSpace, null);
 
                 RenderedImage redMask = new RedMaskOpImage(labImage, tolerance, null);
 
-                ParameterBlock pb;
-
                 KernelJAI morphKernel = new KernelJAI(3, 3, new float[] {1, 1, 1, 1, 0, 1, 1, 1, 1});
-                pb = new ParameterBlock();
-                pb.addSource(redMask);
-                pb.add(morphKernel);
-                redMask = JAI.create("dilate", pb, null);
-
-                /* pb = new ParameterBlock();
-                pb.addSource(redMask);
-                pb.add(morphKernel);
-                redMask = JAI.create("erode", pb, null); */
-
-                KernelJAI blurKernel = Functions.getGaussKernel(4 * scale);
-                pb = new ParameterBlock();
-                pb.addSource(redMask);
-                pb.add(blurKernel);
-                redMask = JAI.create("LCSeparableConvolve", pb, null);
+                final ParameterBlock pb = new ParameterBlock()
+                        .addSource(redMask)
+                        .add(morphKernel);
+                redMask = Functions.fastGaussianBlur(JAI.create("dilate", pb, null), 4 * scale);
 
                 return new RedMaskBlackener(back, redMask, null);
-
-                // return Functions.fromByteToUShort(redMask, null);
-            } else
+            } else {
                 return back;
+            }
         }
     }
 

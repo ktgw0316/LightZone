@@ -10,11 +10,7 @@
 package com.lightcrafts.ui.toolkit;
 
 import com.lightcrafts.jai.utils.Functions;
-import com.lightcrafts.jai.JAIContext;
 
-import com.lightcrafts.mediax.jai.KernelJAI;
-import com.lightcrafts.mediax.jai.JAI;
-import com.lightcrafts.mediax.jai.BorderExtender;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
@@ -22,7 +18,6 @@ import java.awt.image.ConvolveOp;
 import java.awt.image.DataBufferInt;
 import java.awt.image.Kernel;
 import java.awt.image.WritableRaster;
-import java.awt.image.renderable.ParameterBlock;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.HashMap;
@@ -508,14 +503,7 @@ public class ShadowFactory {
     }
 
     static private BufferedImage getGaussianBlur(int size, BufferedImage image) {
-        KernelJAI kernel = Functions.getGaussKernel(size / 3.0);
-        ParameterBlock pb = new ParameterBlock();
-        pb.addSource(image);
-        pb.add(kernel);
-        RenderingHints hints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
-                                                  BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-        hints.add(JAIContext.noCacheHint);
-        return JAI.create("LCSeparableConvolve", pb, hints).getAsBufferedImage();
+        return Functions.fastGaussianBlur(image, size / 3.0).getAsBufferedImage();
     }
 
     // creates the shadow mask for the original picture

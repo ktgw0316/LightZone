@@ -14,7 +14,7 @@ class TemplateDeployer {
     // Don't perform the Template copy operation more than once per VM instance,
     // no matter what.
     private static boolean hasDeployed;
-    
+
     /**
      * Perform the mass copy of predefined Templates from resources to files.
      */
@@ -35,7 +35,7 @@ class TemplateDeployer {
     /**
      * Copy one predefined Template from resources to a file.
      */
-    static void migrateTemplate(String template) throws IOException {
+    private static void migrateTemplate(String template) throws IOException {
         File dir = TemplateDatabase.TemplateDir;
         File file = new File(dir, template);
         ClassLoader loader = TemplateDeployer.class.getClassLoader();
@@ -73,6 +73,9 @@ class TemplateDeployer {
         File dir = TemplateDatabase.TemplateDir;
         if (dir.isDirectory()) {
             File[] files = dir.listFiles();
+            if (files == null) {
+                return true;
+            }
             for (File file : files) {
                 String name = file.getName();
                 names.remove(name);
@@ -81,7 +84,7 @@ class TemplateDeployer {
         return names.isEmpty();
     }
 
-    static Collection<String> getPredefinedTemplateNames() {
+    private static Collection<String> getPredefinedTemplateNames() {
         InputStream in = TemplateDeployer.class.getResourceAsStream(
             "resources/TemplateList"
         );

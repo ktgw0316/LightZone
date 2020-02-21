@@ -1,11 +1,12 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2017-     Masahiro Kitagawa */
 
 package com.lightcrafts.app;
 
 import static com.lightcrafts.app.Locale.LOCALE;
 import com.lightcrafts.ui.editor.Document;
 import com.lightcrafts.ui.editor.EditorMode;
-import com.lightcrafts.ui.toolkit.IconFactory;
+import com.lightcrafts.ui.toolkit.IconFontFactory;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -16,8 +17,7 @@ import java.beans.PropertyChangeEvent;
 final class RevertButton extends EditorButton
     implements PropertyChangeListener {
 
-    private final static Icon Icon =
-        IconFactory.createInvertedIcon(RevertButton.class, "revert.png");
+    private final static Icon Icon = IconFontFactory.buildIcon("revert");
 
     private final static String ToolTip = LOCALE.get("RevertButtonToolTip");
 
@@ -30,6 +30,7 @@ final class RevertButton extends EditorButton
 
         addActionListener(
             new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent event) {
                     frame.getEditor().setMode( EditorMode.ARROW );
                     Application.reOpen(frame);
@@ -38,6 +39,7 @@ final class RevertButton extends EditorButton
         );
     }
 
+    @Override
     void updateButton() {
         ComboFrame frame = getComboFrame();
         Document newDoc = frame.getDocument();
@@ -59,6 +61,7 @@ final class RevertButton extends EditorButton
         }
     }
 
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
         Action action = (Action) evt.getSource();
         setEnabled(action.isEnabled());

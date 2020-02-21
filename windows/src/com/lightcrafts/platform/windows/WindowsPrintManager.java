@@ -8,7 +8,7 @@ import java.awt.print.PageFormat;
 import java.awt.print.Paper;
 import java.awt.print.PrinterException;
 
-import com.lightcrafts.mediax.jai.PlanarImage;
+import javax.media.jai.PlanarImage;
 import com.lightcrafts.platform.AlertDialog;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.utils.thread.ProgressThread;

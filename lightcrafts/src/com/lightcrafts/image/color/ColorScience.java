@@ -1,25 +1,27 @@
 package com.lightcrafts.image.color;
 
-import Jama.Matrix;
-
-import java.awt.image.DataBuffer;
-import java.awt.color.ICC_ProfileRGB;
-
 import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.utils.LCMatrix;
+
+import lombok.val;
+import org.ejml.simple.SimpleMatrix;
+
+import java.awt.color.ICC_ProfileRGB;
+import java.awt.image.DataBuffer;
 
 public class ColorScience {
-    static final float[][] rgbXYZ;
-    static final float[] wtptXYZ;
-    static final float whitePointTemperature;
+    private static final float[][] rgbXYZ;
+    private static final float[] wtptXYZ;
+    private static final float whitePointTemperature;
 
     public static final float Wr;
     public static final float Wg;
     public static final float Wb;
-    public static final float W[];
+    public static final float[] W;
 
     static final float[][] Cxy;
 
-    public static final float[][] XYZToRGBMat;
+    private static final float[][] XYZToRGBMat;
     public static final float[][] RGBToXYZMat;
 
     public static float[] XYZ2xy(float[] XYZ) {
@@ -73,13 +75,13 @@ public class ColorScience {
     // TODO: we have to finish cleaning up this.
 
     public static class ICC_ProfileParameters {
-        public float rgbXYZ[][] = new float[3][3];
-        public float wtptXYZ[];
-        public float Cxy[][];
+        public float[][] rgbXYZ = new float[3][3];
+        public float[] wtptXYZ;
+        public float[][] Cxy;
         public float whitePointTemperature;
-        public float W[];
-        public float RGBToXYZMat[][];
-        public float XYZToRGBMat[][];
+        public float[] W;
+        public float[][] RGBToXYZMat;
+        public float[][] XYZToRGBMat;
 
         public ICC_ProfileParameters(ICC_ProfileRGB profile) {
             // Extract the rgbXYZ from the current linear color profile
@@ -102,22 +104,26 @@ public class ColorScience {
                 {rgbXYZ[2][0] / Cb, rgbXYZ[2][1] / Cb}
             };
 
-            float Zr[] = new float[] {Cxy[0][0], Cxy[0][1], 1 - Cxy[0][0] - Cxy[0][1]};
-            float Zg[] = new float[] {Cxy[1][0], Cxy[1][1], 1 - Cxy[1][0] - Cxy[1][1]};
-            float Zb[] = new float[] {Cxy[2][0], Cxy[2][1], 1 - Cxy[2][0] - Cxy[2][1]};
+            float[] Zr = new float[]{Cxy[0][0], Cxy[0][1], 1 - Cxy[0][0] - Cxy[0][1]};
+            float[] Zg = new float[]{Cxy[1][0], Cxy[1][1], 1 - Cxy[1][0] - Cxy[1][1]};
+            float[] Zb = new float[]{Cxy[2][0], Cxy[2][1], 1 - Cxy[2][0] - Cxy[2][1]};
 
             // wtptXYZ -> wtptxy
             final float[] wtptxy = XYZ2xy(wtptXYZ);
             whitePointTemperature = CCTX(wtptxy[0]);
             W = W(whitePointTemperature, Cxy);
 
-            RGBToXYZMat = new Matrix (new float[][] {
-                mul(W[0] / Zr[1], Zr),
-                mul(W[1] / Zg[1], Zg),
-                mul(W[2] / Zb[1], Zb)
-            }).transpose().getArrayFloat();
+            RGBToXYZMat = LCMatrix.getArrayFloat(
+                    new LCMatrix (new float[][] {
+                            mul(W[0] / Zr[1], Zr),
+                            mul(W[1] / Zg[1], Zg),
+                            mul(W[2] / Zb[1], Zb)
+                    }).transpose()
+            );
 
-            XYZToRGBMat = new Matrix(RGBToXYZMat).inverse().getArrayFloat();
+            XYZToRGBMat = LCMatrix.getArrayFloat(
+                    new LCMatrix(RGBToXYZMat).invert()
+            );
         }
     }
 
@@ -142,20 +148,15 @@ public class ColorScience {
         return BlackBody.t(x);
     }
 
-    public static float[][] RGBtoZYX() {
-        double mdata[][] = new double[3][3];
-        for (int i = 0; i < 3; i++)
-            for (int j = 0; j < 3; j++)
-                mdata[i][j] = rgbXYZ[i][j];
-        Matrix XYZRGB = new Matrix(mdata);
+    public static LCMatrix RGBtoZYX() {
+        val XYZRGB = new LCMatrix(rgbXYZ);
+        val S = LCMatrix.getArrayFloat(new LCMatrix(1, 3, wtptXYZ).mult(XYZRGB.invert()));
 
-        float[][] S = new Matrix(new double[][] {{wtptXYZ[0], wtptXYZ[1], wtptXYZ[2]}}).times(XYZRGB.inverse()).getArrayFloat();
-
-        return new float[][] {
-            {S[0][0] * rgbXYZ[0][0], S[0][0] * rgbXYZ[0][1], S[0][0] * rgbXYZ[0][2]},
-            {S[0][1] * rgbXYZ[1][0], S[0][1] * rgbXYZ[1][1], S[0][1] * rgbXYZ[1][2]},
-            {S[0][2] * rgbXYZ[2][0], S[0][2] * rgbXYZ[2][1], S[0][2] * rgbXYZ[2][2]}
-        };
+        return new LCMatrix(new float[][] {
+                {S[0][0] * rgbXYZ[0][0], S[0][0] * rgbXYZ[0][1], S[0][0] * rgbXYZ[0][2]},
+                {S[0][1] * rgbXYZ[1][0], S[0][1] * rgbXYZ[1][1], S[0][1] * rgbXYZ[1][2]},
+                {S[0][2] * rgbXYZ[2][0], S[0][2] * rgbXYZ[2][1], S[0][2] * rgbXYZ[2][2]}
+        });
     }
 
     static float[] mul(float c, float[] v) {
@@ -169,26 +170,26 @@ public class ColorScience {
         return W(T, Cxy);
     }
 
-    public static float[] W(float T, float Cxy[][]) {
-        float DT[] = D(T);
+    public static float[] W(float T, float[][] Cxy) {
+        float[] DT = D(T);
 
         // Compute z-coordinates
-        float R[] = {Cxy[0][0], Cxy[0][1], 1 - Cxy[0][0] - Cxy[0][1]};
-        float G[] = {Cxy[1][0], Cxy[1][1], 1 - Cxy[1][0] - Cxy[1][1]};
-        float B[] = {Cxy[2][0], Cxy[2][1], 1 - Cxy[2][0] - Cxy[2][1]};
-        float W[] = {DT[0], DT[1], 1 - DT[0] - DT[1]};
+        float[] R = {Cxy[0][0], Cxy[0][1], 1 - Cxy[0][0] - Cxy[0][1]};
+        float[] G = {Cxy[1][0], Cxy[1][1], 1 - Cxy[1][0] - Cxy[1][1]};
+        float[] B = {Cxy[2][0], Cxy[2][1], 1 - Cxy[2][0] - Cxy[2][1]};
+        float[] W = {DT[0], DT[1], 1 - DT[0] - DT[1]};
 
         // Compute luminance weights for the primaries using the white point
-        Matrix RGB = vec(R, G, B);
-        Matrix WGB = vec(W, G, B);
-        Matrix RWB = vec(R, W, B);
-        Matrix RGW = vec(R, G, W);
+        val RGB = vec(R, G, B);
+        val WGB = vec(W, G, B);
+        val RWB = vec(R, W, B);
+        val RGW = vec(R, G, W);
 
-        float rgbDet = (float) RGB.det();
+        val rgbDet = (float) RGB.determinant();
 
-        return new float[] {(R[1] * (float) WGB.det()) / (W[1] * rgbDet),
-                            (G[1] * (float) RWB.det()) / (W[1] * rgbDet),
-                            (B[1] * (float) RGW.det()) / (W[1] * rgbDet)};
+        return new float[] {(R[1] * (float) WGB.determinant()) / (W[1] * rgbDet),
+                            (G[1] * (float) RWB.determinant()) / (W[1] * rgbDet),
+                            (B[1] * (float) RGW.determinant()) / (W[1] * rgbDet)};
     }
 
     /*
@@ -300,7 +301,7 @@ public class ColorScience {
 
         public double[][] toRGB(int dataType) {
             double[][] t = scaleTransform(getTransform(), dataType);
-            return strip(new Matrix(t).inverse().getArray());
+            return strip(LCMatrix.getArrayDouble(new SimpleMatrix(t).invert()));
         }
     }
 
@@ -348,8 +349,8 @@ public class ColorScience {
         }
     }
 
-    static Matrix vec(float[] A, float[] B, float[] C) {
-        Matrix ABC = new Matrix(3, 3);
+    private static LCMatrix vec(float[] A, float[] B, float[] C) {
+        val ABC = new LCMatrix(3, 3);
         for (int i = 0; i < 3; i++)
             ABC.set(i, 0, A[i]);
         for (int i = 0; i < 3; i++)
@@ -360,7 +361,7 @@ public class ColorScience {
     }
 
     public static double[][] strip(double[][] x) {
-        double r[][] = new double[3][];
+        double[][] r = new double[3][];
         r[0] = x[0];
         r[1] = x[1];
         r[2] = x[2];
@@ -414,7 +415,7 @@ public class ColorScience {
     }
 
     static float[][] matrix(float t) {
-        float matrix[][] = new float[3][3];
+        float[][] matrix = new float[3][3];
         float m = mixer(t);
 
         for (int i = 0; i < 3; i++)
@@ -456,15 +457,19 @@ public class ColorScience {
                 break;
         }
 
-        Matrix B = new Matrix(method);
+        val B = new LCMatrix(method);
 
         // source illuminant tristimulus in cone response domain
         float[] sXYZ = xy2XYZ(D(source));
-        sXYZ = new Matrix(new float[][] {{sXYZ[0], sXYZ[1], sXYZ[2]}}).times(B).getArrayFloat()[0];
+        sXYZ = LCMatrix.getArrayFloat(
+                new LCMatrix(1, 3, sXYZ).mult(B)
+        )[0];
 
         // target illuminant tristimulus in cone response domain
         float[] tXYZ = xy2XYZ(D(target));
-        tXYZ = new Matrix(new float[][] {{tXYZ[0], tXYZ[1], tXYZ[2]}}).times(B).getArrayFloat()[0];
+        tXYZ = LCMatrix.getArrayFloat(
+                new LCMatrix(1, 3, tXYZ).mult(B)
+        )[0];
 
         // scaling matrix for the colors
         float[][] diag = new float[][]{
@@ -473,8 +478,10 @@ public class ColorScience {
             {0, 0, sXYZ[2] / tXYZ[2]}
         };
 
-        // total tansform
-        return B.times(new Matrix(diag)).times(B.inverse()).getArrayFloat();
+        // total transform
+        return LCMatrix.getArrayFloat(
+                B.mult(new LCMatrix(diag)).mult(B.invert())
+        );
     }
 
     public static double saturation(double r, double g, double b) {
@@ -483,28 +490,27 @@ public class ColorScience {
         return max != 0 ? 1 - min / max : 0;
     }
 
-    private static Matrix RGBtoZYX = new Matrix(RGBtoZYX()).transpose();
-    private static Matrix XYZtoRGB = RGBtoZYX.inverse();
+    private static SimpleMatrix RGBtoZYX = new LCMatrix(RGBtoZYX()).transpose();
+    private static SimpleMatrix XYZtoRGB = RGBtoZYX.invert();
 
-    public static float[] neutralTemperature(float rgb[], float refT, CAMethod caMethod) {
+    public static float[] neutralTemperature(float[] rgb, float refT, CAMethod caMethod) {
         float sat = Float.MAX_VALUE;
         float minT = 0;
         double wbr = 0, wbg = 0, wbb = 0;
-        float tint = 0;
 
-        Matrix color = new Matrix(new double[][]{{rgb[0]}, {rgb[1]}, {rgb[2]}});
+        val color = new LCMatrix(3, 1, rgb);
 
         for (int t = 1000; t < 40000; t+= (0.001 * t)) {
-            Matrix B = new Matrix(chromaticAdaptation(t, refT, caMethod));
-            Matrix combo = XYZtoRGB.times(B.times(RGBtoZYX));
+            val B = new LCMatrix(chromaticAdaptation(t, refT, caMethod));
+            val combo = XYZtoRGB.mult(B.mult(RGBtoZYX));
 
-            Matrix adapdedColor = combo.times(color);
+            val adapdedColor = combo.mult(color);
 
-            double r = clip(adapdedColor.get(0, 0));
-            double g = clip(adapdedColor.get(1, 0));
-            double b = clip(adapdedColor.get(2, 0));
+            val r = clip(adapdedColor.get(0, 0));
+            val g = clip(adapdedColor.get(1, 0));
+            val b = clip(adapdedColor.get(2, 0));
 
-            float tSat = (float) saturation(r, g, b);
+            val tSat = (float) saturation(r, g, b);
 
             if (tSat < sat) {
                 sat = tSat;
@@ -515,6 +521,7 @@ public class ColorScience {
             }
         }
 
+        float tint = 0;
         if (wbr != 0 || wbg != 0 || wbb != 0) {
             tint = (float) (- (wbg - (wbr + wbb) / 2));
         }
@@ -526,31 +533,31 @@ public class ColorScience {
         return Math.min(Math.max(0, x), 1);
     }
 
-    public static float findTemperature(float rgb[], float refT, CAMethod caMethod) {
+    public static float findTemperature(float[] rgb, float refT, CAMethod caMethod) {
         float minDiff = Float.MAX_VALUE;
         float minT = 0;
 
-        float[] xyzRef = JAIContext.linearColorSpace.toCIEXYZ(rgb);
-        float[] labRef = JAIContext.labColorSpace.fromCIEXYZ(xyzRef);        
+        val xyzRef = JAIContext.linearColorSpace.toCIEXYZ(rgb);
+        val labRef = JAIContext.labColorSpace.fromCIEXYZ(xyzRef);
 
-        Matrix gray = new Matrix(new double[][]{{0.18}, {0.18}, {0.18}});
+        SimpleMatrix gray = new LCMatrix(new float[][]{{0.18f}, {0.18f}, {0.18f}});
 
         for (int t = 1000; t < 40000; t+= (0.001 * t)) {
-            Matrix B = new Matrix(chromaticAdaptation(t, refT, caMethod));
-            Matrix combo = XYZtoRGB.times(B.times(RGBtoZYX));
+            val B = new LCMatrix(chromaticAdaptation(t, refT, caMethod));
+            val combo = XYZtoRGB.mult(B.mult(RGBtoZYX));
 
-            gray = combo.times(gray);
+            gray = combo.mult(gray);
 
-            double r = clip(gray.get(0, 0));
-            double g = clip(gray.get(1, 0));
-            double b = clip(gray.get(2, 0));
+            val r = clip(gray.get(0, 0));
+            val g = clip(gray.get(1, 0));
+            val b = clip(gray.get(2, 0));
 
-            float[] xyzGray = JAIContext.linearColorSpace.toCIEXYZ(new float[] {(float) r, (float) g, (float) b});
-            float[] labGray = JAIContext.labColorSpace.fromCIEXYZ(xyzGray);
+            val xyzGray = JAIContext.linearColorSpace.toCIEXYZ(new float[] {(float) r, (float) g, (float) b});
+            val labGray = JAIContext.labColorSpace.fromCIEXYZ(xyzGray);
 
             float diff = 0;
             for (int i = 1; i < 3; i++) {
-                float di = labGray[i] - labRef[i];
+                val di = labGray[i] - labRef[i];
                 diff += di * di;
             }
             diff = (float) Math.sqrt(diff);
@@ -575,7 +582,7 @@ public class ColorScience {
         for (int i = 2000; i < 25000; i += 500)
             System.out.println("m(" + i + ") : " + mixer(i));
 
-        float D65[] = D(whitePointTemperature);
+        float[] D65 = D(whitePointTemperature);
 
         System.out.println("D65: " + D65[0] + ", " + D65[1] + ", " + (1 - D65[0] - D65[1]));
 
@@ -585,16 +592,15 @@ public class ColorScience {
 
         System.out.println("W: " + Wr + ", " + Wg + ", " + Wb);
 
-        /* Matrix ww = new Matrix(RGBtoZYX()).transpose();
+        /* Matrix ww = new LCMatrix(RGBtoZYX()).transpose();
         ww.print(8, 6);
 
-        Matrix ca = new Matrix(chromaticAdaptation(7500, 5000));
-        float[] result = new Matrix(new float[][] {{0.2, 0.2, 0.2}}).times(ca).getArray()[0];
+        Matrix ca = new LCMatrix(chromaticAdaptation(7500, 5000));
+        float[] result = new LCMatrix(new float[][] {{0.2, 0.2, 0.2}}).times(ca).getArray()[0];
 
         for (int j = 0; j < 3; j++)
             System.out.print(" " + result[j]);
         System.out.println(); */
-
 
         System.out.println("RGBToXYZ");
         for (int i = 0; i < 3; i++) {
@@ -603,12 +609,12 @@ public class ColorScience {
             System.out.println();
         }
 
-        float[][] rgb2xyz = RGBtoZYX();
+        val rgb2xyz = RGBtoZYX();
 
         System.out.println("rgb2xyz");
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++)
-                System.out.print(" " + rgb2xyz[i][j]);
+                System.out.print(" " + rgb2xyz.get(i, j));
             System.out.println();
         }
 

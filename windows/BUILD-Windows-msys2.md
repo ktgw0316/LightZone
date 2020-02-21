@@ -15,7 +15,7 @@ Download and install (or unpack) following:
 -   __MSYS2__
     1. Install MSYS2 and update packages as described in https://msys2.github.io/
     1. Install required packages.
-    -    `pacman -S autoconf git make pkg-config tar`
+    -    `pacman -S autoconf git make tar`
     1. Install target-specific toolchain.
     -    For 32-bit: `pacman -S mingw-w64-i686-toolchain`
     -    For 64-bit: `pacman -S mingw-w64-x86_64-toolchain`
@@ -26,16 +26,14 @@ Download and install (or unpack) following:
     1. Install __ntldd__.
     -    For 32-bit: `pacman -S mingw-w64-i686-ntldd-git`
     -    For 64-bit: `pacman -S mingw-w64-x86_64-ntldd-git`
--   __Oracle JDK SE 8__ (Java Development Kit)
+-   __Java Development Kit__ (JDK) version 11 from [AdoptOpenJDK](https://adoptopenjdk.net/).
 -   __Microsoft Windows SDK__
     Pick the right version based on your Windows version. Information and download links are
     available at
     http://en.wikipedia.org/wiki/Microsoft_Windows_SDK#Versions
     Place at end of PATH environment variable.
 -   __HTML Help Workshop__
--   __Install4J__ (free trial for 90 days, then we'll need to try to get open-source licenses)
-    After installation, run Install4J, click on Project -> Download JREs, and go through wizard
-    dialog.
+-   __Install4J__ version 8 (free trial for 90 days, then we'll need to try to get open-source licenses)
 
 Optionally, install following:
 -   Java IDE - Eclipse, Netbeans or IntelliJ IDEA Community Edition
@@ -49,10 +47,10 @@ Few points for MSYS2 beginners
 If you haven't changed anything, your default shell is Bash. Open `~/.bashrc` with an editor (nano
 or vim) and enter following environmental variables. (Modify the paths to match your environment.):
 
-    export JAVA_HOME="/c/Program Files/Java/jdk1.8.0_181";
-    export ANT_HOME="/c/Program Files/apache-ant-1.9.8";
-    export MSSDK_HOME="/c/Program Files (x86)/Windows Kits/8.0";
-    export INSTALL4J_HOME="/c/Program Files/install4j5";
+    export JAVA_HOME="/c/Program Files/AdoptOpenJDK/jdk-11.0.4.11-hotspot"
+    export ANT_HOME="/c/Program Files/apache-ant-1.9.8"
+    export MSSDK_HOME="/c/Program Files (x86)/Windows Kits/10"
+    export INSTALL4J_HOME="/c/Program Files/install4j5"
     export PATH=$PATH:${JAVA_HOME}/bin:${ANT_HOME}/bin:${MSSDK_HOME}/bin/x86:${INSTALL4J_HOME}/bin;
 
 If you close and open your shell again it will automatically set these variables.

@@ -3,13 +3,13 @@
 package com.lightcrafts.jai.opimage;
 
 import com.lightcrafts.jai.operator.LCMSColorConvertDescriptor;
-import com.lightcrafts.mediax.jai.RasterAccessor;
-import com.lightcrafts.mediax.jai.RasterFormatTag;
+import javax.media.jai.RasterAccessor;
+import javax.media.jai.RasterFormatTag;
 import com.lightcrafts.utils.LCMS;
 import com.lightcrafts.utils.LCMS_ColorSpace;
 
-import com.lightcrafts.mediax.jai.PointOpImage;
-import com.lightcrafts.mediax.jai.ImageLayout;
+import javax.media.jai.PointOpImage;
+import javax.media.jai.ImageLayout;
 
 import java.awt.image.*;
 import java.awt.*;

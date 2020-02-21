@@ -5,10 +5,11 @@ Building the LightZone source requires (at least) following packages:
 - __ant__ version 1.9.8 or later to support nativeheaderdir parameter
 - __fakeroot__ for linux package creation
 - __g++__
-- __gcc__
+- __gcc__ version 4.4 or later
 - __git__
 - __javahelp2__ for jhindexer
 - __liblcms2-dev__
+- __liblensfun-dev__ version 0.3.2
 - __libjpeg-dev__ or __libjpeg-turbo-dev__
 - __libtiff__
 - __libxml2-utils__ for xmllint
@@ -22,7 +23,8 @@ _For Debian (>= squeeze, i386/amd64) and Ubuntu (>= 10.04 lucid). See also [Pack
 
 Install required packages:
 
-    sudo apt-get install debhelper devscripts build-essential ant autoconf git-core javahelp2 default-jdk default-jre-headless rsync libjpeg-turbo8-dev liblcms2-dev libtiff5-dev libx11-dev libxml2-utils
+    sudo apt-get install debhelper devscripts build-essential
+ ant autoconf git-core javahelp2 default-jdk default-jre-headless liblcms2-dev liblensfun-dev libjpeg-dev libtiff5-dev libx11-dev libxml2-utils pkg-config rsync 
 
 _(Note: gcc, g++, libc6-dev and make shall be installed with the build-essential.)_
 
@@ -33,9 +35,10 @@ Before start the build, you have to set JAVA_HOME environment variable, e.g.
 ### OpenSUSE (>= 12.2)
 Install required packages:
 
-    sudo zypper install ant autoconf gcc gcc-c++ make git javahelp2 libjpeg8-devel libtiff-devel libX11-devel libxml2-utils rsync java-1_8_0-openjdk-devel
+    sudo zypper install ant autoconf gcc gcc-c++ make
+    git javahelp2 liblcms2-devel lensfun-devel libjpeg8-devel libtiff-devel libxml2-utils rsync libX11-devel java-1_8_0-openjdk-devel pkg-config
 
-Set your JAVA_HOME variable to point to installed JDK, e.g.
+Set your `JAVA_HOME` variable to point to installed JDK, e.g.
 
     export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0
 
@@ -97,7 +100,7 @@ Then build an .rpm package using .spec file:
 
 If package list for unsatisfied dependency is shown, install the packages via apt-get,
 then execute the rpmbuild command again. Your .rpm package will be created in
-~/rpmbuild/RPMS/i386/ or ~/rpmbuild/RPMS/x86_64/. Install it with
+`~/rpmbuild/RPMS/i386/` or `~/rpmbuild/RPMS/x86_64/`. Install it with
 
     rpm -ivh ~/rpmbuild/RPMS/x86_64/lightzone-*.rpm
 

@@ -5,7 +5,12 @@ package com.lightcrafts.utils.xml;
 import java.util.ArrayList;
 import java.util.Base64;
 
+import lombok.val;
+
 import org.w3c.dom.*;
+
+import static com.lightcrafts.utils.xml.XMLUtil.asList;
+import static com.lightcrafts.utils.xml.XMLUtil.asReversedArray;
 
 /**
  * A limited wrapper around Element, to prevent users from exploring XML
@@ -24,11 +29,10 @@ public class XmlNode {
     XmlNode(Element element) {
         this.element = element;
         children = new ArrayList<XmlNode>();
-        NodeList nodes = element.getChildNodes();
-        for (int n=0; n<nodes.getLength(); n++) {
-            Node node = nodes.item(n);
+        val nodes = asList(element.getChildNodes());
+        for (val node : nodes) {
             if (node.getNodeType() == Node.ELEMENT_NODE) {
-                XmlNode child = new XmlNode((Element) node);
+                val child = new XmlNode((Element) node);
                 children.add(child);
             }
         }
@@ -84,8 +88,7 @@ public class XmlNode {
                 "\" under \"" + getName() + "\"";
             throw new XMLException(message);
         }
-        String value = element.getAttribute(key);
-        return value;
+        return element.getAttribute(key);
     }
 
     /** Set an attribute key-value pair on this XmlNode.
@@ -189,12 +192,11 @@ public class XmlNode {
      * returns null.
      */
     public byte[] getData() {
-        final StringBuilder sb = new StringBuilder();
-        final NodeList nodes = element.getChildNodes();
-        for ( int n = 0; n < nodes.getLength(); n++ ) {
-            final Node node = nodes.item( n );
+        val sb = new StringBuilder();
+        val nodes = asList(element.getChildNodes());
+        for (val node : nodes) {
             if ( node.getNodeType() == Node.TEXT_NODE ) {
-                final Text text = (Text)node;
+                val text = (Text)node;
                 sb.append( text.getData() );
             }
         }
@@ -207,18 +209,10 @@ public class XmlNode {
      * null.
      */
     public void clearData() {
-        final NodeList nodes = element.getChildNodes();
-        int i = nodes.getLength() - 1;
-        while (true) {
-            final Node node = nodes.item(i);
-            if (node == null) {
-                return;
-            }
+        val nodes = asReversedArray(element.getChildNodes());
+        for (val node : nodes) {
             if (node.getNodeType() == Node.TEXT_NODE) {
                 element.removeChild(node);
-            }
-            else {
-                --i;
             }
         }
     }

@@ -2,16 +2,20 @@
 
 package com.lightcrafts.model.ImageEditor;
 
-import com.lightcrafts.model.ZoneOperation;
-import com.lightcrafts.model.OperationType;
-import com.lightcrafts.utils.splines;
-import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.jai.LightnessLookupTable;
+import com.lightcrafts.jai.utils.Transform;
+import com.lightcrafts.model.OperationType;
+import com.lightcrafts.model.ZoneOperation;
+import com.lightcrafts.utils.splines;
 
-import com.lightcrafts.mediax.jai.*;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.JAI;
+import javax.media.jai.LookupTableJAI;
+import javax.media.jai.PlanarImage;
 import java.awt.*;
 import java.awt.image.renderable.ParameterBlock;
-import java.awt.image.DataBuffer;
+
+import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_ZONEMAPPER;
 
 class ZoneOperationImpl extends BlendedOperation implements ZoneOperation {
     static final OperationType type = new OperationTypeImpl("Zone Mapper");
@@ -21,12 +25,13 @@ class ZoneOperationImpl extends BlendedOperation implements ZoneOperation {
     private double[][] controlPoints = {{0, 0}, {1, 1}};
     private short[] tableData = new short[0x10000];
     private LookupTableJAI table = null;
-    private double curve[][] = new double[0x100][2];
+    private double[][] curve = new double[0x100][2];
 
     private int scale = LuminosityScale;  // LuminosityScale (default) or RGBScale
 
     ZoneOperationImpl(Rendering rendering) {
         super(rendering, type);
+        setHelpTopic(HELP_TOOL_ZONEMAPPER);
     }
 
     @Override
@@ -38,7 +43,7 @@ class ZoneOperationImpl extends BlendedOperation implements ZoneOperation {
         return new ZoneOperationImpl(rendering);
     }
 
-    double[] lastPoints = null;
+    private double[] lastPoints = null;
 
     @Override
     public void setScale(int scale) {
@@ -118,24 +123,29 @@ class ZoneOperationImpl extends BlendedOperation implements ZoneOperation {
         if (controlPoints == null) {
             y = x;
         } else {
-            double xmin = 0, xmax = 1;
-            double ymin = 0, ymax = 1;
-
-            for (double cp[] : controlPoints)
+            double xmin = 0;
+            double ymin = 0;
+            for (double[] cp : controlPoints) {
                 if (cp[0] == x) {
                     return fy(cp[1]);
                 } else if (x > cp[0]) {
                     xmin = cp[0];
                     ymin = cp[1];
-                } else
+                } else {
                     break;
+                }
+            }
 
-            for (int i = controlPoints.length - 1; i >= 0; i--)
+            double xmax = 1;
+            double ymax = 1;
+            for (int i = controlPoints.length - 1; i >= 0; i--) {
                 if (x <= controlPoints[i][0]) {
                     xmax = controlPoints[i][0];
                     ymax = controlPoints[i][1];
-                } else
+                } else {
                     break;
+                }
+            }
 
             y = ((x - xmin) / (xmax - xmin)) * (ymax - ymin) + ymin;
         }
@@ -153,7 +163,7 @@ class ZoneOperationImpl extends BlendedOperation implements ZoneOperation {
     }
 
     private void updateCurve() {
-	double weights[] = new double[controlPoints.length];
+        double[] weights = new double[controlPoints.length];
 	weights[0] = weights[controlPoints.length - 1] = 1.0;
 	for (int i = 1; i < controlPoints.length - 1; i++)
 	    weights[i] = weight;
@@ -179,31 +189,6 @@ class ZoneOperationImpl extends BlendedOperation implements ZoneOperation {
                        && scale == LuminosityScale ?
 	    new LightnessLookupTable(tableData, true) :
 	    new LookupTableJAI(tableData, true);
-    }
-
-    private short[] tableDataUShort = new short[0x10000];
-    private byte[] tableDataByte = new byte[0x100];
-    private LookupTableJAI byteLut = null;
-    private LookupTableJAI ushortLut = null;
-
-    private LookupTableJAI computeGammaTable(int dataType) {
-        final double gamma = 2.2;
-
-        if (dataType == DataBuffer.TYPE_BYTE) {
-            if (byteLut != null)
-                return byteLut;
-            for (int i = 0; i < tableDataByte.length; i++) {
-                tableDataByte[i] = (byte) (0xFF * Math.pow(i / (double) 0xFF, gamma) + 0.5);
-            }
-            return byteLut = new LookupTableJAI(tableDataByte);
-        } else {
-            if (ushortLut != null)
-                return ushortLut;
-            for (int i = 0; i < tableDataUShort.length; i++) {
-                tableDataUShort[i] = (short) (0xFFFF * Math.pow(i / (double) 0xFFFF, gamma) + 0.5);
-            }
-            return ushortLut = new LookupTableJAI(tableDataUShort, true);
-        }
     }
 
     private class ZoneMapper extends BlendedTransform {

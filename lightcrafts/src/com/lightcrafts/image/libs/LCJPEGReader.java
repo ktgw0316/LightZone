@@ -7,8 +7,6 @@ import com.lightcrafts.image.types.AdobeEmbedJPEGSegmentFilter;
 import com.lightcrafts.image.types.AdobeJPEGSegmentFilter;
 import com.lightcrafts.image.types.JPEGImageInfo;
 import com.lightcrafts.jai.opimage.CachedImage;
-import com.lightcrafts.mediax.jai.ImageLayout;
-import com.lightcrafts.mediax.jai.PlanarImage;
 import com.lightcrafts.utils.ProgressIndicator;
 import com.lightcrafts.utils.UserCanceledException;
 import com.lightcrafts.utils.thread.ProgressThread;
@@ -23,6 +21,8 @@ import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.PlanarImage;
 
 import static com.lightcrafts.image.types.JPEGConstants.JPEG_APPC_MARKER;
 import static com.lightcrafts.image.types.JPEGConstants.JPEG_APPE_MARKER;
@@ -40,7 +40,7 @@ import static com.lightcrafts.jai.JAIContext.sRGBColorSpace;
  * @author Paul J. Lucas [paul@lightcrafts.com]
  * @see <a href="http://www.ijg.org/">LibJPEG</a>
  */
-public final class LCJPEGReader {
+public final class LCJPEGReader implements LCImageReader {
 
     /**
      * The default buffer size for use with {@link #LCJPEGReader(LCImageDataProvider).
@@ -212,12 +212,11 @@ public final class LCJPEGReader {
     }
 
     /**
-     * Gets the JPEG image.
-     *
-     * @return Returns said image.
+     * {@inheritDoc}
      */
+    @Override
     public PlanarImage getImage() throws LCImageLibException, UserCanceledException {
-        return getImage(null, null);
+        return getImage( null, null );
     }
 
     /**

@@ -5,7 +5,7 @@ package com.lightcrafts.platform.macosx;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import com.lightcrafts.utils.ColorProfileInfo;
+import com.lightcrafts.image.color.ColorProfileInfo;
 
 /**
  * A <code>MacOSXColorProfileManager</code> is a class that is used to get

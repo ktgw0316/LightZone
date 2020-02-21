@@ -2,23 +2,22 @@
 
 package com.lightcrafts.jai.opimage;
 
-import com.lightcrafts.mediax.jai.PointOpImage;
-import com.lightcrafts.mediax.jai.ImageLayout;
-import com.lightcrafts.mediax.jai.RasterAccessor;
-import com.lightcrafts.mediax.jai.RasterFormatTag;
+import com.lightcrafts.image.color.ColorScience;
+import com.lightcrafts.image.color.HSB;
 import com.lightcrafts.jai.JAIContext;
-import com.lightcrafts.utils.ColorScience;
-import com.lightcrafts.utils.HSB;
+import com.lightcrafts.utils.LCMatrix;
 
-import java.awt.image.DataBuffer;
-import java.awt.image.RenderedImage;
-import java.awt.image.Raster;
-import java.awt.image.WritableRaster;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.PointOpImage;
+import javax.media.jai.RasterAccessor;
+import javax.media.jai.RasterFormatTag;
 import java.awt.*;
 import java.awt.color.ICC_ProfileRGB;
+import java.awt.image.DataBuffer;
+import java.awt.image.Raster;
+import java.awt.image.RenderedImage;
+import java.awt.image.WritableRaster;
 import java.util.Map;
-
-import Jama.Matrix;
 
 /**
  * Copyright (C) Light Crafts, Inc.
@@ -31,12 +30,16 @@ public class FilteredGrayscaleOpImage extends PointOpImage {
     private final float[] filter;
     private final float angle;
 
-    public FilteredGrayscaleOpImage(RenderedImage source, float filter[], float angle, float strength, Map config) {
+    public FilteredGrayscaleOpImage(RenderedImage source, float[] filter, float angle, float strength, Map config) {
         super(source, new ImageLayout(source), config, true);
         permitInPlaceOperation();
         ICC_ProfileRGB sRGB = (ICC_ProfileRGB) JAIContext.sRGBColorProfile;
         ICC_ProfileRGB linRGB = (ICC_ProfileRGB) JAIContext.linearProfile;
-        toLinearsRGB = new Matrix(sRGB.getMatrix()).inverse().times(new Matrix(linRGB.getMatrix())).getArrayFloat();
+        toLinearsRGB = LCMatrix.getArrayFloat(
+                new LCMatrix(sRGB.getMatrix())
+                        .invert()
+                        .mult(new LCMatrix(linRGB.getMatrix()))
+        );
 
         this.filter = filter.clone();
         this.angle = angle;
@@ -78,13 +81,13 @@ public class FilteredGrayscaleOpImage extends PointOpImage {
         int width = src.getWidth();
         int height = src.getHeight();
 
-        short dstData[] = dst.getShortDataArray(0);
-        int dstBandOffsets[] = dst.getBandOffsets();
+        short[] dstData = dst.getShortDataArray(0);
+        int[] dstBandOffsets = dst.getBandOffsets();
         int dstLineStride = dst.getScanlineStride();
         int dstPixelStride = dst.getPixelStride();
 
-        short srcData[] = src.getShortDataArray(0);
-        int srcBandOffsets[] = src.getBandOffsets();
+        short[] srcData = src.getShortDataArray(0);
+        int[] srcBandOffsets = src.getBandOffsets();
         int srcLineStride = src.getScanlineStride();
         int srcPixelStride = src.getPixelStride();
 
@@ -98,14 +101,14 @@ public class FilteredGrayscaleOpImage extends PointOpImage {
 
         float filterHue, filterSat;
         {
-            float hsb[] = new float[3];
+            float[] hsb = new float[3];
             HSB.fromRGB(filter, hsb);
             filterHue = (float) (2 * Math.PI * hsb[0] - Math.PI);
             filterSat = hsb[1];
         }
 
-        float rgb[] = new float[3];
-        float hsb[] = new float[3];
+        float[] rgb = new float[3];
+        float[] hsb = new float[3];
 
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {

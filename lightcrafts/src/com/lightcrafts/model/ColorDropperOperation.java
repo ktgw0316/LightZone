@@ -24,4 +24,9 @@ public interface ColorDropperOperation extends GenericOperation {
      * implications this color selection has on other settings.
      */
     Map<String, Float> setColor(Point2D p);
+
+    @Override
+    default void accept(GenericOperationVisitor visitor) {
+        visitor.visitColorDropperOperation(this);
+    }
 }

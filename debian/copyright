@@ -6,7 +6,6 @@ Source: https://github.com/ktgw0316/LightZone
 Files-Excluded: Splash.xcf freebsd-ports macosx windows
 
 Files: lightcrafts/src/com/*
-       lightcrafts/jnisrc/*
        lightcrafts/help/*
        lightcrafts/tools/*
        lightcrafts/coprocess/dcraw/patches/*
@@ -38,34 +37,26 @@ License: permissive
  In no event will the authors be held liable for any damages arising from
  the use of this software.
 
-Files: lightcrafts/extsrc/com/lightcrafts/*
-       lightcrafts/lib/mlibwrapper_jai.jar
+Files: lightcrafts/lib/jai_*.jar
 Copyright: 2005 Sun Microsystems, Inc.
-License: Java Research License or Java Distribution License
- https://java.net/projects/jai-core/sources/svn/content/trunk/LICENSE-JRL.txt
- https://java.net/projects/jai-core/sources/svn/content/trunk/LICENSE-JDL.txt
+           2013 Oracle America, Inc.
+License: Oracle Binary Code License
+ https://www.oracle.com/technetwork/java/javase/downloads/java-se-archive-license-1382604.html
 
-Files: lightcrafts/extsrc/com/sun/image/codec/jpeg/*
-Copyright: 2007 Free Software Foundation, Inc.
-           2007 Matthew Flaschen
-           2011 Red Hat, Inc.
-License: GPL-2+
-
-Files: lightcrafts/extsrc/sun/awt/image/codec/JPEG*.java
-Copyright: 2011 Red Hat, Inc.
-License: GPL-2+
-
-Files: lightcrafts/lib/asm*.jar
-Copyright: 2000-2011 INRIA, France Télécom
-License: BSD
+Files: lightcrafts/lib/ejml-*.jar
+Copyright: 2009 Peter Abeles
+License: Apache-2.0
 
 Files: lightcrafts/lib/substance-lite.jar
        lightcrafts/lib/laf-widget.jar
 Copyright: 2005-2010 Kirill Grouchnikov
 License: BSD
 
+License: Apache-2.0
+ [LICENSE TEXT]
+
 License: BSD
  [LICENSE TEXT]
 
-License: GPL-2+
+License: GPL-2
  [LICENSE TEXT]
