@@ -2,7 +2,7 @@ Source: lightzone
 Section: graphics
 Priority: optional
 Maintainer: Masahiro Kitagawa <arctica0316@gmail.com>
-Build-Depends: debhelper, devscripts, ant (>= 1.9.8), autoconf, git-core, javahelp2, default-jdk (>= 2:1.8), default-jre-headless (>= 2:1.8), openjfx, liblcms2-dev, liblensfun-dev (<< 0.3.95), libglib2.0-dev, libjpeg-dev, libtiff5-dev, libx11-dev, pkg-config, rsync
+Build-Depends: debhelper, devscripts, ant (>= 1.9.8), autoconf, git-core, javahelp2, default-jdk (>= 1.11), default-jre-headless (>= 2:1.8), openjfx, libavcodec58, liblcms2-dev, liblensfun-dev (<< 0.3.95), libglib2.0-dev, libjpeg-dev, libtiff5-dev, libx11-dev, pkg-config, rsync
 Homepage: http://lightzoneproject.org/
 Standards-Version: 4.4.1
 
