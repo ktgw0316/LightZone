@@ -25,7 +25,7 @@
       <variable name="LC_VERSION" />
     </variables>
     <codeSigning windowsEnabled="true" windowsPkcs12File="./resources/sign/lightcrafts.pfx" />
-    <jreBundles jdkProviderId="Liberica" release="OpenJDK 11.0.6+10">
+    <jreBundles jdkProviderId="Liberica" release="OpenJDK 11.0.5+11">
       <modules>
         <defaultModules set="minimum" />
         <module name="java.base" />
