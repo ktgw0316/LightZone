@@ -2,11 +2,13 @@
 !**/lightzone*
 **/build
 **/javah
+**/out
 **/products
 **/release
 *.0
 *.a
 *.cache
+*.bak
 *.d
 *.db
 *.dll
@@ -25,6 +27,7 @@
 *.rej
 *.res
 *.so
+*.srctrl*
 *.status
 *.swp
 *.tlog
