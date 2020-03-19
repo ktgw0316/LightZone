@@ -29,9 +29,9 @@ import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
-import com.lightcrafts.mediax.jai.JAI;
-import com.lightcrafts.mediax.jai.CachedTile;
-import com.lightcrafts.mediax.jai.EnumeratedParameter;
+import javax.media.jai.JAI;
+import javax.media.jai.CachedTile;
+import javax.media.jai.EnumeratedParameter;
 
 import com.lightcrafts.jai.utils.LCTileCache;
 

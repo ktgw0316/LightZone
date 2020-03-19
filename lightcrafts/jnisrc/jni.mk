@@ -271,7 +271,7 @@ endif	# UNIVERSAL
 .PHONY: clean distclean mostlyclean
 
 clean:
-	$(RM) *.o .*.d javah *-ranlib.a *.dSYM *.res $(TARGET).dSYM $(JNI_EXTRA_CLEAN)
+	$(RM) *.o .*.d javah java_jni *-ranlib.a *.dSYM *.res $(TARGET).dSYM $(JNI_EXTRA_CLEAN)
 
 distclean mostlyclean: clean
 	$(RM) $(TARGET) $(TARGET_IMPLIB) $(TARGET_ARM) $(TARGET_X86) $(POST_TARGET) $(JNI_EXTRA_DISTCLEAN)
