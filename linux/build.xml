@@ -47,7 +47,7 @@
     <mkdir dir="javah"/>
     <javac destdir="build" includeantruntime="false" debug="true"
            release="17" nativeheaderdir="javah">
-      <src path="src"/>
+      <src path="src/main/java"/>
       <classpath>
         <fileset dir="${common-dir}/products">
           <include name="*.jar"/>
@@ -68,7 +68,7 @@
 
   <target name="locales">
     <copy todir="build">
-      <fileset dir="locale" excludes=".git"/>
+      <fileset dir="src/main/locale" excludes=".git"/>
     </copy>
   </target>
 

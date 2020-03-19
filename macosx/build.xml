@@ -5,7 +5,7 @@
   <!--===== Properties =====================================================-->
 
   <property name="common-dir" value="../lightcrafts"/>
-  <property file="${common-dir}/resources/com/lightcrafts/utils/resources/Version.properties"/>
+  <property file="${common-dir}/src/main/resources/com/lightcrafts/utils/resources/Version.properties"/>
 
   <property name="app-dir" value="release"/>
   <property name="macosx-jar" value="products/lightcrafts-apple.jar"/>
@@ -42,7 +42,7 @@
     <mkdir dir="javah"/>
     <javac destdir="build" includeantruntime="false" debug="true"
            release="17" nativeheaderdir="javah">
-      <src path="src"/>
+      <src path="src/main/java"/>
       <compilerarg value="-XDignore.symbol.file"/>
       <classpath>
         <fileset dir="${common-dir}/products">
@@ -59,7 +59,7 @@
 
   <target name="locale">
     <copy todir="build">
-      <fileset dir="locale" excludes=".git"/>
+      <fileset dir="src/main/locale" excludes=".git"/>
     </copy>
   </target>
 
