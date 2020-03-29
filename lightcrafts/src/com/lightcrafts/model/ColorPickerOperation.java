@@ -31,4 +31,9 @@ public interface ColorPickerOperation extends GenericOperation {
      * those methods were last invoked).
      */
     Color getColor();
+
+    @Override
+    default void accept(GenericOperationVisitor visitor) {
+        visitor.visitColorPickerOperation(this);
+    }
 }

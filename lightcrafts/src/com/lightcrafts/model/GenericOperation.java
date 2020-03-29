@@ -75,4 +75,8 @@ public interface GenericOperation extends Operation {
       * Get a help topic name, as defined in HelpConstants.
       */
     String getHelpTopic();
+
+    default void accept(GenericOperationVisitor visitor) {
+        visitor.visitGenericOperation(this);
+    }
 }

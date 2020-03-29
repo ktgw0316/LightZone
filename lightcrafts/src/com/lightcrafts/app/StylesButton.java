@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2017-     Masahiro Kitagawa */
 
 package com.lightcrafts.app;
 
@@ -6,7 +7,7 @@ import static com.lightcrafts.app.Locale.LOCALE;
 import com.lightcrafts.templates.TemplateDatabase;
 import com.lightcrafts.templates.TemplateKey;
 import com.lightcrafts.ui.browser.view.AbstractImageBrowser;
-import com.lightcrafts.ui.toolkit.IconFactory;
+import com.lightcrafts.ui.toolkit.IconFontFactory;
 import com.lightcrafts.ui.editor.EditorMode;
 
 import javax.swing.*;
@@ -26,8 +27,7 @@ import java.util.List;
  */
 class StylesButton extends BrowserButton {
 
-    private final static Icon Icon=
-        IconFactory.createInvertedIcon(StylesButton.class, "styles.png");
+    private final static Icon Icon= IconFontFactory.buildIcon("styles");
 
     private final static String ToolTip = LOCALE.get("StylesButtonToolTip");
 
@@ -39,6 +39,7 @@ class StylesButton extends BrowserButton {
         // Show the popup on mouse-pressed, not on action-performed.
         addMouseListener(
             new MouseAdapter() {
+                @Override
                 public void mousePressed(MouseEvent event) {
                     ComboFrame frame = getComboFrame();
                     AbstractImageBrowser browser = frame.getBrowser();
@@ -62,6 +63,7 @@ class StylesButton extends BrowserButton {
                     JMenuItem item = new JMenuItem(key.getName());
                     item.addActionListener(
                         new ActionListener() {
+                            @Override
                             public void actionPerformed(ActionEvent event) {
                                 ComboFrame frame = getComboFrame();
                                 File[] array = files.toArray(new File[0]);

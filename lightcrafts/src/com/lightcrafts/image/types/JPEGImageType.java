@@ -3,46 +3,45 @@
 
 package com.lightcrafts.image.types;
 
-import java.awt.*;
-import java.awt.color.ICC_Profile;
-import java.awt.color.ColorSpace;
-import java.awt.color.ICC_ColorSpace;
-import java.awt.image.*;
-import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.BufferUnderflowException;
-import java.nio.channels.FileChannel;
-import java.util.List;
-import javax.media.jai.*;
-
-import org.w3c.dom.Document;
-
-import com.lightcrafts.image.BadColorProfileException;
-import com.lightcrafts.image.BadImageFileException;
-import com.lightcrafts.image.ColorProfileException;
+import com.lightcrafts.image.*;
+import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.image.export.*;
-import com.lightcrafts.image.ImageInfo;
-import com.lightcrafts.image.metadata.*;
-import com.lightcrafts.image.metadata.providers.PreviewImageProvider;
-import com.lightcrafts.image.metadata.values.ImageMetaValue;
-import com.lightcrafts.image.UnknownImageTypeException;
 import com.lightcrafts.image.libs.InputStreamImageDataProvider;
 import com.lightcrafts.image.libs.LCImageLibException;
 import com.lightcrafts.image.libs.LCJPEGReader;
 import com.lightcrafts.image.libs.LCJPEGWriter;
-import com.lightcrafts.utils.bytebuffer.*;
-import com.lightcrafts.image.color.ColorProfileInfo;
-import com.lightcrafts.utils.thread.ProgressThread;
-import com.lightcrafts.utils.UserCanceledException;
-import com.lightcrafts.utils.file.FileUtil;
-import com.lightcrafts.utils.xml.XmlNode;
-import com.lightcrafts.utils.xml.XMLException;
-import com.lightcrafts.utils.xml.XMLUtil;
+import com.lightcrafts.image.metadata.*;
+import com.lightcrafts.image.metadata.providers.PreviewImageProvider;
+import com.lightcrafts.image.metadata.values.ImageMetaValue;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.opimage.CachedImage;
+import com.lightcrafts.utils.UserCanceledException;
+import com.lightcrafts.utils.bytebuffer.ArrayByteBuffer;
+import com.lightcrafts.utils.bytebuffer.ByteBufferUtil;
+import com.lightcrafts.utils.bytebuffer.LCByteBuffer;
+import com.lightcrafts.utils.bytebuffer.LCMappedByteBuffer;
+import com.lightcrafts.utils.file.FileUtil;
+import com.lightcrafts.utils.thread.ProgressThread;
+import com.lightcrafts.utils.xml.XMLException;
+import com.lightcrafts.utils.xml.XMLUtil;
+import com.lightcrafts.utils.xml.XmlNode;
+import org.w3c.dom.Document;
 
-import static com.lightcrafts.image.libs.LCJPEGConstants.*;
-import static com.lightcrafts.image.metadata.CoreTags.*;
+import javax.media.jai.PlanarImage;
+import java.awt.*;
+import java.awt.color.ColorSpace;
+import java.awt.color.ICC_ColorSpace;
+import java.awt.color.ICC_Profile;
+import java.awt.image.RenderedImage;
+import java.io.*;
+import java.nio.BufferUnderflowException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.util.List;
+
+import static com.lightcrafts.image.libs.LCJPEGConstants.CS_UNKNOWN;
+import static com.lightcrafts.image.metadata.CoreTags.CORE_IMAGE_ORIENTATION;
+import static com.lightcrafts.image.metadata.CoreTags.CORE_RATING;
 import static com.lightcrafts.image.metadata.EXIFConstants.*;
 import static com.lightcrafts.image.metadata.EXIFTags.*;
 import static com.lightcrafts.image.metadata.ImageOrientation.ORIENTATION_UNKNOWN;
@@ -108,18 +107,14 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
             quality = new QualityOption( 85, this );
         }
 
-        /**
-         * @deprecated
-         */
+        @Deprecated
         @Override
         protected void save(XmlNode node) {
             super.save( node );
             quality.save( node );
         }
 
-        /**
-         * @deprecated
-         */
+        @Deprecated
         @Override
         protected void restore( XmlNode node ) throws XMLException {
             super.restore( node );

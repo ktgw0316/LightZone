@@ -12,7 +12,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
 public class CollapseButton extends CoolToggleButton {
-    
+
     private final static String CollapseToolTip =
         LOCALE.get("CollapseButtonCollapseToolTip");
     private final static String ExpandToolTip =

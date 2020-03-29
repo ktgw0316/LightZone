@@ -6,8 +6,8 @@ import com.lightcrafts.image.color.ColorScience;
 import com.lightcrafts.image.types.AuxiliaryImageInfo;
 import com.lightcrafts.image.types.RawImageInfo;
 import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.jai.opimage.BilateralFilterRGBOpImage;
 import com.lightcrafts.jai.opimage.HighlightRecoveryOpImage;
-import com.lightcrafts.jai.opimage.NonLocalMeansFilterOpImage;
 import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.ColorDropperOperation;
 import com.lightcrafts.model.OperationType;
@@ -393,7 +393,7 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
             // NOISE REDUCTION
             if (color_noise != 0 || grain_noise != 0) {
                 BorderExtender borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
-                front = new NonLocalMeansFilterOpImage(front, borderExtender, JAIContext.fileCacheHint, null, (int)grain_noise, 2 * (int)grain_noise, 3, (int)color_noise, 2 * (int)color_noise, 3);
+                front = new BilateralFilterRGBOpImage(front, borderExtender, JAIContext.fileCacheHint, null, grain_noise * scale, 0.02f, color_noise * scale, 0.04f);
                 front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
             }
 

@@ -2,7 +2,7 @@
 # $FreeBSD$
 
 PORTNAME=	lightzone
-DISTVERSION=	4.1.9
+DISTVERSION=	4.2.0
 PORTREVISION=	0
 CATEGORIES=	graphics java
 DIST_SUBDIR=	${PORTNAME}
@@ -22,7 +22,7 @@ LIB_DEPENDS=	liblcms2.so:${PORTSDIR}/graphics/lcms2 \
 		libtiff.so:${PORTSDIR}/graphics/tiff
 
 USE_GITHUB=	yes
-GH_ACCOUNT=	Aries85
+GH_ACCOUNT=	ktgw0316
 GH_PROJECT=	LightZone
 
 USES=		desktop-file-utils gmake jpeg pkgconfig
@@ -32,7 +32,7 @@ USE_GCC=	yes
 USE_LDCONFIG=	yes
 USE_XORG=	x11
 JAVA_VENDOR=	openjdk
-JAVA_VERSION=	1.8+
+JAVA_VERSION=	11+
 JAVA_BUILD=	yes
 JAVA_RUN=	yes
 INSTALLS_ICONS=	yes

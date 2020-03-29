@@ -50,7 +50,7 @@ class EditSizeMetadataEntry extends MetadataEntry {
                 case ORIENTATION_90CCW:
                 case ORIENTATION_90CCW_VFLIP:
                 case ORIENTATION_90CW:
-                case ORIENTATION_90CW_HFLIP:
+                case ORIENTATION_90CW_VFLIP:
                     value = LOCALE.get("EditSizeValue", height, width);
                     break;
                 case ORIENTATION_180:

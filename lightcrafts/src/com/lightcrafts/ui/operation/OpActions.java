@@ -6,6 +6,7 @@ package com.lightcrafts.ui.operation;
 import com.lightcrafts.model.Engine;
 import com.lightcrafts.model.Operation;
 import com.lightcrafts.model.OperationType;
+import com.lightcrafts.ui.toolkit.IconFontFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -235,6 +236,10 @@ public class OpActions {
     }
 
     private static BufferedImage getImage(String key) {
+        final BufferedImage bi = IconFontFactory.buildIconImage(key, 26);
+        if (bi != null) {
+            return bi;
+        }
         String iconName;
         try {
             iconName = Resources_ALL.getString(key + "_Icon");

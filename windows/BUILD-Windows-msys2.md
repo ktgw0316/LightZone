@@ -33,9 +33,7 @@ Download and install (or unpack) following:
     http://en.wikipedia.org/wiki/Microsoft_Windows_SDK#Versions
     Place at end of PATH environment variable.
 -   __HTML Help Workshop__
--   __Install4J__ (free trial for 90 days, then we'll need to try to get open-source licenses)
-    After installation, run Install4J, click on Project -> Download JREs, and go through wizard
-    dialog.
+-   __Install4J__ version 8 (free trial for 90 days, then we'll need to try to get open-source licenses)
 
 Optionally, install following:
 -   Java IDE - Eclipse, Netbeans or IntelliJ IDEA Community Edition

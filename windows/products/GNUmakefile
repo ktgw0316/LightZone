@@ -22,7 +22,7 @@ $(DEST_WINDOWS_SHARES): FORCE
 	$(call SYMLINK,../$@,$@)
 
 libs: $(DEST_COMMON_PRODUCTS)
-	$(shell ntldd *.dll | grep -o " => .*mingw.*\.dll" | sort | uniq | sed 's/ => \(.*\)/"\1"/g' | xargs -r cygpath | xargs -r cp -u -t .)
+	$(shell ./copydeps.sh *.dll)
 
 .PHONY: FORCE
 FORCE:

@@ -188,7 +188,7 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
     }
 
     void setUnderlayRect(Rectangle bounds) {
-        underlayRect = bounds;
+        underlayRect = HiDpi.imageSpaceRectFrom(bounds);
     }
 
     void setAspectConstraint(AspectConstraint constraint) {

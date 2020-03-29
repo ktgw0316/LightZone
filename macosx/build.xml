@@ -39,7 +39,7 @@
     <mkdir dir="build"/>
     <mkdir dir="javah"/>
     <javac destdir="build" includeantruntime="false" debug="true"
-           source="9" target="9" nativeheaderdir="javah">
+           release="11" nativeheaderdir="javah">
       <src path="src"/>
       <compilerarg value="-XDignore.symbol.file"/>
       <classpath>
@@ -117,7 +117,8 @@
       <sysproperty key="java.library.path" value="."/>
       <sysproperty key="lightcrafts.debug" value="1"/>
       <sysproperty key="apple.awt.graphics.EnableDeferredUpdates" value="false"/>
-      <sysproperty key="file.encoding" value="utf-8" />
+      <sysproperty key="file.encoding" value="utf-8"/>
+      <sysproperty key="lensfun.dir" value="./share/lensfun"/>
     </java>
   </target>
 

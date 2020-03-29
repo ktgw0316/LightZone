@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2016-     Masahiro Kitagawa */
 
 package com.lightcrafts.image.metadata;
 
@@ -20,18 +21,22 @@ public enum ImageOrientation {
      * (This means the image is landscape.)
      */
     ORIENTATION_LANDSCAPE( TIFF_ORIENTATION_LANDSCAPE ) {       // TIFF 1
-        public ImageOrientation get90CCW() {
-            return ORIENTATION_90CW;                            // TIFF 8
-        }
+        @Override
         public ImageOrientation get90CW() {
             return ORIENTATION_90CCW;                           // TIFF 6
         }
-        public ImageOrientation get180() {
-            return ORIENTATION_180;                             // TIFF 3
+
+        @Override
+        public ImageOrientation getVFlip() {
+            return ORIENTATION_VFLIP;                           // TIFF 4
         }
+
+        @Override
         public TransposeType getCorrection() {
             return null;
         }
+
+        @Override
         public int getRotationTo( ImageOrientation o ) {
             switch ( o ) {
                 case ORIENTATION_LANDSCAPE:                     // TIFF 1
@@ -46,6 +51,8 @@ public enum ImageOrientation {
                     throw new IllegalArgumentException();
             }
         }
+
+        @Override
         public boolean isRotatableTo( ImageOrientation o ) {
             switch ( o ) {
                 case ORIENTATION_180:                           // TIFF 3
@@ -65,18 +72,22 @@ public enum ImageOrientation {
      * (This means the image is rotated 180 degrees.)
      */
     ORIENTATION_180( TIFF_ORIENTATION_180 ) {                   // TIFF 3
-        public ImageOrientation get90CCW() {
-            return ORIENTATION_90CCW;                           // TIFF 6
-        }
+        @Override
         public ImageOrientation get90CW() {
             return ORIENTATION_90CW;                            // TIFF 8
         }
-        public ImageOrientation get180() {
-            return ORIENTATION_LANDSCAPE;                       // TIFF 1
+
+        @Override
+        public ImageOrientation getVFlip() {
+            return ORIENTATION_SEASCAPE;                        // TIFF 2
         }
+
+        @Override
         public TransposeType getCorrection() {
             return ROTATE_180;                                  // clockwise
         }
+
+        @Override
         public int getRotationTo( ImageOrientation o ) {
             switch ( o ) {
                 case ORIENTATION_LANDSCAPE:                     // TIFF 1
@@ -91,6 +102,8 @@ public enum ImageOrientation {
                     throw new IllegalArgumentException();
             }
         }
+
+        @Override
         public boolean isRotatableTo( ImageOrientation o ) {
             switch ( o ) {
                 case ORIENTATION_180:                           // TIFF 3
@@ -110,18 +123,22 @@ public enum ImageOrientation {
      * (This means the image is rotated 90 CCW.)
      */
     ORIENTATION_90CCW( TIFF_ORIENTATION_90CCW ) {               // TIFF 6
-        public ImageOrientation get90CCW() {
-            return ORIENTATION_LANDSCAPE;                       // TIFF 1
-        }
+        @Override
         public ImageOrientation get90CW() {
             return ORIENTATION_180;                             // TIFF 3
         }
-        public ImageOrientation get180() {
-            return ORIENTATION_90CW;                            // TIFF 8
+
+        @Override
+        public ImageOrientation getVFlip() {
+            return ORIENTATION_90CW_VFLIP;                      // TIFF 7
         }
+
+        @Override
         public TransposeType getCorrection() {
             return ROTATE_90;                                  // clockwise
         }
+
+        @Override
         public int getRotationTo( ImageOrientation o ) {
             switch ( o ) {
                 case ORIENTATION_LANDSCAPE:                     // TIFF 1
@@ -136,6 +153,8 @@ public enum ImageOrientation {
                     throw new IllegalArgumentException();
             }
         }
+
+        @Override
         public boolean isRotatableTo( ImageOrientation o ) {
             switch ( o ) {
                 case ORIENTATION_180:                           // TIFF 3
@@ -155,23 +174,27 @@ public enum ImageOrientation {
      * (This means the image is rotated 90 CCW and vertically flipped.)
      */
     ORIENTATION_90CCW_VFLIP( TIFF_ORIENTATION_90CCW_VFLIP ) {   // TIFF 5
-        public ImageOrientation get90CCW() {
-            return ORIENTATION_VFLIP;                           // TIFF 4
-        }
+        @Override
         public ImageOrientation get90CW() {
             return ORIENTATION_SEASCAPE;                        // TIFF 2
         }
-        public ImageOrientation get180() {
-            return ORIENTATION_90CW_HFLIP;                      // TIFF 7
+
+        @Override
+        public ImageOrientation getVFlip() {
+            return ORIENTATION_90CW;                            // TIFF 8
         }
+
+        @Override
         public TransposeType getCorrection() {
             return FLIP_DIAGONAL;
         }
+
+        @Override
         public int getRotationTo( ImageOrientation o ) {
             switch ( o ) {
                 case ORIENTATION_90CCW_VFLIP:                   // TIFF 5
                     return 0;
-                case ORIENTATION_90CW_HFLIP:                    // TIFF 7
+                case ORIENTATION_90CW_VFLIP:                    // TIFF 7
                     return 180;
                 case ORIENTATION_SEASCAPE:                      // TIFF 2
                     return 90;
@@ -181,10 +204,12 @@ public enum ImageOrientation {
                     throw new IllegalArgumentException();
             }
         }
+
+        @Override
         public boolean isRotatableTo( ImageOrientation o ) {
             switch ( o ) {
                 case ORIENTATION_90CCW_VFLIP:                   // TIFF 5
-                case ORIENTATION_90CW_HFLIP:                    // TIFF 7
+                case ORIENTATION_90CW_VFLIP:                    // TIFF 7
                 case ORIENTATION_SEASCAPE:                      // TIFF 2
                 case ORIENTATION_VFLIP:                         // TIFF 4
                     return true;
@@ -200,18 +225,22 @@ public enum ImageOrientation {
      * (This means the image is rotated 90 CW.)
      */
     ORIENTATION_90CW( TIFF_ORIENTATION_90CW ) {                 // TIFF 8
-        public ImageOrientation get90CCW() {
-            return ORIENTATION_180;                             // TIFF 3
-        }
+        @Override
         public ImageOrientation get90CW() {
             return ORIENTATION_LANDSCAPE;                       // TIFF 1
         }
-        public ImageOrientation get180() {
-            return ORIENTATION_90CCW;                           // TIFF 6
+
+        @Override
+        public ImageOrientation getVFlip() {
+            return ORIENTATION_90CCW_VFLIP;                     // TIFF 5
         }
+
+        @Override
         public TransposeType getCorrection() {
             return ROTATE_270;                                  // clockwise
         }
+
+        @Override
         public int getRotationTo( ImageOrientation o ) {
             switch ( o ) {
                 case ORIENTATION_LANDSCAPE:                     // TIFF 1
@@ -226,6 +255,8 @@ public enum ImageOrientation {
                     throw new IllegalArgumentException();
             }
         }
+
+        @Override
         public boolean isRotatableTo( ImageOrientation o ) {
             switch ( o ) {
                 case ORIENTATION_180:                           // TIFF 3
@@ -244,24 +275,28 @@ public enum ImageOrientation {
      * 0th column represents the visual bottom.
      * (This means the image is rotated 90 CW and horizontally flipped.)
      */
-    ORIENTATION_90CW_HFLIP( TIFF_ORIENTATION_90CW_HFLIP ) {     // TIFF 7
-        public ImageOrientation get90CCW() {
-            return ORIENTATION_SEASCAPE;                        // TIFF 2
-        }
+    ORIENTATION_90CW_VFLIP( TIFF_ORIENTATION_90CW_VFLIP ) {     // TIFF 7
+        @Override
         public ImageOrientation get90CW() {
             return ORIENTATION_VFLIP;                           // TIFF 4
         }
-        public ImageOrientation get180() {
-            return ORIENTATION_90CCW_VFLIP;                     // TIFF 5
+
+        @Override
+        public ImageOrientation getVFlip() {
+            return ORIENTATION_90CCW;                           // TIFF 6
         }
+
+        @Override
         public TransposeType getCorrection() {
             return FLIP_ANTIDIAGONAL;
         }
+
+        @Override
         public int getRotationTo( ImageOrientation o ) {
             switch ( o ) {
                 case ORIENTATION_90CCW_VFLIP:                   // TIFF 5
                     return 180;
-                case ORIENTATION_90CW_HFLIP:                    // TIFF 7
+                case ORIENTATION_90CW_VFLIP:                    // TIFF 7
                     return 0;
                 case ORIENTATION_SEASCAPE:                      // TIFF 2
                     return -90;
@@ -271,10 +306,12 @@ public enum ImageOrientation {
                     throw new IllegalArgumentException();
             }
         }
+
+        @Override
         public boolean isRotatableTo( ImageOrientation o ) {
             switch ( o ) {
                 case ORIENTATION_90CCW_VFLIP:                   // TIFF 5
-                case ORIENTATION_90CW_HFLIP:                    // TIFF 7
+                case ORIENTATION_90CW_VFLIP:                    // TIFF 7
                 case ORIENTATION_SEASCAPE:                      // TIFF 2
                 case ORIENTATION_VFLIP:                         // TIFF 4
                     return true;
@@ -290,23 +327,27 @@ public enum ImageOrientation {
      * (This means the image is seascape.)
      */
     ORIENTATION_SEASCAPE( TIFF_ORIENTATION_SEASCAPE ) {         // TIFF 2
-        public ImageOrientation get90CCW() {
-            return ORIENTATION_90CCW_VFLIP;                     // TIFF 5
-        }
+        @Override
         public ImageOrientation get90CW() {
-            return ORIENTATION_90CW_HFLIP;                      // TIFF 7
+            return ORIENTATION_90CW_VFLIP;                      // TIFF 7
         }
-        public ImageOrientation get180() {
-            return ORIENTATION_VFLIP;                           // TIFF 4
+
+        @Override
+        public ImageOrientation getVFlip() {
+            return ORIENTATION_180;                             // TIFF 3
         }
+
+        @Override
         public TransposeType getCorrection() {
             return FLIP_HORIZONTAL;
         }
+
+        @Override
         public int getRotationTo( ImageOrientation o ) {
             switch ( o ) {
                 case ORIENTATION_90CCW_VFLIP:                   // TIFF 5
                     return -90;
-                case ORIENTATION_90CW_HFLIP:                    // TIFF 7
+                case ORIENTATION_90CW_VFLIP:                    // TIFF 7
                     return 90;
                 case ORIENTATION_SEASCAPE:                      // TIFF 2
                     return 0;
@@ -316,10 +357,12 @@ public enum ImageOrientation {
                     throw new IllegalArgumentException();
             }
         }
+
+        @Override
         public boolean isRotatableTo( ImageOrientation o ) {
             switch ( o ) {
                 case ORIENTATION_90CCW_VFLIP:                   // TIFF 5
-                case ORIENTATION_90CW_HFLIP:                    // TIFF 7
+                case ORIENTATION_90CW_VFLIP:                    // TIFF 7
                 case ORIENTATION_SEASCAPE:                      // TIFF 2
                 case ORIENTATION_VFLIP:                         // TIFF 4
                     return true;
@@ -335,23 +378,27 @@ public enum ImageOrientation {
      * (This means the image is vertically flipped.)
      */
     ORIENTATION_VFLIP( TIFF_ORIENTATION_VFLIP ) {               // TIFF 4
-        public ImageOrientation get90CCW() {
-            return ORIENTATION_90CW_HFLIP;                      // TIFF 7
-        }
+        @Override
         public ImageOrientation get90CW() {
             return ORIENTATION_90CCW_VFLIP;                     // TIFF 5
         }
-        public ImageOrientation get180() {
-            return ORIENTATION_SEASCAPE;                        // TIFF 2
+
+        @Override
+        public ImageOrientation getVFlip() {
+            return ORIENTATION_LANDSCAPE;                       // TIFF 1
         }
+
+        @Override
         public TransposeType getCorrection() {
             return FLIP_VERTICAL;
         }
+
+        @Override
         public int getRotationTo( ImageOrientation o ) {
             switch ( o ) {
                 case ORIENTATION_90CCW_VFLIP:                   // TIFF 5
                     return 90;
-                case ORIENTATION_90CW_HFLIP:                    // TIFF 7
+                case ORIENTATION_90CW_VFLIP:                    // TIFF 7
                     return -90;
                 case ORIENTATION_SEASCAPE:                      // TIFF 2
                     return 180;
@@ -361,10 +408,12 @@ public enum ImageOrientation {
                     throw new IllegalArgumentException();
             }
         }
+
+        @Override
         public boolean isRotatableTo( ImageOrientation o ) {
             switch ( o ) {
                 case ORIENTATION_90CCW_VFLIP:                   // TIFF 5
-                case ORIENTATION_90CW_HFLIP:                    // TIFF 7
+                case ORIENTATION_90CW_VFLIP:                    // TIFF 7
                 case ORIENTATION_SEASCAPE:                      // TIFF 2
                 case ORIENTATION_VFLIP:                         // TIFF 4
                     return true;
@@ -378,21 +427,27 @@ public enum ImageOrientation {
      * It is unknown what the 0th row and 0th column represent.
      */
     ORIENTATION_UNKNOWN( TIFF_ORIENTATION_UNKNOWN ) {           // TIFF 9
-        public ImageOrientation get90CCW() {
-            return ORIENTATION_UNKNOWN;                         // TIFF 9
-        }
+        @Override
         public ImageOrientation get90CW() {
             return ORIENTATION_UNKNOWN;                         // TIFF 9
         }
-        public ImageOrientation get180() {
+
+        @Override
+        public ImageOrientation getVFlip() {
             return ORIENTATION_UNKNOWN;                         // TIFF 9
         }
+
+        @Override
         public TransposeType getCorrection() {
             return null;
         }
+
+        @Override
         public int getRotationTo( ImageOrientation o ) {
             throw new IllegalArgumentException();
         }
+
+        @Override
         public boolean isRotatableTo( ImageOrientation o ) {
             return false;
         }
@@ -403,7 +458,9 @@ public enum ImageOrientation {
      *
      * @return Returns said orientation.
      */
-    public abstract ImageOrientation get180();
+    public final ImageOrientation get180() {
+        return get90CW().get90CW();
+    }
 
     /**
      * Gets the orientation that is rotated 90 degrees counter-clockwise from
@@ -411,7 +468,9 @@ public enum ImageOrientation {
      *
      * @return Returns said orientation.
      */
-    public abstract ImageOrientation get90CCW();
+    public final ImageOrientation get90CCW() {
+        return get180().get90CW();
+    }
 
     /**
      * Gets the orientation that is rotated 90 degrees clockwise from this
@@ -420,6 +479,22 @@ public enum ImageOrientation {
      * @return Returns said orientation.
      */
     public abstract ImageOrientation get90CW();
+
+    /**
+     * Gets the orientation that is flipped horizontally from this orientation.
+     *
+     * @return Returns said orientation.
+     */
+    public final ImageOrientation getHFlip() {
+        return get180().getVFlip();
+    }
+
+    /**
+     * Gets the orientation that is flipped vertically from this orientation.
+     *
+     * @return Returns said orientation.
+     */
+    public abstract ImageOrientation getVFlip();
 
     /**
      * Gets the corrective action to take in order to display an image having
@@ -467,8 +542,8 @@ public enum ImageOrientation {
                 return ORIENTATION_90CCW_VFLIP;
             case TIFF_ORIENTATION_90CW:
                 return ORIENTATION_90CW;
-            case TIFF_ORIENTATION_90CW_HFLIP:
-                return ORIENTATION_90CW_HFLIP;
+            case TIFF_ORIENTATION_90CW_VFLIP:
+                return ORIENTATION_90CW_VFLIP;
             case TIFF_ORIENTATION_SEASCAPE:
                 return ORIENTATION_SEASCAPE;
             case TIFF_ORIENTATION_VFLIP:
@@ -511,7 +586,7 @@ public enum ImageOrientation {
      * @param tiffConstant The constant used in the TIFF specification to
      * encode orientation.
      */
-    private ImageOrientation( short tiffConstant ) {
+    ImageOrientation( short tiffConstant ) {
         assert tiffConstant >= 1 && tiffConstant <= 9;
         m_tiffConstant = tiffConstant;
     }

@@ -1,29 +1,30 @@
 # Maintainer: KITAGAWA Masahiro <arctica0316@gmail.com>
 pkgname="lightzone"
-pkgver=4.1.9
+pkgver=4.2.0
 pkgrel=0
 pkgdesc="Open-source professional-level digital darkroom software"
 url="http://lightzoneproject.org/"
 license=('custom:BSD-3-Clause')
-arch=('i686' 'x86_64')
+arch=('x86_64')
 
-depends=('java-runtime=8' 'javahelp2' 'lensfun' 'lcms2' 'libjpeg-turbo' 'libtiff' 'libxml2')
-makedepends=('java-environment=8' 'apache-ant' 'autoconf' 'gcc' 'make' 'git' 'libx11' 'pkgconf' 'rsync' 'javahelp2' 'lcms2' 'libjpeg-turbo' 'libtiff')
+depends=('java-runtime=13' 'java-openjfx' 'javahelp2' 'lensfun' 'lcms2' 'libjpeg-turbo' 'libtiff' 'libxml2')
+makedepends=('java-environment=13' 'apache-ant' 'autoconf' 'gcc' 'make' 'git' 'libx11' 'pkgconf' 'rsync' 'javahelp2' 'lcms2' 'libjpeg-turbo' 'libtiff')
 
 #vcsname=${pkgname}-${pkgver}
 #source=("${vcsname}.tar.bz2")
 vcsname='LightZone'
-source=("git+https://github.com/Aries85/${vcsname}.git")
+source=("git+https://github.com/ktgw0316/${vcsname}.git")
 md5sums=('SKIP')
 
 build() {
   # Set $JAVA_HOME and $ANT_HOME
-  if [ -d /usr/lib/jvm/java-8-jdk ]; then
-    export JAVA_HOME=/usr/lib/jvm/java-8-jdk
+  if [ -d /usr/lib/jvm/java-13-jdk ]; then
+    export JAVA_HOME=/usr/lib/jvm/java-13-jdk
+  elif [ -d /usr/lib/jvm/java-13-openjdk ]; then
+    export JAVA_HOME=/usr/lib/jvm/java-13-openjdk
   else
-    export JAVA_HOME=/usr/lib/jvm/java-8-openjdk
+    export JAVA_HOME=/usr/lib/jvm/java-13-openjdk
   fi
-  [ -f /etc/profile.d/apache-ant.sh ] && source /etc/profile.d/apache-ant.sh
 
   # Parallel compilation fails, so disable it
   export MAKEFLAGS="-j1"

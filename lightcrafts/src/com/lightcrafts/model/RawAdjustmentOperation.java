@@ -21,4 +21,9 @@ public interface RawAdjustmentOperation extends ColorDropperOperation {
      * raw adjustment preset.
      */
     Map<String, Double> getAsShot();
+
+    @Override
+    default void accept(GenericOperationVisitor visitor) {
+        visitor.visitRawAdjustmentOperation(this);
+    }
 }

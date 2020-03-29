@@ -64,7 +64,7 @@
 
   <target name="download-ivy" unless="offline">
     <mkdir dir="${ivy.jar.dir}"/>
-    <get src="http://repo2.maven.org/maven2/org/apache/ivy/ivy/${ivy.version}/ivy-${ivy.version}.jar"
+    <get src="https://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.version}/ivy-${ivy.version}.jar"
          dest="${ivy.jar.file}" usetimestamp="true"/>
   </target>
 
@@ -85,7 +85,7 @@
     <mkdir dir="build"/>
     <mkdir dir="javah"/>
     <javac destdir="build" includeantruntime="false" debug="true"
-           source="1.8" target="1.8" nativeheaderdir="javah">
+           release="11" nativeheaderdir="javah">
       <src path="src"/>
       <classpath>
         <fileset dir="lib">

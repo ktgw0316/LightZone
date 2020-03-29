@@ -50,9 +50,10 @@ inline jobjectArray createJArray(JNIEnv *env, const T list, int size = -1)
 extern "C"
 JNIEXPORT jlong JNICALL
 Java_com_lightcrafts_utils_Lensfun_init
-(JNIEnv *env, jobject obj)
+(JNIEnv *env, jobject obj, jstring pathStr)
 {
-    auto lf = new LC_lensfun();
+    const auto path = env->GetStringUTFChars(pathStr, NULL);
+    auto lf = new LC_lensfun(path);
     return reinterpret_cast<uintptr_t>(lf);
 }
 
@@ -76,29 +77,27 @@ Java_com_lightcrafts_utils_Lensfun_destroy
 extern "C"
 JNIEXPORT jobjectArray JNICALL
 Java_com_lightcrafts_utils_Lensfun_getCameraNames
-(JNIEnv *env, jclass cls)
+(JNIEnv *env, jobject obj, jlong handle)
 {
-    auto lf = new LC_lensfun();
+    auto lf = reinterpret_cast<LC_lensfun*>(handle);
     const auto jarr = createJArray(env, lf->getCameras());
-    delete lf;
     return jarr;
 }
 
 extern "C"
 JNIEXPORT jobjectArray JNICALL
 Java_com_lightcrafts_utils_Lensfun_getLensNames
-(JNIEnv *env, jclass cls)
+(JNIEnv *env, jobject obj, jlong handle)
 {
-    auto lf = new LC_lensfun();
+    auto lf = reinterpret_cast<LC_lensfun*>(handle);
     const auto jarr = createJArray(env, lf->getLenses());
-    delete lf;
     return jarr;
 }
 
 extern "C"
 JNIEXPORT jobjectArray JNICALL
 Java_com_lightcrafts_utils_Lensfun_getLensNamesForCamera
-(JNIEnv *env, jclass cls,
+(JNIEnv *env, jobject obj,
  jlong handle, jstring cameraMakerStr, jstring cameraModelStr)
 {
     auto lf = reinterpret_cast<LC_lensfun*>(handle);
@@ -178,6 +177,7 @@ Java_com_lightcrafts_utils_Lensfun_initModifierWithPoly5Lens
 #else
     lfLensCalibDistortion dc = {LF_DIST_MODEL_POLY5, focal, {k1, k2}};
 #endif
+    // FIXME: Wrong autoscale, cf. https://github.com/lensfun/lensfun/issues/945
     lens->AddCalibDistortion(&dc);
 
     lfLensCalibTCA tcac = {LF_TCA_MODEL_LINEAR, focal, {kr, kb}};
@@ -248,10 +248,25 @@ Java_com_lightcrafts_utils_Lensfun_backwardMapRect
 // LC_lensfun
 //
 
-LC_lensfun::LC_lensfun()
+LC_lensfun::LC_lensfun(const char* path)
 {
     ldb = new lfDatabase();
-    if (ldb->Load() != LF_NO_ERROR) {
+    lfError err;
+
+    std::cout << "Lensfun: loading database";
+    if (strlen(path) > 0) {
+        std::cout << " from " << path;
+#if (LF_VERSION >= 0x00035f00) // 0.3.95
+        err = ldb->Load(path);
+#else
+        err = ldb->LoadDirectory(path) ? LF_NO_ERROR : LF_NO_DATABASE;
+#endif
+    } else {
+        err = ldb->Load();
+    }
+    std::cout << std::endl;
+
+    if (err != LF_NO_ERROR) {
         std::cerr << "Lensfun database could not be loaded" << std::endl;
     }
 }
@@ -372,6 +387,10 @@ void LC_lensfun::initModifier
     constexpr float scale = 0; // automatic scaling
     const lfLensType targeom = lens->Type;
 
+    if (mod) {
+        delete mod;
+        mod = nullptr;
+    }
 #if (LF_VERSION >= 0x00035f00) // 0.3.95
     mod = new lfModifier(crop, fullWidth, fullHeight, LF_PF_U16);
 #else
