@@ -45,11 +45,7 @@ class LocalePresenter extends BasePresenter<LocaleContract.LocaleView>
 
         static final Map<String, String> availableLanguageItems;
         static {
-            val availableLanguages = Stream.of(
-                    "", // system default
-                    "en", "da", "de", "es", "fr", "hu", "it", "ja", "nl", "pl"
-            );
-            availableLanguageItems = availableLanguages
+            availableLanguageItems = LocaleModel.getAvailableLanguages().stream()
                     .map(l -> Map.entry(languageToItem(l), l))
                     .sorted(Map.Entry.comparingByKey(String.CASE_INSENSITIVE_ORDER))
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
