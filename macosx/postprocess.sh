@@ -8,26 +8,12 @@ if [ $# -ne 1 ]; then
   exit 1
 fi
 
-PATTERN="/usr/local/"
+SCRIPT_DIR=$(cd $(dirname $0) && pwd)
 
 cd $1
 
 # Copy required dylibs, and change their ids
-DEPS=$(otool -L dcraw_lz *.jnilib | egrep -v "/(usr/lib|System)" | grep -o "/.*dylib" | sort -u)
-for DEP in ${DEPS}; do
-  LIB=$(basename ${DEP})
-  cp -f ${DEP} ${LIB}
-  chmod 755 ${LIB}
-  install_name_tool -id ${LIB} ${LIB}
-done
-
-DEPS=$(otool -L *.dylib | egrep -v "/(usr/lib|System)" | grep -o "/.*dylib" | sort -u)
-for DEP in ${DEPS}; do
-  LIB=$(basename ${DEP})
-  cp -f ${DEP} ${LIB}
-  chmod 755 ${LIB}
-  install_name_tool -id ${LIB} ${LIB}
-done
+sh ${SCRIPT_DIR}/copydylibs.sh dcraw_lz *.jnilib
 
 # Change the local library paths in each file
 FILES=$(find . -name "*.jnilib" -a ! -name "libquaqua*" -o -name "*.dylib" -o -name "dcraw_lz")
