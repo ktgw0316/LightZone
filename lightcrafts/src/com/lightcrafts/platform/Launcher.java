@@ -5,16 +5,13 @@ package com.lightcrafts.platform;
 import com.lightcrafts.app.Application;
 import com.lightcrafts.app.CheckForUpdate;
 import com.lightcrafts.app.ExceptionDialog;
+import com.lightcrafts.prefs.LocaleModel;
 import com.lightcrafts.splash.SplashImage;
 import com.lightcrafts.splash.SplashWindow;
 import com.lightcrafts.utils.ForkDaemon;
 import com.lightcrafts.utils.Version;
 
 import javax.swing.*;
-import java.awt.GraphicsEnvironment;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.io.IOException;
 
 /**
@@ -32,6 +29,8 @@ public class Launcher {
             showJavaVersion();
             checkCpu();
             UIManager.setLookAndFeel(Platform.getPlatform().getLookAndFeel());
+
+            LocaleModel.setDefaultFromPreference();
 
             CheckForUpdate.start();
 

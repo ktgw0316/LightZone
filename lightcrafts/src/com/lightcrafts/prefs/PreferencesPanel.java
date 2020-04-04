@@ -23,6 +23,7 @@ public class PreferencesPanel extends JPanel {
     }
 
     private void addItems() {
+        addItem(this, items, new LocaleItem(help));
         addItem(this, items, new HeapLimitItem(help));
         addItem(this, items, new UpdateInteractiveItem(help));
         addItem(this, items, new ScratchFileItem(help));
