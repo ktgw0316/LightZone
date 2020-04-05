@@ -2,7 +2,7 @@
 #
 # LightZone startscript
 #
-echo Starting LightZone version 4.2.0 ...
+echo Starting LightZone version 4.2.1 ...
 echo with options : ${@}
 java -version
 

@@ -1,6 +1,6 @@
 # Maintainer: KITAGAWA Masahiro <arctica0316@gmail.com>
 pkgname="lightzone"
-pkgver=4.2.0
+pkgver=4.2.1
 pkgrel=0
 pkgdesc="Open-source professional-level digital darkroom software"
 url="http://lightzoneproject.org/"
