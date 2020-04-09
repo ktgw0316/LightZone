@@ -16,7 +16,11 @@
 
 typedef unsigned short ushort;
 
-#ifdef __INTEL_COMPILER
+#if defined(__SSE2__) && (defined(__INTEL_COMPILER) || defined(__clang__) || defined(__MINGW32__))
+#define USE_SSE2
+#endif
+
+#ifdef USE_SSE2
 #include <fvec.h>
 #include <dvec.h>
 #include <pmmintrin.h>
@@ -35,6 +39,10 @@ inline Iu16vec8 F32vec4toIu16vec8(const F32vec4 &hi, const F32vec4 &lo) {
 
     return Iu16vec8(_mm_packs_epi32(_mm_cvtps_epi32(lo)-sign_swap32, _mm_cvtps_epi32(hi)-sign_swap32) ^ sign_swap16);
 }
+
+#ifndef _MM_ALIGN16
+#define _MM_ALIGN16 __attribute__((aligned(16)))
+#endif
 
 #define CONST_INT32_PS(N, V3,V2,V1,V0) \
 static const _MM_ALIGN16 int _##N[]= \
@@ -75,9 +83,9 @@ inline void F32vec4toXYZ(F32vec4& a, F32vec4& b, F32vec4& c, const F32vec4& x, c
 inline void load_vector(const unsigned short * const srcData, F32vec4 v_rgb[2][3]) {
     const F32vec4 v_inv_norm(1.0f/0xffff);
 
-    Iu16vec8 src8_1((__m128i) _mm_lddqu_si128((__m128i *) srcData));      // G2 R2 B1 G1 R1 B0 G0 R0
-    Iu16vec8 src8_2((__m128i) _mm_lddqu_si128((__m128i *) (srcData+8)));    // R5 B4 G4 R4 B3 G3 R3 B2
-    Iu16vec8 src8_3((__m128i) _mm_lddqu_si128((__m128i *) (srcData+16)));   // B7 G7 R7 B6 G6 R6 B5 G5
+    Iu16vec8 src8_1((__m128i) _mm_loadu_si128((__m128i *) srcData));      // G2 R2 B1 G1 R1 B0 G0 R0
+    Iu16vec8 src8_2((__m128i) _mm_loadu_si128((__m128i *) (srcData+8)));    // R5 B4 G4 R4 B3 G3 R3 B2
+    Iu16vec8 src8_3((__m128i) _mm_loadu_si128((__m128i *) (srcData+16)));   // B7 G7 R7 B6 G6 R6 B5 G5
 
     // get the first three F32vec4
     F32vec4 src4_1 = convert_low(src8_1);   // R1 B0 G0 R0 -> a1
@@ -153,7 +161,7 @@ extern "C" JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_HighlightReco
     const float threshold = 0.8 * 0xffff;
     const float maximum = 1.0 * 0xffff;
 
-#ifdef __INTEL_COMPILER
+#ifdef USE_SSE2
     const F32vec4 v_threshold(threshold);
     const F32vec4 v_maximum(maximum);
 
@@ -173,7 +181,7 @@ extern "C" JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_HighlightReco
 #endif
     for (int row = 0; row < height; row++) {
         int col = 0;
-#ifdef __INTEL_COMPILER
+#ifdef USE_SSE2
         for (/*int col = 0*/; col < width-8; col+=8) {
             const int srcPixOffset = srcPixelStride * col + row * srcLineStride + srcROffset;
 
@@ -190,14 +198,14 @@ extern "C" JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_HighlightReco
             for (int k = 0; k < 2; k++) {
                 for (int i = 0; i < 3; i++)
                     for (int j = 0; j < 3; j++)
-                        v_rgb[k][i] += v_csMatrix[i][j] * v_raw[k][j];
+                        v_rgb[k][i] = v_rgb[k][i] + v_csMatrix[i][j] * v_raw[k][j];
 
                 F32vec4 val_max = v_0;
                 F32vec4 sum = v_0;
                 F32vec4 saturated = v_0;
                 for (int i = 0; i < 3; i++) {
                     F32vec4 val = simd_min(v_preMul[i] * v_raw[k][i], v_maximum);
-                    saturated += select_gt(val, v_threshold, v_1, v_0);
+                    saturated = saturated + select_gt(val, v_threshold, v_1, v_0);
                     val_max = simd_max(val, val_max);
                     sum += val;
                 }
