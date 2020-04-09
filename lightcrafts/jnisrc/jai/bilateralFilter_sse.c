@@ -53,7 +53,7 @@ jint srcLineStride, jint destLineStride
 static inline float fast_exp(float val) __attribute__ ((always_inline));
 static inline float fast_exp(float val)
 {
-    const float fast_exp_a = (1 << 23)/M_LN2;	
+    const float fast_exp_a = (1 << 23)/M_LN2;
 #if defined(__i386__)
     const float fast_exp_b_c = 127.0f * (1 << 23) - 405000;
 #else
@@ -401,7 +401,7 @@ static void filterChromaWrapSSE
             if (wlast < height) {
                 // float sqrtc = sqrtf(CONST);
                 col=0;
-#if defined(__i386__) && defined(__SSE2__)
+#if USE_VECTOR && defined(__SSE2__)
                 const float norm = 1 / (float) 0x10000;
                 const vFloat vnorm = (vFloat) { norm, norm, norm, norm };
                 const float normc = 1 / cnorm;
@@ -660,7 +660,7 @@ static void filterLumaWrapSSE
                 int base = wlast * srcLineStride + srcGOffset;
                 float sqrtc = sqrtf(CONST);
                 col=0;
-#if USE_VECTOR && (defined(__i386__) || defined(__x86_64__))
+#if USE_VECTOR && defined(__SSE2__)
                 const vFloat vsqrtc = (vFloat) { sqrtc, sqrtc, sqrtc, sqrtc };
 
                 for (/*col=0*/; col < width-3; col+=4) {
@@ -884,7 +884,7 @@ static void filterMonochromeWrapSSE
 
             if (wlast < height) {
                 col=0;
-#if defined(__i386__) && defined(__SSE2__)
+#if defined(__SSE2__)
                 // const vFloat vsqrtc = (vFloat) { sqrtc, sqrtc, sqrtc, sqrtc };
                 
                 for (; col < width-3; col+=4) {
