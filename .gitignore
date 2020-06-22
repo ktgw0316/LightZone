@@ -1,6 +1,9 @@
 !**/GNUMakefile
 !**/lightzone*
+**/.gradle
+**/.vscode
 **/build
+**/java_jni
 **/javah
 **/out
 **/products
