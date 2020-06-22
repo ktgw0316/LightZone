@@ -9,62 +9,57 @@
 #include "include/omp_util.h"
 
 inline void separable_bf_mono_row(
-    float *ibuf,                            // pointer to source data buffer 
-    const float sr,                         // the usual range sigma
-    const int wr,                           // window radius in pixels
-    const float *kernel,                    // half-kernel containing the exponents of the spatial Gaussian
-    const int width, const int height,      // dimensions of the source image
-    const float Ar)                         // coefficient of the exponent for the range Gaussian
+    float *ibuf,         // pointer to source data buffer
+    const float sr,      // the usual range sigma
+    const int wr,        // window radius in pixels
+    const float *kernel, // half-kernel containing the exponents of the spatial Gaussian
+    const int width, const int height, // dimensions of the source image
+    const float Ar)                    // coefficient of the exponent for the range Gaussian
 {
     float *rbuf = new float[width];
-    
+
     OMP_FOR_SIMD
     for (int y=wr; y < height - wr; y++) {
-        
+
         memcpy(rbuf, &ibuf[y * width], width * sizeof(float));
-        
+
         for (int x=wr; x < width - wr; x++) {
-            
+
             const float I_s0 = rbuf[x];
-            
+
             // compute adaptive kernel and convolve color channels
             float num = 0;
             float denom = 0;
-            
+
             for (int k = 0; k <= 2*wr; k++) {
                 const float I_s = rbuf[k-wr + x];
                 const float D_sq = SQR(I_s - I_s0);
 
-#ifdef FP_FAST_FMAF
-                const float f = fast_exp(fmaf(Ar, D_sq, -kernel[k]));
-                num = fmaf(f, I_s, num);
-#else
                 const float f = fast_exp(Ar * D_sq - kernel[k]);
                 num += f * I_s;
-#endif
                 denom += f;
             }
-            
+
             // normalize
             if (denom == 0)
                 denom = 1.0;
-            
+
             const int idx = x + y*width;
             ibuf[idx] = num / denom;
         }
     }
-    
+
     delete [] rbuf;
 }
 
 inline void separable_bf_chroma_row(
-    float *buf_a,                           // pointer to the s source/destination buffer
-    float *buf_b,                           // pointer to the t source/destination buffer
-    const float sr,                         // the usual range sigma
-    const int wr,                           // window radius in pixels
-    const float *kernel,                    // half-kernel containing the exponents of the spatial Gaussian
-    const int width, const int height,      // dimensions of the source image
-    const float Ar)                         // coefficient of the exponent for the range Gaussian
+    float *buf_a,        // pointer to the s source/destination buffer
+    float *buf_b,        // pointer to the t source/destination buffer
+    const float sr,      // the usual range sigma
+    const int wr,        // window radius in pixels
+    const float *kernel, // half-kernel containing the exponents of the spatial Gaussian
+    const int width, const int height, // dimensions of the source image
+    const float Ar)                    // coefficient of the exponent for the range Gaussian
 {
     float *rbuf_a = new float[width];
     float *rbuf_b = new float[width];
@@ -94,15 +89,9 @@ inline void separable_bf_chroma_row(
 
                 const float D_sq = /* SQR(s_L - s0_L) + */ SQR(s_a - s0_a) + SQR(s_b - s0_b);
 
-#ifdef FP_FAST_FMAF
-                const float f = fast_exp(fmaf(Ar, D_sq, -kernel[k]));
-                a_num = fmaf(f, s_a, a_num);
-                b_num = fmaf(f, s_b, b_num);
-#else
                 const float f = fast_exp(Ar * D_sq - kernel[k]);
                 a_num += f * s_a;
                 b_num += f * s_b;
-#endif
                 denom += f;
             }
 
@@ -140,18 +129,18 @@ inline void separable_bf_chroma_row(
  * The macro GS_x_GR(x) controls the interpretation.
  *******************************************************************************/
 inline void separable_bf_mono_tile(
-    float *ibuf,                            // pointer to source data buffer
-    const float sr,                         // the usual range sigma
-    const int wr,                           // window radius in pixels
-    const float *kernel,                    // half-kernel containing the exponents of the spatial Gaussian
-    const int width, const int height)      // dimensions of the source image
+    float *ibuf,         // pointer to source data buffer
+    const float sr,      // the usual range sigma
+    const int wr,        // window radius in pixels
+    const float *kernel, // half-kernel containing the exponents of the spatial Gaussian
+    const int width, const int height) // dimensions of the source image
 {
     if (fabs(sr) < FLT_EPSILON)
         return;
 
     // coefficient of the exponent for the range Gaussian
     const float Ar = - 1.0f / (2.0f * SQR(sr) );
-    
+
     float *tbuf = new float[width*height];
 
 #   pragma omp parallel
@@ -171,29 +160,29 @@ inline void separable_bf_mono_tile(
 /*******************************************************************************
  * separable_bf_chroma_tile()
  *
- * Apply a separable bilateral filter to a rectangular region of a color raster 
+ * Apply a separable bilateral filter to a rectangular region of a color raster
  *
  * Dimensions of source and destination rectangles are related by
  *
  *     dst_width = src_width - 2*wr
  *     dst_height = src_height - 2*wr
  *
- * 'kernel' points to the mid-point of a (2*wr + 1)-length array containing 
- * either 
+ * 'kernel' points to the mid-point of a (2*wr + 1)-length array containing
+ * either
  *     1) spatial gaussian filter coefficients for distances 0, 1, ..., wr
- *     2) negated exponents of the spatial gaussian function (this is what Fabio 
+ *     2) negated exponents of the spatial gaussian function (this is what Fabio
  *        passes from his BilateralFilterOpImage class)
  *
  * The macro GS_x_GR(x) controls the interpretation.
  *******************************************************************************/
 inline void separable_bf_chroma_tile(
-    float *buf_a,                           // pointer to the s source/destination buffer 
-    float *buf_b,                           // pointer to the t source/destination buffer
-    const float sr,                         // the usual range sigma
-    const int wr,                           // window radius in pixels
-    const float *kernel,                    // half-kernel containing the exponents of the spatial Gaussian
-    int width, int height)                  // dimensions of the source image
-{    
+    float *buf_a,          // pointer to the s source/destination buffer
+    float *buf_b,          // pointer to the t source/destination buffer
+    const float sr,        // the usual range sigma
+    const int wr,          // window radius in pixels
+    const float *kernel,   // half-kernel containing the exponents of the spatial Gaussian
+    int width, int height) // dimensions of the source image
+{
     if (fabs(sr) < FLT_EPSILON)
         return;
 

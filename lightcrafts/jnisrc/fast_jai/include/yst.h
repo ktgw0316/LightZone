@@ -21,15 +21,9 @@ inline void planar_YST_to_interleaved_RGB(unsigned short * const dstData, int ds
             const float t = buf_t[idx] - 0.5f;
 
             for (int c = 0; c < 3; c++)
-#ifdef FP_FAST_FMAF
-                dstData[dst_idx+c] = clampUShort(0xffff * fmaf(yst_to_rgb[3*c+2], t,
-                                                          fmaf(yst_to_rgb[3*c+1], s,
-                                                               yst_to_rgb[3*c] * y)));
-#else
                 dstData[dst_idx+c] = clampUShort(0xffff * (yst_to_rgb[3*c]   * y +
                                                            yst_to_rgb[3*c+1] * s +
                                                            yst_to_rgb[3*c+2] * t));
-#endif
         }
     }
 }
@@ -56,15 +50,9 @@ inline void interleaved_RGB_to_planar_YST(const unsigned short * const srcData, 
             float YST[3];
 
             for (int c = 0; c < 3; c++)
-#ifdef FP_FAST_FMAF
-                YST[c] = fmaf(rgb_to_yst[3*c],   r,
-                         fmaf(rgb_to_yst[3*c+1], g,
-                         fmaf(rgb_to_yst[3*c+2], b, (c > 0 ? 0.5f : 0))));
-#else
                 YST[c] = rgb_to_yst[3*c]   * r +
                          rgb_to_yst[3*c+1] * g +
                          rgb_to_yst[3*c+2] * b + (c > 0 ? 0.5f : 0);
-#endif
 
             buf_y[idx] = YST[0];
             buf_s[idx] = YST[1];

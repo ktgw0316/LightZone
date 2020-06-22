@@ -33,11 +33,8 @@ float fast_exp(float val)
         int i;
     } result;
 
-#ifdef FP_FAST_FMAF
-    result.i = int(fmaf(fast_exp_a, val, fast_exp_b_c));
-#else
     result.i = int(fast_exp_a * val + fast_exp_b_c);
-#endif
+
     return result.f;
 }
 
@@ -77,11 +74,7 @@ static inline float fast_log2 (float val)
     *exp_ptr = x;
 
     // increases accuracy
-#ifdef FP_FAST_FMAF
-    val = fmaf(fmaf(-1.0f/3, n.f, 2), n.f, -2.0f/3);
-#else
     val = ((-1.0f/3) * n.f + 2) * n.f - 2.0f/3;
-#endif
 
     return (val + log_2);
 }
