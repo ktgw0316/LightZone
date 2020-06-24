@@ -1,5 +1,5 @@
 #pragma once
-#include "../../include/mathlz.h"
+#include "mathlz.h"
 #include "omp_util.h"
 
 inline void planar_YST_to_interleaved_RGB(unsigned short * const dstData, int dstStep,

@@ -7,12 +7,12 @@
  *
  */
 
-#include <jni.h>
+#include "../pixutils/HSB.h"
+#include "mathlz.h"
 #include <algorithm>
+#include <jni.h>
 #include <math.h>
 #include <omp.h>
-#include "../include/mathlz.h"
-#include "../pixutils/HSB.h"
 
 typedef unsigned short ushort;
 

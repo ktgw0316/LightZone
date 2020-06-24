@@ -3,10 +3,10 @@
 typedef unsigned char byte;
 typedef unsigned short ushort;
 
+#include "mathlz.h"
 #include <math.h>
-#include <stdlib.h>
 #include <omp.h>
-#include "../include/mathlz.h"
+#include <stdlib.h>
 
 static constexpr int sMath_scale = 0x8000;
 static constexpr int sMath_PI = (int) (sMath_scale * M_PI);

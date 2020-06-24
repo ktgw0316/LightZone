@@ -1,15 +1,15 @@
+#include "include/omp_util.h"
+#include "mathlz.h"
 #include <float.h>
+#include <jni.h>
 #include <math.h>
 #include <omp.h>
 #include <stdlib.h>
 #include <string.h>
-#include <jni.h>
-#include "../include/mathlz.h"
-#include "include/omp_util.h"
 
 #ifdef __INTEL_COMPILER
-#include <fvec.h>
 #include <dvec.h>
+#include <fvec.h>
 
 // #define _mm_loadu_si128 _mm_lddqu_si128
 // #define _mm_loadu_ps(x) (__m128) _mm_lddqu_si128((__m128i *) x)

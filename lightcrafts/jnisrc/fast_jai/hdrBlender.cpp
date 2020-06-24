@@ -11,10 +11,10 @@ extern "C" {
 typedef unsigned char byte;
 typedef unsigned short ushort;
 
+#include "mathlz.h"
 #include <algorithm>
 #include <math.h>
 #include <omp.h>
-#include "../include/mathlz.h"
 
 static double softLightBlendPixels(double front, double back) {
     double m = front * back;

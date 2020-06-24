@@ -13,7 +13,7 @@ met:
 
     * Redistributions of source code must retain the above copyright
     notice, this list of conditions and the following disclaimer.
-    
+
     * Redistributions in binary form must reproduce the above
     copyright notice, this list of conditions and the following
     disclaimer in the documentation and/or other materials provided
@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace Math_tools{
 
   // #########################################################
-  
+
   template<typename Vec2,typename Real>
   inline void barycentric_coordinates(const Vec2& A,
 				      const Vec2& B,
@@ -90,9 +90,9 @@ namespace Math_tools{
 				      Real* const a,
 				      Real* const b,
 				      Real* const c);
-  
+
   // #########################################################
-  
+
   inline void init_random() {std::srand(std::time(NULL));}
 
   template<typename Real>
@@ -100,44 +100,44 @@ namespace Math_tools{
 		     const Real max_value_included);
 
   // #########################################################
-  
+
   template<typename ValueIterator>
   inline float entropy(ValueIterator begin,
 			ValueIterator end);
 
   // #########################################################
-  
+
   template<typename Real,typename RealDummy1,typename RealDummy2>
   inline Real clamp(const RealDummy1 min_value,
 		    const RealDummy2 max_value,
 		    const Real x);
 
   // #########################################################
-  
+
   template<typename Real>
   inline Real square(const Real x);
 
 
   // #########################################################
-  
+
   template<unsigned int N,typename Real>
   inline Real power(const Real x);
 
   // #########################################################
-  
+
   template<unsigned int N,typename Real>
   inline Real power2(Real x);
-  
+
   // #########################################################
-  
+
   template<typename Real>
   inline Real next_power_of_2(Real x);
-  
+
   // #########################################################
-  
+
   template<typename Real>
   inline unsigned char used_bits(Real x);
-  
+
   // #########################################################
   
   template<typename Real,typename RealDummy1,typename RealDummy2>
@@ -152,10 +152,10 @@ namespace Math_tools{
   typename Array::value_type
   bilinear_interpolation(const Array& array,
 			 const Real x,
-			 const Real y);
+                                                         const Real y);
 
   // #########################################################
-  
+
   template<typename Array,typename Real>
   inline
   typename Array::value_type
@@ -165,46 +165,46 @@ namespace Math_tools{
 			  const Real z);
 
   // #########################################################
-  
+
   template<typename Array,typename Index>
   inline
   typename Array::value_type
   Nlinear_interpolation(const Array& array,
 			const Index i);
-  
+
   // #########################################################
-  
+
   template<typename Array,typename Index>
   inline
   void
   Nlinear_interpolation_gradient(const Array& array,
 				 const Index  i,
 				 Index* const grad);
-  
+
   // #########################################################
 
   template<unsigned N>
   inline
   Geometry::Vec<(1<<N),Geometry::Vec<N,int> >
   unit_hypercube_corners();
-   
+
   // #########################################################
-  
+
   template<typename Array,typename Index>
   inline
   void
   write_through_Nlinear_interpolation(const typename Array::value_type& v,
 				      Array* const             array,
 				      const Index              i);
-  
+
   // #########################################################
-  
+
   template<typename Array,typename Real>
   inline
   typename Array::value_type
   bicubic_interpolation(const Array& array,
 			const Real x,
-			const Real y);
+                                                        const Real y);
 
   // #########################################################
   
@@ -219,12 +219,12 @@ namespace Math_tools{
   // #########################################################  
 
   inline float degree_to_radian(const float d);
-  
+
   inline float radian_to_degree(const float r);
 
 
   // #########################################################  
-  
+
   template<typename Real>
   inline Real sign(const Real r);
 
@@ -244,7 +244,7 @@ namespace Math_tools{
   template<typename Iterator>
   inline typename std::iterator_traits<Iterator>::value_type
   median(Iterator begin,Iterator end,
-	 const float position = 0.5);
+                                                                  const float position = 0.5);
 
    // #########################################################
 
@@ -252,13 +252,13 @@ namespace Math_tools{
   inline void
   compute_distance_field(const BoolArray&   input,
 			 ScalarArray* const result,
-			 const typename BoolArray::value_type out_value = typename BoolArray::value_type(),
-			 const int          window = 5);
-  
+    const typename BoolArray::value_type out_value = typename BoolArray::value_type(),
+    const int window = 5);
+
 
   // #########################################################
 
-  
+
   template<typename T,typename BitArray>
   inline void
   to_bit_array(const T&        value,
@@ -272,20 +272,20 @@ namespace Math_tools{
   
   // #########################################################  
 
-#ifndef WITHOUT_LIMITS    
+#ifndef WITHOUT_LIMITS
 
   template<typename T> inline bool is_quiet_NaN(T x);
 
   template<typename T> inline bool is_signaling_NaN(T x);
 
   template<typename T> inline bool is_NaN(T x);
-  
+
 #endif
 
 
   
 /*
-  
+
   #############################################
   #############################################
   #############################################
@@ -295,7 +295,7 @@ namespace Math_tools{
   #############################################
   #############################################
   #############################################
-  
+
 */
 
 
@@ -322,19 +322,19 @@ namespace Math_tools{
     const Real det = Xa*Yb - Ya*Xb;
 
     if (det != 0){
-      
+
       const Real inv_det = 1.0/det;
 
       *a = inv_det * (Yb*Xm  - Xb*Ym);
       *b = inv_det * (-Ya*Xm + Ym*Xa);
-      *c = 1.0 - (*a) - (*b);
+        *c = 1.0 - (*a) - (*b);
     }
     else{
 
       Message::error
 	<<"barycentric_coordinates: colinear points not yet implemented"
 	<<Message::done;
-      
+
     }
   }
 
@@ -344,9 +344,9 @@ namespace Math_tools{
   template<typename Real>
   Real random(const Real min_value_included,
 	      const Real max_value_included){
-    
+
     const float delta = static_cast<float>(max_value_included - min_value_included);
-    
+
     return min_value_included + static_cast<Real>(delta*rand()/(RAND_MAX));
   }
 
@@ -356,7 +356,7 @@ namespace Math_tools{
   template<typename ValueIterator>
   float entropy(ValueIterator begin,
 		 ValueIterator end){
-    
+
     float sum = 0;
     for(ValueIterator i=begin;i!=end;i++){
       if (*i>=0){
@@ -364,7 +364,7 @@ namespace Math_tools{
       }
       else{
 	Message::error<<"entropy: non-positive value"<<Message::done;
-      }
+        }
     }
 
     if (sum==0){
@@ -380,7 +380,7 @@ namespace Math_tools{
     return result;
   }
 
-  
+
 
   template<typename Real,typename RealDummy1,typename RealDummy2>
   inline Real clamp(const RealDummy1 min_value,
@@ -390,13 +390,13 @@ namespace Math_tools{
     if ((x >= static_cast<Real>(min_value)) &&
 	(x <= static_cast<Real>(max_value))){
 
-      return x;
+        return x;
     }
     else if (x < static_cast<Real>(min_value)){
-      return static_cast<Real>(min_value);
+        return static_cast<Real>(min_value);
     }
     else {
-      return static_cast<Real>(max_value);
+        return static_cast<Real>(max_value);
     }
   }
 
@@ -408,30 +408,30 @@ namespace Math_tools{
     return x*x;
   }
 
-  
+
   template<unsigned int N,typename Real>
   inline Real power(const Real x){
 
     Real y = x;
     for(unsigned int i=1;i<N;i++){
-      y *= x;
+        y *= x;
     }
 
     return y;
   }
 
-  
+
   template<unsigned int N,typename Real>
   inline Real power2(Real x){
 
     for(unsigned int i=1;i<N;i++){
-      x *= x;
+        x *= x;
     }
 
     return x;
   }
 
-  
+
   template<typename Real>
   inline Real next_power_of_2(Real x){
 
@@ -440,41 +440,41 @@ namespace Math_tools{
     return res;
   }
 
-  
+
   template<typename Real>
   inline unsigned char used_bits(Real x){
     Real r = 1;
     unsigned char b = 0;
     while (r < x) {
-      r *= 2;
-      b++;
+        r *= 2;
+        b++;
     }
     return b;
   }
 
-  
+
   template<typename Real,typename RealDummy1,typename RealDummy2>
   inline Real smooth_step(const RealDummy1 min_value,
 			  const RealDummy2 max_value,
 			  const Real x){
-    
+
     const Real rm = static_cast<Real>(min_value);
     const Real rM = static_cast<Real>(max_value);
 
     if (x<=rm){
-      return 0;
+        return 0;
     }
 
     if (x>=rM){
-      return 1;
+        return 1;
     }
-    
+
     const Real delta = rM - rm;
 
     const Real alpha = 1.0 - (x-rm) / delta;
 
     const Real tmp = 1.0 - alpha * alpha;
-    
+
     return tmp*tmp;
   }
 
@@ -484,18 +484,18 @@ namespace Math_tools{
   unit_hypercube_corners(){
 
     const unsigned int TWO_N = 1 << N;
-    
+
     Geometry::Vec<TWO_N,Geometry::Vec<N,int> > res;
 
     std::vector<int> bit(N);
-    
+
     for(unsigned n = 0;n < TWO_N;n++){
 
       to_bit_array(n,&bit);
 
       for(unsigned i = 0;i < N;i++){
-	res[n][i] = bit[i];
-      }
+            res[n][i] = bit[i];
+        }
     }
 
     return res;
@@ -510,14 +510,14 @@ namespace Math_tools{
 			 const Real y){
 
     typedef unsigned int size_type;
-    typedef float        real_type;
+    typedef float real_type;
 
     const size_type x_size = array.x_size();
     const size_type y_size = array.y_size();
-    
+
     const size_type x_index  = clamp(0,x_size-1,static_cast<size_type>(x));
     const size_type xx_index = clamp(0,x_size-1,x_index+1);
-    
+
     const size_type y_index  = clamp(0,y_size-1,static_cast<size_type>(y));
     const size_type yy_index = clamp(0,y_size-1,y_index+1);
 
@@ -531,7 +531,7 @@ namespace Math_tools{
       x_alpha        * y_alpha        * array(xx_index,yy_index);      
   }
 
-  
+
 
   template<typename Array,typename Real>
   inline
@@ -542,15 +542,15 @@ namespace Math_tools{
 			  const Real z){
 
     typedef unsigned int size_type;
-    typedef float        real_type;
+    typedef float real_type;
 
     const size_type x_size = array.x_size();
     const size_type y_size = array.y_size();
     const size_type z_size = array.z_size();
-    
+
     const size_type x_index  = clamp(0,x_size-1,static_cast<size_type>(x));
     const size_type xx_index = clamp(0,x_size-1,x_index+1);
-    
+
     const size_type y_index  = clamp(0,y_size-1,static_cast<size_type>(y));
     const size_type yy_index = clamp(0,y_size-1,y_index+1);
 
@@ -581,21 +581,21 @@ namespace Math_tools{
 			const Index i){
 
     using namespace std;
-    
-    typedef float        real_type;
+
+    typedef float real_type;
     typedef unsigned int size_type;
-    
+
     typedef Index real_index_type;
     typedef Array array_type;
 
     const size_type N = array_type::dimension;
-    
-    typedef typename Array::key_type      key_type;
+
+    typedef typename Array::key_type key_type;
     typedef typename key_type::value_type key_coef_type;
-    
+
     typedef Array_2D<real_type> coef_array_type;
     typedef Array_2D<size_type> index_array_type;
-    
+
     static key_type size;
     array.all_sizes(&size);
 
@@ -604,18 +604,18 @@ namespace Math_tools{
 
     static index_array_type node(N,2);
     static coef_array_type  coef(N,2);
-    
+
     for(size_type n=0;n<N;n++){
 
       const real_type& i_n    = i[n];
       const size_type& size_n = size[n]-1;
-      
+
       const size_type n0 =
 	static_cast<size_type>(Math_tools::clamp(0,size_n,i_n));
       node(n,0) = n0;
-      const real_type alpha = 1.0 - (i_n - n0);
+        const real_type alpha = 1.0 - (i_n - n0);
       coef(n,0) = alpha;
-      
+
       const size_type n1 =
 	static_cast<size_type>(Math_tools::clamp(0,size_n,i_n+1));
       node(n,1) = n1;
@@ -625,32 +625,32 @@ namespace Math_tools{
     const size_type TWO_N = 1<<N;
 
     static Geometry::Vec<TWO_N,Geometry::Vec<N,int> > corner =
-      Math_tools::unit_hypercube_corners<N>();
+        Math_tools::unit_hypercube_corners<N>();
 
     typedef typename Array::value_type value_type;
     value_type res = value_type();
 
     for(size_type i = 0;i < TWO_N;i++){
-      
-      key_type  p;
-      real_type c = 1;
+
+        key_type p;
+        real_type c = 1;
 
       const Geometry::Vec<N,int>& corner_i = corner[i];
-      
+
       for(size_type n=0;n<N;n++){
 
 	const size_type& corner_i_n = corner_i[n];
 	p[n] = node(n,corner_i_n);
 	c   *= coef(n,corner_i_n);
-      }
+        }
 
-      res += array[p] * c;
+        res += array[p] * c;
 
 //       cout<<VALUE_OF(p)<<endl;
 //       cout<<VALUE_OF(array[p])<<endl;
 
     }
-    
+
     return res;
   }
 
@@ -664,22 +664,22 @@ namespace Math_tools{
 				 Index* const grad){
 
     using namespace std;
+
     
-    
-    typedef float        real_type;
+    typedef float real_type;
     typedef unsigned int size_type;
-    
+
     typedef Index real_index_type;
     typedef Array array_type;
 
     const size_type N = array_type::dimension;
-    
-    typedef typename Array::key_type      key_type;
+
+    typedef typename Array::key_type key_type;
     typedef typename key_type::value_type key_coef_type;
-    
+
     typedef Array_2D<real_type> coef_array_type;
     typedef Array_2D<size_type> index_array_type;
-    
+
     static key_type size;
     array.all_sizes(&size);
 
@@ -689,85 +689,85 @@ namespace Math_tools{
     static index_array_type node(N,2);
     static coef_array_type  coef(N,2);
     static coef_array_type  border_coef(N,2);
-    
+
     Index& gradient = *grad;
-    
+
     for(size_type n = 0;n < N;++n){
 
       const real_type& i_n    = i[n];
       const size_type& size_n = size[n]-1;
-      
+
       const size_type n0 =
 	static_cast<size_type>(Math_tools::clamp(0,size_n,i_n));
       node(n,0) = n0;
-      const real_type alpha = 1.0 - (i_n - n0);
+        const real_type alpha = 1.0 - (i_n - n0);
       coef(n,0) = alpha;
-      
+
       const size_type n1 =
 	static_cast<size_type>(Math_tools::clamp(0,size_n,i_n+1));
       node(n,1) = n1;
       coef(n,1) = 1.0 - alpha;
     }
 
-    
+
     const size_type TWO_N = 1<<N;
 
     static Geometry::Vec<TWO_N,Geometry::Vec<N,int> > corner =
-      Math_tools::unit_hypercube_corners<N>();
+        Math_tools::unit_hypercube_corners<N>();
 
     typedef typename Array::value_type value_type;
     value_type center = value_type();
     value_type border = value_type();
-    
+
 
     for(size_type i = 0;i < TWO_N;++i){
-      
-      key_type  p;
-      real_type c = 1;
+
+        key_type p;
+        real_type c = 1;
 
       const Geometry::Vec<N,int>& corner_i = corner[i];
-      
+
       for(size_type n=0;n<N;n++){
 
 	const size_type& corner_i_n = corner_i[n];
 	p[n] = node(n,corner_i_n);
 	c   *= coef(n,corner_i_n);
-      }
+        }
 
-      center += array[p] * c;
+        center += array[p] * c;
      
     }
 
 
     border_coef = coef;
-    
+
     for(size_type d = 0;d < N;++d){
 
-      border *= 0;
-      
+        border *= 0;
+
       border_coef(d,0) = 0;
       border_coef(d,1) = 1;
 
       for(size_type i = 0;i < TWO_N;++i){
-      
-	key_type  p;
-	real_type c = 1;
+
+            key_type p;
+            real_type c = 1;
 
 	const Geometry::Vec<N,int>& corner_i = corner[i];
-      
+
 	for(size_type n = 0;n < N;++n){
 
 	  const size_type& corner_i_n = corner_i[n];
 	  p[n] = node(n,corner_i_n);
 	  c   *= border_coef(n,corner_i_n);
-	}
+            }
 
-	border += array[p] * c;
+            border += array[p] * c;
      
-      }
+        }
 
       gradient[d] = (border - center) / coef(d,0);
-      
+
       border_coef(d,0) = coef(d,0);
       border_coef(d,1) = coef(d,1);
     } // END OF for d
@@ -784,22 +784,22 @@ namespace Math_tools{
 				      const Index              i){
 
     using namespace std;
-    
-    typedef float        real_type;
+
+    typedef float real_type;
     typedef unsigned int size_type;
-    
+
     typedef Index real_index_type;
     typedef Array array_type;
 
     const size_type N = array_type::dimension;
-    
+
 //     typedef Geometry::Vec<N,size_type> uint_index_type;
-    typedef typename Array::key_type      key_type;
+    typedef typename Array::key_type key_type;
     typedef typename key_type::value_type key_coef_type;
 
     typedef Array_2D<real_type> coef_array_type;
     typedef Array_2D<size_type> index_array_type;
-    
+
     static key_type size;
     array->all_sizes(&size);
 
@@ -808,18 +808,18 @@ namespace Math_tools{
 
     static index_array_type node(N,2);
     static coef_array_type  coef(N,2);
-    
+
     for(size_type n=0;n<N;n++){
-      
+
       const real_type& i_n    = i[n];
       const size_type& size_n = size[n]-1;
-      
+
       const size_type n0 =
 	static_cast<size_type>(Math_tools::clamp(0,size_n,i_n));
       node(n,0) = n0;
-      const real_type alpha = 1.0 - (i_n - n0);
+        const real_type alpha = 1.0 - (i_n - n0);
       coef(n,0) = alpha;
-      
+
       const size_type n1 =
 	static_cast<size_type>(Math_tools::clamp(0,size_n-1,i_n+1));
       node(n,1) = n1;
@@ -827,56 +827,56 @@ namespace Math_tools{
     }
 
 /*
-    static Array_ND<N,bool> proxy_array(all_two);
-    
-    uint_index_type index; // = all_zero;
-    do{
-      uint_index_type p;
-      real_type       c = 1;
-      
-      for(size_type n=0;n<N;n++){
-	const size_type& index_n = index[n];
-	p[n]  = node(n,index_n);
-	c    *= coef(n,index_n);
-      }
+        static Array_ND<N,bool> proxy_array(all_two);
 
-      (*array)[p] += v * c;
-    }
-    while(proxy_array.advance(&index));
+        uint_index_type index; // = all_zero;
+        do{
+          uint_index_type p;
+          real_type       c = 1;
+
+          for(size_type n=0;n<N;n++){
+            const size_type& index_n = index[n];
+            p[n]  = node(n,index_n);
+            c    *= coef(n,index_n);
+          }
+
+          (*array)[p] += v * c;
+        }
+        while(proxy_array.advance(&index));
 */
 
     const size_type TWO_N = 1<<N;
 
     static Geometry::Vec<TWO_N,Geometry::Vec<N,int> > corner =
-      Math_tools::unit_hypercube_corners<N>();
+        Math_tools::unit_hypercube_corners<N>();
 
     typename Array::value_type res;
 
     for(size_type i = 0;i < TWO_N;i++){
-      
-      key_type  p;
-      real_type c = 1;
+
+        key_type p;
+        real_type c = 1;
 
       const Geometry::Vec<N,int>& corner_i = corner[i];
-      
+
       for(size_type n=0;n<N;n++){
 
 	const size_type& corner_i_n = corner_i[n];
 	p[n] = node(n,corner_i_n);
 	c   *= coef(n,corner_i_n);
-      }
+        }
 
-      if (c > 0)
-	(*array)[p] += v * c;
+        if (c > 0)
+            (*array)[p] += v * c;
      
     }
     
-  }
-  
+    }
 
-  
 
-  
+
+
+
   namespace Cubic_Interpolation{
 
     inline float cubic_positive_part(const float x){
@@ -903,41 +903,41 @@ namespace Math_tools{
 
     using namespace std;
     using namespace Cubic_Interpolation;
-    
+
     typedef unsigned int size_type;
-    typedef float       real_type;
+    typedef float real_type;
 
     const size_type x_size = array.x_size();
     const size_type y_size = array.y_size();
 
     vector<size_type> x_index(4);
     vector<size_type> y_index(4);
-    
+
     const size_type x_floor = clamp(0,x_size-1,static_cast<size_type>(x));
     const size_type y_floor = clamp(0,y_size-1,static_cast<size_type>(y));
 
     const real_type x_alpha = x - x_floor;
     const real_type y_alpha = y - y_floor;
-    
+
     for(int i=-1;i<=2;i++){
       x_index[i+1] = clamp<int>(0,x_size-1,x_floor+i);
       y_index[i+1] = clamp<int>(0,y_size-1,y_floor+i);
     }
 
     real_type res = 0;
-    
+
     for(int i=-1;i<=2;i++){
       for(int j=-1;j<=2;j++){
 
 	res += array(x_index[i+1],y_index[j+1]) * cubic_polynom(i-x_alpha) * cubic_polynom(j-y_alpha);
-      }
+        }
     }
 
     return res;
   }
 
 
-    
+
   template<typename Array,typename Real>
   inline
   typename Array::value_type
@@ -948,9 +948,9 @@ namespace Math_tools{
 
     using namespace std;
     using namespace Cubic_Interpolation;
-    
+
     typedef unsigned int size_type;
-    typedef float       real_type;
+    typedef float real_type;
 
     const size_type x_size = array.x_size();
     const size_type y_size = array.y_size();
@@ -959,7 +959,7 @@ namespace Math_tools{
     vector<size_type> x_index(4);
     vector<size_type> y_index(4);
     vector<size_type> z_index(4);
-    
+
     const size_type x_floor = clamp(0,x_size-1,static_cast<size_type>(x));
     const size_type y_floor = clamp(0,y_size-1,static_cast<size_type>(y));
     const size_type z_floor = clamp(0,z_size-1,static_cast<size_type>(z));
@@ -967,7 +967,7 @@ namespace Math_tools{
     const real_type x_alpha = x - x_floor;
     const real_type y_alpha = y - y_floor;
     const real_type z_alpha = z - z_floor;
-    
+
     for(int i=-1;i<=2;i++){
       x_index[i+1] = clamp<int>(0,x_size-1,x_floor+i);
       y_index[i+1] = clamp<int>(0,y_size-1,y_floor+i);
@@ -975,26 +975,26 @@ namespace Math_tools{
     }
 
     real_type res = 0;
-    
+
     for(int i=-1;i<=2;i++){
       for(int j=-1;j<=2;j++){
 	for(int k=-1;k<=2;k++){
 
 	  res += array(x_index[i+1],y_index[j+1],z_index[k+1]) * cubic_polynom(i-x_alpha) * cubic_polynom(j-y_alpha) * cubic_polynom(k-z_alpha);
-	}
-      }
+            }
+        }
     }
 
     return res;
   }
 
-
-
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
   
   inline float degree_to_radian(const float d){
     return d*M_PI/180;
   }
-  
 
   inline float radian_to_degree(const float r){
     return r*180/M_PI;
@@ -1011,7 +1011,7 @@ namespace Math_tools{
   mean(Iterator begin,Iterator end){
 
     typedef typename std::iterator_traits<Iterator>::value_type value_type;
-    
+
     return std::accumulate(begin,end,value_type()) / std::distance(begin,end);
   }
 
@@ -1022,14 +1022,14 @@ namespace Math_tools{
     typedef typename std::iterator_traits<Iterator>::value_type value_type;
 
     unsigned int size = std::distance(begin,end);
-    
+
     std::vector<float> dist_to_mean(size);
 
     const value_type m = mean(begin,end);
-    
+
     Iterator i=begin;
     for(std::vector<float>::iterator d=dist_to_mean.begin();i!=end;i++,d++){
-      
+
       const float dist = std::abs(*i-m);
       *d = dist*dist;
     }
@@ -1066,23 +1066,23 @@ namespace Math_tools{
 			      const int          window){
 
     using namespace std;
-    
+
     typedef typename ScalarArray::value_type real_type;
     typedef unsigned int size_type;
-    
-    const size_type width  = input.x_size();
+
+    const size_type width = input.x_size();
     const size_type height = input.y_size();
 
     ScalarArray& distance = *result;
-    
+
     distance.resize(width,height);
 
     for(size_type x=0;x<width;x++){
       for(size_type y=0;y<height;y++){
 
 	distance(x,y) = (input(x,y) != out_value) ? 0 : numeric_limits<real_type>::max();
-	
-      }
+
+        }
     }
 
     for(int x=window;x+window<static_cast<int>(width);x++){
@@ -1092,19 +1092,19 @@ namespace Math_tools{
 
 	for(int dx=0;dx<=window;dx++){
 	  for(int dy=((dx==0)?1:-window);dy<=window;dy++){
-	    
+
 	    const real_type delta = sqrt(1.0*dx*dx+1.0*dy*dy);
 
 	    real_type& r = distance(x+dx,y+dy);
 
 	    r = min(d+delta,r);
-	  }
-	}
+                }
+            }
 	
-      }
+        }
     }
 
-    
+
     for(int x=width-window-1;x>=window;x--){
       for(int y=height-window-1;y>=window;y--){
 
@@ -1112,18 +1112,18 @@ namespace Math_tools{
 
 	for(int dx=0;dx<=window;dx++){
 	  for(int dy=((dx==0)?1:-window);dy<=window;dy++){
-	    
+
 	    const real_type delta = sqrt(1.0*dx*dx+1.0*dy*dy);
 
 	    real_type& r = distance(x-dx,y-dy);
 
 	    r = min(d+delta,r);
 	  }
-	}
+                }
 	
-      }
-    }    
-  }
+            }
+        }
+    }
 
 
 
@@ -1140,8 +1140,8 @@ namespace Math_tools{
     for(unsigned int n=0;n<n_bits;n++){
 
       const unsigned int B = (1<<n);
-      
-      bit_array[n] = (value & B) / B;
+
+        bit_array[n] = (value & B) / B;
     }
   }
 
@@ -1159,44 +1159,44 @@ namespace Math_tools{
       if (bit[n] != 0){
 	*value += (1<<n);
       }
+        }
     }
-  }
 
-  
-#ifndef WITHOUT_LIMITS    
+
+#ifndef WITHOUT_LIMITS
 
   template<typename T> bool is_quiet_NaN(T x){
 
     const unsigned int size = sizeof(T)/sizeof(int);
-    
+
     T ref = std::numeric_limits<T>::quiet_NaN();
-    
+
     int* index_ref = reinterpret_cast<int*>(&ref);
     int* index_cmp = reinterpret_cast<int*>(&x);
 
     for(unsigned int i=0;i<size;i++){
       if (index_ref[i]!=index_cmp[i]){
-	return false;
-      }
+            return false;
+        }
     }
 
     return true;
   }
 
-  
+
   template<typename T> bool is_signaling_NaN(T x){
-    
+
     const unsigned int size = sizeof(T)/sizeof(int);
-    
+
     T ref = std::numeric_limits<T>::signaling_NaN();
-    
+
     int* index_ref = reinterpret_cast<int*>(&ref);
     int* index_cmp = reinterpret_cast<int*>(&x);
 
     for(unsigned int i=0;i<size;i++){
       if (index_ref[i]!=index_cmp[i]){
-	return false;
-      }
+            return false;
+        }
     }
 
     return true;
@@ -1206,7 +1206,7 @@ namespace Math_tools{
   template<typename T> bool is_NaN(T x){
     return (is_quiet_NaN(x)||is_signaling_NaN(x));
   }
-  
+
 #endif
 
   

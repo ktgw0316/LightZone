@@ -10,9 +10,9 @@
 
 #define NO_XML
 // #define CHRONO
-#include "../include/mathlz.h"
-#include "include/geom.h"
 #include "include/fast_lbf.h"
+#include "include/geom.h"
+#include "mathlz.h"
 
 using namespace std;
 
