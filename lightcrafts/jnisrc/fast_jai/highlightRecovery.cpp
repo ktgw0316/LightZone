@@ -183,7 +183,7 @@ Java_com_lightcrafts_jai_opimage_HighlightRecoveryOpImage_floatNativeUshortLoop(
     for (int row = 0; row < height; row++) {
         int col = 0;
 #ifdef USE_SSE2
-        for (/*int col = 0*/; col < width - 8; col += 8) {
+        for (/*int col = 0*/; col <= width - 8; col += 8) {
             const int srcPixOffset = srcPixelStride * col + row * srcLineStride + srcROffset;
 
             F32vec4 v_raw[2][3];

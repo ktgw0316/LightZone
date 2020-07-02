@@ -103,7 +103,7 @@ void rlm_separable_bf_mono_tile(
     for (int y=0; y < height; y++) {
 #ifdef __INTEL_COMPILER
         int x=0;
-        for (; x < width-8; x+=8) {
+        for (; x <= width-8; x+=8) {
             const int idx = x + y*width;
             const int src_idx = x*srcPixelStride + y*srcStep;
 
@@ -129,7 +129,7 @@ void rlm_separable_bf_mono_tile(
     for (int y=wr; y < height - wr; y++) {
 #ifdef __INTEL_COMPILER
         int x=wr;
-        for (; x < width-wr-8; x+=8) {
+        for (; x <= width-wr-8; x+=8) {
             // TODO
         }
         for (; x < width - wr; x++) {
@@ -321,7 +321,7 @@ void rlm_separable_bf_chroma_tile(
     for (int y=0; y < height; y++) {
 #ifdef __INTEL_COMPILER
         int x=0;
-        for (; x < width-8; x+=8) {
+        for (; x <= width-8; x+=8) {
             const int src_idx = 3*x + y*srcStep;
             const int idx = x + y*width;
 
@@ -417,7 +417,7 @@ void rlm_separable_bf_chroma_tile(
         const F32vec4 v_one = F32vec4(1.0f);
 
         int x=wr;
-        for (; x < width - wr-4; x+=4) {
+        for (; x <= width - wr-4; x+=4) {
             // initialize central pixel
             const int idx0 = x + y*width;
 
@@ -518,7 +518,7 @@ void rlm_separable_bf_chroma_tile(
         const F32vec4 v_ffff((float) 0xffff);
 
         int y=wr;
-        for (; y < height - wr - 4; y+=4) {
+        for (; y <= height - wr - 4; y+=4) {
             // initialize central pixel
             const int src_idx0 = 3*x + y*srcStep;
             const int dst_idx0 = 3*(x-wr) + (y-wr)*dstStep;
