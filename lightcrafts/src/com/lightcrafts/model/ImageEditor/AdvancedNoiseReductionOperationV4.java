@@ -73,11 +73,6 @@ public class AdvancedNoiseReductionOperationV4 extends BlendedOperation {
             PlanarImage front = new BilateralFilterRGBOpImage(back, borderExtender, null, null,
                                                               luma_domain * scale, 0.02f,
                                                               chroma_domain * scale, 0.04f);
-
-            // front = new O1BilateralFilterOpImage(back, JAIContext.fileCacheHint,
-            //                                      luma_domain * scale, 0.04f,
-            //                                      chroma_domain * scale, 0.04f);
-
             front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
             return front;
         }

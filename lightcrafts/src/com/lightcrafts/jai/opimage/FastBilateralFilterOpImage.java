@@ -150,13 +150,6 @@ public final class FastBilateralFilterOpImage extends AreaOpImage {
                                     srcBandOffsets[0], dstBandOffsets[0],
                                     srcScanlineStride, dstScanlineStride,
                                     transform);
-//        else if (luminosity)
-//            bilateralFilterLuma(srcData, dstData,
-//                               wr, ws, scale_r, kernel,
-//                               swidth, sheight,
-//                               srcBandOffsets[0], srcBandOffsets[1], srcBandOffsets[2],
-//                               dstBandOffsets[0], dstBandOffsets[1], dstBandOffsets[2],
-//                               srcScanlineStride, dstScanlineStride);
         else
             fastBilateralFilterChroma(srcData, dstData,
                                      sigma_d, sigma_r,
@@ -183,11 +176,4 @@ public final class FastBilateralFilterOpImage extends AreaOpImage {
                                                  int destROffset, int destGOffset, int destBOffset,
                                                  int srcLineStride, int destLineStride);
 
-    static native void fastBilateralFilterColor(short[] srcData, short[] destData,
-                                                float sigma_s, float sigma_r,
-                                                int width, int height,
-                                                int srcPixelStride, int destPixelStride,
-                                                int srcROffset, int srcGOffset, int srcBOffset,
-                                                int destROffset, int destGOffset, int destBOffset,
-                                                int srcLineStride, int destLineStride);
 }

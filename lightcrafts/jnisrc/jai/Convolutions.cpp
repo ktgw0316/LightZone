@@ -550,35 +550,6 @@ void convolveLoop(T *srcData, T *dstData, int srcScanlineOffset, int dstScanline
 #endif
 }
 
-// #define VIMAGE
-
-#ifdef VIMAGE
-#include "Convolution.h"
-
-void convolveAVLoop(byte *srcData, byte *dstData, int srcScanlineOffset, int dstScanlineOffset,
-		    int srcScanlineStride, int dstScanlineStride,
-		    int srcPixelStride, int dstPixelStride,
-		    int dheight, int dwidth, int kw, int kh,
-		    float *hValues, float *vValues)
-{
-  vImage_Buffer src = { srcData + srcScanlineOffset + srcScanlineStride * dstScanlineOffset / dstScanlineStride, dheight, dwidth, srcScanlineStride };
-  vImage_Buffer dst = { dstData + dstScanlineOffset, dheight, dwidth, dstScanlineStride };
-
-  short kernel[kw * kh];
-
-  int rowOffset = 0;
-  for (int i = 0; i < kw; i++) {
-    float vValue = vValues[i];
-    for (int j = 0; j < kh; j++) {
-      kernel[rowOffset+j] = (short) ((vValue*hValues[j]) * Values<signed short>::maxVal + 0.5);
-    }
-    rowOffset += kh;
-  }
-
-  vImageConvolve_Planar8(&src, &dst, NULL, 0, 0, kernel, kw, kh, Values<signed short>::maxVal, 0, kvImageEdgeExtend | kvImageDoNotTile);
-}
-#endif
-
 #ifndef AUTO_DEP
 #include "javah/com_lightcrafts_jai_opimage_Convolutions.h"
 #endif

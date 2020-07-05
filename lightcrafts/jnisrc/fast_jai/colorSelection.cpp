@@ -8,36 +8,6 @@ typedef unsigned short ushort;
 #include <omp.h>
 #include <stdlib.h>
 
-static constexpr int sMath_scale = 0x8000;
-static constexpr int sMath_PI = (int) (sMath_scale * M_PI);
-static const int sqrt3d2 = (int) (sMath_scale * sqrt(3.0) / 2); // 0.866...
-
-static int arctan2(int y, int x) {
-    constexpr int coeff_1 = sMath_PI / 4;
-    constexpr int coeff_2 = 3 * coeff_1;
-    const int abs_y = abs(y) + 1;      // kludge to prevent 0/0 condition
-    int angle;
-
-    if (x >= 0) {
-        int r = (sMath_scale * (x - abs_y)) / (x + abs_y);
-        angle = coeff_1 - coeff_1 * r / sMath_scale;
-    } else {
-        int r = (sMath_scale * (x + abs_y)) / (abs_y - x);
-        angle = coeff_2 - coeff_1 * r / sMath_scale;
-    }
-
-    return y < 0 ? -angle : angle;
-}
-
-static int hue(int r, int g, int b) {
-    int x = r - (g+b) / 2;
-    int y = (sqrt3d2 * (g-b)) / sMath_scale;
-    int hue = arctan2(y, x);
-    if (hue < 0)
-        hue += 2 * sMath_PI;
-    return hue;
-}
-
 static float arctan2(float y, float x) {
     constexpr float coeff_1 = (float) M_PI / 4;
     constexpr float coeff_2 = 3 * coeff_1;
