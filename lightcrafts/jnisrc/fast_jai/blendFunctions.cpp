@@ -289,7 +289,7 @@ void blendLoop(const ushort s1[], const ushort s2[], ushort d[], const byte m[],
                 s2[s2PixelOffset + 2 * s2bd],
             };
 
-            for (int i = 0, s1b = 0, s2b = 0; i < bands; i++, s1b += s1bd, s2b += s2bd) {
+            for (int i = 0, s1b = 0; i < bands; i++, s1b += s1bd) {
                 const ushort s2Value = pixel[i];
                 ushort value;
                 if (mValue == 0) {
@@ -301,12 +301,12 @@ void blendLoop(const ushort s1[], const ushort s2[], ushort d[], const byte m[],
                             value = blended;
                         } else {
                             value = (intOpacity * blended + (maxVal - intOpacity) * s2Value) /
-                                    (maxVal + 1);
+                                    maxVal;
                         }
                     } else {
                         const int maskedOpacity = (intOpacity * mValue) / 0xFF;
                         value = (maskedOpacity * blended + (maxVal - maskedOpacity) * s2Value) /
-                                (maxVal + 1);
+                                maxVal;
                     }
                 }
                 d[dPixelOffset + i] = value;
