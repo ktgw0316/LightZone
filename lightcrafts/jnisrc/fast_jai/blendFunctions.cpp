@@ -253,6 +253,7 @@ BlendMode *BlendMode::blendMode[] = {
 #include "../pixutils/HSB.h"
 #include <cassert>
 #include <cstdio>
+#include <functional>
 
 void blendLoop(const ushort s1[], const ushort s2[], ushort d[], const byte m[], const byte cs[],
                int bands, int s1bd, int s2bd, int s1LineOffset, int s2LineOffset, int dLineOffset,
@@ -264,6 +265,7 @@ void blendLoop(const ushort s1[], const ushort s2[], ushort d[], const byte m[],
     intOpacity = abs(intOpacity);
 
     const BlendMode *const blender = BlendMode::getBlender(mode);
+    const auto blendPixels = [&](ushort f, ushort b) { return blender->blendPixels(f, b); };
     const ushort maxVal = BlendMode::maxVal;
 
 #pragma omp parallel for schedule(guided)
@@ -293,7 +295,7 @@ void blendLoop(const ushort s1[], const ushort s2[], ushort d[], const byte m[],
                 if (mValue == 0) {
                     value = s2Value;
                 } else {
-                    const ushort blended = blender->blendPixels(s1[s1PixelOffset + s1b], s2Value);
+                    const ushort blended = blendPixels(s1[s1PixelOffset + s1b], s2Value);
                     if (m == NULL && cs == NULL) {
                         if (intOpacity == maxVal) {
                             value = blended;
