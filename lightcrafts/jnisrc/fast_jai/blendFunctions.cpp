@@ -14,19 +14,20 @@
 #include <cmath>
 #include <complex>
 #include <omp.h>
+#include "mathlz.h"
 
 typedef unsigned char byte;
 typedef unsigned short ushort;
 
-static double hilightsThreshold = 0.59;
-static double midtonesThreshold = 0.172;
-static double shadowsThreshold = 0.0425;
+static constexpr double hilightsThreshold = 0.59;
+static constexpr double midtonesThreshold = 0.172;
+static constexpr double shadowsThreshold = 0.0425;
 
 class BlendMode {
     static BlendMode *blendMode[];
 
   public:
-    static const ushort maxVal = 0xFFFF;
+    static constexpr ushort maxVal = 0xFFFF;
 
     virtual ushort blendPixels(ushort front, ushort back) const = 0;
 
@@ -54,21 +55,11 @@ class ScreenBlendMode : public BlendMode {
 };
 
 class DarkenBlendMode : public BlendMode {
-    virtual ushort blendPixels(ushort front, ushort back) const {
-        if (front < back)
-            return front;
-        else
-            return back;
-    }
+    virtual ushort blendPixels(ushort front, ushort back) const { return std::min(front, back); }
 };
 
 class LightenBlendMode : public BlendMode {
-    virtual ushort blendPixels(ushort front, ushort back) const {
-        if (front > back)
-            return front;
-        else
-            return back;
-    }
+    virtual ushort blendPixels(ushort front, ushort back) const { return std::max(front, back); }
 };
 
 class DifferenceBlendMode : public BlendMode {
@@ -153,29 +144,21 @@ class ColorBurnBlendMode : public BlendMode {
 
 class SoftDodgeBlendMode : public BlendMode {
     virtual ushort blendPixels(ushort front, ushort back) const {
-        if (front + back < maxVal + 1) {
-            if (front == maxVal)
-                return maxVal;
-            unsigned int c = (unsigned int)back * (maxVal / 2) / (maxVal - front);
-            return std::min(c, (unsigned int)maxVal);
-        } else {
-            int c = maxVal - (unsigned int)(maxVal - front) * (maxVal / 2) / back;
-            return std::max(c, 0);
-        }
+        const auto p = std::minmax(back, ushort(maxVal - front));
+        if (p.second == 0)
+            return maxVal;
+        unsigned int c = (unsigned int)p.first * (maxVal / 2) / p.second;
+        return clampUShort(c);
     }
 };
 
 class SoftBurnBlendMode : public BlendMode {
     virtual ushort blendPixels(ushort front, ushort back) const {
-        if (front + back < maxVal + 1) {
-            if (back == maxVal)
-                return maxVal;
-            unsigned int c = (unsigned int)front * (maxVal / 2) / (maxVal - back);
-            return std::min(c, (unsigned int)maxVal);
-        } else {
-            int c = maxVal - (unsigned int)(maxVal - back) * (maxVal / 2) / front;
-            return std::max(c, 0);
-        }
+        const auto p = std::minmax(front, ushort(maxVal - back));
+        if (p.second == 0)
+            return maxVal;
+        unsigned int c = (unsigned int)p.first * (maxVal / 2) / p.second;
+        return clampUShort(c);
     }
 };
 
@@ -190,19 +173,17 @@ class LowPassBlendMode : public BlendMode {
     virtual ushort blendPixels(ushort front, ushort back) const {
         if (back < threshold - transition)
             return front;
-        else if (back > threshold + transition)
+        if (back > threshold + transition)
             return back;
-        else {
-            /*
-              unsigned long long k = back - (threshold - transition);
-              k = (k * k) / (maxVal + 1);
-              unsigned long long t4 = 4 * transition * transition;
-              return (ushort) ((k * back + (t4 * maxVal - k) * front) / (t4 * (maxVal + 1)));
-            */
-            double k = (back - (threshold - transition)) / (2.0 * transition);
-            k *= k;
-            return (ushort)(k * back + (1 - k) * front);
-        }
+        /*
+          unsigned long long k = back - (threshold - transition);
+          k = (k * k) / (maxVal + 1);
+          unsigned long long t4 = 4 * transition * transition;
+          return (ushort) ((k * back + (t4 * maxVal - k) * front) / (t4 * (maxVal + 1)));
+        */
+        double k = (back - (threshold - transition)) / (2.0 * transition);
+        k *= k;
+        return ushort(k * back + (1 - k) * front);
     }
 };
 
@@ -217,13 +198,11 @@ class HighPassBlendMode : public BlendMode {
     virtual ushort blendPixels(ushort front, ushort back) const {
         if (back > threshold + transition)
             return front;
-        else if (back < threshold - transition)
+        if (back < threshold - transition)
             return back;
-        else {
-            double k = sqrt((back - (threshold - transition)) / (2.0 * transition));
 
-            return (ushort)(k * front + (1 - k) * back);
-        }
+        double k = sqrt((back - (threshold - transition)) / (2.0 * transition));
+        return ushort(k * front + (1 - k) * back);
     }
 };
 
@@ -261,13 +240,14 @@ BlendMode *BlendMode::blendMode[] = {
     new SoftLightBlendMode2(0.4),   // 16
     new SoftLightBlendMode2(1.31),  // 17
     new SoftLightBlendMode2(0.291), // 18
-    new LowPassBlendMode((ushort)(midtonesThreshold *maxVal),
-                         (ushort)(midtonesThreshold *maxVal / 2)), // 19
-    new HighPassBlendMode((ushort)(shadowsThreshold *maxVal),
-                          (ushort)(shadowsThreshold *maxVal / 2)), // 20
-    new BandBlendMode((ushort)(shadowsThreshold *maxVal), (ushort)(shadowsThreshold *maxVal / 2),
-                      (ushort)(hilightsThreshold *maxVal),
-                      (ushort)(hilightsThreshold *maxVal / 2)), // 21
+    new LowPassBlendMode(ushort(midtonesThreshold * maxVal),
+                         ushort(midtonesThreshold * maxVal / 2)), // 19
+    new HighPassBlendMode(ushort(shadowsThreshold * maxVal),
+                          ushort(shadowsThreshold * maxVal / 2)), // 20
+    new BandBlendMode(ushort(shadowsThreshold * maxVal),
+                      ushort(shadowsThreshold * maxVal / 2),
+                      ushort(hilightsThreshold * maxVal),
+                      ushort(hilightsThreshold * maxVal / 2)), // 21
 };
 
 #include "../pixutils/HSB.h"
