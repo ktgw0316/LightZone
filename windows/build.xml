@@ -144,6 +144,19 @@
 
   <!--===== Clean up =======================================================-->
 
+  <target name="clean-up-native">
+    <ant dir="${common-dir}" target="clean-up-native"/>
+    <exec executable="make" dir="jnisrc">
+      <arg value="${clean-method}"/>
+    </exec>
+  </target>
+
+  <target name="clean-native">
+    <antcall target="clean-up-native">
+      <param name="clean-method" value="distclean"/>
+    </antcall>
+  </target>
+
   <target name="clean-up">
     <ant dir="${common-dir}" target="${clean-method}"/>
     <parallel>
@@ -152,9 +165,7 @@
       <delete file="${installer-name}"/>
       <delete file="products/lightzone.jvmargs"/>
     </parallel>
-    <exec executable="make" dir="jnisrc">
-      <arg value="${clean-method}"/>
-    </exec>
+    <antcall target="clean-native"/>
     <exec executable="make" dir="products">
       <arg value="-j"/>
       <arg value="${clean-method}"/>

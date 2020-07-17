@@ -216,11 +216,7 @@
 
   <!--===== Clean up =======================================================-->
 
-  <target name="clean-up">
-    <parallel>
-      <delete dir="build"/>
-      <delete dir="javah"/>
-    </parallel>
+  <target name="clean-up-native">
     <exec executable="${MAKE}" dir="jnisrc">
       <arg value="-j"/>
       <arg value="${clean-method}"/>
@@ -229,6 +225,20 @@
       <arg value="-j"/>
       <arg value="${clean-method}"/>
     </exec>
+  </target>
+
+  <target name="clean-native">
+    <antcall target="clean-up-native">
+      <param name="clean-method" value="distclean"/>
+    </antcall>
+  </target>
+
+  <target name="clean-up">
+    <parallel>
+      <delete dir="build"/>
+      <delete dir="javah"/>
+    </parallel>
+    <antcall target="clean-native"/>
     <exec executable="${MAKE}" dir="products">
       <arg value="-j"/>
       <arg value="${clean-method}"/>
