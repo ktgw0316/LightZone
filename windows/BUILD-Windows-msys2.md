@@ -15,7 +15,7 @@ Download and install (or unpack) following:
 -   __MSYS2__
     1. Install MSYS2 and update packages as described in https://msys2.github.io/
     1. Install required packages.
-    -    `pacman -S autoconf git make tar`
+    -    `pacman -S autoconf diffutils git make tar`
     1. Install target-specific toolchain.
     -    For 32-bit: `pacman -S mingw-w64-i686-toolchain`
     -    For 64-bit: `pacman -S mingw-w64-x86_64-toolchain`
