@@ -4,7 +4,11 @@ package com.lightcrafts.jai.operator;
 
 import com.sun.media.jai.util.AreaOpPropertyGenerator;
 
-import javax.media.jai.*;
+import javax.media.jai.JAI;
+import javax.media.jai.OperationDescriptorImpl;
+import javax.media.jai.ParameterBlockJAI;
+import javax.media.jai.PropertyGenerator;
+import javax.media.jai.RenderedOp;
 import javax.media.jai.registry.RenderedRegistryMode;
 import java.awt.image.RenderedImage;
 import java.awt.*;

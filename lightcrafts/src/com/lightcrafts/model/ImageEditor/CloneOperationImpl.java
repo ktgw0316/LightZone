@@ -6,10 +6,13 @@ import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.LCROIShape;
 import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.*;
-
-import javax.media.jai.*;
 import com.lightcrafts.ui.editor.EditorMode;
 
+import javax.media.jai.BorderExtender;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.RenderedOp;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.image.renderable.ParameterBlock;

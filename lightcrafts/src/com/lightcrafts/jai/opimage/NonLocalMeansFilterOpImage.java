@@ -2,7 +2,12 @@
 package com.lightcrafts.jai.opimage;
 
 import com.lightcrafts.image.color.ColorScience;
-import javax.media.jai.*;
+
+import javax.media.jai.AreaOpImage;
+import javax.media.jai.BorderExtender;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.RasterAccessor;
+import javax.media.jai.RasterFormatTag;
 
 import java.awt.*;
 import java.awt.image.DataBuffer;

@@ -9,7 +9,16 @@ import com.lightcrafts.model.ImageEditor.Rendering;
 import com.lightcrafts.model.Operation;
 import com.sun.media.jai.util.ImageUtil;
 
-import javax.media.jai.*;
+import javax.media.jai.BorderExtender;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.Interpolation;
+import javax.media.jai.JAI;
+import javax.media.jai.KernelJAI;
+import javax.media.jai.LookupTableJAI;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.RasterAccessor;
+import javax.media.jai.RasterFormatTag;
+import javax.media.jai.RenderedOp;
 import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.color.ICC_Profile;

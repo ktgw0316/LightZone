@@ -7,11 +7,14 @@ import com.lightcrafts.image.metadata.ImageMetadata;
 import com.lightcrafts.image.metadata.ImageOrientation;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.utils.Functions;
-import javax.media.jai.*;
-import javax.media.jai.operator.TransposeDescriptor;
-import javax.media.jai.operator.TransposeType;
 
 import javax.imageio.ImageIO;
+import javax.media.jai.BorderExtender;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.Interpolation;
+import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.operator.TransposeType;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;

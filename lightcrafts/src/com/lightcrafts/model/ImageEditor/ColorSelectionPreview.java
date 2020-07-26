@@ -2,21 +2,26 @@
 
 package com.lightcrafts.model.ImageEditor;
 
-import static com.lightcrafts.model.ImageEditor.Locale.LOCALE;
-import com.lightcrafts.model.*;
-import com.lightcrafts.jai.utils.*;
 import com.lightcrafts.jai.JAIContext;
-
-import javax.media.jai.*;
+import com.lightcrafts.jai.utils.Functions;
+import com.lightcrafts.model.Operation;
+import com.lightcrafts.model.Preview;
+import com.lightcrafts.model.Region;
 import com.lightcrafts.ui.LightZoneSkin;
 
+import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.image.*;
-import java.awt.image.renderable.ParameterBlock;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
+import java.awt.image.RenderedImage;
+import java.awt.image.renderable.ParameterBlock;
 import java.lang.ref.SoftReference;
+
+import static com.lightcrafts.model.ImageEditor.Locale.LOCALE;
 
 public class ColorSelectionPreview extends Preview implements PaintListener {
     static final boolean ADJUST_GRAYSCALE = true;

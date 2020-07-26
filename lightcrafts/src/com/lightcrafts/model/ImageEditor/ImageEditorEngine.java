@@ -24,12 +24,17 @@ import com.lightcrafts.model.*;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.utils.UserCanceledException;
 import com.lightcrafts.utils.thread.ProgressThread;
-import com.lightcrafts.utils.xml.XMLUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.val;
 
-import javax.media.jai.*;
+import javax.media.jai.BorderExtender;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.Interpolation;
+import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.RenderedImageAdapter;
+import javax.media.jai.RenderedOp;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.color.ICC_ColorSpace;
@@ -44,11 +49,10 @@ import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 public class ImageEditorEngine implements Engine {
     private ImageInfo m_imageInfo;

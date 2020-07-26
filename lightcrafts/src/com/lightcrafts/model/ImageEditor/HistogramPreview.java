@@ -2,18 +2,19 @@
 
 package com.lightcrafts.model.ImageEditor;
 
-import static com.lightcrafts.model.ImageEditor.Locale.LOCALE;
+import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.model.Preview;
 import com.lightcrafts.model.Region;
-import com.lightcrafts.jai.utils.Functions;
-import com.lightcrafts.jai.JAIContext;
 
-import javax.media.jai.*;
-
+import javax.media.jai.Histogram;
+import javax.media.jai.PlanarImage;
 import java.awt.*;
-import java.awt.geom.Rectangle2D;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.Raster;
+
+import static com.lightcrafts.model.ImageEditor.Locale.LOCALE;
 
 public class HistogramPreview extends Preview implements PaintListener {
     private int[][] bins = null;

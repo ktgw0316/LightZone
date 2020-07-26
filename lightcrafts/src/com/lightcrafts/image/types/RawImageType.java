@@ -3,31 +3,40 @@
 
 package com.lightcrafts.image.types;
 
+import com.lightcrafts.image.BadImageFileException;
+import com.lightcrafts.image.ColorProfileException;
+import com.lightcrafts.image.ImageInfo;
+import com.lightcrafts.image.UnknownImageTypeException;
+import com.lightcrafts.image.libs.LCImageLibException;
+import com.lightcrafts.image.libs.LCTIFFReader;
+import com.lightcrafts.image.metadata.DCRawMetadataReader;
+import com.lightcrafts.image.metadata.XMPMetadataWriter;
+import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.jai.opimage.CachedImage;
+import com.lightcrafts.jai.opimage.RGBDemosaicOpImage;
+import com.lightcrafts.jai.utils.Functions;
+import com.lightcrafts.utils.DCRaw;
+import com.lightcrafts.utils.ProgressIndicator;
+import com.lightcrafts.utils.UserCanceledException;
+import com.lightcrafts.utils.thread.ProgressThread;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.val;
+
+import javax.media.jai.BorderExtender;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.Interpolation;
+import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.RasterFactory;
+import javax.media.jai.RenderedOp;
+import javax.media.jai.TiledImage;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.*;
 import java.awt.image.renderable.ParameterBlock;
-import java.io.IOException;
 import java.io.File;
-
-import com.lightcrafts.image.BadImageFileException;
-import com.lightcrafts.image.ColorProfileException;
-import com.lightcrafts.image.ImageInfo;
-import com.lightcrafts.image.metadata.*;
-import com.lightcrafts.image.UnknownImageTypeException;
-import com.lightcrafts.image.libs.LCTIFFReader;
-import com.lightcrafts.image.libs.LCImageLibException;
-import com.lightcrafts.jai.JAIContext;
-import com.lightcrafts.jai.utils.Functions;
-import com.lightcrafts.jai.opimage.CachedImage;
-import com.lightcrafts.jai.opimage.RGBDemosaicOpImage;
-import javax.media.jai.*;
-import com.lightcrafts.utils.thread.ProgressThread;
-import com.lightcrafts.utils.*;
-
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.val;
+import java.io.IOException;
 
 /**
  * A <code>RawImageType</code> is-an {@link ImageType} that is the base class

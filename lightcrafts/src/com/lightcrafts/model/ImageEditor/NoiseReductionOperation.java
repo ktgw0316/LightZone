@@ -9,7 +9,10 @@ import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.image.color.ColorScience;
 
-import javax.media.jai.*;
+import javax.media.jai.BorderExtender;
+import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.RenderedOp;
 import javax.media.jai.operator.MedianFilterDescriptor;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.*;

@@ -9,7 +9,11 @@ import com.lightcrafts.utils.ProgressIndicator;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.JAIContext;
 
-import javax.media.jai.*;
+import javax.media.jai.BorderExtender;
+import javax.media.jai.Interpolation;
+import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.RenderedOp;
 import javax.media.jai.operator.TransposeDescriptor;
 import java.awt.print.*;
 import java.awt.image.Raster;

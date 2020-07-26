@@ -3,7 +3,11 @@ package com.lightcrafts.jai.opimage;
 import com.lightcrafts.utils.OpenSimplexNoise;
 import lombok.val;
 
-import javax.media.jai.*;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.RasterAccessor;
+import javax.media.jai.RasterFormatTag;
+import javax.media.jai.SourcelessOpImage;
 import java.awt.*;
 import java.awt.image.DataBuffer;
 import java.awt.image.RenderedImage;

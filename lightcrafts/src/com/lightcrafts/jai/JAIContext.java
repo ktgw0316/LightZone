@@ -11,7 +11,12 @@ import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.platform.Platform;
 import com.sun.media.jai.util.SunTileCache;
 
-import javax.media.jai.*;
+import javax.media.jai.JAI;
+import javax.media.jai.OperationDescriptor;
+import javax.media.jai.OperationRegistry;
+import javax.media.jai.RasterFactory;
+import javax.media.jai.TileCache;
+import javax.media.jai.TileFactory;
 import javax.media.jai.registry.CRIFRegistry;
 import javax.media.jai.registry.RIFRegistry;
 import java.awt.*;

@@ -10,7 +10,14 @@ import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.LCROIShape;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.utils.SoftValueHashMap;
-import javax.media.jai.*;
+
+import javax.media.jai.BorderExtender;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.Interpolation;
+import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.RasterFactory;
+import javax.media.jai.TiledImage;
 
 import java.awt.image.*;
 import java.awt.image.renderable.ParameterBlock;

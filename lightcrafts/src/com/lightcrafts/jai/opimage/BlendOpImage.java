@@ -5,7 +5,13 @@ package com.lightcrafts.jai.opimage;
 import com.sun.media.jai.util.ImageUtil;
 import com.sun.media.jai.util.JDKWorkarounds;
 import com.lightcrafts.jai.LCROIShape;
-import javax.media.jai.*;
+
+import javax.media.jai.ImageLayout;
+import javax.media.jai.PointOpImage;
+import javax.media.jai.ROI;
+import javax.media.jai.RasterAccessor;
+import javax.media.jai.RasterFactory;
+import javax.media.jai.RasterFormatTag;
 
 import java.awt.image.*;
 import java.awt.*;

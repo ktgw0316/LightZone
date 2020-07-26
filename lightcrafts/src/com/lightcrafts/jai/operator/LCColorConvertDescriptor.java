@@ -14,14 +14,19 @@
 
 package com.lightcrafts.jai.operator;
 
-import java.awt.RenderingHints;
+import javax.media.jai.EnumeratedParameter;
+import javax.media.jai.JAI;
+import javax.media.jai.OperationDescriptorImpl;
+import javax.media.jai.ParameterBlockJAI;
+import javax.media.jai.RenderableOp;
+import javax.media.jai.RenderedOp;
+import javax.media.jai.registry.RenderableRegistryMode;
+import javax.media.jai.registry.RenderedRegistryMode;
+import java.awt.*;
 import java.awt.color.ICC_Profile;
 import java.awt.image.ColorModel;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.RenderableImage;
-import javax.media.jai.*;
-import javax.media.jai.registry.RenderableRegistryMode;
-import javax.media.jai.registry.RenderedRegistryMode;
 
 /**
  * An <code>OperationDescriptor</code> describing the "ColorConvert" operation.

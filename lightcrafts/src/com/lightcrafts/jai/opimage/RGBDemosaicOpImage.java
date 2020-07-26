@@ -2,14 +2,18 @@
 
 package com.lightcrafts.jai.opimage;
 
-import javax.media.jai.*;
-import com.lightcrafts.utils.DCRaw;
 import com.lightcrafts.jai.utils.Functions;
+import com.lightcrafts.utils.DCRaw;
 
-import java.awt.image.*;
+import javax.media.jai.AreaOpImage;
+import javax.media.jai.BorderExtender;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.RasterAccessor;
+import javax.media.jai.RasterFormatTag;
 import java.awt.*;
-import java.util.Map;
+import java.awt.image.*;
 import java.util.Arrays;
+import java.util.Map;
 
 /**
  * Copyright (C) 2007 Light Crafts, Inc.

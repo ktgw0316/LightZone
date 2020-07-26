@@ -3,20 +3,21 @@
 
 package com.lightcrafts.model.ImageEditor;
 
-import com.lightcrafts.model.CropBounds;
-import com.lightcrafts.model.Operation;
-import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.opimage.CachedImage;
-
-import javax.media.jai.*;
-
+import com.lightcrafts.jai.utils.Functions;
+import com.lightcrafts.model.CropBounds;
+import com.lightcrafts.model.Operation;
 import lombok.Getter;
 import lombok.val;
 
-import java.awt.Dimension;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
+import javax.media.jai.BorderExtender;
+import javax.media.jai.ImageLayout;
+import javax.media.jai.Interpolation;
+import javax.media.jai.JAI;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.RenderedOp;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.Raster;

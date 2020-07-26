@@ -3,10 +3,11 @@
 package com.lightcrafts.model.ImageEditor;
 
 import com.lightcrafts.jai.utils.Transform;
-import com.lightcrafts.model.*;
-
-import javax.media.jai.*;
+import com.lightcrafts.model.OperationType;
+import com.lightcrafts.model.SpotOperation;
 import com.lightcrafts.ui.editor.EditorMode;
+
+import javax.media.jai.PlanarImage;
 
 import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_SPOT;
 
