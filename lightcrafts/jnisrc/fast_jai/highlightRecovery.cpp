@@ -16,14 +16,10 @@
 
 typedef unsigned short ushort;
 
-#if defined(__SSE2__) && (defined(__INTEL_COMPILER) || defined(__clang__) || defined(__MINGW32__))
-#define USE_SSE2
-#endif
-
-#ifdef USE_SSE2
 #include <dvec.h>
 #include <fvec.h>
-#include <pmmintrin.h>
+#ifdef USE_SIMD
+#include "simde/x86/sse2.h"
 inline F32vec4 convert_high(const Iu16vec8 &a) {
     return _mm_cvtepi32_ps(unpack_high(a, (__m128i)_mm_setzero_ps()));
 }
@@ -131,12 +127,6 @@ inline void store_vector(unsigned short *const dstData, const F32vec4 v_rgb[2][3
     _mm_storeu_si128((__m128i *)(dstData + 16),
                      F32vec4toIu16vec8(c2, b2)); // B7 G7 R7 B6 G6 R6 B5 G5
 }
-
-// Ad Horizontal using SSE3
-inline float addh(const F32vec4 &a) {
-    return _mm_cvtss_f32(_mm_hadd_ps(_mm_hadd_ps(a, _mm_setzero_ps()), _mm_setzero_ps()));
-}
-
 #endif
 
 extern "C" JNIEXPORT void JNICALL
@@ -162,7 +152,7 @@ Java_com_lightcrafts_jai_opimage_HighlightRecoveryOpImage_floatNativeUshortLoop(
     const float threshold = 0.8 * 0xffff;
     const float maximum = 1.0 * 0xffff;
 
-#ifdef USE_SSE2
+#ifdef USE_SIMD
     const F32vec4 v_threshold(threshold);
     const F32vec4 v_maximum(maximum);
 
@@ -182,7 +172,7 @@ Java_com_lightcrafts_jai_opimage_HighlightRecoveryOpImage_floatNativeUshortLoop(
 #endif
     for (int row = 0; row < height; row++) {
         int col = 0;
-#ifdef USE_SSE2
+#ifdef USE_SIMD
         for (/*int col = 0*/; col <= width - 8; col += 8) {
             const int srcPixOffset = srcPixelStride * col + row * srcLineStride + srcROffset;
 
