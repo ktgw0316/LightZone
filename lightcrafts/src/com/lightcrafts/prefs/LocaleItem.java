@@ -10,7 +10,7 @@ import java.awt.event.MouseEvent;
 
 import static com.lightcrafts.prefs.LocalePresenter.LanguageItemConverter.availableLanguageItems;
 
-class LocaleItem extends PreferencesItem implements LocaleContract.LocaleView {
+class LocaleItem extends PreferencesItem implements LocaleContract.View {
 
     private JComboBox<String> combo;
     private LocalePresenter presenter;

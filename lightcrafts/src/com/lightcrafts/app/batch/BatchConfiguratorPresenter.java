@@ -6,6 +6,7 @@ package com.lightcrafts.app.batch;
 
 import com.lightcrafts.image.export.ImageExportOptions;
 import com.lightcrafts.image.export.ImageFileExportOptions;
+import com.lightcrafts.ui.base.BasePresenter;
 import lombok.Getter;
 import lombok.val;
 

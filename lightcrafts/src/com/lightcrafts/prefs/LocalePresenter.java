@@ -4,6 +4,7 @@
 
 package com.lightcrafts.prefs;
 
+import com.lightcrafts.ui.base.BasePresenter;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,9 +12,8 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-class LocalePresenter extends BasePresenter<LocaleContract.LocaleView>
+class LocalePresenter extends BasePresenter<LocaleContract.View>
         implements LocaleContract.ViewActions {
 
     @Override
