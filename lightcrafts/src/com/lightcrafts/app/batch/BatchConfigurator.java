@@ -34,7 +34,8 @@ public class BatchConfigurator {
     public static void main(String[] args) throws Exception {
         val files = new File[100];
         for (int n = 0; n < 100; n++) {
-            files[n] = new File("/tmp/" + n + ".lzn");
+            files[n] = File.createTempFile("test", ".lzn");
+            files[n].deleteOnExit();
         }
         UIManager.setLookAndFeel(Platform.getPlatform().getLookAndFeel());
         EventQueue.invokeLater(() -> {
