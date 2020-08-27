@@ -2,7 +2,6 @@
 
 package com.lightcrafts.app;
 
-import static com.lightcrafts.app.Locale.LOCALE;
 import com.lightcrafts.app.advice.AdviceManager;
 import com.lightcrafts.app.menu.ComboFrameMenuBar;
 import com.lightcrafts.app.menu.WindowMenu;
@@ -10,7 +9,6 @@ import com.lightcrafts.app.other.OtherApplication;
 import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.image.metadata.ImageMetadata;
 import com.lightcrafts.model.Scale;
-import com.lightcrafts.platform.AlertDialog;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.platform.ProgressDialog;
 import com.lightcrafts.templates.TemplateDatabase;
@@ -50,9 +48,12 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.prefs.Preferences;
+import java.util.stream.Stream;
+
+import static com.lightcrafts.app.Locale.LOCALE;
 
 // An amalgamation of editor and browser components to make a single frame
 // for all purposes.  Looks like Aperture and LightRoom.
@@ -547,33 +548,11 @@ public class ComboFrame
     // This should only be called from the Platform class on Mac.
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (e.getScrollType() == 2) {
-            if (editor != null) {
-                JComponent image = editor.getImage();
-                if (isMouseWheelEventInComponent(e, image)) {
-                    editor.horizontalMouseWheelMoved(e);
-                    return;
-                }
-            }
-            if (folders != null) {
-                JComponent tree = folders.getTree();
-                if (isMouseWheelEventInComponent(e, tree)) {
-                    folders.horizontalMouseWheelMoved(e);
-                    return;
-                }
-            }
-            if (history != null) {
-                JComponent scroll = history.getScrollPane();
-                if (isMouseWheelEventInComponent(e, scroll)) {
-                    history.horizontalMouseWheelMoved(e);
-                    return;
-                }
-            }
-            if (templates != null) {
-                JComponent scroll = templates.getScrollPane();
-                if (isMouseWheelEventInComponent(e, scroll)) {
-                    templates.horizontalMouseWheelMoved(e);
-                }
-            }
+            Stream.of(editor, folders, history, templates)
+                    .filter(Objects::nonNull)
+                    .filter(elem -> isMouseWheelEventInComponent(e, elem.getHorizontalMouseWheelSupportComponent()))
+                    .findFirst()
+                    .ifPresent(elem -> elem.horizontalMouseWheelMoved(e));
         }
     }
 

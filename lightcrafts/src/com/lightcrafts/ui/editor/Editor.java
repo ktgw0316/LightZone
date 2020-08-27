@@ -8,12 +8,12 @@ import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.Preview;
 import com.lightcrafts.model.Scale;
 import com.lightcrafts.ui.ActivityMeter;
+import com.lightcrafts.ui.HorizontalMouseWheelSupport;
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.ui.crop.CropMode;
-import static com.lightcrafts.ui.editor.Locale.LOCALE;
 import com.lightcrafts.ui.layout.ToggleTitleBorder;
-import com.lightcrafts.ui.mode.ModeOverlay;
 import com.lightcrafts.ui.mode.AbstractMode;
+import com.lightcrafts.ui.mode.ModeOverlay;
 import com.lightcrafts.ui.operation.OpControl;
 import com.lightcrafts.ui.region.RegionOverlay;
 import com.lightcrafts.ui.scroll.CenteringScrollPane;
@@ -27,13 +27,15 @@ import com.lightcrafts.utils.xml.XmlNode;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.event.MouseInputAdapter;
-import javax.swing.event.UndoableEditListener;
 import javax.swing.event.MouseInputListener;
+import javax.swing.event.UndoableEditListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.util.List;
+
+import static com.lightcrafts.ui.editor.Locale.LOCALE;
 
 /**
  * This class initializes the various Document editor controls and
@@ -48,7 +50,7 @@ import java.util.List;
  * See Document.getEditor().
  */
 
-public class Editor {
+public class Editor implements HorizontalMouseWheelSupport {
 
     private Engine engine;
     private ScaleModel scale;
@@ -124,6 +126,13 @@ public class Editor {
         scrollbar.setValue(newValue);
     }
 
+
+    @Override
+    public JComponent getHorizontalMouseWheelSupportComponent() {
+        return getImage();
+    }
+
+    @Override
     public void horizontalMouseWheelMoved(MouseWheelEvent e) {
         if (transientPanMode != null) {
             transientPanMode.getOverlay().getMouseWheelListeners()[0].mouseWheelMoved(e);

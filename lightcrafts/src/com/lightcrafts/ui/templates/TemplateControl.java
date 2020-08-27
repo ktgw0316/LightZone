@@ -6,21 +6,23 @@ import com.lightcrafts.platform.Platform;
 import com.lightcrafts.templates.TemplateDatabase;
 import com.lightcrafts.templates.TemplateDatabaseListener;
 import com.lightcrafts.templates.TemplateKey;
+import com.lightcrafts.ui.HorizontalMouseWheelSupport;
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.ui.editor.Editor;
-import static com.lightcrafts.ui.templates.Locale.LOCALE;
 import com.lightcrafts.ui.toolkit.PaneTitle;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputListener;
 import java.awt.event.MouseWheelEvent;
 
+import static com.lightcrafts.ui.templates.Locale.LOCALE;
+
 /**
  * Maintain a selectable list of Templates and associated controls.  Update
  * controls in an Editor as the selection changes.
  */
 public class TemplateControl
-    extends JPanel implements TemplateDatabaseListener
+    extends JPanel implements TemplateDatabaseListener, HorizontalMouseWheelSupport
 {
     private final static String ControlTitle =
         LOCALE.get("TemplateControlTitle");
@@ -58,8 +60,14 @@ public class TemplateControl
         return scroll;
     }
 
+    @Override
+    public JComponent getHorizontalMouseWheelSupportComponent() {
+        return getScrollPane();
+    }
+
     // Special handling for Mighty Mouse and two-finger trackpad
     // horizontal scroll events
+    @Override
     public void horizontalMouseWheelMoved(MouseWheelEvent e) {
         if (e.getScrollType() >= 2) {
             if (scroll.isWheelScrollingEnabled()) {

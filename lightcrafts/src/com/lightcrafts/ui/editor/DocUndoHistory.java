@@ -3,8 +3,8 @@
 package com.lightcrafts.ui.editor;
 
 import com.lightcrafts.app.ComboFrame;
+import com.lightcrafts.ui.HorizontalMouseWheelSupport;
 import com.lightcrafts.ui.LightZoneSkin;
-import static com.lightcrafts.ui.editor.Locale.LOCALE;
 import com.lightcrafts.ui.toolkit.PaneTitle;
 
 import javax.swing.*;
@@ -17,12 +17,14 @@ import java.awt.*;
 import java.awt.event.MouseWheelEvent;
 import java.util.List;
 
+import static com.lightcrafts.ui.editor.Locale.LOCALE;
+
 /**
  * Renders the live undo stack in list form, allowing selection and
  * keyboard navigation of the stack.
  */
 public final class DocUndoHistory
-    extends JPanel implements UndoableEditListener {
+    extends JPanel implements UndoableEditListener, HorizontalMouseWheelSupport {
 
     private DocUndoManager undo;
     private DefaultListModel model;
@@ -122,8 +124,14 @@ public final class DocUndoHistory
         return scroll;
     }
 
+    @Override
+    public JComponent getHorizontalMouseWheelSupportComponent() {
+        return getScrollPane();
+    }
+
     // Special handling for Mighty Mouse and two-finger trackpad
     // horizontal scroll events
+    @Override
     public void horizontalMouseWheelMoved(MouseWheelEvent e) {
         if (e.getScrollType() >= 2) {
             if (scroll.isWheelScrollingEnabled()) {

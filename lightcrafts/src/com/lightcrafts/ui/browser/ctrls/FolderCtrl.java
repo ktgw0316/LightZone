@@ -2,6 +2,7 @@
 
 package com.lightcrafts.ui.browser.ctrls;
 
+import com.lightcrafts.ui.HorizontalMouseWheelSupport;
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.ui.browser.folders.FolderBrowserPane;
 import com.lightcrafts.ui.browser.folders.FolderTreeListener;
@@ -11,7 +12,7 @@ import javax.swing.*;
 import java.awt.event.MouseWheelEvent;
 import java.io.File;
 
-public class FolderCtrl extends JPanel {
+public class FolderCtrl extends JPanel implements HorizontalMouseWheelSupport {
 
     private FolderBrowserPane tree;
 
@@ -51,8 +52,14 @@ public class FolderCtrl extends JPanel {
         return tree;
     }
 
+    @Override
+    public JComponent getHorizontalMouseWheelSupportComponent() {
+        return getTree();
+    }
+
     // Special handling for Mighty Mouse and two-finger trackpad
     // horizontal scroll events
+    @Override
     public void horizontalMouseWheelMoved(MouseWheelEvent e) {
         if (e.getScrollType() >= 2) {
             if (tree.isWheelScrollingEnabled()) {
