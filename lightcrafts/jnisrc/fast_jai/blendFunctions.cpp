@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2020-     Masahiro Kitagawa */
 
 /*
   Smartass C++ code for layer blending modes
@@ -99,8 +100,8 @@ class HardLightBlendMode : public BlendMode {
 // original soft light
 class SoftLightBlendMode : public BlendMode {
     virtual ushort blendPixels(ushort front, ushort back) const {
-        ushort m = front * back / (maxVal + 1);
-        ushort s = maxVal - (maxVal - front) * (maxVal - back) / (maxVal + 1);
+        ushort m = (front * back) / ((unsigned int)maxVal + 1);
+        ushort s = maxVal - ((maxVal - front) * (maxVal - back)) / ((unsigned int)maxVal + 1);
 
         return ((maxVal - back) * m + (back * s)) / (maxVal + 1);
     }
