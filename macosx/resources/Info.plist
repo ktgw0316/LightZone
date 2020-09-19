@@ -111,6 +111,7 @@
             <string>-XX:UseG1GC</string>
             <string>-XX:MinHeapFreeRatio=30</string>
             <string>-XX:MaxHeapFreeRatio=30</string>
+            <string>-Xmx16384m</string>
         </array>
         <key>Properties</key>
         <dict>
