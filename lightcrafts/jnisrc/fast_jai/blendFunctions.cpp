@@ -13,12 +13,12 @@
 
 #include <algorithm>
 #include <cmath>
-#include <complex>
+#include <cstdint>
 #include <omp.h>
 #include "mathlz.h"
 
-typedef unsigned char byte;
-typedef unsigned short ushort;
+using byte = uint8_t;
+using ushort = uint16_t;
 
 static constexpr double hilightsThreshold = 0.59;
 static constexpr double midtonesThreshold = 0.172;
@@ -100,10 +100,10 @@ class HardLightBlendMode : public BlendMode {
 // original soft light
 class SoftLightBlendMode : public BlendMode {
     virtual ushort blendPixels(ushort front, ushort back) const {
-        ushort m = (front * back) / ((unsigned int)maxVal + 1);
-        ushort s = maxVal - ((maxVal - front) * (maxVal - back)) / ((unsigned int)maxVal + 1);
+        ushort m = (front * back) / (uint32_t(maxVal) + 1);
+        ushort s = maxVal - ((maxVal - front) * (maxVal - back)) / (uint32_t(maxVal) + 1);
 
-        return ((maxVal - back) * m + (back * s)) / (maxVal + 1);
+        return ((maxVal - back) * m + (back * s)) / (uint32_t(maxVal) + 1);
     }
 };
 
@@ -116,12 +116,12 @@ class SoftLightBlendMode2 : public BlendMode {
     SoftLightBlendMode2(double exp) : exp(exp) {}
 
     virtual ushort blendPixels(ushort front, ushort back) const {
-        ushort m = (front * back) / ((unsigned)maxVal + 1);
-        ushort s = maxVal - ((maxVal - front) * (maxVal - back)) / ((unsigned)maxVal + 1);
+        ushort m = (front * back) / (uint32_t(maxVal) + 1);
+        ushort s = maxVal - ((maxVal - front) * (maxVal - back)) / (uint32_t(maxVal) + 1);
 
         double p = pow((back / (double)maxVal), exp);
 
-        return (ushort)(m * (1 - p) + s * p);
+        return ushort(m * (1 - p) + s * p);
     }
 };
 
@@ -129,8 +129,8 @@ class ColorDodgeBlendMode : public BlendMode {
     virtual ushort blendPixels(ushort front, ushort back) const {
         if (front == maxVal)
             return front;
-        unsigned int c = (unsigned int)back * (maxVal + 1) / (maxVal - front);
-        return std::min(c, (unsigned int)maxVal);
+        uint32_t c = uint32_t(back) * (maxVal + 1) / (maxVal - front);
+        return std::min(c, uint32_t(maxVal));
     }
 };
 
@@ -138,7 +138,7 @@ class ColorBurnBlendMode : public BlendMode {
     virtual ushort blendPixels(ushort front, ushort back) const {
         if (front == 0)
             return 0;
-        int c = maxVal - (unsigned int)(maxVal - back) * (maxVal + 1) / front;
+        int c = maxVal - uint32_t(maxVal - back) * (maxVal + 1) / front;
         return std::max(c, 0);
     }
 };
@@ -148,7 +148,7 @@ class SoftDodgeBlendMode : public BlendMode {
         const auto p = std::minmax(back, ushort(maxVal - front));
         if (p.second == 0)
             return maxVal;
-        unsigned int c = (unsigned int)p.first * (maxVal / 2) / p.second;
+        uint32_t c = uint32_t(p.first) * (maxVal / 2) / p.second;
         return clampUShort(c);
     }
 };
@@ -158,7 +158,7 @@ class SoftBurnBlendMode : public BlendMode {
         const auto p = std::minmax(front, ushort(maxVal - back));
         if (p.second == 0)
             return maxVal;
-        unsigned int c = (unsigned int)p.first * (maxVal / 2) / p.second;
+        uint32_t c = uint32_t(p.first) * (maxVal / 2) / p.second;
         return clampUShort(c);
     }
 };
@@ -177,9 +177,9 @@ class LowPassBlendMode : public BlendMode {
         if (back > threshold + transition)
             return back;
         /*
-          unsigned long long k = back - (threshold - transition);
+          uint64_t k = back - (threshold - transition);
           k = (k * k) / (maxVal + 1);
-          unsigned long long t4 = 4 * transition * transition;
+          uint64_t t4 = 4 * transition * transition;
           return (ushort) ((k * back + (t4 * maxVal - k) * front) / (t4 * (maxVal + 1)));
         */
         double k = (back - (threshold - transition)) / (2.0 * transition);
@@ -279,9 +279,9 @@ void blendLoop(const ushort s1[], const ushort s2[], ushort d[], const byte m[],
 
         for (int w = 0; w < dwidth; w++) {
             int mValue = 0xFF;
-            if (m != NULL)
+            if (m != nullptr)
                 mValue = inverted ? 0xFF - m[mPixelOffset] : m[mPixelOffset];
-            if (cs != NULL)
+            if (cs != nullptr)
                 mValue = mValue * cs[csPixelOffset] / 0xFF;
 
             const ushort pixel[3] = {
@@ -297,7 +297,7 @@ void blendLoop(const ushort s1[], const ushort s2[], ushort d[], const byte m[],
                     value = s2Value;
                 } else {
                     const ushort blended = blendPixels(s1[s1PixelOffset + s1b], s2Value);
-                    if (m == NULL && cs == NULL) {
+                    if (m == nullptr && cs == nullptr) {
                         if (intOpacity == maxVal) {
                             value = blended;
                         } else {
@@ -336,8 +336,8 @@ extern "C" JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_PixelBlender_
     ushort *cs1 = (ushort *)env->GetPrimitiveArrayCritical(s1, 0);
     ushort *cs2 = (ushort *)env->GetPrimitiveArrayCritical(s2, 0);
     ushort *cd = (ushort *)env->GetPrimitiveArrayCritical(d, 0);
-    byte *cm = (m != NULL ? (byte *)env->GetPrimitiveArrayCritical(m, 0) : (byte *)NULL);
-    byte *ccs = (cs != NULL ? (byte *)env->GetPrimitiveArrayCritical(cs, 0) : (byte *)NULL);
+    byte *cm = (m != nullptr ? (byte *)env->GetPrimitiveArrayCritical(m, 0) : nullptr);
+    byte *ccs = (cs != nullptr ? (byte *)env->GetPrimitiveArrayCritical(cs, 0) : nullptr);
 
     blendLoop(cs1, cs2, cd, cm, ccs, bands, s1bd, s2bd, s1LineOffset, s2LineOffset, dLineOffset,
               mLineOffset, csLineOffset, s1LineStride, s2LineStride, dLineStride, mLineStride,
@@ -347,8 +347,8 @@ extern "C" JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_PixelBlender_
     env->ReleasePrimitiveArrayCritical(s1, cs1, 0);
     env->ReleasePrimitiveArrayCritical(s2, cs2, 0);
     env->ReleasePrimitiveArrayCritical(d, cd, 0);
-    if (cm != NULL)
+    if (cm != nullptr)
         env->ReleasePrimitiveArrayCritical(m, cm, 0);
-    if (ccs != NULL)
+    if (ccs != nullptr)
         env->ReleasePrimitiveArrayCritical(cs, ccs, 0);
 }
