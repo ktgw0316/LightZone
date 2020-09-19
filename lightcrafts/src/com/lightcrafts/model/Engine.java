@@ -7,8 +7,9 @@ import com.lightcrafts.image.export.ImageExportOptions;
 import com.lightcrafts.model.ImageEditor.LensCorrectionsOperation;
 import com.lightcrafts.utils.thread.ProgressThread;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.RenderedImage;
 import java.awt.print.PageFormat;
@@ -16,6 +17,9 @@ import java.awt.print.PrinterException;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import javax.swing.JMenuItem;
+
+import javax.swing.JMenuItem;
 
 /**
  * An Engine is the basic image interpretation and manipulation object.
@@ -166,8 +170,6 @@ public interface Engine {
      * @return A List of Scale objects.
      */
     List<Scale> getPreferredScales();
-
-    Scale getScale();
 
     /**
      * Force the Engine to adopt a given Scale.

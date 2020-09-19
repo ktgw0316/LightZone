@@ -7,7 +7,6 @@ import com.lightcrafts.image.BadImageFileException;
 import com.lightcrafts.image.ColorProfileException;
 import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.image.UnknownImageTypeException;
-import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.image.export.BitsPerChannelOption;
 import com.lightcrafts.image.export.ImageExportOptions;
 import com.lightcrafts.image.export.ImageFileExportOptions;
@@ -20,8 +19,10 @@ import com.lightcrafts.jai.operator.LCMSColorConvertDescriptor;
 import com.lightcrafts.jai.opimage.CachedImage;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.utils.LCTileCache;
+import javax.media.jai.*;
 import com.lightcrafts.model.*;
 import com.lightcrafts.platform.Platform;
+import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.utils.UserCanceledException;
 import com.lightcrafts.utils.thread.ProgressThread;
 import lombok.AccessLevel;
@@ -42,10 +43,7 @@ import java.awt.color.ICC_Profile;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
-import java.awt.image.DataBuffer;
-import java.awt.image.DataBufferByte;
-import java.awt.image.DataBufferUShort;
-import java.awt.image.RenderedImage;
+import java.awt.image.*;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
@@ -53,6 +51,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.*;
+
+import com.lightcrafts.utils.xml.XMLUtil;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.val;
 
 public class ImageEditorEngine implements Engine {
     private ImageInfo m_imageInfo;
@@ -74,13 +77,18 @@ public class ImageEditorEngine implements Engine {
     private List<Preview> previews = new LinkedList<Preview>();
 
     private static final List<Scale> preferredScales = Arrays.asList(
-            new Scale(1, 32),
-            new Scale(1, 16),
+            new Scale(1, 40),
+            new Scale(1, 20),
+            new Scale(1, 10),
             new Scale(1, 8),
+            new Scale(1, 6),
             new Scale(1, 4),
+            new Scale(1, 3),
             new Scale(1, 2),
+            new Scale(2, 3),
             new Scale(1, 1),
             new Scale(2, 1),
+            new Scale(3, 1),
             new Scale(4, 1)
     );
 
@@ -95,9 +103,6 @@ public class ImageEditorEngine implements Engine {
     private RenderedImage backgroundImage;
 
     private boolean addFirstPaintLatency;
-
-    @Getter
-    private Scale scale;
 
     @Override
     public AffineTransform getTransform() {
@@ -469,7 +474,6 @@ public class ImageEditorEngine implements Engine {
 
     @Override
     public void setScale(Scale scale) {
-        this.scale = scale;
         rendering.setScaleFactor(scale.getFactor());
         update(null, false);
     }
@@ -483,8 +487,7 @@ public class ImageEditorEngine implements Engine {
 
         rendering.setScaleFactor(Math.min(hScale, wScale));
         update(null, false);
-        scale = new Scale(rendering.getScaleFactor());
-        return scale;
+        return new Scale(rendering.getScaleFactor());
     }
 
     PlanarImage scaleFinal(PlanarImage image) {
