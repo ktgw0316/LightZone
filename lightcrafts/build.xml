@@ -93,6 +93,11 @@
         <fileset dir="lib">
           <include name="*.jar"/>
         </fileset>
+        <fileset dir="/usr">
+          <include name="share/java*/**/*.jar"/>
+          <include name="local/share/java/classes/*.jar"/>
+          <include name="jdk/packages/lib/ext/*.jar"/>
+        </fileset>
       </classpath>
     </javac>
   </target>
