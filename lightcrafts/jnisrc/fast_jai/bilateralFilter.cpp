@@ -1,15 +1,16 @@
 #include "include/omp_util.h"
 #include "mathlz.h"
-#include <float.h>
+#include <cfloat>
 #include <jni.h>
-#include <math.h>
+#include <cmath>
 #include <omp.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 
-#ifdef __INTEL_COMPILER
-#include <dvec.h>
-#include <fvec.h>
+#ifdef USE_SIMD
+#include "simde/x86/sse2.h"
+#include "dvec.h"
+#include "fvec.h"
 
 // #define _mm_loadu_si128 _mm_lddqu_si128
 // #define _mm_loadu_ps(x) (__m128) _mm_lddqu_si128((__m128i *) x)
@@ -28,12 +29,6 @@ inline I16vec8 convert(const F32vec4 &hi, const F32vec4 &lo) {
     _mm_empty();
     return result;
 }
-
-// Ad Horizontal using SSE3
-/* inline float addh(const F32vec4 &a)
-{
-    return _mm_cvtss_f32(_mm_hadd_ps(_mm_hadd_ps(a, _mm_setzero_ps()), _mm_setzero_ps()));
-} */
 
 static inline F32vec4 v_fast_exp(F32vec4 val)
 {
@@ -93,7 +88,7 @@ void rlm_separable_bf_mono_tile(
     unsigned short *src = &srcData[srcOffset];
     unsigned short *dst = &dstData[dstOffset];
 
-#ifdef __INTEL_COMPILER
+#ifdef USE_SIMD
     const F32vec4 v_inv_norm(1.0f/0xffff);
 #endif
 
@@ -101,8 +96,8 @@ void rlm_separable_bf_mono_tile(
 {
 #pragma omp for
     for (int y=0; y < height; y++) {
-#ifdef __INTEL_COMPILER
         int x=0;
+#ifdef USE_SIMD
         for (; x <= width-8; x+=8) {
             const int idx = x + y*width;
             const int src_idx = x*srcPixelStride + y*srcStep;
@@ -114,11 +109,8 @@ void rlm_separable_bf_mono_tile(
             _mm_storeu_ps(&fsrc[idx], v_inv_norm * src_low);
             _mm_storeu_ps(&fsrc[idx+4], v_inv_norm * src_high);
         }
-        for (; x < width; x++) {
-#else
-        OMP_SIMD
-        for (int x=0; x < width; x++) {
 #endif
+        for (; x < width; x++) {
             const int idx = x + y*width;
             const int src_idx = x*srcPixelStride + y*srcStep;
             fsrc[idx] = src[src_idx] / (float) 0xffff;
@@ -127,16 +119,13 @@ void rlm_separable_bf_mono_tile(
 
 #pragma omp for
     for (int y=wr; y < height - wr; y++) {
-#ifdef __INTEL_COMPILER
         int x=wr;
+#ifdef USE_SIMD
         for (; x <= width-wr-8; x+=8) {
             // TODO
         }
-        for (; x < width - wr; x++) {
-#else
-        OMP_SIMD
-        for (int x=wr; x < width - wr; x++) {
 #endif
+        for (; x < width - wr; x++) {
             const int idx = x + y*width;
             const float I_s0 = fsrc[idx];
 
@@ -167,9 +156,9 @@ void rlm_separable_bf_mono_tile(
     delete [] fsrc;
 }
 
-#ifdef __INTEL_COMPILER
+#ifdef USE_SIMD
 #define CONST_INT32_PS(N, V3,V2,V1,V0) \
-static const _MM_ALIGN16 int _##N[]= \
+static const SIMDE_ALIGN(16) int _##N[]= \
     {V0, V1, V2, V3};/*little endian!*/ \
 const F32vec4 N = _mm_load_ps((float*)_##N);
 
@@ -310,7 +299,7 @@ void rlm_separable_bf_chroma_tile(
         }
     } */
 
-#ifdef __INTEL_COMPILER
+#ifdef USE_SIMD
     const F32vec4 v_inv_norm(inv_norm);
     const F32vec4 v_inv_cnorm(inv_cnorm);
 #endif
@@ -319,8 +308,8 @@ void rlm_separable_bf_chroma_tile(
 {
 #pragma omp for
     for (int y=0; y < height; y++) {
-#ifdef __INTEL_COMPILER
         int x=0;
+#ifdef USE_SIMD
         for (; x <= width-8; x+=8) {
             const int src_idx = 3*x + y*srcStep;
             const int idx = x + y*width;
@@ -364,11 +353,8 @@ void rlm_separable_bf_chroma_tile(
             F32vec4 src4_b = _mm_cvtepi32_ps(I32vec4(src_b[src_idx+9], src_b[src_idx+6], src_b[src_idx+3], src_b[src_idx]));
             _mm_storeu_ps(&fsrc_b[idx], v_inv_cnorm * src4_b); */
         }
-        for (; x < width; x++) {
-#else
-        OMP_SIMD
-        for (int x=0; x < width; x++) {
 #endif
+        for (; x < width; x++) {
             const int src_idx = 3*x + y*srcStep;
             const int idx = x + y*width;
 
@@ -412,11 +398,11 @@ void rlm_separable_bf_chroma_tile(
 
 #pragma omp for
     for (int y=wr; y < height - wr; y++) {
-#ifdef __INTEL_COMPILER
+        int x=wr;
+#ifdef USE_SIMD
         const F32vec4 v_zero = _mm_setzero_ps();
         const F32vec4 v_one = F32vec4(1.0f);
 
-        int x=wr;
         for (; x <= width - wr-4; x+=4) {
             // initialize central pixel
             const int idx0 = x + y*width;
@@ -454,11 +440,8 @@ void rlm_separable_bf_chroma_tile(
             _mm_storeu_ps(&buf_a[idx0], a_num / denom);
             _mm_storeu_ps(&buf_b[idx0], b_num / denom);
         }
-        for (; x < width - wr; x++) {
-#else
-        OMP_SIMD
-        for (int x=wr; x < width - wr; x++) {
 #endif
+        for (; x < width - wr; x++) {
             // initialize central pixel
             const int idx0 = x + y*width;
 
@@ -512,12 +495,13 @@ void rlm_separable_bf_chroma_tile(
             cbuf_a[y] = a;
             cbuf_b[y] = b;
         }
-#ifdef __INTEL_COMPILER
+
+        int y=wr;
+#ifdef USE_SIMD
         const F32vec4 v_zero(0.0f);
         const F32vec4 v_one(1.0f);
         const F32vec4 v_ffff((float) 0xffff);
 
-        int y=wr;
         for (; y <= height - wr - 4; y+=4) {
             // initialize central pixel
             const int src_idx0 = 3*x + y*srcStep;
@@ -569,11 +553,8 @@ void rlm_separable_bf_chroma_tile(
             for (int i = 0; i < 4; i++)
                 dst_b[dst_idx0 + dstStep*i] = a_result[i];
         }
-        for (; y < height - wr; y++) {
-#else
-        OMP_SIMD
-        for (int y=wr; y < height - wr; y++) {
 #endif
+        for (; y < height - wr; y++) {
             // initialize central pixel
             const int src_idx0 = 3*x + y*srcStep;
             const int dst_idx0 = 3*(x-wr) + (y-wr)*dstStep;
