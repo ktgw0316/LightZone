@@ -48,13 +48,13 @@ public:
   friend F32vec4 operator /(const F32vec4 &a,const F32vec4 &b) { return _mm_div_ps(a,b); }
   F32vec4& operator =(const F32vec4 &a) { vec = a.vec; return *this; }
   F32vec4& operator =(const __m128 &avec) { vec = avec; return *this; }
-  F32vec4& operator +=(F32vec4 &a) { return *this = _mm_add_ps(vec,a); }
-  F32vec4& operator -=(F32vec4 &a) { return *this = _mm_sub_ps(vec,a); }
-  F32vec4& operator *=(F32vec4 &a) { return *this = _mm_mul_ps(vec,a); }
-  F32vec4& operator /=(F32vec4 &a) { return *this = _mm_div_ps(vec,a); }
-  F32vec4& operator &=(F32vec4 &a) { return *this = _mm_and_ps(vec,a); }
-  F32vec4& operator |=(F32vec4 &a) { return *this = _mm_or_ps(vec,a); }
-  F32vec4& operator ^=(F32vec4 &a) { return *this = _mm_xor_ps(vec,a); }
+  F32vec4& operator +=(const F32vec4 &a) { return *this = _mm_add_ps(vec,a); }
+  F32vec4& operator -=(const F32vec4 &a) { return *this = _mm_sub_ps(vec,a); }
+  F32vec4& operator *=(const F32vec4 &a) { return *this = _mm_mul_ps(vec,a); }
+  F32vec4& operator /=(const F32vec4 &a) { return *this = _mm_div_ps(vec,a); }
+  F32vec4& operator &=(const F32vec4 &a) { return *this = _mm_and_ps(vec,a); }
+  F32vec4& operator |=(const F32vec4 &a) { return *this = _mm_or_ps(vec,a); }
+  F32vec4& operator ^=(const F32vec4 &a) { return *this = _mm_xor_ps(vec,a); }
   friend float add_horizontal(F32vec4 &a) {
     F32vec4 ftemp = _mm_add_ss(a,_mm_add_ss(_mm_shuffle_ps(a,a,1),_mm_add_ss(_mm_shuffle_ps(a,a,2),_mm_shuffle_ps(a,a,3))));
     return ftemp[0];

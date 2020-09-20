@@ -13,6 +13,7 @@
 
 // #include <intrin.h>
 #include <cassert>
+#include <cstdint>
 #include "fvec.h"
 // #include <crtdefs.h>
 
@@ -49,11 +50,11 @@ class I128vec1;
 #define _MM_4UDW(element,vector) (*((unsigned int*)&(vector) + (element)))
 #define _MM_4DW(element,vector) (*((int*)&(vector) + (element)))
 
-#define _MM_2QW(element,vector) (*((__int64*)&(vector) + (element)))
+#define _MM_2QW(element,vector) (*((int64_t*)&(vector) + (element)))
 
-__MINGW_EXTENSION inline const __m128i get_mask128()
+inline const __m128i get_mask128()
 {
-  static const __m128i mask128 = _mm_set1_epi64(M64((__int64)0xffffffffffffffffll));
+  static const __m128i mask128 = _mm_set1_epi64(M64((int64_t)0xffffffffffffffffll));
   return mask128;
 }
 
@@ -98,10 +99,10 @@ public:
   I64vec2() { }
   I64vec2(__m128i mm) : M128(mm) { }
 
-  __MINGW_EXTENSION I64vec2(__m64 q1,__m64 q0)
+  I64vec2(__m64 q1,__m64 q0)
   {
-    _MM_2QW(0,vec) = *(__int64*)&q0;
-    _MM_2QW(1,vec) = *(__int64*)&q1;
+    _MM_2QW(0,vec) = *(int64_t*)&q0;
+    _MM_2QW(1,vec) = *(int64_t*)&q1;
   }
 
   I64vec2& operator= (const M128 &a) { return *this = (I64vec2) a; }
@@ -122,13 +123,13 @@ public:
   I64vec2& operator>>=(const I64vec2 &a) { return *this = (I64vec2) _mm_srl_epi64(vec,a); }
   I64vec2& operator>>=(int count) { return *this = (I64vec2) _mm_srli_epi64(vec,count); }
 
-  __MINGW_EXTENSION const __int64& operator[](int i)const
+  const int64_t& operator[](int i)const
   {
     assert(static_cast<unsigned int>(i) < 2);
     return _MM_2QW(i,vec);
   }
 
-  __MINGW_EXTENSION __int64& operator[](int i)
+  int64_t& operator[](int i)
   {
     assert(static_cast<unsigned int>(i) < 2);
     return _MM_2QW(i,vec);

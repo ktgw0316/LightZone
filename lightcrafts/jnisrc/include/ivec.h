@@ -25,7 +25,7 @@
 
 #ifdef __SSE__
 
-#define _MM_QW (*((__int64*)&vec))
+#define _MM_QW (*((int64_t*)&vec))
 
 #pragma pack(push,16)
 
@@ -36,7 +36,7 @@ protected:
 public:
     M64() {}
     M64(__m64 mm) { vec = mm; }
-    M64(__int64 mm) { _MM_QW = mm; }
+    M64(int64_t mm) { _MM_QW = mm; }
     M64(int i) { vec = _m_from_int(i); }
 
     operator __m64() const { return vec; }
