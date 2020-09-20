@@ -52,7 +52,9 @@
     <os family="windows"/>
   </condition>
 
-  <target name="resolve" depends="init-ivy">
+  <property name="offline" value="true"/>
+
+  <target name="resolve" depends="init-ivy" unless="offline">
     <ivy:resolve file="${basedir}/ivy.xml"/>
     <ivy:retrieve/>
   </target>
