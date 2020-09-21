@@ -21,6 +21,7 @@ Build-Depends:
  libjaxb-java,
  libjetbrains-annotations-java,
  libjiconfont-font-awesome-java,
+ libjiconfont-google-material-design-icons-java,
  libjiconfont-swing-java,
  libjpeg-dev,
  liblombok-java,
