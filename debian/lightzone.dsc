@@ -27,6 +27,7 @@ Build-Depends:
  liblombok-java,
  liblcms2-dev,
  liblensfun-dev (<< 0.3.95),
+ librefuel-java,
  libslf4j-java,
  libtiff5-dev,
  libx11-dev,
