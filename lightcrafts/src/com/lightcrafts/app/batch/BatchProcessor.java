@@ -6,7 +6,6 @@ package com.lightcrafts.app.batch;
 import com.lightcrafts.app.Application;
 import com.lightcrafts.app.ComboFrame;
 import com.lightcrafts.app.DocumentWriter;
-import static com.lightcrafts.app.batch.Locale.LOCALE;
 import com.lightcrafts.image.BadImageFileException;
 import com.lightcrafts.image.ColorProfileException;
 import com.lightcrafts.image.UnknownImageTypeException;
@@ -18,11 +17,11 @@ import com.lightcrafts.image.types.JPEGImageType;
 import com.lightcrafts.image.types.LZNImageType;
 import com.lightcrafts.image.types.TIFFImageType;
 import com.lightcrafts.model.Engine;
+import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.ui.editor.Document;
 import com.lightcrafts.ui.editor.assoc.DocumentDatabase;
 import com.lightcrafts.ui.export.ExportNameUtility;
 import com.lightcrafts.ui.export.SaveOptions;
-import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlDocument;
 import com.lightcrafts.utils.xml.XmlNode;
@@ -35,6 +34,8 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.io.File;
 import java.io.IOException;
+
+import static com.lightcrafts.app.batch.Locale.LOCALE;
 
 /**
  * This encapsulates the procedures applied when LightZone processes multiple
@@ -77,7 +78,7 @@ public class BatchProcessor {
                         );
                         e.printStackTrace();
                         Error = e;
-                        Dialog.setVisible(false);
+                        Dialog.dispose();
                     }
                     finally {
                         frame.resume();
@@ -142,13 +143,15 @@ public class BatchProcessor {
                 if (!Finished) {
                     Canceled = true;
                     Button.setText("Canceling...");
-                } else
-                    Dialog.setVisible(false);
+                } else {
+                    Dialog.dispose();
+                }
             }
         };
         Button.addActionListener(disposeAction);
 
         Dialog.setContentPane(background);
+        Dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         Dialog.setModal(true);
         Dialog.setTitle(LOCALE.get("BatchDialogTitle"));
         Dialog.getRootPane().setDefaultButton(Button);

@@ -55,7 +55,7 @@ public class BatchConfiguratorView implements BatchConfiguratorContract.View {
     @Override
     public void createAndShowGUI() {
         dialog = new JDialog(parent);
-        final ActionListener disposeAction = e -> dialog.setVisible(false);
+        final ActionListener disposeAction = e -> dialog.dispose();
 
         dirLabel = new JTextField(presenter.getDirLabelText());
         dirLabel.setEditable(false);
@@ -130,6 +130,7 @@ public class BatchConfiguratorView implements BatchConfiguratorContract.View {
         // Set up the dialog:
         dialog.setContentPane(content);
         dialog.getRootPane().setDefaultButton(start);
+        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         dialog.setModal(true);
         dialog.setTitle(LOCALE.get("BatchConfDialogTitle"));
         dialog.pack();
