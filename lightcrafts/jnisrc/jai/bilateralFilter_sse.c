@@ -288,7 +288,7 @@ static void filterLumaWrapSSE(FILTER_LUMA_WRAP_ARGS) {
         (float *)(*env)->GetPrimitiveArrayCritical(env, jkernel, 0) + wr; // Keep 0 in the middle...
 
     int i, wlast, row, col, y, x;
-    int window_size = (ws + 1) * sizeof(float *) + ws * width * sizeof(float);
+    size_t window_size = (ws + 1) * sizeof(float *) + (size_t) ws * width * sizeof(float);
     float **window = (float **)calloc(window_size, 1);
     if (window == NULL)
         return;

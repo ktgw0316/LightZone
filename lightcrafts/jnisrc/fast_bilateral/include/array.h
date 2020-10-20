@@ -13,7 +13,7 @@ met:
 
     * Redistributions of source code must retain the above copyright
     notice, this list of conditions and the following disclaimer.
-    
+
     * Redistributions in binary form must reproduce the above
     copyright notice, this list of conditions and the following
     disclaimer in the documentation and/or other materials provided
@@ -57,18 +57,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __ARRAY__
 #define __ARRAY__
 
-  
+
 #ifdef ARRAY_EXCEPTION
 #  include <stdexcept>
 #else
 #  include <iostream>
 #endif
-  
+
+#include <cstddef>
 #include <vector>
 
 #ifndef NO_XML
 #include <sstream>
-   
+
 #include <qdom.h>
 #endif
 
@@ -88,7 +89,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   \code
   for(x=...){ for(y=...){...} }
   \endcode
-  
+
   at() and the operator[]() also accept a vector that provides an
   access to its elements through an [] operator.
  */
@@ -98,7 +99,7 @@ class Array_2D{
 private:
   //! Type of the storage structure.
   typedef std::vector<T,A> Storage;
-  
+
 public:
 
   //@{
@@ -106,7 +107,7 @@ public:
 
   typedef typename Storage::value_type             value_type;
   typedef typename Storage::allocator_type         allocator_type;
-  
+
   typedef typename Storage::size_type              size_type;
   typedef typename Storage::difference_type        difference_type;
 
@@ -119,23 +120,23 @@ public:
   typedef typename Storage::reference              reference;
   typedef typename Storage::const_reference        const_reference;
   //@}
-  
+
   //@{
   //! Classical constructor.
-  
+
   explicit inline Array_2D(const A& a = A());
-  
+
   explicit inline Array_2D(const size_type nx,
 			   const size_type ny,
 			   const T& val = T(),const A& a = A());
-  
+
   template<typename Element_iterator>
   inline Array_2D(Element_iterator begin_elt,
 		  Element_iterator end_elt,
 		  const size_type nx,
 		  const size_type ny,
 		  const A& a = A());
-    
+
   inline Array_2D(const Array_2D<T,A>& a);
   //@}
 
@@ -143,12 +144,12 @@ public:
   void assign(const size_type nx,
 	      const size_type ny,
 	      const T& val);
-  
+
   //@{
   //! Handle the array dimension.
 
   inline bool empty() const;
-  
+
   inline size_type x_size() const;
   inline size_type width() const;
   inline size_type y_size() const;
@@ -156,7 +157,7 @@ public:
   inline size_type size() const;
 
   inline size_type max_size() const;
-  
+
   inline void resize(const size_type nx,
 		     const size_type ny);
   //@}
@@ -165,14 +166,14 @@ public:
   inline void swap(Array_2D<T,A>& a); /* A reference is used as in the STL. */
 
   //! Gives the memory allocator.
-  inline allocator_type get_allocator() const; 
-  
+  inline allocator_type get_allocator() const;
+
   //@{
   //! Classical operator.
-  
+
   inline Array_2D<T,A>& operator=(const Array_2D<T,A>& a);
   inline bool operator==(const Array_2D<T,A>& a);
-  inline bool operator!=(const Array_2D<T,A>& a); 
+  inline bool operator!=(const Array_2D<T,A>& a);
   //@}
 
   //@{
@@ -180,25 +181,25 @@ public:
 
   template<typename Vector_position>
   inline reference       operator[](const Vector_position& v);
-  
+
   template<typename Vector_position>
   inline const_reference operator[](const Vector_position& v) const;
 
   inline reference       operator()(const size_type x,
 				    const size_type y);
-  
+
   inline const_reference operator()(const size_type x,
 				    const size_type y) const;
 
   template<typename Vector_position>
   inline reference       at(const Vector_position& v);
-  
+
   template<typename Vector_position>
   inline const_reference at(const Vector_position& v) const;
 
   inline reference       at(const size_type x,
 			    const size_type y);
-  
+
   inline const_reference at(const size_type x,
 			    const size_type y) const;
   //@}
@@ -211,7 +212,7 @@ public:
       for(x=...){ for(y=...){...} }.
     \endcode
    */
-  
+
   inline iterator       begin();
   inline const_iterator begin() const;
   //@}
@@ -224,7 +225,7 @@ public:
       for(x=...){ for(y=...){...} }.
     \endcode
    */
-  
+
   inline iterator       end();
   inline const_iterator end() const;
   //@}
@@ -232,7 +233,7 @@ public:
   //@{
   //! Reverse iterator.
 
-  inline reverse_iterator       rbegin();  
+  inline reverse_iterator       rbegin();
   inline const_reverse_iterator rbegin() const;
   inline reverse_iterator       rend();
   inline const_reverse_iterator rend() const;
@@ -243,7 +244,7 @@ public:
 				    QDomDocument& document) const;
   inline void from_DOM_element(const QDomElement& element);
 #endif
-  
+
 private:
   //@{
   //! Dimension of the array.
@@ -256,10 +257,10 @@ private:
 
   //@{
   //! Computation of the position in the storage structure.
-  
+
   template<typename Vector_position>
   inline size_type offset(const Vector_position& v) const;
-  
+
   inline size_type offset(const size_type& x,
 			  const size_type& y) const;
   //@}
@@ -295,7 +296,7 @@ private:
   \code
   for(x=...){ for(y=...){for(z=...){...} } }
   \endcode
-  
+
   at() and the operator[]() also accept a vector that provides an
   access to its elements through an [] operator.
  */
@@ -305,7 +306,7 @@ class Array_3D{
 private:
   //! Type of the storage structure.
   typedef std::vector<T,A> Storage;
-  
+
 public:
 
   //@{
@@ -313,7 +314,7 @@ public:
 
   typedef typename Storage::value_type             value_type;
   typedef typename Storage::allocator_type         allocator_type;
-  
+
   typedef typename Storage::size_type              size_type;
   typedef typename Storage::difference_type        difference_type;
 
@@ -329,9 +330,9 @@ public:
 
   //@{
   //! Classical constructor.
-  
+
   explicit inline Array_3D(const A& a = A());
-  
+
   explicit inline Array_3D(const size_type nx,
 			   const size_type ny,
 			   const size_type nz,
@@ -345,7 +346,7 @@ public:
 		  const size_type ny,
 		  const size_type nz,
 		  const A& a = A());
-  
+
   inline Array_3D(const Array_3D<T,A>& a);
   //@}
 
@@ -354,12 +355,12 @@ public:
 	      const size_type ny,
 	      const size_type nz,
 	      const T& val);
-  
+
   //@{
   //! Handle the array dimension.
 
   inline bool empty() const;
-  
+
   inline size_type x_size() const;
   inline size_type width() const;
   inline size_type y_size() const;
@@ -369,7 +370,7 @@ public:
   inline size_type size() const;
 
   inline size_type max_size() const;
-  
+
   inline void resize(const size_type nx,
 		     const size_type ny,
 		     const size_type nz);
@@ -379,14 +380,14 @@ public:
   inline void swap(Array_3D<T,A>& a); /* A reference is used as in the STL. */
 
   //! Renvoie l'allocateur.
-  inline allocator_type get_allocator() const; 
-  
+  inline allocator_type get_allocator() const;
+
   //@{
   //! Classical operator.
-  
+
   inline Array_3D<T,A>& operator=(const Array_3D<T,A>& a);
   inline bool operator==(const Array_3D<T,A>& a);
-  inline bool operator!=(const Array_3D<T,A>& a); 
+  inline bool operator!=(const Array_3D<T,A>& a);
   //@}
 
   //@{
@@ -394,28 +395,28 @@ public:
 
   template<typename Vector_position>
   inline reference       operator[](const Vector_position& v);
-  
+
   template<typename Vector_position>
   inline const_reference operator[](const Vector_position& v) const;
 
   inline reference       operator()(const size_type x,
 				    const size_type y,
 				    const size_type z);
-  
+
   inline const_reference operator()(const size_type x,
 				    const size_type y,
 				    const size_type z) const;
 
   template<typename Vector_position>
   inline reference       at(const Vector_position& v);
-  
+
   template<typename Vector_position>
   inline const_reference at(const Vector_position& v) const;
 
   inline reference       at(const size_type x,
 			    const size_type y,
 			    const size_type z);
-  
+
   inline const_reference at(const size_type x,
 			    const size_type y,
 			    const size_type z) const;
@@ -429,7 +430,7 @@ public:
       for(x=...){ for(y=...){ for(z=...){...} } }.
     \endcode
    */
-  
+
   inline iterator       begin();
   inline const_iterator begin() const;
   //@}
@@ -442,7 +443,7 @@ public:
       for(x=...){ for(y=...){ for(z=...){...} } }.
     \endcode
    */
-  
+
   inline iterator       end();
   inline const_iterator end() const;
   //@}
@@ -450,7 +451,7 @@ public:
   //@{
   //! Reverse iterator.
 
-  inline reverse_iterator       rbegin();  
+  inline reverse_iterator       rbegin();
   inline const_reverse_iterator rbegin() const;
   inline reverse_iterator       rend();
   inline const_reverse_iterator rend() const;
@@ -472,7 +473,7 @@ private:
 
   template<typename Vector_position>
   inline size_type offset(const Vector_position& v) const;
-  
+
   inline size_type offset(const size_type& x,
 			  const size_type& y,
 			  const size_type& z) const;
@@ -488,7 +489,7 @@ private:
 
 
 /*
-  
+
   #############################################
   #############################################
   #############################################
@@ -498,7 +499,7 @@ private:
   #############################################
   #############################################
   #############################################
-  
+
 */
 
 
@@ -549,7 +550,7 @@ Array_2D<T,A>::Array_2D(Element_iterator begin_elt,
 
   const size_type s = x_dim*y_dim;
   storage.reserve(s);
-  
+
   Element_iterator elt;
   size_type index;
   for(elt=begin_elt,index=0;(elt!=end_elt)&&(index<s);elt++,index++){
@@ -632,22 +633,22 @@ Array_2D<T,A>::max_size() const{
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 void
 Array_2D<T,A>::resize(const size_type nx,
 		      const size_type ny){
   x_dim = nx;
   y_dim = ny;
-  storage.resize(x_dim * y_dim);
+  storage.resize(size_t(x_dim) * y_dim);
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 void
 Array_2D<T,A>::swap(Array_2D<T,A>& a){
   size_type x_buf = x_dim;
   size_type y_buf = y_dim;
-  
+
   x_dim = a.x_dim;
   y_dim = a.y_dim;
 
@@ -658,14 +659,14 @@ Array_2D<T,A>::swap(Array_2D<T,A>& a){
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 typename Array_2D<T,A>::allocator_type
 Array_2D<T,A>::get_allocator() const{
   return storage.get_allocator();
 }
-  
-  
-template<typename T,typename A> 
+
+
+template<typename T,typename A>
 Array_2D<T,A>&
 Array_2D<T,A>::operator=(const Array_2D<T,A>& a){
 
@@ -679,14 +680,14 @@ Array_2D<T,A>::operator=(const Array_2D<T,A>& a){
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 bool
 Array_2D<T,A>::operator==(const Array_2D<T,A>& a){
   return ((x_dim==a.x_dim)&&(y_dim==a.y_dim)&&(storage==a.storage));
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 bool
 Array_2D<T,A>::operator!=(const Array_2D<T,A>& a){
   return !(*this==a);
@@ -705,21 +706,21 @@ template<typename T,typename A>
 template<typename Vector_position>
 typename Array_2D<T,A>::const_reference
 Array_2D<T,A>::operator[](const Vector_position& v) const{
-  return storage[offset(v)];  
+  return storage[offset(v)];
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 typename Array_2D<T,A>::reference
 Array_2D<T,A>::operator()(const size_type x,const size_type y){
-  return storage[offset(x,y)]; 
+  return storage[offset(x,y)];
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 typename Array_2D<T,A>::const_reference
-Array_2D<T,A>::operator()(const size_type x,const size_type y) const{  
-  return storage[offset(x,y)]; 
+Array_2D<T,A>::operator()(const size_type x,const size_type y) const{
+  return storage[offset(x,y)];
 }
 
 
@@ -741,7 +742,7 @@ Array_2D<T,A>::at(const Vector_position& v){
     exit(1);
 #endif
   }
-  
+
   return storage[offset(v)];
 }
 
@@ -764,12 +765,12 @@ Array_2D<T,A>::at(const Vector_position& v) const{
     exit(1);
 #endif
   }
-  
+
     return storage[offset(v)];
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 typename Array_2D<T,A>::reference
 Array_2D<T,A>::at(const size_type x,const size_type y){
 
@@ -787,11 +788,11 @@ Array_2D<T,A>::at(const size_type x,const size_type y){
 #endif
   }
 
-   return storage[offset(x,y)]; 
+   return storage[offset(x,y)];
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 typename Array_2D<T,A>::const_reference
 Array_2D<T,A>::at(const size_type x,const size_type y) const{
 
@@ -809,67 +810,67 @@ Array_2D<T,A>::at(const size_type x,const size_type y) const{
 #endif
   }
 
-  return storage[offset(x,y)]; 
+  return storage[offset(x,y)];
 }
 
-  
-template<typename T,typename A> 
+
+template<typename T,typename A>
 typename Array_2D<T,A>::iterator
 Array_2D<T,A>::begin(){
   return storage.begin();
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 typename Array_2D<T,A>::const_iterator
 Array_2D<T,A>::begin() const{
   return storage.begin();
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 typename Array_2D<T,A>::iterator
 Array_2D<T,A>::end(){
   return storage.end();
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 typename Array_2D<T,A>::const_iterator
 Array_2D<T,A>::end() const{
   return storage.end();
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 typename Array_2D<T,A>::reverse_iterator
 Array_2D<T,A>::rbegin(){
   return storage.rbegin();
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 typename Array_2D<T,A>::const_reverse_iterator
 Array_2D<T,A>::rbegin() const{
   return storage.rbegin();
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 typename Array_2D<T,A>::reverse_iterator
 Array_2D<T,A>::rend(){
   return storage.rend();
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 typename Array_2D<T,A>::const_reverse_iterator
 Array_2D<T,A>::rend() const{
   return storage.rend();
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 template<typename Vector_position>
 typename Array_2D<T,A>::size_type
 Array_2D<T,A>::offset(const Vector_position& v) const{
@@ -880,29 +881,29 @@ Array_2D<T,A>::offset(const Vector_position& v) const{
   }
   exit(1);
 #endif
-  
+
   return v[0]*y_dim + v[1];
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 typename Array_2D<T,A>::size_type
 Array_2D<T,A>::offset(const size_type& x,const size_type& y) const{
-  
+
 #ifdef CHECK_ARRAY_ACCESS
   if ((x >= x_dim) || (y >= y_dim)){
     std::cerr<<"Array_2D: Out of range ("<<x<<","<<y<<"), actual size is "<<x_dim<<"x"<<y_dim<<std::endl;
   }
   exit(1);
 #endif
-  
+
     return x*y_dim + y;
 }
 
 
 #ifndef NO_XML
 
-template<typename T,typename A> 
+template<typename T,typename A>
 QDomElement Array_2D<T,A>::to_DOM_element(const QString& name,
 					  QDomDocument& document) const{
 
@@ -921,7 +922,7 @@ QDomElement Array_2D<T,A>::to_DOM_element(const QString& name,
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 void Array_2D<T,A>::from_DOM_element(const QDomElement& element){
 
   QDomElement& elt = const_cast<QDomElement&>(element);
@@ -932,7 +933,7 @@ void Array_2D<T,A>::from_DOM_element(const QDomElement& element){
   resize(width,height);
 
   std::istringstream in(elt.text());
-    
+
   for(iterator i=begin(),i_end=end();i!=i_end;i++){
     in>>(*i);
   }
@@ -994,7 +995,7 @@ Array_3D<T,A>::Array_3D(Element_iterator begin_elt,
 
   const size_type s = x_dim*y_dim*z_dim;
   storage.reserve(s);
-  
+
   Element_iterator elt;
   size_type index;
   for(elt=begin_elt,index=0;(elt!=end_elt)&&(index<s);elt++,index++){
@@ -1027,7 +1028,7 @@ Array_3D<T,A>::assign(const size_type nx,
 		      const T& val){
   x_dim = nx;
   y_dim = ny;
-  z_dim = nz;  
+  z_dim = nz;
   storage.assign(x_dim*y_dim*z_dim,val);;
 }
 
@@ -1095,7 +1096,7 @@ Array_3D<T,A>::max_size() const{
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 void
 Array_3D<T,A>::resize(const size_type nx,
 		      const size_type ny,
@@ -1107,13 +1108,13 @@ Array_3D<T,A>::resize(const size_type nx,
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 void
 Array_3D<T,A>::swap(Array_3D<T,A>& a){
   size_type x_buf = x_dim;
   size_type y_buf = y_dim;
   size_type z_buf = z_dim;
-  
+
   x_dim = a.x_dim;
   y_dim = a.y_dim;
   z_dim = a.z_dim;
@@ -1126,14 +1127,14 @@ Array_3D<T,A>::swap(Array_3D<T,A>& a){
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 typename Array_3D<T,A>::allocator_type
 Array_3D<T,A>::get_allocator() const{
   return storage.get_allocator();
 }
-  
-  
-template<typename T,typename A> 
+
+
+template<typename T,typename A>
 Array_3D<T,A>&
 Array_3D<T,A>::operator=(const Array_3D<T,A>& a){
 
@@ -1148,7 +1149,7 @@ Array_3D<T,A>::operator=(const Array_3D<T,A>& a){
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 bool
 Array_3D<T,A>::operator==(const Array_3D<T,A>& a){
   return ((x_dim==a.x_dim)
@@ -1158,14 +1159,14 @@ Array_3D<T,A>::operator==(const Array_3D<T,A>& a){
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 bool
 Array_3D<T,A>::operator!=(const Array_3D<T,A>& a){
   return !(*this==a);
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 template<typename Vector_position>
 typename Array_3D<T,A>::reference
 Array_3D<T,A>::operator[](const Vector_position& v){
@@ -1173,35 +1174,35 @@ Array_3D<T,A>::operator[](const Vector_position& v){
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 template<typename Vector_position>
 typename Array_3D<T,A>::const_reference
 Array_3D<T,A>::operator[](const Vector_position& v) const{
-  return storage[offset(v)];  
+  return storage[offset(v)];
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 typename Array_3D<T,A>::reference
 Array_3D<T,A>::operator()(const size_type x,
 			  const size_type y,
 			  const size_type z){
-  
-  return storage[offset(x,y,z)]; 
+
+  return storage[offset(x,y,z)];
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 typename Array_3D<T,A>::const_reference
 Array_3D<T,A>::operator()(const size_type x,
 			  const size_type y,
 			  const size_type z) const{
-  
-  return storage[offset(x,y,z)]; 
+
+  return storage[offset(x,y,z)];
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 template<typename Vector_position>
 typename Array_3D<T,A>::reference
 Array_3D<T,A>::at(const Vector_position& v){
@@ -1222,12 +1223,12 @@ Array_3D<T,A>::at(const Vector_position& v){
     exit(1);
 #endif
   }
-  
+
   return storage[offset(v)];
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 template<typename Vector_position>
 typename Array_3D<T,A>::const_reference
 Array_3D<T,A>::at(const Vector_position& v) const{
@@ -1248,12 +1249,12 @@ Array_3D<T,A>::at(const Vector_position& v) const{
     exit(1);
 #endif
   }
-  
+
     return storage[offset(v)];
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 typename Array_3D<T,A>::reference
 Array_3D<T,A>::at(const size_type x,
 		  const size_type y,
@@ -1275,11 +1276,11 @@ Array_3D<T,A>::at(const size_type x,
 #endif
   }
 
-   return storage[offset(x,y,z)]; 
+   return storage[offset(x,y,z)];
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 typename Array_3D<T,A>::const_reference
 Array_3D<T,A>::at(const size_type x,
 		  const size_type y,
@@ -1301,67 +1302,67 @@ Array_3D<T,A>::at(const size_type x,
 #endif
   }
 
-  return storage[offset(x,y,z)]; 
+  return storage[offset(x,y,z)];
 }
 
-  
-template<typename T,typename A> 
+
+template<typename T,typename A>
 typename Array_3D<T,A>::iterator
 Array_3D<T,A>::begin(){
   return storage.begin();
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 typename Array_3D<T,A>::const_iterator
 Array_3D<T,A>::begin() const{
   return storage.begin();
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 typename Array_3D<T,A>::iterator
 Array_3D<T,A>::end(){
   return storage.end();
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 typename Array_3D<T,A>::const_iterator
 Array_3D<T,A>::end() const{
   return storage.end();
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 typename Array_3D<T,A>::reverse_iterator
 Array_3D<T,A>::rbegin(){
   return storage.rbegin();
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 typename Array_3D<T,A>::const_reverse_iterator
 Array_3D<T,A>::rbegin() const{
   return storage.rbegin();
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 typename Array_3D<T,A>::reverse_iterator
 Array_3D<T,A>::rend(){
   return storage.rend();
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 typename Array_3D<T,A>::const_reverse_iterator
 Array_3D<T,A>::rend() const{
   return storage.rend();
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 template<typename Vector_position>
 typename Array_3D<T,A>::size_type
 Array_3D<T,A>::offset(const Vector_position& v) const{
@@ -1376,7 +1377,7 @@ Array_3D<T,A>::offset(const Vector_position& v) const{
 }
 
 
-template<typename T,typename A> 
+template<typename T,typename A>
 typename Array_3D<T,A>::size_type
 Array_3D<T,A>::offset(const size_type& x,
 		      const size_type& y,

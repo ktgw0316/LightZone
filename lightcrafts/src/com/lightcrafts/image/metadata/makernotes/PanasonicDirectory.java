@@ -2,10 +2,6 @@
 
 package com.lightcrafts.image.metadata.makernotes;
 
-import java.util.*;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-
 import com.lightcrafts.image.metadata.*;
 import com.lightcrafts.image.metadata.providers.FlashProvider;
 import com.lightcrafts.image.metadata.providers.ISOProvider;
@@ -13,6 +9,12 @@ import com.lightcrafts.image.metadata.providers.LensProvider;
 import com.lightcrafts.image.metadata.providers.OrientationProvider;
 import com.lightcrafts.image.metadata.values.*;
 import com.lightcrafts.utils.bytebuffer.LCByteBuffer;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.lightcrafts.image.metadata.ImageMetaType.*;
 import static com.lightcrafts.image.metadata.ImageOrientation.*;
@@ -247,12 +249,12 @@ public final class PanasonicDirectory extends MakerNotesDirectory implements
                     final int days = (int)(time / (24 * 3600));
                     sb.append( days );
                     sb.append( " days " );  // TODO: localize
-                    time -= days * 24 * 3600;
+                    time -= (long) days * 24 * 3600;
                 }
                 final int h = (int)(time / 3600);
-                time -= h * 3600;
+                time -= h * 3600L;
                 final int m = (int)(time / 60);
-                time -= m * 60;
+                time -= m * 60L;
                 final int s = (int)time;
                 sb.append( String.format( "%02d:%02d:%02d", h, m, s ) );
                 return sb.toString();
@@ -332,13 +334,13 @@ public final class PanasonicDirectory extends MakerNotesDirectory implements
      * A mapping of tags by ID.
      */
     private static final Map<Integer,ImageMetaTagInfo> m_tagsByID =
-        new HashMap<Integer, ImageMetaTagInfo>();
+            new HashMap<>();
 
     /**
      * A mapping of tags by name.
      */
     private static final Map<String,ImageMetaTagInfo> m_tagsByName =
-        new HashMap<String, ImageMetaTagInfo>();
+            new HashMap<>();
 
     /**
      * This is where the actual labels for the Panasonic tags are.

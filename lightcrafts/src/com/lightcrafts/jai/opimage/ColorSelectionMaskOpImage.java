@@ -131,7 +131,7 @@ public class ColorSelectionMaskOpImage extends PointOpImage {
         float y = ((g-b) * (float) Math.sqrt(3) / 2);
         float hue = arctan2(y, x);
         if (hue < 0)
-            hue += 2 * Math.PI;
+            hue += 2 * (float) Math.PI;
         return hue;
     }
 

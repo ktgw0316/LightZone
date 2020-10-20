@@ -2,20 +2,23 @@
 
 package com.lightcrafts.image.metadata.makernotes;
 
-import java.awt.image.RenderedImage;
-import java.io.IOException;
-import java.util.regex.Pattern;
-import java.util.*;
-
 import com.lightcrafts.image.BadImageFileException;
 import com.lightcrafts.image.ImageInfo;
+import com.lightcrafts.image.UnknownImageTypeException;
 import com.lightcrafts.image.metadata.*;
 import com.lightcrafts.image.metadata.providers.*;
-import com.lightcrafts.image.metadata.values.*;
+import com.lightcrafts.image.metadata.values.DateMetaValue;
+import com.lightcrafts.image.metadata.values.ImageMetaValue;
+import com.lightcrafts.image.metadata.values.UndefinedMetaValue;
+import com.lightcrafts.image.metadata.values.UnsignedShortMetaValue;
 import com.lightcrafts.image.types.PEFImageType;
-import com.lightcrafts.image.UnknownImageTypeException;
-import com.lightcrafts.utils.bytebuffer.LCByteBuffer;
 import com.lightcrafts.utils.TextUtil;
+import com.lightcrafts.utils.bytebuffer.LCByteBuffer;
+
+import java.awt.image.RenderedImage;
+import java.io.IOException;
+import java.util.*;
+import java.util.regex.Pattern;
 
 import static com.lightcrafts.image.metadata.ImageMetaType.*;
 import static com.lightcrafts.image.metadata.makernotes.PentaxConstants.*;
@@ -313,7 +316,7 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
                     try {
                         final int v0 = Integer.parseInt( values[0] );
                         final int v1 = Integer.parseInt( values[1] );
-                        value = new UnsignedShortMetaValue( v0 << 8 | v1 );
+                        value = new UnsignedShortMetaValue((long) v0 << 8 | v1 );
                     }
                     catch ( NumberFormatException e ) {
                         return;
@@ -436,13 +439,13 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
      * A mapping of tags by ID.
      */
     private static final Map<Integer,ImageMetaTagInfo> m_tagsByID =
-        new HashMap<Integer, ImageMetaTagInfo>();
+            new HashMap<>();
 
     /**
      * A mapping of tags by name.
      */
     private static final Map<String,ImageMetaTagInfo> m_tagsByName =
-        new HashMap<String, ImageMetaTagInfo>();
+            new HashMap<>();
 
     /**
      * This is where the actual labels for the Pentax tags are.

@@ -178,9 +178,9 @@ public class HDROpImage2 extends PointOpImage {
 
                 double ratio = (compressedHilights * highlights + (1-highlights)) * mm / y;
 
-                r *= ratio;
-                g *= ratio;
-                b *= ratio;
+                r = (int) (r * ratio);
+                g = (int) (g * ratio);
+                b = (int) (b * ratio);
 
                 dstData[dstPixelStride * col + row * dstLineStride + dstROffset] = ImageUtil.clampUShort(r);
                 dstData[dstPixelStride * col + row * dstLineStride + dstGOffset] = ImageUtil.clampUShort(g);

@@ -126,12 +126,12 @@ public class VibranceOpImage extends PointOpImage {
                 float hue = (float) (arctan2(x, y) + Math.PI);
 
                 if (hue < 0)
-                    hue += 2 * Math.PI;
+                    hue += 2 * (float) Math.PI;
 
                 if (hue > 4 * Math.PI / 3)
-                    hue -= 4 * Math.PI / 3;
+                    hue -= 4 * (float) Math.PI / 3;
                 else if (hue > 2 * Math.PI / 3)
-                    hue -= 2 * Math.PI / 3;
+                    hue -= 2 * (float) Math.PI / 3;
 
                 float mask = (float) (0.5 + 0.5 * (1 - Math.abs(Math.PI / 6 - hue) / (Math.PI / 3)));
 

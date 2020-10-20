@@ -102,7 +102,7 @@ inline void nlm_mono_tile(
     const int pd = 2 * pr + 1; // search window full width in pixels
     const float C_inv = -1.0f / (SQR(h) * SQR(pd));
 
-    const size_t elems = width * height;
+    const size_t elems = size_t(width) * height;
     float *obuf  = new float[elems](); // output data buffer
     float *w_sum = new float[elems]();
     float *w_max = new float[elems]();
@@ -209,7 +209,7 @@ inline void nlm_chroma_tile(
     const int pd = 2 * pr + 1; // search window full width in pixels
     const float C_inv = -1.0f / (SQR(h) * SQR(pd));
 
-    const size_t elems = width * height;
+    const size_t elems = size_t(width) * height;
     float *obuf_a = new float[elems](); // output data buffer for a
     float *obuf_b = new float[elems](); // output data buffer for b
     float *w_sum  = new float[elems]();
