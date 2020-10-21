@@ -1,40 +1,16 @@
 #!/usr/bin/make -f
 
-JAVA_HOME:=$(shell readlink -f /usr/bin/javac | sed "s:/bin/javac::")
+export JAVA_HOME=$(shell readlink -f /usr/bin/javac | sed "s:/bin/javac::")
+
+SYMLINK:=cp -pH "$1" "$2"
 ANT_OPTIONS=-f $(CURDIR)/linux/build.xml
 
-build: build-stamp
-build-stamp:
-	dh_testdir
-	JAVA_HOME=$(JAVA_HOME) ant $(ANT_OPTIONS) jar
-	touch $@
+%:
+	dh $@ --with javahelper --buildsystem=ant
 
-install: build
-	dh_testdir
-	dh_testroot
-	dh_prep
-	dh_installdirs
+override_dh_auto_build:
+	dh_auto_build -- $(ANT_OPTIONS) jar
 
-binary-indep: build install
-
-binary-arch: build install
-	dh_testdir
-	dh_testroot
-	dh_install
-	dh_link
-	dh_compress
-	dh_fixperms
-	dh_installdeb
-	dh_gencontrol
-	dh_md5sums
-	dh_builddeb
-
-clean:
-	dh_testdir
-	dh_testroot
-	JAVA_HOME=$(JAVA_HOME) ant $(ANT_OPTIONS) clean
-	dh_clean
-
-binary: binary-arch binary-indep
-.PHONY: build clean binary-arch binary-indep binary install
+override_dh_auto_clean:
+	dh_auto_clean -- $(ANT_OPTIONS)
 

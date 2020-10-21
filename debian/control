@@ -11,6 +11,7 @@ Build-Depends:
  devscripts,
  git-core,
  javahelp2,
+ javahelper,
  libavcodec58,
  libejml-java,
  libglib2.0-dev,
@@ -36,6 +37,9 @@ Standards-Version: 4.4.1
 Package: lightzone
 Architecture: i386 amd64
 Depends:
+ ${java:depends},
+ ${misc:depends},
+ ${shlibs:depends},
  default-jre (>= 2:1.11),
  javahelp2,
  libejml-java,

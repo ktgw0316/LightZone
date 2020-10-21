@@ -51,7 +51,7 @@ PLATFORM_LDFLAGS=	$(LDFLAGS)
 # Default symlink command.  This needs to be defined as a function variable
 # rather than just a simple variable because of the way it's overridden for
 # Windows.  (Must not use := here!)
-SYMLINK=		ln -fs "$1" "$2"
+SYMLINK?=		ln -fs "$1" "$2"
 
 # Miscellaneous commands.
 AR:=			ar
