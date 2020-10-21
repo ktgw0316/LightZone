@@ -97,7 +97,7 @@ class KnobPainter implements ActionListener {
 
     public void actionPerformed(ActionEvent event) {
         if (isOn) {
-            alpha += .1;
+            alpha += .1f;
             if (alpha >= 1) {
                 alpha = 1;
                 timer.stop();

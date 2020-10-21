@@ -226,9 +226,9 @@ public class Functions {
         if (DEBUG) System.out.println("kernel data: (" + radius + ") ");
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                data[i + size * j] *= gain;
+                data[i + size * j] *= (float)gain;
                 if (i == size / 2 && j == size / 2)
-                    data[i + size * j] += (1 - gain);
+                    data[i + size * j] += (float)(1 - gain);
                 if (DEBUG) System.out.print(fmt.format(data[i + size * j]) + " ");
             }
             if (DEBUG) System.out.println();
@@ -251,7 +251,7 @@ public class Functions {
                 if (i == size / 2 && j == size / 2)
                     data[i + size * j] = (float) (1 + gain * (1 - data[i + size * j]));
                 else
-                    data[i + size * j] *= -gain;
+                    data[i + size * j] *= (float)(-gain);
                 if (DEBUG) System.out.print(fmt.format(data[i + size * j]) + " ");
             }
             if (DEBUG) System.out.println();
@@ -323,9 +323,9 @@ public class Functions {
         for (int i = 0; i < data.length; i++) {
             if (data[i] > 0)
                 data[i] *= -negative/positive;
-            data[i] *= -gain;
+            data[i] *= (float)(-gain);
             if (i == size / 2)
-                data[i] += (1 + gain);
+                data[i] += (1 + (float)gain);
         }
         } else {
         for (int i = 0; i < data.length; i++)

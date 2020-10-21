@@ -14,27 +14,17 @@ package com.lightcrafts.jai.utils;
  * $State: Exp $
  */
 
-import java.awt.Point;
-import java.awt.image.ComponentSampleModel;
-import java.awt.image.DataBuffer;
-import java.awt.image.DataBufferByte;
-import java.awt.image.DataBufferInt;
-import java.awt.image.DataBufferShort;
-import java.awt.image.DataBufferUShort;
-import java.awt.image.MultiPixelPackedSampleModel;
-import java.awt.image.Raster;
-import java.awt.image.SampleModel;
-import java.awt.image.SinglePixelPackedSampleModel;
-import java.awt.image.WritableRaster;
+import com.sun.media.jai.util.DataBufferUtils;
+
+import javax.media.jai.TileFactory;
+import javax.media.jai.TileRecycler;
+import java.awt.*;
+import java.awt.image.*;
 import java.lang.ref.SoftReference;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Observable;
-import com.sun.media.jai.util.DataBufferUtils;
-
-import javax.media.jai.TileFactory;
-import javax.media.jai.TileRecycler;
 
 /**
  * A simple implementation of <code>TileFactory</code> wherein the tiles
@@ -154,10 +144,10 @@ public class LCRecyclingTileFactory extends Observable
             size += maxBandOff+1;
         int pixelStride = csm.getPixelStride();
         if (pixelStride > 0)
-            size += pixelStride * (csm.getWidth()-1);
+            size += (long) pixelStride * (csm.getWidth() - 1);
         int scanlineStride = csm.getScanlineStride();
         if (scanlineStride > 0)
-            size += scanlineStride*(csm.getHeight()-1);
+            size += (long) scanlineStride * (csm.getHeight() - 1);
         return size;
     }
 
@@ -234,7 +224,7 @@ public class LCRecyclingTileFactory extends Observable
 
         }
 
-        return numBanks*size*bytesPerElement;
+        return (long) numBanks * size * bytesPerElement;
     }
 
     /**
@@ -295,14 +285,14 @@ public class LCRecyclingTileFactory extends Observable
                 (MultiPixelPackedSampleModel)sampleModel;
             numBanks = 1;
             int dataTypeSize = DataBuffer.getDataTypeSize(type);
-            size = mppsm.getScanlineStride()*height +
+            size = (long) mppsm.getScanlineStride() * height +
                 (mppsm.getDataBitOffset() + dataTypeSize - 1)/dataTypeSize;
         } else if(sampleModel instanceof SinglePixelPackedSampleModel) {
             SinglePixelPackedSampleModel sppsm =
                 (SinglePixelPackedSampleModel)sampleModel;
             numBanks = 1;
             size = height == 1 ? sppsm.getScanlineStride()
-                               : sppsm.getScanlineStride()*(height - 1) +
+                               : (long) sppsm.getScanlineStride() * (height - 1) +
                                        sppsm.getWidth();
         }
 

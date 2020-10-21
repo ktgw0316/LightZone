@@ -121,7 +121,7 @@ public class ColorBalanceOperationV2 extends BlendedOperation implements com.lig
                             // Get the complementary color
                             float[] hsb = new float[3];
                             hsb = Color.RGBtoHSB(pixel[0] / 256, pixel[1] / 256, pixel[2] / 256, hsb);
-                            hsb[0] += 0.5;
+                            hsb[0] += 0.5f;
                             if (hsb[0] >= 1)
                                 hsb[0] -= 1;
                             color = Color.getHSBColor(hsb[0], hsb[1], hsb[2]);
