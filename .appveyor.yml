@@ -18,8 +18,12 @@ install:
   - cmd: SET JAVA_HOME=/c/Program Files/Java/jdk11
   - cmd: cinst ant html-help-workshop
   - cmd: bash -lc 'cp "/c/Program Files (x86)/Windows Kits/10/Lib/10.0.14393.0/um/x64/Htmlhelp.Lib" /c/mingw-w64/x86_64-7.2.0-posix-seh-rt_v5-rev1/mingw64/lib/libhtmlhelp.a'
-  - cmd: bash -lc "pacman --needed --noconfirm -Syu"
-  - cmd: bash -lc "pacman --needed --noconfirm -Sy"
+  - cmd: bash -lc "curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
+  - cmd: bash -lc "curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig"
+  - cmd: bash -lc "pacman-key --verify msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig"
+  - cmd: bash -lc "pacman --noconfirm -U msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
+  - cmd: bash -lc "pacman --needed --noconfirm -Sy pacman"
+  - cmd: bash -lc "pacman --needed --noconfirm -Su"
   - cmd: bash -lc "pacman --noconfirm -S autoconf git make tar"
   - cmd: bash -lc "pacman --noconfirm -S ${MINGW_ARCH}-lcms2 ${MINGW_ARCH}-lensfun ${MINGW_ARCH}-ntldd-git ${MINGW_ARCH}-pkg-config"
   - sh: export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
