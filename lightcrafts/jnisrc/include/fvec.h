@@ -21,7 +21,7 @@
 
 #pragma pack(push,_CRT_PACKING)
 
-#ifdef __SSE__
+#if defined(__SSE__) || defined(SIMDE_ENABLE_NATIVE_ALIASES)
 
 #pragma pack(push,16)
 
@@ -246,7 +246,7 @@ inline int F32vec1ToInt(const F32vec1 &a)
 
 #pragma pack(pop)
 
-#endif /* #ifdef __SSE__ */
+#endif /* #if defined(__SSE__) || defined(SIMDE_ENABLE_NATIVE_ALIASES) */
 #pragma pack(pop)
 
 #include "ivec.h"

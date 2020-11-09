@@ -23,7 +23,7 @@
 
 #pragma pack(pop)
 
-#ifdef __SSE__
+#if defined(__SSE__) || defined(SIMDE_ENABLE_NATIVE_ALIASES)
 
 #define _MM_QW (*((int64_t*)&vec))
 
@@ -48,7 +48,7 @@ public:
 
 #pragma pack(pop)
 
-#endif /* ifdef __SSE__ */
+#endif /* #if defined(__SSE__) || defined(SIMDE_ENABLE_NATIVE_ALIASES) */
 
 #include "dvec.h"
 
