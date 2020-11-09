@@ -22,11 +22,13 @@
  *
  * Copyright:
  *   2020      Evan Nemerson <evan@nemerson.com>
- *   2020      Sean Maher <seanptmaher@gmail.com>
+ *   2020      Sean Maher <seanptmaher@gmail.com> (Copyright owned by Google, LLC)
  */
 
 #if !defined(SIMDE_ARM_NEON_PADAL_H)
 #define SIMDE_ARM_NEON_PADAL_H
+
+#include "types.h"
 
 #include "add.h"
 #include "paddl.h"

@@ -43,6 +43,15 @@
   #define SIMDE_X86_AVX512F_NATIVE
 #endif
 
+#if !defined(SIMDE_X86_AVX512VP2INTERSECT_NATIVE) && !defined(SIMDE_X86_AVX512VP2INTERSECT_NO_NATIVE) && !defined(SIMDE_NO_NATIVE)
+  #if defined(SIMDE_ARCH_X86_AVX512VP2INTERSECT)
+    #define SIMDE_X86_AVX512VP2INTERSECT_NATIVE
+  #endif
+#endif
+#if defined(SIMDE_X86_AVX512VP2INTERSECT_NATIVE) && !defined(SIMDE_X86_AVX512F_NATIVE)
+  #define SIMDE_X86_AVX512F_NATIVE
+#endif
+
 #if !defined(SIMDE_X86_AVX512CD_NATIVE) && !defined(SIMDE_X86_AVX512CD_NO_NATIVE) && !defined(SIMDE_NO_NATIVE)
   #if defined(SIMDE_ARCH_X86_AVX512CD)
     #define SIMDE_X86_AVX512CD_NATIVE
@@ -241,6 +250,13 @@
   #include <arm_neon.h>
 #endif
 
+#if !defined(SIMDE_ARM_SVE_NATIVE) && !defined(SIMDE_ARM_SVE_NO_NATIVE) && !defined(SIMDE_NO_NATIVE)
+  #if defined(SIMDE_ARCH_ARM_SVE)
+    #define SIMDE_ARM_SVE_NATIVE
+    #include <arm_sve.h>
+  #endif
+#endif
+
 #if !defined(SIMDE_WASM_SIMD128_NATIVE) && !defined(SIMDE_WASM_SIMD128_NO_NATIVE) && !defined(SIMDE_NO_NATIVE)
   #if defined(SIMDE_ARCH_WASM_SIMD128)
     #define SIMDE_WASM_SIMD128_NATIVE
@@ -297,15 +313,28 @@
     #define SIMDE_POWER_ALTIVEC_P5_NATIVE
   #endif
 #endif
+
 #if defined(SIMDE_POWER_ALTIVEC_P6_NATIVE)
-  /* stdbool.h conflicts with the bool in altivec.h */
-  #if defined(bool) && !defined(SIMDE_POWER_ALTIVEC_NO_UNDEF_BOOL_)
+  /* AltiVec conflicts with lots of stuff.  The bool keyword conflicts
+   * with the bool keyword in C++ and the bool macro in C99+ (defined
+   * in stdbool.h).  The vector keyword conflicts with std::vector in
+   * C++ if you are `using std;`.
+   *
+   * Luckily AltiVec allows you to use `__vector`/`__bool`/`__pixel`
+   * instead, but altivec.h will unconditionally define
+   * `vector`/`bool`/`pixel` so we need to work around that.
+   *
+   * Unfortunately this means that if your code uses AltiVec directly
+   * it may break.  If this is the case you'll want to define
+   * `SIMDE_POWER_ALTIVEC_NO_UNDEF` before including SIMDe.  Or, even
+   * better, port your code to use the double-underscore versions. */
+  #if defined(bool)
     #undef bool
   #endif
+
   #include <altivec.h>
-  /* GCC allows you to undefine these macros to prevent conflicts with
-   * standard types as they become context-sensitive keywords. */
-  #if defined(__cplusplus)
+
+  #if !defined(SIMDE_POWER_ALTIVEC_NO_UNDEF)
     #if defined(vector)
       #undef vector
     #endif
@@ -315,14 +344,26 @@
     #if defined(bool)
       #undef bool
     #endif
-    #define SIMDE_POWER_ALTIVEC_VECTOR(T) __vector T
-    #define SIMDE_POWER_ALTIVEC_PIXEL __pixel
-    #define SIMDE_POWER_ALTIVEC_BOOL __bool
-  #else
-    #define SIMDE_POWER_ALTIVEC_VECTOR(T) __vector T
-    #define SIMDE_POWER_ALTIVEC_PIXEL __pixel
-    #define SIMDE_POWER_ALTIVEC_BOOL __bool
-  #endif /* defined(__cplusplus) */
+  #endif /* !defined(SIMDE_POWER_ALTIVEC_NO_UNDEF) */
+
+  /* Use these intsead of vector/pixel/bool in SIMDe. */
+  #define SIMDE_POWER_ALTIVEC_VECTOR(T) __vector T
+  #define SIMDE_POWER_ALTIVEC_PIXEL __pixel
+  #define SIMDE_POWER_ALTIVEC_BOOL __bool
+
+  /* Re-define bool if we're using stdbool.h */
+  #if !defined(__cplusplus) && defined(__bool_true_false_are_defined) && !defined(SIMDE_POWER_ALTIVEC_NO_UNDEF)
+    #define bool _Bool
+  #endif
+#endif
+
+#if !defined(SIMDE_MIPS_LOONGSON_MMI_NATIVE) && !defined(SIMDE_MIPS_LOONGSON_MMI_NO_NATIVE) && !defined(SIMDE_NO_NATIVE)
+  #if defined(SIMDE_ARCH_MIPS_LOONGSON_MMI)
+    #define SIMDE_MIPS_LOONGSON_MMI_NATIVE  1
+  #endif
+#endif
+#if defined(SIMDE_MIPS_LOONGSON_MMI_NATIVE)
+  #include <loongson-mmiintrin.h>
 #endif
 
 /* This is used to determine whether or not to fall back on a vector
@@ -348,8 +389,8 @@
   #endif
 #endif
 
-#define SIMDE_NATURAL_VECTOR_SIZE_LE(x) (SIMDE_NATURAL_VECTOR_SIZE <= (x))
-#define SIMDE_NATURAL_VECTOR_SIZE_GE(x) (SIMDE_NATURAL_VECTOR_SIZE >= (x))
+#define SIMDE_NATURAL_VECTOR_SIZE_LE(x) ((SIMDE_NATURAL_VECTOR_SIZE > 0) && (SIMDE_NATURAL_VECTOR_SIZE <= (x)))
+#define SIMDE_NATURAL_VECTOR_SIZE_GE(x) ((SIMDE_NATURAL_VECTOR_SIZE > 0) && (SIMDE_NATURAL_VECTOR_SIZE >= (x)))
 
 /* Native aliases */
 #if defined(SIMDE_ENABLE_NATIVE_ALIASES)
@@ -411,6 +452,29 @@
   #if !defined(SIMDE_ARM_NEON_A64V8_NATIVE)
     #define SIMDE_ARM_NEON_A64V8_ENABLE_NATIVE_ALIASES
   #endif
+#endif
+
+/* Are floating point values stored using IEEE 754?  Knowing
+ * this at during preprocessing is a bit tricky, mostly because what
+ * we're curious about is how values are stored and not whether the
+ * implementation is fully conformant in terms of rounding, NaN
+ * handling, etc.
+ *
+ * For example, if you use -ffast-math or -Ofast on
+ * GCC or clang IEEE 754 isn't strictly followed, therefore IEE 754
+ * support is not advertised (by defining __STDC_IEC_559__).
+ *
+ * However, what we care about is whether it is safe to assume that
+ * floating point values are stored in IEEE 754 format, in which case
+ * we can provide faster implementations of some functions.
+ *
+ * Luckily every vaugely modern architecture I'm aware of uses IEEE 754-
+ * so we just assume IEEE 754 for now.  There is a test which verifies
+ * this, if that test fails sowewhere please let us know and we'll add
+ * an exception for that platform.  Meanwhile, you can define
+ * SIMDE_NO_IEEE754_STORAGE. */
+#if !defined(SIMDE_IEEE754_STORAGE) && !defined(SIMDE_NO_IEE754_STORAGE)
+  #define SIMDE_IEEE754_STORAGE
 #endif
 
 #endif /* !defined(SIMDE_FEATURES_H) */
