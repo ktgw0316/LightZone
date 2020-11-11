@@ -1,8 +1,8 @@
 version: 4.2.1.{build}-{branch}
 
+# common configuration for all branches
 image:
-- Visual Studio 2017
-- Ubuntu2004
+  - Ubuntu2004
 
 clone_depth: 1
 
@@ -10,22 +10,6 @@ matrix:
   fast_finish: true
 
 install:
-  - cmd: SET MINGW_PATH=mingw-w64/x86_64-7.2.0-posix-seh-rt_v5-rev1/mingw64
-  - cmd: SET MINGW_DIR=/c/%MINGW_PATH%/
-  - cmd: SET MINGW_ARCH=mingw-w64-x86_64
-  - cmd: SET PATH=C:/%MINGW_PATH%/bin/;C:/msys64/mingw64/bin/;C:/msys64/usr/bin/;%PATH%
-  - cmd: SET MSSDK_HOME=/c/Program Files (x86)/Windows Kits/10
-  - cmd: SET JAVA_HOME=/c/Program Files/Java/jdk11
-  - cmd: cinst ant html-help-workshop
-  - cmd: bash -lc 'cp "/c/Program Files (x86)/Windows Kits/10/Lib/10.0.14393.0/um/x64/Htmlhelp.Lib" /c/mingw-w64/x86_64-7.2.0-posix-seh-rt_v5-rev1/mingw64/lib/libhtmlhelp.a'
-  - cmd: bash -lc "curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
-  - cmd: bash -lc "curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig"
-  - cmd: bash -lc "pacman-key --verify msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig"
-  - cmd: bash -lc "pacman --noconfirm -U msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
-  - cmd: bash -lc "pacman --needed --noconfirm -Sy pacman"
-  - cmd: bash -lc "pacman --needed --noconfirm -Su"
-  - cmd: bash -lc "pacman --noconfirm -S autoconf git make tar"
-  - cmd: bash -lc "pacman --noconfirm -S ${MINGW_ARCH}-lcms2 ${MINGW_ARCH}-lensfun ${MINGW_ARCH}-ntldd-git ${MINGW_ARCH}-pkg-config"
   - sh: export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 
 init:
@@ -34,5 +18,38 @@ init:
   - sh: sudo apt-get install -y ant autoconf javahelp2 libejml-java libglib2.0-dev libjaxb-java libjetbrains-annotations-java libjiconfont-font-awesome-java libjiconfont-google-material-design-icons-java libjiconfont-swing-java liblensfun-dev liblcms2-dev liblombok-java librefuel-java libslf4j-java libtiff5-dev openjfx tidy 
 
 build_script:
-  - cmd: bash -lc "ant -f /c/projects/lightzone/windows/build.xml"
   - sh: ant -f linux/build.xml
+
+# additional configuration
+for:
+-
+  branches:
+    except:
+      - ubuntu
+
+  image:
+  - Visual Studio 2017
+  - Ubuntu2004
+  
+  install:
+    - cmd: SET MINGW_PATH=mingw-w64/x86_64-7.2.0-posix-seh-rt_v5-rev1/mingw64
+    - cmd: SET MINGW_DIR=/c/%MINGW_PATH%/
+    - cmd: SET MINGW_ARCH=mingw-w64-x86_64
+    - cmd: SET PATH=C:/%MINGW_PATH%/bin/;C:/msys64/mingw64/bin/;C:/msys64/usr/bin/;%PATH%
+    - cmd: SET MSSDK_HOME=/c/Program Files (x86)/Windows Kits/10
+    - cmd: SET JAVA_HOME=/c/Program Files/Java/jdk11
+    - cmd: cinst ant html-help-workshop
+    - cmd: bash -lc 'cp "/c/Program Files (x86)/Windows Kits/10/Lib/10.0.14393.0/um/x64/Htmlhelp.Lib" /c/mingw-w64/x86_64-7.2.0-posix-seh-rt_v5-rev1/mingw64/lib/libhtmlhelp.a'
+    - cmd: bash -lc "curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
+    - cmd: bash -lc "curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig"
+    - cmd: bash -lc "pacman-key --verify msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig"
+    - cmd: bash -lc "pacman --noconfirm -U msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
+    - cmd: bash -lc "pacman --needed --noconfirm -Sy pacman"
+    - cmd: bash -lc "pacman --needed --noconfirm -Su"
+    - cmd: bash -lc "pacman --noconfirm -S autoconf git make tar"
+    - cmd: bash -lc "pacman --noconfirm -S ${MINGW_ARCH}-lcms2 ${MINGW_ARCH}-lensfun ${MINGW_ARCH}-ntldd-git ${MINGW_ARCH}-pkg-config"
+    - sh: export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+  
+  build_script:
+    - cmd: bash -lc "ant -f /c/projects/lightzone/windows/build.xml"
+    - sh: ant -f linux/build.xml
