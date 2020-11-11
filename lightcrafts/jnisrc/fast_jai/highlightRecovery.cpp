@@ -38,12 +38,8 @@ inline Iu16vec8 F32vec4toIu16vec8(const F32vec4 &hi, const F32vec4 &lo) {
         sign_swap16);
 }
 
-#ifndef _MM_ALIGN16
-#define _MM_ALIGN16 __attribute__((aligned(16)))
-#endif
-
 #define CONST_INT32_PS(N, V3, V2, V1, V0)                                                          \
-    static const _MM_ALIGN16 int _##N[] = {V0, V1, V2, V3}; /*little endian!*/                     \
+    alignas(16) static const int32_t _##N[] = {V0, V1, V2, V3}; /*little endian!*/                     \
     const F32vec4 N = _mm_load_ps((float *)_##N);
 
 // usage example, mask for elements 3 and 1:
