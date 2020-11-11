@@ -22,7 +22,7 @@
  *
  * Copyright:
  *   2020      Evan Nemerson <evan@nemerson.com>
- *   2020      Sean Maher <seanptmaher@gmail.com>
+ *   2020      Sean Maher <seanptmaher@gmail.com> (Copyright owned by Google, LLC)
  */
 
 #if !defined(SIMDE_ARM_NEON_MUL_N_H)
@@ -44,7 +44,7 @@ simde_vmul_n_f32(simde_float32x2_t a, simde_float32 b) {
       r_,
       a_ = simde_float32x2_to_private(a);
 
-    #if defined(SIMDE_VECTOR_SUBSCRIPT_SCALAR)
+    #if defined(SIMDE_VECTOR_SUBSCRIPT_SCALAR) && !defined(SIMDE_BUG_GCC_53784)
       r_.values = a_.values * b;
     #else
       SIMDE_VECTORIZE
@@ -71,7 +71,7 @@ simde_vmul_n_f64(simde_float64x1_t a, simde_float64 b) {
       r_,
       a_ = simde_float64x1_to_private(a);
 
-    #if defined(SIMDE_VECTOR_SUBSCRIPT_SCALAR)
+    #if defined(SIMDE_VECTOR_SUBSCRIPT_SCALAR) && !defined(SIMDE_BUG_GCC_53784)
       r_.values = a_.values * b;
     #else
       SIMDE_VECTORIZE
@@ -213,7 +213,7 @@ simde_vmulq_n_f32(simde_float32x4_t a, simde_float32 b) {
       r_,
       a_ = simde_float32x4_to_private(a);
 
-    #if defined(SIMDE_VECTOR_SUBSCRIPT_SCALAR)
+    #if defined(SIMDE_VECTOR_SUBSCRIPT_SCALAR) && !defined(SIMDE_BUG_GCC_53784)
       r_.values = a_.values * b;
     #else
       SIMDE_VECTORIZE
@@ -244,7 +244,7 @@ simde_vmulq_n_f64(simde_float64x2_t a, simde_float64 b) {
       r_,
       a_ = simde_float64x2_to_private(a);
 
-    #if defined(SIMDE_VECTOR_SUBSCRIPT_SCALAR)
+    #if defined(SIMDE_VECTOR_SUBSCRIPT_SCALAR) && !defined(SIMDE_BUG_GCC_53784)
       r_.values = a_.values * b;
     #else
       SIMDE_VECTORIZE

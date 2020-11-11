@@ -34,6 +34,14 @@
 #include "hedley.h"
 #include "simde-features.h"
 
+#include <stdint.h>
+#if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+  #include <arm_neon.h>
+#endif
+
+HEDLEY_DIAGNOSTIC_PUSH
+SIMDE_DISABLE_UNWANTED_DIAGNOSTICS
+
 /* SLEEF support
  * https://sleef.org/
  *
@@ -123,11 +131,32 @@
   #endif
 #endif
 
-#if !defined(__cplusplus)
-  /* If this is a problem we *might* be able to avoid including
-   * <complex.h> on some compilers (gcc, clang, and others which
-   * implement builtins like __builtin_cexpf).  If you don't have
-   * a <complex.h> please file an issue and we'll take a look. */
+/* Try to avoid including <complex> since it pulls in a *lot* of code. */
+#if \
+    HEDLEY_HAS_BUILTIN(__builtin_creal) || \
+    HEDLEY_GCC_VERSION_CHECK(4,7,0) || \
+    HEDLEY_INTEL_VERSION_CHECK(13,0,0)
+  HEDLEY_DIAGNOSTIC_PUSH
+  SIMDE_DIAGNOSTIC_DISABLE_C99_EXTENSIONS_
+    typedef __complex__ float simde_cfloat32;
+    typedef __complex__ double simde_cfloat64;
+  HEDLEY_DIAGNOSTIC_POP
+  #define SIMDE_MATH_CMPLX(x, y) (HEDLEY_STATIC_CAST(double, x) + HEDLEY_STATIC_CAST(double, y) * (__extension__ 1.0j))
+  #define SIMDE_MATH_CMPLXF(x, y) (HEDLEY_STATIC_CAST(float, x) + HEDLEY_STATIC_CAST(float, y) * (__extension__ 1.0fj))
+
+  #if !defined(simde_math_creal)
+    #define simde_math_crealf(z) __builtin_crealf(z)
+  #endif
+  #if !defined(simde_math_crealf)
+    #define simde_math_creal(z) __builtin_creal(z)
+  #endif
+  #if !defined(simde_math_cimag)
+    #define simde_math_cimagf(z) __builtin_cimagf(z)
+  #endif
+  #if !defined(simde_math_cimagf)
+    #define simde_math_cimag(z) __builtin_cimag(z)
+  #endif
+#elif !defined(__cplusplus)
   #include <complex.h>
 
   #if !defined(HEDLEY_MSVC_VERSION)
@@ -137,58 +166,31 @@
     typedef _Fcomplex simde_cfloat32;
     typedef _Dcomplex simde_cfloat64;
   #endif
-  #if \
-      HEDLEY_HAS_BUILTIN(__builtin_complex) || \
-      HEDLEY_GCC_VERSION_CHECK(4,7,0) || \
-      HEDLEY_INTEL_VERSION_CHECK(13,0,0)
-    #define SIMDE_MATH_CMPLX(x, y) __builtin_complex((double) (x), (double) (y))
-    #define SIMDE_MATH_CMPLXF(x, y) __builtin_complex((float) (x), (float) (y))
-  #elif defined(HEDLEY_MSVC_VERSION)
+
+  #if defined(HEDLEY_MSVC_VERSION)
     #define SIMDE_MATH_CMPLX(x, y) ((simde_cfloat64) { (x), (y) })
     #define SIMDE_MATH_CMPLXF(x, y) ((simde_cfloat32) { (x), (y) })
   #elif defined(CMPLX) && defined(CMPLXF)
     #define SIMDE_MATH_CMPLX(x, y) CMPLX(x, y)
     #define SIMDE_MATH_CMPLXF(x, y) CMPLXF(x, y)
   #else
-    /* CMPLX / CMPLXF are in C99, but these seem to be necessary in
-     * some compilers that aren't even MSVC. */
     #define SIMDE_MATH_CMPLX(x, y) (HEDLEY_STATIC_CAST(double, x) + HEDLEY_STATIC_CAST(double, y) * I)
     #define SIMDE_MATH_CMPLXF(x, y) (HEDLEY_STATIC_CAST(float, x) + HEDLEY_STATIC_CAST(float, y) * I)
   #endif
 
   #if !defined(simde_math_creal)
-    #if SIMDE_MATH_BUILTIN_LIBM(creal)
-      #define simde_math_creal(z) __builtin_creal(z)
-    #else
-      #define simde_math_creal(z) creal(z)
-    #endif
+    #define simde_math_creal(z) creal(z)
   #endif
-
   #if !defined(simde_math_crealf)
-    #if SIMDE_MATH_BUILTIN_LIBM(crealf)
-      #define simde_math_crealf(z) __builtin_crealf(z)
-    #else
-      #define simde_math_crealf(z) crealf(z)
-    #endif
+    #define simde_math_crealf(z) crealf(z)
   #endif
-
   #if !defined(simde_math_cimag)
-    #if SIMDE_MATH_BUILTIN_LIBM(cimag)
-      #define simde_math_cimag(z) __builtin_cimag(z)
-    #else
-      #define simde_math_cimag(z) cimag(z)
-    #endif
+    #define simde_math_cimag(z) cimag(z)
   #endif
-
   #if !defined(simde_math_cimagf)
-    #if SIMDE_MATH_BUILTIN_LIBM(cimagf)
-      #define simde_math_cimagf(z) __builtin_cimagf(z)
-    #else
-      #define simde_math_cimagf(z) cimagf(z)
-    #endif
+    #define simde_math_cimagf(z) cimagf(z)
   #endif
 #else
-
   HEDLEY_DIAGNOSTIC_PUSH
   #if defined(HEDLEY_MSVC_VERSION)
     #pragma warning(disable:4530)
@@ -286,6 +288,22 @@
   #else
     #define SIMDE_MATH_PIF 3.14159265358979323846f
   #endif
+#endif
+
+#if !defined(SIMDE_MATH_PI_OVER_180)
+  #define SIMDE_MATH_PI_OVER_180 0.0174532925199432957692369076848861271344287188854172545609719144
+#endif
+
+#if !defined(SIMDE_MATH_PI_OVER_180F)
+  #define SIMDE_MATH_PI_OVER_180F 0.0174532925199432957692369076848861271344287188854172545609719144f
+#endif
+
+#if !defined(SIMDE_MATH_180_OVER_PI)
+  #define SIMDE_MATH_180_OVER_PI 57.295779513082320876798154814105170332405472466564321549160243861
+#endif
+
+#if !defined(SIMDE_MATH_180_OVER_PIF)
+  #define SIMDE_MATH_180_OVER_PIF 57.295779513082320876798154814105170332405472466564321549160243861f
 #endif
 
 #if !defined(SIMDE_MATH_FLT_MIN)
@@ -386,6 +404,36 @@
     #define simde_math_isnormalf(v) std::isnormal(v)
   #elif defined(simde_math_isnormal)
     #define simde_math_isnormalf(v) simde_math_isnormal(v)
+  #endif
+#endif
+
+/*** Manipulation functions ***/
+
+#if !defined(simde_math_nextafter)
+  #if \
+      (HEDLEY_HAS_BUILTIN(__builtin_nextafter) && !defined(HEDLEY_IBM_VERSION)) || \
+      HEDLEY_ARM_VERSION_CHECK(4,1,0) || \
+      HEDLEY_GCC_VERSION_CHECK(3,4,0) || \
+      HEDLEY_INTEL_VERSION_CHECK(13,0,0)
+    #define simde_math_nextafter(x, y) __builtin_nextafter(x, y)
+  #elif defined(SIMDE_MATH_HAVE_CMATH)
+    #define simde_math_nextafter(x, y) std::nextafter(x, y)
+  #elif defined(SIMDE_MATH_HAVE_MATH_H)
+    #define simde_math_nextafter(x, y) nextafter(x, y)
+  #endif
+#endif
+
+#if !defined(simde_math_nextafterf)
+  #if \
+      (HEDLEY_HAS_BUILTIN(__builtin_nextafterf) && !defined(HEDLEY_IBM_VERSION)) || \
+      HEDLEY_ARM_VERSION_CHECK(4,1,0) || \
+      HEDLEY_GCC_VERSION_CHECK(3,4,0) || \
+      HEDLEY_INTEL_VERSION_CHECK(13,0,0)
+    #define simde_math_nextafterf(x, y) __builtin_nextafterf(x, y)
+  #elif defined(SIMDE_MATH_HAVE_CMATH)
+    #define simde_math_nextafterf(x, y) std::nextafter(x, y)
+  #elif defined(SIMDE_MATH_HAVE_MATH_H)
+    #define simde_math_nextafterf(x, y) nextafterf(x, y)
   #endif
 #endif
 
@@ -809,6 +857,46 @@
   #endif
 #endif
 
+#if !defined(simde_math_fma)
+  #if SIMDE_MATH_BUILTIN_LIBM(fma)
+    #define simde_math_fma(x, y, z) __builtin_fma(x, y, z)
+  #elif defined(SIMDE_MATH_HAVE_CMATH)
+    #define simde_math_fma(x, y, z) std::fma(x, y, z)
+  #elif defined(SIMDE_MATH_HAVE_MATH_H)
+    #define simde_math_fma(x, y, z) fma(x, y, z)
+  #endif
+#endif
+
+#if !defined(simde_math_fmaf)
+  #if SIMDE_MATH_BUILTIN_LIBM(fmaf)
+    #define simde_math_fmaf(x, y, z) __builtin_fmaf(x, y, z)
+  #elif defined(SIMDE_MATH_HAVE_CMATH)
+    #define simde_math_fmaf(x, y, z) std::fma(x, y, z)
+  #elif defined(SIMDE_MATH_HAVE_MATH_H)
+    #define simde_math_fmaf(x, y, z) fmaf(x, y, z)
+  #endif
+#endif
+
+#if !defined(simde_math_fmax)
+  #if SIMDE_MATH_BUILTIN_LIBM(fmax)
+    #define simde_math_fmax(x, y, z) __builtin_fmax(x, y, z)
+  #elif defined(SIMDE_MATH_HAVE_CMATH)
+    #define simde_math_fmax(x, y, z) std::fmax(x, y, z)
+  #elif defined(SIMDE_MATH_HAVE_MATH_H)
+    #define simde_math_fmax(x, y, z) fmax(x, y, z)
+  #endif
+#endif
+
+#if !defined(simde_math_fmaxf)
+  #if SIMDE_MATH_BUILTIN_LIBM(fmaxf)
+    #define simde_math_fmaxf(x, y, z) __builtin_fmaxf(x, y, z)
+  #elif defined(SIMDE_MATH_HAVE_CMATH)
+    #define simde_math_fmaxf(x, y, z) std::fmax(x, y, z)
+  #elif defined(SIMDE_MATH_HAVE_MATH_H)
+    #define simde_math_fmaxf(x, y, z) fmaxf(x, y, z)
+  #endif
+#endif
+
 #if !defined(simde_math_hypot)
   #if SIMDE_MATH_BUILTIN_LIBM(hypot)
     #define simde_math_hypot(y, x) __builtin_hypot(y, x)
@@ -1132,20 +1220,20 @@
 /***  Complex functions ***/
 
 #if !defined(simde_math_cexp)
-  #if defined(__cplusplus)
-    #define simde_math_cexp(v) std::cexp(v)
-  #elif SIMDE_MATH_BUILTIN_LIBM(cexp)
+  #if SIMDE_MATH_BUILTIN_LIBM(cexp)
     #define simde_math_cexp(v) __builtin_cexp(v)
+  #elif defined(__cplusplus)
+    #define simde_math_cexp(v) std::cexp(v)
   #elif defined(SIMDE_MATH_HAVE_MATH_H)
     #define simde_math_cexp(v) cexp(v)
   #endif
 #endif
 
 #if !defined(simde_math_cexpf)
-  #if defined(__cplusplus)
-    #define simde_math_cexpf(v) std::exp(v)
-  #elif SIMDE_MATH_BUILTIN_LIBM(cexpf)
+  #if SIMDE_MATH_BUILTIN_LIBM(cexpf)
     #define simde_math_cexpf(v) __builtin_cexpf(v)
+  #elif defined(__cplusplus)
+    #define simde_math_cexpf(v) std::exp(v)
   #elif defined(SIMDE_MATH_HAVE_MATH_H)
     #define simde_math_cexpf(v) cexpf(v)
   #endif
@@ -1484,25 +1572,281 @@ HEDLEY_DIAGNOSTIC_POP
 static HEDLEY_INLINE
 double
 simde_math_rad2deg(double radians) {
- return radians * (180.0 / SIMDE_MATH_PI);
+ return radians * SIMDE_MATH_180_OVER_PI;
 }
 
 static HEDLEY_INLINE
 float
 simde_math_rad2degf(float radians) {
-    return radians * (180.0f / SIMDE_MATH_PIF);
+    return radians * SIMDE_MATH_180_OVER_PIF;
 }
 
 static HEDLEY_INLINE
 double
 simde_math_deg2rad(double degrees) {
-  return degrees * (SIMDE_MATH_PI / 180.0);
+  return degrees * SIMDE_MATH_PI_OVER_180;
 }
 
 static HEDLEY_INLINE
 float
 simde_math_deg2radf(float degrees) {
-    return degrees * (SIMDE_MATH_PIF / 180.0f);
+    return degrees * (SIMDE_MATH_PI_OVER_180F);
 }
+
+/***  Saturated arithmetic ***/
+
+static HEDLEY_INLINE
+int8_t
+simde_math_adds_i8(int8_t a, int8_t b) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+    return vqaddb_s8(a, b);
+  #else
+    uint8_t a_ = HEDLEY_STATIC_CAST(uint8_t, a);
+    uint8_t b_ = HEDLEY_STATIC_CAST(uint8_t, b);
+    uint8_t r_ = a_ + b_;
+
+    a_ = (a_ >> ((8 * sizeof(r_)) - 1)) + INT8_MAX;
+    if (HEDLEY_STATIC_CAST(int8_t, ((a_ ^ b_) | ~(b_ ^ r_))) >= 0) {
+      r_ = a_;
+    }
+
+    return HEDLEY_STATIC_CAST(int8_t, r_);
+  #endif
+}
+
+static HEDLEY_INLINE
+int16_t
+simde_math_adds_i16(int16_t a, int16_t b) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+    return vqaddh_s16(a, b);
+  #else
+    uint16_t a_ = HEDLEY_STATIC_CAST(uint16_t, a);
+    uint16_t b_ = HEDLEY_STATIC_CAST(uint16_t, b);
+    uint16_t r_ = a_ + b_;
+
+    a_ = (a_ >> ((8 * sizeof(r_)) - 1)) + INT16_MAX;
+    if (HEDLEY_STATIC_CAST(int16_t, ((a_ ^ b_) | ~(b_ ^ r_))) >= 0) {
+      r_ = a_;
+    }
+
+    return HEDLEY_STATIC_CAST(int16_t, r_);
+  #endif
+}
+
+static HEDLEY_INLINE
+int32_t
+simde_math_adds_i32(int32_t a, int32_t b) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+    return vqadds_s32(a, b);
+  #else
+    uint32_t a_ = HEDLEY_STATIC_CAST(uint32_t, a);
+    uint32_t b_ = HEDLEY_STATIC_CAST(uint32_t, b);
+    uint32_t r_ = a_ + b_;
+
+    a_ = (a_ >> ((8 * sizeof(r_)) - 1)) + INT32_MAX;
+    if (HEDLEY_STATIC_CAST(int32_t, ((a_ ^ b_) | ~(b_ ^ r_))) >= 0) {
+      r_ = a_;
+    }
+
+    return HEDLEY_STATIC_CAST(int32_t, r_);
+  #endif
+}
+
+static HEDLEY_INLINE
+int64_t
+simde_math_adds_i64(int64_t a, int64_t b) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+    return vqaddd_s64(a, b);
+  #else
+    uint64_t a_ = HEDLEY_STATIC_CAST(uint64_t, a);
+    uint64_t b_ = HEDLEY_STATIC_CAST(uint64_t, b);
+    uint64_t r_ = a_ + b_;
+
+    a_ = (a_ >> ((8 * sizeof(r_)) - 1)) + INT64_MAX;
+    if (HEDLEY_STATIC_CAST(int64_t, ((a_ ^ b_) | ~(b_ ^ r_))) >= 0) {
+      r_ = a_;
+    }
+
+    return HEDLEY_STATIC_CAST(int64_t, r_);
+  #endif
+}
+
+static HEDLEY_INLINE
+uint8_t
+simde_math_adds_u8(uint8_t a, uint8_t b) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+    return vqaddb_u8(a, b);
+  #else
+    uint8_t r = a + b;
+    r |= -(r < a);
+    return r;
+  #endif
+}
+
+static HEDLEY_INLINE
+uint16_t
+simde_math_adds_u16(uint16_t a, uint16_t b) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+    return vqaddh_u16(a, b);
+  #else
+    uint16_t r = a + b;
+    r |= -(r < a);
+    return r;
+  #endif
+}
+
+static HEDLEY_INLINE
+uint32_t
+simde_math_adds_u32(uint32_t a, uint32_t b) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+    return vqadds_u32(a, b);
+  #else
+    uint32_t r = a + b;
+    r |= -(r < a);
+    return r;
+  #endif
+}
+
+static HEDLEY_INLINE
+uint64_t
+simde_math_adds_u64(uint64_t a, uint64_t b) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+    return vqaddd_u64(a, b);
+  #else
+    uint64_t r = a + b;
+    r |= -(r < a);
+    return r;
+  #endif
+}
+
+static HEDLEY_INLINE
+int8_t
+simde_math_subs_i8(int8_t a, int8_t b) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+    return vqsubb_s8(a, b);
+  #else
+    uint8_t a_ = HEDLEY_STATIC_CAST(uint8_t, a);
+    uint8_t b_ = HEDLEY_STATIC_CAST(uint8_t, b);
+    uint8_t r_ = a_ - b_;
+
+    a_ = (a_ >> 7) + INT8_MAX;
+
+    if (HEDLEY_STATIC_CAST(int8_t, (a_ ^ b_) & (a_ ^ r_)) < 0) {
+      r_ = a_;
+    }
+
+    return HEDLEY_STATIC_CAST(int8_t, r_);
+  #endif
+}
+
+static HEDLEY_INLINE
+int16_t
+simde_math_subs_i16(int16_t a, int16_t b) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+    return vqsubh_s16(a, b);
+  #else
+    uint16_t a_ = HEDLEY_STATIC_CAST(uint16_t, a);
+    uint16_t b_ = HEDLEY_STATIC_CAST(uint16_t, b);
+    uint16_t r_ = a_ - b_;
+
+    a_ = (a_ >> 15) + INT16_MAX;
+
+    if (HEDLEY_STATIC_CAST(int16_t, (a_ ^ b_) & (a_ ^ r_)) < 0) {
+      r_ = a_;
+    }
+
+    return HEDLEY_STATIC_CAST(int16_t, r_);
+  #endif
+}
+
+static HEDLEY_INLINE
+int32_t
+simde_math_subs_i32(int32_t a, int32_t b) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+    return vqsubs_s32(a, b);
+  #else
+    uint32_t a_ = HEDLEY_STATIC_CAST(uint32_t, a);
+    uint32_t b_ = HEDLEY_STATIC_CAST(uint32_t, b);
+    uint32_t r_ = a_ - b_;
+
+    a_ = (a_ >> 31) + INT32_MAX;
+
+    if (HEDLEY_STATIC_CAST(int32_t, (a_ ^ b_) & (a_ ^ r_)) < 0) {
+      r_ = a_;
+    }
+
+    return HEDLEY_STATIC_CAST(int32_t, r_);
+  #endif
+}
+
+static HEDLEY_INLINE
+int64_t
+simde_math_subs_i64(int64_t a, int64_t b) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+    return vqsubd_s64(a, b);
+  #else
+    uint64_t a_ = HEDLEY_STATIC_CAST(uint64_t, a);
+    uint64_t b_ = HEDLEY_STATIC_CAST(uint64_t, b);
+    uint64_t r_ = a_ - b_;
+
+    a_ = (a_ >> 63) + INT64_MAX;
+
+    if (HEDLEY_STATIC_CAST(int64_t, (a_ ^ b_) & (a_ ^ r_)) < 0) {
+      r_ = a_;
+    }
+
+    return HEDLEY_STATIC_CAST(int64_t, r_);
+  #endif
+}
+
+static HEDLEY_INLINE
+uint8_t
+simde_math_subs_u8(uint8_t a, uint8_t b) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+    return vqsubb_u8(a, b);
+  #else
+    uint8_t res = a - b;
+    res &= -(res <= a);
+    return res;
+  #endif
+}
+
+static HEDLEY_INLINE
+uint16_t
+simde_math_subs_u16(uint16_t a, uint16_t b) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+    return vqsubh_u16(a, b);
+  #else
+    uint16_t res = a - b;
+    res &= -(res <= a);
+    return res;
+  #endif
+}
+
+static HEDLEY_INLINE
+uint32_t
+simde_math_subs_u32(uint32_t a, uint32_t b) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+    return vqsubs_u32(a, b);
+  #else
+    uint32_t res = a - b;
+    res &= -(res <= a);
+    return res;
+  #endif
+}
+
+static HEDLEY_INLINE
+uint64_t
+simde_math_subs_u64(uint64_t a, uint64_t b) {
+  #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
+    return vqsubd_u64(a, b);
+  #else
+    uint64_t res = a - b;
+    res &= -(res <= a);
+    return res;
+  #endif
+}
+
+HEDLEY_DIAGNOSTIC_POP
 
 #endif /* !defined(SIMDE_MATH_H) */

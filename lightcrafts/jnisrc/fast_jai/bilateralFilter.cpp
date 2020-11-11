@@ -158,7 +158,7 @@ void rlm_separable_bf_mono_tile(
 
 #ifdef USE_SIMD
 #define CONST_INT32_PS(N, V3,V2,V1,V0) \
-static const SIMDE_ALIGN(16) int _##N[]= \
+alignas(16) static const int32_t _##N[]= \
     {V0, V1, V2, V3};/*little endian!*/ \
 const F32vec4 N = _mm_load_ps((float*)_##N);
 
