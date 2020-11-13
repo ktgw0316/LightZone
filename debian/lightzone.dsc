@@ -31,7 +31,6 @@ Build-Depends:
  libslf4j-java,
  libtiff5-dev,
  libx11-dev,
- openjfx,
  pkg-config,
  rsync
 Package-List: 

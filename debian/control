@@ -28,7 +28,6 @@ Build-Depends:
  libslf4j-java,
  libtiff5-dev,
  libx11-dev,
- openjfx,
  pkg-config,
  rsync
 Homepage: http://lightzoneproject.org/
@@ -55,6 +54,5 @@ Depends:
  libslf4j-java,
  libtiff5,
  libxml2-utils,
- openjfx
 Description: Open-source professional-level digital darkroom software
  LightZone is open-source professional-level digital darkroom software for Windows, Mac OS X, and Linux. Rather than using layers as many other photo editors do, LightZone lets the user build up a stack of tools which can be rearranged, turned off and on, and removed from the stack. It's a non-destructive editor, where any of the tools can be re-adjusted or modified later - even in a different editing session. A tool stack can be copied to a batch of photos at one time. LightZone operates in a 16-bit linear color space with the wide gamut of ProPhoto RGB.

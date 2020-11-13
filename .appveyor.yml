@@ -2,7 +2,7 @@ version: 4.2.1.{build}-{branch}
 
 # common configuration for all branches
 image:
-  - Ubuntu2004
+- Ubuntu2004
 
 clone_depth: 1
 
@@ -15,7 +15,7 @@ install:
 init:
   - sh: sudo add-apt-repository --yes ppa:lightzone-team/lightzone
   - sh: sudo apt-get update
-  - sh: sudo apt-get install -y ant autoconf javahelp2 libejml-java libglib2.0-dev libjaxb-java libjetbrains-annotations-java libjiconfont-font-awesome-java libjiconfont-google-material-design-icons-java libjiconfont-swing-java liblensfun-dev liblcms2-dev liblombok-java librefuel-java libslf4j-java libtiff5-dev openjfx tidy 
+  - sh: sudo apt-get install -y ant autoconf javahelp2 libejml-java libglib2.0-dev libjaxb-java libjetbrains-annotations-java libjiconfont-font-awesome-java libjiconfont-google-material-design-icons-java libjiconfont-swing-java liblensfun-dev liblcms2-dev liblombok-java librefuel-java libslf4j-java libtiff5-dev tidy
 
 build_script:
   - sh: ant -f linux/build.xml

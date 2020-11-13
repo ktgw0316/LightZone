@@ -34,7 +34,6 @@
         <module name="java.management" />
         <module name="java.prefs" />
         <module name="java.rmi" />
-        <module name="javafx.swing" />
         <module name="jdk.management" />
       </modules>
     </jreBundles>

@@ -98,8 +98,7 @@ class DisplayProfileItem extends PreferencesItem implements ActionListener {
         }
         File file = new File(path);
         file = chooser.openFile(
-            LOCALE.get("DisplayProfileDialogTitle"), file, null,
-                (javafx.stage.FileChooser.ExtensionFilter) null
+            LOCALE.get("DisplayProfileDialogTitle"), file, null, null
         );
         if (file != null) {
             if (! file.isFile()) {

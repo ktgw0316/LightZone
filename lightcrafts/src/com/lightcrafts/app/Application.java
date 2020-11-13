@@ -118,7 +118,7 @@ public class Application {
             LOCALE.get("OpenFileDialogTitle"),
             LastOpenPath,
             parent,
-            ImageExtensionFilter.getFilter()
+            ImageFilenameFilter.INSTANCE
         );
         if (file != null) {
             ComboFrame frame = getFrameForFile(file);

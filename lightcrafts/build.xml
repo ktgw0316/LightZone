@@ -37,21 +37,6 @@
     </or>
   </condition>
 
-  <condition property="javafx.platform" value="linux">
-    <not>
-      <or>
-        <os family="mac"/>
-        <os family="windows"/>
-      </or>
-    </not>
-  </condition>
-  <condition property="javafx.platform" value="mac">
-    <os family="mac"/>
-  </condition>
-  <condition property="javafx.platform" value="win">
-    <os family="windows"/>
-  </condition>
-
   <property name="offline" value="true"/>
 
   <target name="resolve" depends="init-ivy" unless="offline">
