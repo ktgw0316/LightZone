@@ -19,36 +19,39 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 class TestSSE2 {
-    
-    private static String osname = System.getProperty("os.name");
+
+    private static String simdRegex;
+    private static String modelRegex;
+    private static String[] cmd;
+
+    static {
+        String osname = System.getProperty("os.name");
+
+        if (osname.contains("Linux")) {
+            cmd = new String[] {"cat", "/proc/cpuinfo"};
+            simdRegex = "^flags\t\t:.*sse2";
+            modelRegex = "^model name\t: ";
+        } else if (osname.contains("SunOS")) {
+            cmd = new String[] {"sh", "-c", "isainfo -nv ; psrinfo -pv"};
+            simdRegex = "^\t.*sse2";
+            modelRegex = "^\t";
+        } else if (osname.contains("FreeBSD")) {
+            cmd = new String[] {"sysctl", "hw"};
+            simdRegex = "^hw.instruction_sse: 1";
+            modelRegex = "^hw.model: ";
+        } else {
+            cmd = new String[] {"dmesg"};
+            simdRegex = "^  Features=.*SSE2";
+            modelRegex = "^CPU: ";
+        }
+    }
 
     static boolean hasSSE2() {
-        String regex;
-        if (osname.contains("Linux")) {
-            regex = "^flags\t\t:.*sse2";
-        } else if (osname.contains("SunOS")) {
-            regex = "^\t.*sse2";
-        } else if (osname.contains("FreeBSD")) {
-            regex = "^hw.instruction_sse: 1";
-        } else {
-            regex = "^  Features=.*SSE2";
-        }
-        return (getCpuInfoLine(regex) != null);
+        return getCpuInfoLine(simdRegex) != null;
     }
 
     private static String getCpuInfoLine(String regex) {
         String line = null;
-        String[] cmd;
-        if (osname.contains("Linux")) {
-            cmd = new String[] {"cat", "/proc/cpuinfo"};
-        } else if (osname.contains("SunOS")) {
-            cmd = new String[] {"sh", "-c", "isainfo -nv ; psrinfo -pv"};
-        } else if (osname.contains("FreeBSD")) {
-            cmd = new String[] {"sysctl", "hw"};
-        } else {
-            cmd = new String[] {"dmesg"};
-        }
-
         try {
             Process process = Runtime.getRuntime().exec(cmd);
             try (InputStream in = process.getInputStream();
@@ -65,24 +68,17 @@ class TestSSE2 {
         return line;
     }
 
-    static void showDialog() {
-        String regex;
-        if (osname.contains("Linux")) {
-            regex = getCpuInfoLine("^model name\t: ");
-        } else if (osname.contains("SunOS")) {
-            regex = getCpuInfoLine("^\t");
-        } else if (osname.contains("FreeBSD")) {
-            regex = getCpuInfoLine("^hw.model: ");
-        } else {
-            regex = getCpuInfoLine("^CPU: ");
-        }
-        String model = getCpuInfoLine(regex);
+    private static String getCpuModel() {
+        String model = getCpuInfoLine(modelRegex);
         if (model != null)
-            model = model.replaceFirst(Matcher.quoteReplacement(regex), "");
+            model = model.replaceFirst(Matcher.quoteReplacement(modelRegex), "");
+        return model;
+    }
 
+    static void showDialog() {
         String messageA = LOCALE.get("CantRunSSE2Title");
         String messageB = LOCALE.get("CantRunSSE2");
-        String messageC = LOCALE.get("FoundProcCpuinfo", model);
+        String messageC = LOCALE.get("FoundProcCpuinfo", getCpuModel());
         String messageD = LOCALE.get("LearnMoreSSE2");
         String messageE = LOCALE.get("LearnMoreSSE2URL");
 
@@ -124,3 +120,4 @@ class TestSSE2 {
         );
     }
 }
+
