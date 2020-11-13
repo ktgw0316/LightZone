@@ -2,13 +2,13 @@
 
 package com.lightcrafts.app;
 
-import com.lightcrafts.image.ImageExtensionFilter;
 import com.lightcrafts.platform.AlertDialog;
 import com.lightcrafts.platform.FileChooser;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.ui.toolkit.TextAreaFactory;
 
 import static com.lightcrafts.app.Locale.LOCALE;
+import com.lightcrafts.image.ImageFilenameFilter;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -109,7 +109,7 @@ class DocumentImageSelector {
                     FileChooser chooser = Env.getFileChooser();
                     file = chooser.openFile(
                         findTitle, chooserFile, parent,
-                        ImageExtensionFilter.getFilter()
+                        ImageFilenameFilter.INSTANCE
                     );
                     if (file != null) {
                         dialog.dispose();
@@ -182,7 +182,7 @@ class DocumentImageSelector {
                 "ImageSelectorFindDialogTitle", oldImageFile.getName()
             );
             file = chooser.openFile(
-                title, chooserFile, parent, ImageExtensionFilter.getFilter()
+                title, chooserFile, parent, ImageFilenameFilter.INSTANCE
             );
         }
         else {
@@ -216,7 +216,7 @@ class DocumentImageSelector {
                 "ImageSelectorFindDialogTitle", oldImageFile.getName()
             );
             file = chooser.openFile(
-                title, chooserFile, parent, ImageExtensionFilter.getFilter()
+                title, chooserFile, parent, ImageFilenameFilter.INSTANCE
             );
         }
         else {

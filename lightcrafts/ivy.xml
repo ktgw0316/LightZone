@@ -9,22 +9,6 @@
     <dependency org="org.slf4j" name="slf4j-simple" rev="1.7.25" conf="default"/>
     <dependency org="javax.xml.bind" name="jaxb-api" rev="2.4.0-b180830.0359"/>
     <dependency org="org.glassfish.jaxb" name="jaxb-runtime" rev="2.4.0-b180830.0438"/>
-    <dependency org="org.openjfx" name="javafx-base" rev="11.0.2">
-	    <artifact name="javafx-base" ext="jar"/>
-	    <artifact name="javafx-base" ext="jar" type="${javafx.platform}" m:classifier="${javafx.platform}"/>
-    </dependency>
-    <dependency org="org.openjfx" name="javafx-controls" rev="11.0.2">
-	    <artifact name="javafx-controls" ext="jar"/>
-	    <artifact name="javafx-controls" ext="jar" type="${javafx.platform}" m:classifier="${javafx.platform}"/>
-    </dependency>
-    <dependency org="org.openjfx" name="javafx-graphics" rev="11.0.2">
-	    <artifact name="javafx-graphics" ext="jar"/>
-	    <artifact name="javafx-graphics" ext="jar" type="${javafx.platform}" m:classifier="${javafx.platform}"/>
-    </dependency>
-    <dependency org="org.openjfx" name="javafx-swing" rev="11.0.2">
-	    <artifact name="javafx-swing" ext="jar"/>
-	    <artifact name="javafx-swing" ext="jar" type="${javafx.platform}" m:classifier="${javafx.platform}"/>
-    </dependency>
     <dependency org="com.github.jiconfont" name="jiconfont-swing" rev="1.0.0"/>
     <dependency org="com.github.jiconfont" name="jiconfont-font_awesome" rev="4.5.0.3"/>
     <dependency org="com.github.jiconfont" name="jiconfont-google_material_design_icons" rev="2.2.0.1"/>
