@@ -18,7 +18,7 @@ init:
   - sh: sudo apt-get install -y ant autoconf javahelp2 libejml-java libglib2.0-dev libjaxb-java libjetbrains-annotations-java libjiconfont-font-awesome-java libjiconfont-google-material-design-icons-java libjiconfont-swing-java liblensfun-dev liblcms2-dev liblombok-java librefuel-java libslf4j-java libtiff5-dev tidy
 
 build_script:
-  - sh: ant -f linux/build.xml
+  - sh: ant -f linux/build.xml -Doffline=true
 
 # additional configuration
 for:
@@ -52,4 +52,4 @@ for:
   
   build_script:
     - cmd: bash -lc "ant -f /c/projects/lightzone/windows/build.xml"
-    - sh: ant -f linux/build.xml
+    - sh: ant -f linux/build.xml -Doffline=true
