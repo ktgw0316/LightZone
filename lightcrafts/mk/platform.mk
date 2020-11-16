@@ -51,7 +51,7 @@ PLATFORM_LDFLAGS=	$(LDFLAGS)
 # Default symlink command.  This needs to be defined as a function variable
 # rather than just a simple variable because of the way it's overridden for
 # Windows.  (Must not use := here!)
-SYMLINK=		ln -fs "$1" "$2"
+SYMLINK?=		ln -fs "$1" "$2"
 
 # Miscellaneous commands.
 AR:=			ar
@@ -273,6 +273,10 @@ ifeq ($(PLATFORM),$(filter $(PLATFORM),Linux FreeBSD SunOS))
 
   ifeq ($(PROCESSOR),$(filter $(PROCESSOR),x86_64 i386))
     PLATFORM_CFLAGS+=	$(SSE_FLAGS)
+  else ifeq ($(PROCESSOR),$(filter $(PROCESSOR),aarch64 armv8l))
+    PLATFORM_CFLAGS+=	-march=armv8-a
+  else ifeq ($(PROCESSOR),$(filter $(PROCESSOR),armhf armv7l))
+    PLATFORM_CFLAGS+=	-march=armv7-a
   else ifeq ($(PROCESSOR),ppc)
     PLATFORM_CFLAGS+=	-mcpu=powerpc
   else ifeq ($(PROCESSOR),ppc64)

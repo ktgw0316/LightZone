@@ -2,12 +2,57 @@ Source: lightzone
 Section: graphics
 Priority: optional
 Maintainer: Masahiro Kitagawa <arctica0316@gmail.com>
-Build-Depends: debhelper, devscripts, ant (>= 1.9.8), autoconf, git-core, javahelp2, default-jdk (>= 1.11), default-jre-headless (>= 2:1.8), libavcodec58, liblcms2-dev, liblensfun-dev (<< 0.3.95), libglib2.0-dev, libjpeg-dev, libtiff5-dev, libx11-dev, pkg-config, rsync
+Build-Depends:
+ ant (>= 1.9.8),
+ autoconf,
+ debhelper,
+ default-jdk (>= 1.11),
+ default-jre-headless (>= 2:1.11),
+ devscripts,
+ git-core,
+ javahelp2,
+ javahelper,
+ libavcodec58,
+ libejml-java,
+ libglib2.0-dev,
+ libjaxb-java,
+ libjetbrains-annotations-java,
+ libjiconfont-font-awesome-java,
+ libjiconfont-google-material-design-icons-java,
+ libjiconfont-swing-java,
+ libjpeg-dev,
+ liblombok-java,
+ liblcms2-dev,
+ liblensfun-dev (<< 0.3.95),
+ librefuel-java,
+ libslf4j-java,
+ libtiff5-dev,
+ libx11-dev,
+ pkg-config,
+ rsync
 Homepage: http://lightzoneproject.org/
 Standards-Version: 4.4.1
 
 Package: lightzone
 Architecture: i386 amd64
-Depends: default-jre (>= 2:1.8), javahelp2, libgomp1, liblensfun0 | liblensfun1 (<< 0.3.95), liblcms2-2, libjpeg62-turbo | libjpeg-turbo8, libtiff5, libxml2-utils
+Depends:
+ ${java:depends},
+ ${misc:depends},
+ ${shlibs:depends},
+ default-jre (>= 2:1.11),
+ javahelp2,
+ libejml-java,
+ libgomp1,
+ libjaxb-java,
+ libjiconfont-font-awesome-java,
+ libjiconfont-google-material-design-icons-java,
+ libjiconfont-swing-java,
+ libjpeg62-turbo | libjpeg-turbo8,
+ liblcms2-2,
+ liblensfun0 | liblensfun1 (<< 0.3.95),
+ librefuel-java,
+ libslf4j-java,
+ libtiff5,
+ libxml2-utils,
 Description: Open-source professional-level digital darkroom software
  LightZone is open-source professional-level digital darkroom software for Windows, Mac OS X, and Linux. Rather than using layers as many other photo editors do, LightZone lets the user build up a stack of tools which can be rearranged, turned off and on, and removed from the stack. It's a non-destructive editor, where any of the tools can be re-adjusted or modified later - even in a different editing session. A tool stack can be copied to a batch of photos at one time. LightZone operates in a 16-bit linear color space with the wide gamut of ProPhoto RGB.

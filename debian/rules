@@ -1,59 +1,16 @@
 #!/usr/bin/make -f
 
-JAVA_HOME:=$(shell readlink -f /usr/bin/javac | sed "s:/bin/javac::")
-ANT_OPTIONS=-f $(CURDIR)/linux/build.xml
+export JAVA_HOME=$(shell readlink -f /usr/bin/javac | sed "s:/bin/javac::")
 
-configure: configure-stamp
-configure-stamp:
-	dh_testdir
-	touch configure-stamp
+SYMLINK:=cp -pH "$1" "$2"
+ANT_OPTIONS=-f $(CURDIR)/linux/build.xml -Doffline=true
 
-build: build-arch build-indep
-build-arch: build-stamp
-build-indep: build-stamp
-build-stamp: configure-stamp
-	dh_testdir
-	JAVA_HOME=$(JAVA_HOME) ant $(ANT_OPTIONS) jar
-	touch $@
+%:
+	dh $@ --with javahelper --buildsystem=ant
 
-install: build
-	dh_testdir
-	dh_testroot
-	dh_prep
-	dh_installdirs
-	install -m 755 $(CURDIR)/linux/products/lightzone $(CURDIR)/debian/lightzone/usr/bin/
-	install -m 644 $(CURDIR)/linux/products/lightzone.desktop $(CURDIR)/debian/lightzone/usr/share/applications/
-	# not using install file here because
-	# 1 - icon files have to be copied recursively
-	# 2 - some files are symlinks and they need to be followed. Install file just copies symlinks
-	cp -pHR $(CURDIR)/linux/icons $(CURDIR)/debian/lightzone/usr/share/
-	cp -pH $(CURDIR)/linux/products/LightZone-forkd $(CURDIR)/debian/lightzone/usr/lib/lightzone/
-	cp -pH $(CURDIR)/linux/products/dcraw_lz $(CURDIR)/debian/lightzone/usr/lib/lightzone/
-	cp -pH $(CURDIR)/linux/products/*.so $(CURDIR)/debian/lightzone/usr/lib/lightzone/
-	cp -pH $(CURDIR)/linux/products/*.jar $(CURDIR)/debian/lightzone/usr/share/java/lightzone/
+override_dh_auto_build:
+	dh_auto_build -- $(ANT_OPTIONS) jar
 
-binary-indep: build-indep install
-binary-arch: build-arch install
-	dh_testdir
-	dh_testroot
-#	dh_installdocs
-#	dh_installexamples
-#	dh_install
-#	dh_installmenu
-#	dh_installman
-	dh_link
-	dh_compress
-	dh_fixperms
-	dh_installdeb
-	dh_gencontrol
-	dh_md5sums
-	dh_builddeb
-
-clean:
-	JAVA_HOME=$(JAVA_HOME) ant $(ANT_OPTIONS) clean
-	-$(RM) -rf $(CURDIR)/debian/lightzone/
-	-$(RM) configure-stamp build-stamp
-
-binary: binary-arch binary-indep
-.PHONY: build-arch build clean binary-arch binary-indep binary install configure
+override_dh_auto_clean:
+	dh_auto_clean -- $(ANT_OPTIONS)
 

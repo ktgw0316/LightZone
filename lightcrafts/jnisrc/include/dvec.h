@@ -23,7 +23,7 @@
 #include <iostream>
 #endif
 
-#ifdef __SSE__
+#if defined(__SSE__) || defined(SIMDE_ENABLE_NATIVE_ALIASES)
 
 #pragma pack(push,16)
 
@@ -842,7 +842,7 @@ inline F64vec2 IntToF64vec2(const F64vec2 &a,int b) { return _mm_cvtsi32_sd(a,b)
 
 #pragma pack(pop)
 
-#endif /* ifdef __SSE__ */
+#endif /* #if defined(__SSE__) || defined(SIMDE_ENABLE_NATIVE_ALIASES) */
 
 #pragma pack(pop)
 #endif

@@ -6,7 +6,7 @@ package com.lightcrafts.ui.toolkit;
 
 import jiconfont.IconCode;
 import jiconfont.icons.FontAwesome;
-import jiconfont.icons.GoogleMaterialDesignIcons;
+import jiconfont.icons.google_material_design_icons.GoogleMaterialDesignIcons;
 import jiconfont.swing.IconFontSwing;
 import lombok.val;
 

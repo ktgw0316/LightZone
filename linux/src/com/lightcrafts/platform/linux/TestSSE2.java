@@ -28,9 +28,16 @@ class TestSSE2 {
         String osname = System.getProperty("os.name");
 
         if (osname.contains("Linux")) {
-            cmd = new String[] {"cat", "/proc/cpuinfo"};
-            simdRegex = "^flags\t\t:.*sse2";
-            modelRegex = "^model name\t: ";
+            String osarch = System.getProperty("os.arch");
+            if (osarch.contains("arm") || osarch.contains("aarch")) {
+                simdRegex = "^Flags:.* (neon|asimd)";
+                modelRegex = "^Model name: ";
+                cmd = new String[] {"lscpu"};
+            } else {
+                simdRegex = "^flags\t\t:.*sse2";
+                modelRegex = "^model name\t: ";
+                cmd = new String[] {"cat", "/proc/cpuinfo"};
+            }
         } else if (osname.contains("SunOS")) {
             cmd = new String[] {"sh", "-c", "isainfo -nv ; psrinfo -pv"};
             simdRegex = "^\t.*sse2";
@@ -71,8 +78,8 @@ class TestSSE2 {
     private static String getCpuModel() {
         String model = getCpuInfoLine(modelRegex);
         if (model != null)
-            model = model.replaceFirst(Matcher.quoteReplacement(modelRegex), "");
-        return model;
+            return model.replaceFirst(Matcher.quoteReplacement(modelRegex), "");
+        return "";
     }
 
     static void showDialog() {

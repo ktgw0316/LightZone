@@ -37,7 +37,7 @@
     </or>
   </condition>
 
-  <target name="resolve" depends="init-ivy">
+  <target name="resolve" depends="init-ivy" unless="offline">
     <ivy:resolve file="${basedir}/ivy.xml"/>
     <ivy:retrieve/>
   </target>
@@ -62,22 +62,36 @@
     <property name="ivy.initialized" value="true"/>
   </target>
 
-  <target name="javac" depends="resolve">
+  <available file="/usr" type="dir" property="have.usr"/>
+
+  <path id="compile.classpath">
+    <fileset dir="lib">
+      <include name="*.jar"/>
+    </fileset>
+  </path>
+
+  <target name="init_classpath" if="have.usr">
+    <path id="compile.classpath">
+      <fileset dir="lib">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="/usr">
+        <include name="share/java*/**/*.jar"/>
+        <include name="local/share/java/classes/*.jar"/>
+        <include name="jdk/packages/lib/ext/*.jar"/>
+      </fileset>
+    </path>
+  </target>
+
+  <target name="javac" depends="resolve, init_classpath">
     <exec executable="${MAKE}" dir="products" failonerror="true"
           vmlauncher="true">
       <arg value="-j"/>
     </exec>
     <mkdir dir="build"/>
     <mkdir dir="javah"/>
-    <javac destdir="build" includeantruntime="false" debug="true"
-           release="11" nativeheaderdir="javah">
-      <src path="src"/>
-      <classpath>
-        <fileset dir="lib">
-          <include name="*.jar"/>
-        </fileset>
-      </classpath>
-    </javac>
+    <javac srcdir="src" destdir="build" includeantruntime="false" debug="true"
+      release="11" nativeheaderdir="javah" classpathref="compile.classpath"/>
   </target>
 
   <target name="coprocesses">
