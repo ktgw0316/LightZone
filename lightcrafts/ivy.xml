@@ -11,7 +11,7 @@
     <dependency org="org.glassfish.jaxb" name="jaxb-runtime" rev="2.4.0-b180830.0438"/>
     <dependency org="com.github.jiconfont" name="jiconfont-swing" rev="1.0.0"/>
     <dependency org="com.github.jiconfont" name="jiconfont-font_awesome" rev="4.5.0.3"/>
-    <dependency org="com.github.jiconfont" name="jiconfont-google_material_design_icons" rev="2.2.0.1"/>
+    <dependency org="com.github.jiconfont" name="jiconfont-google_material_design_icons" rev="2.2.0.2"/>
   </dependencies>
 </ivy-module>
 
