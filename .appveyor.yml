@@ -38,3 +38,7 @@ init:
 build_script:
   - cmd: bash -lc "ant -f /c/projects/lightzone/windows/build.xml build-installer"
   - sh: ant -f linux/build.xml -Doffline=true
+
+artifacts:
+  - path: 'windows/LightZone_Installer_*.exe'
+    name: windows installer
