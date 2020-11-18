@@ -130,15 +130,16 @@
 
   <!--===== Make a Windows installer =======================================-->
 
+  <taskdef name="install4j"
+         classname="com.install4j.Install4JTask"
+         classpath="C:\Program Files\install4j8\bin\ant.jar"/>
+
   <target name="build-installer-only">
-    <exec executable="install4jc.exe" failonerror="true">
-      <!-- The "-D LC_VERSION=..." has to be given to install4j as two seperate
-           arguments, hence the use of line= rather than value= since the
-           latter, even if there's a space in it, will be given as a single
-           argument containing a space and not as two seperate arguments. -->
-      <arg line="-D LC_VERSION=${app-version}"/>
-      <arg file="lightzone-${jre-arch}.install4j"/>
-    </exec>
+    <install4j projectfile="lightzone-${jre-arch}.install4j"
+               license="${env.INSTALL4J_LICENSE}"
+               winKeystorePassword="${env.WIN_KEYSTORE_PASSWORD}">
+      <vmparameter value="-DLC_VERSION=${app-version}"/>
+    </install4j>
   </target>
   <target name="build-installer" depends="jar, help, build-installer-only"/>
 
