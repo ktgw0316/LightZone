@@ -1,6 +1,7 @@
 version: 4.2.1.{build}-{branch}
 
 image:
+- macos-mojave
 - Visual Studio 2017
 - Ubuntu2004
 
@@ -42,3 +43,21 @@ build_script:
 artifacts:
   - path: 'windows/LightZone_Installer_*.exe'
     name: windows installer
+
+for:
+-
+  matrix:
+    only:
+      - image: macos-mojave
+
+  install:
+    - sh: export JAVA_HOME=/usr/local/opt/openjdk
+  init:
+    - sh: brew install ant autoconf lensfun libjpeg-turbo libomp libtiff libxml2 little-cms2 pkg-config rsync
+
+  build_script:
+    - sh: ant -f macosx/build.xml dmg
+
+  artifacts:
+    - path: 'macosx/dmg/LightZone.dmg'
+      name: macos installer
