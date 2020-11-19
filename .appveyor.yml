@@ -51,9 +51,11 @@ for:
       - image: macos-mojave
 
   install:
-    - sh: export JAVA_HOME=/usr/local/opt/openjdk
-  init:
     - sh: brew install ant autoconf lensfun libjpeg-turbo libomp libtiff libxml2 little-cms2 pkg-config rsync
+
+  init:
+    - sh: export JAVA_HOME=/usr/local/opt/openjdk
+    - sh: export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
 
   build_script:
     - sh: ant -f macosx/build.xml dmg
