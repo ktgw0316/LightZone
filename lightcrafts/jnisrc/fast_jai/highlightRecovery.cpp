@@ -34,7 +34,8 @@ inline Iu16vec8 F32vec4toIu16vec8(const F32vec4 &hi, const F32vec4 &lo) {
     const Iu16vec8 sign_swap16(0x8000, 0x8000, 0x8000, 0x8000, 0x8000, 0x8000, 0x8000, 0x8000);
 
     return Iu16vec8(
-        _mm_packs_epi32(_mm_cvtps_epi32(lo) - sign_swap32, _mm_cvtps_epi32(hi) - sign_swap32) ^
+        _mm_packs_epi32(Iu32vec4(_mm_cvtps_epi32(lo)) - sign_swap32,
+                        Iu32vec4(_mm_cvtps_epi32(hi)) - sign_swap32) ^
         sign_swap16);
 }
 

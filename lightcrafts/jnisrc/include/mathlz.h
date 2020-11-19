@@ -10,6 +10,16 @@
 #define M_PI		3.14159265358979323846
 #endif
 
+union U {
+    float f;
+    int i;
+};
+
+union UU {
+    float f;
+    unsigned int i;
+};
+
 // Very fast approximation of exp, faster than lookup table!
 // See paper of Nicol N. Schraudolph, adapted here to single precision floats.
 #if _OPENMP >= 201307
@@ -28,10 +38,7 @@ float fast_exp(float val)
     constexpr float fast_exp_b_c = 127.0f * (1 << 23) - 347000;
 #endif
 
-    union {
-        float f;
-        int i;
-    } result;
+    U result = { 0.0 };
 
     result.i = int(fast_exp_a * val + fast_exp_b_c);
 
@@ -60,10 +67,7 @@ constexpr T SQR( T x )
 #endif
 static inline float fast_log2 (float val)
 {
-    union {
-        float f;
-        int i;
-    } n;
+    U n = { 0.0 };
 
     n.f = val;
     int * const exp_ptr = &n.i;
@@ -92,10 +96,7 @@ static inline float fast_log (float x) {
 static inline float inv_sqrt(float x)
 {
     float xhalf = 0.5f * x;
-    union {
-        float f;
-        unsigned int i;
-    } n;
+    UU n = { 0.0 };
 
     n.f = x;                          // get bits for floating value
     n.i = 0x5f375a86 - (n.i>>1);      // gives initial guess y0
