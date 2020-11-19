@@ -64,14 +64,14 @@ RM:=			rm -fr
 ifeq ($(PLATFORM),MacOSX)
   MACOSX_MINOR_VERSION:=	$(shell sw_vers -productVersion | cut -d. -f2-2)
   ifeq ($(MACOSX_MINOR_VERSION),6) # Snow Leopard
-    CC:=		gcc
-    CXX:=		g++
+    CC?=		gcc
+    CXX?=		g++
   else ifeq ($(shell expr $(MACOSX_MINOR_VERSION) \>= 12),1) # Sierra
-    CC:=		clang
-    CXX:=		clang++
+    CC?=		clang
+    CXX?=		clang++
   else
-    CC:=		clang-omp
-    CXX:=		clang-omp++
+    CC?=		clang-omp
+    CXX?=		clang-omp++
   endif
 
   MACOSX_DEPLOYMENT_TARGET:= 	$(shell sw_vers -productVersion | cut -d. -f-2)
@@ -214,8 +214,8 @@ ifeq ($(PLATFORM),Windows)
   else
     MINGW:=		i686-w64-mingw32
   endif
-  CC:=		$(MINGW)-gcc
-  CXX:=		$(MINGW)-g++
+  CC?=		$(MINGW)-gcc
+  CXX?=		$(MINGW)-g++
   PKGCFG:=	$(MINGW)-pkg-config
 
   ifeq ($(CYGWIN),1)
