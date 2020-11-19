@@ -8,7 +8,7 @@
       <arg line="--compress=2 --module-path ${env.JAVA_HOME}/jmods --add-modules java.base,java.desktop,java.logging,java.management,java.prefs,java.rmi,jdk.management --output Home --no-header-files --no-man-pages --strip-debug"/>
     </exec>
     <mkdir dir="${jre-dir}/MacOS"/>
-    <copy todir="${jre-dir}/MacOS" file="${env.JAVA_HOME}/lib/jli/libjli.dylib"/>
+    <copy todir="${jre-dir}/MacOS" file="${env.JAVA_HOME}/../MacOS/libjli.dylib"/>
     <copy todir="${jre-dir}" file="${env.JAVA_HOME}/../Info.plist"/>
   </target>
 
