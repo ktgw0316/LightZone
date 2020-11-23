@@ -47,12 +47,16 @@ class AspectConstraint {
         return new AspectConstraint(denominator, numerator);
     }
 
+    private String nameWithDescription;
+
     String getNameWithDescription() {
-        String s = String.format("%.2f", 1 / getAspectRatio()) + " | " + name;
-        if (description != null && !description.isEmpty()) {
-            s += " (" + description + ")";
+        if (nameWithDescription == null) {
+            nameWithDescription = String.format("%.2f", 1 / getAspectRatio()) + " | " + name;
+            if (description != null && !description.isEmpty()) {
+                nameWithDescription += " (" + description + ")";
+            }
         }
-        return s;
+        return nameWithDescription;
     }
 
     @Override

@@ -200,8 +200,7 @@ public class JAIContext {
             jaiInstance.getTileScheduler().setParallelism(processors);
         else
             jaiInstance.getTileScheduler().setParallelism(1);
-
-        fileCache = new LCTileCache(maxMemory <= 1024 * MB ? maxMemory/2 : maxMemory -  512 * MB, true);
+        fileCache = new LCTileCache(maxMemory <= 2048L * MB ? maxMemory/2 : maxMemory -  1024 * MB, true);
         // fileCache.setMemoryThreshold(0.5f);
         jaiInstance.setTileCache(fileCache);
         fileCacheHint = new RenderingHints(JAI.KEY_TILE_CACHE, fileCache);
