@@ -1,7 +1,7 @@
 Format: 3.0 (quilt)
 Source: lightzone
 Binary: lightzone
-Architecture: i386 amd64
+Architecture: i386 amd64 armhf arm64
 Version: 4.2.1
 Maintainer: Masahiro Kitagawa <arctica0316@gmail.com>
 Homepage: http://lightzoneproject.org/

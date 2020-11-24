@@ -34,7 +34,7 @@ Homepage: http://lightzoneproject.org/
 Standards-Version: 4.4.1
 
 Package: lightzone
-Architecture: i386 amd64
+Architecture: i386 amd64 armhf arm64
 Depends:
  ${java:depends},
  ${misc:depends},
