@@ -12,20 +12,20 @@ line endings. There's a .gitattributes file to specify that those files need to 
 
 Download and install (or unpack) following:
 -   __Apache Ant__ version 1.9.8 or later to support nativeheaderdir parameter
--   __MSYS2__
-    1. Install MSYS2 and update packages as described in https://msys2.github.io/
-    1. Install required packages.
-    -    `pacman -S autoconf diffutils git make tar`
-    1. Install target-specific toolchain.
-    -    For 32-bit: `pacman -S mingw-w64-i686-toolchain`
-    -    For 64-bit: `pacman -S mingw-w64-x86_64-toolchain`
-    then select (at least) __binutils__, __gcc__, __gcc-libs__, and __pkg_config__.
-    1. Install __lcms2__. This will also install __libtiff__ and __libjpeg-turbo__.
-    -    For 32-bit: `pacman -S mingw-w64-i686-lcms2`
-    -    For 64-bit: `pacman -S mingw-w64-x86_64-lcms2`
-    1. Install __ntldd__.
-    -    For 32-bit: `pacman -S mingw-w64-i686-ntldd-git`
-    -    For 64-bit: `pacman -S mingw-w64-x86_64-ntldd-git`
+- __MSYS2__
+  1. Install MSYS2 and update packages as described in https://msys2.github.io/
+  1. Install required packages.
+  -    `pacman -S autoconf diffutils git make pkgconf tar`
+  1. Install target-specific toolchain.
+  -    For 32-bit: `pacman -S mingw-w64-i686-toolchain`
+  -    For 64-bit: `pacman -S mingw-w64-x86_64-toolchain`
+  then select (at least) __binutils__, __gcc__, and __gcc-libs__.
+  1. Install __lcms2__. This will also install __libtiff__ and __libjpeg-turbo__.
+  -    For 32-bit: `pacman -S mingw-w64-i686-lcms2`
+  -    For 64-bit: `pacman -S mingw-w64-x86_64-lcms2`
+  1. Install __ntldd__.
+  -    For 32-bit: `pacman -S mingw-w64-i686-ntldd-git`
+  -    For 64-bit: `pacman -S mingw-w64-x86_64-ntldd-git`
 -   __Java Development Kit__ (JDK) version 11 from [AdoptOpenJDK](https://adoptopenjdk.net/).
 -   __Microsoft Windows SDK__
     Pick the right version based on your Windows version. Information and download links are

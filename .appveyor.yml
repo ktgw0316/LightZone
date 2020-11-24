@@ -1,7 +1,7 @@
 version: 4.2.1.{build}-{branch}
 
 image:
-- Visual Studio 2017
+- Visual Studio 2019
 - macos-mojave
 - Ubuntu2004
 
@@ -14,32 +14,37 @@ for:
 -
   matrix:
     only:
-      - image: Visual Studio 2017
+      - image: Visual Studio 2019
 
   init:
-    - cmd: SET MINGW_PATH=mingw-w64/x86_64-7.2.0-posix-seh-rt_v5-rev1/mingw64
-    - cmd: SET MINGW_DIR=/c/%MINGW_PATH%/
-    - cmd: SET MINGW_ARCH=mingw-w64-x86_64
-    - cmd: SET PATH=C:/%MINGW_PATH%/bin/;C:/msys64/mingw64/bin/;C:/msys64/usr/bin/;%PATH%
+    - cmd: SET MINGW64_PATH=mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64
+    - cmd: SET MINGW32_PATH=mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32
+    - cmd: SET PATH=C:/%MINGW64_PATH%/bin/;C:/%MINGW32_PATH%/bin/;C:/msys64/usr/bin/;%PATH%
     - cmd: SET MSSDK_HOME=/c/Program Files (x86)/Windows Kits/10
     - cmd: SET JAVA_HOME=/c/Program Files/Java/jdk11
+    - cmd: SET PROJECT_DIR=/c/projects/lightzone
 
   install:
     - cmd: cinst ant html-help-workshop
+    - cmd: bash -lc 'cp "$MSSDK_HOME/../8.1/Lib/winv6.3/um/x64/Htmlhelp.Lib" /c/$MINGW64_PATH/lib/libhtmlhelp.a'
+    - cmd: bash -lc 'cp "$MSSDK_HOME/../8.1/Lib/winv6.3/um/x86/Htmlhelp.Lib" /c/$MINGW32_PATH/lib/libhtmlhelp.a'
     - ps: (new-object net.webclient).DownloadFile('https://download-gcdn.ej-technologies.com/install4j/install4j_windows-x64_8_0_8.exe', 'install4j-installer.exe')
     - ps: install4j-installer.exe -q
-    - cmd: bash -lc 'cp "/c/Program Files (x86)/Windows Kits/10/Lib/10.0.14393.0/um/x64/Htmlhelp.Lib" /c/mingw-w64/x86_64-7.2.0-posix-seh-rt_v5-rev1/mingw64/lib/libhtmlhelp.a'
     - cmd: bash -lc "curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
     - cmd: bash -lc "curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig"
     - cmd: bash -lc "pacman-key --verify msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig"
     - cmd: bash -lc "pacman --noconfirm -U msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
     - cmd: bash -lc "pacman --needed --noconfirm -Sy pacman"
     - cmd: bash -lc "pacman --needed --noconfirm -Su"
-    - cmd: bash -lc "pacman --noconfirm -S autoconf git make tar"
-    - cmd: bash -lc "pacman --noconfirm -S ${MINGW_ARCH}-lcms2 ${MINGW_ARCH}-lensfun ${MINGW_ARCH}-ntldd-git ${MINGW_ARCH}-pkg-config"
+    - cmd: bash -lc "pacboy --noconfirm --disable-download-timeout -S lcms2:m lensfun:m ntldd-git:m"
 
   build_script:
-    - cmd: bash -lc "ant -f /c/projects/lightzone/windows/build.xml build-installer"
+    - cmd: bash -lc "MINGW_DIR=/c/$MINGW64_PATH ant -f $PROJECT_DIR/windows/build.xml build-installer"
+    - cmd: bash -lc "make -C $PROJECT_DIR/lightcrafts/coprocesses/ clean"
+    - cmd: bash -lc "make -C $PROJECT_DIR/lightcrafts/jnisrc/ clean"
+    - cmd: bash -lc "make -C $PROJECT_DIR/windows/jnisrc/ clean"
+    - cmd: bash -lc "make -C $PROJECT_DIR/windows/products/ clean"
+    - cmd: bash -lc "TARGET=i686 MINGW_DIR=/c/$MINGW32_PATH ant -f $PROJECT_DIR/windows/build.xml -Doffline=true build-installer"
   
   artifacts:
     - path: 'windows/LightZone_Installer_*.exe'
