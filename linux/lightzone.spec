@@ -13,16 +13,7 @@ Url:		http://lightzoneproject.org/
 Group:		Productivity/Graphics/Convertors 
 Source:		%{name}-%{version}.tar.bz2
 
-%if 0%{?rhel}
-%define lcms2_devel lcms2-devel
-%define libjpeg_devel libjpeg-turbo-devel
-%define libX11_devel libX11-devel
-%define pkg_config pkgconfig
-%define xmllint libxml2
-%define debug_package %{nil}
-%endif
-
-%if 0%{?fedora}
+%if 0%{?fedora} || 0%{?rhel_version} || 0%{?centos_version}
 %define lcms2_devel lcms2-devel
 %define libjpeg_devel libjpeg-turbo-devel
 %define libX11_devel libX11-devel
@@ -41,11 +32,14 @@ BuildRequires: update-desktop-files
 %endif
 
 %if 0%{?suse_version}
-%define libX11_devel libX11-devel
 %define lcms2_devel liblcms2-devel
 %define libjpeg_devel libjpeg8-devel
+%define libX11_devel libX11-devel
 %define pkg_config pkg-config
 %define xmllint libxml2-tools
+%if 0%{?suse_version} >= 1320
+Requires:	xerces-j2-xml-apis
+%endif
 %endif
 
 %if 0%{?mdkversion} || 0%{?pclinuxos}
@@ -54,21 +48,22 @@ BuildRequires: update-desktop-files
 %define libX11_devel libX11-devel
 %define pkg_config pkg-config
 %define xmllint libxml2-utils
+BuildRequires:	libgomp-devel
+Requires:	libgomp1
+%endif
+
+%if 0%{?mageia}
+%define lcms2_devel liblcms2-devel
+%define libjpeg_devel libjpeg-devel
+%define libX11_devel libx11-devel
+%define pkg_config pkg-config
+%define xmllint libxml2-utils
+BuildRequires:	libgomp-devel
+Requires:	libgomp1
 %endif
 
 BuildRequires:	javapackages-tools, %{libX11_devel}, ant, autoconf, gcc, gcc-c++, make, git, javahelp2, %{lcms2_devel}, lensfun-devel, %{libjpeg_devel}, libtiff-devel, %{pkg_config}, rsync
-%if 0%{?mdkversion} || 0%{?pclinuxos}
-BuildRequires:	libgomp-devel
-%endif
-
 Requires:	javahelp2, lcms2, lensfun, %{xmllint}
-%if 0%{?suse_version} >= 1320
-Requires:	xerces-j2-xml-apis
-%else
-%if 0%{?mdkversion} || 0%{?pclinuxos}
-Requires:	libgomp1
-%endif
-%endif
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
