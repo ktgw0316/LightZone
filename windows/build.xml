@@ -150,6 +150,9 @@
     <exec executable="make" dir="jnisrc">
       <arg value="${clean-method}"/>
     </exec>
+    <exec executable="make" dir="products">
+      <arg value="${clean-method}"/>
+    </exec>
   </target>
 
   <target name="clean-native">

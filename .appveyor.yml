@@ -22,7 +22,7 @@ for:
     - cmd: SET PATH=C:/%MINGW64_PATH%/bin/;C:/%MINGW32_PATH%/bin/;C:/msys64/usr/bin/;%PATH%
     - cmd: SET MSSDK_HOME=/c/Program Files (x86)/Windows Kits/10
     - cmd: SET JAVA_HOME=/c/Program Files/Java/jdk11
-    - cmd: SET PROJECT_DIR=/c/projects/lightzone
+    - cmd: SET ANT_SCRIPT=/c/projects/lightzone/windows/build.xml
 
   install:
     - cmd: cinst ant html-help-workshop
@@ -39,12 +39,9 @@ for:
     - cmd: bash -lc "pacboy --noconfirm --disable-download-timeout -S lcms2:m lensfun:m ntldd-git:m"
 
   build_script:
-    - cmd: bash -lc "MINGW_DIR=/c/$MINGW64_PATH ant -f $PROJECT_DIR/windows/build.xml build-installer"
-    - cmd: bash -lc "make -C $PROJECT_DIR/lightcrafts/coprocesses/ clean"
-    - cmd: bash -lc "make -C $PROJECT_DIR/lightcrafts/jnisrc/ clean"
-    - cmd: bash -lc "make -C $PROJECT_DIR/windows/jnisrc/ clean"
-    - cmd: bash -lc "make -C $PROJECT_DIR/windows/products/ clean"
-    - cmd: bash -lc "TARGET=i686 MINGW_DIR=/c/$MINGW32_PATH ant -f $PROJECT_DIR/windows/build.xml -Doffline=true build-installer"
+    - cmd: bash -lc "MINGW_DIR=/c/$MINGW64_PATH ant -f $ANT_SCRIPT build-installer"
+    - cmd: bash -lc "ant -f $ANT_SCRIPT clean-native"
+    - cmd: bash -lc "TARGET=i686 MINGW_DIR=/c/$MINGW32_PATH ant -f $ANT_SCRIPT -Doffline=true build-installer"
   
   artifacts:
     - path: 'windows/LightZone_Installer_*.exe'
