@@ -15,6 +15,7 @@ Build-Depends:
  devscripts,
  git-core,
  javahelp2,
+ javahelper,
  libavcodec58,
  libejml-java,
  libglib2.0-dev,
