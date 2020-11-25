@@ -1,7 +1,11 @@
 Source: lightzone
+Maintainer: Masahiro Kitagawa <arctica0316@gmail.com>
 Section: graphics
 Priority: optional
-Maintainer: Masahiro Kitagawa <arctica0316@gmail.com>
+Homepage: http://lightzoneproject.org/
+Standards-Version: 4.4.1
+Vcs-Browser: https://github.com/ktgw0316/LightZone
+Vcs-Git: https://github.com/ktgw0316/LightZone.git
 Build-Depends:
  ant (>= 1.9.8),
  autoconf,
@@ -30,11 +34,11 @@ Build-Depends:
  libx11-dev,
  pkg-config,
  rsync
-Homepage: http://lightzoneproject.org/
-Standards-Version: 4.4.1
 
 Package: lightzone
 Architecture: i386 amd64 armhf arm64
+Section: graphics
+Priority: optional
 Depends:
  ${java:depends},
  ${misc:depends},
