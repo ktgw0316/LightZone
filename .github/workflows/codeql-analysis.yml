@@ -44,8 +44,14 @@ jobs:
         languages: ${{ matrix.language }}
 
     - run: |
+      
+    - sh: sudo apt-get update
+    - sh: sudo 
+
+  build_script:
+       sudo add-apt-repository --yes ppa:lightzone-team/lightzone
        sudo apt-get update
-       sudo apt-get install -y ant autoconf javahelp2 tidy libglib2.0-dev liblensfun-dev liblcms2-dev libtiff5-dev openjfx
+       sudo apt-get install -y apt-get install -y ant autoconf javahelp2 libejml-java libglib2.0-dev libjaxb-java libjetbrains-annotations-java libjiconfont-font-awesome-java libjiconfont-google-material-design-icons-java libjiconfont-swing-java liblensfun-dev liblcms2-dev liblombok-java librefuel-java libslf4j-java libtiff5-dev tidy
        ant -f linux/build.xml -Doffline=true
 
     - name: Perform CodeQL Analysis
