@@ -15,12 +15,12 @@ Building the LightZone source requires (at least) following packages:
 - __libtiff__
 - __libxml2-utils__ for xmllint
 - __make__
-- __openjdk-8-jdk__ or later
+- __openjdk-11-jdk__ or later
 - __pkg-config__
 - __rsync__
 
-### Debian and Ubuntu
-_For Debian (>= squeeze, i386/amd64) and Ubuntu (>= 10.04 lucid). See also [Packaging on Debian or Ubuntu](#packaging_deb) below._
+### Debian (>= 10) and Ubuntu (>= 18.04)
+_See also [Packaging on Debian or Ubuntu](#packaging_deb) below._
 
 Install required packages:
 
@@ -28,15 +28,15 @@ Install required packages:
 
 _(Note: gcc, g++, libc6-dev and make shall be installed with the build-essential.)_
 
-Before start the build, you have to set JAVA_HOME environment variable, e.g.
+Before start the build, you have to set `JAVA_HOME` environment variable, e.g.
 
     export JAVA_HOME=/usr/lib/jvm/default-java
 
-### OpenSUSE (>= 12.2)
+### OpenSUSE (>= 15.2)
 Install required packages:
 
     sudo zypper install ant autoconf gcc gcc-c++ make
-    git javahelp2 liblcms2-devel lensfun-devel libjpeg8-devel libtiff-devel libxml2-utils rsync libX11-devel java-1_8_0-openjdk-devel pkg-config
+    git javahelp2 liblcms2-devel lensfun-devel libjpeg8-devel libtiff-devel libxml2-utils rsync libX11-devel java-11-openjdk-devel pkg-config
 
 Set your `JAVA_HOME` variable to point to installed JDK, e.g.
 
@@ -63,12 +63,12 @@ To check if it works fine before installing:
 ## Create a package and install
 ### <a name="packaging_deb"/>.deb package (Debian or Ubuntu)
 You need to place an original source tarball in parent directory.
-For instance, if you want to build v4.1.9 in /tmp directory,
+For instance, if you want to build v4.2.2 in /tmp directory,
 
     cd /tmp
+    curl -L https://github.com/ktgw0316/LightZone/tarball/4.2.2 > lightzone_4.2.2.orig.tar.gz
+    tar xf lightzone_4.2.2.orig.tar.gz -C lightzone --strip-components=1
     mkdir lightzone
-    curl -L https://github.com/Aries85/LightZone/tarball/master > lightzone_4.1.9.orig.tar.gz
-    tar xf lightzone_4.1.9.orig.tar.gz -C lightzone --strip-components=1
     cd lightzone
 
 (If you want to build a package including your modification, you need to create its source tarball by yourself and place the tarball in the parent directory of the source code.)
@@ -118,7 +118,7 @@ In the local overlay use the portage groups:
     mkdir media-gfx/lightroom
 
 Put _linux/lightzone_9999.ebuild_ in the local overlay.
-If you need to build specific version, replace the _9999_ in the filename with the version number such as _4.1.9_.
+If you need to build specific version, replace the _9999_ in the filename with the version number such as _4.2.2_.
 
 Move into the new directory _media-gfx/lightroom_ and do:
 
@@ -137,16 +137,3 @@ There is a build script: _linux/PKGBUILD_
 ### Ports (FreeBSD etc.)
 There are build scripts in _freebsd-ports/graphics/lightzone/_ directory.
 
-## Miscellaneous
-### If you prefer Oracle Java to OpenJDK
-You can use _Oracle Java JRE version 8 or later_ instead of openjdk-8-jdk.
-
-Easiest way to setup one of these on Ubuntu is, for example:
-
-    sudo add-apt-repository ppa:webupd8team/java
-    sudo apt-get update
-    sudo apt-get install oracle-java8-installer
-
-Set your JAVA_HOME variable to point to installed JDK, e.g.
-
-    export JAVA_HOME=/usr/lib/jvm/java-8-oracle
