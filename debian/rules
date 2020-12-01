@@ -2,7 +2,6 @@
 
 export JAVA_HOME=$(shell readlink -f /usr/bin/javac | sed "s:/bin/javac::")
 
-SYMLINK:=cp -pH "$1" "$2"
 ANT_OPTIONS=-f $(CURDIR)/linux/build.xml -Doffline=true
 
 %:

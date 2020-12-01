@@ -75,14 +75,6 @@ if [ ${maxmem} -le ${minmem} ]; then
   fi
 fi
 
-jvmopts=-XX:+UseG1GC \
-	-XX:MinHeapFreeRatio=30 \
-	-XX:MaxHeapFreeRatio=30 \
-	-Xmx${maxmem}k \
-	-classpath ".:${pkgjavadir}/*:${jhpath}" \
-	-Djava.library.path=$pkglibexecdir \
-	-Dfile.encoding=UTF8
-
 # IFS should be \n to handle filenames that include space.
 IFS="
 "
