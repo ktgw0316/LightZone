@@ -36,21 +36,22 @@ else
   pkglibexecdir=${usrdir}/lib/lightzone
 fi
 
-if   [ -f ${usrdir}/share/java/jh.jar ]; then        # Debian, Ubuntu
-   jhpath=${usrdir}/share/java/jh.jar
-elif [ -f ${usrdir}/share/java/javahelp2.jar ]; then # Fedora, OpenSUSE, PCLinuxOS
-   jhpath=${usrdir}/share/java/javahelp2.jar
-elif [ -f ${usrdir}/share/java/javahelp/jh.jar ]; then      # Arch
-   jhpath=${usrdir}/share/java/javahelp/jh.jar
-elif [ -f ${usrdir}/share/javahelp/lib/jh.jar ]; then  # Gentoo
-   jhpath=${usrdir}/share/javahelp/lib/jh.jar
-elif [ -f ${usrdir}/share/java/classes/jh.jar ]; then # FreeBSD
-   jhpath=${usrdir}/share/java/classes/jh.jar
-elif [ -f ${usrdir}/j2se/opt/javahelp/lib/jhall.jar ]; then # OpenIndiana
-   jhpath=${usrdir}/j2se/opt/javahelp/lib/jhall.jar
-else
-  echo "jh.jar was not found."
+classpath=${pkgjavadir}'/*'
+if   [ -d ${usrdir}/share/java ]; then  # Debian, Ubuntu, Fedora, OpenSUSE, PCLinuxOS
+   classpath=${classpath}:${usrdir}/share/java/'*'
 fi
+if [ -d ${usrdir}/share/java/classes ]; then  # FreeBSD
+   classpath=${classpath}:${usrdir}/share/java/classes/'*'
+fi
+for name in javahelp; do  # TODO: Add paths for other jars
+  if [ -d ${usrdir}/share/java/${name} ]; then  # Arch
+     classpath=${classpath}:${usrdir}/share/java/${name}/'*'
+  elif [ -d ${usrdir}/share/${name}/lib ]; then  # Gentoo
+     classpath=${classpath}:${usrdir}/share/${name}/lib/'*'
+  elif [ -d ${usrdir}/j2se/opt/${name}/lib ]; then  # OpenIndiana
+     classpath=${classpath}:${usrdir}/j2se/opt/${name}/lib/'*'
+  fi
+done
 
 minmem=524288
 maxmem=${minmem}
@@ -85,8 +86,9 @@ for i in "$@"; do
   fi
 done
 
+echo ${classpath}
 (cd ${pkgjavadir} && LD_LIBRARY_PATH=${pkglibexecdir} exec java \
--classpath ".:${pkgjavadir}/*:${jhpath}" \
+-classpath ${classpath} \
 -XX:+UseG1GC \
 -XX:MinHeapFreeRatio=30 \
 -XX:MaxHeapFreeRatio=30 \
