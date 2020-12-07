@@ -71,12 +71,6 @@ ifeq ($(PLATFORM),MacOSX)
   endif
   ALTIVEC_CFLAGS:=	-DLC_USE_ALTIVEC
 
-  ifdef USE_ICC_HERE
-    ICC_ROOT:=		/opt/intel/Compiler/11.1/067
-    ICC:=		$(ICC_ROOT)/bin/ia32/icc
-    XIAR:=		$(ICC_ROOT)/bin/ia32/xiar
-  endif
-
   ##
   # Don't use := here so other makefiles can override SDKROOT.
   ##
@@ -104,25 +98,10 @@ ifeq ($(PLATFORM),MacOSX)
     ##
     FAST_CFLAGS_PPC:=	-fast -Wstrict-aliasing -Wstrict-aliasing=2
 
-    ifdef USE_ICC_HERE
-      FAST_CFLAGS_X86:=	-O3 -no-prec-div -xP -fp-model fast=2 -ipo -vec-report0 -fno-common # -fno-alias
-      ifeq ($(UNIVERSAL),1)
-        CC_X86:=	$(ICC)
-	AR_X86:=	$(XIAR)
-        CXX_X86:=	$(ICC)
-      else
-        ifneq ($(PROCESSOR),powerpc)
-	  AR:=		$(XIAR)
-          CC:=		$(ICC)
-          CXX:=		$(ICC)
-        endif
-      endif
-    else
-      FAST_CFLAGS_X86:=	-O3 \
+    FAST_CFLAGS_X86:=	-O3 \
 			-fno-trapping-math \
 			-fomit-frame-pointer \
 			-msse2 -mfpmath=sse
-    endif
     MACOSX_CFLAGS_PPC+=	$(FAST_CFLAGS_PPC)
     MACOSX_CFLAGS_X86+=	$(FAST_CFLAGS_X86)
   else

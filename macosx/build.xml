@@ -21,9 +21,6 @@
   <condition property="UNIVERSAL" value="1" else="0">
     <isset property="UNIVERSAL"/>
   </condition>
-  <condition property="USE_ICC" value="1" else="0">
-    <isset property="USE_ICC"/>
-  </condition>
 
   <!--===== Application build ==============================================-->
 
@@ -139,7 +136,6 @@
   <target name="dmg" depends="build-bundle">
     <exec executable="make" dir="dmg" failonerror="true" vmlauncher="false">
       <arg value="APP_NAME=${app-name}"/>
-      <arg value="USE_ICC=${USE_ICC}"/>
       <arg value="UNIVERSAL=${UNIVERSAL}"/>
       <arg value="user"/>
     </exec>
