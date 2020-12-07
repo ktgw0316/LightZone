@@ -12,24 +12,17 @@ include		$(COMMON_DIR)/mk/platform.mk
 # Uncomment to compile in debug mode.
 #DEBUG:=		true
 
-MACOSX_MINOR_VERSION:=	$(shell sw_vers -productVersion | cut -d. -f2-2)
-
 # Different compilers required for Objective-C sources.
-ifeq ($(MACOSX_MINOR_VERSION),6) # Snow Leopard
-  CC=	gcc
-  CXX=	g++
+XCODE_PATH:=	$(shell xcode-select -p)
+ifeq ($(findstring CommandLineTools,$(XCODE_PATH)),CommandLineTools)
+  # Use command line tools.
+  XCODE_BIN_DIR=	$(XCODE_PATH)/usr/bin
 else
-  XCODE_PATH:=	$(shell xcode-select -p)
-  ifeq ($(findstring CommandLineTools,$(XCODE_PATH)),CommandLineTools)
-    # Use command line tools.
-    XCODE_BIN_DIR=	$(XCODE_PATH)/usr/bin
-  else
-    # Use Xcode.
-    XCODE_BIN_DIR=	$(XCODE_PATH)/Toolchains/XcodeDefault.xctoolchain/usr/bin
-  endif
-  CC=	$(XCODE_BIN_DIR)/clang
-  CXX=	$(XCODE_BIN_DIR)/clang++
+  # Use Xcode.
+  XCODE_BIN_DIR=	$(XCODE_PATH)/Toolchains/XcodeDefault.xctoolchain/usr/bin
 endif
+CC=	$(XCODE_BIN_DIR)/clang
+CXX=	$(XCODE_BIN_DIR)/clang++
 
 ifeq ($(UNIVERSAL),1)
   ##

@@ -62,17 +62,8 @@ RM:=			rm -fr
 # Mac OS X
 ##
 ifeq ($(PLATFORM),MacOSX)
-  MACOSX_MINOR_VERSION:=	$(shell sw_vers -productVersion | cut -d. -f2-2)
-  ifeq ($(MACOSX_MINOR_VERSION),6) # Snow Leopard
-    CC:=		gcc
-    CXX:=		g++
-  else ifeq ($(shell expr $(MACOSX_MINOR_VERSION) \>= 12),1) # Sierra
-    CC:=		clang
-    CXX:=		clang++
-  else
-    CC:=		clang-omp
-    CXX:=		clang-omp++
-  endif
+  CC:=	clang
+  CXX:=	clang++
 
   MACOSX_DEPLOYMENT_TARGET:= 	$(shell sw_vers -productVersion | cut -d. -f-2)
   ifndef EXECUTABLE
