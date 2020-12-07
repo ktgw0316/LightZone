@@ -31,17 +31,6 @@ endif
 CC=	$(XCODE_BIN_DIR)/clang
 CXX=	$(XCODE_BIN_DIR)/clang++
 
-ifeq ($(UNIVERSAL),1)
-  ##
-  # We need to build the PowerPC part with gcc/g++ 3.3 so the launcher will run
-  # on older versions of Mac OS X.
-  ##
-  CC_PPC:=	$(CC) -arch ppc
-  CXX_PPC:=	$(CXX) -arch ppc
-  CC_X86:=	$(CC) -arch i386
-  CXX_X86:=	$(CXX) -arch i386
-endif
-
 CFLAGS:=	-Os -mdynamic-no-pic -fobjc-exceptions
 INCLUDES=	$(MACOSX_ISYSROOT) $(JAVA_INCLUDES) \
 		-I$(COMMON_DIR)/jnisrc/jniutils
@@ -72,11 +61,11 @@ all: $(TARGET)
 
 ifeq ($(UNIVERSAL),1)
 
-$(TARGET): $(TARGET)-ppc $(TARGET)-x86
-	$(LIPO) -create $(TARGET)-ppc $(TARGET)-x86 -output $@
+$(TARGET): $(TARGET)-arm $(TARGET)-x86
+	$(LIPO) -create $(TARGET)-arm $(TARGET)-x86 -output $@
 
-$(TARGET)-ppc: $(OBJECTS_PPC)
-	$(CC_LINK) $(CFLAGS) $(LDFLAGS) -o $@ *-ppc.o $(LINK)
+$(TARGET)-arm: $(OBJECTS_ARM)
+	$(CC_LINK) $(CFLAGS) $(LDFLAGS) -o $@ *-arm.o $(LINK)
 	$(STRIP) $@
 
 $(TARGET)-x86: $(OBJECTS_X86)
@@ -93,7 +82,7 @@ endif	# UNIVERSAL
 
 include		$(COMMON_DIR)/mk/auto_dep.mk
 
-main.o main-ppc.o main-x86.o: jar_md5_include
+main.o main-arm.o main-x86.o: jar_md5_include
 
 jar_md5_include: $(JARS)
 	$(COMMON_DIR)/tools/bin/lc-md5-jar -l c $(JARS) > $@
@@ -108,7 +97,7 @@ clean:
 	$(RM) *.o .*.d jar_md5_include
 
 distclean: clean
-	$(RM) $(TARGET) $(TARGET)-ppc $(TARGET)-x86
+	$(RM) $(TARGET) $(TARGET)-arm $(TARGET)-x86
 
 mostlyclean:
 

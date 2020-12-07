@@ -25,8 +25,8 @@ ifeq ($(PROCESSOR),$(filter $(PROCESSOR),i486 i586 i686 i86pc))
   PROCESSOR:=		i386
 else ifeq ($(PROCESSOR),amd64)
   PROCESSOR:=		x86_64
-else ifeq ($(PROCESSOR),"Power Macintosh")
-  PROCESSOR:=		powerpc
+else ifeq ($(PROCESSOR),$(filter $(PROCESSOR),aarch64 armv8l arm64))
+  PROCESSOR:=		arm64
 endif
 
 TOOLS_BIN:=		$(abspath $(ROOT)/lightcrafts/tools/bin)
@@ -89,41 +89,43 @@ ifeq ($(PLATFORM),MacOSX)
   # These are to be only the bare minimum architecture-specific CFLAGS.  High-
   # performance CFLAGS go in the FAST_CFLAGS_* variables below.
   ##
-  MACOSX_CFLAGS_PPC:=	-mcpu=G4 -mtune=G5
+  MACOSX_CFLAGS_ARM:=	-march=armv8.3-a
   MACOSX_CFLAGS_X86:=	-march=core2
 
   ifdef HIGH_PERFORMANCE
     ##
     # High-performance architecture-specific CFLAGS only.
     ##
-    FAST_CFLAGS_PPC:=	-fast -Wstrict-aliasing -Wstrict-aliasing=2
-
+    FAST_CFLAGS_ARM:=	-O3 # TODO
     FAST_CFLAGS_X86:=	-O3 \
 			-fno-trapping-math \
 			-fomit-frame-pointer \
 			-msse2 -mfpmath=sse
-    MACOSX_CFLAGS_PPC+=	$(FAST_CFLAGS_PPC)
+    MACOSX_CFLAGS_ARM+=	$(FAST_CFLAGS_ARM)
     MACOSX_CFLAGS_X86+=	$(FAST_CFLAGS_X86)
   else
     PLATFORM_CFLAGS+=	-Os
   endif
 
   ifeq ($(UNIVERSAL),1)
-    PLATFORM_CFLAGS_PPC:= $(PLATFORM_CFLAGS) -arch ppc7400 $(MACOSX_CFLAGS_PPC)
-    PLATFORM_CFLAGS_X86:= $(PLATFORM_CFLAGS) -arch i386 $(MACOSX_CFLAGS_X86)
+    PLATFORM_CFLAGS_ARM:= $(PLATFORM_CFLAGS) -arch aarch64 $(MACOSX_CFLAGS_ARM) # TODO
+    PLATFORM_CFLAGS_X86:= $(PLATFORM_CFLAGS) -arch x86_64 $(MACOSX_CFLAGS_X86)
 
-    ifeq ($(PROCESSOR),powerpc)
-      OTHER_PROCESSOR:=	i386
+    ifeq ($(PROCESSOR),arm64)
+      OTHER_PROCESSOR:=	x86_64
+      OTHER_VERSION:=	10.12 # Sierra
+      HOST_VERSION:=	11    # Big Sur
     else
-      OTHER_PROCESSOR:=	powerpc
+      OTHER_PROCESSOR:=	arm64
+      OTHER_VERSION:=	11
+      HOST_VERSION:=	10.12
     endif
-    DARWIN_RELEASE:=	$(shell uname -r)
-    CONFIG_HOST:=	$(PROCESSOR)-apple-darwin$(DARWIN_RELEASE)
-    CONFIG_TARGET:=	$(OTHER_PROCESSOR)-apple-darwin$(DARWIN_RELEASE)
+    CONFIG_HOST:=	$(PROCESSOR)-apple-macos$(HOST_VERSION)
+    CONFIG_TARGET:=	$(OTHER_PROCESSOR)-apple-macos$(OTHER_VERSION)
   else
-    ifeq ($(PROCESSOR),powerpc)
-      PLATFORM_CFLAGS+=	$(MACOSX_CFLAGS_PPC)
-      PLATFORM_CFLAGS_PPC:= $(PLATFORM_CFLAGS)
+    ifeq ($(PROCESSOR),arm64)
+      PLATFORM_CFLAGS+=	$(MACOSX_CFLAGS_ARM)
+      PLATFORM_CFLAGS_ARM:= $(PLATFORM_CFLAGS)
     else
       PLATFORM_CFLAGS+=	$(MACOSX_CFLAGS_X86)
       PLATFORM_CFLAGS_X86:= $(PLATFORM_CFLAGS)
@@ -243,7 +245,7 @@ ifeq ($(PLATFORM),$(filter $(PLATFORM),Linux FreeBSD SunOS))
 
   ifeq ($(PROCESSOR),$(filter $(PROCESSOR),x86_64 i386))
     PLATFORM_CFLAGS+=	$(SSE_FLAGS)
-  else ifeq ($(PROCESSOR),$(filter $(PROCESSOR),aarch64 armv8l))
+  else ifeq ($(PROCESSOR),arm64)
     PLATFORM_CFLAGS+=	-march=armv8-a
   else ifeq ($(PROCESSOR),$(filter $(PROCESSOR),armhf armv7l))
     PLATFORM_CFLAGS+=	-march=armv7-a

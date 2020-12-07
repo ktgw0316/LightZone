@@ -24,28 +24,6 @@ endif
 CC=	$(XCODE_BIN_DIR)/clang
 CXX=	$(XCODE_BIN_DIR)/clang++
 
-ifeq ($(UNIVERSAL),1)
-  ##
-  # We need to build the PowerPC part with gcc/g++ 3.3 so the launcher will run
-  # on older versions of Mac OS X.
-  ##
-  CC_PPC:=	$(CC) -arch ppc
-  CXX_PPC:=	$(CXX) -arch ppc
-  CC_X86:=	$(CC) -arch i386
-  CXX_X86:=	$(CXX) -arch i386
-
-  #SDKROOT_PPC:=	/Developer/SDKs/MacOSX10.3.9.sdk
-  #SDKROOT_X86:=	/Developer/SDKs/MacOSX10.4u.sdk
-else
-  ifeq ($(PROCESSOR),powerpc)
-    ##
-    # For PowerPC-only, we want to build against 10.3.9 to support Panther.
-    # (Intel-only requires 10.4.)
-    ##
-    SDKROOT:=	/Developer/SDKs/MacOSX10.3.9.sdk
-  endif
-endif
-
 CFLAGS:=	-g -Os -mdynamic-no-pic
 INCLUDES=	$(MACOSX_ISYSROOT)
 LDFLAGS=	$(PLATFORM_LDFLAGS) -framework Cocoa
@@ -53,9 +31,6 @@ LDFLAGS=	$(PLATFORM_LDFLAGS) -framework Cocoa
 TARGET:=	CrashReporter
 
 ########## You shouldn't have to change anything below this line. #############
-
-export MACOSX_DEPLOYMENT_TARGET_ppc:=	10.3
-export MACOSX_DEPLOYMENT_TARGET_i386:=	10.5
 
 ifdef DEBUG
 DEFINES+=	-DDEBUG
@@ -74,11 +49,11 @@ all: $(TARGET)
 
 ifeq ($(UNIVERSAL),1)
 
-$(TARGET): $(TARGET)-ppc $(TARGET)-x86
-	$(LIPO) -create $(TARGET)-ppc $(TARGET)-x86 -output $@
+$(TARGET): $(TARGET)-arm $(TARGET)-x86
+	$(LIPO) -create $(TARGET)-arm $(TARGET)-x86 -output $@
 
-$(TARGET)-ppc: $(OBJECTS_PPC)
-	$(CC_LINK) $(CFLAGS) $(LDFLAGS) -o $@ *-ppc.o
+$(TARGET)-arm: $(OBJECTS_ARM)
+	$(CC_LINK) $(CFLAGS) $(LDFLAGS) -o $@ *-arm.o
 
 $(TARGET)-x86: $(OBJECTS_X86)
 	$(CC_LINK) $(CFLAGS) $(LDFLAGS) -o $@ *-x86.o
@@ -110,7 +85,7 @@ clean:
 	$(RM) *.o .*.d
 
 distclean: clean
-	$(RM) $(TARGET) $(TARGET)-ppc $(TARGET)-x86 $(TARGET).app
+	$(RM) $(TARGET) $(TARGET)-arm $(TARGET)-x86 $(TARGET).app
 
 mostlyclean:
 
