@@ -134,7 +134,7 @@ ifeq ($(PLATFORM),MacOSX)
 
   LIPO:=		lipo
 
-  JAVA_INCLUDES=	-I$(SDKROOT)/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers
+  JAVA_INCLUDES+=	-I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/darwin"
   JNILIB_PREFIX:=	lib
   JNILIB_EXT:=		.jnilib
   DYLIB_PREFIX:=	$(JNILIB_PREFIX)
@@ -216,7 +216,7 @@ ifeq ($(PLATFORM),Windows)
     else
       PLATFORM_CFLAGS+=	-O3 \
 			-fno-trapping-math \
-			-fomit-frame-pointer 
+			-fomit-frame-pointer
     endif
   else
     PLATFORM_CFLAGS+=	-Os

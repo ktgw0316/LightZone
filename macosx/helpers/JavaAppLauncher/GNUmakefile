@@ -34,7 +34,7 @@ CXX=	$(XCODE_BIN_DIR)/clang++
 CFLAGS:=	-Os -mdynamic-no-pic -fobjc-exceptions
 INCLUDES=	$(MACOSX_ISYSROOT) $(JAVA_INCLUDES) \
 		-I$(COMMON_DIR)/jnisrc/jniutils
-LDFLAGS=	$(PLATFORM_LDFLAGS) -framework JavaVM -framework Cocoa
+LDFLAGS=	$(PLATFORM_LDFLAGS) -framework Cocoa
 
 TARGET:=	JavaAppLauncher
 
