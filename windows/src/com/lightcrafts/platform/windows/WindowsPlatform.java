@@ -119,11 +119,6 @@ public final class WindowsPlatform extends Platform {
     }
 
     @Override
-    public boolean isKeyPressed( int keyCode ) {
-        return WindowsKeyUtil.isKeyPressed( keyCode );
-    }
-
-    @Override
     public File isSpecialFile( File file ) {
         file = FileUtil.resolveAliasFile( file );
         if ( !(file instanceof WindowsSavedSearch) &&

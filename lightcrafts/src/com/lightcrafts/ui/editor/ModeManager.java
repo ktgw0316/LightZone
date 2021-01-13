@@ -51,6 +51,7 @@ public class ModeManager
     private KeyEventPostProcessor panModeKeyProcessor =
         new KeyEventPostProcessor() {
             private boolean isPanMode;
+            private long lastPressed = 0L;
 
             @Override
             public boolean postProcessKeyEvent(KeyEvent e) {
@@ -58,14 +59,12 @@ public class ModeManager
                 if (e.getKeyCode() == PanKeyCode) {
                     if (e.getID() == KeyEvent.KEY_PRESSED) {
                         isPanMode = true;
+                        lastPressed = e.getWhen();
                     }
-                    if (e.getID() == KeyEvent.KEY_RELEASED) {
-                        if (Platform.isMac()) {
+                    else if (e.getID() == KeyEvent.KEY_RELEASED) {
+                        // Detect and ignore auto-repeat release events
+                        if (e.getWhen() > lastPressed + 1) {
                             isPanMode = false;
-                        }
-                        else {
-                            // Detect and ignore auto-repeat release events
-                            isPanMode = Platform.getPlatform().isKeyPressed(PanKeyCode);
                         }
                     }
                 }

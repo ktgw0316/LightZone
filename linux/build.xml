@@ -60,10 +60,6 @@
     </javac>
   </target>
 
-  <target name="jni">
-    <exec executable="${MAKE}" dir="jnisrc" failonerror="true" vmlauncher="true"/>
-  </target>
-
   <target name="locales">
     <copy todir="build">
       <fileset dir="locale" excludes=".git"/>
@@ -74,7 +70,7 @@
     <ant dir="help" target="build"/>
   </target>
 
-  <target name="build" depends="javac, jni, locales, help"/>
+  <target name="build" depends="javac, locales, help"/>
 
   <!--===== Make the jar files =============================================-->
 
@@ -187,10 +183,6 @@
       <delete file="LightZone.tar.gz"/>
     </parallel>
     <exec executable="${MAKE}" dir="products">
-      <arg value="distclean"/>
-    </exec>
-    <exec executable="${MAKE}" dir="jnisrc">
-      <arg value="-j"/>
       <arg value="distclean"/>
     </exec>
   </target>

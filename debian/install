@@ -5,7 +5,6 @@ lightcrafts/products/*.so usr/lib/lightzone
 lightcrafts/products/LightZone-forkd usr/lib/lightzone
 lightcrafts/products/dcraw_lz usr/lib/lightzone
 lightcrafts/products/lightcrafts.jar usr/share/java/lightzone
-linux/products/libLinux.so usr/lib/lightzone
 linux/products/lightcrafts-linux.jar usr/share/java/lightzone
 linux/products/lightzonehelp.jar usr/share/java/lightzone
 linux/products/lightzone usr/bin
