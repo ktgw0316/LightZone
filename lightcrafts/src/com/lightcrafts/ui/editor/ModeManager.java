@@ -4,7 +4,6 @@
 package com.lightcrafts.ui.editor;
 
 import com.lightcrafts.model.CropBounds;
-import com.lightcrafts.platform.Platform;
 import com.lightcrafts.ui.crop.CropListener;
 import com.lightcrafts.ui.crop.CropMode;
 import com.lightcrafts.ui.mode.AbstractMode;
@@ -27,6 +26,8 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Handle switching among all the Modes.  Lots of special mode-transition
@@ -44,34 +45,41 @@ public class ModeManager
     // Look for the special key events to enter and exit the pan mode,
     // taking care to filter out auto-repeat events:
 
-    private static int PanKeyCode = Platform.isMac()
-            ? KeyEvent.VK_META
-            : KeyEvent.VK_CONTROL;
+    private static final Map<Integer, Long> PanKeyCodeAndTime = new HashMap<>() {{
+        put(KeyEvent.VK_SPACE, 0L);
+        put(KeyEvent.VK_META, 0L);
+        put(KeyEvent.VK_CONTROL, 0L);
+    }};
 
-    private KeyEventPostProcessor panModeKeyProcessor =
+    private final KeyEventPostProcessor panModeKeyProcessor =
         new KeyEventPostProcessor() {
             private boolean isPanMode;
-            private long lastPressed = 0L;
 
             @Override
             public boolean postProcessKeyEvent(KeyEvent e) {
                 val wasPanMode = (overlay.peekMode() == transientPanMode);
-                if (e.getKeyCode() == PanKeyCode) {
-                    if (e.getID() == KeyEvent.KEY_PRESSED) {
-                        isPanMode = true;
-                        lastPressed = e.getWhen();
-                    }
-                    else if (e.getID() == KeyEvent.KEY_RELEASED) {
-                        // Detect and ignore auto-repeat release events
-                        if (e.getWhen() > lastPressed + 1) {
-                            isPanMode = false;
-                        }
+                val keyCode = e.getKeyCode();
+                if (PanKeyCodeAndTime.containsKey(keyCode)) {
+                    switch (e.getID()) {
+                        case KeyEvent.KEY_PRESSED:
+                            PanKeyCodeAndTime.replace(keyCode, e.getWhen());
+                            isPanMode = true;
+                            break;
+                        case KeyEvent.KEY_RELEASED:
+                            // Detect and ignore auto-repeat release events
+                            val lastPressed = PanKeyCodeAndTime.get(keyCode);
+                            if (e.getWhen() > lastPressed + 1) {
+                                PanKeyCodeAndTime.replace(keyCode, 0L);
+                                isPanMode = PanKeyCodeAndTime.values().stream()
+                                        .anyMatch(t -> t > 0L);
+                            }
+                            break;
                     }
                 }
-                if (isPanMode && ! wasPanMode) {
+                if (! wasPanMode && isPanMode) {
                     overlay.pushMode(transientPanMode);
                 }
-                if (wasPanMode && ! isPanMode) {
+                else if (wasPanMode && ! isPanMode) {
                     overlay.popMode();
                 }
                 return false;   // these key events have other interpretations
