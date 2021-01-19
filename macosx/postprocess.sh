@@ -16,7 +16,7 @@ cd $1
 sh ${SCRIPT_DIR}/copydylibs.sh dcraw_lz *.jnilib
 
 # Change the local library paths in each file
-FILES=$(find . -name "*.jnilib" -a ! -name "libquaqua*" -o -name "*.dylib" -o -name "dcraw_lz")
+FILES=$(find . -name "*.jnilib" -o -name "*.dylib" -o -name "dcraw_lz")
 for FILE in ${FILES}; do
   otool -L ${FILE} | egrep -v "$(otool -D ${FILE})" | egrep -v "/(usr/lib|System)" | grep -o "/.*\.dylib" | while read; do
     install_name_tool -change ${REPLY} @executable_path/$(basename ${REPLY}) ${FILE}
