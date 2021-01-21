@@ -4,7 +4,7 @@
 package com.lightcrafts.image.metadata;
 
 import com.lightcrafts.image.metadata.providers.GPSProvider;
-import com.lightcrafts.image.metadata.values.UnsignedRationalMetaValue;
+import com.lightcrafts.image.metadata.values.RationalMetaValue;
 import com.lightcrafts.utils.Rational;
 import com.lightcrafts.utils.tuple.Pair;
 import lombok.Getter;
@@ -104,7 +104,7 @@ public final class GPSDirectory extends ImageMetadataDirectory
         if (metaValue == null) {
             return null;
         }
-        val values = ((UnsignedRationalMetaValue) metaValue).getRationalValues();
+        val values = ((RationalMetaValue) metaValue).getRationalValues();
         if (values.length != 3) {
             return null;
         }
