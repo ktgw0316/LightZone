@@ -22,7 +22,7 @@
       <root url="jar://$PROJECT_DIR$/lightcrafts/lib/jiconfont-swing-1.0.0.jar!/" />
       <root url="jar://$PROJECT_DIR$/lightcrafts/lib/jsr305-3.0.2.jar!/" />
       <root url="jar://$PROJECT_DIR$/lightcrafts/lib/laf-widget.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lightcrafts/lib/lombok-1.18.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lightcrafts/lib/lombok-1.18.16.jar!/" />
       <root url="jar://$PROJECT_DIR$/lightcrafts/lib/refuel-0.1.1.jar!/" />
       <root url="jar://$PROJECT_DIR$/lightcrafts/lib/slf4j-api-1.7.25.jar!/" />
       <root url="jar://$PROJECT_DIR$/lightcrafts/lib/slf4j-simple-1.7.25.jar!/" />
