@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/lightcrafts/lightcrafts.iml" filepath="$PROJECT_DIR$/lightcrafts/lightcrafts.iml" />
+      <module fileurl="file://$PROJECT_DIR$/linux/linux.iml" filepath="$PROJECT_DIR$/linux/linux.iml" />
+      <module fileurl="file://$PROJECT_DIR$/macosx/macosx.iml" filepath="$PROJECT_DIR$/macosx/macosx.iml" />
+      <module fileurl="file://$PROJECT_DIR$/windows/windows.iml" filepath="$PROJECT_DIR$/windows/windows.iml" />
+    </modules>
+  </component>
+</project>
