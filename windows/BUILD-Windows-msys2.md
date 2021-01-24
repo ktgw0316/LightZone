@@ -73,9 +73,9 @@ To start the build:
     cd windows
     ant build-installer
 
-If you want to build a 32-bit binary on 64-bit machine, specify TARGET variable:
+If you want to build a 32-bit binary on 64-bit machine, specify TARGET_ARCH variable:
 
-    TARGET=i386 ant build-installer
+    TARGET_ARCH=i386 ant build-installer
 
 ### Known build issues
 -   In LightZone there are now no version information. There was a problem with rc.exe from MSSDK

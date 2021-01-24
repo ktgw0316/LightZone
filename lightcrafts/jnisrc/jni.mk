@@ -174,7 +174,7 @@ endif
 # These are always defined even when UNIVERSAL is not set so a "make disclean"
 # will remove them.
 ##
-TARGET_ARM:=	$(JNILIB_PREFIX)$(TARGET_BASE)-ppc$(JNILIB_EXT)
+TARGET_ARM:=	$(JNILIB_PREFIX)$(TARGET_BASE)-arm64$(JNILIB_EXT)
 TARGET_X86:=	$(JNILIB_PREFIX)$(TARGET_BASE)-x86$(JNILIB_EXT)
 
 ##
@@ -223,11 +223,11 @@ endif
 ifndef JNI_MANUAL_TARGET
 ifdef USE_AR_RANLIB
 $(TARGET_ARM): $(OBJECTS_ARM) $(BUILT_LIBS)
-	ar -rc $@ *-ppc.o
+	ar -rc $@ *-arm64.o
 	-ranlib $@
 else
 $(TARGET_ARM): $(OBJECTS_ARM) $(LOCAL_RANLIBS) $(BUILT_LIBS)
-	$(CC_LINK) $(CFLAGS_ARM) $(LDFLAGS) -o $@ *-ppc.o $(LINK)
+	$(CC_LINK) $(CFLAGS_ARM) $(LDFLAGS) -o $@ *-arm64.o $(LINK)
 endif
 
 ifdef USE_AR_RANLIB

@@ -16,16 +16,19 @@ endif
 ##
 # Target architecture
 ##
-ifdef TARGET
-  PROCESSOR:=		$(TARGET)
+ifdef TARGET_ARCH
+  PROCESSOR:=		$(TARGET_ARCH)
 else
   PROCESSOR:=		$(shell uname -m)
 endif
+
 ifeq ($(PROCESSOR),$(filter $(PROCESSOR),i486 i586 i686 i86pc))
   PROCESSOR:=		i386
-else ifeq ($(PROCESSOR),amd64)
+endif
+ifeq ($(PROCESSOR),amd64)
   PROCESSOR:=		x86_64
-else ifeq ($(PROCESSOR),$(filter $(PROCESSOR),aarch64 armv8l arm64))
+endif
+ifeq ($(PROCESSOR),$(filter $(PROCESSOR),aarch64 armv8l arm64))
   PROCESSOR:=		arm64
 endif
 
@@ -71,6 +74,15 @@ ifeq ($(PLATFORM),MacOSX)
   endif
   ALTIVEC_CFLAGS:=	-DLC_USE_ALTIVEC
 
+  ifeq ($(PROCESSOR),arm64)
+    BREW?=  /opt/homebrew/bin/brew
+  else
+    BREW?=  /usr/local/bin/brew
+  endif
+  LIBOMP_PATH?= $(shell $(BREW) --prefix libomp)
+  PLATFORM_INCLUDES+=	-I$(LIBOMP_PATH)/include
+  PLATFORM_LDFLAGS+=	-L$(LIBOMP_PATH)/lib
+
   ##
   # Don't use := here so other makefiles can override SDKROOT.
   ##
@@ -79,7 +91,7 @@ ifeq ($(PLATFORM),MacOSX)
     MACOSX_ISYSROOT=	-isysroot $(SDKROOT)
     MACOSX_SYSLIBROOT=	-Wl,-syslibroot,$(SDKROOT)
   else
-    SDKROOT:=
+    SDKROOT?=
     MACOSX_ISYSROOT=
     MACOSX_SYSLIBROOT=
   endif
@@ -89,8 +101,8 @@ ifeq ($(PLATFORM),MacOSX)
   # These are to be only the bare minimum architecture-specific CFLAGS.  High-
   # performance CFLAGS go in the FAST_CFLAGS_* variables below.
   ##
-  MACOSX_CFLAGS_ARM:=	-march=armv8.3-a
-  MACOSX_CFLAGS_X86:=	-march=core2
+  MACOSX_CFLAGS_ARM:=	-target arm64-apple-macos11
+  MACOSX_CFLAGS_X86:=	-target x86_64-apple-macos10.12
 
   ifdef HIGH_PERFORMANCE
     ##
@@ -108,20 +120,16 @@ ifeq ($(PLATFORM),MacOSX)
   endif
 
   ifeq ($(UNIVERSAL),1)
-    PLATFORM_CFLAGS_ARM:= $(PLATFORM_CFLAGS) -arch aarch64 $(MACOSX_CFLAGS_ARM) # TODO
-    PLATFORM_CFLAGS_X86:= $(PLATFORM_CFLAGS) -arch x86_64 $(MACOSX_CFLAGS_X86)
+    PLATFORM_CFLAGS_ARM:= $(PLATFORM_CFLAGS) $(MACOSX_CFLAGS_ARM)
+    PLATFORM_CFLAGS_X86:= $(PLATFORM_CFLAGS) $(MACOSX_CFLAGS_X86)
 
     ifeq ($(PROCESSOR),arm64)
-      OTHER_PROCESSOR:=	x86_64
-      OTHER_VERSION:=	10.12 # Sierra
-      HOST_VERSION:=	11    # Big Sur
+      CONFIG_HOST:= $(MACOSX_CFLAGS_ARM)
+      CONFIG_TARGET:= $(MACOSX_CFLAGS_X86)
     else
-      OTHER_PROCESSOR:=	arm64
-      OTHER_VERSION:=	11
-      HOST_VERSION:=	10.12
+      CONFIG_HOST:= $(MACOSX_CFLAGS_X86)
+      CONFIG_TARGET:= $(MACOSX_CFLAGS_ARM)
     endif
-    CONFIG_HOST:=	$(PROCESSOR)-apple-macos$(HOST_VERSION)
-    CONFIG_TARGET:=	$(OTHER_PROCESSOR)-apple-macos$(OTHER_VERSION)
   else
     ifeq ($(PROCESSOR),arm64)
       PLATFORM_CFLAGS+=	$(MACOSX_CFLAGS_ARM)

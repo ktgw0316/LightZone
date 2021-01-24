@@ -18,14 +18,15 @@ JARS:=		$(COMMON_DIR)/products/lightcrafts.jar \
 
 # Different compilers required for Objective-C sources.
 MACOSX_DEPLOYMENT_TARGET:=	$(shell sw_vers -productVersion | cut -d. -f-2)
-SDKROOT:=	$(shell xcodebuild -version -sdk macosx${MACOSX_DEPLOYMENT_TARGET} | sed -n '/^Path:/p' | sed 's/^Path: //')
 
 XCODE_PATH:=	$(shell xcode-select -p)
 ifeq ($(findstring CommandLineTools,$(XCODE_PATH)),CommandLineTools)
   # Use command line tools.
+  SDKROOT:=	$(XCODE_PATH)/SDKs/MacOSX${MACOSX_DEPLOYMENT_TARGET}.sdk
   XCODE_BIN_DIR=	$(XCODE_PATH)/usr/bin
 else
   # Use Xcode.
+  SDKROOT:=	$(shell xcodebuild -version -sdk macosx${MACOSX_DEPLOYMENT_TARGET} | sed -n '/^Path:/p' | sed 's/^Path: //')
   XCODE_BIN_DIR=	$(XCODE_PATH)/Toolchains/XcodeDefault.xctoolchain/usr/bin
 endif
 CC=	$(XCODE_BIN_DIR)/clang

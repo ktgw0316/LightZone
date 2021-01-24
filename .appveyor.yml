@@ -41,7 +41,7 @@ for:
   build_script:
     - cmd: bash -lc "MINGW_DIR=/c/$MINGW64_PATH ant -f $ANT_SCRIPT build-installer"
     - cmd: bash -lc "ant -f $ANT_SCRIPT clean-native"
-    - cmd: bash -lc "TARGET=i686 MINGW_DIR=/c/$MINGW32_PATH ant -f $ANT_SCRIPT -Doffline=true build-installer"
+    - cmd: bash -lc "TARGET_ARCH=i686 MINGW_DIR=/c/$MINGW32_PATH ant -f $ANT_SCRIPT -Doffline=true build-installer"
   
   artifacts:
     - path: 'windows/LightZone_Installer_*.exe'

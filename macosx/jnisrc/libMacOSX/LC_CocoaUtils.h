@@ -5,7 +5,7 @@
 
 // standard
 #include <Cocoa/Cocoa.h>
-#include <JavaVM/jni.h>
+#include <jni.h>
 
 #ifdef  __cplusplus
 // local
