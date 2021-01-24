@@ -10,40 +10,32 @@ ifeq ($(UNIVERSAL),1)
   # If architecture-specific versions of CC, CXX, and CFLAGS aren't set, just
   # copy them from the architecture-neutral values.
   ##
-  ifndef CC_PPC
-    CC_PPC:=		$(CC)
+  ifndef CC_ARM
+    CC_ARM:=		$(CC)
   endif
   ifndef CC_X86
     CC_X86:=		$(CC)
   endif
-  ifndef CXX_PPC
-    CXX_PPC:=		$(CXX)
+  ifndef CXX_ARM
+    CXX_ARM:=		$(CXX)
   endif
   ifndef CXX_X86
     CXX_X86:=		$(CXX)
   endif
 
-  ifndef CFLAGS_PPC
-    CFLAGS_PPC=		$(CFLAGS)
+  ifndef CFLAGS_ARM
+    CFLAGS_ARM=		$(CFLAGS)
   endif
   ifndef CFLAGS_X86
     CFLAGS_X86=		$(CFLAGS)
   endif
 
-  ifndef INCLUDES_PPC
-    INCLUDES_PPC=	$(INCLUDES)
+  ifndef INCLUDES_ARM
+    INCLUDES_ARM=	$(INCLUDES)
   endif
   ifndef INCLUDES_X86
     INCLUDES_X86=	$(INCLUDES)
   endif
-
-  ##
-  # gcc-3.3 doesn't permit specifying -o with -c so we have to let it generate
-  # the default .o and then rename it.  We set this variable to know whether
-  # we're dealing with gcc-3.3 and thus have to deal with this case.  (We only
-  # need to use gcc-3.3 for the PowerPC-half of Mac OS X Universal builds.)
-  ##
-  GCC_33_PPC:=		$(findstring 3.3,$(CC_PPC))
 
 endif	# UNIVERSAL
 
@@ -85,17 +77,17 @@ RC_OBJECTS:=		$(RC_SOURCES:.rc=.res)
 OBJECTS:=		$(C_OBJECTS) $(OC_OBJECTS) \
 			$(CXX_OBJECTS) $(OCXX_OBJECTS)
 ifeq ($(UNIVERSAL),1)
-  C_OBJECTS_PPC:=	$(C_SOURCES:.c=-ppc.o)
+  C_OBJECTS_ARM:=	$(C_SOURCES:.c=-arm.o)
   C_OBJECTS_X86:=	$(C_SOURCES:.c=-x86.o)
-  CXX_OBJECTS_PPC:=	$(CXX_SOURCES:.cpp=-ppc.o)
+  CXX_OBJECTS_ARM:=	$(CXX_SOURCES:.cpp=-arm.o)
   CXX_OBJECTS_X86:=	$(CXX_SOURCES:.cpp=-x86.o)
-  OC_OBJECTS_PPC:=	$(OC_SOURCES:.m=-ppc.o)
+  OC_OBJECTS_ARM:=	$(OC_SOURCES:.m=-arm.o)
   OC_OBJECTS_X86:=	$(OC_SOURCES:.m=-x86.o)
-  OCXX_OBJECTS_PPC:=	$(OCXX_SOURCES:.mm=-ppc.o)
+  OCXX_OBJECTS_ARM:=	$(OCXX_SOURCES:.mm=-arm.o)
   OCXX_OBJECTS_X86:=	$(OCXX_SOURCES:.mm=-x86.o)
 
-  OBJECTS_PPC:=		$(C_OBJECTS_PPC) $(OC_OBJECTS_PPC) \
-			$(CXX_OBJECTS_PPC) $(OCXX_OBJECTS_PPC)
+  OBJECTS_ARM:=		$(C_OBJECTS_ARM) $(OC_OBJECTS_ARM) \
+			$(CXX_OBJECTS_ARM) $(OCXX_OBJECTS_ARM)
   OBJECTS_X86:=		$(C_OBJECTS_X86) $(OC_OBJECTS_X86) \
 			$(CXX_OBJECTS_X86) $(OCXX_OBJECTS_X86)
 endif
@@ -105,17 +97,9 @@ endif
 # given architecture.
 ##
 ifeq ($(UNIVERSAL),1)
-  ifdef SDKROOT_PPC
-    %-ppc.o : SDKROOT:= $(SDKROOT_PPC)
-    %-ppc   : SDKROOT:= $(SDKROOT_PPC)
-    ifdef GCC_33_PPC
-      %-ppc.o : export NEXT_ROOT:= $(SDKROOT_PPC)
-      %-ppc   : export NEXT_ROOT:= $(SDKROOT_PPC)
-      %-ppc.o : MACOSX_ISYSROOT:=
-      %-ppc   : MACOSX_ISYSROOT:=
-      %-ppc.o : MACOSX_SYSLIBROOT:=
-      %-ppc   : MACOSX_SYSLIBROOT:=
-    endif
+  ifdef SDKROOT_ARM
+    %-arm.o : SDKROOT:= $(SDKROOT_ARM)
+    %-arm   : SDKROOT:= $(SDKROOT_ARM)
   endif
   ifdef SDKROOT_X86
     %-x86.o : SDKROOT:= $(SDKROOT_X86)
@@ -131,21 +115,11 @@ endif
 
 ifeq ($(UNIVERSAL),1)
 
-ifdef GCC_33_PPC
-%-ppc.o : %.c
-	$(CC_PPC) -c $(CFLAGS_PPC) $(INCLUDES_PPC) $< && mv $*.o $@
-else
-%-ppc.o : %.c
-	$(CC_PPC) -c $(CFLAGS_PPC) $(INCLUDES_PPC) -o $@ $<
-endif
+%-arm.o : %.c
+	$(CC_ARM) -c $(CFLAGS_ARM) $(INCLUDES_ARM) -o $@ $<
 
-ifdef GCC_33_PPC
-%-ppc.o : %.cpp
-	$(CXX_PPC) -c $(CFLAGS_PPC) $(INCLUDES_PPC) $< && mv $*.o $@
-else
-%-ppc.o : %.cpp
-	$(CXX_PPC) -c $(CFLAGS_PPC) $(INCLUDES_PPC) -o $@ $<
-endif
+%-arm.o : %.cpp
+	$(CXX_ARM) -c $(CFLAGS_ARM) $(INCLUDES_ARM) -o $@ $<
 
 %-x86.o : %.c
 	$(CC_X86) -c $(CFLAGS_X86) $(INCLUDES_X86) -o $@ $<
@@ -166,21 +140,11 @@ endif	# UNIVERSAL
 ##
 ifeq ($(UNIVERSAL),1)
 
-ifdef GCC_33_PPC
-%-ppc.o : %.m
-	$(CC_PPC) -c $(filter-out -fast,$(CFLAGS_PPC)) $(INCLUDES_PPC) $< && mv $*.o $@
-else
-%-ppc.o : %.m
-	$(CC_PPC) -c $(filter-out -fast,$(CFLAGS_PPC)) $(INCLUDES_PPC) -o $@ $<
-endif
+%-arm.o : %.m
+	$(CC_ARM) -c $(filter-out -fast,$(CFLAGS_ARM)) $(INCLUDES_ARM) -o $@ $<
 
-ifdef GCC_33_PPC
-%-ppc.o : %.mm
-	$(CXX_PPC) -c $(filter-out -fast,$(CFLAGS_PPC)) $(INCLUDES_PPC) $< && mv $*.o $@
-else
-%-ppc.o : %.mm
-	$(CXX_PPC) -c $(filter-out -fast,$(CFLAGS_PPC)) $(INCLUDES_PPC) -o $@ $<
-endif
+%-arm.o : %.mm
+	$(CXX_ARM) -c $(filter-out -fast,$(CFLAGS_ARM)) $(INCLUDES_ARM) -o $@ $<
 
 %-x86.o : %.m
 	$(CC_X86) -c $(filter-out -fast,$(CFLAGS_X86)) $(INCLUDES_X86) -o $@ $<
@@ -204,27 +168,27 @@ endif	# UNIVERSAL
 ##
 ifeq ($(UNIVERSAL),1)
 
-  CC_LINK_PPC:=		$(CC_PPC)
+  CC_LINK_ARM:=		$(CC_ARM)
   CC_LINK_X86:=		$(CC_X86)
   ifdef CXX_SOURCES
-    CC_LINK_PPC:=	$(CXX_PPC)
+    CC_LINK_ARM:=	$(CXX_ARM)
     CC_LINK_X86:=	$(CXX_X86)
-  endif 
+  endif
   ifdef OCXX_SOURCES
-    CC_LINK_PPC:=	$(CXX_PPC)
+    CC_LINK_ARM:=	$(CXX_ARM)
     CC_LINK_X86:=	$(CXX_X86)
   endif
 
-  %-ppc	: CFLAGS:= 	$(CFLAGS_PPC)
+  %-arm	: CFLAGS:= 	$(CFLAGS_ARM)
   %-x86 : CFLAGS:= 	$(CFLAGS_X86)
 
-  %-ppc	: CC_LINK:= 	$(CC_LINK_PPC)
+  %-arm	: CC_LINK:= 	$(CC_LINK_ARM)
   %-x86 : CC_LINK:= 	$(CC_LINK_X86)
 
-  %-ppc$(JNILIB_EXT) : CFLAGS:= $(CFLAGS_PPC)
+  %-arm$(JNILIB_EXT) : CFLAGS:= $(CFLAGS_ARM)
   %-x86$(JNILIB_EXT) : CFLAGS:= $(CFLAGS_X86)
 
-  %-ppc$(JNILIB_EXT) : CC_LINK:= $(CC_LINK_PPC)
+  %-arm$(JNILIB_EXT) : CC_LINK:= $(CC_LINK_ARM)
   %-x86$(JNILIB_EXT) : CC_LINK:= $(CC_LINK_X86)
 
 else	# UNIVERSAL
