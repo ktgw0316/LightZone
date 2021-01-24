@@ -75,11 +75,12 @@ ifeq ($(PLATFORM),MacOSX)
   ALTIVEC_CFLAGS:=	-DLC_USE_ALTIVEC
 
   ifeq ($(PROCESSOR),arm64)
-    BREW?=  /opt/homebrew/bin/brew
+    BREW_DIR?=  /opt/homebrew
   else
-    BREW?=  /usr/local/bin/brew
+    BREW_DIR?=  /usr/local
   endif
-  LIBOMP_PATH?= $(shell $(BREW) --prefix libomp)
+  PKG_CONFIG_PATH?= $(BREW_DIR)/lib/pkgconf
+  LIBOMP_PATH?= $(shell $(BREW_DIR)/bin/brew --prefix libomp)
   PLATFORM_INCLUDES+=	-I$(LIBOMP_PATH)/include
   PLATFORM_LDFLAGS+=	-L$(LIBOMP_PATH)/lib
 
