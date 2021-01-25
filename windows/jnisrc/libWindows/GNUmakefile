@@ -21,7 +21,6 @@ JNI_WINDOWS_LINK:= 	-lcomdlg32 -lgdi32 -lshlwapi -lole32 -luuid -lWininet \
 
 JAVAH_CLASSES:=	com.lightcrafts.platform.windows.WindowsColorProfileManager \
 		com.lightcrafts.platform.windows.WindowsFileUtil \
-		com.lightcrafts.platform.windows.WindowsKeyUtil \
 		com.lightcrafts.platform.windows.WindowsHelp \
 		com.lightcrafts.platform.windows.WindowsPrintManager \
 		com.lightcrafts.platform.windows.WindowsSavedSearch

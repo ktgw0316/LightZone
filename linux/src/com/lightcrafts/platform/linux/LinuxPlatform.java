@@ -114,11 +114,6 @@ public class LinuxPlatform extends Platform {
         return getColorProfiles();
     }
 
-    @Override
-    public boolean isKeyPressed(int keyCode) {
-        return LinuxKeyUtil.isKeyPressed(keyCode);
-    }
-
     private static synchronized Collection<ColorProfileInfo> getColorProfiles() {
         if (Profiles == null) {
             Profiles = new HashSet<>();
