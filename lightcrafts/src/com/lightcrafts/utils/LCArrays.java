@@ -3,6 +3,7 @@
 package com.lightcrafts.utils;
 
 import java.lang.reflect.Array;
+import java.nio.ByteBuffer;
 
 /**
  * Various array utilities.
@@ -49,8 +50,12 @@ public final class LCArrays {
      * @param destPos The starting position in the destination array.
      * @param length The number of bytes to be copied.
      */
-    public static native void copy( int[] src, int srcPos,
-                                    byte[] dest, int destPos, int length );
+    public static void copy( int[] src, int srcPos,
+                             byte[] dest, int destPos, int length ) {
+        ByteBuffer.wrap(dest, destPos, length)
+                .asIntBuffer()
+                .put(src, srcPos, length / 8);
+    }
 
     /**
      * Copies the bytes from the source array to the destination array
@@ -72,8 +77,12 @@ public final class LCArrays {
      * @param destPos The starting position in the destination array.
      * @param length The number of bytes to be copied.
      */
-    public static native void copy( short[] src, int srcPos,
-                                    byte[] dest, int destPos, int length );
+    public static void copy( short[] src, int srcPos,
+                             byte[] dest, int destPos, int length ) {
+        ByteBuffer.wrap(dest, destPos, length)
+                .asShortBuffer()
+                .put(src, srcPos, length / 4);
+    }
 
     /**
      * Copies the bytes from the source array to the destination array
@@ -95,8 +104,12 @@ public final class LCArrays {
      * @param destPos The starting position in the destination array.
      * @param length The number of bytes to be copied.
      */
-    public static native void copy( byte[] src, int srcPos,
-                                    int[] dest, int destPos, int length );
+    public static void copy( byte[] src, int srcPos,
+                             int[] dest, int destPos, int length ) {
+        ByteBuffer.wrap(src, srcPos, length)
+                .asIntBuffer()
+                .get(dest, destPos, length / 8);
+    }
 
     /**
      * Copies the bytes from the source array to the destination array
@@ -118,8 +131,12 @@ public final class LCArrays {
      * @param destPos The starting position in the destination array.
      * @param length The number of bytes to be copied.
      */
-    public static native void copy( byte[] src, int srcPos,
-                                    short[] dest, int destPos, int length );
+    public static void copy( byte[] src, int srcPos,
+                             short[] dest, int destPos, int length ) {
+        ByteBuffer.wrap(src, srcPos, length)
+                .asShortBuffer()
+                .get(dest, destPos, length / 4);
+    }
 
     /**
      * Resize an array.
@@ -135,22 +152,18 @@ public final class LCArrays {
      * and new lengths are the same, returns the old array as-is.
      */
     public static Object resize( Object oldArray, int newLength )  {
-        final Class c = oldArray.getClass();
+        final Class<?> c = oldArray.getClass();
         if ( !c.isArray() )
             throw new IllegalArgumentException( "given non-array" );
         final int oldLength = Array.getLength( oldArray );
         if ( oldLength == newLength )
             return oldArray;
-        final Class type = c.getComponentType();
+        final Class<?> type = c.getComponentType();
         final Object newArray = Array.newInstance( type, newLength );
         final int copyLength = Math.min( oldLength, newLength );
         if ( copyLength > 0 )
             System.arraycopy( oldArray, 0, newArray, 0, copyLength );
         return newArray;
-    }
-
-    static {
-        System.loadLibrary( "LCArrays" );
     }
 }
 /* vim:set et sw=4 ts=4: */

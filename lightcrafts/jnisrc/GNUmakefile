@@ -2,7 +2,6 @@
 # We need to specify this manually so that jniutils is built first.
 ##
 SUBDIRS:=	jniutils \
-		arrays \
 		cache \
 		dcraw \
 		EDISON \
