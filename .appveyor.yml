@@ -1,8 +1,8 @@
 version: 4.2.2.{build}-{branch}
 
 image:
+- macos
 - Visual Studio 2019
-- macos-mojave
 - Ubuntu2004
 
 clone_depth: 1
@@ -42,7 +42,7 @@ for:
     - cmd: bash -lc "MINGW_DIR=/c/$MINGW64_PATH ant -f $ANT_SCRIPT build-installer"
     - cmd: bash -lc "ant -f $ANT_SCRIPT clean-native"
     - cmd: bash -lc "TARGET_ARCH=i686 MINGW_DIR=/c/$MINGW32_PATH ant -f $ANT_SCRIPT -Doffline=true build-installer"
-  
+
   artifacts:
     - path: 'windows/LightZone_Installer_*.exe'
       name: windows installer
@@ -50,7 +50,7 @@ for:
 -
   matrix:
     only:
-      - image: macos-mojave
+      - image: macos
 
   init:
     - sh: export JAVA_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-11.jdk/Contents/Home
@@ -81,4 +81,3 @@ for:
 
   build_script:
     - sh: ant -f linux/build.xml -Doffline=true
-
