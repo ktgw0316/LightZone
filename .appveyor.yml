@@ -17,8 +17,8 @@ for:
       - image: Visual Studio 2019
 
   init:
-    - cmd: SET MINGW64_PATH=mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64
-    - cmd: SET MINGW32_PATH=mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32
+    - cmd: SET MINGW64_PATH=msys64/mingw64
+    - cmd: SET MINGW32_PATH=msys64/mingw32
     - cmd: SET PATH=C:/%MINGW64_PATH%/bin/;C:/%MINGW32_PATH%/bin/;C:/msys64/usr/bin/;%PATH%
     - cmd: SET MSSDK_HOME=/c/Program Files (x86)/Windows Kits/10
     - cmd: SET JAVA_HOME=/c/Program Files/Java/jdk11
