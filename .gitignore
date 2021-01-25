@@ -18,7 +18,6 @@
 *.dylib
 *.exe
 *.hhc
-*.iml
 *.jar
 *.jnilib
 *.la
@@ -36,7 +35,8 @@
 *.tlog
 *~
 -
-.idea/**
+.idea/**/workspace.xml
+.idea/**/tasks.xml
 Java.runtime
 debian/*.debhelper
 debian/*.substvars
