@@ -40,7 +40,6 @@ CLASSPATH_SEP:=		:
 # The default C and C++ compilers for Linux, FreeBSD, or OpenIndiana
 CC?=			gcc
 CXX?=			g++
-PKGCFG:=		pkg-config
 
 # Unset USE_ICC_HERE if the overall USE_ICC flags != 1.
 ifneq ($(USE_ICC),1)
@@ -79,7 +78,7 @@ ifeq ($(PLATFORM),MacOSX)
   else
     BREW_DIR?=  /usr/local
   endif
-  PKG_CONFIG_PATH?= $(BREW_DIR)/lib/pkgconf
+  PKGCFG:=	$(BREW_DIR)/bin/pkg-config
   LIBOMP_PATH?= $(shell $(BREW_DIR)/bin/brew --prefix libomp)
   PLATFORM_INCLUDES+=	-I$(LIBOMP_PATH)/include
   PLATFORM_LDFLAGS+=	-L$(LIBOMP_PATH)/lib
@@ -277,6 +276,8 @@ ifeq ($(PLATFORM),$(filter $(PLATFORM),Linux FreeBSD SunOS))
   JNILIB_EXT:=		.so
   DYLIB_PREFIX:=	$(JNILIB_PREFIX)
   DYLIB_EXT:=		$(JNILIB_EXT)
+
+  PKGCFG:=		pkg-config
 
   ifeq ($(PLATFORM),Linux)
     JAVA_INCLUDES:=	-I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux
