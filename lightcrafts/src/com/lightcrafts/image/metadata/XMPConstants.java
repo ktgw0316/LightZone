@@ -66,12 +66,6 @@ public interface XMPConstants {
     // String XMP_XAP_PREFIX = "xap";
     String XMP_XAP_PREFIX = "xmp";
 
-    /** The DigiKam namespace URI. */
-    String XMP_DIGIKAM_NS = "http://www.digikam.org/ns/1.0/";
-
-    /** The DigiKam namespace prefix. */
-    String XMP_DIGIKAM_PREFIX = "digiKam";
-
     /** The PhotoShop namespace URI. */
     String XMP_PHOTOSHOP_NS = "http://ns.adobe.com/photoshop/1.0/";
 

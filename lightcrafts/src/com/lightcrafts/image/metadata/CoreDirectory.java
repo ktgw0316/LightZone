@@ -71,7 +71,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
         dir.addShutterSpeed( metadata );
 
         dir.addRating( metadata );
-        dir.addColorLabel( metadata );
+        dir.addUrgency( metadata );
         syncEditableMetadata( metadata );
     }
 
@@ -381,7 +381,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
                 break;
             case CORE_SHUTTER_SPEED:
                 return MetadataUtil.shutterSpeedString( value.getFloatValue() );
-            case CORE_COLOR_LABEL:
+            case CORE_URGENCY:
                 return Integer.toString(value.getIntValue());
         }
         return super.valueToString( value );
@@ -511,28 +511,22 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
             xapRDFDescElement.appendChild( ratingElement );
         }
 
-        ////////// Color Label
+        ////////// Color Label (Urgency)
 
-        final ImageMetaValue colorLabel = getValue( CORE_COLOR_LABEL );
-        if (colorLabel != null) {
-            final String colorLabelString = colorLabel.getStringValue();
-
-            final Element digiKamColorLabelElement = xmpDoc.createElementNS(
-                    XMP_DIGIKAM_NS, XMP_DIGIKAM_PREFIX + ":ColorLabel"
-            );
-            XMLUtil.setTextContentOf(digiKamColorLabelElement, colorLabelString);
-            xapRDFDescElement.appendChild( digiKamColorLabelElement );
+        final ImageMetaValue urgency = getValue( CORE_URGENCY );
+        if (urgency != null) {
+            final String urgencyString = urgency.getStringValue();
 
             final Element photoshopUrgencyElement = xmpDoc.createElementNS(
                     XMP_PHOTOSHOP_NS, XMP_PHOTOSHOP_PREFIX + ":Urgency"
             );
-            XMLUtil.setTextContentOf(photoshopUrgencyElement, colorLabelString);
+            XMLUtil.setTextContentOf(photoshopUrgencyElement, urgencyString);
             xapRDFDescElement.appendChild( photoshopUrgencyElement );
 
             final Element labelElement = xmpDoc.createElementNS(
                     XMP_XAP_NS, XMP_XAP_PREFIX + ":Label"
             );
-            XMLUtil.setTextContentOf( labelElement, convertToColorName(colorLabelString) );
+            XMLUtil.setTextContentOf( labelElement, convertToColorName(urgencyString) );
             xapRDFDescElement.appendChild( labelElement );
         }
 
@@ -859,14 +853,14 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     }
 
     /**
-     * Adds color label information to the <code>CoreDirectory</code>'s metadata.
+     * Adds urgency information to the <code>CoreDirectory</code>'s metadata.
      *
      * @param metadata The {@link ImageMetadata} to add into.
      */
-    private void addColorLabel( ImageMetadata metadata ) {
-        final int colorLabel = metadata.getColorLabel();
-        if ( colorLabel > 0 )
-            putValue( CORE_COLOR_LABEL, new UnsignedShortMetaValue( colorLabel ) );
+    private void addUrgency( ImageMetadata metadata ) {
+        final int urgency = metadata.getUrgency();
+        if ( urgency > 0 )
+            putValue( CORE_URGENCY, new UnsignedShortMetaValue( urgency ) );
     }
 
     /**
@@ -968,7 +962,6 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
         add( CORE_CAMERA, "Camera", META_STRING, false );
         add( CORE_CAPTION, "Caption", META_STRING, true );
         add( CORE_CAPTURE_DATE_TIME, "CaptureDateTime", META_DATE, false );
-        add( CORE_COLOR_LABEL, "ColorLabel", META_USHORT, true );
         add( CORE_COLOR_PROFILE, "ColorProfile", META_STRING, false );
         add( CORE_COLOR_TEMPERATURE, "ColorTemperature", META_USHORT, false );
         add( CORE_COPYRIGHT, "Copyright", META_STRING, true );
@@ -987,6 +980,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
         add( CORE_ORIGINAL_ORIENTATION, "OriginalOrientation", META_USHORT, false );
         add( CORE_RATING, "Rating", META_USHORT, true );
         add( CORE_SHUTTER_SPEED, "ShutterSpeed", META_FLOAT, false );
+        add( CORE_URGENCY, "Urgency", META_USHORT, true );
     }
 }
 /* vim:set et sw=4 ts=4: */

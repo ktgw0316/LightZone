@@ -203,9 +203,6 @@ public final class XMPUtil {
             newXMPDoc, oldXMPDoc, XMP_XAP_NS, XMP_XAP_PREFIX
         );
         mergeMetadata(
-            newXMPDoc, oldXMPDoc, XMP_DIGIKAM_NS, XMP_DIGIKAM_PREFIX
-        );
-        mergeMetadata(
             newXMPDoc, oldXMPDoc, XMP_PHOTOSHOP_NS, XMP_PHOTOSHOP_PREFIX
         );
         return oldXMPDoc;

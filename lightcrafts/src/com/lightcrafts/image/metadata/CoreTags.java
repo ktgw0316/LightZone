@@ -208,6 +208,6 @@ public interface CoreTags extends ImageMetaTags {
      * <p>
      * Type: Unsigned short.
      */
-    int CORE_COLOR_LABEL            = 0x0304;
+    int CORE_URGENCY                = 0x0304;
 }
 /* vim:set et sw=4 ts=4: */

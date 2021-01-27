@@ -61,10 +61,6 @@ public final class XMPMetadataReader {
                 rdfElement, XMP_XAP_NS, XMP_XAP_PREFIX, CoreDirectory.class,
                 metadata
         );
-        readMetadata(                   // reads digiKam:ColorLabel
-                rdfElement, XMP_DIGIKAM_NS, XMP_DIGIKAM_PREFIX, CoreDirectory.class,
-                metadata
-        );
         readMetadata(                   // reads photoshop:Urgency
             rdfElement, XMP_PHOTOSHOP_NS, XMP_PHOTOSHOP_PREFIX, CoreDirectory.class,
             metadata

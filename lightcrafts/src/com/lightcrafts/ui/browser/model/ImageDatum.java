@@ -379,7 +379,7 @@ public class ImageDatum {
                 CORE_DIR_NAME,
                 CORE_IMAGE_ORIENTATION,
                 CORE_RATING,
-                CORE_COLOR_LABEL)
+                CORE_URGENCY)
                 .map(tag -> Pair.of(tag, core.getValue(tag)))
                 .filter(p -> p.right != null)
                 .forEach(thisCore::putValue);

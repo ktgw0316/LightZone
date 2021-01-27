@@ -4,13 +4,13 @@
 
 package com.lightcrafts.image.metadata.providers;
 
-public interface ColorLabelProvider extends ImageMetadataProvider {
+public interface UrgencyProvider extends ImageMetadataProvider {
 
     /**
-     * Gets the color label number of an image: 1-8.
+     * Gets the urgency number of an image: 1-8.
      *
      * @return Returns the number or 0 if it's unavailable.
      */
-    int getColorLabel();
+    int getUrgency();
 
 }

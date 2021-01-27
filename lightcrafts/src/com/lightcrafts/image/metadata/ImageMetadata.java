@@ -39,7 +39,7 @@ public class ImageMetadata implements
     CaptureDateTimeProvider, Cloneable, ColorTemperatureProvider,
     CopyrightProvider, Externalizable, FileDateTimeProvider, FlashProvider,
     FocalLengthProvider, GPSProvider, ISOProvider, LensProvider, MakeModelProvider,
-    OrientationProvider, OriginalWidthHeightProvider, RatingProvider, ColorLabelProvider,
+    OrientationProvider, OriginalWidthHeightProvider, RatingProvider, UrgencyProvider,
     ResolutionProvider, ShutterSpeedProvider, TitleProvider,
     WidthHeightProvider {
 
@@ -86,6 +86,16 @@ public class ImageMetadata implements
     public void clearRating() {
         //removeValues( CoreDirectory.class, CORE_RATING );
         setRating( 0 );
+    }
+
+    /**
+     * Clears the urgency of the image.
+     *
+     * @see #getUrgency()
+     * @see #setUrgency(int)
+     */
+    public void clearUrgency() {
+        setUrgency( 0 );
     }
 
     /**
@@ -620,12 +630,20 @@ public class ImageMetadata implements
         return 0;
     }
 
+    /**
+     * Gets the urgency of this image.
+     *
+     * @return Returns said urgency in the range 1-8 if it's set, otherwise
+     * returns 0.
+     * @see #clearUrgency()
+     * @see #setUrgency(int)
+     */
     @Override
-    public int getColorLabel() {
+    public int getUrgency() {
         final Collection<ImageMetadataDirectory> dirs =
-            findProvidersOf( ColorLabelProvider.class );
+            findProvidersOf( UrgencyProvider.class );
         for ( ImageMetadataDirectory dir : dirs ) {
-            final int colorLabel = ((ColorLabelProvider)dir).getColorLabel();
+            final int colorLabel = ((UrgencyProvider)dir).getUrgency();
             if ( colorLabel != 0 )
                 return colorLabel;
         }
@@ -1280,6 +1298,21 @@ public class ImageMetadata implements
         final ImageMetadataDirectory dir =
             getDirectoryFor( CoreDirectory.class, true );
         dir.setValue( CORE_RATING, rating );
+    }
+
+    /**
+     * Sets the urgency of the image.
+     *
+     * @param urgency The urgency; must be in the range 0-8.
+     * @see #clearUrgency()
+     * @see #getUrgency()
+     */
+    public void setUrgency(int urgency) {
+        if (urgency < 0 || urgency > 8)
+            throw new IllegalArgumentException("urgency must be between 0-8");
+        final ImageMetadataDirectory dir =
+            getDirectoryFor(CoreDirectory.class, true);
+        dir.setValue(CORE_URGENCY, urgency);
     }
 
     /**
