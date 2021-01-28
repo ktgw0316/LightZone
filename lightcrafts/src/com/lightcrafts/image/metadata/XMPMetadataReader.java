@@ -194,13 +194,10 @@ public final class XMPMetadataReader {
                                          ImageMetadataDirectory dir ) {
         for ( int i = 0; i < atts.getLength(); ++i ) {
             final Attr att = (Attr)atts.item( i );
-            String nodeName = att.getNodeName();
-            final int sep = nodeName.indexOf(':');
-            String nodePrefix = nodeName.substring(0, sep);
-            if (!nodePrefix.equals(prefix))
+            if ( !prefix.equals( att.getPrefix() ) )
                 continue;
-            String nodeLocalName = nodeName.substring(sep + 1);
-            final ImageMetaTagInfo tagInfo = dir.getTagInfoFor(nodeLocalName);
+            final ImageMetaTagInfo tagInfo =
+                dir.getTagInfoFor( att.getLocalName() );
             if ( tagInfo == null )
                 continue;
             switch ( tagInfo.getType() ) {

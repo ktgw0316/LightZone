@@ -461,7 +461,9 @@ public final class XMLUtil {
 
     static {
         try {
-            m_builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            final var dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            m_builder = dbf.newDocumentBuilder();
 
             m_builder.setErrorHandler(new ErrorHandler() {
                 @Override

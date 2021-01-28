@@ -43,7 +43,9 @@ public class XmlDocument {
 
     static {
         try {
-            Builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            final var dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+            Builder = dbf.newDocumentBuilder();
         }
         catch (ParserConfigurationException e) {
             throw new RuntimeException("Couldn't init XML builder", e);
