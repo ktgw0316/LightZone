@@ -8,25 +8,16 @@ import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.image.metadata.CoreDirectory;
 import com.lightcrafts.image.metadata.CoreTags;
 import com.lightcrafts.image.metadata.ImageMetadata;
-import com.lightcrafts.image.metadata.values.ImageMetaValue;
-import lombok.RequiredArgsConstructor;
+import com.lightcrafts.ui.toolkit.IconFontFactory;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
+import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
+
 public class UrgencyMetadataEntry extends SimpleMetadataEntry {
-
-    @RequiredArgsConstructor
-    private static class UrgencyObject {
-        final ImageMetaValue value;
-
-        @Override
-        public String toString() {
-            // A zero value results from clearUrgency().
-            return (value != null) && (value.getIntValue() > 0)
-                    ? value.toString()
-                    : "";
-        }
-    }
 
     UrgencyMetadataEntry() {
         super(CoreDirectory.class, CoreTags.CORE_URGENCY);
@@ -38,11 +29,16 @@ public class UrgencyMetadataEntry extends SimpleMetadataEntry {
     }
 
     @Override
-    public UrgencyObject getValue(ImageMetadata meta) {
+    public Icon getValue(ImageMetadata meta) {
         val dir = meta.getDirectoryFor(clazz);
-        return dir != null
-                ? new UrgencyObject(dir.getValue(tagID))
-                : new UrgencyObject(null);
+        val metaValue = dir != null ? dir.getValue(tagID) : null;
+        val value = metaValue != null ? metaValue.getIntValue() : null;
+        return createIcon(value);
+    }
+
+    private Icon createIcon(Integer value) {
+        val color = valueToColorMap.get(value);
+        return IconFontFactory.buildIcon("square", 16, color);
     }
 
     @Override
@@ -77,4 +73,16 @@ public class UrgencyMetadataEntry extends SimpleMetadataEntry {
             meta.clearUrgency();
         }
     }
+
+    static private final Map<Integer, Color> valueToColorMap = new HashMap<>() {{
+        // cf. https://jfly.uni-koeln.de/colorset/CUD_color_set_GuideBook_2018_for_print_cs4.pdf
+        put(1, new Color(255, 75, 0)); // red
+        put(2, new Color(246, 170, 0)); // orange
+        put(3, new Color(255, 241, 0)); // yellow
+        put(4, new Color(3, 175, 122)); // green
+        put(5, new Color(77, 196, 255)); // blue
+        put(6, new Color(153, 0, 153)); // purple
+        put(7, new Color(132, 145, 158)); // gray
+        put(8, Color.BLACK);
+    }};
 }
