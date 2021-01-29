@@ -16,17 +16,20 @@ endif
 ##
 # Target architecture
 ##
-ifdef TARGET
-  PROCESSOR:=		$(TARGET)
+ifdef TARGET_ARCH
+  PROCESSOR:=		$(TARGET_ARCH)
 else
   PROCESSOR:=		$(shell uname -m)
 endif
+
 ifeq ($(PROCESSOR),$(filter $(PROCESSOR),i486 i586 i686 i86pc))
   PROCESSOR:=		i386
-else ifeq ($(PROCESSOR),amd64)
+endif
+ifeq ($(PROCESSOR),amd64)
   PROCESSOR:=		x86_64
-else ifeq ($(PROCESSOR),"Power Macintosh")
-  PROCESSOR:=		powerpc
+endif
+ifeq ($(PROCESSOR),$(filter $(PROCESSOR),aarch64 armv8l arm64))
+  PROCESSOR:=		arm64
 endif
 
 TOOLS_BIN:=		$(abspath $(ROOT)/lightcrafts/tools/bin)
@@ -37,7 +40,6 @@ CLASSPATH_SEP:=		:
 # The default C and C++ compilers for Linux, FreeBSD, or OpenIndiana
 CC?=			gcc
 CXX?=			g++
-PKGCFG:=		pkg-config
 
 # Unset USE_ICC_HERE if the overall USE_ICC flags != 1.
 ifneq ($(USE_ICC),1)
@@ -62,17 +64,8 @@ RM:=			rm -fr
 # Mac OS X
 ##
 ifeq ($(PLATFORM),MacOSX)
-  MACOSX_MINOR_VERSION:=	$(shell sw_vers -productVersion | cut -d. -f2-2)
-  ifeq ($(MACOSX_MINOR_VERSION),6) # Snow Leopard
-    CC:=		gcc
-    CXX:=		g++
-  else ifeq ($(shell expr $(MACOSX_MINOR_VERSION) \>= 12),1) # Sierra
-    CC:=		clang
-    CXX:=		clang++
-  else
-    CC:=		clang-omp
-    CXX:=		clang-omp++
-  endif
+  CC:=	clang
+  CXX:=	clang++
 
   MACOSX_DEPLOYMENT_TARGET:= 	$(shell sw_vers -productVersion | cut -d. -f-2)
   ifndef EXECUTABLE
@@ -80,11 +73,15 @@ ifeq ($(PLATFORM),MacOSX)
   endif
   ALTIVEC_CFLAGS:=	-DLC_USE_ALTIVEC
 
-  ifdef USE_ICC_HERE
-    ICC_ROOT:=		/opt/intel/Compiler/11.1/067
-    ICC:=		$(ICC_ROOT)/bin/ia32/icc
-    XIAR:=		$(ICC_ROOT)/bin/ia32/xiar
+  ifeq ($(PROCESSOR),arm64)
+    BREW_DIR?=  /opt/homebrew
+  else
+    BREW_DIR?=  /usr/local
   endif
+  PKGCFG:=	$(BREW_DIR)/bin/pkg-config
+  LIBOMP_PATH?= $(shell $(BREW_DIR)/bin/brew --prefix libomp)
+  PLATFORM_INCLUDES+=	-I$(LIBOMP_PATH)/include
+  PLATFORM_LDFLAGS+=	-L$(LIBOMP_PATH)/lib
 
   ##
   # Don't use := here so other makefiles can override SDKROOT.
@@ -94,7 +91,7 @@ ifeq ($(PLATFORM),MacOSX)
     MACOSX_ISYSROOT=	-isysroot $(SDKROOT)
     MACOSX_SYSLIBROOT=	-Wl,-syslibroot,$(SDKROOT)
   else
-    SDKROOT:=
+    SDKROOT?=
     MACOSX_ISYSROOT=
     MACOSX_SYSLIBROOT=
   endif
@@ -104,56 +101,39 @@ ifeq ($(PLATFORM),MacOSX)
   # These are to be only the bare minimum architecture-specific CFLAGS.  High-
   # performance CFLAGS go in the FAST_CFLAGS_* variables below.
   ##
-  MACOSX_CFLAGS_PPC:=	-mcpu=G4 -mtune=G5
-  MACOSX_CFLAGS_X86:=	-march=core2
+  MACOSX_CFLAGS_ARM:=	-target arm64-apple-macos11
+  MACOSX_CFLAGS_X86:=	-target x86_64-apple-macos10.12
 
   ifdef HIGH_PERFORMANCE
     ##
     # High-performance architecture-specific CFLAGS only.
     ##
-    FAST_CFLAGS_PPC:=	-fast -Wstrict-aliasing -Wstrict-aliasing=2
-
-    ifdef USE_ICC_HERE
-      FAST_CFLAGS_X86:=	-O3 -no-prec-div -xP -fp-model fast=2 -ipo -vec-report0 -fno-common # -fno-alias
-      ifeq ($(UNIVERSAL),1)
-        CC_X86:=	$(ICC)
-	AR_X86:=	$(XIAR)
-        CXX_X86:=	$(ICC)
-      else
-        ifneq ($(PROCESSOR),powerpc)
-	  AR:=		$(XIAR)
-          CC:=		$(ICC)
-          CXX:=		$(ICC)
-        endif
-      endif
-    else
-      FAST_CFLAGS_X86:=	-O3 \
+    FAST_CFLAGS_ARM:=	-O3 # TODO
+    FAST_CFLAGS_X86:=	-O3 \
 			-fno-trapping-math \
 			-fomit-frame-pointer \
 			-msse2 -mfpmath=sse
-    endif
-    MACOSX_CFLAGS_PPC+=	$(FAST_CFLAGS_PPC)
+    MACOSX_CFLAGS_ARM+=	$(FAST_CFLAGS_ARM)
     MACOSX_CFLAGS_X86+=	$(FAST_CFLAGS_X86)
   else
     PLATFORM_CFLAGS+=	-Os
   endif
 
   ifeq ($(UNIVERSAL),1)
-    PLATFORM_CFLAGS_PPC:= $(PLATFORM_CFLAGS) -arch ppc7400 $(MACOSX_CFLAGS_PPC)
-    PLATFORM_CFLAGS_X86:= $(PLATFORM_CFLAGS) -arch i386 $(MACOSX_CFLAGS_X86)
+    PLATFORM_CFLAGS_ARM:= $(PLATFORM_CFLAGS) $(MACOSX_CFLAGS_ARM)
+    PLATFORM_CFLAGS_X86:= $(PLATFORM_CFLAGS) $(MACOSX_CFLAGS_X86)
 
-    ifeq ($(PROCESSOR),powerpc)
-      OTHER_PROCESSOR:=	i386
+    ifeq ($(PROCESSOR),arm64)
+      CONFIG_HOST:= $(MACOSX_CFLAGS_ARM)
+      CONFIG_TARGET:= $(MACOSX_CFLAGS_X86)
     else
-      OTHER_PROCESSOR:=	powerpc
+      CONFIG_HOST:= $(MACOSX_CFLAGS_X86)
+      CONFIG_TARGET:= $(MACOSX_CFLAGS_ARM)
     endif
-    DARWIN_RELEASE:=	$(shell uname -r)
-    CONFIG_HOST:=	$(PROCESSOR)-apple-darwin$(DARWIN_RELEASE)
-    CONFIG_TARGET:=	$(OTHER_PROCESSOR)-apple-darwin$(DARWIN_RELEASE)
   else
-    ifeq ($(PROCESSOR),powerpc)
-      PLATFORM_CFLAGS+=	$(MACOSX_CFLAGS_PPC)
-      PLATFORM_CFLAGS_PPC:= $(PLATFORM_CFLAGS)
+    ifeq ($(PROCESSOR),arm64)
+      PLATFORM_CFLAGS+=	$(MACOSX_CFLAGS_ARM)
+      PLATFORM_CFLAGS_ARM:= $(PLATFORM_CFLAGS)
     else
       PLATFORM_CFLAGS+=	$(MACOSX_CFLAGS_X86)
       PLATFORM_CFLAGS_X86:= $(PLATFORM_CFLAGS)
@@ -162,7 +142,7 @@ ifeq ($(PLATFORM),MacOSX)
 
   LIPO:=		lipo
 
-  JAVA_INCLUDES=	-I$(SDKROOT)/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers
+  JAVA_INCLUDES+=	-I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/darwin"
   JNILIB_PREFIX:=	lib
   JNILIB_EXT:=		.jnilib
   DYLIB_PREFIX:=	$(JNILIB_PREFIX)
@@ -244,7 +224,7 @@ ifeq ($(PLATFORM),Windows)
     else
       PLATFORM_CFLAGS+=	-O3 \
 			-fno-trapping-math \
-			-fomit-frame-pointer 
+			-fomit-frame-pointer
     endif
   else
     PLATFORM_CFLAGS+=	-Os
@@ -273,7 +253,7 @@ ifeq ($(PLATFORM),$(filter $(PLATFORM),Linux FreeBSD SunOS))
 
   ifeq ($(PROCESSOR),$(filter $(PROCESSOR),x86_64 i386))
     PLATFORM_CFLAGS+=	$(SSE_FLAGS)
-  else ifeq ($(PROCESSOR),$(filter $(PROCESSOR),aarch64 armv8l))
+  else ifeq ($(PROCESSOR),arm64)
     PLATFORM_CFLAGS+=	-march=armv8-a
   else ifeq ($(PROCESSOR),$(filter $(PROCESSOR),armhf armv7l))
     PLATFORM_CFLAGS+=	-march=armv7-a
@@ -296,6 +276,8 @@ ifeq ($(PLATFORM),$(filter $(PLATFORM),Linux FreeBSD SunOS))
   JNILIB_EXT:=		.so
   DYLIB_PREFIX:=	$(JNILIB_PREFIX)
   DYLIB_EXT:=		$(JNILIB_EXT)
+
+  PKGCFG:=		pkg-config
 
   ifeq ($(PLATFORM),Linux)
     JAVA_INCLUDES:=	-I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux

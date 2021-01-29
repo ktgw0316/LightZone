@@ -115,13 +115,16 @@ public:
   I64vec2& operator -=(const I64vec2 &a) { return *this = (I64vec2) _mm_sub_epi64(vec,a); }
 
   I64vec2 operator<<(const I64vec2 &a) { return _mm_sll_epi64(vec,a); }
-  I64vec2 operator<<(int count) { return _mm_slli_epi64(vec,count); }
   I64vec2& operator<<=(const I64vec2 &a) { return *this = (I64vec2) _mm_sll_epi64(vec,a); }
-  I64vec2& operator<<=(int count) { return *this = (I64vec2) _mm_slli_epi64(vec,count); }
   I64vec2 operator>>(const I64vec2 &a) { return _mm_srl_epi64(vec,a); }
-  I64vec2 operator>>(int count) { return _mm_srli_epi64(vec,count); }
   I64vec2& operator>>=(const I64vec2 &a) { return *this = (I64vec2) _mm_srl_epi64(vec,a); }
+
+  #if !defined __clang__ && !defined __aarch64__
+  I64vec2 operator<<(int count) { return _mm_slli_epi64(vec,count); }
+  I64vec2& operator<<=(int count) { return *this = (I64vec2) _mm_slli_epi64(vec,count); }
+  I64vec2 operator>>(int count) { return _mm_srli_epi64(vec,count); }
   I64vec2& operator>>=(int count) { return *this = (I64vec2) _mm_srli_epi64(vec,count); }
+  #endif
 
   const int64_t& operator[](int i)const
   {
@@ -156,10 +159,12 @@ public:
   I32vec4& operator -=(const I32vec4 &a) { return *this = (I32vec4)_mm_sub_epi32(vec,a); }
 
   I32vec4 operator<<(const I32vec4 &a) { return _mm_sll_epi32(vec,a); }
-  I32vec4 operator<<(int count) { return _mm_slli_epi32(vec,count); }
   I32vec4& operator<<=(const I32vec4 &a) { return *this = (I32vec4)_mm_sll_epi32(vec,a); }
-  I32vec4& operator<<=(int count) { return *this = (I32vec4)_mm_slli_epi32(vec,count); }
 
+  #if !defined __clang__ && !defined __aarch64__
+  I32vec4 operator<<(int count) { return _mm_slli_epi32(vec,count); }
+  I32vec4& operator<<=(int count) { return *this = (I32vec4)_mm_slli_epi32(vec,count); }
+  #endif
 };
 
 inline I32vec4 cmpeq(const I32vec4 &a,const I32vec4 &b) { return _mm_cmpeq_epi32(a,b); }
@@ -191,14 +196,16 @@ public:
   Is32vec4& operator -=(const I32vec4 &a) { return *this = (Is32vec4)_mm_sub_epi32(vec,a); }
 
   Is32vec4 operator<<(const M128 &a) { return _mm_sll_epi32(vec,a); }
-  Is32vec4 operator<<(int count) { return _mm_slli_epi32(vec,count); }
   Is32vec4& operator<<=(const M128 &a) { return *this = (Is32vec4)_mm_sll_epi32(vec,a); }
-  Is32vec4& operator<<=(int count) { return *this = (Is32vec4)_mm_slli_epi32(vec,count); }
-
   Is32vec4 operator>>(const M128 &a) { return _mm_sra_epi32(vec,a); }
-  Is32vec4 operator>>(int count) { return _mm_srai_epi32(vec,count); }
   Is32vec4& operator>>=(const M128 &a) { return *this = (Is32vec4) _mm_sra_epi32(vec,a); }
+
+  #if !defined __clang__ && !defined __aarch64__
+  Is32vec4 operator<<(int count) { return _mm_slli_epi32(vec,count); }
+  Is32vec4& operator<<=(int count) { return *this = (Is32vec4)_mm_slli_epi32(vec,count); }
+  Is32vec4 operator>>(int count) { return _mm_srai_epi32(vec,count); }
   Is32vec4& operator>>=(int count) { return *this = (Is32vec4) _mm_srai_epi32(vec,count); }
+  #endif
 
 #if defined(_ENABLE_VEC_DEBUG)
 
@@ -256,13 +263,16 @@ public:
   Iu32vec4& operator -=(const I32vec4 &a) { return *this = (Iu32vec4)_mm_sub_epi32(vec,a); }
 
   Iu32vec4 operator<<(const M128 &a) { return _mm_sll_epi32(vec,a); }
-  Iu32vec4 operator<<(int count) { return _mm_slli_epi32(vec,count); }
   Iu32vec4& operator<<=(const M128 &a) { return *this = (Iu32vec4)_mm_sll_epi32(vec,a); }
-  Iu32vec4& operator<<=(int count) { return *this = (Iu32vec4)_mm_slli_epi32(vec,count); }
   Iu32vec4 operator>>(const M128 &a) { return _mm_srl_epi32(vec,a); }
-  Iu32vec4 operator>>(int count) { return _mm_srli_epi32(vec,count); }
   Iu32vec4& operator>>=(const M128 &a) { return *this = (Iu32vec4) _mm_srl_epi32(vec,a); }
+
+  #if !defined __clang__ && !defined __aarch64__
   Iu32vec4& operator>>=(int count) { return *this = (Iu32vec4) _mm_srli_epi32(vec,count); }
+  Iu32vec4 operator<<(int count) { return _mm_slli_epi32(vec,count); }
+  Iu32vec4& operator<<=(int count) { return *this = (Iu32vec4)_mm_slli_epi32(vec,count); }
+  Iu32vec4 operator>>(int count) { return _mm_srli_epi32(vec,count); }
+  #endif
 
 #if defined(_ENABLE_VEC_DEBUG)
 
@@ -313,9 +323,12 @@ public:
   I16vec8& operator *=(const I16vec8 &a) { return *this = (I16vec8) _mm_mullo_epi16(vec,a); }
 
   I16vec8 operator<<(const M128 &a) { return _mm_sll_epi16(vec,a); }
-  I16vec8 operator<<(int count) { return _mm_slli_epi16(vec,count); }
   I16vec8& operator<<=(const M128 &a) { return *this = (I16vec8)_mm_sll_epi16(vec,a); }
+
+  #if !defined __clang__ && !defined __aarch64__
   I16vec8& operator<<=(int count) { return *this = (I16vec8)_mm_slli_epi16(vec,count); }
+  I16vec8 operator<<(int count) { return _mm_slli_epi16(vec,count); }
+  #endif
 
 };
 
@@ -355,14 +368,17 @@ public:
   Is16vec8& operator *=(const I16vec8 &a) { return *this = (Is16vec8) _mm_mullo_epi16(vec,a); }
 
   Is16vec8 operator<<(const M128 &a) { return _mm_sll_epi16(vec,a); }
-  Is16vec8 operator<<(int count) { return _mm_slli_epi16(vec,count); }
   Is16vec8& operator<<=(const M128 &a) { return *this = (Is16vec8)_mm_sll_epi16(vec,a); }
-  Is16vec8& operator<<=(int count) { return *this = (Is16vec8)_mm_slli_epi16(vec,count); }
 
   Is16vec8 operator>>(const M128 &a) { return _mm_sra_epi16(vec,a); }
-  Is16vec8 operator>>(int count) { return _mm_srai_epi16(vec,count); }
   Is16vec8& operator>>=(const M128 &a) { return *this = (Is16vec8)_mm_sra_epi16(vec,a); }
+
+  #if !defined __clang__ && !defined __aarch64__
+  Is16vec8 operator<<(int count) { return _mm_slli_epi16(vec,count); }
+  Is16vec8& operator<<=(int count) { return *this = (Is16vec8)_mm_slli_epi16(vec,count); }
+  Is16vec8 operator>>(int count) { return _mm_srai_epi16(vec,count); }
   Is16vec8& operator>>=(int count) { return *this = (Is16vec8)_mm_srai_epi16(vec,count); }
+  #endif
 
 #if defined(_ENABLE_VEC_DEBUG)
 
@@ -440,13 +456,16 @@ public:
   Iu16vec8& operator *=(const I16vec8 &a) { return *this = (Iu16vec8) _mm_mullo_epi16(vec,a); }
 
   Iu16vec8 operator<<(const M128 &a) { return _mm_sll_epi16(vec,a); }
-  Iu16vec8 operator<<(int count) { return _mm_slli_epi16(vec,count); }
   Iu16vec8& operator<<=(const M128 &a) { return *this = (Iu16vec8)_mm_sll_epi16(vec,a); }
-  Iu16vec8& operator<<=(int count) { return *this = (Iu16vec8)_mm_slli_epi16(vec,count); }
   Iu16vec8 operator>>(const M128 &a) { return _mm_srl_epi16(vec,a); }
-  Iu16vec8 operator>>(int count) { return _mm_srli_epi16(vec,count); }
   Iu16vec8& operator>>=(const M128 &a) { return *this = (Iu16vec8) _mm_srl_epi16(vec,a); }
+
+  #if !defined __clang__ && !defined __aarch64__
+  Iu16vec8 operator<<(int count) { return _mm_slli_epi16(vec,count); }
+  Iu16vec8& operator<<=(int count) { return *this = (Iu16vec8)_mm_slli_epi16(vec,count); }
+  Iu16vec8 operator>>(int count) { return _mm_srli_epi16(vec,count); }
   Iu16vec8& operator>>=(int count) { return *this = (Iu16vec8) _mm_srli_epi16(vec,count); }
+  #endif
 
 #if defined(_ENABLE_VEC_DEBUG)
 

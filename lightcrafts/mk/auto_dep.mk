@@ -14,12 +14,12 @@ ifeq ($(UNIVERSAL),1)
   ##
   # We need to use an architecture-specific INCLUDES, but since dependencies
   # are generated once regardless of the number of architectures, we have to
-  # pick one, so we pick PPC.  Strictly speaking, this isn't the right thing do
-  # do since it means the X86 compile will depend on PPC includes, but in
+  # pick one, so we pick ARM.  Strictly speaking, this isn't the right thing do
+  # do since it means the X86 compile will depend on ARM includes, but in
   # practice it's OK because this is only for dependency generation, not code
   # generation.
   ##
-  AUTO_DEP_FLAGS+=	$(INCLUDES_PPC)
+  AUTO_DEP_FLAGS+=	$(INCLUDES_ARM)
 else
   AUTO_DEP_FLAGS+=	$(INCLUDES)
 endif
@@ -37,15 +37,7 @@ ifeq ($(PROCESSOR),powerpc)
   AUTO_DEP_FLAGS+= 	-maltivec
 endif
 
-ifeq ($(findstring MacOSX10.2.8,$(AUTO_DEP_FLAGS)),MacOSX10.2.8)
-  ##
-  # There aren't gcc 4.0 headers for the 10.2.8 SDK, so use gcc 3.3 to generate
-  # the dependencies.
-  ##
-  AUTO_DEP_CC:=		gcc-3.3
-else
-  AUTO_DEP_CC:=		$(CC)
-endif
+AUTO_DEP_CC:=		$(CC)
 
 MAKEDEPEND:=		$(AUTO_DEP_CC) $(AUTO_DEP_FLAGS)
 

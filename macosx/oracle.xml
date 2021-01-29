@@ -114,9 +114,6 @@
     <copy todir="${bundle-contents}">
       <fileset dir="resources" excludes=".git"/>
     </copy>
-    <copy todir="${bundle-contents}/Resources">
-      <fileset dir="helpers/JavaAppLauncher/Resources" excludes=".git"/>
-    </copy>
     <copy todir="${bundle-contents}/Resources/share">
       <fileset dir="products/share" excludes=".git"/>
     </copy>

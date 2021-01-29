@@ -15,22 +15,22 @@ from LightZone/macosx/resources/Info.plist and launch the MainClass defined ther
 ## Install required software
 Building the LightZone source requires the following software:
 
-- __Java__ version 8 or later from Oracle
+- __Java__ version 11 or later
+- __clang__
 - __git__
 - __homebrew__ from http://brew.sh/
 
 You need to install following packages using homebrew:
-- __llvm__ (to correctly compile OpenMP; it includes __clang__ and __clang++__)
 - __ant__ version 1.9.8 or later to support nativeheaderdir parameter
 - __autoconf__
 - __jpeg-turbo__
+- __lensfun__
+- __libomp__
 - __libtiff__ "brew edit libtiff", replace all "jpeg" occurences with "jpeg-turbo", then "brew install libtiff --build-from-source"
 - __little-cms2__
 - __pkg-config__
 
-On older releases of macOS, you may need to use __clang-omp__ or __gcc__ instead of __llvm__ clang.
-
-If you need to install gcc and git, the easiest route is to download XCode's command-line tools; the link depends on your OS X version.
+If you need to install clang and git, the easiest route is to download XCode's command-line tools; the link depends on your OS X version.
 
 - Run `xcode-select --install` on OS X 10.9 or later
 - http://stackoverflow.com/questions/9353444/how-to-use-install-gcc-on-mac-os-x-10-8-xcode-4-4

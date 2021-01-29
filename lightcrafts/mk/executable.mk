@@ -26,8 +26,8 @@
 # platform only, the makefile can replace "EXTRA" with one of "MACOSX",
 # "WINDOWS" or "LINUX".
 #
-# In addition to the above, there are also EXEC_PPC_CFLAGS, EXEC_PPC_DEFINES,
-# and EXEC_PPC_LDFLAGS for PowerPC-specific directives, and EXEC_X86_CFLAGS,
+# In addition to the above, there are also EXEC_ARM_CFLAGS, EXEC_ARM_DEFINES,
+# and EXEC_ARM_LDFLAGS for arm64-specific directives, and EXEC_X86_CFLAGS,
 # EXEC_X86_DEFINES, and EXEC_X86_LDFLAGS for Intel-specific directives.
 #
 # If a makefile needs to override how the TARGET is build, it can do:
@@ -52,7 +52,7 @@ COMMON_DIR:=		$(ROOT)/lightcrafts
 include			$(COMMON_DIR)/mk/platform.mk
 
 ifeq ($(UNIVERSAL),1)
-  CFLAGS_PPC:=		$(PLATFORM_CFLAGS_PPC) $(EXEC_EXTRA_CFLAGS)
+  CFLAGS_ARM:=		$(PLATFORM_CFLAGS_ARM) $(EXEC_EXTRA_CFLAGS)
   CFLAGS_X86:=		$(PLATFORM_CFLAGS_X86) $(EXEC_EXTRA_CFLAGS)
 else
   CFLAGS:=		$(PLATFORM_CFLAGS) $(EXEC_EXTRA_CFLAGS)
@@ -70,16 +70,16 @@ ifeq ($(PLATFORM),MacOSX)
   LDFLAGS+=		$(EXEC_MACOSX_LDFLAGS)
   LINK+=		$(EXEC_MACOSX_LINK)
   ifeq ($(UNIVERSAL),1)
-    CFLAGS_PPC+=	$(EXEC_MACOSX_CFLAGS) $(EXEC_PPC_CFLAGS)
+    CFLAGS_ARM+=	$(EXEC_MACOSX_CFLAGS) $(EXEC_ARM_CFLAGS)
     CFLAGS_X86+=	$(EXEC_MACOSX_CFLAGS) $(EXEC_X86_CFLAGS)
   else
     CFLAGS+=		$(EXEC_MACOSX_CFLAGS)
-    ifeq ($(PROCESSOR),powerpc)
-      CFLAGS+=		$(EXEC_PPC_CFLAGS)
-      DEFINES+=		$(EXEC_PPC_DEFINES)
-      LDFLAGS+=		$(EXEC_PPC_LDFLAGS)
+    ifeq ($(PROCESSOR),arm64)
+      CFLAGS+=		$(EXEC_ARM_CFLAGS)
+      DEFINES+=		$(EXEC_ARM_DEFINES)
+      LDFLAGS+=		$(EXEC_ARM_LDFLAGS)
     endif
-    ifeq ($(PROCESSOR),i386)
+    ifeq ($(PROCESSOR),x86_64)
       CFLAGS+=		$(EXEC_X86_CFLAGS)
       DEFINES+=		$(EXEC_X86_DEFINES)
       LDFLAGS+=		$(EXEC_X86_LDFLAGS)
@@ -112,9 +112,9 @@ DEFINES+=	-DDEBUG
 endif
 
 ifeq ($(UNIVERSAL),1)
-  CFLAGS_PPC+=		$(DEFINES) $(EXEC_PPC_DEFINES)
+  CFLAGS_ARM+=		$(DEFINES) $(EXEC_ARM_DEFINES)
   CFLAGS_X86+=		$(DEFINES) $(EXEC_X86_DEFINES)
-  INCLUDES_PPC:=	$(INCLUDES) $(EXEC_PPC_INCLUDES)
+  INCLUDES_ARM:=	$(INCLUDES) $(EXEC_ARM_INCLUDES)
   INCLUDES_X86:=	$(INCLUDES) $(EXEC_X86_INCLUDES)
 else
   CFLAGS+=		$(DEFINES)
@@ -133,7 +133,7 @@ TARGET:=	$(TARGET_DIR)/$(TARGET_BASE)$(EXEC_EXT)
 # These are always defined even when UNIVERSAL is not set so a "make disclean"
 # will remove them.
 ##
-TARGET_PPC:=	$(TARGET_BASE)-ppc$(EXEC_EXT)
+TARGET_ARM:=	$(TARGET_BASE)-arm$(EXEC_EXT)
 TARGET_X86:=	$(TARGET_BASE)-x86$(EXEC_EXT)
 
 ##
@@ -147,13 +147,13 @@ include		$(COMMON_DIR)/mk/auto_dep.mk
 
 ifeq ($(UNIVERSAL),1)
 
-$(TARGET): $(TARGET_PPC) $(TARGET_X86)
+$(TARGET): $(TARGET_ARM) $(TARGET_X86)
 	-$(MKDIR) $(TARGET_DIR)
-	$(LIPO) -create $(TARGET_PPC) $(TARGET_X86) -output $@
+	$(LIPO) -create $(TARGET_ARM) $(TARGET_X86) -output $@
 
 ifndef JNI_MANUAL_TARGET
-$(TARGET_PPC): $(OBJECTS_PPC) $(LOCAL_RANLIBS) $(BUILT_LIBS)
-	$(CC_LINK) $(CFLAGS_PPC) $(LDFLAGS) -o $@ *-ppc.o $(LINK)
+$(TARGET_ARM): $(OBJECTS_ARM) $(LOCAL_RANLIBS) $(BUILT_LIBS)
+	$(CC_LINK) $(CFLAGS_ARM) $(LDFLAGS) -o $@ *-arm.o $(LINK)
 
 $(TARGET_X86): $(OBJECTS_X86) $(LOCAL_RANLIBS) $(BUILT_LIBS)
 	$(CC_LINK) $(CFLAGS_X86) $(LDFLAGS) -o $@ *-x86.o $(LINK)
@@ -177,6 +177,6 @@ clean:
 	$(RM) *.o .*.d
 
 distclean mostlyclean: clean
-	$(RM) $(TARGET) $(TARGET_PPC) $(TARGET_X86) $(POST_TARGET)
+	$(RM) $(TARGET) $(TARGET_ARM) $(TARGET_X86) $(POST_TARGET)
 
 # vim:set noet sw=8 ts=8:

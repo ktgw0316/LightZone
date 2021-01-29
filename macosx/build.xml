@@ -21,9 +21,6 @@
   <condition property="UNIVERSAL" value="1" else="0">
     <isset property="UNIVERSAL"/>
   </condition>
-  <condition property="USE_ICC" value="1" else="0">
-    <isset property="USE_ICC"/>
-  </condition>
 
   <!--===== Application build ==============================================-->
 
@@ -62,12 +59,6 @@
 
   <target name="jni">
     <exec executable="make" dir="jnisrc" failonerror="true" vmlauncher="false">
-      <arg value="UNIVERSAL=${UNIVERSAL}"/>
-    </exec>
-  </target>
-
-  <target name="helpers">
-    <exec executable="make" dir="helpers" failonerror="true" vmlauncher="false">
       <arg value="UNIVERSAL=${UNIVERSAL}"/>
     </exec>
   </target>
@@ -139,7 +130,6 @@
   <target name="dmg" depends="build-bundle">
     <exec executable="make" dir="dmg" failonerror="true" vmlauncher="false">
       <arg value="APP_NAME=${app-name}"/>
-      <arg value="USE_ICC=${USE_ICC}"/>
       <arg value="UNIVERSAL=${UNIVERSAL}"/>
       <arg value="user"/>
     </exec>
@@ -178,11 +168,6 @@
     </parallel>
     <exec executable="make" dir="dmg">
       <arg value="-j"/>
-      <arg value="${clean-method}"/>
-    </exec>
-    <exec executable="make" dir="helpers">
-      <arg value="-j"/>
-      <arg value="UNIVERSAL=1"/>
       <arg value="${clean-method}"/>
     </exec>
     <exec executable="make" dir="jnisrc">
