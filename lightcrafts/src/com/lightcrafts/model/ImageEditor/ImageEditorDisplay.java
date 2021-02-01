@@ -370,7 +370,7 @@ public class ImageEditorDisplay extends JPanel {
             drawBackgroundTile(g2d, tileIndex, tileClipRect, tile);
         }
         g2d.setClip(originalClipBounds); // reset the clip rect
-
+        repaint();
         updateTileComputingStatus(tileIndices, originalClipBounds);
     }
 
