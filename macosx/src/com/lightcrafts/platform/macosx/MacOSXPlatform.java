@@ -57,6 +57,11 @@ public final class MacOSXPlatform extends Platform {
     }
 
     @Override
+    public FileChooser getFileChooser() {
+        return new MacOSXFileChooser();
+    }
+
+    @Override
     public synchronized Collection<ColorProfileInfo> getExportProfiles() {
         if (m_exportProfiles == null) {
             m_exportProfiles = new HashSet<ColorProfileInfo>();
