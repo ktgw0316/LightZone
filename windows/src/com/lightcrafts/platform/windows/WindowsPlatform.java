@@ -54,12 +54,6 @@ public final class WindowsPlatform extends Platform {
     }
 
     @Override
-    public FileChooser getFileChooser() {
-        return super.getFileChooser();
-        // return new WindowsFileChooser();
-    }
-
-    @Override
     public String getDisplayNameOf( File file ) {
         String displayName = getFileSystemView().getSystemDisplayName( file );
 
