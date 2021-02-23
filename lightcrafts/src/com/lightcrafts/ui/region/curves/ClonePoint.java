@@ -2,6 +2,7 @@
 
 package com.lightcrafts.ui.region.curves;
 
+import com.lightcrafts.utils.awt.geom.HiDpi;
 import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlNode;
 
@@ -18,7 +19,9 @@ import java.awt.geom.AffineTransform;
  */
 class ClonePoint implements Cloneable {
 
-    private static final int NominalRadius = 8;    // rendering size at 1-1
+    // rendering size at 1-1
+    private static final float NominalRadius =
+            8 * (float) Math.sqrt(HiDpi.defaultTransform.getDeterminant());
 
     private Stroke foregroundStroke = new BasicStroke(1f);
     private Stroke backgroundStroke = new BasicStroke(3f);
