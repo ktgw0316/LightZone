@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2021-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.region.curves;
 
@@ -91,8 +92,9 @@ public class EllipticCurve extends AbstractCurve {
 
         // Update the control points to the complementary locations, to
         // preserve the center.
-        double dx = Math.max(p.getX() - centerX, MIN_RADIUS);
-        double dy = Math.max(p.getY() - centerY, MIN_RADIUS);
+        double sign = (n == 0) ? -1.0 : 1.0;
+        double dx = sign * Math.max(sign * (p.getX() - centerX), MIN_RADIUS);
+        double dy = sign * Math.max(sign * (p.getY() - centerY), MIN_RADIUS);
         Point2D q1 = new Point2D.Double(centerX + dx, centerY + dy);
         super.movePoint(n, q1);
         Point2D q2 = new Point2D.Double(centerX - dx, centerY - dy);
