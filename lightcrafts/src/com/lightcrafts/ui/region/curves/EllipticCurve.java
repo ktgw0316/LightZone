@@ -29,6 +29,7 @@ public class EllipticCurve extends AbstractCurve {
     private final static Preferences Prefs = Preferences.userRoot().node(
         "/com/lightcrafts/ui/region/curves"
     );
+
     // Default values for new EllipticCurves.  See EllipticCurve(Point2D).
     private final static String EllipticXTag = "SpotX";
     private final static String EllipticYTag = "SpotY";
@@ -36,17 +37,17 @@ public class EllipticCurve extends AbstractCurve {
     private final static String EllipticCloneYTag = "SpotCloneY";
 
     // Minimum value for width and height of EllipticCurves
-    private static final double MIN_RADIUS = 0.5; 
+    private static final double MIN_RADIUS = 0.5;
+
     // Default width for new EllipticCurves.
     private static double EllipticX = Math.max(Prefs.getDouble(EllipticXTag, 30), MIN_RADIUS);
+
     // Default height for new EllipticCurves.
     private static double EllipticY = Math.max(Prefs.getDouble(EllipticYTag, 30), MIN_RADIUS);
 
     // Default clone point offsets for new EllipticCurves.
-    private static double EllipticCloneX =
-        Prefs.getDouble(EllipticCloneXTag, EllipticX);
-    private static double EllipticCloneY =
-        Prefs.getDouble(EllipticCloneYTag, 0);
+    private static double EllipticCloneX = Prefs.getDouble(EllipticCloneXTag, EllipticX);
+    private static double EllipticCloneY = Prefs.getDouble(EllipticCloneYTag, 0);
 
     // If the width is directly manipulated (user interaction, restore), then
     // stop updating it automatically when control points change.
@@ -63,73 +64,74 @@ public class EllipticCurve extends AbstractCurve {
     }
 
     public EllipticCurve(Point2D center) {
-        Point2D upperLeft = new Point2D.Double(
+        final var upperLeft = new Point2D.Double(
             center.getX() - EllipticX, center.getY() - EllipticY
         );
-        Point2D lowerRight = new Point2D.Double(
+        final var lowerRight = new Point2D.Double(
             center.getX() + EllipticX, center.getY() + EllipticY
         );
         addPoint(upperLeft);
         addPoint(lowerRight);
 
-        double scale = Math.min(
-            2 * Math.abs(EllipticX), 2 * Math.abs(EllipticY)
-        );
+        final var scale = Math.min(2 * Math.abs(EllipticX), 2 * Math.abs(EllipticY));
         setWidth((float) scale / 6);
         
-        Point2D clonePt = new Point2D.Double(
+        final var clonePt = new Point2D.Double(
             center.getX() + EllipticCloneX, center.getY() + EllipticCloneY
         );
         setClonePoint(clonePt);
     }
 
+    @Override
     public void movePoint(int n, Point2D p) {
         // Preserve the center:
-        Point2D p1 = (Point2D) points.get(0);
-        Point2D p2 = (Point2D) points.get(1);
-        double centerX = (p1.getX() + p2.getX()) / 2;
-        double centerY = (p1.getY() + p2.getY()) / 2;
+        var p1 = points.get(0);
+        var p2 = points.get(1);
+        final var centerX = (p1.getX() + p2.getX()) / 2;
+        final var centerY = (p1.getY() + p2.getY()) / 2;
 
         // Update the control points to the complementary locations, to
         // preserve the center.
-        double sign = (n == 0) ? -1.0 : 1.0;
-        double dx = sign * Math.max(sign * (p.getX() - centerX), MIN_RADIUS);
-        double dy = sign * Math.max(sign * (p.getY() - centerY), MIN_RADIUS);
-        Point2D q1 = new Point2D.Double(centerX + dx, centerY + dy);
+        final var sign = (n == 0) ? -1.0 : 1.0;
+        final var dx = sign * Math.max(sign * (p.getX() - centerX), MIN_RADIUS);
+        final var dy = sign * Math.max(sign * (p.getY() - centerY), MIN_RADIUS);
+        final var q1 = new Point2D.Double(centerX + dx, centerY + dy);
         super.movePoint(n, q1);
-        Point2D q2 = new Point2D.Double(centerX - dx, centerY - dy);
+        final var q2 = new Point2D.Double(centerX - dx, centerY - dy);
         super.movePoint(1 - n, q2);
 
         // Revise the default values.
-        p1 = (Point2D) points.get(0);
-        p2 = (Point2D) points.get(1);
+        p1 = points.get(0);
+        p2 = points.get(1);
         EllipticX = (p1.getX() - p2.getX()) / 2;
         EllipticY = (p1.getY() - p2.getY()) / 2;
 
         // Adjust the inner curve width automatically.
         if (! isManualWidthSet) {
             Rectangle2D bounds = shape.getBounds();
-            double width = bounds.getWidth();
-            double height = bounds.getHeight();
-            double scale = Math.min(width, height);
+            final var width = bounds.getWidth();
+            final var height = bounds.getHeight();
+            final var scale = Math.min(width, height);
             setWidth((float) scale / 6);
             isManualWidthSet = false;
         }
         savePrefs();
     }
 
+    @Override
     public void setClonePoint(Point2D p) {
         super.setClonePoint(p);
 
         // Revise the default clone point offsets.
-        Point2D p1 = (Point2D) points.get(0);
-        Point2D p2 = (Point2D) points.get(1);
+        final var p1 = points.get(0);
+        final var p2 = points.get(1);
         EllipticCloneX = p.getX() - (p1.getX() + p2.getX()) / 2;
         EllipticCloneY = p.getY() - (p1.getY() + p2.getY()) / 2;
 
         savePrefs();
     }
 
+    @Override
     public void setInnerShape(Point2D p) {
         super.setInnerShape(p);
         isManualWidthSet = true;
@@ -138,6 +140,7 @@ public class EllipticCurve extends AbstractCurve {
     /**
      * This is the only Curve implementation with a fixed number of points.
      */
+    @Override
     public boolean allowsAddRemovePoints() {
         return false;
     }
@@ -145,6 +148,7 @@ public class EllipticCurve extends AbstractCurve {
     /**
      * This is the only Curve that is valid with only two points.
      */
+    @Override
     public boolean isValidShape() {
         return (points.size() == 2);
     }
@@ -153,39 +157,39 @@ public class EllipticCurve extends AbstractCurve {
      * Turn off automatic inner curve width updates if this Curve has ever
      * been saved.
      */
+    @Override
     public void restore(XmlNode node) throws XMLException {
         super.restore(node);
         isManualWidthSet = true;
     }
 
+    @Override
     void updateShape() {
         if (points.size() != 2) {
             shape = new GeneralPath();
             return;
         }
-        Point2D p1 = (Point2D) points.get(0);
-        Point2D p2 = (Point2D) points.get(1);
+        final var p1 = points.get(0);
+        final var p2 = points.get(1);
 
-        double minX = Math.min(p1.getX(), p2.getX());
-        double minY = Math.min(p1.getY(), p2.getY());
-        double maxX = Math.max(p1.getX(), p2.getX());
-        double maxY = Math.max(p1.getY(), p2.getY());
+        final var minX = Math.min(p1.getX(), p2.getX());
+        final var minY = Math.min(p1.getY(), p2.getY());
+        final var maxX = Math.max(p1.getX(), p2.getX());
+        final var maxY = Math.max(p1.getY(), p2.getY());
 
-        double x = minX;
-        double y = minY;
-        double w = maxX - minX;
-        double h = maxY - minY;
+        final var w = maxX - minX;
+        final var h = maxY - minY;
 
-        Rectangle2D bounds = new Rectangle2D.Double(x, y, w, h);
+        final var bounds = new Rectangle2D.Double(minX, minY, w, h);
 
-        Shape ne = new Arc2D.Double(bounds, -45, 180, Arc2D.OPEN);
-        Shape sw = new Arc2D.Double(bounds, 135, 180, Arc2D.OPEN);
+        final Shape ne = new Arc2D.Double(bounds, -45, 180, Arc2D.OPEN);
+        final Shape sw = new Arc2D.Double(bounds, 135, 180, Arc2D.OPEN);
 
         segments.clear();
         segments.add(ne);
         segments.add(sw);
 
-        float[] start = new float[6];
+        final var start = new float[6];
         ne.getPathIterator(null).currentSegment(start);
 
         GeneralPath path = new GeneralPath();
