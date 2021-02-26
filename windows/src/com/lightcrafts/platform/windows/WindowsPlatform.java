@@ -151,12 +151,6 @@ public final class WindowsPlatform extends Platform {
     }
 
     @Override
-    public void readyToOpenFiles() {
-        if ( System.getProperty( "IDE" ) == null )
-            WindowsLauncher.readyToOpenFiles();
-    }
-
-    @Override
     public String resolveAliasFile( File file ) {
         return WindowsFileUtil.resolveShortcut( file.getAbsolutePath() );
     }
