@@ -63,6 +63,11 @@
         <fileset dir="${common-dir}/products">
           <include name="*.jar"/>
         </fileset>
+        <fileset dir="${common-dir}/lib">
+          <include name="lombok*.jar"/>
+          <include name="annotations*.jar"/>
+          <include name="jsr305*.jar"/>
+        </fileset>
       </classpath>
     </javac>
   </target>

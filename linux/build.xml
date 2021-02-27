@@ -51,6 +51,11 @@
         <fileset dir="${common-dir}/products">
           <include name="*.jar"/>
         </fileset>
+        <fileset dir="${common-dir}/lib">
+          <include name="lombok*.jar"/>
+          <include name="annotations*.jar"/>
+          <include name="jsr305*.jar"/>
+        </fileset>
         <fileset dir="/usr">
           <include name="share/java*/**/*.jar"/>
           <include name="local/share/java/classes/*.jar"/>
