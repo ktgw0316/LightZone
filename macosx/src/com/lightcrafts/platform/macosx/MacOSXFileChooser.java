@@ -30,10 +30,8 @@ public class MacOSXFileChooser extends DefaultFileChooser {
                 fd.setDirectory(directory.getAbsolutePath());
             }
             fd.setVisible(true);
-            final String dir = fd.getFile();
-            if (dir != null) {
-                selectedFile = new File(dir);
-            }
+            final String dir = fd.getDirectory() + fd.getFile();
+            selectedFile = new File(dir);
         } finally {
             System.setProperty("apple.awt.fileDialogForDirectories", "false");
         }
