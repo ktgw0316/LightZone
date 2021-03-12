@@ -14,11 +14,11 @@
   <property environment="env"/>
   <condition property="64bit">
     <or>
-      <matches string="${env.TARGET}" pattern="x86_64"/>
-      <matches string="${env.TARGET}" pattern="amd64"/>
+      <matches string="${env.TARGET_ARCH}" pattern="x86_64"/>
+      <matches string="${env.TARGET_ARCH}" pattern="amd64"/>
       <and>
         <not>
-          <matches string="${env.TARGET}" pattern="i.*86"/>
+          <matches string="${env.TARGET_ARCH}" pattern="i.*86"/>
         </not>
         <matches string="${processor}" pattern="^.*64$"/>
       </and>
