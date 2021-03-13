@@ -173,15 +173,17 @@ Java_com_lightcrafts_utils_Lensfun_initModifierWithPoly5Lens
     }
 
 #if (LF_VERSION >= 0x00035f00) // 0.3.95
-    lfLensCalibDistortion dc = {LF_DIST_MODEL_POLY5, focal, focal, false, {k1, k2}};
+    lfLensCalibAttributes attr = {0, 0, 1, fullWidth / float(fullHeight)};
+    lfLensCalibDistortion dc = {LF_DIST_MODEL_POLY5, focal, focal, 0, {k1, k2}, attr};
+    lfLensCalibTCA tcac = {LF_TCA_MODEL_LINEAR, focal, {kr, kb}, attr};
 #else
     lfLensCalibDistortion dc = {LF_DIST_MODEL_POLY5, focal, {k1, k2}};
-#endif
-    // FIXME: Wrong autoscale, cf. https://github.com/lensfun/lensfun/issues/945
-    lens->AddCalibDistortion(&dc);
-
     lfLensCalibTCA tcac = {LF_TCA_MODEL_LINEAR, focal, {kr, kb}};
+#endif
+    lens->RemoveCalibrations();
+    lens->AddCalibDistortion(&dc);
     lens->AddCalibTCA(&tcac);
+    // FIXME: Wrong autoscale, cf. https://github.com/lensfun/lensfun/issues/945
 
     lf->initModifier(fullWidth, fullHeight, 1, lens, focal, aperture);
 }
@@ -281,6 +283,10 @@ LC_lensfun::~LC_lensfun()
         delete ldb;
         ldb = nullptr;
     }
+    if (default_lens) {
+        delete default_lens;
+        default_lens = nullptr;
+    }
 }
 
 const lfCamera* LC_lensfun::findCamera(
@@ -334,8 +340,8 @@ const lfLens* const* LC_lensfun::getLenses() const
 
 lfLens* LC_lensfun::getDefaultLens() {
     if (!default_lens) {
-        default_lens = const_cast<lfLens*>(
-                findLens(nullptr, "Generic", "Rectilinear 10-1000mm f/1.0"));
+        auto dl = findLens(nullptr, "Generic", "Rectilinear 10-1000mm f/1.0");
+        default_lens = new lfLens(*dl);
         if (!default_lens->Check()) {
             std::cout << "Lensfun: Failed to get default lens" << std::endl;
             default_lens = nullptr;
@@ -368,7 +374,11 @@ void LC_lensfun::initModifier
         std::cout << "Lensfun: fallback to the default lens" << std::endl;
     }
 
+#if (LF_VERSION >= 0x00035f00) // 0.3.95
+    const float crop = camera ? camera->CropFactor : 1.0f;
+#else
     const float crop = camera ? camera->CropFactor : lens->CropFactor;
+#endif
 
     initModifier(fullWidth, fullHeight, crop, lens, focal, aperture);
 }
