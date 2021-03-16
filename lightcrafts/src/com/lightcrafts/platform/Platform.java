@@ -24,6 +24,8 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -310,9 +312,17 @@ public class Platform {
      * an active internet connection and can reach the specified host.
      */
     public boolean hasInternetConnectionTo( String hostName ) {
+        final int timeoutMs = 1000;
         try {
             final InetAddress address = InetAddress.getByName(hostName);
-            return address.isReachable(2000);
+            if (address.isReachable(timeoutMs)) return true;
+
+            final var url = new URL("https://" + hostName);
+            final URLConnection conn = url.openConnection();
+            conn.setConnectTimeout(timeoutMs);
+            conn.connect();
+            conn.getInputStream().close();
+            return true;
         }
         catch (Throwable t) {
             return false;
