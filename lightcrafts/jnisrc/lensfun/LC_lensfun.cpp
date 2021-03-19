@@ -176,11 +176,11 @@ Java_com_lightcrafts_utils_Lensfun_initModifierWithPoly5Lens
     lfLensCalibAttributes attr = {0, 0, 1, fullWidth / float(fullHeight)};
     lfLensCalibDistortion dc = {LF_DIST_MODEL_POLY5, focal, focal, 0, {k1, k2}, attr};
     lfLensCalibTCA tcac = {LF_TCA_MODEL_LINEAR, focal, {kr, kb}, attr};
+    lens->RemoveCalibrations();
 #else
     lfLensCalibDistortion dc = {LF_DIST_MODEL_POLY5, focal, {k1, k2}};
     lfLensCalibTCA tcac = {LF_TCA_MODEL_LINEAR, focal, {kr, kb}};
 #endif
-    lens->RemoveCalibrations();
     lens->AddCalibDistortion(&dc);
     lens->AddCalibTCA(&tcac);
     // FIXME: Wrong autoscale, cf. https://github.com/lensfun/lensfun/issues/945
@@ -340,8 +340,8 @@ const lfLens* const* LC_lensfun::getLenses() const
 
 lfLens* LC_lensfun::getDefaultLens() {
     if (!default_lens) {
-        auto dl = findLens(nullptr, "Generic", "Rectilinear 10-1000mm f/1.0");
-        default_lens = new lfLens(*dl);
+        default_lens = const_cast<lfLens*>(
+                findLens(nullptr, "Generic", "Rectilinear 10-1000mm f/1.0"));
         if (!default_lens->Check()) {
             std::cout << "Lensfun: Failed to get default lens" << std::endl;
             default_lens = nullptr;
@@ -563,4 +563,3 @@ void LC_lensfun::backwardMapRect
     srcRectParams[2] = bottomMost - topMost;
     srcRectParams[3] = rightMost - leftMost;
 }
-
