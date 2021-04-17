@@ -2,16 +2,19 @@
 <ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
   <info organisation="lightcrafts" module="lightcrafts"/>
   <dependencies>
-    <dependency org="org.projectlombok" name="lombok" rev="1.18.16" conf="default"/>
-    <dependency org="org.jetbrains" name="annotations" rev="17.0.0" conf="default"/>
-    <dependency org="org.ejml" name="ejml-simple" rev="0.37.1" conf="default"/>
-    <dependency org="de.dimaki" name="refuel" rev="0.1.1" conf="default"/>
-    <dependency org="org.slf4j" name="slf4j-simple" rev="1.7.25" conf="default"/>
-    <dependency org="javax.xml.bind" name="jaxb-api" rev="2.4.0-b180830.0359"/>
-    <dependency org="org.glassfish.jaxb" name="jaxb-runtime" rev="2.4.0-b180830.0438"/>
-    <dependency org="com.github.jiconfont" name="jiconfont-swing" rev="1.0.0"/>
-    <dependency org="com.github.jiconfont" name="jiconfont-font_awesome" rev="4.5.0.3"/>
-    <dependency org="com.github.jiconfont" name="jiconfont-google_material_design_icons" rev="2.2.0.2"/>
+    <dependency name="annotations" rev="20.1.0" org="org.jetbrains"/>
+    <dependency name="ejml-simple" rev="0.40" org="org.ejml"/>
+    <dependency name="jaxb-api" rev="2.4.0-b180830.0359" org="javax.xml.bind"/>
+    <dependency name="jaxb-runtime" rev="3.0.0" org="org.glassfish.jaxb"/>
+    <dependency name="jiconfont-font_awesome" rev="4.7.0.1" org="com.github.jiconfont"/>
+    <dependency name="jiconfont-google_material_design_icons" rev="2.2.0.2" org="com.github.jiconfont"/>
+    <dependency name="jiconfont-swing" rev="1.0.1" org="com.github.jiconfont"/>
+    <dependency name="lombok" rev="1.18.20" org="org.projectlombok"/>
+    <dependency name="refuel" rev="0.1.1" org="de.dimaki"/>
+    <dependency name="slf4j-simple" rev="1.7.30" org="org.slf4j"/>
+    <!-- Don't download source or javadocs to save bandwidth -->
+    <exclude org="*" ext="*" type="source"/>
+    <exclude org="*" ext="*" type="javadoc"/>
   </dependencies>
 </ivy-module>
 
