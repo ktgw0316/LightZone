@@ -1,0 +1,7 @@
+--tar-ignore=.idea/
+--tar-ignore=freebsd-ports/
+--tar-ignore=macosx/
+--tar-ignore=windows/
+--tar-ignore=.appveyor.yml
+--tar-ignore=.git*
+--tar-ignore=Splash.xcf
