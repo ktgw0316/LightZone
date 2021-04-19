@@ -57,7 +57,7 @@ for:
     - sh: export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
 
   install:
-    - sh: brew install ant autoconf lensfun libjpeg-turbo libomp libtiff libxml2 little-cms2 pkg-config rsync
+    - sh: HOMEBREW_NO_AUTO_UPDATE=1 brew install ant autoconf lensfun libjpeg-turbo libomp libtiff libxml2 little-cms2 rsync
 
   build_script:
     - sh: ant -f macosx/build.xml dmg
