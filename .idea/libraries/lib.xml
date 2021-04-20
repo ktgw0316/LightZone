@@ -18,7 +18,7 @@
       <root url="jar://$PROJECT_DIR$/lightcrafts/lib/jaxb-api-2.4.0-b180830.0359.jar!/" />
       <root url="jar://$PROJECT_DIR$/lightcrafts/lib/jaxb-core-3.0.0.jar!/" />
       <root url="jar://$PROJECT_DIR$/lightcrafts/lib/jaxb-runtime-3.0.0.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lightcrafts/lib/jiconfont-font_awesome-4.7.0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lightcrafts/lib/jiconfont-font_awesome-4.7.0.0.jar!/" />
       <root url="jar://$PROJECT_DIR$/lightcrafts/lib/jiconfont-google_material_design_icons-2.2.0.2.jar!/" />
       <root url="jar://$PROJECT_DIR$/lightcrafts/lib/jiconfont-swing-1.0.1.jar!/" />
       <root url="jar://$PROJECT_DIR$/lightcrafts/lib/laf-widget.jar!/" />
