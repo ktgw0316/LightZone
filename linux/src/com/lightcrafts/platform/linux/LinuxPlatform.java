@@ -124,11 +124,6 @@ public class LinuxPlatform extends Platform {
     }
 
     @Override
-    public void loadLibraries() throws UnsatisfiedLinkError {
-        System.loadLibrary("Linux");
-    }
-
-    @Override
     public void makeModal(Dialog dialog) {
         dialog.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
     }
