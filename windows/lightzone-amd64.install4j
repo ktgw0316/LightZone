@@ -70,8 +70,7 @@
       </java>
       <macStaticAssociationActions mode="selected" />
       <vmOptionsFile mode="content" overwriteMode="1">
-        <content>-Xrs -XX:+UseG1GC
--XX:MinHeapFreeRatio=30
+        <content>-XX:MinHeapFreeRatio=30
 -XX:MaxHeapFreeRatio=30
 -Xmx16384m
 -Dfile.encoding=UTF8

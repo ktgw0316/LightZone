@@ -110,8 +110,6 @@
         </array>
         <key>VMOptions</key>
         <array>
-            <string>-Xrs</string>
-            <string>-XX:UseG1GC</string>
             <string>-XX:MinHeapFreeRatio=30</string>
             <string>-XX:MaxHeapFreeRatio=30</string>
             <string>-Xmx16384m</string>

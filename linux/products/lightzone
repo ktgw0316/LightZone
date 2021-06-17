@@ -89,7 +89,6 @@ done
 echo ${classpath}
 (cd ${pkgjavadir} && LD_LIBRARY_PATH=${pkglibexecdir} exec java \
 -classpath ${classpath} \
--XX:+UseG1GC \
 -XX:MinHeapFreeRatio=30 \
 -XX:MaxHeapFreeRatio=30 \
 -Xmx${maxmem}k \
