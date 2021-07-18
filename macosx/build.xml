@@ -40,7 +40,6 @@
       <src path="src"/>
       <compilerarg value="-XDignore.symbol.file"/>
       <classpath>
-        <pathelement location="/System/Library/Java/"/>
         <fileset dir="${common-dir}/products">
           <include name="*.jar"/>
         </fileset>
@@ -102,14 +101,11 @@
           dir="products" failonerror="true" fork="true"
           maxmemory="${maxmemory}">
       <classpath>
-        <pathelement location="/System/Library/Java/"/>
         <fileset dir="products">
           <include name="*.jar"/>
         </fileset>
       </classpath>
       <env key="JAVA_JVM_VERSION" value="${jvm-version}"/>
-      <sysproperty key="com.lightcrafts.zorn" value="true"/>
-      <sysproperty key="IDE" value="true"/>
       <sysproperty key="java.library.path" value="."/>
       <sysproperty key="lightcrafts.debug" value="1"/>
       <sysproperty key="apple.awt.graphics.EnableDeferredUpdates" value="false"/>
