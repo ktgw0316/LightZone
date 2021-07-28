@@ -2,21 +2,17 @@
 
 package com.lightcrafts.platform.macosx;
 
+import com.lightcrafts.image.color.ColorProfileInfo;
+import com.lightcrafts.platform.*;
+import com.lightcrafts.utils.Version;
+import com.lightcrafts.utils.file.FileUtil;
+
 import java.awt.color.ICC_Profile;
 import java.io.File;
-import java.io.InputStream;
 import java.io.IOException;
-import java.util.*;
-import javax.swing.filechooser.FileSystemView;
-import javax.swing.*;
-
-import com.lightcrafts.platform.*;
-import com.lightcrafts.image.color.ColorProfileInfo;
-import com.lightcrafts.utils.file.FileUtil;
-import com.lightcrafts.utils.Version;
-
-import static com.lightcrafts.platform.macosx.MacOSXColorProfileManager.*;
-import com.lightcrafts.ui.LightZoneSkin;
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * <code>MacOSXPlatform</code> is-a {@link Platform} for Mac&nbsp;OS;&nbsp;X.
@@ -54,6 +50,11 @@ public final class MacOSXPlatform extends Platform {
     @Override
     public File getDefaultImageDirectory() {
         return new File(home, "Pictures");
+    }
+
+    @Override
+    public FileChooser getFileChooser() {
+        return new MacOSXFileChooser();
     }
 
     @Override
@@ -113,11 +114,6 @@ public final class MacOSXPlatform extends Platform {
     }
 
     @Override
-    public void readyToOpenFiles() {
-        MacOSXLauncher.readyToOpenFiles();
-    }
-
-    @Override
     public String resolveAliasFile(File file) {
         return MacOSXFileUtil.resolveAlias(file.getAbsolutePath());
     }
@@ -126,29 +122,6 @@ public final class MacOSXPlatform extends Platform {
     public void showHelpTopic(String topic) {
         MacOSXHelp.showHelpTopic(topic);
     }
-
-    /*
-     * public static final int WHEEL_HORIZONTAL_SCROLLg = 2;
-     * 
-     * static class MouseWheelDispatcher implements MacOSXMightyMouse.Listener {
-     * final JFrame frame; final MouseWheelListener listener;
-     * 
-     * MouseWheelDispatcher(JFrame frame, MouseWheelListener listener) { this.frame
-     * = frame; this.listener = listener; }
-     * 
-     * private int eventId = 0;
-     * 
-     * public void mightyMouseEvent( MacOSXMightyMouse.Event e ) { int x = e.getX();
-     * int y = frame.getHeight() - e.getY(); final MouseWheelEvent event = new
-     * MouseWheelEvent(frame, eventId++, System.currentTimeMillis(), 0, x, y, 0,
-     * false, WHEEL_HORIZONTAL_SCROLL, 1, e.getHScrollDelta());
-     * EventQueue.invokeLater( new Runnable() { public void run() {
-     * listener.mouseWheelMoved(event); } } ); } }
-     * 
-     * public void registerMouseWheelListener(MouseWheelListener listener, JFrame
-     * frame) { MacOSXMightyMouse.setListener(new MouseWheelDispatcher(frame,
-     * listener), frame); }
-     */
 
     ////////// private ////////////////////////////////////////////////////////
 

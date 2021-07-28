@@ -1,7 +1,3 @@
-ROOT:=		../../..
-COMMON_DIR:=	$(ROOT)/lightcrafts
-include		$(COMMON_DIR)/mk/platform.mk
-
 ##
 # Build rules
 ##

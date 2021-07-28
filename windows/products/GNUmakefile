@@ -22,7 +22,7 @@ $(DEST_WINDOWS_SHARES): FORCE
 	$(call SYMLINK,../$@,$@)
 
 libs: $(DEST_COMMON_PRODUCTS)
-	$(shell ./copydeps.sh *.dll)
+	@ PATH=$(DLL_DIR):"$(PATH)" ./copydeps.sh *.dll
 
 .PHONY: FORCE
 FORCE:

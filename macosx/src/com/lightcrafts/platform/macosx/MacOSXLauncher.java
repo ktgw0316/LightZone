@@ -42,12 +42,6 @@ public final class MacOSXLauncher extends Launcher {
         launcher.init(args);
     }
 
-    /**
-     * Tell the native launcher that we're ready to open image files.  Note
-     * that the code for this native method is inside the native launcher.
-     */
-    public static native void readyToOpenFiles();
-
     ////////// protected //////////////////////////////////////////////////////
 
     @Override

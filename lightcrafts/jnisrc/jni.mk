@@ -33,8 +33,8 @@
 # platform only, the makefile can replace "EXTRA" with one of "MACOSX",
 # "WINDOWS" or "LINUX".
 #
-# In addition to the above, there are also JNI_PPC_CFLAGS, JNI_PPC_DEFINES, and
-# JNI_PPC_LDFLAGS for PowerPC-specific directives, and JNI_X86_CFLAGS,
+# In addition to the above, there are also JNI_ARM_CFLAGS, JNI_ARM_DEFINES, and
+# JNI_ARM_LDFLAGS for arm64-specific directives, and JNI_X86_CFLAGS,
 # JNI_X86_DEFINES, and JNI_X86_LDFLAGS for Intel-specific directives.
 #
 # If a makefile needs to override how the TARGET is build, it can do:
@@ -57,7 +57,7 @@ COMMON_DIR:=		$(ROOT)/lightcrafts
 include			$(COMMON_DIR)/mk/platform.mk
 
 ifeq ($(UNIVERSAL),1)
-  CFLAGS_PPC:=		$(PLATFORM_CFLAGS_PPC) $(JNI_EXTRA_CFLAGS)
+  CFLAGS_ARM:=		$(PLATFORM_CFLAGS_ARM) $(JNI_EXTRA_CFLAGS)
   CFLAGS_X86:=		$(PLATFORM_CFLAGS_X86) $(JNI_EXTRA_CFLAGS)
 else
   CFLAGS:=		$(PLATFORM_CFLAGS) $(JNI_EXTRA_CFLAGS)
@@ -82,7 +82,7 @@ TARGET_DIR:=		../../products
 ifeq ($(PLATFORM),MacOSX)
   DEFINES+=		$(JNI_MACOSX_DEFINES)
   INCLUDES:=		$(MACOSX_ISYSROOT) $(INCLUDES) $(JNI_MACOSX_INCLUDES)
-  LDFLAGS+=		-dynamiclib -framework JavaVM $(JNI_MACOSX_LDFLAGS)
+  LDFLAGS+=		-dynamiclib $(JNI_MACOSX_LDFLAGS)
   LINK+=		$(JNI_MACOSX_LINK)
   ifdef JNI_MACOSX_DYLIB
     JNILIB_EXT:=	$(DYLIB_EXT)
@@ -93,15 +93,15 @@ ifeq ($(PLATFORM),MacOSX)
     endif
   endif
   ifeq ($(UNIVERSAL),1)
-    CFLAGS_PPC+=	$(JNI_MACOSX_CFLAGS) $(JNI_PPC_CFLAGS)
+    CFLAGS_ARM+=	$(JNI_MACOSX_CFLAGS) $(JNI_ARM_CFLAGS)
     CFLAGS_X86+=	$(JNI_MACOSX_CFLAGS) $(JNI_X86_CFLAGS)
   else
     CFLAGS+=		$(JNI_MACOSX_CFLAGS)
-    ifeq ($(PROCESSOR),powerpc)
-      CFLAGS+=		$(JNI_PPC_CFLAGS)
-      DEFINES+=		$(JNI_PPC_DEFINES)
-      LDFLAGS+=		$(JNI_PPC_LDFLAGS)
-      LINK+=		$(JNI_PPC_LINK)
+    ifeq ($(PROCESSOR),arm64)
+      CFLAGS+=		$(JNI_ARM_CFLAGS)
+      DEFINES+=		$(JNI_ARM_DEFINES)
+      LDFLAGS+=		$(JNI_ARM_LDFLAGS)
+      LINK+=		$(JNI_ARM_LINK)
     endif
     ifeq ($(PROCESSOR),x86_64)
       CFLAGS+=		$(JNI_X86_CFLAGS)
@@ -147,9 +147,9 @@ DEFINES+=	-DDEBUG
 endif
 
 ifeq ($(UNIVERSAL),1)
-  CFLAGS_PPC+=		$(DEFINES) $(JNI_PPC_DEFINES)
+  CFLAGS_ARM+=		$(DEFINES) $(JNI_ARM_DEFINES)
   CFLAGS_X86+=		$(DEFINES) $(JNI_X86_DEFINES)
-  INCLUDES_PPC:=	$(INCLUDES) $(JNI_PPC_INCLUDES)
+  INCLUDES_ARM:=	$(INCLUDES) $(JNI_ARM_INCLUDES)
   INCLUDES_X86:=	$(INCLUDES) $(JNI_X86_INCLUDES)
 else
   CFLAGS+=		$(DEFINES)
@@ -174,7 +174,7 @@ endif
 # These are always defined even when UNIVERSAL is not set so a "make disclean"
 # will remove them.
 ##
-TARGET_PPC:=	$(JNILIB_PREFIX)$(TARGET_BASE)-ppc$(JNILIB_EXT)
+TARGET_ARM:=	$(JNILIB_PREFIX)$(TARGET_BASE)-arm64$(JNILIB_EXT)
 TARGET_X86:=	$(JNILIB_PREFIX)$(TARGET_BASE)-x86$(JNILIB_EXT)
 
 ##
@@ -213,21 +213,21 @@ endif
 
 ifeq ($(UNIVERSAL),1)
 
-$(TARGET): $(TARGET_PPC) $(TARGET_X86)
+$(TARGET): $(TARGET_ARM) $(TARGET_X86)
 	-$(MKDIR) $(TARGET_DIR)
-	$(LIPO) -create $(TARGET_PPC) $(TARGET_X86) -output $@
+	$(LIPO) -create $(TARGET_ARM) $(TARGET_X86) -output $@
 ifeq ($(PLATFORM),MacOSX)
 	cp -p $@ $(TARGET_DIR)
 endif
 
 ifndef JNI_MANUAL_TARGET
 ifdef USE_AR_RANLIB
-$(TARGET_PPC): $(OBJECTS_PPC) $(BUILT_LIBS)
-	ar -rc $@ *-ppc.o
+$(TARGET_ARM): $(OBJECTS_ARM) $(BUILT_LIBS)
+	ar -rc $@ *-arm64.o
 	-ranlib $@
 else
-$(TARGET_PPC): $(OBJECTS_PPC) $(LOCAL_RANLIBS) $(BUILT_LIBS)
-	$(CC_LINK) $(CFLAGS_PPC) $(LDFLAGS) -o $@ *-ppc.o $(LINK)
+$(TARGET_ARM): $(OBJECTS_ARM) $(LOCAL_RANLIBS) $(BUILT_LIBS)
+	$(CC_LINK) $(CFLAGS_ARM) $(LDFLAGS) -o $@ *-arm64.o $(LINK)
 endif
 
 ifdef USE_AR_RANLIB
@@ -274,6 +274,6 @@ clean:
 	$(RM) *.o .*.d javah *-ranlib.a *.dSYM *.res $(TARGET).dSYM $(JNI_EXTRA_CLEAN)
 
 distclean mostlyclean: clean
-	$(RM) $(TARGET) $(TARGET_IMPLIB) $(TARGET_PPC) $(TARGET_X86) $(POST_TARGET) $(JNI_EXTRA_DISTCLEAN)
+	$(RM) $(TARGET) $(TARGET_IMPLIB) $(TARGET_ARM) $(TARGET_X86) $(POST_TARGET) $(JNI_EXTRA_DISTCLEAN)
 
 # vim:set noet sw=8 ts=8:

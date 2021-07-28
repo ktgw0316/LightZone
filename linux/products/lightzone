@@ -2,7 +2,7 @@
 #
 # LightZone startscript
 #
-echo Starting LightZone version 4.2.2 ...
+echo Starting LightZone version 4.2.3 ...
 echo with options : ${@}
 java -version
 
@@ -89,7 +89,6 @@ done
 echo ${classpath}
 (cd ${pkgjavadir} && LD_LIBRARY_PATH=${pkglibexecdir} exec java \
 -classpath ${classpath} \
--XX:+UseG1GC \
 -XX:MinHeapFreeRatio=30 \
 -XX:MaxHeapFreeRatio=30 \
 -Xmx${maxmem}k \

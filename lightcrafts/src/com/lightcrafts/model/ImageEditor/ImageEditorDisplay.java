@@ -316,8 +316,6 @@ public class ImageEditorDisplay extends JPanel {
         }
 
         val g2d = (Graphics2D)g;
-        g2d.setBackground(backgroundColor);
-        g2d.clearRect(0, 0, getWidth(), getHeight());
 
         HiDpi.resetTransformScaleOf(g2d);
 
@@ -370,7 +368,7 @@ public class ImageEditorDisplay extends JPanel {
             drawBackgroundTile(g2d, tileIndex, tileClipRect, tile);
         }
         g2d.setClip(originalClipBounds); // reset the clip rect
-
+        repaint();
         updateTileComputingStatus(tileIndices, originalClipBounds);
     }
 
@@ -381,7 +379,7 @@ public class ImageEditorDisplay extends JPanel {
 
         if (!validImageBackground[tx][ty] && tile != null) {
             validImageBackground[tx][ty] = true;
-            g2d.drawImage(getBackgroundTile(tile, tx, ty), null, tile.getMinX(), tile.getMinY());
+            g2d.drawImage(getBackgroundTile(tile, tx, ty), tile.getMinX(), tile.getMinY(), this);
             return;
         }
 
@@ -389,20 +387,20 @@ public class ImageEditorDisplay extends JPanel {
         val backgroundTileCache = backgroundCache.get(new CacheKey(tx, ty));
         if (backgroundTileCache != null) {
             // Recycle the background tile
-            g2d.drawImage(backgroundTileCache, null, source.tileXToX(tx), source.tileYToY(ty));
+            g2d.drawImage(backgroundTileCache, source.tileXToX(tx), source.tileYToY(ty), this);
             return;
         }
 
         val cachedTiles = availableTiles(new Point(tx, ty));
         if (cachedTiles.length == 1 && cachedTiles[0] != null) {
             val cachedTile = (WritableRaster) cachedTiles[0];
-            g2d.drawImage(getBackgroundTile(cachedTile, tx, ty), null,
-                    cachedTile.getMinX(), cachedTile.getMinY());
+            g2d.drawImage(getBackgroundTile(cachedTile, tx, ty),
+                    cachedTile.getMinX(), cachedTile.getMinY(), this);
             return;
         }
 
         if (backgroundImage instanceof BufferedImage) {
-            g2d.drawImage((BufferedImage) backgroundImage, null, tileClipRect.x, tileClipRect.y);
+            g2d.drawImage((BufferedImage) backgroundImage, tileClipRect.x, tileClipRect.y, this);
             return;
         }
 

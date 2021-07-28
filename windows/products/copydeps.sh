@@ -1,9 +1,10 @@
 #!/bin/sh
 
-DEPS=$(ntldd $@ | grep -o " => .*mingw.*\.dll" | sort | uniq | sed 's/ => \(.*\)/"\1"/g' | xargs -r cygpath)
+DEPS=$({ ldd $@; ntldd $@; } | sort | sed -n 's/.* \([^ ]*mingw.*\.dll\) .*/"\1"/p' | xargs -r cygpath | uniq)
 
 if [ "${DEPS}" = "" ]; then exit 0; fi
 
+echo Copying ${DEPS}
 cp -u -t . ${DEPS}
 for DEP in ${DEPS}; do
   $0 $(basename ${DEP})

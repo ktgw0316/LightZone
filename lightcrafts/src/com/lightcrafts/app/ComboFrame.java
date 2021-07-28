@@ -46,7 +46,6 @@ import java.awt.image.RenderedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.List;
 import java.util.*;
@@ -153,11 +152,6 @@ public class ComboFrame
         // open events that arrive before the first frame gains focus.
         if (LastActiveComboFrame == null) {
             LastActiveComboFrame = this;
-        }
-
-        // Mac OS X 10.7 Lion Fullscreen Support
-        if (Platform.isMac()) {
-            enableFullScreenMode(this);
         }
 
         // Java 1.6 will just use a cofee cup otherwise...
@@ -1380,19 +1374,4 @@ public class ComboFrame
     };
 
     // *** Helper interface implementations for use in the browser: end. ***
-
-    public static void enableFullScreenMode(Window window) {
-        try {
-            Class<?> clazz = Class.forName("com.apple.eawt.FullScreenUtilities");
-            Class<?>[] param = new Class<?>[]{Window.class, Boolean.TYPE};
-            Method method = clazz.getMethod("setWindowCanFullScreen", param);
-            method.invoke(clazz, window, true);
-        }
-        catch (ClassNotFoundException e0) {
-	    // Just ignore it, may be the OS is older than 10.7 Lion
-        }
-        catch (Exception e) {
-            System.err.println("Could not enable OS X fullscreen mode " + e);
-        }
-    }
 }

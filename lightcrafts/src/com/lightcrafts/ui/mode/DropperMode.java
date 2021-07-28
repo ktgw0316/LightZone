@@ -2,6 +2,12 @@
 
 package com.lightcrafts.ui.mode;
 
+import com.lightcrafts.ui.operation.OpControl;
+import com.lightcrafts.utils.WeakHashSet;
+import com.lightcrafts.utils.awt.geom.HiDpi;
+
+import javax.swing.*;
+import javax.swing.event.MouseInputListener;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -12,11 +18,6 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import javax.swing.*;
-import javax.swing.event.MouseInputListener;
-
-import com.lightcrafts.ui.operation.OpControl;
-import com.lightcrafts.utils.WeakHashSet;
 
 /**
  * A Mode that draws nothing but handles mouse events, designed to go with
@@ -53,7 +54,8 @@ public class DropperMode extends AbstractMode {
         m_overlay.addMouseListener(
             new MouseAdapter() {
                 public void mousePressed( MouseEvent me ) {
-                    notifyPointSelected( me.getPoint() );
+                    Point p = HiDpi.imageSpacePointFrom(me.getPoint());
+                    notifyPointSelected(p);
                 }
             }
         );

@@ -2,6 +2,8 @@
 
 package com.lightcrafts.ui.region;
 
+import com.lightcrafts.utils.awt.geom.HiDpi;
+
 import java.awt.*;
 import java.awt.event.MouseEvent;
 
@@ -22,7 +24,7 @@ class ClonePointMode extends MinorRegionMode {
     }
 
     public void mouseReleased(MouseEvent event) {
-        Point p = event.getPoint();
+        Point p = HiDpi.imageSpacePointFrom(event.getPoint());
         update(p, false);
         model.setMajorMode(new EditCurveMode(this, curve));
         if (! currentPoint.equals(startPoint)) {
@@ -35,13 +37,13 @@ class ClonePointMode extends MinorRegionMode {
     }
 
     public void mouseMoved(MouseEvent event) {
-        Point p = event.getPoint();
+        Point p = HiDpi.imageSpacePointFrom(event.getPoint());
         update(p, true);
         autoscroll(event);
     }
 
     public void mouseDragged(MouseEvent event) {
-        Point p = event.getPoint();
+        Point p = HiDpi.imageSpacePointFrom(event.getPoint());
         update(p, true);
         autoscroll(event);
     }

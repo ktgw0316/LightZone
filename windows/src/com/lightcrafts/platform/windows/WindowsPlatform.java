@@ -54,12 +54,6 @@ public final class WindowsPlatform extends Platform {
     }
 
     @Override
-    public FileChooser getFileChooser() {
-        return super.getFileChooser();
-        // return new WindowsFileChooser();
-    }
-
-    @Override
     public String getDisplayNameOf( File file ) {
         String displayName = getFileSystemView().getSystemDisplayName( file );
 
@@ -148,12 +142,6 @@ public final class WindowsPlatform extends Platform {
     @Override
     public boolean moveFilesToTrash( String[] pathNames ) {
         return WindowsFileUtil.moveToRecycleBin( pathNames );
-    }
-
-    @Override
-    public void readyToOpenFiles() {
-        if ( System.getProperty( "IDE" ) == null )
-            WindowsLauncher.readyToOpenFiles();
     }
 
     @Override

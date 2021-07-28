@@ -4,11 +4,6 @@ package com.lightcrafts.platform.windows;
 
 import java.io.IOException;
 import java.io.File;
-import java.util.Collection;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import com.lightcrafts.image.types.ImageType;
 
 /**
  * Windows file utilities.
@@ -72,62 +67,6 @@ public final class WindowsFileUtil {
     public static native boolean moveToRecycleBin( String[] pathNames );
 
     /**
-     * Display the native Windows open-file dialog to have the user select an
-     * image file to open.
-     *
-     * @param initialDir The initial directory to open the dialog at.
-     * @return Returns the selected file or <code>null</code> if the user
-     * cancelled.
-     * @see #openFile(String,String[],String[][])
-     */
-    public static String openFile( String initialDir ) throws IOException {
-        final Collection<ImageType> types = ImageType.getAllTypes();
-
-        Stream<String> displayStringsHead = Stream.of("All files");
-        Stream<String> displayStringsRest =
-                types.stream().map(ImageType::getName);
-        final String[] displayStrings =
-                Stream.concat(displayStringsHead, displayStringsRest)
-                .toArray(String[]::new);
-
-        Stream<String[]> extensionsStreamHead = Stream.of(new String[][]{{"*"}});
-        Stream<String[]> extensionsStreamRest =
-                types.stream().map(ImageType::getExtensions);
-        final String[][] extensions =
-                Stream.concat(extensionsStreamHead, extensionsStreamRest)
-                .toArray(String[][]::new);
-
-        return openFile( initialDir, displayStrings, extensions );
-    }
-
-    /**
-     * Display the native Windows open-file dialog to have the user select a
-     * file to open.
-     *
-     * @param initialDir The initial directory to open the dialog at.
-     * @param displayStrings An array of the names of file types to be
-     * displayed in a pop-up menu.
-     * @param extensions For each display string, an array of filename
-     * extension(s) for that string.
-     * @return Returns the selected file or <code>null</code> if the user
-     * cancelled.
-     * @see #openFile(String)
-     */
-    public static String openFile( String initialDir,
-                                   String[] displayStrings,
-                                   String[][] extensions ) throws IOException {
-        if ( displayStrings.length != extensions.length )
-            throw new IllegalArgumentException();
-        final String[] patterns = Stream.of(extensions)
-                .map(extensionArray -> Stream.of(extensionArray)
-                        .map(extension -> "*." + extension)
-                        .collect(Collectors.joining(";"))
-                )
-                .toArray(String[]::new);
-        return openFile( initialDir, displayStrings, patterns );
-    }
-
-    /**
      * Resolve a Windows shortcut file.
      *
      * @param path The absolute path of the shortcut to resolve.
@@ -139,24 +78,6 @@ public final class WindowsFileUtil {
     }
 
     ////////// private ////////////////////////////////////////////////////////
-
-    /**
-     * Display the native Windows open-file dialog to have the user select a
-     * file to open.
-     *
-     * @param initialDir The initial directory to open the dialog at.
-     * @param displayStrings An array of the names of file types to be
-     * displayed in a pop-up menu.
-     * @param patterns For each display string, a pattern of filename
-     * extension(s) for that string.  Multiple extensions are seperated by
-     * semicolons.
-     * @return Returns the selected file or <code>null</code> if the user
-     * cancelled.
-     */
-    private static native String openFile( String initialDir,
-                                           String[] displayStrings,
-                                           String[] patterns )
-        throws IOException;
 
     /**
      * Resolve a Windows shortcut file.

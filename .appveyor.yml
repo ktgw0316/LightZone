@@ -1,8 +1,8 @@
-version: 4.2.2.{build}-{branch}
+version: 4.2.3.{build}-{branch}
 
 image:
+- macos
 - Visual Studio 2019
-- macos-mojave
 - Ubuntu2004
 
 clone_depth: 1
@@ -25,7 +25,7 @@ for:
     - cmd: SET ANT_SCRIPT=/c/projects/lightzone/windows/build.xml
 
   install:
-    - cmd: cinst ant html-help-workshop
+    - cmd: cinst ant
     - cmd: bash -lc 'cp "$MSSDK_HOME/../8.1/Lib/winv6.3/um/x64/Htmlhelp.Lib" /c/$MINGW64_PATH/lib/libhtmlhelp.a'
     - cmd: bash -lc 'cp "$MSSDK_HOME/../8.1/Lib/winv6.3/um/x86/Htmlhelp.Lib" /c/$MINGW32_PATH/lib/libhtmlhelp.a'
     - ps: (new-object net.webclient).DownloadFile('https://download-gcdn.ej-technologies.com/install4j/install4j_windows-x64_8_0_8.exe', 'install4j-installer.exe')
@@ -41,8 +41,8 @@ for:
   build_script:
     - cmd: bash -lc "MINGW_DIR=/c/$MINGW64_PATH ant -f $ANT_SCRIPT build-installer"
     - cmd: bash -lc "ant -f $ANT_SCRIPT clean-native"
-    - cmd: bash -lc "TARGET=i686 MINGW_DIR=/c/$MINGW32_PATH ant -f $ANT_SCRIPT -Doffline=true build-installer"
-  
+    - cmd: bash -lc "TARGET_ARCH=i686 MINGW_DIR=/c/$MINGW32_PATH ant -f $ANT_SCRIPT -Doffline=true build-installer"
+
   artifacts:
     - path: 'windows/LightZone_Installer_*.exe'
       name: windows installer
@@ -50,14 +50,14 @@ for:
 -
   matrix:
     only:
-      - image: macos-mojave
+      - image: macos
 
   init:
     - sh: export JAVA_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-11.jdk/Contents/Home
     - sh: export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
 
   install:
-    - sh: brew install ant autoconf lensfun libjpeg-turbo libomp libtiff libxml2 little-cms2 pkg-config rsync
+    - sh: HOMEBREW_NO_AUTO_UPDATE=1 brew install ant autoconf lensfun libjpeg-turbo libomp libtiff libxml2 little-cms2 rsync
 
   build_script:
     - sh: ant -f macosx/build.xml dmg
@@ -81,4 +81,3 @@ for:
 
   build_script:
     - sh: ant -f linux/build.xml -Doffline=true
-

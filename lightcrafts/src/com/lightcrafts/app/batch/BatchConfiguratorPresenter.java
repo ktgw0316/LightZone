@@ -8,7 +8,6 @@ import com.lightcrafts.image.export.ImageExportOptions;
 import com.lightcrafts.image.export.ImageFileExportOptions;
 import com.lightcrafts.ui.base.BasePresenter;
 import lombok.Getter;
-import lombok.val;
 
 import java.io.File;
 
@@ -53,8 +52,12 @@ class BatchConfiguratorPresenter extends BasePresenter<BatchConfiguratorContract
         final File configDirectory = config.directory != null && config.directory.isDirectory()
                 ? config.directory
                 : new File(System.getProperty("java.io.tmpdir"));
-        val directory = mView.chooseDirectory(configDirectory);
+        var directory = mView.chooseDirectory(configDirectory);
+        if (directory == null) return;
 
+        if (!directory.isDirectory()) {
+            directory = directory.getParentFile();
+        }
         if (directory != null) {
             config.directory = directory;
             dirLabelText = directory.getName();

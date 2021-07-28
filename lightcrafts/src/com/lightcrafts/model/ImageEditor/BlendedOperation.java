@@ -135,7 +135,6 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
 
     @Override
     public RGBColorSelection getColorSelectionAt(Point2D p) {
-        System.out.println("setColorSelection(): " + p);
         this.clickPoint = p;
         settingsChanged();
 
