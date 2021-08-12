@@ -62,7 +62,7 @@ public class UrgencyMetadataEntry extends SimpleMetadataEntry {
         // Interpret as a decimal formatted number:
         try {
             final int i = Integer.parseInt(value);
-            if (0 < i && i <= 5) {
+            if (0 < i && i <= 8) {
                 meta.setUrgency(i);
             } else if (i > 8) {
                 meta.setUrgency(8);
