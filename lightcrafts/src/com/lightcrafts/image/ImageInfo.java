@@ -2,27 +2,27 @@
 
 package com.lightcrafts.image;
 
+import com.lightcrafts.image.metadata.*;
+import com.lightcrafts.image.types.*;
+import com.lightcrafts.platform.Platform;
+import com.lightcrafts.ui.editor.LightweightDocument;
+import com.lightcrafts.utils.CloseableManager;
+import com.lightcrafts.utils.UserCanceledException;
+import com.lightcrafts.utils.bytebuffer.LCByteBuffer;
+import com.lightcrafts.utils.bytebuffer.LCReopenableMappedByteBuffer;
+import com.lightcrafts.utils.bytebuffer.SoftChunkyFileByteBuffer;
+import com.lightcrafts.utils.file.FileUtil;
+import com.lightcrafts.utils.thread.ProgressThread;
+import com.lightcrafts.utils.xml.XmlDocument;
+import org.jetbrains.annotations.NotNull;
+import org.w3c.dom.Document;
+
+import javax.media.jai.PlanarImage;
 import java.awt.image.RenderedImage;
 import java.io.*;
 import java.lang.ref.WeakReference;
 import java.util.LinkedList;
 import java.util.ResourceBundle;
-import javax.media.jai.PlanarImage;
-
-import org.w3c.dom.Document;
-
-import com.lightcrafts.image.metadata.*;
-import com.lightcrafts.image.types.*;
-import com.lightcrafts.platform.Platform;
-import com.lightcrafts.ui.editor.LightweightDocument;
-import com.lightcrafts.utils.bytebuffer.LCByteBuffer;
-import com.lightcrafts.utils.bytebuffer.LCReopenableMappedByteBuffer;
-import com.lightcrafts.utils.bytebuffer.SoftChunkyFileByteBuffer;
-import com.lightcrafts.utils.CloseableManager;
-import com.lightcrafts.utils.file.FileUtil;
-import com.lightcrafts.utils.thread.ProgressThread;
-import com.lightcrafts.utils.UserCanceledException;
-import com.lightcrafts.utils.xml.XmlDocument;
 
 /**
  * An <code>ImageInfo</code> holds various information about an image in a
@@ -405,21 +405,9 @@ public final class ImageInfo {
      *
      * @return Returns said filename.
      */
-    public String getXMPFilename()
-        throws BadImageFileException, IOException, UnknownImageTypeException
-    {
-        final ImageType t = getImageType();
-        final String fileName = m_imageFile.getAbsolutePath();
-
-        final int dot = fileName.lastIndexOf( '.' );
-        if ( dot <= 0 || dot == fileName.length() - 1 )
-            throw new UnknownImageTypeException( "no filename extension" );
-
-        if ( t instanceof RawImageType )
-            return fileName.substring( 0, dot + 1 ) + "xmp";
-
-        return  fileName.substring( 0, dot ) +
-                '_' + fileName.substring( dot + 1 ) + ".xmp";
+    @NotNull
+    public String getXMPFilename() {
+        return m_imageFile.getAbsolutePath() + ".xmp";
     }
 
     /**
@@ -595,19 +583,10 @@ public final class ImageInfo {
      * @return Returns said {@link ImageMetadata} or <code>null</code> if there
      * is no sidecar XMP file.
      */
-    private ImageMetadata readXMPMetadata()
-        throws BadImageFileException, IOException, UnknownImageTypeException
-    {
+    private ImageMetadata readXMPMetadata() throws IOException {
         final String xmpFilename = getXMPFilename();
-        if ( xmpFilename != null ) {
-            try {
-                return XMPMetadataReader.readFrom( new File( xmpFilename ) );
-            }
-            catch ( FileNotFoundException e ) {
-                // ignore
-            }
-        }
-        return null;
+        final var xmpFile = new File(xmpFilename);
+        return xmpFile.isFile() ? XMPMetadataReader.readFrom(xmpFile) : null;
     }
 
     private AuxiliaryImageInfo m_auxInfo;

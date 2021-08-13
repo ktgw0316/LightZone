@@ -315,6 +315,7 @@ public class ImageDatum {
                 xmpFile = new File(info.getXMPFilename());
             }
             catch (Throwable e) {
+                // TODO: Is this required?
                 badFile = true;
                 logMetadataError(e);
                 xmpFile = null;

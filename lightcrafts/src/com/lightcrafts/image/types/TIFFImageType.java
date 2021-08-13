@@ -464,20 +464,6 @@ public class TIFFImageType extends ImageType implements TrueImageTypeProvider {
         }
     }
 
-    /**
-     * Writes the metadata for TIFF files to an XMP sidecar file.
-     *
-     * @param imageInfo The image to write the metadata for.
-     */
-    public void writeMetadata( ImageInfo imageInfo )
-        throws BadImageFileException, IOException, UnknownImageTypeException
-    {
-        final File xmpFile = new File( imageInfo.getXMPFilename() );
-        final ImageMetadata metadata = imageInfo.getCurrentMetadata();
-        XMPMetadataWriter.mergeInto( metadata, xmpFile );
-        metadata.clearEdited();
-    }
-
     ////////// package ////////////////////////////////////////////////////////
 
     /**

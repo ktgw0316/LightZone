@@ -259,27 +259,6 @@ public final class XMPUtil {
             oldRDFElement.replaceChild( newRDFDirElement, oldRDFDirElement );
         else
             oldRDFElement.appendChild( newRDFDirElement );
-
-/*
-        // This old code does a node-by-node merge.
-
-        final ElementPrefixFilter dirPrefixFilter =
-            new ElementPrefixFilter( dirPrefix );
-        final Node[] newDirElements =
-            XMLUtil.getChildrenOf( newRDFDirElement, dirPrefixFilter );
-        for ( int i = 0; i < newDirElements.length; ++i ) {
-            final Element newDirElement =
-                (Element)oldDocument.importNode( newDirElements[i], true );
-            final Element oldDirElement = (Element)XMLUtil.getFirstChildOf(
-                oldRDFDirElement,
-                new ElementFilter( newDirElement.getTagName() )
-            );
-            if ( oldDirElement != null )
-                oldRDFDirElement.replaceChild( newDirElement, oldDirElement );
-            else
-                oldRDFDirElement.appendChild( newDirElement );
-        }
-*/
     }
 
 }
