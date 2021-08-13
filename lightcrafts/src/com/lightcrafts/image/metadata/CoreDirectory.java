@@ -40,7 +40,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     ColorTemperatureProvider, CopyrightProvider, FileDateTimeProvider,
     FlashProvider, FocalLengthProvider, ISOProvider, LensProvider,
     MakeModelProvider, OrientationProvider, OriginalWidthHeightProvider,
-    RatingProvider, ShutterSpeedProvider, WidthHeightProvider {
+    RatingProvider, ShutterSpeedProvider, UrgencyProvider, WidthHeightProvider {
 
     ////////// public /////////////////////////////////////////////////////////
 
@@ -356,6 +356,15 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
      * {@inheritDoc}
      */
     @Override
+    public int getUrgency() {
+        final ImageMetaValue value = getValue( CORE_URGENCY );
+        return value != null ? value.getIntValue() : 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Collection<Element> toXMP( Document xmpDoc ) {
         return toXMP( xmpDoc, XMP_XAP_NS, XMP_XAP_PREFIX );
     }
@@ -517,11 +526,15 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
         if (urgency != null) {
             final String urgencyString = urgency.getStringValue();
 
+            final Element photoshopRDFDescElement = XMPUtil.createRDFDescription(
+                    xmpDoc, XMP_PHOTOSHOP_NS, XMP_PHOTOSHOP_PREFIX
+            );
             final Element photoshopUrgencyElement = xmpDoc.createElementNS(
                     XMP_PHOTOSHOP_NS, XMP_PHOTOSHOP_PREFIX + ":Urgency"
             );
             XMLUtil.setTextContentOf(photoshopUrgencyElement, urgencyString);
-            xapRDFDescElement.appendChild( photoshopUrgencyElement );
+            photoshopRDFDescElement.appendChild(photoshopUrgencyElement);
+            elements.add(photoshopRDFDescElement);
 
             final Element labelElement = xmpDoc.createElementNS(
                     XMP_XAP_NS, XMP_XAP_PREFIX + ":Label"
