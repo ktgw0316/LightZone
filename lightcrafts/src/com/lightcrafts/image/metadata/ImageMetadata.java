@@ -84,7 +84,6 @@ public class ImageMetadata implements
      * @see #setRating(int)
      */
     public void clearRating() {
-        //removeValues( CoreDirectory.class, CORE_RATING );
         setRating( 0 );
     }
 
@@ -1262,12 +1261,12 @@ public class ImageMetadata implements
      * @see #clearRating()
      * @see #getRating()
      */
+    @Override
     public void setRating( int rating ) {
         if ( rating < 0 || rating > 5 )
             throw new IllegalArgumentException( "rating must be between 0-5" );
-        final ImageMetadataDirectory dir =
-            getDirectoryFor( CoreDirectory.class, true );
-        dir.setValue( CORE_RATING, rating );
+        findProvidersOf(RatingProvider.class)
+                .forEach(dir -> ((RatingProvider) dir).setRating(rating));
     }
 
     /**

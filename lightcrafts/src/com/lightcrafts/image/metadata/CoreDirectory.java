@@ -2,29 +2,29 @@
 
 package com.lightcrafts.image.metadata;
 
-import java.awt.color.ICC_Profile;
-import java.awt.*;
-import java.io.File;
-import java.util.*;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.Document;
-
 import com.lightcrafts.image.ImageInfo;
-import com.lightcrafts.image.metadata.values.*;
+import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.image.metadata.providers.*;
+import com.lightcrafts.image.metadata.values.*;
 import com.lightcrafts.image.types.AuxiliaryImageInfo;
 import com.lightcrafts.image.types.ImageType;
 import com.lightcrafts.image.types.RawImageInfo;
-import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.utils.DCRaw;
 import com.lightcrafts.utils.TextUtil;
 import com.lightcrafts.utils.Version;
 import com.lightcrafts.utils.xml.XMLUtil;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import java.awt.*;
+import java.awt.color.ICC_Profile;
+import java.io.File;
+import java.util.*;
 
 import static com.lightcrafts.image.metadata.CoreTags.*;
 import static com.lightcrafts.image.metadata.ImageMetaType.*;
-import static com.lightcrafts.image.metadata.ImageOrientation.*;
+import static com.lightcrafts.image.metadata.ImageOrientation.ORIENTATION_LANDSCAPE;
+import static com.lightcrafts.image.metadata.ImageOrientation.ORIENTATION_UNKNOWN;
 import static com.lightcrafts.image.metadata.XMPConstants.*;
 
 /**
@@ -323,6 +323,17 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     public int getRating() {
         final ImageMetaValue value = getValue( CORE_RATING );
         return value != null ? value.getIntValue() : 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setRating(int rating) {
+        if (rating < 0 || rating > 5)
+            throw new IllegalArgumentException( "rating must be between 0-5" );
+        // Do not remove value even if the rating is 0.
+        setValue(CORE_RATING, rating);
     }
 
     /**

@@ -45,7 +45,6 @@ import static com.lightcrafts.image.metadata.CoreTags.CORE_RATING;
 import static com.lightcrafts.image.metadata.EXIFConstants.*;
 import static com.lightcrafts.image.metadata.EXIFTags.*;
 import static com.lightcrafts.image.metadata.ImageOrientation.ORIENTATION_UNKNOWN;
-import static com.lightcrafts.image.metadata.TIFFTags.TIFF_MS_RATING;
 import static com.lightcrafts.image.types.JPEGConstants.*;
 
 /**
@@ -857,10 +856,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
             final short newRating = rating.getShortValue();
             boolean removeRating = false;
             if ( newRating == 0 ) {
-                metadata.removeValues( CoreDirectory.class, CORE_RATING );
-                metadata.removeValues( EXIFDirectory.class, EXIF_MS_RATING );
-                metadata.removeValues( SubEXIFDirectory.class, EXIF_MS_RATING );
-                metadata.removeValues( TIFFDirectory.class, TIFF_MS_RATING );
+                metadata.clearRating();
                 removeRating = true;
             }
             modifyMetadata(
@@ -868,8 +864,6 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
             );
             rating.clearEdited();
         }
-
-        // TODO: must do something about unrating a photo
 
         ////////// IPTC directory
 
