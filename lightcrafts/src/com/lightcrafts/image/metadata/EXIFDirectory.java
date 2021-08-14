@@ -2,19 +2,21 @@
 
 package com.lightcrafts.image.metadata;
 
-import java.util.*;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.Document;
-
 import com.lightcrafts.image.metadata.providers.*;
-import com.lightcrafts.image.metadata.values.*;
+import com.lightcrafts.image.metadata.values.DateMetaValue;
+import com.lightcrafts.image.metadata.values.ImageMetaValue;
+import com.lightcrafts.image.metadata.values.RationalMetaValue;
 import com.lightcrafts.utils.TextUtil;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import java.util.*;
 
 import static com.lightcrafts.image.metadata.EXIFTags.*;
 import static com.lightcrafts.image.metadata.ImageMetaType.*;
 import static com.lightcrafts.image.metadata.ImageOrientation.ORIENTATION_UNKNOWN;
-import static com.lightcrafts.image.metadata.XMPConstants.*;
+import static com.lightcrafts.image.metadata.XMPConstants.XMP_EXIF_NS;
+import static com.lightcrafts.image.metadata.XMPConstants.XMP_EXIF_PREFIX;
 import static com.lightcrafts.image.types.TIFFConstants.*;
 
 /**
@@ -315,10 +317,14 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setRating( int rating ) {
-        if ( rating < 0 || rating > 5 )
-            throw new IllegalArgumentException( "rating must be between 0-5" );
-        setValue( EXIF_MS_RATING, rating );
+        if (rating < 0 || rating > 5)
+            throw new IllegalArgumentException("rating must be between 0-5");
+        if (rating == 0)
+            removeValue(EXIF_MS_RATING);
+        else
+            setValue(EXIF_MS_RATING, rating);
     }
 
     /**

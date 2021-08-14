@@ -2,26 +2,26 @@
 
 package com.lightcrafts.image.metadata;
 
-import java.awt.image.RenderedImage;
-import java.io.IOException;
-import java.util.*;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.Document;
-
 import com.lightcrafts.image.BadImageFileException;
 import com.lightcrafts.image.ImageInfo;
+import com.lightcrafts.image.UnknownImageTypeException;
 import com.lightcrafts.image.metadata.providers.*;
 import com.lightcrafts.image.metadata.values.DateMetaValue;
 import com.lightcrafts.image.metadata.values.ImageMetaValue;
 import com.lightcrafts.image.metadata.values.RationalMetaValue;
 import com.lightcrafts.image.types.JPEGImageType;
-import com.lightcrafts.image.UnknownImageTypeException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import java.awt.image.RenderedImage;
+import java.io.IOException;
+import java.util.*;
 
 import static com.lightcrafts.image.metadata.ImageMetaType.*;
 import static com.lightcrafts.image.metadata.ImageOrientation.ORIENTATION_UNKNOWN;
 import static com.lightcrafts.image.metadata.TIFFTags.*;
-import static com.lightcrafts.image.metadata.XMPConstants.*;
+import static com.lightcrafts.image.metadata.XMPConstants.XMP_TIFF_NS;
+import static com.lightcrafts.image.metadata.XMPConstants.XMP_TIFF_PREFIX;
 import static com.lightcrafts.image.types.TIFFConstants.*;
 
 /**
@@ -160,6 +160,19 @@ public class TIFFDirectory extends ImageMetadataDirectory implements
     public int getRating() {
         final ImageMetaValue rating = getValue( TIFF_MS_RATING );
         return rating != null ? rating.getIntValue() : 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setRating(int rating) {
+        if (rating < 0 || rating > 5)
+            throw new IllegalArgumentException("rating must be between 0-5");
+        if (rating == 0)
+            removeValue(TIFF_MS_RATING);
+        else
+            setValue(TIFF_MS_RATING, rating);
     }
 
     /**

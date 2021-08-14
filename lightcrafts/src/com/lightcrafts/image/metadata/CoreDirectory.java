@@ -331,6 +331,17 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
      * {@inheritDoc}
      */
     @Override
+    public void setRating(int rating) {
+        if (rating < 0 || rating > 5)
+            throw new IllegalArgumentException( "rating must be between 0-5" );
+        // Do not remove value even if the rating is 0.
+        setValue(CORE_RATING, rating);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public float getShutterSpeed() {
         final ImageMetaValue value = getValue( CORE_SHUTTER_SPEED );
         return value != null ? value.getFloatValue() : 0;

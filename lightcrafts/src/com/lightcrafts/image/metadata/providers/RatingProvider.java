@@ -13,8 +13,16 @@ public interface RatingProvider extends ImageMetadataProvider {
      * Gets the rating of an image: 1-5.
      *
      * @return Returns the rating or 0 if it's unavailable.
+     * @see #setRating(int)
      */
     int getRating();
 
+    /**
+     * Sets the rating of the image.
+     *
+     * @param rating The rating; must be in the range 0-5.
+     * @see #getRating()
+     */
+    void setRating(int rating);
 }
 /* vim:set et sw=4 ts=4: */
