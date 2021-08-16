@@ -3,14 +3,15 @@
 package com.lightcrafts.ui.browser.model;
 
 import com.lightcrafts.image.metadata.CoreDirectory;
-import static com.lightcrafts.image.metadata.CoreTags.*;
 import com.lightcrafts.image.metadata.ImageMetadata;
 import com.lightcrafts.image.metadata.ImageMetadataDirectory;
 import com.lightcrafts.image.metadata.values.ImageMetaValue;
-import static com.lightcrafts.ui.browser.model.Locale.LOCALE;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+
+import static com.lightcrafts.image.metadata.CoreTags.*;
+import static com.lightcrafts.ui.browser.model.Locale.LOCALE;
 
 public class ImageDatumComparator implements Comparator<ImageDatum> {
 
@@ -59,8 +60,13 @@ public class ImageDatumComparator implements Comparator<ImageDatum> {
         );
 
     public static ImageDatumComparator FocalLength =
+            new ImageDatumComparator(
+                    CORE_FOCAL_LENGTH, LOCALE.get("FocalLengthSort"), false
+            );
+
+    public static ImageDatumComparator Urgency =
         new ImageDatumComparator(
-            CORE_FOCAL_LENGTH, LOCALE.get("FocalLengthSort"), false
+            CORE_URGENCY, "Color Label", false // TODO: l10n
         );
 
     boolean reverse;
