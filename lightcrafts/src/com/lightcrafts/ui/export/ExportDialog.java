@@ -131,6 +131,7 @@ public class ExportDialog extends JFileChooser {
         // This adds controls to the layout:
         fileFilterChanged(null, (ExportFilter) getFileFilter());
         dialog.pack();
+        dialog.setResizable(false);
         dialog.setLocationRelativeTo(null);
         return dialog;
     }

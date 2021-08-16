@@ -156,6 +156,7 @@ public class BatchProcessor {
         Dialog.setTitle(LOCALE.get("BatchDialogTitle"));
         Dialog.getRootPane().setDefaultButton(Button);
         Dialog.pack();
+        Dialog.setResizable(false);
         Dialog.setLocationRelativeTo(frame);
 
         Dialog.addComponentListener(
