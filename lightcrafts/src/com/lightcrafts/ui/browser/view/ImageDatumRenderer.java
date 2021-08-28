@@ -2,14 +2,14 @@
 
 package com.lightcrafts.ui.browser.view;
 
+import com.lightcrafts.image.metadata.ImageMetadata;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.ui.LightZoneSkin;
-import javax.media.jai.JAI;
-import javax.media.jai.BorderExtender;
-import javax.media.jai.Interpolation;
-import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.utils.awt.geom.HiDpi;
 
+import javax.media.jai.BorderExtender;
+import javax.media.jai.Interpolation;
+import javax.media.jai.JAI;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -82,7 +82,7 @@ class ImageDatumRenderer {
         RenderedImage image,
         String text,
         String tag,
-        int rating,
+        ImageMetadata meta,
         Rectangle rect,
         boolean selected
     ) {
@@ -140,8 +140,14 @@ class ImageDatumRenderer {
         g.setTransform(oldXform);
 
         // Show any rating number and the star
+        final int rating = meta.getRating();
         if (rating > 0) {
             ImageDatumRatingRenderer.paint(g, rect, rating);
+        }
+        // Show any color label (urgency)
+        final int urgency = meta.getUrgency();
+        if (urgency > 0) {
+            ImageDatumUrgencyRenderer.paint(g, rect, urgency);
         }
         // Show the type overlay (RAW, LZN, etc.)
         if (ShowImageTypes) {

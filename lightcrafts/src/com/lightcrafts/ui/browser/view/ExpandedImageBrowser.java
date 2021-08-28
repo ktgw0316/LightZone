@@ -134,7 +134,7 @@ public class ExpandedImageBrowser extends AbstractImageBrowser {
             ImageMetadata meta = datum.getMetadata(true);
             int rating = meta.getRating();
             boolean selected = selection.isSelected(datum);
-            renderer.paint(g, image, label, tag, rating, rect, selected);
+            renderer.paint(g, image, label, tag, meta, rect, selected);
         }
         g.setColor(oldColor);
         g.setClip(clip);
