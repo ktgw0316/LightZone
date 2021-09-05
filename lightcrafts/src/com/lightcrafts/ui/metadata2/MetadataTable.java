@@ -152,6 +152,7 @@ class MetadataTable extends JTable {
         for (int urgency = 0; urgency <= 8; urgency++) {
             urgencyCombo.addItem(Integer.valueOf(urgency).toString());
         }
+        urgencyCombo.setSelectedIndex(-1);
 
         var urgencyEditor = new DefaultCellEditor(urgencyCombo);
         val urgencyComp = (JComboBox<?>) urgencyEditor.getComponent();
@@ -175,6 +176,7 @@ class MetadataTable extends JTable {
             // A star character with a glyph in the "Serif" logical font:
             ratingCombo.addItem("\u2605".repeat(rating));
         }
+        ratingCombo.setSelectedIndex(-1);
 
         var ratingEditor = new DefaultCellEditor(ratingCombo);
         val ratingComp = (JComboBox<?>) ratingEditor.getComponent();

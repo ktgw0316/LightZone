@@ -62,6 +62,8 @@ public class UrgencyMetadataEntry extends SimpleMetadataEntry {
 
     @Override
     public void setValue(ImageMetadata meta, String value) {
+        if (value == null) return;
+
         // Interpret as a decimal formatted number:
         try {
             final int i = Integer.parseInt(value);
