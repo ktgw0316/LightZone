@@ -33,6 +33,11 @@ class MetadataTableModel extends AbstractTableModel {
         this.section = section;
     }
 
+    @Override
+    public Class<?> getColumnClass(int col){
+        return getValueAt(0, col).getClass();
+    }
+
     public String getColumnName(int col) {
         return ColumnNames[col];
     }

@@ -2,12 +2,10 @@
 
 package com.lightcrafts.ui.browser.view;
 
+import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.platform.AlertDialog;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.ui.export.ExportNameUtility;
-import com.lightcrafts.image.ImageInfo;
-import com.lightcrafts.image.BadImageFileException;
-import com.lightcrafts.image.UnknownImageTypeException;
 
 import javax.swing.*;
 import java.awt.*;
@@ -154,9 +152,7 @@ class FileActions {
         }
     }
 
-    private static File getXmpFile(File file)
-        throws IOException, BadImageFileException, UnknownImageTypeException
-    {
+    private static File getXmpFile(File file) {
         ImageInfo info = ImageInfo.getInstanceFor(file);
         String name = info.getXMPFilename();
         return new File(name);

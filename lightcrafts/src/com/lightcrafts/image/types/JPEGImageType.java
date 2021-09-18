@@ -40,8 +40,7 @@ import java.nio.channels.FileChannel;
 import java.util.List;
 
 import static com.lightcrafts.image.libs.LCJPEGConstants.CS_UNKNOWN;
-import static com.lightcrafts.image.metadata.CoreTags.CORE_IMAGE_ORIENTATION;
-import static com.lightcrafts.image.metadata.CoreTags.CORE_RATING;
+import static com.lightcrafts.image.metadata.CoreTags.*;
 import static com.lightcrafts.image.metadata.EXIFConstants.*;
 import static com.lightcrafts.image.metadata.EXIFTags.*;
 import static com.lightcrafts.image.metadata.ImageOrientation.ORIENTATION_UNKNOWN;
@@ -863,6 +862,22 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
                 imageInfo, EXIF_MS_RATING, newRating, xmpRating, removeRating
             );
             rating.clearEdited();
+        }
+
+        final ImageMetaValue urgency = coreDir.getValue(CORE_URGENCY);
+        if (urgency != null && (urgency.isEdited() || xmpExists)) {
+            final short xmpUrgency = xmpMetadata != null ?
+                    (short)xmpMetadata.getUrgency() : -1;
+            final short newUrgency = urgency.getShortValue();
+            boolean removeUrgency = false;
+            if (newUrgency == 0) {
+                metadata.removeValues(CoreDirectory.class, CORE_URGENCY);
+                removeUrgency = true;
+            }
+            modifyMetadata(
+                    imageInfo, -1, newUrgency, xmpUrgency, removeUrgency
+            );
+            urgency.clearEdited();
         }
 
         ////////// IPTC directory

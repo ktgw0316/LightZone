@@ -36,11 +36,7 @@ public class ElementPrefixFilter extends NodeTypeFilter {
         if ( !super.accept( node ) )
             return false;
         val element = (Element)node;
-        //
-        // Use getTagName() since getPrefix() always returns null.
-        //
-        // return m_prefix.equals( element.getPrefix() );
-        return prefix.equals( element.getTagName().replaceAll( ":.*", "" ) );
+        return prefix.equals( element.getPrefix() );
     }
 }
 /* vim:set et sw=4 ts=4: */

@@ -9,6 +9,7 @@ import jiconfont.icons.FontAwesome;
 import jiconfont.icons.google_material_design_icons.GoogleMaterialDesignIcons;
 import jiconfont.swing.IconFontSwing;
 import lombok.val;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,7 +21,7 @@ import java.util.Map;
  * Created by Masahiro Kitagawa on 2017/01/02.
  */
 public final class IconFontFactory {
-    private static final Color COLOR = Color.LIGHT_GRAY;
+    private static final Color DEFAULT_COLOR = Color.LIGHT_GRAY;
     private static final float DEFAULT_SIZE = 20f;
 
     public static Icon buildIcon(String name) {
@@ -28,8 +29,12 @@ public final class IconFontFactory {
     }
 
     public static Icon buildIcon(String name, float size) {
+        return buildIcon(name, size, DEFAULT_COLOR);
+    }
+
+    public static Icon buildIcon(String name, float size, @Nullable Color color) {
         val code = iconCodeMap.get(name);
-        return code != null ? buildIcon(code, size) : new ImageIcon();
+        return buildIcon(code, size, color);
     }
 
     public static BufferedImage buildIconImage(String name, float size) {
@@ -46,12 +51,10 @@ public final class IconFontFactory {
         return bi;
     }
 
-    public static Icon buildIcon(IconCode code) {
-        return buildIcon(code, DEFAULT_SIZE);
-    }
-
-    public static Icon buildIcon(IconCode code, float size) {
-        return IconFontSwing.buildIcon(code, size, COLOR);
+    public static Icon buildIcon(@Nullable IconCode code, float size, @Nullable Color color) {
+        return (code == null || color == null)
+                ? new ImageIcon()
+                : IconFontSwing.buildIcon(code, size, color);
     }
 
     static {
@@ -103,5 +106,8 @@ public final class IconFontFactory {
 
                 // ui.operation.resources
                 put("FilmGrain", FontAwesome.FILM);
+
+                // ui.metadata2.UrgencyMetadata.UrgencyMetadataEntry
+                put("square", FontAwesome.SQUARE);
             }};
 }

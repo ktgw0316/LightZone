@@ -315,6 +315,7 @@ public class ImageDatum {
                 xmpFile = new File(info.getXMPFilename());
             }
             catch (Throwable e) {
+                // TODO: Is this required?
                 badFile = true;
                 logMetadataError(e);
                 xmpFile = null;
@@ -378,7 +379,8 @@ public class ImageDatum {
                 CORE_FILE_NAME,
                 CORE_DIR_NAME,
                 CORE_IMAGE_ORIENTATION,
-                CORE_RATING)
+                CORE_RATING,
+                CORE_URGENCY)
                 .map(tag -> Pair.of(tag, core.getValue(tag)))
                 .filter(p -> p.right != null)
                 .forEach(thisCore::putValue);

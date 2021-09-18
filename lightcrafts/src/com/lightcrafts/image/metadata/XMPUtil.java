@@ -2,20 +2,19 @@
 
 package com.lightcrafts.image.metadata;
 
-import java.io.IOException;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
 import com.lightcrafts.app.Application;
 import com.lightcrafts.image.metadata.values.ByteMetaValue;
 import com.lightcrafts.image.metadata.values.ImageMetaValue;
 import com.lightcrafts.image.metadata.values.UndefinedMetaValue;
 import com.lightcrafts.image.metadata.values.UnsignedByteMetaValue;
 import com.lightcrafts.utils.xml.ElementFilter;
-import com.lightcrafts.utils.xml.XMLUtil;
 import com.lightcrafts.utils.xml.NodeTypeFilter;
+import com.lightcrafts.utils.xml.XMLUtil;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
+import java.io.IOException;
 
 import static com.lightcrafts.image.metadata.XMPConstants.*;
 
@@ -203,6 +202,9 @@ public final class XMPUtil {
         mergeMetadata(
             newXMPDoc, oldXMPDoc, XMP_XAP_NS, XMP_XAP_PREFIX
         );
+        mergeMetadata(
+            newXMPDoc, oldXMPDoc, XMP_PHOTOSHOP_NS, XMP_PHOTOSHOP_PREFIX
+        );
         return oldXMPDoc;
     }
 
@@ -257,27 +259,6 @@ public final class XMPUtil {
             oldRDFElement.replaceChild( newRDFDirElement, oldRDFDirElement );
         else
             oldRDFElement.appendChild( newRDFDirElement );
-
-/*
-        // This old code does a node-by-node merge.
-
-        final ElementPrefixFilter dirPrefixFilter =
-            new ElementPrefixFilter( dirPrefix );
-        final Node[] newDirElements =
-            XMLUtil.getChildrenOf( newRDFDirElement, dirPrefixFilter );
-        for ( int i = 0; i < newDirElements.length; ++i ) {
-            final Element newDirElement =
-                (Element)oldDocument.importNode( newDirElements[i], true );
-            final Element oldDirElement = (Element)XMLUtil.getFirstChildOf(
-                oldRDFDirElement,
-                new ElementFilter( newDirElement.getTagName() )
-            );
-            if ( oldDirElement != null )
-                oldRDFDirElement.replaceChild( newDirElement, oldDirElement );
-            else
-                oldRDFDirElement.appendChild( newDirElement );
-        }
-*/
     }
 
 }

@@ -7,6 +7,7 @@ import com.lightcrafts.image.ColorProfileException;
 import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.image.UnknownImageTypeException;
 import com.lightcrafts.image.export.ImageExportOptions;
+import com.lightcrafts.image.metadata.XMPMetadataWriter;
 import com.lightcrafts.utils.UserCanceledException;
 import com.lightcrafts.utils.file.FileUtil;
 import com.lightcrafts.utils.thread.ProgressThread;
@@ -287,8 +288,14 @@ public abstract class ImageType {
      *
      * @param imageInfo The image to write the metadata for.
      */
-    public abstract void writeMetadata( ImageInfo imageInfo )
-        throws BadImageFileException, IOException, UnknownImageTypeException;
+    public void writeMetadata(ImageInfo imageInfo)
+            throws BadImageFileException, IOException, UnknownImageTypeException
+    {
+        final var xmpFile = new File(imageInfo.getXMPFilename());
+        final var metadata = imageInfo.getCurrentMetadata();
+        XMPMetadataWriter.mergeInto(metadata, xmpFile);
+        metadata.clearEdited();
+    }
 
     ////////// protected //////////////////////////////////////////////////////
 

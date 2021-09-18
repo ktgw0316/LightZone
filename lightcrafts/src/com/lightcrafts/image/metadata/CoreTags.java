@@ -202,5 +202,12 @@ public interface CoreTags extends ImageMetaTags {
      * Type: ASCII.
      */
     int CORE_TITLE                  = 0x0303;
+
+    /**
+     * User color label.
+     * <p>
+     * Type: Unsigned short.
+     */
+    int CORE_URGENCY                = 0x0304;
 }
 /* vim:set et sw=4 ts=4: */

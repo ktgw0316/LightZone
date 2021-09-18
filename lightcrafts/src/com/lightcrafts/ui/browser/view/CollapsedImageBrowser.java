@@ -79,9 +79,8 @@ public class CollapsedImageBrowser extends AbstractImageBrowser {
             ImageDatumType type = datum.getType();
             String tag = type.toString();
             ImageMetadata meta = datum.getMetadata(true);
-            int rating = meta.getRating();
             boolean selected = selection.isSelected(datum);
-            renderer.paint(g, image, label, tag, rating, rect, selected);
+            renderer.paint(g, image, label, tag, meta, rect, selected);
 
             ImageGroup group = datum.getGroup();
             if (group.isNonTrivial()) {

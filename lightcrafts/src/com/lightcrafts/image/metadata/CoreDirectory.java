@@ -13,6 +13,7 @@ import com.lightcrafts.utils.DCRaw;
 import com.lightcrafts.utils.TextUtil;
 import com.lightcrafts.utils.Version;
 import com.lightcrafts.utils.xml.XMLUtil;
+import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -39,7 +40,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     ColorTemperatureProvider, CopyrightProvider, FileDateTimeProvider,
     FlashProvider, FocalLengthProvider, ISOProvider, LensProvider,
     MakeModelProvider, OrientationProvider, OriginalWidthHeightProvider,
-    RatingProvider, ShutterSpeedProvider, WidthHeightProvider {
+    RatingProvider, ShutterSpeedProvider, UrgencyProvider, WidthHeightProvider {
 
     ////////// public /////////////////////////////////////////////////////////
 
@@ -70,6 +71,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
         dir.addShutterSpeed( metadata );
 
         dir.addRating( metadata );
+        dir.addUrgency( metadata );
         syncEditableMetadata( metadata );
     }
 
@@ -365,6 +367,15 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
      * {@inheritDoc}
      */
     @Override
+    public int getUrgency() {
+        final ImageMetaValue value = getValue( CORE_URGENCY );
+        return value != null ? value.getIntValue() : 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Collection<Element> toXMP( Document xmpDoc ) {
         return toXMP( xmpDoc, XMP_XAP_NS, XMP_XAP_PREFIX );
     }
@@ -390,6 +401,8 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
                 break;
             case CORE_SHUTTER_SPEED:
                 return MetadataUtil.shutterSpeedString( value.getFloatValue() );
+            case CORE_URGENCY:
+                return Integer.toString(value.getIntValue());
         }
         return super.valueToString( value );
     }
@@ -518,11 +531,52 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
             xapRDFDescElement.appendChild( ratingElement );
         }
 
+        ////////// Color Label (Urgency)
+
+        final ImageMetaValue urgency = getValue( CORE_URGENCY );
+        if (urgency != null) {
+            final String urgencyString = urgency.getStringValue();
+
+            final Element photoshopRDFDescElement = XMPUtil.createRDFDescription(
+                    xmpDoc, XMP_PHOTOSHOP_NS, XMP_PHOTOSHOP_PREFIX
+            );
+            final Element photoshopUrgencyElement = xmpDoc.createElementNS(
+                    XMP_PHOTOSHOP_NS, XMP_PHOTOSHOP_PREFIX + ":Urgency"
+            );
+            XMLUtil.setTextContentOf(photoshopUrgencyElement, urgencyString);
+            photoshopRDFDescElement.appendChild(photoshopUrgencyElement);
+            elements.add(photoshopRDFDescElement);
+
+            final Element labelElement = xmpDoc.createElementNS(
+                    XMP_XAP_NS, XMP_XAP_PREFIX + ":Label"
+            );
+            XMLUtil.setTextContentOf( labelElement, convertToColorName(urgencyString) );
+            xapRDFDescElement.appendChild( labelElement );
+        }
+
         elements.add( xapRDFDescElement );
         return elements;
     }
 
     ////////// private ////////////////////////////////////////////////////////
+
+    @NotNull
+    private String convertToColorName(@NotNull String c) {
+        switch (c) {
+            case "1":
+                return "Red";
+            case "3":
+                return "Yellow";
+            case "4":
+                return "Green";
+            case "5":
+                return "Blue";
+            case "6":
+                return "Purple";
+            default:
+                return "";
+        }
+    }
 
     /**
      * Adds the tag mappings.
@@ -823,6 +877,17 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
     }
 
     /**
+     * Adds urgency information to the <code>CoreDirectory</code>'s metadata.
+     *
+     * @param metadata The {@link ImageMetadata} to add into.
+     */
+    private void addUrgency( ImageMetadata metadata ) {
+        final int urgency = metadata.getUrgency();
+        if ( urgency > 0 )
+            putValue( CORE_URGENCY, new UnsignedShortMetaValue( urgency ) );
+    }
+
+    /**
      * Adds resolution information to the <code>CoreDirectory</code>'s metadata.
      *
      * @param metadata The {@link ImageMetadata} to add into.
@@ -939,6 +1004,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
         add( CORE_ORIGINAL_ORIENTATION, "OriginalOrientation", META_USHORT, false );
         add( CORE_RATING, "Rating", META_USHORT, true );
         add( CORE_SHUTTER_SPEED, "ShutterSpeed", META_FLOAT, false );
+        add( CORE_URGENCY, "Urgency", META_USHORT, true );
     }
 }
 /* vim:set et sw=4 ts=4: */

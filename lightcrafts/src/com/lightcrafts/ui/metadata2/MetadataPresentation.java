@@ -55,6 +55,9 @@ class MetadataPresentation {
         editableSection.addEntry(
             new IPTCMetadataEntry(IPTCTags.IPTC_LOCATION)
         );
+        editableSection.addEntry(
+            new UrgencyMetadataEntry()
+        );
         sections.add(editableSection);
 
         MetadataSection miscSection = new MetadataSection();

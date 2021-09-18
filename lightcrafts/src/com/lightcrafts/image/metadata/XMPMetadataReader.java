@@ -2,15 +2,14 @@
 
 package com.lightcrafts.image.metadata;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.IOException;
-
-import org.w3c.dom.*;
-
 import com.lightcrafts.image.metadata.values.ImageMetaValue;
 import com.lightcrafts.utils.xml.*;
+import org.w3c.dom.*;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 import static com.lightcrafts.image.metadata.XMPConstants.*;
 
@@ -59,7 +58,11 @@ public final class XMPMetadataReader {
             metadata
         );
         readMetadata(                   // reads xap:Rating
-            rdfElement, XMP_XAP_NS, XMP_XAP_PREFIX, CoreDirectory.class,
+                rdfElement, XMP_XAP_NS, XMP_XAP_PREFIX, CoreDirectory.class,
+                metadata
+        );
+        readMetadata(                   // reads photoshop:Urgency
+            rdfElement, XMP_PHOTOSHOP_NS, XMP_PHOTOSHOP_PREFIX, CoreDirectory.class,
             metadata
         );
         return metadata;
@@ -109,11 +112,7 @@ public final class XMPMetadataReader {
                                ImageMetadataDirectory dir ) {
         for ( Node node : elements ) {
             final Element dirElement = (Element)node;
-            //
-            // Use getTagName() since getLocalName() always returns null.
-            //
-            // final String tagName = dirElement.getLocalName();
-            final String tagName = dirElement.getTagName().replaceAll( ".*:", "" );
+            final String tagName = dirElement.getLocalName();
             final ImageMetaTagInfo tagInfo = dir.getTagInfoFor( tagName );
             if ( tagInfo == null )
                 continue;

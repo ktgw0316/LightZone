@@ -10,7 +10,6 @@ import com.lightcrafts.image.UnknownImageTypeException;
 import com.lightcrafts.image.libs.LCImageLibException;
 import com.lightcrafts.image.libs.LCTIFFReader;
 import com.lightcrafts.image.metadata.DCRawMetadataReader;
-import com.lightcrafts.image.metadata.XMPMetadataWriter;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.opimage.CachedImage;
 import com.lightcrafts.jai.opimage.RGBDemosaicOpImage;
@@ -23,14 +22,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
 
-import javax.media.jai.BorderExtender;
-import javax.media.jai.ImageLayout;
-import javax.media.jai.Interpolation;
-import javax.media.jai.JAI;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.RasterFactory;
-import javax.media.jai.RenderedOp;
-import javax.media.jai.TiledImage;
+import javax.media.jai.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.*;
@@ -380,21 +372,6 @@ public abstract class RawImageType extends ImageType {
         throws BadImageFileException, IOException, UnknownImageTypeException
     {
         new DCRawMetadataReader( imageInfo ).readMetadata();
-    }
-
-    /**
-     * Writes the metadata for raw files to an XMP sidecar file.
-     *
-     * @param imageInfo The image to write the metadata for.
-     */
-    @Override
-    public void writeMetadata( ImageInfo imageInfo )
-        throws BadImageFileException, IOException, UnknownImageTypeException
-    {
-        val xmpFile = new File( imageInfo.getXMPFilename() );
-        val metadata = imageInfo.getCurrentMetadata();
-        XMPMetadataWriter.mergeInto( metadata, xmpFile );
-        metadata.clearEdited();
     }
 }
 /* vim:set et sw=4 ts=4: */

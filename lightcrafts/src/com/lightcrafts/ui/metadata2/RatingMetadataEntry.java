@@ -60,6 +60,8 @@ class RatingMetadataEntry extends SimpleMetadataEntry {
     }
 
     public void setValue(ImageMetadata meta, String value) {
+        if (value == null) return;
+
         if (value.replaceAll("\u2605", "").length() == 0) {
             // Interpret as a string of stars:
             int i = value.length();
