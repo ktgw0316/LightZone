@@ -1,9 +1,8 @@
 package com.lightcrafts.image.metadata;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Created by Masahiro Kitagawa on 2016/10/20.
@@ -78,18 +77,18 @@ public class MetadataUtilTest {
     public void undupMakeModel() throws Exception {
         // The model contains the make
         assertThat(
-                MetadataUtil.undupMakeModel("Canon", "Canon EOS 10D"),
-                is("Canon EOS 10D"));
+                MetadataUtil.undupMakeModel("Canon", "Canon EOS 10D"))
+                .isEqualTo("Canon EOS 10D");
 
         // The make contains the first word of the model
         assertThat(
-                MetadataUtil.undupMakeModel("Nikon Corporation", "Nikon D2X"),
-                is("Nikon D2X"));
+                MetadataUtil.undupMakeModel("Nikon Corporation", "Nikon D2X"))
+                .isEqualTo("Nikon D2X");
 
         // Other cases
         assertThat(
-                MetadataUtil.undupMakeModel("OLYMPUS IMAGING CORP.", "E-PL7"),
-                is("OLYMPUS IMAGING CORP. E-PL7"));
+                MetadataUtil.undupMakeModel("OLYMPUS IMAGING CORP.", "E-PL7"))
+                .isEqualTo("OLYMPUS IMAGING CORP. E-PL7");
     }
 
 }

@@ -1,13 +1,13 @@
 package com.lightcrafts.utils.xml;
 
 import lombok.val;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Element;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Created by Masahiro Kitagawa on 16/10/09.
@@ -15,14 +15,12 @@ import static org.junit.Assert.*;
 public class XmlNodeTest {
     private XmlNode xmlNode;
 
-    @org.junit.Before
+    @BeforeEach
     public void setUp() throws Exception {
         val resource = XmlNodeTest.class.getClassLoader().getResource("test.lzt");
-        if (resource == null) {
-            fail();
-        }
-        val filename = resource.getPath();
+        assertThat(resource).isNotNull();
 
+        val filename = resource.getPath();
         val factory = DocumentBuilderFactory.newInstance();
         val docBuilder = factory.newDocumentBuilder();
         val doc = docBuilder.parse(filename);
@@ -32,19 +30,19 @@ public class XmlNodeTest {
     }
 
     @Test
-    public void getVersion() throws Exception {
-        assertThat(xmlNode.getVersion(), is(7));
+    public void getVersion() {
+        assertThat(xmlNode.getVersion()).isEqualTo(7);
     }
 
     @Test
-    public void getAttributes() throws Exception {
+    public void getAttributes() {
         val attrs = xmlNode.getAttributes();
-        assertThat(attrs.length, is(1));
-        assertThat(attrs[0], is("version"));
+        assertThat(attrs.length).isEqualTo(1);
+        assertThat(attrs[0]).isEqualTo("version");
     }
 
-    @org.junit.Test
-    public void clearData() throws Exception {
+    @Test
+    public void clearData() {
         xmlNode.clearData();
         // TODO:
     }

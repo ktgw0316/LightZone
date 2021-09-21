@@ -77,7 +77,7 @@
     <property name="dir" value="${test-dir}"/>
     <junit dir="${dir}" showoutput="true" printsummary="withOutAndErr" fork="true">
       <formatter type="plain"/>
-      <test name="com.lightcrafts.image.metadata.BulkMetadataTester" outfile="metadata-test"/>
+      <test name="com.lightcrafts.image.metadata.BulkImageInfoTest" outfile="metadata-test"/>
       <classpath>
         <path refid="classpath"/>
         <pathelement path="build"/>
