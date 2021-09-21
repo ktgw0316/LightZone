@@ -21,7 +21,7 @@ public class LCArraysTest {
 
     @Test
     public void testCopyShortArrayToByteArray() {
-        final int length = intArray.length * 2;
+        final int length = shortArray.length * 2;
         var dstByteArray = new byte[length];
         LCArrays.copy(shortArray, 0, dstByteArray, 0, length);
         assertThat(dstByteArray).isEqualTo(byteArray);
@@ -30,7 +30,7 @@ public class LCArraysTest {
     @Test
     public void testCopyByteArrayToIntArray() {
         final int length = byteArray.length;
-        var dstIntArray = new int[length];
+        var dstIntArray = new int[length / 4];
         LCArrays.copy(byteArray, 0, dstIntArray, 0, length);
         assertThat(dstIntArray).isEqualTo(intArray);
     }
@@ -38,7 +38,7 @@ public class LCArraysTest {
     @Test
     public void testCopyByteArrayToShortArray() {
         final int length = byteArray.length;
-        var dstShortArray = new short[length];
+        var dstShortArray = new short[length / 2];
         LCArrays.copy(byteArray, 0, dstShortArray, 0, length);
         assertThat(dstShortArray).isEqualTo(shortArray);
     }
