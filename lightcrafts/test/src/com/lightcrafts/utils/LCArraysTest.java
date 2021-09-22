@@ -42,11 +42,5 @@ public class LCArraysTest {
         LCArrays.copy(byteArray, 0, dstShortArray, 0, length);
         assertThat(dstShortArray).isEqualTo(shortArray);
     }
-
-    @Test
-    public void testResize() {
-        assertThat((short[]) LCArrays.resize(shortArray, 4))
-                .isEqualTo(new short[]{0x100, 0, 0, 0});
-        // TODO
-    }
 }
+/* vim:set et sw=4 ts=4: */

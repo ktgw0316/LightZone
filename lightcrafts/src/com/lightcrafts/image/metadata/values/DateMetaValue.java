@@ -7,13 +7,13 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.lightcrafts.image.metadata.ImageMetaType;
-import com.lightcrafts.utils.LCArrays;
 import com.lightcrafts.utils.TextUtil;
 import com.lightcrafts.utils.xml.XMLUtil;
 
@@ -164,7 +164,7 @@ public final class DateMetaValue extends ImageMetaValue {
         if ( m_value == null )
             m_value = new Date[ index + 1 ];
         else if ( index >= m_value.length )
-            m_value = (Date[])LCArrays.resize( m_value, index + 1 );
+            m_value = Arrays.copyOf(m_value, index + 1);
         m_value[ index ] = newValue;
         dirty();
     }
@@ -243,7 +243,7 @@ public final class DateMetaValue extends ImageMetaValue {
         if ( m_value == null )
             m_value = new Date[] { newDate };
         else {
-            m_value = (Date[])LCArrays.resize( m_value, m_value.length + 1 );
+            m_value = Arrays.copyOf( m_value, m_value.length + 1 );
             m_value[ m_value.length - 1 ] = newDate;
         }
     }

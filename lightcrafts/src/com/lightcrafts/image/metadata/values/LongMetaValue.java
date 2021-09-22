@@ -5,10 +5,10 @@ package com.lightcrafts.image.metadata.values;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.Arrays;
 
 import com.lightcrafts.image.metadata.ImageMetadataDirectory;
 import com.lightcrafts.image.metadata.ImageMetaType;
-import com.lightcrafts.utils.LCArrays;
 import com.lightcrafts.utils.Rational;
 
 import static com.lightcrafts.image.metadata.ImageMetaType.META_SLONG;
@@ -166,7 +166,7 @@ public class LongMetaValue extends NumericMetaValue {
         if ( m_value == null )
             m_value = new long[ index + 1 ];
         else if ( index >= m_value.length )
-            m_value = (long[])LCArrays.resize( m_value, index + 1 );
+            m_value = Arrays.copyOf( m_value, index + 1 );
         m_value[ index ] = constrain( newValue );
         dirty();
     }
@@ -205,7 +205,7 @@ public class LongMetaValue extends NumericMetaValue {
         if ( m_value == null )
             m_value = new long[]{ newLong };
         else {
-            m_value = (long[])LCArrays.resize( m_value, m_value.length + 1 );
+            m_value = Arrays.copyOf( m_value, m_value.length + 1 );
             m_value[ m_value.length - 1 ] = newLong;
         }
     }

@@ -33,5 +33,21 @@
       </library>
     </orderEntry>
     <orderEntry type="library" scope="TEST" name="org.assertj:assertj-core:3.21.0" level="project" />
+    <orderEntry type="module-library" scope="TEST">
+      <library name="JUnit5.7.0">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../lib/junit-jupiter-5.7.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../lib/junit-jupiter-api-5.7.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../lib/apiguardian-api-1.1.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../lib/opentest4j-1.2.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../lib/junit-platform-commons-1.7.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../lib/junit-jupiter-params-5.7.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../lib/junit-jupiter-engine-5.7.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/../lib/junit-platform-engine-1.7.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>

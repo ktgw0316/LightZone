@@ -3,6 +3,7 @@
 package com.lightcrafts.platform.macosx;
 
 import java.io.File;
+import java.util.Arrays;
 
 import com.lightcrafts.utils.file.SmartFolder;
 import com.lightcrafts.utils.LCArrays;
@@ -180,7 +181,7 @@ public final class MacOSXSmartFolder extends SmartFolder {
                 --actualLength;
             else
                 break;
-        return (String[])LCArrays.resize( contents, actualLength );
+        return Arrays.copyOf( contents, actualLength );
     }
 
     /**

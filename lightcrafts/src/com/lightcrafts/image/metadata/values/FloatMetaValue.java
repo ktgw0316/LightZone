@@ -5,9 +5,9 @@ package com.lightcrafts.image.metadata.values;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.Arrays;
 
 import com.lightcrafts.image.metadata.ImageMetaType;
-import com.lightcrafts.utils.LCArrays;
 import com.lightcrafts.utils.Rational;
 
 import static com.lightcrafts.image.metadata.ImageMetaType.META_FLOAT;
@@ -179,7 +179,7 @@ public final class FloatMetaValue extends NumericMetaValue {
         if ( m_value == null )
             m_value = new float[ index + 1 ];
         else if ( index >= m_value.length )
-            m_value = (float[])LCArrays.resize( m_value, index + 1 );
+            m_value = Arrays.copyOf( m_value, index + 1 );
         m_value[ index ] = newValue;
         dirty();
     }
@@ -225,7 +225,7 @@ public final class FloatMetaValue extends NumericMetaValue {
         if ( m_value == null )
             m_value = new float[]{ newFloat };
         else {
-            m_value = (float[])LCArrays.resize( m_value, m_value.length + 1 );
+            m_value = Arrays.copyOf( m_value, m_value.length + 1 );
             m_value[ m_value.length - 1 ] = newFloat;
         }
     }
