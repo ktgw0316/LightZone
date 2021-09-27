@@ -63,6 +63,34 @@
       <plistentry key="CFBundleHelpBookFolder" value="${app-name}_Help"/>
       <plistentry key="CFBundleHelpBookName" value="${app-name} Help"/>
 
+      <!-- Security Entitlements -->
+      <plistentry key="com.apple.security.app-sandbox" value="false" type="boolean"/>
+      <plistentry key="com.apple.security.cs.allow-jit" value="true" type="boolean"/>
+      <plistentry key="com.apple.security.cs.allow-unsigned-executable-memory" value="true" type="boolean"/>
+      <plistentry key="com.apple.security.cs.allow-dyld-environment-variables" value="true" type="boolean"/>
+      <plistentry key="com.apple.security.cs.disable-library-validation" value="true" type="boolean"/>
+
+      <!-- Network -->
+      <plistentry key="com.apple.security.network.client" value="false" type="boolean"/>
+      <plistentry key="com.apple.security.network.server" value="false" type="boolean"/>
+
+      <!-- Hardware -->
+      <plistentry key="com.apple.security.device.bluetooth" value="false" type="boolean"/>
+      <plistentry key="com.apple.security.device.camera" value="false" type="boolean"/>
+      <plistentry key="com.apple.security.device.microphone" value="false" type="boolean"/>
+      <plistentry key="com.apple.security.device.usb" value="false" type="boolean"/>
+      <plistentry key="com.apple.security.print" value="true" type="boolean"/>
+
+      <!-- App Data -->
+      <plistentry key="com.apple.security.personal-information.addressbook" value="false" type="boolean"/>
+      <plistentry key="com.apple.security.personal-information.calendars" value="false" type="boolean"/>
+      <plistentry key="com.apple.security.personal-information.location" value="false" type="boolean"/>
+
+      <!-- File Access -->
+      <plistentry key="com.apple.security.assets.pictures.read-write" value="true" type="boolean"/>
+      <plistentry key="com.apple.security.files.downloads.read-write" value="true" type="boolean"/>
+      <plistentry key="com.apple.security.files.user-selected.read-write" value="true" type="boolean"/>
+
       <option value="-Xdock:name=${app-name}"/>
       <option value="-Dapple.laf.useScreenMenuBar=true"/>
       <option value="-Dcom.apple.macos.use-file-dialog-packages=true"/>
