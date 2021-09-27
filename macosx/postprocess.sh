@@ -11,25 +11,16 @@ fi
 SCRIPT_DIR=$(cd $(dirname $0) && pwd)
 
 cd $1
+FILES=$(find . -name "*.jnilib" -o -name "dcraw_lz")
 
 # Copy required dylibs, and change their ids
-sh ${SCRIPT_DIR}/copydylibs.sh dcraw_lz *.jnilib
+sh ${SCRIPT_DIR}/copydylibs.sh ${FILES}
 
 # Change the local library paths in each file
-FILES=$(find . -name "*.jnilib" -o -name "*.dylib" -o -name "dcraw_lz")
 for FILE in ${FILES}; do
   otool -L ${FILE} | egrep -v "$(otool -D ${FILE})" | egrep -v "/(usr/lib|System)" | grep -o "/.*\.dylib" | while read; do
-    install_name_tool -change ${REPLY} @executable_path/$(basename ${REPLY}) ${FILE}
+    install_name_tool -change ${REPLY} @loader_path/$(basename ${REPLY}) ${FILE}
   done
 done
-
-# # Hack for homebrew libtiff, which uses libjpeg instead of libjpeg-turbo
-# tiff=$(find . -name "libtiff*.dylib")
-# turbo=$(find . -name "libjpeg*.dylib" | sed -e "s%^\.\/%%")
-# jpeg=$(otool -L ${tiff} | grep -o "@executable_path/libjpeg.*\.dylib")
-# install_name_tool -change ${jpeg} @executable_path/${turbo} ${tiff}
-
-# Hack for older macOS than High Sierra
-install_name_tool -change /System/Library/Frameworks/ColorSync.framework/Versions/A/ColorSync /System/Library/Frameworks/ApplicationServices.framework/Frameworks/ColorSync.framework/Versions/A/ColorSync libMacOSX.jnilib
 
 # vim:set noet sw=8 ts=8:
