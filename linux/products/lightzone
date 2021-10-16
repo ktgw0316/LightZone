@@ -88,6 +88,7 @@ done
 
 echo ${classpath}
 (cd ${pkgjavadir} && LD_LIBRARY_PATH=${pkglibexecdir} exec java \
+--add-exports=java.desktop/sun.awt.image=ALL-UNNAMED \
 -classpath ${classpath} \
 -XX:MinHeapFreeRatio=30 \
 -XX:MaxHeapFreeRatio=30 \

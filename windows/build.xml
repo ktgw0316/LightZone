@@ -31,6 +31,8 @@
   <property name="installer-name" value="${app-name}-Installer-${jre-arch}.exe"/>
   <property name="windows-jar" value="products/lightcrafts-windows.jar"/>
 
+  <property name="JVMARG" value="--add-exports=java.desktop/sun.awt.image=ALL-UNNAMED"/>
+
   <!-- The default maxmemory for the run* targets. -->
   <property name="maxmemory" value="512m"/>
 
@@ -116,9 +118,7 @@
     <java classname="com.lightcrafts.platform.windows.WindowsLauncher"
           dir="products" failonerror="true" fork="true"
           maxmemory="${maxmemory}">
-      <!--
-      <jvmarg value="-Xincgc"/>
-      -->
+      <jvmarg line="${JVMARG}"/>
       <classpath>
         <fileset dir="products">
           <include name="*.jar"/>

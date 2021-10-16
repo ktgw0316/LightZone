@@ -20,6 +20,8 @@
     <isset property="USE_ICC"/>
   </condition>
 
+  <property name="JVMARG" value="--add-exports=java.desktop/sun.awt.image=ALL-UNNAMED"/>
+
 	<!--===== Application build ==============================================-->
 
   <condition property="MAKE" value="make">
@@ -173,6 +175,7 @@
   <target name="run" depends="jar-if-necessary">
     <java classname="com.lightcrafts.app.Application" dir="products"
           failonerror="true" fork="true" maxmemory="768m">
+      <jvmarg line="${JVMARG}"/>
       <classpath>
         <fileset dir="products">
           <include name="*.jar"/>

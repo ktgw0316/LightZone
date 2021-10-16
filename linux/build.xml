@@ -14,7 +14,7 @@
     <arg value="${common-dir}/version.txt"/>
   </exec>
 
-  <property name="JVMARG" value=""/>
+  <property name="JVMARG" value="--add-exports=java.desktop/sun.awt.image=ALL-UNNAMED"/>
 
   <!--===== Application build ==============================================-->
 
