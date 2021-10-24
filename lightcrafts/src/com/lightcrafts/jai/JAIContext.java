@@ -182,6 +182,9 @@ public class JAIContext {
         // Use multiple procs only if we have enough heap
         final int parallelism = (maxMemory >= 400 * MB) ? processors : 1;
         jaiInstance.getTileScheduler().setParallelism(parallelism);
+        jaiInstance.getTileScheduler().setPrefetchParallelism(parallelism);
+        jaiInstance.getTileScheduler().setPrefetchPriority(7);
+        jaiInstance.getTileScheduler().setPriority(7);
 
         final long tileCacheMemory = (maxMemory <= 2048L * MB)
                 ? maxMemory / 2
