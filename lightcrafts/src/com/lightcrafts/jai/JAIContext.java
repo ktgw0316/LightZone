@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2021-     Masahiro Kitagawa */
 
 package com.lightcrafts.jai;
 
@@ -30,13 +31,6 @@ import java.io.*;
 import java.util.Collection;
 import java.util.ArrayList;
 
-/**
- * Created by IntelliJ IDEA.
- * User: fabio
- * Date: Feb 27, 2005
- * Time: 6:33:47 PM
- * To change this template use File | Settings | File Templates.
- */
 public class JAIContext {
     public static final Collection<ColorProfileInfo> systemProfiles;
 
@@ -170,37 +164,30 @@ public class JAIContext {
     }
 
     static {
-        final long maxMemory = Runtime.getRuntime().maxMemory();
-        System.out.printf("Max Memory:   %11d%n", maxMemory);
-        System.out.printf("Total Memory: %11d%n", Runtime.getRuntime().totalMemory());
+        final int MB = 1024 * 1024;
+
+        final long maxMemory = Runtime.getRuntime().maxMemory(); // -Xmx
+        final long totalMemory = Runtime.getRuntime().totalMemory(); // -Xms
+        System.out.printf("Max Memory:   %6d MB%n", maxMemory / MB);
+        System.out.printf("Total Memory: %6d MB%n", totalMemory / MB);
 
         JAI jaiInstance = JAI.getDefaultInstance();
 
         // Use our own Tile Scheduler -- TODO: Needs more testing
         // jaiInstance.setTileScheduler(new LCTileScheduler());
 
-        int processors = Runtime.getRuntime().availableProcessors();
-
-        String[] VMVersion = System.getProperty("java.version").split("[._]");
-        String OSArch = System.getProperty("os.arch");
-
+        final int processors = Runtime.getRuntime().availableProcessors();
         System.out.println("Running on " + processors + " processors");
 
-        if (OSArch.equals("ppc") && Integer.parseInt(VMVersion[3]) < 7) {
-            processors = Math.min(processors, 2);
-            System.out.println("Old PPC Java, limiting to " + processors + " processors");
-        }
+        // Use multiple procs only if we have enough heap
+        final int parallelism = (maxMemory >= 400 * MB) ? processors : 1;
+        jaiInstance.getTileScheduler().setParallelism(parallelism);
 
-        // don't use more than 2 processors, it uses too much memory,
-        // and use 2 procs only if we have more than 750MB of heap
-
-        final int MB = 1024 * 1024;
-
-        if (maxMemory >= 400 * MB)
-            jaiInstance.getTileScheduler().setParallelism(processors);
-        else
-            jaiInstance.getTileScheduler().setParallelism(1);
-        fileCache = new LCTileCache(maxMemory <= 2048L * MB ? maxMemory/2 : maxMemory -  1024 * MB, true);
+        final long tileCacheMemory = (maxMemory <= 2048L * MB)
+                ? maxMemory / 2
+                : maxMemory - 1024 * MB;
+        System.out.printf("Tile Cache:   %6d MB%n", tileCacheMemory / MB);
+        fileCache = new LCTileCache(tileCacheMemory, true);
         // fileCache.setMemoryThreshold(0.5f);
         jaiInstance.setTileCache(fileCache);
         fileCacheHint = new RenderingHints(JAI.KEY_TILE_CACHE, fileCache);
@@ -211,6 +198,8 @@ public class JAIContext {
         jaiInstance.setRenderingHint(JAI.KEY_TILE_RECYCLER, rtf);
         // TODO: causes rendering artifacts
         // jaiInstance.setRenderingHint(JAI.KEY_CACHED_TILE_RECYCLING_ENABLED, Boolean.TRUE);
+
+        JAI.setDefaultTileSize(new Dimension(TILE_WIDTH, TILE_HEIGHT));
 
         OperationRegistry or = jaiInstance.getOperationRegistry();
 
@@ -279,9 +268,7 @@ public class JAIContext {
         rif = new BilateralFilterRIF();
         RIFRegistry.register(or, desc.getName(), "com.lightcrafts", rif);
 
-        JAI.setDefaultTileSize(new Dimension(JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT));
-
-        systemProfiles = new ArrayList<ColorProfileInfo>();
+        systemProfiles = new ArrayList<>();
         final Collection<ColorProfileInfo> exportProfiles =
             Platform.getPlatform().getExportProfiles();
         if (exportProfiles != null) {
@@ -295,10 +282,11 @@ public class JAIContext {
 
         ICC_Profile _sRGBColorProfile = null;
         for (ColorProfileInfo cpi : systemProfiles) {
-            if ((cpi.getName().equals("sRGB Profile") || cpi.getName().equals("sRGB IEC61966-2.1"))) {
+            final String cpiName = cpi.getName();
+            if ((cpiName.equals("sRGB Profile") || cpiName.equals("sRGB IEC61966-2.1"))) {
                 try {
                     _sRGBColorProfile = ICC_Profile.getInstance(cpi.getPath());
-                    System.out.println("found " + cpi.getName());
+                    System.out.println("found " + cpiName);
                     if (_sRGBColorProfile != null)
                         break;
                 } catch (IOException e) {
@@ -386,13 +374,13 @@ public class JAIContext {
                             Transparency.OPAQUE);
             _colorModel_sRGB16 =
                     RasterFactory.createComponentColorModel(DataBuffer.TYPE_USHORT,
-                            JAIContext.sRGBColorSpace,
+                            sRGBColorSpace,
                             false,
                             false,
                             Transparency.OPAQUE);
             _colorModel_sRGB8 =
                     RasterFactory.createComponentColorModel(DataBuffer.TYPE_BYTE,
-                            JAIContext.sRGBColorSpace,
+                            sRGBColorSpace,
                             false,
                             false,
                             Transparency.OPAQUE);
