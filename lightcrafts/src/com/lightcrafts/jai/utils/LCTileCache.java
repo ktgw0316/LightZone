@@ -869,17 +869,12 @@ public final class LCTileCache extends Observable
                     oldCacheFile.delete();
                 }
 
-            int defaultMemorySize = MemoryLimits.getDefault();
-            Preferences prefs = Preferences.userRoot().node("/com/lightcrafts/app");
-            long maxMemory = (long) prefs.getInt("MaxMemory", defaultMemorySize) * 1024 * 1024;
-            long maxHeap = Runtime.getRuntime().maxMemory();
-            long extraCacheSize = Math.max( maxMemory - maxHeap, 0 );
-
-            System.out.println("Allocating " + (extraCacheSize / (1024 * 1024)) + "MB for the image cache.");
+            final long extraCacheSize = getExtraCacheSize();
+            System.out.println("Allocating " + extraCacheSize / MB + " MB for the image cache.");
 
             return new Cache(
                 new TileCacheCacheObjectBroker(),
-                extraCacheSize < 128 * 1024 * 1024 ?
+                extraCacheSize < 128 * MB ?
                     new WriteThroughCacheObjectMap() :
                     new LRUCacheObjectMap(
                         new NativeByteBufferAllocator( CHUNK_SIZE ), extraCacheSize
@@ -894,8 +889,17 @@ public final class LCTileCache extends Observable
         }
     }
 
-    // private static final long CACHE_SIZE = (long) (1024 * 1024 * 1024);
-    private static final int CHUNK_SIZE = 16 * 1024 * 1024;
+    private static long getExtraCacheSize() {
+        final int defaultMemorySize = MemoryLimits.getDefault();
+        final var prefs = Preferences.userRoot().node("/com/lightcrafts/app");
+        final long maxMemory = (long) prefs.getInt("MaxMemory", defaultMemorySize) * MB;
+        final long maxHeap = Runtime.getRuntime().maxMemory();
+        return Math.max(0, maxMemory - maxHeap);
+    }
+
+    private static final int MB = 1024 * 1024;
+
+    private static final int CHUNK_SIZE = 16 * MB;
 
     public synchronized void dispose() throws IOException {
         m_objectCache.dispose();
