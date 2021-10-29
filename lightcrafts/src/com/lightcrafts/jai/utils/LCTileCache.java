@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2013-     Masahiro Kitagawa */
 
 /*
  * $RCSfile: SunTileCache.java,v $
@@ -304,6 +305,15 @@ public final class LCTileCache extends Observable
         }
     }
 
+    /// Notify observers that a tile has been changed.
+    private void diagnosis(LCCachedTile ct, int action) {
+        if (diagnostics) {
+            ct.action = action;
+            setChanged();
+            notifyObservers(ct);
+        }
+    }
+
     private boolean removeFromTileList(Object key, int action) {
         LCCachedTile ct = cachedObject.remove(key);
 
@@ -316,14 +326,7 @@ public final class LCTileCache extends Observable
             }
 
             tileList.remove(ct);
-
-            // Notify observers that a tile has been removed.
-            if ( diagnostics ) {
-                ct.action = action;
-                setChanged();
-                notifyObservers(ct);
-            }
-
+            diagnosis(ct, action);
             return true;
         }
         return false;
@@ -342,12 +345,7 @@ public final class LCTileCache extends Observable
         }
 
         cacheHitCount++;
-
-        if ( diagnostics ) {
-            ct.action = action;
-            setChanged();
-            notifyObservers(ct);
-        }
+        diagnosis(ct, action);
     }
 
     /**
@@ -375,10 +373,7 @@ public final class LCTileCache extends Observable
             // be ok, since a hard reference to the tile will be
             // kept for the observers, so the garbage collector won't
             // remove the tile until the observers release it.
-            ct.action = ABOUT_TO_REMOVE;
-            setChanged();
-            notifyObservers(ct);
-
+            diagnosis(ct, ABOUT_TO_REMOVE);
             removeFromTileList(key, REMOVE);
         } else {
             // if the tile is not in the memory cache than it might be on disk...
@@ -601,7 +596,7 @@ public final class LCTileCache extends Observable
 
         if ( cacheSortedSet != null ) {
             cacheSortedSet.clear();
-            cacheSortedSet = Collections.synchronizedSortedSet( new TreeSet<LCCachedTile>(tileComparator) );
+            cacheSortedSet = Collections.synchronizedSortedSet( new TreeSet<>(tileComparator) );
         }
 
         tileList.clear();
@@ -912,15 +907,6 @@ public final class LCTileCache extends Observable
             tmpFile.delete();
     }
 
-    /**
-     * Finalize an <code>LCTileCache</code>.
-     */
-    @Override
-    protected void finalize() throws Throwable {
-        dispose();
-        super.finalize();
-    }
-
     private long tilesWritten = 0;
     private long tilesRead = 0;
     private long tilesOnDisk = 0;
@@ -968,18 +954,9 @@ public final class LCTileCache extends Observable
 
             WritableRaster raster;
 
-            if (true)
-                raster = Raster.createWritableRaster(sm, db, new Point(tileX * owner.getTileWidth(),
-                                                                       tileY * owner.getTileHeight()));
-            else {
-                int bands = sm.getNumBands();
-                int[] bandOffsets = ((PixelInterleavedSampleModel) sm).getBandOffsets();
-
-                raster = Raster.createInterleavedRaster(db, owner.getTileWidth(), owner.getTileHeight(),
-                                                        bands * owner.getTileWidth(), bands, bandOffsets,
-                                                        new Point(tileX * owner.getTileWidth(),
-                                                                  tileY * owner.getTileHeight()));
-            }
+            raster = Raster.createWritableRaster(sm, db, new Point(
+                    tileX * owner.getTileWidth(),
+                    tileY * owner.getTileHeight()));
             synchronized (this) {
                 tilesRead++;
             }
@@ -1047,12 +1024,7 @@ public final class LCTileCache extends Observable
 
             tileList.remove(ct);
             cachedObject.remove(ct.key);
-
-            if ( diagnostics ) {
-                ct.action = REMOVE_FROM_MEMCON;
-                setChanged();
-                notifyObservers(ct);
-            }
+            diagnosis(ct, REMOVE_FROM_MEMCON);
         }
 
         // If the custom memory control didn't release sufficient
@@ -1087,21 +1059,8 @@ public final class LCTileCache extends Observable
             }
         } else {
             // copy tiles from hashtable to sorted tree set
-            cacheSortedSet = Collections.synchronizedSortedSet( new TreeSet<LCCachedTile>(tileComparator) );
+            cacheSortedSet = Collections.synchronizedSortedSet( new TreeSet<>(tileComparator) );
             cachedObject.forEach((key, ct) -> cacheSortedSet.add(ct));
-        }
-    }
-
-    // test
-    public void dump() {
-
-        System.out.println("first = " + tileList.getFirst());
-        System.out.println("last  = " + tileList.getLast());
-
-        int k = 0;
-        for (LCCachedTile ct : cacheSortedSet) {
-            System.out.println(k++);
-            System.out.println(ct);
         }
     }
 
@@ -1131,30 +1090,22 @@ public final class LCTileCache extends Observable
         public void run() {
             while ( !m_killed ) {
                 try {
-                    final Reference weakKey = m_refQ.remove(); // Image to be garbage collected
+                    // Image to be garbage collected
+                    final Reference<? extends RenderedImage> weakKey = m_refQ.remove();
 
-                    final LCTileCache tileCache =
-                            m_tileCacheRef.get();
-
-                    if ( tileCache == null )
+                    final LCTileCache tileCache = m_tileCacheRef.get();
+                    if (tileCache == null) {
                         break;
+                    }
 
-                    synchronized ( tileCache ) {
-                        // System.out.println( "Removing tiles from caches" );
-
-                        Set hashKeys = tileCache.m_imageMap.remove(weakKey);
-
+                    synchronized (tileCache) {
+                        Set<Object> hashKeys = tileCache.m_imageMap.remove(weakKey);
                         assert hashKeys != null;
 
                         for (Object o : hashKeys) {
-                            if (tileCache.removeFromTileList(o, REMOVE_FROM_GCEVENT)) {
-                                // System.out.println("removed entry from memory cache");
-                            }
-
+                            tileCache.removeFromTileList(o, REMOVE_FROM_GCEVENT);
                             if (tileCache.m_objectCache.remove(o)) {
-                                synchronized (tileCache) {
-                                    tileCache.tilesOnDisk--;
-                                }
+                                tileCache.tilesOnDisk--;
                                 // System.out.println("removed entry from disk cache");
                             }
                         }
