@@ -256,7 +256,7 @@ ifeq ($(PLATFORM),$(filter $(PLATFORM),Linux FreeBSD SunOS))
   else ifeq ($(PROCESSOR),arm64)
     PLATFORM_CFLAGS+=	-march=armv8-a
   else ifeq ($(PROCESSOR),$(filter $(PROCESSOR),armhf armv7l))
-    PLATFORM_CFLAGS+=	-march=armv7-a
+    PLATFORM_CFLAGS+=	-march=armv7-a+fp
   else ifeq ($(PROCESSOR),ppc)
     PLATFORM_CFLAGS+=	-mcpu=powerpc
   else ifeq ($(PROCESSOR),ppc64)
