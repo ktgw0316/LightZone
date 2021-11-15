@@ -1,4 +1,4 @@
-Format: 1.0
+Format: 3.0 (quilt)
 Source: lightzone
 Binary: lightzone
 Architecture: i386 amd64 armhf arm64
