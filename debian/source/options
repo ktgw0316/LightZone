@@ -1,5 +1,4 @@
 --tar-ignore=.idea
---tar-ignore=debian
 --tar-ignore=freebsd-ports
 --tar-ignore=macosx
 --tar-ignore=windows

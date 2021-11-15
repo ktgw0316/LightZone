@@ -2,8 +2,13 @@ Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: LightZone
 Upstream-Contact: Masahiro Kitagawa <arctica0316@gmail.com>
 Source: https://github.com/ktgw0316/LightZone
-
-Files-Excluded: Splash.xcf freebsd-ports macosx windows
+Files-Excluded: .appveyor.yml
+                .git*
+                .idea
+                Splash.xcf
+                freebsd-ports
+                macosx
+                windows
 
 Files: lightcrafts/src/com/*
        lightcrafts/help/*
