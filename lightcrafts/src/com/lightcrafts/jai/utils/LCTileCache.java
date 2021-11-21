@@ -22,6 +22,7 @@ import com.sun.media.jai.util.CacheDiagnostics;
 import com.sun.media.jai.util.ImageUtil;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 
 import javax.media.jai.EnumeratedParameter;
 import javax.media.jai.TileCache;
@@ -76,13 +77,13 @@ public final class LCTileCache extends Observable
 
     /**
      * The tile cache.
-     * A Hashtable is used to cache the tiles.  The "key" is a
+     * A LinkedHashMap is used to cache the tiles.  The "key" is a
      * <code>Object</code> determined based on tile owner's UID if any or
      * hashCode if the UID doesn't exist, and tile index.  The
      * "value" is a LCCachedTile.
      */
     @Getter
-    private Hashtable<Object, LCCachedTile> cachedObject;
+    private final LinkedHashMap<Object, LCCachedTile> cachedObject;
 
     /**
      * Sorted (Tree) Set used with tile metrics.
@@ -90,8 +91,6 @@ public final class LCTileCache extends Observable
      * which tiles are removed during memoryControl().
      */
     private SortedSet<LCCachedTile> cacheSortedSet;
-
-    private LinkedList<LCCachedTile> tileList;
 
     /** The memory capacity of the cache. */
     @Getter
@@ -113,9 +112,10 @@ public final class LCTileCache extends Observable
     @Getter
     private Comparator tileComparator = null;
 
-    /** Tile count used for diagnostics */
-    @Getter
-    private long cacheTileCount = 0;
+    @Override
+    public long getCacheTileCount() {
+        return cachedObject.size();
+    }
 
     /** Cache hit count */
     @Getter
@@ -188,11 +188,8 @@ public final class LCTileCache extends Observable
 
         this.memoryCapacity = memoryCapacity;
 
-        // try to get a prime number (more efficient?)
         // lower values of LOAD_FACTOR increase speed, decrease space efficiency
-        cachedObject = new Hashtable<>(DEFAULT_HASHTABLE_CAPACITY, LOAD_FACTOR);
-
-        tileList = new LinkedList<>();
+        cachedObject = new LinkedHashMap<>(DEFAULT_HASHTABLE_CAPACITY, LOAD_FACTOR, true);
 
         if (useDisk) {
             m_objectCache = createDiskCache();
@@ -252,24 +249,21 @@ public final class LCTileCache extends Observable
         // This tile is not in the cache; create a new LCCachedTile.
         // else just update.
         Object key = LCCachedTile.hashKey(owner, tileX, tileY);
-        LCCachedTile ct = cachedObject.get(key);
-
-        if ( ct != null ) {
+        final LCCachedTile ct;
+        if (cachedObject.containsKey(key)) {
+            ct = cachedObject.get(key);
             updateTileList(ct, UPDATE_FROM_ADD);
         } else {
             // create a new tile
             ct = new LCCachedTile(owner, tileX, tileY, tile, tileCacheMetric);
-            updateTileList(ct, ADD);
 
             // add to tile cache
-            if ( cachedObject.put(ct.key, ct) == null ) {
-                cacheMemoryUsed += ct.tileSize;
-                cacheTileCount++;
-                //cacheMissCount++;  Not necessary?
+            cachedObject.put(ct.key, ct);
+            updateTileList(ct, ADD);
+            cacheMemoryUsed += ct.tileSize;
 
-                if ( cacheSortedSet != null ) {
-                    cacheSortedSet.add(ct);
-                }
+            if ( cacheSortedSet != null ) {
+                cacheSortedSet.add(ct);
             }
 
             // Bring memory usage down to memoryThreshold % of memory capacity.
@@ -316,34 +310,23 @@ public final class LCTileCache extends Observable
 
     private boolean removeFromTileList(Object key, int action) {
         LCCachedTile ct = cachedObject.remove(key);
-
         if (ct != null) {
-            cacheMemoryUsed -= ct.tileSize;
-            cacheTileCount--;
-
-            if ( cacheSortedSet != null ) {
-                cacheSortedSet.remove(ct);
-            }
-
-            tileList.remove(ct);
-            diagnosis(ct, action);
+            removeTile(ct, action);
             return true;
         }
         return false;
     }
 
+    private void removeTile(@NotNull LCCachedTile ct, int action) {
+        cacheMemoryUsed -= ct.tileSize;
+            if ( cacheSortedSet != null ) {
+                cacheSortedSet.remove(ct);
+            }
+            diagnosis(ct, action);
+    }
+
     private void updateTileList(LCCachedTile ct, int action) {
         ct.tileTimeStamp = timeStamp++;
-
-        if (tileList.isEmpty()) {
-            tileList.add(ct);
-        }
-        else if (!tileList.getFirst().equals(ct)) {
-            // Bring this tile to the beginning of the list.
-            tileList.remove(ct);
-            tileList.addFirst(ct);
-        }
-
         cacheHitCount++;
         diagnosis(ct, action);
     }
@@ -445,7 +428,7 @@ public final class LCTileCache extends Observable
         }
 
         int size = Math.min(owner.getNumXTiles() * owner.getNumYTiles(),
-                            (int) cacheTileCount);
+                            cachedObject.size());
 
         if ( size > 0 ) {
             int minTx = owner.getMinTileX();
@@ -591,7 +574,7 @@ public final class LCTileCache extends Observable
         cacheMissCount = 0;
 
         if ( memoryCapacity > 0 ) {
-            cachedObject = new Hashtable<>(DEFAULT_HASHTABLE_CAPACITY, LOAD_FACTOR);
+            cachedObject.clear();
         }
 
         if ( cacheSortedSet != null ) {
@@ -599,10 +582,7 @@ public final class LCTileCache extends Observable
             cacheSortedSet = Collections.synchronizedSortedSet( new TreeSet<>(tileComparator) );
         }
 
-        tileList.clear();
-
         // force reset after diagnostics
-        cacheTileCount = 0;
         timeStamp   = 0;
         cacheMemoryUsed = 0;
 
@@ -735,19 +715,22 @@ public final class LCTileCache extends Observable
     private void standard_memory_control() {
         long limit = (long)(memoryCapacity * memoryThreshold);
 
-        while( cacheMemoryUsed > limit && ! tileList.isEmpty() ) {
-            final Object lastKey = tileList.getLast().key;
-            LCCachedTile ct = cachedObject.get(lastKey);
+        final var iter = cachedObject.entrySet().iterator();
+        while (iter.hasNext() && cacheMemoryUsed > limit) {
+            final var eldestEntry = iter.next();
+            final Object eldestKey = eldestEntry.getKey();
+            final LCCachedTile ct = eldestEntry.getValue();
 
-            if ( ct != null ) {
+            if (ct != null) {
                 if (m_objectCache != null) {
                     RenderedImage owner = ct.getOwner();
                     if (owner != null && owner.getProperty(JAIContext.PERSISTENT_CACHE_TAG) == Boolean.TRUE) {
-                        writeTileToDisk(ct, lastKey);
+                        writeTileToDisk(ct, eldestKey);
                     }
                 }
-                removeFromTileList(lastKey, REMOVE_FROM_MEMCON);
+                removeTile(ct, REMOVE_FROM_MEMCON);
             }
+            iter.remove();
         }
     }
 
@@ -1007,9 +990,6 @@ public final class LCTileCache extends Observable
             final LCCachedTile ct = iter.next();
 
             cacheMemoryUsed -= ct.tileSize;
-            synchronized (this) {
-                cacheTileCount--;
-            }
 
             // remove from sorted set
             try {
@@ -1022,7 +1002,6 @@ public final class LCTileCache extends Observable
 //                e.printStackTrace();
             }
 
-            tileList.remove(ct);
             cachedObject.remove(ct.key);
             diagnosis(ct, REMOVE_FROM_MEMCON);
         }
