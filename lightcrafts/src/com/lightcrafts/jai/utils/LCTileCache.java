@@ -19,14 +19,12 @@ import com.lightcrafts.utils.LCArrays;
 import com.lightcrafts.utils.MemoryLimits;
 import com.lightcrafts.utils.cache.*;
 import com.sun.media.jai.util.CacheDiagnostics;
-import com.sun.media.jai.util.ImageUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
 import javax.media.jai.EnumeratedParameter;
 import javax.media.jai.TileCache;
-import javax.media.jai.util.ImagingListener;
 import java.awt.*;
 import java.awt.image.*;
 import java.io.File;
@@ -85,13 +83,6 @@ public final class LCTileCache extends Observable
     @Getter
     private final LinkedHashMap<Object, LCCachedTile> cachedObject;
 
-    /**
-     * Sorted (Tree) Set used with tile metrics.
-     * Adds another level of metrics used to determine
-     * which tiles are removed during memoryControl().
-     */
-    private SortedSet<LCCachedTile> cacheSortedSet;
-
     /** The memory capacity of the cache. */
     @Getter
     private long memoryCapacity;
@@ -105,12 +96,6 @@ public final class LCTileCache extends Observable
 
     /** A indicator for tile access time. */
     private long timeStamp = 0;
-
-    /** Custom tileComparator used to determine tile cost or
-     *  priority ordering in the tile cache.
-     */
-    @Getter
-    private Comparator tileComparator = null;
 
     @Override
     public long getCacheTileCount() {
@@ -262,10 +247,6 @@ public final class LCTileCache extends Observable
             updateTileList(ct, ADD);
             cacheMemoryUsed += ct.tileSize;
 
-            if ( cacheSortedSet != null ) {
-                cacheSortedSet.add(ct);
-            }
-
             // Bring memory usage down to memoryThreshold % of memory capacity.
             if (cacheMemoryUsed > memoryCapacity) {
                 memoryControl();
@@ -319,9 +300,6 @@ public final class LCTileCache extends Observable
 
     private void removeTile(@NotNull LCCachedTile ct, int action) {
         cacheMemoryUsed -= ct.tileSize;
-            if ( cacheSortedSet != null ) {
-                cacheSortedSet.remove(ct);
-            }
             diagnosis(ct, action);
     }
 
@@ -577,11 +555,6 @@ public final class LCTileCache extends Observable
             cachedObject.clear();
         }
 
-        if ( cacheSortedSet != null ) {
-            cacheSortedSet.clear();
-            cacheSortedSet = Collections.synchronizedSortedSet( new TreeSet<>(tileComparator) );
-        }
-
         // force reset after diagnostics
         timeStamp   = 0;
         cacheMemoryUsed = 0;
@@ -704,15 +677,6 @@ public final class LCTileCache extends Observable
      */
     @Override
     public synchronized void memoryControl() {
-        if ( cacheSortedSet == null ) {
-            standard_memory_control();
-        } else {
-            custom_memory_control();
-        }
-    }
-
-    // time stamp based memory control (LRU)
-    private void standard_memory_control() {
         long limit = (long)(memoryCapacity * memoryThreshold);
 
         final var iter = cachedObject.entrySet().iterator();
@@ -981,72 +945,24 @@ public final class LCTileCache extends Observable
         }
     }
 
-    // tileComparator based memory control (TreeSet)
-    private void custom_memory_control() {
-        long limit = (long)(memoryCapacity * memoryThreshold);
-        Iterator<LCCachedTile> iter = cacheSortedSet.iterator();
-
-        while( iter.hasNext() && (cacheMemoryUsed > limit) ) {
-            final LCCachedTile ct = iter.next();
-
-            cacheMemoryUsed -= ct.tileSize;
-
-            // remove from sorted set
-            try {
-                iter.remove();
-            } catch(ConcurrentModificationException e) {
-                ImagingListener listener =
-                    ImageUtil.getImagingListener((RenderingHints)null);
-                listener.errorOccurred("something wrong with the TileCache",
-                                       e, this, false);
-//                e.printStackTrace();
-            }
-
-            cachedObject.remove(ct.key);
-            diagnosis(ct, REMOVE_FROM_MEMCON);
-        }
-
-        // If the custom memory control didn't release sufficient
-        // number of tiles to satisfy the memory limit, fallback
-        // to the standard memory controller.
-        if ( cacheMemoryUsed > limit ) {
-            standard_memory_control();
-        }
+    /**
+     * Not Supported
+     *
+     * @throws UnsupportedOperationException
+     */
+    @Override
+    public Comparator<LCCachedTile> getTileComparator() {
+        throw new UnsupportedOperationException("Comparator not supported");
     }
 
     /**
-     *  The <code>Comparator</code> is used to produce an
-     *  ordered list of tiles based on a user defined
-     *  compute cost or priority metric.  This determines
-     *  which tiles are subject to "ordered" removal
-     *  during a memory control operation.
+     * Not Supported
      *
-     *  @since 1.1
+     * @throws UnsupportedOperationException
      */
     @Override
     public synchronized void setTileComparator(Comparator c) {
-        if (tileComparator != null)
-            throw new IllegalArgumentException("TileComparator not supported by LCTileCache");
-
-        tileComparator = c;
-
-        if ( tileComparator == null ) {
-            // turn off tileComparator
-            if ( cacheSortedSet != null ) {
-                cacheSortedSet.clear();
-                cacheSortedSet = null;
-            }
-        } else {
-            // copy tiles from hashtable to sorted tree set
-            cacheSortedSet = Collections.synchronizedSortedSet( new TreeSet<>(tileComparator) );
-            cachedObject.forEach((key, ct) -> cacheSortedSet.add(ct));
-        }
-    }
-
-    void sendExceptionToListener(String message, Exception e) {
-        ImagingListener listener =
-            ImageUtil.getImagingListener((RenderingHints)null);
-        listener.errorOccurred(message, e, this, false);
+        throw new UnsupportedOperationException("Comparator not supported");
     }
 
     /**
