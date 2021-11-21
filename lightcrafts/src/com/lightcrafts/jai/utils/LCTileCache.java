@@ -965,6 +965,19 @@ public final class LCTileCache extends Observable
         throw new UnsupportedOperationException("Comparator not supported");
     }
 
+    private synchronized void reap(Reference<? extends RenderedImage> weakKey) {
+        Set<Object> hashKeys = m_imageMap.remove(weakKey);
+        assert hashKeys != null;
+
+        for (Object o : hashKeys) {
+            removeFromTileList(o, REMOVE_FROM_GCEVENT);
+            if (m_objectCache.remove(o)) {
+                tilesOnDisk--;
+                // System.out.println("removed entry from disk cache");
+            }
+        }
+    }
+
     /**
      * A <code>TileReaper</code> is-a {@link Thread} that runs continuously and
      * asynchronously in the background waiting for {@link RenderedImage}s that
@@ -992,19 +1005,7 @@ public final class LCTileCache extends Observable
                     if (tileCache == null) {
                         break;
                     }
-
-                    synchronized (tileCache) {
-                        Set<Object> hashKeys = tileCache.m_imageMap.remove(weakKey);
-                        assert hashKeys != null;
-
-                        for (Object o : hashKeys) {
-                            tileCache.removeFromTileList(o, REMOVE_FROM_GCEVENT);
-                            if (tileCache.m_objectCache.remove(o)) {
-                                tileCache.tilesOnDisk--;
-                                // System.out.println("removed entry from disk cache");
-                            }
-                        }
-                    }
+                    tileCache.reap(weakKey);
                 }
                 catch ( InterruptedException e ) {
                     // do nothing
