@@ -1,15 +1,17 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2021-     Masahiro Kitagawa */
 
 package com.lightcrafts.jai.opimage;
 
-import javax.media.jai.PointOpImage;
+import com.lightcrafts.jai.utils.OpImageUtil;
+
 import javax.media.jai.ImageLayout;
+import javax.media.jai.PointOpImage;
 import javax.media.jai.RasterAccessor;
 import javax.media.jai.RasterFormatTag;
-
-import java.awt.image.*;
-import java.awt.color.ColorSpace;
 import java.awt.*;
+import java.awt.color.ColorSpace;
+import java.awt.image.*;
 import java.util.Map;
 
 /**
@@ -42,18 +44,22 @@ public class RedMaskOpImage extends PointOpImage {
     protected void computeRect(Raster[] sources,
                                WritableRaster dest,
                                Rectangle destRect) {
-        // Retrieve format tags.
-        RasterFormatTag[] formatTags = getFormatTags();
-
         Raster source = sources[0];
+
+        // Retrieve format tags.
+        var formatTags = new RasterFormatTag[] {
+                OpImageUtil.getFormatTag(source),
+                OpImageUtil.getFormatTag(dest)
+        };
+
         Rectangle srcRect = mapDestRect(destRect, 0);
 
         RasterAccessor src = new RasterAccessor(source, srcRect, formatTags[0],
                                                 getSourceImage(0).getColorModel());
         RasterAccessor dst = new RasterAccessor(dest, destRect, formatTags[1], getColorModel());
 
-        switch (dst.getDataType()) {
-            case DataBuffer.TYPE_BYTE:
+        switch (src.getDataType()) {
+            case DataBuffer.TYPE_USHORT:
                 ushortLoop(src, dst);
                 break;
             default:

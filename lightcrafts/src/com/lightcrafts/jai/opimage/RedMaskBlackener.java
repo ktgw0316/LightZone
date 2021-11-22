@@ -1,14 +1,19 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2021-     Masahiro Kitagawa */
 
 package com.lightcrafts.jai.opimage;
 
-import javax.media.jai.PointOpImage;
+import com.lightcrafts.jai.utils.OpImageUtil;
+
 import javax.media.jai.ImageLayout;
+import javax.media.jai.PointOpImage;
 import javax.media.jai.RasterAccessor;
 import javax.media.jai.RasterFormatTag;
-
-import java.awt.image.*;
 import java.awt.*;
+import java.awt.image.DataBuffer;
+import java.awt.image.Raster;
+import java.awt.image.RenderedImage;
+import java.awt.image.WritableRaster;
 import java.util.Map;
 
 /**
@@ -35,7 +40,11 @@ public class RedMaskBlackener extends PointOpImage {
                                WritableRaster dest,
                                Rectangle destRect) {
         // Retrieve format tags.
-        RasterFormatTag[] formatTags = getFormatTags();
+        var formatTags = new RasterFormatTag[] {
+                OpImageUtil.getFormatTag(sources[0]),
+                OpImageUtil.getFormatTag(sources[1]),
+                OpImageUtil.getFormatTag(dest)
+        };
 
         RasterAccessor src = new RasterAccessor(sources[0], destRect,
                 formatTags[0],
