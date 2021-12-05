@@ -10,9 +10,6 @@ import com.lightcrafts.utils.ProgressIndicator;
 import com.lightcrafts.utils.Version;
 import com.lightcrafts.utils.WebBrowser;
 import com.lightcrafts.utils.thread.ProgressThread;
-import de.dimaki.refuel.appcast.entity.Appcast;
-import de.dimaki.refuel.updater.boundary.Updater;
-import de.dimaki.refuel.updater.entity.ApplicationStatus;
 import lombok.val;
 
 import java.net.MalformedURLException;
@@ -148,8 +145,7 @@ public final class CheckForUpdate {
     }
 
     public static boolean isEnabled() {
-        // Refuel only supports Java 8 or later
-        return Double.parseDouble(System.getProperty("java.specification.version")) >= 1.8;
+        return false;
     }
 
     ////////// private ////////////////////////////////////////////////////////
@@ -273,18 +269,7 @@ public final class CheckForUpdate {
     }
 
     static boolean checkIfUpdateIsAvailable(String currentVersion, URL url) {
-        val updater = new Updater();
-        if (currentVersion.contains("alpha") || currentVersion.contains("beta") || currentVersion.contains("rc")) {
-            // TODO:
-        }
-        val applicationStatus = updater.getApplicationStatus(currentVersion, url);
-        if (!ApplicationStatus.UPDATE_AVAILABLE.equals(applicationStatus)) {
-            // This also handles the case for development versions when the version
-            // resource hasn't been populated.
-            return false;
-        }
-        val appcast = applicationStatus.getAppcast();
-        return parseAppcast(appcast);
+        return false;
     }
 
     /**
@@ -332,19 +317,6 @@ public final class CheckForUpdate {
             // ignore?
         }
         return false;
-    }
-
-    /**
-     * Parses an Appcast document as obtained from the web server.
-     *
-     * @param appcast The {@link Appcast} to parse.
-     * @return Returns <code>true</code> only if the document was parsed
-     * successfully and a version we're interested in was found.
-     */
-    private static boolean parseAppcast(Appcast appcast) {
-        m_updateURL = appcast.getChannel().getItems().get(0).getReleaseNotesLink();
-        m_updateVersion = appcast.getLatestVersion();
-        return m_updateURL != null && m_updateVersion != null;
     }
 
     /**

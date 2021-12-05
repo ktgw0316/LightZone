@@ -3,7 +3,6 @@
 package com.lightcrafts.app.menu;
 
 import com.lightcrafts.app.Application;
-import com.lightcrafts.app.CheckForUpdate;
 import com.lightcrafts.app.ComboFrame;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.utils.Version;
@@ -55,17 +54,6 @@ class HelpMenu extends UpdatableDisposableMenu {
                 }
             }
         );
-        add(menuItem);
-
-        menuItem = MenuFactory.createMenuItem("CheckForUpdate");
-        menuItem.addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        CheckForUpdate.checkNowAndWait();
-                    }
-                }
-        );
-        menuItem.setEnabled(CheckForUpdate.isEnabled());
         add(menuItem);
 
         if (!Platform.isMac()) {

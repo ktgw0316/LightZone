@@ -4,14 +4,10 @@
   <dependencies>
     <dependency name="annotations" rev="20.1.0" org="org.jetbrains"/>
     <dependency name="ejml-simple" rev="0.40" org="org.ejml"/>
-    <dependency name="jaxb-api" rev="2.4.0-b180830.0359" org="javax.xml.bind"/>
-    <dependency name="jaxb-runtime" rev="3.0.0" org="org.glassfish.jaxb"/>
     <dependency name="jiconfont-font_awesome" rev="4.7.0.0" org="com.github.jiconfont"/>
     <dependency name="jiconfont-google_material_design_icons" rev="2.2.0.2" org="com.github.jiconfont"/>
     <dependency name="jiconfont-swing" rev="1.0.1" org="com.github.jiconfont"/>
     <dependency name="lombok" rev="1.18.20" org="org.projectlombok"/>
-    <dependency name="refuel" rev="0.1.1" org="de.dimaki"/>
-    <dependency name="slf4j-simple" rev="1.7.30" org="org.slf4j"/>
     <!-- Don't download source or javadocs to save bandwidth -->
     <exclude org="*" ext="*" type="source"/>
     <exclude org="*" ext="*" type="javadoc"/>
