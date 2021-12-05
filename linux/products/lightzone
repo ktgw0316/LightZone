@@ -9,15 +9,10 @@ java -version
 arch=`getconf LONG_BIT`
 PLATFORM=`uname`
 if [ "${PLATFORM}" = "Linux" ]; then
-  totalmem=`cat /proc/meminfo | grep 'MemTotal: ' | sed -r 's/.* ([0-9]+) .*/\1/'`
   usrdir=/usr
 elif [ "${PLATFORM}" = "SunOS" ]; then
-  totalmem=`prtconf | grep 'Memory size:' | sed -r 's/.* ([0-9]+) .*/\1/'`
-  totalmem=$(( ${totalmem} * 1024 ))
   usrdir=/usr
 elif [ "${PLATFORM}" = "FreeBSD" ]; then
-  totalmem=`sysctl -n hw.physmem`
-  totalmem=$(( ${totalmem} / 1024 ))
   usrdir=%%LOCALBASE%%
 fi
 
@@ -53,27 +48,11 @@ for name in javahelp; do  # TODO: Add paths for other jars
   fi
 done
 
-minmem=524288
-maxmem=${minmem}
-
-javapref=${HOME}/.java/.userPrefs/com/lightcrafts/app/prefs.xml
-if [ -f ${javapref} ]; then
-  maxmem_pref=`xmllint --xpath 'map/entry[@key="MaxMemory"]/@value' ${javapref} | sed -r 's/value=\"([0-9]+)\"/\1/'`
-  if [ ! -z ${maxmem_pref} ]; then
-    maxmem=$(( ${maxmem_pref} * 1024 ))
-  fi
-fi
-
-if [ ${maxmem} -le ${minmem} ]; then
-  if [ ${totalmem} -ge 1048576 ]; then
-    maxmem=$(( ${totalmem} / 2 ))
-    # on 32-bit architectures there is ~2GB limit for maximum Java heap size
-    if [ ${arch} = "32" -a ${totalmem} -ge 4194304 ]; then
-      maxmem=2097152
-    fi
-  else
-      maxmem=${minmem}
-  fi
+# on 32-bit architectures there is ~2GB limit for maximum Java heap size
+if [ ${arch} = "32" ]; then
+  maxmem=2048m
+else
+  maxmem=16384m
 fi
 
 # IFS should be \n to handle filenames that include space.
@@ -92,7 +71,7 @@ echo ${classpath}
 -classpath ${classpath} \
 -XX:MinHeapFreeRatio=30 \
 -XX:MaxHeapFreeRatio=30 \
--Xmx${maxmem}k \
+-Xmx${maxmem} \
 -Djava.library.path=${pkglibexecdir} \
 -Dfile.encoding=UTF8 \
 com.lightcrafts.platform.linux.LinuxLauncher ${file} ${@} )
