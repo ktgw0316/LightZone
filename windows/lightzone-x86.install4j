@@ -74,7 +74,8 @@
 -XX:MaxHeapFreeRatio=30
 -Xmx2048m
 -Dfile.encoding=UTF8
--Dlensfun.dir=${launcher:sys.launcherDirectory}/share/lensfun</content>
+-Dlensfun.dir=${launcher:sys.launcherDirectory}/share/lensfun
+--add-exports=java.desktop/sun.awt.image=ALL-UNNAMED</content>
       </vmOptionsFile>
       <iconImageFiles>
         <file path="./resources/icons/LightZone_128.png" />

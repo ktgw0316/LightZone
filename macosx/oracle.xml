@@ -98,6 +98,7 @@
       <option value="-Dapple.awt.graphics.UseQuartz=false"/>
       <option value="-Dfile.encoding=utf-8"/>
       <option value="-Dlensfun.dir=$APP_ROOT/Contents/Resources/share/lensfun"/>
+      <option value="--add-exports=java.desktop/sun.awt.image=ALL-UNNAMED"/>
 
       <bundledocument
         extensions="jpe,jpg,jpeg"
