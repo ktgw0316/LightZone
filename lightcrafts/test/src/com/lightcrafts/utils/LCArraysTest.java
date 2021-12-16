@@ -7,9 +7,9 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class LCArraysTest {
-    private final byte[] byteArray = {1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0};
-    private final int[] intArray = {0x1000000, 0, 0x1000000, 0};
-    private final short[] shortArray = {0x100, 0, 0, 0, 0x100, 0, 0, 0};
+    private final byte[] byteArray = {1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0};
+    private final int[] intArray = {1, 1, 1, 1};
+    private final short[] shortArray = {1, 0, 1, 0, 1, 0, 1, 0};
 
     @Test
     public void testCopyIntArrayToByteArray() {
