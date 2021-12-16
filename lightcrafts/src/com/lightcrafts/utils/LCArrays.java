@@ -2,8 +2,9 @@
 
 package com.lightcrafts.utils;
 
-import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
+
+import static java.nio.ByteOrder.LITTLE_ENDIAN;
 
 /**
  * Various array utilities.
@@ -53,6 +54,7 @@ public final class LCArrays {
     public static void copy( int[] src, int srcPos,
                              byte[] dest, int destPos, int length ) {
         ByteBuffer.wrap(dest, destPos, length)
+                .order(LITTLE_ENDIAN)
                 .asIntBuffer()
                 .put(src, srcPos, length / 4);
     }
@@ -80,6 +82,7 @@ public final class LCArrays {
     public static void copy( short[] src, int srcPos,
                              byte[] dest, int destPos, int length ) {
         ByteBuffer.wrap(dest, destPos, length)
+                .order(LITTLE_ENDIAN)
                 .asShortBuffer()
                 .put(src, srcPos, length / 2);
     }
@@ -107,6 +110,7 @@ public final class LCArrays {
     public static void copy( byte[] src, int srcPos,
                              int[] dest, int destPos, int length ) {
         ByteBuffer.wrap(src, srcPos, length)
+                .order(LITTLE_ENDIAN)
                 .asIntBuffer()
                 .get(dest, destPos, length / 4);
     }
@@ -134,6 +138,7 @@ public final class LCArrays {
     public static void copy( byte[] src, int srcPos,
                              short[] dest, int destPos, int length ) {
         ByteBuffer.wrap(src, srcPos, length)
+                .order(LITTLE_ENDIAN)
                 .asShortBuffer()
                 .get(dest, destPos, length / 2);
     }
