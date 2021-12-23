@@ -78,6 +78,8 @@
     <jar jarfile="${macosx-jar}">
       <fileset dir="build"/>
       <manifest>
+        <attribute name="Main-Class"
+                   value="com.lightcrafts.platform.macosx.MacOSXLauncher"/>
         <attribute name="Built-By" value="${user.name}"/>
         <attribute name="Implementation-Vendor" value="${company-name}"/>
         <attribute name="Implementation-Version"
@@ -122,34 +124,66 @@
   <property name="bundle-contents" value="${app-dir}/${app-name}.app/Contents"/>
   <property name="bundle-resources" value="${bundle-contents}/Resources"/>
 
+  <property environment="env"/>
+  <property name="jpackage-path" value="${env.JAVA_HOME}/bin/jpackage"/>
+
   <target name="delete-bundle">
     <delete dir="${app-dir}" quiet="true"/>
   </target>
 
-  <property name="jdk-provider" value="oracle"/>
-  <import file="${jdk-provider}.xml"/>
+  <target name="build-bundle" depends="jar, delete-bundle">
+    <!-- <exec executable="${common-dir}/tools/bin/lc-git-revision"
+          outputproperty="git-revision" vmlauncher="false" failonerror="true"/> -->
+    <exec executable="${jpackage-path}" dir="." failonerror="true" vmlauncher="false">
+      <arg line="--type app-image"/>
+      <arg line="--app-version ${app-version}"/>
+      <arg line="--name ${app-name}"/>
+      <arg line="--copyright 'Copyright 2005-2011 Light Crafts, Inc. All Rights Reserved. Copyright 2013- The LightZone Project. All Rights Reserved.'"/>
+      <arg line="--dest release"/>
+      <arg line="--vendor 'The LightZone Project'"/>
+      <arg line="--add-modules 'java.base,java.desktop,java.logging,java.management,java.prefs,java.rmi,jdk.management'"/>
+      <arg line="--icon resources/Resources/LightZone.icns"/>
+      <arg line="--input products"/>
+      <arg line="--java-options '-Xdock:name=LightZone'"/>
+      <arg line="--java-options '-Dapple.laf.useScreenMenuBar=true'"/>
+      <arg line="--java-options '-Dcom.apple.macos.use-file-dialog-packages=true'"/>
+      <arg line="--java-options '-Dcom.apple.macos.useScreenMenuBar=true'"/>
+      <arg line="--java-options '-Dapple.awt.graphics.UseQuartz=false'"/>
+      <arg line="--java-options '-Dfile.encoding=utf-8'"/>
+      <arg line="--java-options '-Djava.library.path=$APPDIR'"/>
+      <arg line="--java-options '-Dlensfun.dir=$APPDIR/share/lensfun'"/>
+      <arg line="--java-options '--add-exports=java.desktop/sun.awt.image=ALL-UNNAMED'"/>
+      <arg line="--main-jar lightcrafts-apple.jar"/>
+      <arg line="--mac-app-category photography"/>
+      <arg line="--mac-package-identifier LCLZ"/>
+      <arg line="--mac-package-name ${app-name}"/>
+    </exec>
+    <!-- TODO: Add file associations -->
+    <exec executable="./postprocess.sh" dir="." failonerror="true" vmlauncher="false">
+      <arg value="${bundle-contents}/app"/>
+    </exec>
+    <delete file="${bundle-contents}/app/GNUmakefile"/>
+    <exec executable="make" dir="help" failonerror="true" vmlauncher="false"/>
+    <!-- TODO: edit Info.plist for Help path -->
+    <!--
+    <plistentry key="CFBundleHelpBookFolder" value="${app-name}_Help"/>
+    <plistentry key="CFBundleHelpBookName" value="${app-name} Help"/>
+    -->
+  </target>
 
   <!--===== Make a dmg file ================================================-->
 
-  <target name="dmg" depends="build-bundle">
-    <exec executable="make" dir="dmg" failonerror="true" vmlauncher="false">
-      <arg value="APP_NAME=${app-name}"/>
-      <arg value="UNIVERSAL=${UNIVERSAL}"/>
-      <arg value="user"/>
-    </exec>
+  <target name="delete-dmg">
+    <delete file="${app-name}-${app-version}.dmg" quiet="true"/>
   </target>
 
-  <!--===== Make a zip file ================================================-->
-
-  <target name="zip" depends="build-bundle">
-    <delete file="${app-dir}/${app-name}.zip"/>
-    <zip destfile="${app-dir}/${app-name}.zip">
-      <zipfileset dir="${app-dir}"
-        excludes="${app-name}.app/Contents/MacOS/${app-name}"/>
-      <zipfileset dir="${app-dir}"
-        includes="${app-name}.app/Contents/MacOS/${app-name}"
-        filemode="755"/>
-    </zip>
+  <target name="dmg" depends="delete-dmg,build-bundle">
+    <exec executable="${jpackage-path}" dir="." failonerror="true" vmlauncher="false">
+      <arg line="--type dmg"/>
+      <arg line="--app-version ${app-version}"/>
+      <arg line="--app-image ${app-dir}/${app-name}.app"/>
+      <arg line="--name ${app-name}"/>
+    </exec>
   </target>
 
   <!--===== Javadoc ========================================================-->
@@ -170,10 +204,6 @@
       <delete dir="javah"/>
       <delete dir="${app-dir}"/>
     </parallel>
-    <exec executable="make" dir="dmg">
-      <arg value="-j"/>
-      <arg value="${clean-method}"/>
-    </exec>
     <exec executable="make" dir="jnisrc">
       <arg value="-j"/>
       <arg value="UNIVERSAL=1"/>
@@ -185,7 +215,7 @@
     </exec>
   </target>
 
-  <target name="distclean">
+  <target name="distclean" depends="delete-bundle,delete-dmg">
     <antcall target="clean-up">
       <param name="clean-method" value="distclean"/>
     </antcall>
