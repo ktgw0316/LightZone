@@ -21,7 +21,7 @@ for:
     - cmd: SET MINGW32_PATH=msys64/mingw32
     - cmd: SET PATH=C:/%MINGW64_PATH%/bin/;C:/%MINGW32_PATH%/bin/;C:/msys64/usr/bin/;%PATH%
     - cmd: SET MSSDK_HOME=/c/Program Files (x86)/Windows Kits/10
-    - cmd: SET JAVA_HOME=/c/Program Files/Java/jdk11
+    - cmd: SET JAVA_HOME=/c/Program Files/Java/jdk15
     - cmd: SET ANT_SCRIPT=/c/projects/lightzone/windows/build.xml
 
   install:
@@ -54,7 +54,7 @@ for:
       - image: macos
 
   init:
-    - sh: export JAVA_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-11.jdk/Contents/Home
+    - sh: export JAVA_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-15.jdk/Contents/Home
     - sh: export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
 
   install:
@@ -64,7 +64,7 @@ for:
     - sh: ant -f macosx/build.xml dmg
 
   artifacts:
-    - path: 'macosx/dmg/LightZone.dmg'
+    - path: 'macosx/LightZone-*.dmg'
       name: macos installer
 
 -
@@ -73,7 +73,7 @@ for:
       - image: Ubuntu2004
 
   init:
-    - sh: export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+    - sh: export JAVA_HOME=/usr/lib/jvm/java-15-openjdk-amd64
 
   install:
     - sh: sudo add-apt-repository --yes ppa:lightzone-team/lightzone
