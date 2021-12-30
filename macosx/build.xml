@@ -154,21 +154,17 @@
       <arg line="--java-options '-Dlensfun.dir=$APPDIR/share/lensfun'"/>
       <arg line="--java-options '--add-exports=java.desktop/sun.awt.image=ALL-UNNAMED'"/>
       <arg line="--main-jar lightcrafts-apple.jar"/>
-      <arg line="--mac-app-category photography"/>
-      <arg line="--mac-package-identifier LCLZ"/>
-      <arg line="--mac-package-name ${app-name}"/>
+      <arg line="--resource-dir resources"/>
     </exec>
-    <!-- TODO: Add file associations -->
     <exec executable="./postprocess.sh" dir="." failonerror="true" vmlauncher="false">
       <arg value="${bundle-contents}/app"/>
     </exec>
     <delete file="${bundle-contents}/app/GNUmakefile"/>
+    <copy todir="${bundle-contents}/app/share/lensfun">
+      <fileset dir="products/share/lensfun"/>
+    </copy>
+    <copy file="resources/Resources/LightZoneFile.icns" todir="${bundle-contents}/Resources/"/>
     <exec executable="make" dir="help" failonerror="true" vmlauncher="false"/>
-    <!-- TODO: edit Info.plist for Help path -->
-    <!--
-    <plistentry key="CFBundleHelpBookFolder" value="${app-name}_Help"/>
-    <plistentry key="CFBundleHelpBookName" value="${app-name} Help"/>
-    -->
   </target>
 
   <!--===== Make a dmg file ================================================-->

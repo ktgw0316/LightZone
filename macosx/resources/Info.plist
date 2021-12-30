@@ -1,132 +1,156 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist SYSTEM "file://localhost/System/Library/DTDs/PropertyList.dtd">
+<?xml version="1.0" ?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "https://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
-    <key>CFBundleAllowMixedLocalizations</key>
-    <string>false</string>
-    <key>CFBundleDevelopmentRegion</key>
-    <string>US</string>
-    <key>CFBundleExecutable</key>
-    <string>@APPNAME@</string>
-    <key>NSHumanReadableCopyright</key>
-    <string>@APPNAME@ @VERSION@ (@BUILD@), Copyright 2005-2011 Light Crafts, Inc. All Rights Reserved. Copyright 2013- The LightZone Project. All Rights Reserved.</string>
-    <key>CFBundleHelpBookFolder</key>
-    <string>LightZone_Help</string>
-    <key>CFBundleHelpBookName</key>
-    <string>@APPNAME@ Help</string>
-    <key>CFBundleIdentifier</key>
-    <string>@BUNDLEID@</string>
-    <key>CFBundleInfoDictionaryVersion</key>
-    <string>6.0</string>
-    <key>CFBundleName</key>
-    <string>@APPNAME@</string>
-    <key>CFBundlePackageType</key>
-    <string>APPL</string>
-    <key>CFBundleSignature</key>
-    <string>LCLZ</string>
-    <key>CFBundleVersion</key>
-    <string>@VERSION@</string>
-    <key>NSPrincipalClass</key>
-    <string>NSApplication</string>
-    <key>NSMainNibFile</key>
-    <string>MainMenu</string>
-    <key>CFBundleDocumentTypes</key>
-    <array>
-        <dict>
-            <key>CFBundleTypeExtensions</key>
-            <array>
-                <string>ARW</string>
-                <string>CR2</string>
-                <string>CRW</string>
-                <string>DCR</string>
-                <string>dng</string>
-                <string>jpe</string>
-                <string>jpeg</string>
-                <string>jpg</string>
-                <string>KDC</string>
-                <string>lzn</string>
-                <string>lzt</string>
-                <string>MOS</string>
-                <string>MRW</string>
-                <string>NEF</string>
-                <string>ORF</string>
-                <string>PEF</string>
-                <string>RAF</string>
-                <string>RAW</string>
-                <string>RW2</string>
-                <string>SR2</string>
-                <string>tif</string>
-                <string>tiff</string>
-            </array>
-            <key>CFBundleTypeMIMETypes</key>
-            <array>
-                <string>image/jpeg</string>
-                <string>image/tiff</string>
-            </array>
-            <key>CFBundleTypeName</key>
-            <string>JPEG Image</string>
-            <key>CFBundleTypeName</key>
-            <string>TIFF Image</string>
-            <key>CFBundleTypeOSTypes</key>
-            <array>
-                <string>JPEG</string>
-                <string>TIFF</string>
-            </array>
-            <key>CFBundleTypeIconFile</key>
-            <string>LightZoneFile.icns</string>
-            <key>CFBundleTypeName</key>
-            <string>@APPNAME@ Transform Format</string>
-            <key>CFBundleTypeRole</key>
-            <string>Editor</string>
-        </dict>
-    </array>
-    <key>CFBundleIconFile</key>
-    <string>LightZone.icns</string>
-    <key>NSHighResolutionCapable</key>
-    <true/>
-    <key>LSArchitecturePriority</key>
-    <string>arm64e</string>
-    <string>arm64</string>
-    <string>x86_64</string>
-
-    <!-- Java stuff -->
-
-    <key>Java</key>
     <dict>
-        <key>MainClass</key>
-        <string>com.lightcrafts.platform.macosx.MacOSXLauncher</string>
-        <key>JVMVersion</key>
-        <string>1.6+</string>
-        <key>ClassPath</key>
+        <key>CFBundleAllowMixedLocalizations</key>
+        <false/>
+        <key>CFBundleDevelopmentRegion</key>
+        <string>English</string>
+        <key>CFBundleExecutable</key>
+        <string>LightZone</string>
+        <key>CFBundleHelpBookFolder</key>
+        <string>LightZone_Help</string>
+        <key>CFBundleHelpBookName</key>
+        <string>LightZone Help</string>
+        <key>CFBundleIconFile</key>
+        <string>LightZone.icns</string>
+        <key>CFBundleIdentifier</key>
+        <string>com.lightcrafts.LightZone</string>
+        <key>CFBundleInfoDictionaryVersion</key>
+        <string>6.0</string>
+        <key>CFBundleName</key>
+        <string>LightZone</string>
+        <key>CFBundlePackageType</key>
+        <string>APPL</string>
+        <key>CFBundleSignature</key>
+        <string>LCLZ</string>
+        <key>CFBundleVersion</key>
+        <string>4.2.3</string>
+        <key>CFBundleDocumentTypes</key>
         <array>
-            <string>.</string>
-            <string>asm-all-2.2.2.jar</string>
-            <string>jai_core-1.1.3.jar</string>
-            <string>laf-widget.jar</string>
-            <string>lightcrafts-apple.jar</string>
-            <string>lightcrafts.jar</string>
-            <string>substance-lite.jar</string>
-            <string>/System/Library/Java</string>
+            <dict>
+                <key>CFBundleTypeExtensions</key>
+                <array>
+                    <string>jpe</string>
+                    <string>jpg</string>
+                    <string>jpeg</string>
+                </array>
+                <key>LSTypeIsPackage</key>
+                <false/>
+                <key>CFBundleTypeName</key>
+                <string>JPEG Image</string>
+                <key>CFBundleTypeRole</key>
+                <string>Editor</string>
+                <key>LSHandlerRank</key>
+                <string>Owner</string>
+            </dict>
+            <dict>
+                <key>CFBundleTypeExtensions</key>
+                <array>
+                    <string>tif</string>
+                    <string>tiff</string>
+                </array>
+                <key>LSTypeIsPackage</key>
+                <false/>
+                <key>CFBundleTypeName</key>
+                <string>TIFF Image</string>
+                <key>CFBundleTypeRole</key>
+                <string>Editor</string>
+                <key>LSHandlerRank</key>
+                <string>Owner</string>
+            </dict>
+            <dict>
+                <key>CFBundleTypeExtensions</key>
+                <array>
+                    <string>arw</string>
+                    <string>cr2</string>
+                    <string>crw</string>
+                    <string>dcr</string>
+                    <string>dng</string>
+                    <string>kdc</string>
+                    <string>mos</string>
+                    <string>mrw</string>
+                    <string>nef</string>
+                    <string>orf</string>
+                    <string>pef</string>
+                    <string>raf</string>
+                    <string>raw</string>
+                    <string>rw2</string>
+                    <string>sr2</string>
+                </array>
+                <key>LSTypeIsPackage</key>
+                <false/>
+                <key>CFBundleTypeIconFile</key>
+                <string>LightZoneFile.icns</string>
+                <key>CFBundleTypeName</key>
+                <string>Camera Raw Image</string>
+                <key>CFBundleTypeRole</key>
+                <string>Editor</string>
+                <key>LSHandlerRank</key>
+                <string>Alternate</string>
+            </dict>
+            <dict>
+                <key>LSItemContentTypes</key>
+                <array>
+                    <string>com.lightcrafts.lzt</string>
+                </array>
+                <key>CFBundleTypeName</key>
+                <string>LightZone Transform Format</string>
+                <key>CFBundleTypeRole</key>
+                <string>Editor</string>
+                <key>LSHandlerRank</key>
+                <string>Owner</string>
+            </dict>
         </array>
-        <key>VMOptions</key>
+        <key>UTExportedTypeDeclarations</key>
         <array>
-            <string>-XX:MinHeapFreeRatio=30</string>
-            <string>-XX:MaxHeapFreeRatio=30</string>
-            <string>-Xmx16384m</string>
+            <dict>
+                <key>UTTypeIdentifier</key>
+                <string>com.lightcrafts.lzn</string>
+                <key>UTTypeDescription</key>
+                <string>LightZone Transform Format</string>
+                <key>UTTypeIconFile</key>
+                <string>LightZoneFile.icns</string>
+                <key>UTTypeConformsTo</key>
+                <array>
+                    <string>public.data</string>
+                </array>
+                <key>UTTypeTagSpecification</key>
+                <dict>
+                    <key>public.filename-extension</key>
+                    <array>
+                        <string>lzn</string>
+                    </array>
+                </dict>
+            </dict>
+            <dict>
+                <key>UTTypeIdentifier</key>
+                <string>com.lightcrafts.lzt</string>
+                <key>UTTypeDescription</key>
+                <string>LightZone Transform Format</string>
+                <key>UTTypeIconFile</key>
+                <string>LightZoneFile.icns</string>
+                <key>UTTypeConformsTo</key>
+                <array>
+                    <string>public.data</string>
+                </array>
+                <key>UTTypeTagSpecification</key>
+                <dict>
+                    <key>public.filename-extension</key>
+                    <array>
+                        <string>lzt</string>
+                    </array>
+                </dict>
+            </dict>
         </array>
-        <key>Properties</key>
-        <dict>
-            <key>apple.laf.useScreenMenuBar</key>
-            <string>true</string>
-            <key>apple.awt.graphics.UseQuartz</key>
-            <string>false</string>
-            <key>file.encoding</key>
-            <string>utf-8</string>
-        </dict>
-        <key>WorkingDirectory</key>
-        <string>$APP_PACKAGE/$JAVAROOT</string>
+        <key>LSApplicationCategoryType</key>
+        <string>public.app-category.photography</string>
+        <key>LSMinimumSystemVersion</key>
+        <string>10.11</string>
+        <key>NSHumanReadableCopyright</key>
+        <string>Copyright 2005-2011 Light Crafts, Inc. All Rights Reserved. Copyright 2013- The LightZone Project. All Rights Reserved.</string>
+        <key>NSHighResolutionCapable</key>
+        <true/>
     </dict>
-
-</dict>
 </plist>
 <!-- vim:set et sw=4 ts=4: -->
