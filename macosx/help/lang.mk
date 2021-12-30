@@ -51,16 +51,19 @@ MKDIR:=			mkdir -p
 # Build rules
 ##
 
-.PHONY: all copy search_indexes index_page
-all: copy search_indexes index_page
+.PHONY: all copy search_indexes index_page info_plist_strings
+all: copy search_indexes index_page info_plist_strings
 
 $(TARGET_HELP_DIR):
-	-$(MKDIR) $(@D)
+	-$(MKDIR) $@
 
 copy: $(TARGET_HELP_DIR)
 	$(call COPY,$(COMMON_DIR)/help/neutral)
 	$(call COPY,$(COMMON_DIR)/help/$(LANG))
 	$(call COPY,$(SOURCE_HELP_DIR))
+
+info_plist_strings: $(TARGET_HELP_DIR)
+	cp $(SOURCE_LANG_DIR)/InfoPlist.strings $(TARGET_LANG_DIR)
 
 search_indexes: $(HELP_INDEX)
 index_page: $(INDEX_PAGE)
@@ -78,4 +81,4 @@ $(INDEX_PAGE): $(TARGET_HELP_DIR)
 ##
 
 clean distclean mostlyclean:
-	$(RM) $(HELP_INDEX) $(INDEX_PAGE_DIR) $(HELP_INDEXER_LOG)
+	$(RM) $(HELP_INDEX) $(INDEX_PAGE_DIR) $(TARGET_LANG_DIR)
