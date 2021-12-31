@@ -195,7 +195,7 @@ ifeq ($(PLATFORM),Windows)
   endif
   CC:=		$(MINGW)-gcc
   CXX:=		$(MINGW)-g++
-  PKGCFG:=	pkgconf
+  PKGCFG:=	$(MINGW)-pkg-config
 
   ifeq ($(CYGWIN),1)
     MINGW_DIR?=		/usr/$(MINGW)/sys-root/mingw/
