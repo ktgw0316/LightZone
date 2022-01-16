@@ -283,10 +283,6 @@ LC_lensfun::~LC_lensfun()
         delete ldb;
         ldb = nullptr;
     }
-    if (default_lens) {
-        delete default_lens;
-        default_lens = nullptr;
-    }
 }
 
 const lfCamera* LC_lensfun::findCamera(
