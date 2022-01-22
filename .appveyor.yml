@@ -36,7 +36,7 @@ for:
     - cmd: bash -lc "pacman --noconfirm -U msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
     - cmd: bash -lc "pacman --needed --noconfirm -Sy pacman"
     - cmd: bash -lc "pacman --needed --noconfirm -Su"
-    - cmd: bash -lc "pacman --noconfirm --disable-download-timeout -S pactoys"
+    - cmd: bash -lc "pacman --noconfirm --disable-download-timeout -S pactoys autoconf"
     - cmd: bash -lc "pacboy --noconfirm --disable-download-timeout -S lcms2:m lensfun:m ntldd-git:m pkg-config:m"
 
   build_script:
