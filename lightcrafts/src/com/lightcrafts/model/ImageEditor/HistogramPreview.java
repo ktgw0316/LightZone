@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2018-     Masahiro Kitagawa */
 
 package com.lightcrafts.model.ImageEditor;
 
@@ -6,6 +7,7 @@ import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.model.Preview;
 import com.lightcrafts.model.Region;
+import lombok.val;
 
 import javax.media.jai.Histogram;
 import javax.media.jai.PlanarImage;
@@ -20,6 +22,7 @@ public class HistogramPreview extends Preview implements PaintListener {
     private int[][] bins = null;
     private double[][] controlPoints = null;
     private int currentFocusZone = -1;
+    private Color sample;
     final ImageEditorEngine engine;
 
     HistogramPreview(final ImageEditorEngine engine) {
@@ -33,12 +36,16 @@ public class HistogramPreview extends Preview implements PaintListener {
 
     @Override
     public void setDropper(Point p) {
+        if (p == null || engine == null)
+            return;
 
+        sample = engine.getPixelValue(p.x, p.y);
+        val zone = (sample != null) ? (int) Math.round(calcZone(sample)) : -1;
+        setFocusedZone(zone, null);
     }
 
     @Override
     public void setRegion(Region region) {
-
     }
 
     @Override
@@ -114,6 +121,8 @@ public class HistogramPreview extends Preview implements PaintListener {
                 }
             }
 
+            final int maxY = (int) (4.5 + miny); // == yscale(max)
+
             scaler s = new scaler();
 
             for (int c = 0; c < bins.length; c++) {
@@ -162,6 +171,13 @@ public class HistogramPreview extends Preview implements PaintListener {
                 g2d.fill(gp);
                 g2d.setComposite(AlphaComposite.SrcOver);
                 g2d.draw(gp);
+
+                if (sample != null) {
+                    val value = 255 * sample.getRGBColorComponents(null)[c];
+                    val position = calcZone(value) / 16;
+                    val sampleX = (int) (position * width + minx);
+                    g2d.drawLine(sampleX, zeroY, sampleX, maxY);
+                }
             }
         }
 
@@ -179,7 +195,7 @@ public class HistogramPreview extends Preview implements PaintListener {
         }
     }
 
-    private static float[] logTable = new float[0x10000];
+    private static final float[] logTable = new float[0x10000];
 
     static {
         for (int i = 0; i < 0x10000; i++)
