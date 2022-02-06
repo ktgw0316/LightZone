@@ -285,18 +285,22 @@ public class ImageEditorDisplay extends JPanel {
     }
 
     private boolean firstTime;
+    private int repaintCount = 0;
 
-    private final Timer paintTimer = new Timer(300, new ActionListener() {
+    private final Timer paintTimer = new Timer(100, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
             firstTime = false;
             paintTimer.stop();
+            repaintCount++;
             repaint();
+//            System.out.println("repaintCount = " + repaintCount);
         }
     });
 
     void setFirstTime() {
         firstTime = true;
+        repaintCount = 0;
     }
 
     private long startGetTiles;
@@ -339,23 +343,28 @@ public class ImageEditorDisplay extends JPanel {
             return;
         }
 
-        if (ASYNCH_REPAINT) {
-            asyncRepaint(g2d, tileIndices);
-            progressNotifyer.setTiles(tileManager.pendingTiles(source, epoch));
-        } else {
-            // fetching tiles explicitly allows to schedule them on separate threads,
-            // this is good if we have multiple CPUs
-            progressNotifyer.setTiles(1);
-            source.getTiles(tileIndices); // this blocks until the tiles are all available
-            g2d.drawRenderedImage(source, identityTransform);
-            progressNotifyer.setTiles(0);
+        final int MAX_REPAINT_COUNT = 2;
+        if (repaintCount > MAX_REPAINT_COUNT) {
+            System.err.println("asyncRepaint failed");
+            // Fetch tiles explicitly, blocks until the tiles are all available
+            source.getTiles(tileIndices);
+        }
+
+        val isCompleted = asyncRepaint(g2d, tileIndices);
+        progressNotifyer.setTiles(tileManager.pendingTiles(source, epoch));
+
+        if (isCompleted) {
+            repaintCount = 0;
+        } else if (!paintTimer.isRunning()) {
+            paintTimer.start();
         }
     }
 
-    private void asyncRepaint(Graphics2D g2d, Point[] tileIndices) {
+    private boolean asyncRepaint(Graphics2D g2d, Point[] tileIndices) {
         val originalClipBounds = g2d.getClipBounds();
         val tiles = availableTiles(tileIndices);
 
+        boolean isCompleted = true;
         for (int i = 0; i < tileIndices.length; i++) {
             val tileIndex = tileIndices[i];
             val tile = (tiles == null) ? null : (WritableRaster) tiles[i];
@@ -365,48 +374,46 @@ public class ImageEditorDisplay extends JPanel {
                     JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT);
             g2d.setClip(tileClipRect.intersection(originalClipBounds));
 
-            drawBackgroundTile(g2d, tileIndex, tileClipRect, tile);
+            isCompleted &= drawBackgroundTile(g2d, tileIndex, tileClipRect, tile);
         }
         g2d.setClip(originalClipBounds); // reset the clip rect
 
         updateTileComputingStatus(tileIndices, originalClipBounds);
+        return isCompleted;
     }
 
-    private void drawBackgroundTile(Graphics2D g2d, Point tileIndex, Rectangle tileClipRect,
+    private boolean drawBackgroundTile(Graphics2D g2d, Point tileIndex, Rectangle tileClipRect,
                                     WritableRaster tile) {
         val tx = tileIndex.x;
         val ty = tileIndex.y;
 
         if (!validImageBackground[tx][ty] && tile != null) {
             validImageBackground[tx][ty] = true;
-            g2d.drawImage(getBackgroundTile(tile, tx, ty), tile.getMinX(), tile.getMinY(), this);
-            return;
+            return g2d.drawImage(getBackgroundTile(tile, tx, ty), tile.getMinX(), tile.getMinY(), this);
         }
 
         // if we don't have a fresh tile, try and see if we have an old one around
         val backgroundTileCache = backgroundCache.get(new CacheKey(tx, ty));
         if (backgroundTileCache != null) {
             // Recycle the background tile
-            g2d.drawImage(backgroundTileCache, source.tileXToX(tx), source.tileYToY(ty), this);
-            return;
+            return g2d.drawImage(backgroundTileCache, source.tileXToX(tx), source.tileYToY(ty), this);
         }
 
         val cachedTiles = availableTiles(new Point(tx, ty));
         if (cachedTiles.length == 1 && cachedTiles[0] != null) {
             val cachedTile = (WritableRaster) cachedTiles[0];
-            g2d.drawImage(getBackgroundTile(cachedTile, tx, ty),
+            return g2d.drawImage(getBackgroundTile(cachedTile, tx, ty),
                     cachedTile.getMinX(), cachedTile.getMinY(), this);
-            return;
         }
 
         if (backgroundImage instanceof BufferedImage) {
-            g2d.drawImage((BufferedImage) backgroundImage, tileClipRect.x, tileClipRect.y, this);
-            return;
+            return g2d.drawImage((BufferedImage) backgroundImage, tileClipRect.x, tileClipRect.y, this);
         }
 
         // If all fails paint the default background color
         g2d.setColor(backgroundColor);
         g2d.fillRect(tileClipRect.x, tileClipRect.y, tileClipRect.width, tileClipRect.height);
+        return false;
     }
 
     private void updateTileComputingStatus(Point[] tileIndices, Rectangle clipBounds) {
