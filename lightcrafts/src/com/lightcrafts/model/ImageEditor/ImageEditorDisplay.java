@@ -37,7 +37,7 @@ public class ImageEditorDisplay extends JPanel {
 
     private int epoch = 0;
 
-    private static TileManager tileManager = new TileManager();
+    private static final TileManager tileManager = new TileManager();
 
     @Setter
     private LinkedList<EngineListener> engineListeners = null;
@@ -49,7 +49,7 @@ public class ImageEditorDisplay extends JPanel {
 
     private LCTileHandler tileHandler = new LCTileHandler();
 
-    private ProgressNotifyer progressNotifyer = new ProgressNotifyer();
+    private ProgressNotifier progressNotifier = new ProgressNotifier();
 
     @Setter(AccessLevel.PACKAGE)
     private RenderedImage backgroundImage;
@@ -57,7 +57,7 @@ public class ImageEditorDisplay extends JPanel {
     private SoftValueHashMap<CacheKey, BufferedImage> backgroundCache = null;
 
     // Workaround for unreliable ComponentListener.componentResized() callbacks.
-    private ConcurrentLinkedQueue<ComponentListener> compListeners =
+    private final ConcurrentLinkedQueue<ComponentListener> compListeners =
             new ConcurrentLinkedQueue<>();
 
     @SuppressWarnings("deprecation")
@@ -134,7 +134,7 @@ public class ImageEditorDisplay extends JPanel {
         engineListeners = null;
         paintListener = null;
         tileHandler = null;
-        progressNotifyer = null;
+        progressNotifier = null;
     }
 
     public synchronized void set(PlanarImage image, boolean synchronous) {
@@ -210,11 +210,11 @@ public class ImageEditorDisplay extends JPanel {
             synchronizedImage = currentSynchronized;
             source = currentSource;
         } else {
-            progressNotifyer.setTiles(tileManager.pendingTiles(source, epoch));
+            progressNotifier.setTiles(tileManager.pendingTiles(source, epoch));
         }
     }
 
-    private class ProgressNotifyer {
+    private class ProgressNotifier {
         private int queuedTiles = 0;
 
         private void notifyListeners() {
@@ -304,12 +304,8 @@ public class ImageEditorDisplay extends JPanel {
     }
 
     private long startGetTiles;
-    private boolean computingTiles = false;
 
     private static final Color backgroundColor = LightZoneSkin.Colors.EditorBackground;
-    private static final AffineTransform identityTransform = new AffineTransform();
-    private static final boolean ADVANCED_REPAINT = true;
-    private static final boolean ASYNCH_REPAINT = true;
 
     @Override
     public synchronized void paintComponent(Graphics g) {
@@ -323,18 +319,10 @@ public class ImageEditorDisplay extends JPanel {
 
         HiDpi.resetTransformScaleOf(g2d);
 
-        g2d.setBackground(backgroundColor);
-        g2d.clearRect(0, 0, getWidth(), getHeight());
-
         // empty component (no image)
         if (source == null) {
-            return;
-        }
-
-        if (!ADVANCED_REPAINT) {
-            progressNotifyer.setTiles(1);
-            g2d.drawRenderedImage(source, identityTransform);
-            progressNotifyer.setTiles(0);
+            g2d.setBackground(backgroundColor);
+            g2d.clearRect(0, 0, getWidth(), getHeight());
             return;
         }
 
@@ -351,7 +339,7 @@ public class ImageEditorDisplay extends JPanel {
         }
 
         val isCompleted = asyncRepaint(g2d, tileIndices);
-        progressNotifyer.setTiles(tileManager.pendingTiles(source, epoch));
+        progressNotifier.setTiles(tileManager.pendingTiles(source, epoch));
 
         if (isCompleted) {
             repaintCount = 0;
@@ -415,6 +403,8 @@ public class ImageEditorDisplay extends JPanel {
         g2d.fillRect(tileClipRect.x, tileClipRect.y, tileClipRect.width, tileClipRect.height);
         return false;
     }
+
+    private boolean computingTiles = false;
 
     private void updateTileComputingStatus(Point[] tileIndices, Rectangle clipBounds) {
         val tileComparator = new TileComparator(
