@@ -1,14 +1,20 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2022-     Masahiro Kitagawa */
 
 package com.lightcrafts.model.ImageEditor;
 
+import javax.media.jai.PlanarImage;
 import javax.media.jai.TileComputationListener;
 import javax.media.jai.TileRequest;
-import javax.media.jai.PlanarImage;
-import java.awt.image.Raster;
 import java.awt.*;
-import java.util.*;
+import java.awt.image.Raster;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.util.function.Predicate.not;
 
 /**
  * Created by IntelliJ IDEA.
@@ -24,23 +30,24 @@ class PaintRequest implements PaintContext {
     private final boolean synchronous;
     private final boolean prefetch;
     private final TileHandler tileHandler;
-    private TileRequest tileRequest = null;
+    private final TileRequest tileRequest;
     private int pendingTiles;
-    private Set<Point> tiles = new HashSet<Point>();
-    private Set<Point> handledTiles = new HashSet<Point>();
+    private final Set<Point> tiles;
+    private final Set<Point> handledTiles = new HashSet<>();
     private boolean cancelled = false;
 
-    PaintRequest(PlanarImage image, int epoch, Point[] tileIndices, boolean syncronous, boolean prefetch, TileHandler handler) {
+    PaintRequest(PlanarImage image, int epoch, Set<Point> tileIndices, boolean syncronous, boolean prefetch,
+                 TileHandler handler) {
         this.image = image;
         this.epoch = epoch;
+        this.tiles = Set.copyOf(tileIndices);
         this.synchronous = syncronous;
         this.prefetch = prefetch;
         this.tileHandler = handler;
-        this.pendingTiles = tileIndices.length;
 
-        this.tileRequest = image.queueTiles(tileIndices);
-        for (Point tileIndice : tileIndices)
-            tiles.add(new Point(tileIndice.x, tileIndice.y));
+        final int size = tileIndices.size();
+        this.pendingTiles = size;
+        this.tileRequest = image.queueTiles(tileIndices.toArray(new Point[size]));
     }
 
     @Override
@@ -95,65 +102,59 @@ class PaintRequest implements PaintContext {
 }
 
 public class TileManager implements TileComputationListener {
-    private final List<PaintRequest> requests = new LinkedList<PaintRequest>();
+    private final List<PaintRequest> requests = new LinkedList<>();
     private PaintRequest prefetchRequest = null;
 
-    private void cancelRequest(PaintRequest request) {
+    private PaintRequest cancelRequest(PaintRequest request) {
         request.cancel();
         if (prefetchRequest == request)
             prefetchRequest = null;
+        return request;
     }
 
     private void cancelPrefetch() {
         if (prefetchRequest == null)
             return;
 
-        Iterator it = requests.iterator();
-        while (it.hasNext()) {
-            PaintRequest pr = (PaintRequest) it.next();
-            if (pr == prefetchRequest) {
-                it.remove();
-                cancelRequest(pr);
-            }
-        }
+        final var canceled = requests.stream()
+                .filter(pr -> pr == prefetchRequest)
+                .map(this::cancelRequest)
+                .collect(Collectors.toList());
+        requests.removeAll(canceled);
+
         prefetchRequest = null;
     }
 
     private void handleTile(TileRequest tileRequest, int tileX, int tileY) {
-        Iterator it = requests.iterator();
-        while (it.hasNext()) {
-            PaintRequest pr = (PaintRequest) it.next();
-            if (pr.getTileRequest() == tileRequest && pr.handleTile(tileX, tileY)) {
-                if (pr.getPendingTiles() == 0)
-                    it.remove();
-                return;
-            }
-        }
+        final var removed = requests.stream()
+                .filter(pr -> pr.getTileRequest() == tileRequest)
+                .filter(pr -> pr.handleTile(tileX, tileY))
+                .findFirst()
+                .filter(pr -> pr.getPendingTiles() == 0);
+        removed.ifPresent(requests::remove);
     }
 
     // Public interface, synchronized
 
     public synchronized void cancelTiles(PlanarImage image, int epoch) {
-        Iterator it = requests.iterator();
-        while (it.hasNext()) {
-            PaintRequest pr = (PaintRequest) it.next();
-            if (pr.image == image && pr.epoch == epoch) {
-                it.remove();
-                cancelRequest(pr);
-            }
-        }
+        final var canceled = requests.stream()
+                .filter(pr -> pr.image == image)
+                .filter(pr -> pr.epoch == epoch)
+                .map(this::cancelRequest)
+                .collect(Collectors.toList());
+        requests.removeAll(canceled);
     }
 
     public synchronized int pendingTiles(PlanarImage image, int epoch) {
-        int pendingTiles = 0;
-        for (final PaintRequest pr : requests) {
-            if (pr.image == image && pr.epoch == epoch)
-                pendingTiles += pr.getPendingTiles();
-        }
-        return pendingTiles;
+        return requests.stream()
+                .filter(pr -> pr.image == image)
+                .filter(pr -> pr.epoch == epoch)
+                .mapToInt(PaintRequest::getPendingTiles)
+                .sum();
     }
 
-    public synchronized int queueTiles(PlanarImage image, int epoch, List<Point> tiles, boolean syncronous, boolean prefetch, TileHandler handler) {
+    public synchronized int queueTiles(PlanarImage image, int epoch, List<Point> tiles, boolean syncronous,
+                                       boolean prefetch, TileHandler handler) {
         cancelPrefetch();
 
         /*
@@ -163,28 +164,15 @@ public class TileManager implements TileComputationListener {
             does) enqueue the same repaint several times
          */
 
-        Iterator dtit = tiles.iterator();
-
-        next_tile:
-        while (dtit.hasNext()) {
-            Point tile = (Point) dtit.next();
-
-            for (final PaintRequest pr : requests) {
-                if (!pr.isCancelled() && pr.image == image && pr.epoch == epoch && pr.hasTile(tile)) {
-                    dtit.remove();
-                    continue next_tile;
-                }
-            }
-        }
+        final var paintRequests = requests.stream()
+                .filter(not(PaintRequest::isCancelled))
+                .filter(pr -> pr.image == image)
+                .filter(pr -> pr.epoch == epoch)
+                .collect(Collectors.toList());
+        tiles.removeIf(t -> paintRequests.stream().anyMatch(pr -> pr.hasTile(t)));
 
         if (!tiles.isEmpty()) {
-            Point[] tileIndices = new Point[tiles.size()];
-
-            int i = 0;
-            for (final Point p : tiles)
-                tileIndices[i++] = p;
-
-            PaintRequest pr = new PaintRequest(image, epoch, tileIndices, syncronous, prefetch, handler);
+            PaintRequest pr = new PaintRequest(image, epoch, Set.copyOf(tiles), syncronous, prefetch, handler);
             requests.add(pr);
             if (prefetch)
                 prefetchRequest = pr;
