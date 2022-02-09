@@ -12,6 +12,7 @@ import com.lightcrafts.utils.awt.geom.HiDpi;
 import com.lightcrafts.utils.SoftValueHashMap;
 import lombok.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.media.jai.OpImage;
 import javax.media.jai.PlanarImage;
@@ -250,6 +251,7 @@ public class ImageEditorDisplay extends JPanel {
         }
     }
 
+    @NotNull
     private Raster[] availableTiles(Point... tileIndices) {
         final OpImage ro;
         if (source instanceof OpImage) {
@@ -259,7 +261,8 @@ public class ImageEditorDisplay extends JPanel {
             ro = (OpImage) rendering;
         }
         TileCache cache = ro.getTileCache();
-        return cache.getTiles(ro, tileIndices);
+        @Nullable val tiles = cache.getTiles(ro, tileIndices);
+        return (tiles != null) ? tiles : new Raster[tileIndices.length];
     }
 
     private static final ColorModel sRGBColorModel = new ComponentColorModel(
@@ -355,8 +358,7 @@ public class ImageEditorDisplay extends JPanel {
         boolean isCompleted = true;
         for (int i = 0; i < tileIndices.length; i++) {
             val tileIndex = tileIndices[i];
-            val tile = (tiles == null) ? null : (WritableRaster) tiles[i];
-
+            @Nullable val tile = (WritableRaster) tiles[i];
             val tileClipRect = new Rectangle(
                     tileIndex.x * JAIContext.TILE_WIDTH, tileIndex.y * JAIContext.TILE_HEIGHT,
                     JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT);
@@ -371,7 +373,7 @@ public class ImageEditorDisplay extends JPanel {
     }
 
     private boolean drawBackgroundTile(Graphics2D g2d, Point tileIndex, Rectangle tileClipRect,
-                                    WritableRaster tile) {
+                                    @Nullable WritableRaster tile) {
         val tx = tileIndex.x;
         val ty = tileIndex.y;
 
@@ -388,7 +390,7 @@ public class ImageEditorDisplay extends JPanel {
         }
 
         val cachedTiles = availableTiles(new Point(tx, ty));
-        if (cachedTiles.length == 1 && cachedTiles[0] != null) {
+        if (cachedTiles[0] != null) {
             val cachedTile = (WritableRaster) cachedTiles[0];
             return g2d.drawImage(getBackgroundTile(cachedTile, tx, ty),
                     cachedTile.getMinX(), cachedTile.getMinY(), this);
