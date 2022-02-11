@@ -1,3 +1,9 @@
+lightzone (4.2.4-0obs1) unstable; urgency=medium
+
+  * Upstream sync
+
+ -- Masahiro Kitagawa <arctica0316@gmail.com>  Fri, 11 Feb 2022 16:13:51 +0900
+
 lightzone (4.2.3-0obs1) unstable; urgency=medium
 
   * Upstream sync
@@ -235,7 +241,7 @@ lightzone (4.0.0-0obs20130807) raring; urgency=low
 
 lightzone (4.0.0-0obs20130803) raring; urgency=low
 
-  * Simpler way to find liblzma.so in /usr/bin/lightzone 
+  * Simpler way to find liblzma.so in /usr/bin/lightzone
 
  -- Masahiro Kitagawa <arctica0316@gmail.com>  Sat, 03 Aug 2013 13:37:22 +0900
 

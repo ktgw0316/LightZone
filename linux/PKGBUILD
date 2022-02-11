@@ -1,6 +1,6 @@
 # Maintainer: KITAGAWA Masahiro <arctica0316@gmail.com>
 pkgname=lightzone
-pkgver=4.2.3
+pkgver=4.2.4
 pkgrel=0
 pkgdesc="Open-source professional-level digital darkroom software"
 url="http://lightzoneproject.org/"
@@ -60,7 +60,7 @@ package() {
   cp -pH lightcrafts/products/dcraw_lz "${pkgdir}/${_javadir}/${pkgname}"
   cp -pH lightcrafts/products/LightZone-forkd "${pkgdir}/${_javadir}/${pkgname}"
   cp -pH linux/products/*.jar "${pkgdir}/${_javadir}/${pkgname}"
-  
+
 # create icons and shortcuts
   _datadir=/usr/share
   install -dm 0755 "${pkgdir}/${_datadir}/applications"

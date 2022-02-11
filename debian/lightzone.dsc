@@ -2,7 +2,7 @@ Format: 3.0 (quilt)
 Source: lightzone
 Binary: lightzone
 Architecture: i386 amd64 armhf arm64
-Version: 4.2.3
+Version: 4.2.4
 Maintainer: Masahiro Kitagawa <arctica0316@gmail.com>
 Homepage: http://lightzoneproject.org/
 Standards-Version: 4.4.1
@@ -33,6 +33,6 @@ Build-Depends:
  libx11-dev,
  pkg-config,
  rsync
-Package-List: 
+Package-List:
  lightzone deb graphics optional
-DEBTRANSFORM-TAR: lightzone-4.2.3.tar.bz2
+DEBTRANSFORM-TAR: lightzone-4.2.4.tar.bz2
