@@ -72,7 +72,7 @@
       <vmOptionsFile mode="content" overwriteMode="1">
         <content>-XX:MinHeapFreeRatio=30
 -XX:MaxHeapFreeRatio=30
--Xmx16384m
+-Xmx2048m
 -Dfile.encoding=UTF8
 -Dlensfun.dir=${launcher:sys.launcherDirectory}/share/lensfun
 --add-exports=java.desktop/sun.awt.image=ALL-UNNAMED</content>

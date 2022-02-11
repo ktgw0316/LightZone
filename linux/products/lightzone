@@ -48,13 +48,6 @@ for name in javahelp; do  # TODO: Add paths for other jars
   fi
 done
 
-# on 32-bit architectures there is ~2GB limit for maximum Java heap size
-if [ ${arch} = "32" ]; then
-  maxmem=2048m
-else
-  maxmem=16384m
-fi
-
 # IFS should be \n to handle filenames that include space.
 IFS="
 "
@@ -71,7 +64,7 @@ echo ${classpath}
 -classpath ${classpath} \
 -XX:MinHeapFreeRatio=30 \
 -XX:MaxHeapFreeRatio=30 \
--Xmx${maxmem} \
+-Xmx2048m \
 -Djava.library.path=${pkglibexecdir} \
 -Dfile.encoding=UTF8 \
 com.lightcrafts.platform.linux.LinuxLauncher ${file} ${@} )
