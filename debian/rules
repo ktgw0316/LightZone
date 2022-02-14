@@ -2,7 +2,7 @@
 
 export JAVA_HOME=$(shell readlink -f /usr/bin/javac | sed "s:/bin/javac::")
 
-ANT_OPTIONS=-f $(CURDIR)/linux/build.xml -Doffline=true
+ANT_OPTIONS=-f $(CURDIR)/linux/build.xml -Dno-ivy=true
 
 %:
 	dh $@ --with javahelper --buildsystem=ant
@@ -12,4 +12,3 @@ override_dh_auto_build:
 
 override_dh_auto_clean:
 	dh_auto_clean -- $(ANT_OPTIONS)
-

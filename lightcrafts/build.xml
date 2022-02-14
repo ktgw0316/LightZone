@@ -39,7 +39,16 @@
     </or>
   </condition>
 
-  <target name="resolve" depends="init-ivy" unless="offline">
+  <target name="resolve" depends="resolve-submodule,resolve-ivy"/>
+
+  <target name="resolve-submodule" if="no-ivy">
+    <antcall target="clean-lib"/>
+    <copy todir="${basedir}/lib">
+      <fileset dir="${basedir}/dependencies" includes="*.jar"/>
+    </copy>
+  </target>
+
+  <target name="resolve-ivy" depends="init-ivy" unless="no-ivy">
     <ivy:resolve file="${basedir}/ivy.xml"/>
     <ivy:retrieve/>
   </target>
@@ -49,7 +58,7 @@
   <property name="ivy.jar.file"
             value="${ivy.jar.dir}/ivy.jar"/>
 
-  <target name="download-ivy" unless="offline">
+  <target name="download-ivy" unless="no-ivy">
     <mkdir dir="${ivy.jar.dir}"/>
     <get src="https://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.version}/ivy-${ivy.version}.jar"
          dest="${ivy.jar.file}" usetimestamp="true"/>
@@ -67,14 +76,14 @@
   <available file="/usr" type="dir" property="have.usr"/>
 
   <path id="compile.classpath">
-    <fileset dir="lib">
+    <fileset dir="${basedir}/lib">
       <include name="*.jar"/>
     </fileset>
   </path>
 
   <target name="init_classpath" if="have.usr">
     <path id="compile.classpath">
-      <fileset dir="lib">
+      <fileset dir="${basedir}/lib">
         <include name="*.jar"/>
       </fileset>
       <fileset dir="/usr">
@@ -235,12 +244,19 @@
     </antcall>
   </target>
 
+  <target name="clean-lib">
+    <exec executable="git">
+      <arg line="clean -fdx ${basedir}/lib"/>
+    </exec>
+  </target>
+
   <target name="clean-up">
     <parallel>
       <delete dir="build"/>
       <delete dir="javah"/>
     </parallel>
     <antcall target="clean-native"/>
+    <antcall target="clean-lib"/>
     <exec executable="${MAKE}" dir="products">
       <arg value="-j"/>
       <arg value="${clean-method}"/>

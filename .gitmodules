@@ -1,0 +1,3 @@
+[submodule "lightcrafts/dependencies"]
+	path = lightcrafts/dependencies
+	url = https://github.com/ktgw0316/lightzone-dependencies.git

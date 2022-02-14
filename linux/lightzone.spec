@@ -74,7 +74,7 @@ LightZone is open-source professional-level digital darkroom software for Window
 %setup -q
 
 %build
-%ant -f linux/build.xml jar
+%ant -f linux/build.xml -Dno-ivy jar
 
 %install
 %if 0%{?sles_version}
