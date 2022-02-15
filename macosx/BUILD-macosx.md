@@ -8,19 +8,22 @@ since it's a common IDE with Ant built in.
 These instructions sometimes say to right-click on something; use Control+Click instead if necessary.
 
 ## General Info and Status
+
 The application's startup java class is com.lightcrafts.app.Application.
 There's also an OSX-specific startup class, which will read its info
 from LightZone/macosx/resources/Info.plist and launch the MainClass defined there.
 
 ## Install required software
+
 Building the LightZone source requires the following software:
 
 - __Java__ version 11 or later
 - __clang__
 - __git__
-- __homebrew__ from http://brew.sh/
+- __homebrew__ from <http://brew.sh/>
 
 You need to install following packages using homebrew:
+
 - __ant__ version 1.9.8 or later to support nativeheaderdir parameter
 - __autoconf__
 - __jpeg-turbo__
@@ -33,11 +36,12 @@ You need to install following packages using homebrew:
 If you need to install clang and git, the easiest route is to download XCode's command-line tools; the link depends on your OS X version.
 
 - Run `xcode-select --install` on OS X 10.9 or later
-- http://stackoverflow.com/questions/9353444/how-to-use-install-gcc-on-mac-os-x-10-8-xcode-4-4
-- http://stackoverflow.com/questions/4360110/installing-gcc-to-mac-os-x-leopard-without-installing-xcode
-- http://stackoverflow.com/questions/10904774/install-git-separately-from-xcode
+- <http://stackoverflow.com/questions/9353444/how-to-use-install-gcc-on-mac-os-x-10-8-xcode-4-4>
+- <http://stackoverflow.com/questions/4360110/installing-gcc-to-mac-os-x-leopard-without-installing-xcode>
+- <http://stackoverflow.com/questions/10904774/install-git-separately-from-xcode>
 
 ## Pre-work
+
 Open the Java Preferences app. (You can use Spotlight to search for it)
 
 On the General tab, note the topmost Java version and type (64- or 32-bit).
@@ -45,6 +49,7 @@ Because the project builds its libraries and JARs using varied commands,
 make sure you use this version consistently throughout the project settings.
 
 ## Build instructions for LightZone with Ant (if you're not using Eclipse)
+
 If you're using Eclipse, skip this section.
 
 - Make sure command-line tools, clang-omp, git, and ant are installed.
@@ -54,24 +59,25 @@ If you're using Eclipse, skip this section.
 - To build LightZone, run these commands; each run's output should end with "`BUILD SUCCESSFUL`" when you run it.
 If you have errors, see the "Troubleshooting" section of this document.
 
-		ant clean
-		ant build
-		ant jar
+  ant clean
+  ant build
+  ant jar
 
 - You should now be able to run LightZone with:
 
-		ant run
+  ant run
 
 - If everything is OK, you should be able to create an installer package with:
 
-		ant dmg
+  ant dmg
 
 ## Setup instructions for LightZone as an Eclipse project
+
 (This is written for Eclipse 3.6, and should be applicable to other versions with minor changes.)
 
 If you're already using Eclipse for other development, you may want to make a new eclipse workspace for LightZone only.
 
-# Eclipse initial setup
+## Eclipse initial setup
 
 - Eclipse prefs -> Java -> Installed JREs -> whatever you selected in Java Preferences (1.6 for me)
 
@@ -86,21 +92,21 @@ If you can't find it in the list, click Add -> MacOS X JVM and browse to
 - Select the second "javac" task in target "javac"
 - Click "Finish"
 
-
 In the Project Explorer view, do the following:
-- Right-click the project
-    - Choose Properties
-    - Resource: Text file encoding: Other: UTF-8 (not the default MacRoman)
-    - Hit OK
 
-# Build Setup and Preparation
+- Right-click the project
+  - Choose Properties
+  - Resource: Text file encoding: Other: UTF-8 (not the default MacRoman)
+  - Hit OK
+
+## Build Setup and Preparation
 
 We will create several build configs.  The first one will be from scratch, then to save time for the rest
 we'll copy it and change the copy's build targets.
 
 If you get error messages while running these builds, see the "Troubleshooting" section at the end of this document.
 
-# First build config: clean
+## First build config: clean
 
 - Click the down-arrow next to the External Tools icon, or choose Run -> External Tools -> External Tools Configurations
 - Select Ant Build, click the New icon
@@ -108,23 +114,22 @@ If you get error messages while running these builds, see the "Troubleshooting" 
 Set up this config for the build:
 
 - Main tab:
-	- Name: clean
-	- Buildfile: Browse workspace: lightcrafts -> build.xml
-	- Base directory: Browse file system: lightcrafts (at top level of the source tree)
+  - Name: clean
+  - Buildfile: Browse workspace: lightcrafts -> build.xml
+  - Base directory: Browse file system: lightcrafts (at top level of the source tree)
 - Build tab: un-check "Build before launch"
 - Targets tab: check clean  ; un-check the default "build"
 - JRE tab: Separate JRE  ; in the dropdown, be sure to select the same one you're using throughout the project
 - Environment tab:
-	- New: `JAVA_HOME = /Library/Java/Home`
-	- Choose "Append Environment", not Replace
+  - New: `JAVA_HOME = /Library/Java/Home`
+  - Choose "Append Environment", not Replace
 - Click Apply, click Run
 
-	The console output should end with:
+ The console output should end with:
 
-		clean: BUILD SUCCESSFUL
+  clean: BUILD SUCCESSFUL
 
-
-# Main build config: build
+## Main build config: build
 
 - Open the External Tools Configurations window.
 - Right-click our first one ("clean") and Duplicate
@@ -132,13 +137,14 @@ Set up this config for the build:
 - Targets tab: un-check clean; check build
 - Click Apply, click Run
 
-	Run will take a while. Some parts of LightZone are in c or c++, and gcc or gcc+ will compile them to JNI libraries.
+ Run will take a while. Some parts of LightZone are in c or c++, and gcc or gcc+ will compile them to JNI libraries.
 
-	Eventually the console output should end with:
+ Eventually the console output should end with:
 
-		build: BUILD SUCCESSFUL
+  build: BUILD SUCCESSFUL
 
-# Final build config: jar
+## Final build config: jar
+
 This config will package LightZone as a JAR for execution.
 
 - Open the External Tools Configurations window.
@@ -148,15 +154,15 @@ This config will package LightZone as a JAR for execution.
 - Targets tab: un-check clean; check jar
 - Click Apply, click Run
 
-	Run will quickly verify the build steps, then create a jar file.
-	The console output should end with:
+ Run will quickly verify the build steps, then create a jar file.
+ The console output should end with:
 
-		jar: BUILD SUCCESSFUL
-
+  jar: BUILD SUCCESSFUL
 
 Now, LightZone is built and can be set up to run inside Eclipse.
 
-# Setup to add LightZone to the run menu
+## Setup to add LightZone to the run menu
+
 If any part of this fails, check the error message and the console tab, and see the Troubleshooting section.
 
 - Project Explorer: in src, in package com.lightcrafts.app, find Application.java
@@ -166,25 +172,26 @@ If any part of this fails, check the error message and the console tab, and see 
 
   Click OK at each error message. Eventually you will see "LightZone has encountered an internal error." Choose "Exit without saving files"
 
--  edit the run configuration
+- edit the run configuration
 
-	- Arguments tab: Working directory: Other: file system: under source tree: lightcrafts/products
-	- Apply, Run
-	- "LightZone failed to start last time... Would you like to try resetting your LightZone settings?"
-		- choose Reset
-	- "Are you sure?"
-		- choose Reset
+  - Arguments tab: Working directory: Other: file system: under source tree: lightcrafts/products
+  - Apply, Run
+  - "LightZone failed to start last time... Would you like to try resetting your LightZone settings?"
+    - choose Reset
+  - "Are you sure?"
+    - choose Reset
 
-# Setup is Complete
+## Setup is Complete
+
 At this point, you can now run and develop LightZone.
 
 ## Testing your Build
+
 - Run LightZone, from the Eclipse run menu or from the command line with Ant.
 - Navigate to a folder with some JPEGs, TIFFs or RAWs. Try all 3 if you have them; they are parsed with different libraries.
 - Make sure you can see the thumbnails at the bottom of the window.
 - Right-click an image thumbnail and choose Apply Style (any style) to test Batch Processing.
 - Double-click an image thumbnail and try some Tools and Styles on it.
-
 
 ## Troubleshooting
 
@@ -197,20 +204,22 @@ Some specific errors:
 
 If this appears during build, you may need to go to the antRun directory under /Applications/eclipse-3.6/... and run:
 
-		sudo chmod +x *
+  sudo chmod +x *
 
 ### class file has wrong version 51.0, should be 50.0
+
 If this appears, then some of the project was built with java 1.7, some with java 1.6.
 
 - Find which one is the default JVM version for your machine, and set that (see "Eclipse initial setup" above).
 - Then, run the "clean" external tool and rebuild the project.
 
-### "java.lang.UnsatisfiedLinkError" ending with "mach-o, but wrong architecture" or "Couldn't link with native library: DCRaw: libDCRaw.jnilib: mach-o, but wrong architecture":
+### "java.lang.UnsatisfiedLinkError" ending with "mach-o, but wrong architecture" or "Couldn't link with native library: DCRaw: libDCRaw.jnilib: mach-o, but wrong architecture"
+
 Probably some code was compiled as 64-bit but you're running the app in a 32-bit JVM.
 
 - Use the "`file`" command on the library:
 
-		libDCRaw.jnilib: Mach-O dynamically linked shared library x86_64
+  libDCRaw.jnilib: Mach-O dynamically linked shared library x86_64
 
 - x86_64 means 64-bit (i386 means 32-bit); if this is the case, Add `-d64` as a VM argument in the Eclipse Run Configuration and re-run.
 
@@ -221,4 +230,5 @@ Probably some code was compiled as 64-bit but you're running the app in a 32-bit
 - use the "file" command to verify each one's architecture and bitness (32 or 64) matches the project settings and system default JDK
 
 ## Questions/Comments?
+
 This quick guide, and the OSX 64-bit build updates, were originally done by Jeremy D Monin <jdmonin@nand.net> and updated by Masahiro Kitagawa <arctica0316@gmail.com>.

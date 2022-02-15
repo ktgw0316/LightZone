@@ -1,7 +1,9 @@
 # Development guide
 
 ## Install required packages
+
 Building the LightZone source requires (at least) following packages:
+
 - __ant__ version 1.9.8 or later to support nativeheaderdir parameter
 - __fakeroot__ for linux package creation
 - __g++__
@@ -20,19 +22,21 @@ Building the LightZone source requires (at least) following packages:
 - __rsync__
 
 ### Debian (>= 10) and Ubuntu (>= 18.04)
-_See also [Packaging on Debian or Ubuntu](#packaging_deb) below._
+
+_See also [Packaging on Debian or Ubuntu](#.deb-package-(debian-or-ubuntu)) below._
 
 Install required packages:
 
     sudo apt-get install debhelper devscripts build-essential ant autoconf git-core javahelp2 default-jdk default-jre-headless libglib2.0-dev liblcms2-dev liblensfun-dev libjpeg-dev libtiff5-dev libx11-dev libxml2-utils pkg-config rsync
 
-_(Note: gcc, g++, libc6-dev and make shall be installed with the build-essential.)_
+_Note: gcc, g++, libc6-dev and make shall be installed with the build-essential._
 
 Before start the build, you have to set `JAVA_HOME` environment variable, e.g.
 
     export JAVA_HOME=/usr/lib/jvm/default-java
 
 ### OpenSUSE (>= 15.2)
+
 Install required packages:
 
     sudo zypper install ant autoconf gcc gcc-c++ make
@@ -40,14 +44,15 @@ Install required packages:
 
 Set your `JAVA_HOME` variable to point to installed JDK, e.g.
 
-    export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0
+    export JAVA_HOME=/usr/lib64/jvm/java
 
 ## Build
+
 To start the build:
 
     ant -f linux/build.xml
 
-_Note: If the build failed with a message_
+_Note: If the build failed with a message._
 
     "/usr/share/ant/bin/antRun": java.io.IOException: error=2, No such file or directory
 
@@ -56,12 +61,15 @@ _manually download Apache Ant, unpack it somewhere (e.g. to your home directory)
     export PATH=/home/yourusername/apache-ant-1.10.5/bin/:$PATH
 
 ## Test Run
+
 To check if it works fine before installing:
 
     ant -f linux/build.xml run
 
 ## Create a package and install
-### <a name="packaging_deb"/>.deb package (Debian or Ubuntu)
+
+### .deb package (Debian or Ubuntu)
+
 You need to place an original source tarball in parent directory.
 For instance, if you want to build v4.2.2 in /tmp directory,
 
@@ -83,7 +91,9 @@ To install the package:
     sudo dpkg -i ../lightzone_*.deb
 
 ### .rpm package (Fedora, OpenSUSE, CentOS etc.)
+
 ### Re-packaging rpm from a source rpm
+
 If you already have a .src.rpm for other distro, you can create .rpm for your distro
 from the .src.rpm by yourself.
 
@@ -91,6 +101,7 @@ First of all, you need to install rpm-build using package manager of your distro
 
 Then extract the containts of the .src.rpm, and copy its source archive to SOURCES
 directory:
+
     rpm2cpio lightzone-*.src.rpm | cpio -idmv --no-absolute-filenames
     cp lightzone-*.tar.bz2 ~/rpmbuild/SOURCES/
 
@@ -105,7 +116,9 @@ then execute the rpmbuild command again. Your .rpm package will be created in
     rpm -ivh ~/rpmbuild/RPMS/x86_64/lightzone-*.rpm
 
 ## Build from upstream source and install
+
 ### ebuild (Gentoo Linux)
+
 Install Lightzone in a local overlay. First you need _app-portage/layman_:
 
     USE=git emerge app-portage/layman
@@ -125,15 +138,16 @@ Move into the new directory _media-gfx/lightroom_ and do:
     repoman manifest
     popd
 
-Now you are ready to 
+Now you are ready to
 
     emerge media-gfx/lightzone
 
 In my case I had to keyword lightzone....
 
 ### PKGBUILD (Arch Linux)
+
 There is a build script: _linux/PKGBUILD_
 
 ### Ports (FreeBSD etc.)
-There are build scripts in _freebsd-ports/graphics/lightzone/_ directory.
 
+There are build scripts in _freebsd-ports/graphics/lightzone/_ directory.
