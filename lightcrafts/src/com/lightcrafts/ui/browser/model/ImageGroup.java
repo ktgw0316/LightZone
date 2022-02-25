@@ -11,12 +11,12 @@ import java.util.*;
  */
 public class ImageGroup {
 
-    private List<ImageDatum> datums;
+    private final List<ImageDatum> datums;
 
     private ImageDatum leader;
 
     public List<ImageDatum> getImageDatums() {
-        return new LinkedList<ImageDatum>(datums);
+        return new LinkedList<>(datums);
     }
 
     public boolean isNonTrivial() {
@@ -25,7 +25,7 @@ public class ImageGroup {
 
     ImageGroup(ImageDatum leader) {
         this.leader = leader;
-        datums = new LinkedList<ImageDatum>();
+        datums = new LinkedList<>();
         datums.add(leader);
     }
 
@@ -56,13 +56,13 @@ public class ImageGroup {
      */
     public static boolean checkConsistency(Collection<ImageDatum> datums) {
         // Identify the distinct ImageGroups:
-        Set<ImageGroup> groups = new HashSet<ImageGroup>();
+        Set<ImageGroup> groups = new HashSet<>();
         for (ImageDatum datum : datums) {
             ImageGroup group = datum.getGroup();
             groups.add(group);
         }
         // Tally all ImageDatums in the groups:
-        Set<ImageDatum> seen = new HashSet<ImageDatum>();
+        Set<ImageDatum> seen = new HashSet<>();
         for (ImageGroup group : groups) {
             List<ImageDatum> members = group.getImageDatums();
             for (ImageDatum member : members) {
@@ -78,5 +78,27 @@ public class ImageGroup {
             }
         }
         return true;
+    }
+
+    public boolean isGroupStart(List<ImageDatum> data, int index) {
+        if (! isNonTrivial()) {
+            return false;
+        }
+        if (index == 0) {
+            return true;
+        }
+        ImageDatum prev = data.get(index - 1);
+        return this != prev.getGroup();
+    }
+
+    public boolean isGroupEnd(List<ImageDatum> data, int index) {
+        if (! isNonTrivial()) {
+            return false;
+        }
+        if (index == data.size() - 1) {
+            return true;
+        }
+        ImageDatum next = data.get(index + 1);
+        return this != next.getGroup();
     }
 }

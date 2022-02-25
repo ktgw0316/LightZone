@@ -1,10 +1,13 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2022-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.browser.view;
 
 import com.lightcrafts.image.metadata.ImageMetadata;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.ui.LightZoneSkin;
+import com.lightcrafts.ui.browser.model.ImageDatum;
+import com.lightcrafts.ui.browser.model.ImageDatumType;
 import com.lightcrafts.utils.awt.geom.HiDpi;
 
 import javax.media.jai.BorderExtender;
@@ -15,6 +18,7 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
+import java.io.File;
 import java.util.prefs.Preferences;
 
 /**
@@ -78,14 +82,18 @@ class ImageDatumRenderer {
      * the given Rectangle.
      */
     void paint(
-        Graphics2D g,
-        RenderedImage image,
-        String text,
-        String tag,
-        ImageMetadata meta,
-        Rectangle rect,
-        boolean selected
+            Graphics2D g,
+            RenderedImage image,
+            ImageDatum datum,
+            Rectangle rect,
+            boolean selected
     ) {
+        File file = datum.getFile();
+        String text = file.getName();
+        ImageDatumType type = datum.getType();
+        String tag = type.toString();
+        ImageMetadata meta = datum.getMetadata(true);
+
         // Find the AffineTransform to center the image inside the border
         Dimension imageSize =
             new Dimension(image.getWidth(), image.getHeight());

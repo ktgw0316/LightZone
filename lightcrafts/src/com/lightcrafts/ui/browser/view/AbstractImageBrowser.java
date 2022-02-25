@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2022-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.browser.view;
 
@@ -7,25 +8,28 @@ import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.ui.browser.model.*;
 import com.lightcrafts.utils.awt.geom.HiDpi;
 
-import static com.lightcrafts.ui.browser.view.Locale.LOCALE;
-
-import javax.swing.*;
 import javax.swing.Timer;
+import javax.swing.*;
 import javax.swing.event.MouseInputListener;
 import java.awt.*;
 import java.awt.dnd.*;
 import java.awt.event.*;
+import java.awt.image.RenderedImage;
 import java.io.File;
-import java.util.*;
 import java.util.List;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import static com.lightcrafts.ui.browser.view.Locale.LOCALE;
 
 /**
  * A base class for components that render ImageDatums from an ImageList.
  */
 public abstract class AbstractImageBrowser
-    extends JComponent
-    implements Scrollable, ImageDatumObserver, ImageListListener
-{
+        extends JComponent
+        implements Scrollable, ImageDatumObserver, ImageListListener {
     public final static Color Background = LightZoneSkin.Colors.BrowserBackground;
 
     ImageList list;
@@ -49,19 +53,19 @@ public abstract class AbstractImageBrowser
 
     boolean isDisabled;
 
-    private HashMap<ImageDatum, Integer> datumIndex; // ImageList indices
+    private final HashMap<ImageDatum, Integer> datumIndex; // ImageList indices
 
-    private LinkedList<ImageDatum> previews;    // dispose after getPreview()
+    private final LinkedList<ImageDatum> previews;    // dispose after getPreview()
 
-    private ImageBrowserMulticaster listeners;
+    private final ImageBrowserMulticaster listeners;
 
     private TemplateProvider templates; // Defines templates for popup menus
 
     private PreviewUpdater.Provider previewer;   // Previews for LZNs
 
-    private ImageBrowserActions actions;    // For menus
+    private final ImageBrowserActions actions;    // For menus
 
-    private List<ExternalBrowserAction> externalActions;// Menus are extensible
+    private final List<ExternalBrowserAction> externalActions;// Menus are extensible
 
     private int across; // The number of images in a row.
 
@@ -70,7 +74,7 @@ public abstract class AbstractImageBrowser
     private boolean sizePausedFlag;
 
     // Save just so it can be cleaned up in dispose().
-    private DragSourceAdapter dragSrcAdapter;
+    private final DragSourceAdapter dragSrcAdapter;
 
     // When drag-and-drop gestures end (before Java 1.6), the drag source is
     // the only one who can know whether the drag was a MOVE gesture or a
@@ -81,6 +85,7 @@ public abstract class AbstractImageBrowser
     public boolean justShown = true;
 
     final Timer paintTimer = new Timer(300, new ActionListener() {
+        @Override
         public void actionPerformed(ActionEvent e) {
             justShown = false;
             paintTimer.stop();
@@ -96,11 +101,11 @@ public abstract class AbstractImageBrowser
 
         selection = new ImageBrowserSelectionModel(this);
 
-        previews = new LinkedList<ImageDatum>();
+        previews = new LinkedList<>();
 
-        externalActions = new LinkedList<ExternalBrowserAction>();
+        externalActions = new LinkedList<>();
 
-        datumIndex = new HashMap<ImageDatum, Integer>();
+        datumIndex = new HashMap<>();
         rebuildIndex();
 
         // Monitor for changes to the ImageDatums.
@@ -112,7 +117,7 @@ public abstract class AbstractImageBrowser
 
         // Add mouse listeners for popups, overlays, and selection.
         MouseInputListener mouseHandler =
-            new ImageBrowserMouseListener(this, selection, controller);
+                new ImageBrowserMouseListener(this, selection, controller);
         addMouseListener(mouseHandler);
         addMouseMotionListener(mouseHandler);
 
@@ -127,43 +132,42 @@ public abstract class AbstractImageBrowser
         initKeyMaps();
 
         ImageBrowserTransferHandler transfer =
-            new ImageBrowserTransferHandler(this, selection);
+                new ImageBrowserTransferHandler(this, selection);
         setTransferHandler(transfer);
 
         DragSource src = DragSource.getDefaultDragSource();
         DragGestureListener init = transfer.createDragInitiator();
         src.createDefaultDragGestureRecognizer(
-            this, DnDConstants.ACTION_COPY_OR_MOVE, init
+                this, DnDConstants.ACTION_COPY_OR_MOVE, init
         );
         dragSrcAdapter = new DragSourceAdapter() {
-                public void dragDropEnd(DragSourceDropEvent dsde) {
-                    copyOrMove = dsde.getDropAction();
-                }
-            };
+            @Override
+            public void dragDropEnd(DragSourceDropEvent dsde) {
+                copyOrMove = dsde.getDropAction();
+            }
+        };
         src.addDragSourceListener(dragSrcAdapter);
 
         updateEnabled();
 
         across = 1;
 
-        addComponentListener(
-            new ComponentAdapter() {
-                public void componentResized(ComponentEvent e) {
-                    inferAcross();
-                    if (! isWidthInitialized) {
-                        isWidthInitialized = true;
-                    }
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                inferAcross();
+                if (!isWidthInitialized) {
+                    isWidthInitialized = true;
                 }
             }
-        );
+        });
     }
 
     // Called from the ImageBrowserTransferHandler for its drag Image.
     Rectangle getBounds(ImageDatum datum) {
         Integer index = datumIndex.get(datum);
         if (index != null) {
-            Rectangle bounds = HiDpi.imageSpaceRectFrom(getBounds(index));
-            return bounds;
+            return HiDpi.imageSpaceRectFrom(getBounds(index));
         }
         return null;
     }
@@ -182,8 +186,8 @@ public abstract class AbstractImageBrowser
             return -1;
         }
         int index = row * across + col;
-        ArrayList datums = getAllImageData();
-        int count = datums.size();
+        List<ImageDatum> data = getAllImageData();
+        int count = data.size();
         if (index >= count) {
             return -1;
         }
@@ -196,26 +200,21 @@ public abstract class AbstractImageBrowser
      * ImageList here, because that structure is modified on multiple threads.)
      * Used in painting and for cancelling thumbnail tasks.
      */
-    int[] getIndices(int count, Rectangle rect) {
-        int size = getCharacteristicSize();
-        int left = rect.x / size;
-        int right = (rect.x + rect.width) / size + 1;
-        int top = rect.y / size;
-        int bottom = (rect.y + rect.height) / size + 1;
+    private List<Integer> getValidIndices(int count, Rectangle rect) {
+        final int size = getCharacteristicSize();
+        final int left = rect.x / size;
+        final int right = (rect.x + rect.width) / size + 1;
+        final int top = rect.y / size;
+        final int bottom = (rect.y + rect.height) / size + 1;
 
-        int[] indices = new int[(right - left + 1) * (bottom - top + 1)];
-
-        int i = 0;
-        for (int y=top; y<=bottom; y++) {
-            for (int x=left; x<=right; x++) {
-                int index = y * across + x;
+        final List<Integer> indices = new ArrayList<>();
+        for (int y = top; y <= bottom; y++) {
+            for (int x = left; x <= right; x++) {
+                final int index = y * across + x;
                 if (index <= count - 1) {
-                    indices[i++] = index;
+                    indices.add(index);
                 }
             }
-        }
-        while (i < indices.length) {
-            indices[i++] = - 1;
         }
         return indices;
     }
@@ -270,11 +269,10 @@ public abstract class AbstractImageBrowser
      * differently.
      */
     public void setCharacteristicSize(int size, boolean isAdjusting) {
-        if (isAdjusting && (! sizePausedFlag)) {
+        if (isAdjusting && (!sizePausedFlag)) {
             list.pause();
             sizePausedFlag = true;
-        }
-        else if ((! isAdjusting) && sizePausedFlag) {
+        } else if ((!isAdjusting) && sizePausedFlag) {
             list.resume();
             sizePausedFlag = false;
         }
@@ -300,14 +298,16 @@ public abstract class AbstractImageBrowser
         }
     }
 
+    @Override
     public int getScrollableUnitIncrement(
-        Rectangle visibleRect, int orientation, int direction
+            Rectangle visibleRect, int orientation, int direction
     ) {
         return getCharacteristicSize();
     }
 
+    @Override
     public int getScrollableBlockIncrement(
-        Rectangle visibleRect, int orientation, int direction
+            Rectangle visibleRect, int orientation, int direction
     ) {
         switch (orientation) {
             case SwingConstants.HORIZONTAL:
@@ -318,25 +318,90 @@ public abstract class AbstractImageBrowser
         return 1;
     }
 
+    @Override
     public boolean getScrollableTracksViewportWidth() {
         return true;
     }
 
+    @Override
     public boolean getScrollableTracksViewportHeight() {
         return isDisabled;
     }
+
+    abstract protected void renderImageGroup(
+            Graphics2D g, List<ImageDatum> data, int index, ImageDatum datum, Rectangle rect);
 
     /**
      * Declare this method as overridden, just to provide package access to
      * browser painting for the ImageBrowserTransferHandler.
      */
-    protected abstract void paintComponent(Graphics g);
+    @Override
+    protected void paintComponent(Graphics graphics) {
+        if (justShown) {
+            if (!paintTimer.isRunning()) {
+                paintTimer.start();
+            }
+            return;
+        }
+        if (!isWidthInitialized) {
+            // Only paint if the component size has been initialized.  Layout
+            // jumps are typical the first time this component is displayed,
+            // because the preferred height depends on the component width.
+            return;
+        }
+        Graphics2D g = (Graphics2D) graphics;
+
+        // Set up context for the ImageGroup highlights.
+        Color oldColor = g.getColor();
+        g.setColor(LightZoneSkin.Colors.BrowserGroupColor);
+
+        // Figure out which ImageDatums fall within the clip bounds.
+        final Rectangle clip0 = g.getClipBounds();
+        final List<ImageDatum> data = getAllImageData();
+        final var indices = getValidIndices(data.size(), clip0);
+
+        if (!indices.isEmpty()) {
+            HiDpi.resetTransformScaleOf(g);
+        }
+        final Rectangle clip = g.getClipBounds();
+
+        // Iterate backwards through indices, so repaints get enqueued
+        // in a visually pleasing order.
+        Collections.reverse(indices);
+        for (final int index : indices) {
+            final ImageDatum datum = data.get(index);
+            if (datum == null) {
+                // A race; the image disappeared during painting.
+                continue;
+            }
+            final RenderedImage image = datum.getImage(this);
+
+            // This queue prevents GC of recently painted images:
+            recentImages.add(image);
+
+            final Rectangle rect = HiDpi.imageSpaceRectFrom(getBounds(index));
+            g.setClip(clip.intersection(rect));
+            renderImageGroup(g, data, index, datum, rect);
+            boolean selected = selection.isSelected(datum);
+            renderer.paint(g, image, datum, rect, selected);
+        }
+        g.setColor(oldColor);
+        g.setClip(clip);
+
+        // The control is drawn as an overlay.
+        if (controller.isEnabled()) {
+            Rectangle ctrlRect = controller.getRect();
+            if (ctrlRect != null && ctrlRect.intersects(clip)) {
+                controller.paint(g);
+            }
+        }
+    }
 
     /**
      * Report the current selection as a list of files.
      */
     public ArrayList<File> getSelectedFiles() {
-        ArrayList<File> files = new ArrayList<File>();
+        ArrayList<File> files = new ArrayList<>();
         for (ImageDatum datum : selection.getSelected()) {
             File file = datum.getFile();
             files.add(file);
@@ -356,6 +421,7 @@ public abstract class AbstractImageBrowser
     /**
      * When an ImageDatum image updates, repaint the corresponding Rectangle.
      */
+    @Override
     public void imageChanged(ImageDatum datum) {
         Integer i = datumIndex.get(datum);
         if (i != null) {
@@ -371,11 +437,12 @@ public abstract class AbstractImageBrowser
      * The preferred height is the height required to wrap all the images at
      * the characteristic size within the current component width.
      */
+    @Override
     public Dimension getPreferredSize() {
-        ArrayList datums = getAllImageData();
+        ArrayList<ImageDatum> data = getAllImageData();
         int size = getCharacteristicSize();
         int width = across * size;
-        int count = datums.size();
+        int count = data.size();
         int height = (int) (Math.ceil(count / (double) across) * size);
         return new Dimension(width, height);
     }
@@ -406,6 +473,7 @@ public abstract class AbstractImageBrowser
         listeners.remove(listener);
     }
 
+    @Override
     public Dimension getPreferredScrollableViewportSize() {
         return getPreferredSize();
     }
@@ -417,8 +485,9 @@ public abstract class AbstractImageBrowser
     // seconds.
     private long lastAutoSelectionTime;
 
+    @Override
     public void imageAdded(
-        ImageList source, final ImageDatum datum, int index
+            ImageList source, final ImageDatum datum, int index
     ) {
         rebuildIndex();
         updateEnabled();
@@ -430,14 +499,14 @@ public abstract class AbstractImageBrowser
         long time = System.currentTimeMillis();
         if (time - lastAutoSelectionTime > 30000) {
             selection.setSelected(Collections.singletonList(datum));
-        }
-        else {
+        } else {
             // Just to update the image count:
             notifySelectionChanged();
         }
         lastAutoSelectionTime = time;
     }
 
+    @Override
     public void imageRemoved(ImageList source, ImageDatum datum, int index) {
         updateSelectionDatumRemoved(datum, index);
         rebuildIndex();
@@ -464,13 +533,13 @@ public abstract class AbstractImageBrowser
                     Rectangle bounds = getBounds(index);
                     scrollRectToVisible(bounds);
                 }
-            }
-            else {
+            } else {
                 selection.removeSelected(datum);
             }
         }
     }
 
+    @Override
     public void imagesReordered(ImageList source) {
         rebuildIndex();
         revalidate();
@@ -510,34 +579,30 @@ public abstract class AbstractImageBrowser
     // files that were selected last time.
     public void setSelectedFiles(Collection<File> files) {
         selection.clearSelected();
-        ArrayList<ImageDatum> datums = getAllImageData();
-        for (ImageDatum datum : datums) {
-            if (files.contains(datum.getFile())) {
-                selection.setLeadSelected(datum);
-                final ImageDatum finalDatum = datum;
-                EventQueue.invokeLater(
-                    new Runnable() {
-                        public void run() {
-                            // Enqueue the scroll update, because selection
-                            // is routinely initialized during component
-                            // construction and before layout.
-                            Rectangle bounds = getBounds(finalDatum);
-                            if (bounds != null) {
-                                scrollRectToVisible(bounds);
-                            }
-                        }
-                    }
-                );
-                break;
+        ArrayList<ImageDatum> data = getAllImageData();
+        final ImageDatum finalDatum = data.stream()
+                .filter(datum -> files.contains(datum.getFile()))
+                .findFirst()
+                .orElse(null);
+        if (finalDatum == null) return;
+
+        selection.setLeadSelected(finalDatum);
+        EventQueue.invokeLater(() -> {
+            // Enqueue the scroll update, because selection
+            // is routinely initialized during component
+            // construction and before layout.
+            Rectangle bounds = getBounds(finalDatum);
+            if (bounds != null) {
+                scrollRectToVisible(bounds);
             }
-        }
+        });
     }
 
     // Select the most recently modified ImageDatum in each ImageDatumGroup.
     public void selectLatest() {
-        ArrayList<ImageDatum> datums = getAllImageData();
-        LinkedHashSet<ImageDatum> latest = new LinkedHashSet<ImageDatum>();
-        for (ImageDatum datum : datums) {
+        ArrayList<ImageDatum> data = getAllImageData();
+        Set<ImageDatum> latest = new LinkedHashSet<>();
+        for (ImageDatum datum : data) {
             ImageGroup group = datum.getGroup();
             List<ImageDatum> members = group.getImageDatums();
             long time = 0;
@@ -557,8 +622,8 @@ public abstract class AbstractImageBrowser
     }
 
     public void selectAll() {
-        ArrayList<ImageDatum> datums = getAllImageData();
-        selection.setSelected(datums);
+        ArrayList<ImageDatum> data = getAllImageData();
+        selection.setSelected(data);
     }
 
     public void clearSelection() {
@@ -576,27 +641,16 @@ public abstract class AbstractImageBrowser
     // render thumbnails outside these bounds may be cancelled.
     public void cancelTasks(Rectangle rect) {
         // Figure out which ImageDatums fall within the bounds.
-        ArrayList<ImageDatum> datums = getAllImageData();
-        int[] indices = getIndices(datums.size(), rect);
+        ArrayList<ImageDatum> data = getAllImageData();
+        final var indices = getValidIndices(data.size(), rect);
 
         // Make a hash set of the excluded ImageDatums, for quick lookup:
-        HashSet<ImageDatum> excluded = new HashSet<ImageDatum>();
-        for (int index : indices) {
-            if (index >= 0) {
-                ImageDatum datum = datums.get(index);
-                excluded.add(datum);
-            }
-        }
-        for (ImageDatum datum : datums) {
-            if (! excluded.contains(datum)) {
-                datum.cancel();
-            }
-        }
-    }
-
-    // Used by ImageBrowserActions for the "external" actions
-    List<ExternalBrowserAction> getExternalBrowserActions() {
-        return externalActions;
+        HashSet<ImageDatum> excluded = indices.stream()
+                .map(data::get)
+                .collect(Collectors.toCollection(HashSet::new));
+        data.stream()
+                .filter(Predicate.not(excluded::contains))
+                .forEach(ImageDatum::cancel);
     }
 
     // Used by ImageBrowserActions for the apply-Template actions
@@ -606,8 +660,8 @@ public abstract class AbstractImageBrowser
 
     // Needed by mouse listeners like ImageDatumControl.
     ImageDatum getImageDatum(int index) {
-        Set datums = datumIndex.keySet();
-        for (Object datum1 : datums) {
+        Set<ImageDatum> data = datumIndex.keySet();
+        for (Object datum1 : data) {
             ImageDatum datum = (ImageDatum) datum1;
             Integer n = datumIndex.get(datum);
             if (n == index) {
@@ -624,30 +678,27 @@ public abstract class AbstractImageBrowser
         }
         Integer start = datumIndex.get(leadSelected);
         Integer end = datumIndex.get(datum);
-        if ((start != null) && (end != null)) {
-            if (end < start) {
-                int temp = end;
-                end = start;
-                start = temp;
+        if (start == null || end == null) {
+            return;
+        }
+        if (end < start) {
+            int temp = end;
+            end = start;
+            start = temp;
+        }
+        List<ImageDatum> selected = IntStream.rangeClosed(start, end)
+                .boxed()
+                .map(this::getImageDatum)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        if (isAppendix) {
+            if (selection.isSelected(leadSelected)) {
+                selection.addSelected(selected);
+            } else {
+                selection.removeSelected(selected);
             }
-            List<ImageDatum> selected = new LinkedList<ImageDatum>();
-            for (int index=start; index<=end; index++) {
-                ImageDatum d = getImageDatum(index);
-                if (d != null) {
-                    selected.add(d);
-                }
-            }
-            if (isAppendix) {
-                if (selection.isSelected(leadSelected)) {
-                    selection.addSelected(selected);
-                }
-                else {
-                    selection.removeSelected(selected);
-                }
-            }
-            else {
-                selection.setSelected(selected);
-            }
+        } else {
+            selection.setSelected(selected);
         }
     }
 
@@ -681,11 +732,11 @@ public abstract class AbstractImageBrowser
         // selection and the one that clears the rating
         JMenu ratingMenu = new JMenu(LOCALE.get("RatingItem"));
         List<SelectionAction> ratingActions =
-            RatingActions.createRatingActions(this, false);
+                RatingActions.createRatingActions(this, false);
 //        List<SelectionAction> ratingAdvanceActions =
 //            RatingActions.createRatingAdvanceActions(this, false);
         Action clearAction =
-            RatingActions.createClearRatingAction(this, false);
+                RatingActions.createClearRatingAction(this, false);
 //        Action clearAdvanceAction =
 //            RatingActions.createClearRatingAdvanceAction(this, false);
         for (Action action : ratingActions) {
@@ -694,8 +745,9 @@ public abstract class AbstractImageBrowser
             // On Windogs only the core fonts seem to see stars
             if (Platform.isWindows()) {
                 char star = '\u2605';
-                if (name.length() > 0 && name.charAt(0) == star)
+                if (name.length() > 0 && name.charAt(0) == star) {
                     ratingItem.setFont(new Font("Serif", Font.PLAIN, 14));
+                }
             }
 
             ratingMenu.add(ratingItem);
@@ -715,29 +767,17 @@ public abstract class AbstractImageBrowser
         menu.addSeparator();
 
         JMenuItem openItem = new JMenuItem(LOCALE.get("EditMenuItem"));
-        openItem.addActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    selection.setLeadSelected(datum);
-                    notifyDoubleClicked(datum);
-                }
-            }
-        );
+        openItem.addActionListener(e -> {
+            selection.setLeadSelected(datum);
+            notifyDoubleClicked(datum);
+        });
         menu.add(openItem);
 
         JMenuItem showItem = new JMenuItem(actions.getShowFileInFolderAction());
         menu.add(showItem);
 
         JMenuItem renameItem = new JMenuItem(LOCALE.get("RenameMenuItem"));
-        renameItem.addActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    FileActions.renameFile(
-                        datum.getFile(), AbstractImageBrowser.this
-                    );
-                }
-            }
-        );
+        renameItem.addActionListener(e -> FileActions.renameFile(datum.getFile(), AbstractImageBrowser.this));
         renameItem.setEnabled(true);
         menu.add(renameItem);
 
@@ -747,14 +787,8 @@ public abstract class AbstractImageBrowser
         menu.addSeparator();
 
         JMenuItem copyTemplate = new JMenuItem(LOCALE.get("CopyMenuItem"));
-        copyTemplate.addActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    ImageBrowserActions.TemplateClipboard = datum.getFile();
-                }
-            }
-        );
-        if (! type.hasLznData() ) {
+        copyTemplate.addActionListener(e -> ImageBrowserActions.TemplateClipboard = datum.getFile());
+        if (!type.hasLznData()) {
             copyTemplate.setEnabled(false);
         }
         menu.add(copyTemplate);
@@ -769,30 +803,20 @@ public abstract class AbstractImageBrowser
 
         JMenu templateItem = new JMenu(LOCALE.get("ApplyMenuItem"));
         if (
-            (templates != null) &&
-            (! files.isEmpty())
+                (templates != null) &&
+                        (!files.isEmpty())
         ) {
             List actions = templates.getTemplateActions();
-            if (! actions.isEmpty()) {
+            if (!actions.isEmpty()) {
                 for (final Object action : actions) {
                     JMenuItem item = new JMenuItem(action.toString());
-                    item.addActionListener(
-                        new ActionListener() {
-                            public void actionPerformed(ActionEvent event) {
-                                templates.applyTemplateAction(
-                                    action, files.toArray(new File[0])
-                                );
-                            }
-                        }
-                    );
+                    item.addActionListener(event1 -> templates.applyTemplateAction(action, files.toArray(new File[0])));
                     templateItem.add(item);
                 }
-            }
-            else {
+            } else {
                 templateItem.setEnabled(false);
             }
-        }
-        else {
+        } else {
             templateItem.setEnabled(false);
         }
         menu.add(templateItem);
@@ -802,27 +826,15 @@ public abstract class AbstractImageBrowser
         for (final ExternalBrowserAction action : externalActions) {
             String name = action.getName();
             JMenuItem item = new JMenuItem(name);
-            item.addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        action.actionPerformed(
-                            datum.getFile(), files.toArray(new File[0])
-                        );
-                    }
-                }
-            );
+            item.addActionListener( e -> action.actionPerformed(datum.getFile(), files.toArray(new File[0])));
             menu.add(item);
         }
         menu.addSeparator();
 
         JMenuItem refreshItem = new JMenuItem(LOCALE.get("RefreshMenuItem"));
-        refreshItem.addActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    datum.refresh(false);   // don't use caches
-                }
-            }
-        );
+        refreshItem.addActionListener(e -> {
+            datum.refresh(false);   // don't use caches
+        });
         menu.add(refreshItem);
 
         menu.addSeparator();
@@ -851,26 +863,25 @@ public abstract class AbstractImageBrowser
         if (lead != null) {
             PreviewUpdater preview = lead.getPreview(previewer);
             event = new ImageBrowserEvent(
-                lead, selected, preview, getSelectedPreviews(), count
+                    lead, selected, preview, getSelectedPreviews(), count
             );
-        }
-        else {
+        } else {
             event = new ImageBrowserEvent(
-                null, selected, null, getSelectedPreviews(), count
+                    null, selected, null, getSelectedPreviews(), count
             );
         }
         disposePreviews(selected);
 
         listeners.selectionChanged(event);
     }
-    
+
     void notifyDoubleClicked(ImageDatum datum) {
         PreviewUpdater preview = datum.getPreview(previewer);
         ImageBrowserEvent event =
-            new ImageBrowserEvent(
-                datum, selection.getSelected(),
-                preview, getSelectedPreviews(), count
-            );
+                new ImageBrowserEvent(
+                        datum, selection.getSelected(),
+                        preview, getSelectedPreviews(), count
+                );
         disposePreviews(Collections.singleton(datum));
         listeners.imageDoubleClicked(event);
     }
@@ -883,7 +894,7 @@ public abstract class AbstractImageBrowser
     // Clean up PreviewUpdaters created in notifySelectionChanged() and
     // notifyDoubleClicked().
     private void disposePreviews(Collection<ImageDatum> newPreviews) {
-        HashSet<ImageDatum> disposable = new HashSet<ImageDatum>(previews);
+        HashSet<ImageDatum> disposable = new HashSet<>(previews);
         if (newPreviews != null) {
             disposable.removeAll(newPreviews);
         }
@@ -905,7 +916,7 @@ public abstract class AbstractImageBrowser
     }
 
     ArrayList<ImageDatum> getSelectedDatums() {
-        return new ArrayList<ImageDatum>(selection.getSelected());
+        return new ArrayList<>(selection.getSelected());
     }
 
     ImageDatum getLeadSelectedDatum() {
@@ -993,7 +1004,7 @@ public abstract class AbstractImageBrowser
 
     private ArrayList<PreviewUpdater> getSelectedPreviews() {
         List<ImageDatum> selected = selection.getSelected();
-        ArrayList<PreviewUpdater> previews = new ArrayList<PreviewUpdater>();
+        ArrayList<PreviewUpdater> previews = new ArrayList<>();
         for (ImageDatum datum : selected) {
             PreviewUpdater preview = datum.getPreview(previewer);
             previews.add(preview);
@@ -1013,8 +1024,7 @@ public abstract class AbstractImageBrowser
     private void updateEnabled() {
         if (datumIndex.size() == 0) {
             setDisabled();
-        }
-        else {
+        } else {
             setEnabled();
         }
     }
@@ -1027,7 +1037,7 @@ public abstract class AbstractImageBrowser
     }
 
     private void setDisabled() {
-        if (! isDisabled) {
+        if (!isDisabled) {
             removeAll();
             setLayout(new BorderLayout());
             add(new DisabledLabel(LOCALE.get("NoImagesLabel")));
@@ -1046,97 +1056,99 @@ public abstract class AbstractImageBrowser
         setFocusable(true);
 
         registerKeyboardAction(
-            new AbstractAction() {
-                public void actionPerformed(ActionEvent event) {
-                    moveSelectionUp();
-                }
-            },
-            KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0),
-            WHEN_FOCUSED
-        );
-        registerKeyboardAction(
-            new AbstractAction() {
-                public void actionPerformed(ActionEvent event) {
-                    moveSelectionDown();
-                }
-            },
-            KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0),
-            WHEN_FOCUSED
-        );
-        registerKeyboardAction(
-            new AbstractAction() {
-                public void actionPerformed(ActionEvent event) {
-                    moveSelectionLeft();
-                }
-            },
-            KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0),
-            WHEN_FOCUSED
-        );
-        registerKeyboardAction(
-            new AbstractAction() {
-                public void actionPerformed(ActionEvent event) {
-                    moveSelectionRight();
-                }
-            },
-            KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0),
-            WHEN_FOCUSED
-        );
-        registerKeyboardAction(
-            new AbstractAction() {
-                public void actionPerformed(ActionEvent event) {
-                    ImageDatum lead = selection.getLeadSelected();
-                    if (lead != null) {
-                        notifyDoubleClicked(lead);
+                new AbstractAction() {
+                    public void actionPerformed(ActionEvent event) {
+                        moveSelectionUp();
                     }
-                }
-            },
-            KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
-            WHEN_FOCUSED
+                },
+                KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0),
+                WHEN_FOCUSED
+        );
+        registerKeyboardAction(
+                new AbstractAction() {
+                    public void actionPerformed(ActionEvent event) {
+                        moveSelectionDown();
+                    }
+                },
+                KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0),
+                WHEN_FOCUSED
+        );
+        registerKeyboardAction(
+                new AbstractAction() {
+                    public void actionPerformed(ActionEvent event) {
+                        moveSelectionLeft();
+                    }
+                },
+                KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0),
+                WHEN_FOCUSED
+        );
+        registerKeyboardAction(
+                new AbstractAction() {
+                    public void actionPerformed(ActionEvent event) {
+                        moveSelectionRight();
+                    }
+                },
+                KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0),
+                WHEN_FOCUSED
+        );
+        registerKeyboardAction(
+                new AbstractAction() {
+                    @Override
+                    public void actionPerformed(ActionEvent event) {
+                        ImageDatum lead = selection.getLeadSelected();
+                        if (lead != null) {
+                            notifyDoubleClicked(lead);
+                        }
+                    }
+                },
+                KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
+                WHEN_FOCUSED
         );
 
         Action deleteSelected = new AbstractAction() {
+            @Override
             public void actionPerformed(ActionEvent event) {
                 ArrayList<File> files = getSelectedFiles();
-                if (! files.isEmpty()) {
+                if (!files.isEmpty()) {
                     FileActions.deleteFiles(
-                        files.toArray(new File[0]),
-                        AbstractImageBrowser.this
+                            files.toArray(new File[0]),
+                            AbstractImageBrowser.this
                     );
                 }
             }
         };
         registerKeyboardAction(
-            deleteSelected,
-            KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0),
-            WHEN_FOCUSED
+                deleteSelected,
+                KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0),
+                WHEN_FOCUSED
         );
         registerKeyboardAction(
-            deleteSelected,
-            KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0),
-            WHEN_FOCUSED
+                deleteSelected,
+                KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0),
+                WHEN_FOCUSED
         );
         // All the rating actions
         List<SelectionAction> ratings =
-            RatingActions.createAllActions(this, true);
+                RatingActions.createAllActions(this, true);
         for (SelectionAction action : ratings) {
             registerKeyboardAction(
-                action, action.getKeyStroke(), WHEN_FOCUSED
+                    action, action.getKeyStroke(), WHEN_FOCUSED
             );
         }
         // The left and right rotate actions
         List<SelectionAction> rotations =
-            RotateActions.createAllActions(this, true);
+                RotateActions.createAllActions(this, true);
         for (SelectionAction action : rotations) {
             registerKeyboardAction(
-                action,
-                action.getKeyStroke(),
-                WHEN_FOCUSED
+                    action,
+                    action.getKeyStroke(),
+                    WHEN_FOCUSED
             );
         }
     }
 
     public void dispose() {
         DragSource src = DragSource.getDefaultDragSource();
-        src.removeDragSourceListener(dragSrcAdapter);        
+        src.removeDragSourceListener(dragSrcAdapter);
     }
 }

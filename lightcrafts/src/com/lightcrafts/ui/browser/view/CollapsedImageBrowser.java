@@ -1,16 +1,13 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2022-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.browser.view;
 
-import com.lightcrafts.image.metadata.ImageMetadata;
 import com.lightcrafts.ui.browser.model.ImageDatum;
-import com.lightcrafts.ui.browser.model.ImageDatumType;
 import com.lightcrafts.ui.browser.model.ImageGroup;
 import com.lightcrafts.ui.browser.model.ImageList;
-import com.lightcrafts.utils.awt.geom.HiDpi;
 
 import java.awt.*;
-import java.awt.image.RenderedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -27,74 +24,11 @@ public class CollapsedImageBrowser extends AbstractImageBrowser {
         super(list);
     }
 
-    protected void paintComponent(Graphics graphics) {
-        if (justShown) {
-            if (!paintTimer.isRunning())
-                paintTimer.start();
-            return;
-        }
-        
-        if (! isWidthInitialized) {
-            // Only paint if the component size has been initialized.  Layout
-            // jumps are typical the first time this component is displayed,
-            // because the preferred height depends on the component width.
-            return;
-        }
-        Graphics2D g = (Graphics2D) graphics;
-
-        // Figure out which ImageDatums fall within the clip bounds.
-        final Rectangle clip0 = g.getClipBounds();
-        List<ImageDatum> datums = getAllImageData();
-        int[] indices = getIndices(datums.size(), clip0);
-
-        if (! isDisabled) {
-            HiDpi.resetTransformScaleOf(g);
-        }
-        final Rectangle clip = g.getClipBounds();
-
-        // Iterate backwards through indices, so repaints get enqueued
-        // in a visually pleasing order.
-        for (int i=indices.length-1; i>=0; i--) {
-            int index = indices[i];
-            if (index < 0) {
-                continue;
-            }
-            ImageDatum datum = datums.get(index);
-            if (datum == null) {
-                // A race; the image disappeared during painting.
-                continue;
-            }
-            RenderedImage image = datum.getImage(this);
-
-            // This queue prevents GC of recently painted images:
-            recentImages.add(image);
-
-            final Rectangle rect = HiDpi.imageSpaceRectFrom(getBounds(index));
-            g.setClip(clip.intersection(rect));
-
-            File file = datum.getFile();
-            String label = file.getName();
-            ImageDatumType type = datum.getType();
-            String tag = type.toString();
-            ImageMetadata meta = datum.getMetadata(true);
-            boolean selected = selection.isSelected(datum);
-            renderer.paint(g, image, label, tag, meta, rect, selected);
-
-            ImageGroup group = datum.getGroup();
-            if (group.isNonTrivial()) {
-                ImageGroupCountRenderer.paint(g, rect, datum);
-            }
-        }
-        g.setClip(clip);
-
-        // The control is drawn as an overlay.
-        if (controller.isEnabled()) {
-            Rectangle ctrlRect = controller.getRect();
-            if (ctrlRect != null) {
-                if (ctrlRect.intersects(clip)) {
-                    controller.paint(g);
-                }
-            }
+    @Override
+    protected void renderImageGroup(Graphics2D g, List<ImageDatum> data, int index, ImageDatum datum, Rectangle rect) {
+        ImageGroup group = datum.getGroup();
+        if (group.isNonTrivial()) {
+            ImageGroupCountRenderer.paint(g, rect, datum);
         }
     }
 
@@ -102,6 +36,7 @@ public class CollapsedImageBrowser extends AbstractImageBrowser {
      * Get the ImageDatums rendered in this AbstractImageBrowser: the ones that
      * are the most recently modified among all ImageDatums in their ImageGroup.
      */
+    @Override
     ArrayList<ImageDatum> getAllImageData() {
         List<ImageDatum> allDatums = list.getAllImageData();
         Set<ImageDatum> recentDatums = new LinkedHashSet<ImageDatum>();
@@ -123,6 +58,7 @@ public class CollapsedImageBrowser extends AbstractImageBrowser {
         return new ArrayList<ImageDatum>(recentDatums);
     }
 
+    @Override
     void updateSelectionDatumRemoved(ImageDatum datum, int index) {
         List<ImageDatum> selected = selection.getSelected();
         if (selected.contains(datum)) {
