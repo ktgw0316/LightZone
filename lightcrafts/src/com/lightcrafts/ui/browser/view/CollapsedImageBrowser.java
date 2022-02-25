@@ -7,13 +7,9 @@ import com.lightcrafts.ui.browser.model.ImageDatum;
 import com.lightcrafts.ui.browser.model.ImageDatumType;
 import com.lightcrafts.ui.browser.model.ImageGroup;
 import com.lightcrafts.ui.browser.model.ImageList;
-import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.utils.awt.geom.HiDpi;
 
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -51,7 +47,9 @@ public class CollapsedImageBrowser extends AbstractImageBrowser {
         List<ImageDatum> datums = getAllImageData();
         int[] indices = getIndices(datums.size(), clip0);
 
-        HiDpi.resetTransformScaleOf(g);
+        if (! isDisabled) {
+            HiDpi.resetTransformScaleOf(g);
+        }
         final Rectangle clip = g.getClipBounds();
 
         // Iterate backwards through indices, so repaints get enqueued

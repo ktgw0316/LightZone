@@ -3,19 +3,16 @@
 package com.lightcrafts.ui.browser.view;
 
 import com.lightcrafts.image.metadata.ImageMetadata;
+import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.ui.browser.model.ImageDatum;
 import com.lightcrafts.ui.browser.model.ImageDatumType;
 import com.lightcrafts.ui.browser.model.ImageGroup;
 import com.lightcrafts.ui.browser.model.ImageList;
-import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.utils.awt.geom.HiDpi;
 
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.RenderedImage;
 import java.io.File;
@@ -73,7 +70,9 @@ public class ExpandedImageBrowser extends AbstractImageBrowser {
         List<ImageDatum> datums = getAllImageData();
         int[] indices = getIndices(datums.size(), clip0);
 
-        HiDpi.resetTransformScaleOf(g);
+        if (! isDisabled) {
+            HiDpi.resetTransformScaleOf(g);
+        }
         final Rectangle clip = g.getClipBounds();
 
         // Set up context for the ImageGroup highlights.
