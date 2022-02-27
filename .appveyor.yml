@@ -30,12 +30,6 @@ for:
     - cmd: bash -lc 'cp "$MSSDK_HOME/../8.1/Lib/winv6.3/um/x86/Htmlhelp.Lib" /c/$MINGW32_PATH/lib/libhtmlhelp.a'
     - ps: (new-object net.webclient).DownloadFile('https://download-gcdn.ej-technologies.com/install4j/install4j_windows-x64_8_0_8.exe', 'install4j-installer.exe')
     - ps: install4j-installer.exe -q
-    - cmd: bash -lc "curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
-    - cmd: bash -lc "curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig"
-    - cmd: bash -lc "pacman-key --verify msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig"
-    - cmd: bash -lc "pacman --noconfirm -U msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
-    - cmd: bash -lc "pacman --needed --noconfirm -Sy pacman"
-    - cmd: bash -lc "pacman --needed --noconfirm -Su"
     - cmd: bash -lc "pacman --noconfirm --disable-download-timeout -S pactoys autoconf"
     - cmd: bash -lc "pacboy --noconfirm --disable-download-timeout -S lcms2:m lensfun:m ntldd-git:m pkg-config:m"
 
