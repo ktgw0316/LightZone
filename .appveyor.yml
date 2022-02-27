@@ -1,9 +1,9 @@
 version: 4.2.3.{build}-{branch}
 
 image:
-- macos
-- Visual Studio 2019
-- Ubuntu2004
+  - macos
+  - Visual Studio 2019
+  - Ubuntu2004
 
 clone_depth: 1
 
@@ -11,68 +11,65 @@ matrix:
   fast_finish: true
 
 for:
--
-  matrix:
-    only:
-      - image: Visual Studio 2019
+  - matrix:
+      only:
+        - image: Visual Studio 2019
 
-  init:
-    - cmd: SET MINGW64_PATH=msys64/mingw64
-    - cmd: SET MINGW32_PATH=msys64/mingw32
-    - cmd: SET PATH=C:/%MINGW64_PATH%/bin/;C:/%MINGW32_PATH%/bin/;C:/msys64/usr/bin/;%PATH%
-    - cmd: SET MSSDK_HOME=/c/Program Files (x86)/Windows Kits/10
-    - cmd: SET JAVA_HOME=/c/Program Files/Java/jdk15
-    - cmd: SET ANT_SCRIPT=/c/projects/lightzone/windows/build.xml
+    init:
+      - cmd: SET MINGW64_PATH=msys64/mingw64
+      - cmd: SET MINGW32_PATH=msys64/mingw32
+      - cmd: SET PATH=C:/%MINGW64_PATH%/bin/;C:/%MINGW32_PATH%/bin/;C:/msys64/usr/bin/;%PATH%
+      - cmd: SET MSSDK_HOME=/c/Program Files (x86)/Windows Kits/10
+      - cmd: SET JAVA_HOME=/c/Program Files/Java/jdk15
+      - cmd: SET ANT_SCRIPT=/c/projects/lightzone/windows/build.xml
 
-  install:
-    - cmd: cinst ant
-    - cmd: bash -lc 'cp "$MSSDK_HOME/../8.1/Lib/winv6.3/um/x64/Htmlhelp.Lib" /c/$MINGW64_PATH/lib/libhtmlhelp.a'
-    - cmd: bash -lc 'cp "$MSSDK_HOME/../8.1/Lib/winv6.3/um/x86/Htmlhelp.Lib" /c/$MINGW32_PATH/lib/libhtmlhelp.a'
-    - ps: (new-object net.webclient).DownloadFile('https://download-gcdn.ej-technologies.com/install4j/install4j_windows-x64_8_0_8.exe', 'install4j-installer.exe')
-    - ps: install4j-installer.exe -q
-    - cmd: bash -lc "pacman --noconfirm --disable-download-timeout -S pactoys autoconf"
-    - cmd: bash -lc "pacboy --noconfirm --disable-download-timeout -S lcms2:m lensfun:m ntldd-git:m pkg-config:m"
+    install:
+      - cmd: cinst ant
+      - cmd: bash -lc 'cp "$MSSDK_HOME/../8.1/Lib/winv6.3/um/x64/Htmlhelp.Lib" /c/$MINGW64_PATH/lib/libhtmlhelp.a'
+      - cmd: bash -lc 'cp "$MSSDK_HOME/../8.1/Lib/winv6.3/um/x86/Htmlhelp.Lib" /c/$MINGW32_PATH/lib/libhtmlhelp.a'
+      - ps: (new-object net.webclient).DownloadFile('https://download-gcdn.ej-technologies.com/install4j/install4j_windows-x64_8_0_8.exe', 'install4j-installer.exe')
+      - ps: install4j-installer.exe -q
+      - cmd: bash -lc "pacman --noconfirm --disable-download-timeout -S pactoys autoconf"
+      - cmd: bash -lc "pacboy --noconfirm --disable-download-timeout -S lcms2:m lensfun:m ntldd-git:m pkg-config:m"
 
-  build_script:
-    - cmd: bash -lc "MINGW_DIR=/c/$MINGW64_PATH ant -f $ANT_SCRIPT build-installer"
-    - cmd: bash -lc "ant -f $ANT_SCRIPT clean-native"
-    - cmd: bash -lc "TARGET_ARCH=i686 MINGW_DIR=/c/$MINGW32_PATH ant -f $ANT_SCRIPT -Doffline=true build-installer"
+    build_script:
+      - cmd: bash -lc "MINGW_DIR=/c/$MINGW64_PATH ant -f $ANT_SCRIPT build-installer"
+      - cmd: bash -lc "ant -f $ANT_SCRIPT clean-native"
+      - cmd: bash -lc "TARGET_ARCH=i686 MINGW_DIR=/c/$MINGW32_PATH ant -f $ANT_SCRIPT -Doffline=true build-installer"
 
-  artifacts:
-    - path: 'windows/LightZone_Installer_*.exe'
-      name: windows installer
+    artifacts:
+      - path: "windows/LightZone_Installer_*.exe"
+        name: windows installer
 
--
-  matrix:
-    only:
-      - image: macos
+  - matrix:
+      only:
+        - image: macos
 
-  init:
-    - sh: export JAVA_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-15.jdk/Contents/Home
-    - sh: export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+    init:
+      - sh: export JAVA_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-15.jdk/Contents/Home
+      - sh: export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
 
-  install:
-    - sh: HOMEBREW_NO_AUTO_UPDATE=1 brew install ant autoconf lensfun libjpeg-turbo libomp libtiff libxml2 little-cms2 rsync
+    install:
+      - sh: HOMEBREW_NO_AUTO_UPDATE=1 brew install ant autoconf lensfun libjpeg-turbo libomp libtiff libxml2 little-cms2 rsync
 
-  build_script:
-    - sh: ant -f macosx/build.xml dmg
+    build_script:
+      - sh: ant -f macosx/build.xml dmg
 
-  artifacts:
-    - path: 'macosx/LightZone-*.dmg'
-      name: macos installer
+    artifacts:
+      - path: "macosx/LightZone-*.dmg"
+        name: macos installer
 
--
-  matrix:
-    only:
-      - image: Ubuntu2004
+  - matrix:
+      only:
+        - image: Ubuntu2004
 
-  init:
-    - sh: export JAVA_HOME=/usr/lib/jvm/java-15-openjdk-amd64
+    init:
+      - sh: export JAVA_HOME=/usr/lib/jvm/java-15-openjdk-amd64
 
-  install:
-    - sh: sudo add-apt-repository --yes ppa:lightzone-team/lightzone
-    - sh: sudo apt-get update
-    - sh: sudo apt-get install -y ant autoconf javahelp2 libejml-java libglib2.0-dev libjaxb-java libjetbrains-annotations-java libjiconfont-font-awesome-java libjiconfont-google-material-design-icons-java libjiconfont-swing-java liblensfun-dev liblcms2-dev liblombok-java librefuel-java libslf4j-java libtiff5-dev tidy
+    install:
+      - sh: sudo add-apt-repository --yes ppa:lightzone-team/lightzone
+      - sh: sudo apt-get update
+      - sh: sudo apt-get install -y ant autoconf javahelp2 libejml-java libglib2.0-dev libjaxb-java libjetbrains-annotations-java libjiconfont-font-awesome-java libjiconfont-google-material-design-icons-java libjiconfont-swing-java liblensfun-dev liblcms2-dev liblombok-java librefuel-java libslf4j-java libtiff5-dev tidy
 
-  build_script:
-    - sh: ant -f linux/build.xml -Doffline=true
+    build_script:
+      - sh: ant -f linux/build.xml -Doffline=true
