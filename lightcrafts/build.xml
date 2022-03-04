@@ -48,7 +48,8 @@
     </copy>
   </target>
 
-  <target name="resolve-ivy" depends="init-ivy" unless="no-ivy">
+  <target name="resolve-ivy" unless="no-ivy">
+    <antcall target="init-ivy"/>
     <ivy:resolve file="${basedir}/ivy.xml"/>
     <ivy:retrieve/>
   </target>
