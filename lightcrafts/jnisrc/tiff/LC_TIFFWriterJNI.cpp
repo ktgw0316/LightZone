@@ -121,7 +121,7 @@ JNIEXPORT jboolean JNICALL LCTIFFWriter_METHOD(setByteField)
             value.vp = cArray;
             return TIFFSetField( tiff, tagID, cArray.length(), value.vp );
 
-        // readcount is uint32 value in libtiff
+        // readcount is uint32_t value in libtiff
         case TIFFTAG_RICHTIFFIPTC:
             value.vp = cArray;
             return TIFFSetField( tiff, tagID, cArray.length() / 4, value.vp );

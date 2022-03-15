@@ -32,7 +32,7 @@ using namespace LightCrafts;
 JNIEXPORT jbyteArray JNICALL LCTIFFReader_METHOD(getICCProfileData)
     ( JNIEnv *env, jobject jLCTIFFReader )
 {
-    uint32 profileSize;
+    uint32_t profileSize;
     void *profileData;
     int const result = TIFFGetField(
         getNativePtr( env, jLCTIFFReader ), TIFFTAG_ICCPROFILE,

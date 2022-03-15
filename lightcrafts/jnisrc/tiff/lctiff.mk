@@ -9,6 +9,7 @@ TARGET_BASE:=		LCTIFF
 #DEBUG:=		true
 
 JNI_EXTRA_PKGCFG:=	libtiff-4
+JNI_EXTRA_CFLAGS:=	-DTIFF_DISABLE_DEPRECATED
 JNI_WINDOWS_LINK:=	-Wl,-Bdynamic -lLCJNI -Wl,-Bstatic -lstdc++
 JNI_LINUX_LINK:=	-lLCJNI -lstdc++
 JNI_MACOSX_LINK:=	../jniutils/libLCJNI.a

@@ -2,6 +2,7 @@
 
 // standard
 #include <jni.h>
+#include <stdint.h>
 #include <tiffio.h>
 
 // local
@@ -12,10 +13,10 @@
  * via TIFFGetField() or to set via TIFFSetField().
  */
 union LC_TIFFFieldValue {
-    uint32  u32;
-    uint32* u32p;
-    uint16  u16;
-    uint16* u16p;
+    uint32_t  u32;
+    uint32_t* u32p;
+    uint16_t  u16;
+    uint16_t* u16p;
     double  d;
     float   f;
     char*   cp;
