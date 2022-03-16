@@ -10,7 +10,6 @@ Vcs-Browser: https://github.com/ktgw0316/LightZone
 Vcs-Git: https://github.com/ktgw0316/LightZone.git
 Build-Depends:
  ant (>= 1.9.8),
- autoconf,
  debhelper,
  default-jdk (>= 1.11),
  default-jre-headless (>= 2:1.11),

@@ -25,7 +25,6 @@ Building the LightZone source requires the following software:
 You need to install following packages using homebrew:
 
 - __ant__ version 1.9.8 or later to support nativeheaderdir parameter
-- __autoconf__
 - __jpeg-turbo__
 - __lensfun__
 - __libomp__

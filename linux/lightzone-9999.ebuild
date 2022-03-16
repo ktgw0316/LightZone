@@ -29,7 +29,6 @@ DEPEND="virtual/jdk
 	media-libs/libjpeg-turbo
 	media-libs/tiff
 	net-misc/rsync
-	sys-devel/autoconf
 	x11-libs/libX11"
 
 RDEPEND="virtual/jre
@@ -55,7 +54,7 @@ src_compile() {
 
 src_install() {
 	cd "${S}"
-	
+
 	_libdir=/usr/$(get_libdir)
 	install -dm 0755 "${D}/${_libdir}/${PN}"
 	cp -pH lightcrafts/products/dcraw_lz "${D}/${_libdir}/${PN}"
@@ -65,14 +64,13 @@ src_install() {
 	_javadir=/usr/share
 	install -dm 0755 "${D}/${_javadir}/${PN}/lib"
 	cp -pH linux/products/*.jar "${D}/${_javadir}/${PN}/lib"
-  
+
 	_datadir=/usr/share
 	install -dm 0755 "${D}/${_datadir}/applications"
 	install -m 644 linux/products/lightzone.desktop "${D}/${_datadir}/applications/"
 	cp -pHR linux/icons "${D}/${_datadir}/"
-	
+
 	_bindir=/usr/bin
 	install -dm 0755 "${D}/${_bindir}"
 	install -m 755 "linux/products/${PN}" "${D}/${_bindir}"
 }
-

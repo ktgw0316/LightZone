@@ -16,7 +16,6 @@ depends=('java-runtime>11'
  'libxml2')
 makedepends=('java-environment>11'
  'ant'
- 'autoconf'
  'gcc'
  'make'
  'git'

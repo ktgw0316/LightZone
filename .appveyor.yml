@@ -29,7 +29,7 @@ for:
       - cmd: bash -lc 'cp "$MSSDK_HOME/../8.1/Lib/winv6.3/um/x86/Htmlhelp.Lib" /c/$MINGW32_PATH/lib/libhtmlhelp.a'
       - ps: (new-object net.webclient).DownloadFile('https://download-gcdn.ej-technologies.com/install4j/install4j_windows-x64_8_0_8.exe', 'install4j-installer.exe')
       - ps: install4j-installer.exe -q
-      - cmd: bash -lc "pacman --noconfirm --disable-download-timeout -S pactoys autoconf"
+      - cmd: bash -lc "pacman --noconfirm --disable-download-timeout -S pactoys"
       - cmd: bash -lc "pacboy --noconfirm --disable-download-timeout -S lcms2:m lensfun:m ntldd-git:m pkg-config:m"
 
     build_script:
@@ -50,7 +50,7 @@ for:
       - sh: export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
 
     install:
-      - sh: HOMEBREW_NO_AUTO_UPDATE=1 brew install ant autoconf lensfun libjpeg-turbo libomp libtiff libxml2 little-cms2 rsync
+      - sh: HOMEBREW_NO_AUTO_UPDATE=1 brew install ant lensfun libjpeg-turbo libomp libtiff libxml2 little-cms2 rsync
 
     build_script:
       - sh: ant -f macosx/build.xml dmg
@@ -69,7 +69,7 @@ for:
     install:
       - sh: sudo add-apt-repository --yes ppa:lightzone-team/lightzone
       - sh: sudo apt-get update
-      - sh: sudo apt-get install -y ant autoconf javahelp2 libejml-java libglib2.0-dev libjaxb-java libjetbrains-annotations-java libjiconfont-font-awesome-java libjiconfont-google-material-design-icons-java libjiconfont-swing-java liblensfun-dev liblcms2-dev liblombok-java librefuel-java libslf4j-java libtiff5-dev tidy
+      - sh: sudo apt-get install -y ant javahelp2 libejml-java libglib2.0-dev libjaxb-java libjetbrains-annotations-java libjiconfont-font-awesome-java libjiconfont-google-material-design-icons-java libjiconfont-swing-java liblensfun-dev liblcms2-dev liblombok-java librefuel-java libslf4j-java libtiff5-dev tidy
 
     build_script:
       - sh: ant -f linux/build.xml -Doffline=true

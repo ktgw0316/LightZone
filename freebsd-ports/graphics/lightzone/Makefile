@@ -13,7 +13,6 @@ COMMENT=	Open-source professional-level digital darkroom software
 LICENSE=	BSD3CLAUSE
 
 BUILD_DEPENDS=	ant:${PORTSDIR}/devel/apache-ant \
-		autoconf:${PORTSDIR}/devel/autoconf \
 		git:${PORTSDIR}/devel/git \
 		jhindexer:${PORTSDIR}/java/javahelp \
 		rsync:${PORTSDIR}/net/rsync

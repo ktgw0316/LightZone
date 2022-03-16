@@ -27,7 +27,7 @@ _See also [Packaging on Debian or Ubuntu](#.deb-package-(debian-or-ubuntu)) belo
 
 Install required packages:
 
-    sudo apt-get install debhelper devscripts build-essential ant autoconf git-core javahelp2 default-jdk default-jre-headless libglib2.0-dev liblcms2-dev liblensfun-dev libjpeg-dev libtiff5-dev libx11-dev libxml2-utils pkg-config rsync
+    sudo apt-get install debhelper devscripts build-essential ant git-core javahelp2 default-jdk default-jre-headless libglib2.0-dev liblcms2-dev liblensfun-dev libjpeg-dev libtiff5-dev libx11-dev libxml2-utils pkg-config rsync
 
 _Note: gcc, g++, libc6-dev and make shall be installed with the build-essential._
 
@@ -39,7 +39,7 @@ Before start the build, you have to set `JAVA_HOME` environment variable, e.g.
 
 Install required packages:
 
-    sudo zypper install ant autoconf gcc gcc-c++ make
+    sudo zypper install ant gcc gcc-c++ make
     git javahelp2 liblcms2-devel lensfun-devel libjpeg8-devel libtiff-devel libxml2-utils rsync libX11-devel java-11-openjdk-devel pkg-config
 
 Set your `JAVA_HOME` variable to point to installed JDK, e.g.
