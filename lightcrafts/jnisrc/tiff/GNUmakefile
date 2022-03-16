@@ -3,11 +3,8 @@
 ##
 
 .PHONY: all
-all: configure
+all:
 	$(MAKE) -f lctiff.mk
-configure:
-	autoconf
-	CC="$(CC)" CXX="$(CXX)" ./configure
 
 ##
 # Utility rules
