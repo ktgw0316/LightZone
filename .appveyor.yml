@@ -35,7 +35,7 @@ for:
     build_script:
       - cmd: bash -lc "MINGW_DIR=/c/$MINGW64_PATH ant -f $ANT_SCRIPT build-installer"
       - cmd: bash -lc "ant -f $ANT_SCRIPT clean-native"
-      - cmd: bash -lc "TARGET_ARCH=i686 MINGW_DIR=/c/$MINGW32_PATH ant -f $ANT_SCRIPT -Doffline=true build-installer"
+      - cmd: bash -lc "TARGET_ARCH=i686 MINGW_DIR=/c/$MINGW32_PATH ant -f $ANT_SCRIPT -Dno-ivy=true build-installer"
 
     artifacts:
       - path: "windows/LightZone_Installer_*.exe"
@@ -72,4 +72,4 @@ for:
       - sh: sudo apt-get install -y ant javahelp2 libejml-java libglib2.0-dev libjaxb-java libjetbrains-annotations-java libjiconfont-font-awesome-java libjiconfont-google-material-design-icons-java libjiconfont-swing-java liblensfun-dev liblcms2-dev liblombok-java librefuel-java libslf4j-java libtiff5-dev tidy
 
     build_script:
-      - sh: ant -f linux/build.xml -Doffline=true
+      - sh: ant -f linux/build.xml
