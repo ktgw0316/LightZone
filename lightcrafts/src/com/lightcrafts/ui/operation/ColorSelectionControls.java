@@ -2,36 +2,38 @@
 
 package com.lightcrafts.ui.operation;
 
-import java.awt.event.*;
-import java.awt.geom.Point2D;
-import java.awt.*;
-import java.beans.PropertyChangeSupport;
-import java.util.Enumeration;
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.undo.AbstractUndoableEdit;
-
+import com.lightcrafts.app.ComboFrame;
+import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.model.ColorSelection;
 import com.lightcrafts.model.Operation;
 import com.lightcrafts.model.RGBColorSelection;
 import com.lightcrafts.model.RGBColorSelectionPreset;
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.ui.editor.EditorMode;
-import com.lightcrafts.ui.toolkit.LCSliderUI;
-import com.lightcrafts.ui.toolkit.DropperButton;
 import com.lightcrafts.ui.mode.DropperMode;
-import com.lightcrafts.ui.swing.*;
+import com.lightcrafts.ui.swing.ColorSwatch;
+import com.lightcrafts.ui.swing.RangeSelector;
+import com.lightcrafts.ui.swing.RangeSelectorZoneTrack;
+import com.lightcrafts.ui.toolkit.DropperButton;
+import com.lightcrafts.ui.toolkit.LCSliderUI;
+import com.lightcrafts.utils.LCMS;
 import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlNode;
-import com.lightcrafts.utils.LCMS;
+import org.jvnet.substance.SubstanceLookAndFeel;
+import org.jvnet.substance.color.ColorScheme;
+import org.jvnet.substance.theme.SubstanceTheme;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.undo.AbstractUndoableEdit;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.geom.Point2D;
+import java.beans.PropertyChangeSupport;
+import java.util.Enumeration;
 
 import static com.lightcrafts.ui.operation.Locale.LOCALE;
-import com.lightcrafts.jai.JAIContext;
-import com.lightcrafts.app.ComboFrame;
-import org.jvnet.substance.SubstanceLookAndFeel;
-import org.jvnet.substance.theme.SubstanceTheme;
-import org.jvnet.substance.color.ColorScheme;
 
 /**
  * A <code>ColorSelectionControls</code> is-a {@link Box} that contains all
@@ -102,12 +104,14 @@ final class ColorSelectionControls extends Box {
                                                 0xff & systemColor[1],
                                                 0xff & systemColor[2]);
 
-                        final ColorScheme colorScheme = new LightZoneSkin.CustomColorScheme(color);
-                        final SubstanceTheme theme = LightZoneSkin.makeTheme(colorScheme, p.name());
-
-                        button.putClientProperty(SubstanceLookAndFeel.THEME_PROPERTY, theme);
-                        button.putClientProperty(SubstanceLookAndFeel.PAINT_ACTIVE_PROPERTY, Boolean.TRUE);
-
+                        if (false) {
+                            final ColorScheme colorScheme = new LightZoneSkin.CustomColorScheme(color);
+                            final SubstanceTheme theme = LightZoneSkin.makeTheme(colorScheme, p.name());
+                            button.putClientProperty(SubstanceLookAndFeel.THEME_PROPERTY, theme);
+                            button.putClientProperty(SubstanceLookAndFeel.PAINT_ACTIVE_PROPERTY, Boolean.TRUE);
+                        } else {
+                            button.setBackground(color);
+                        }
                         button.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 3));
                     }
 

@@ -1,35 +1,32 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2013-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui;
 
-import org.jvnet.substance.theme.SubstanceTheme;
-import org.jvnet.substance.theme.SubstanceComplexTheme;
-import org.jvnet.substance.theme.SubstanceEbonyTheme;
+import com.formdev.flatlaf.FlatDarculaLaf;
+import com.formdev.flatlaf.FlatLaf;
+import contrib.com.jgoodies.looks.common.FontSet;
+import org.jvnet.substance.button.ClassicButtonShaper;
 import org.jvnet.substance.color.BaseColorScheme;
 import org.jvnet.substance.color.ColorScheme;
-import org.jvnet.substance.skin.SubstanceAbstractSkin;
-import org.jvnet.substance.painter.SimplisticSoftBorderReverseGradientPainter;
-import org.jvnet.substance.painter.GlassGradientPainter;
 import org.jvnet.substance.painter.AlphaControlBackgroundComposite;
-import org.jvnet.substance.button.ClassicButtonShaper;
-import org.jvnet.substance.watermark.SubstanceNoneWatermark;
+import org.jvnet.substance.painter.GlassGradientPainter;
+import org.jvnet.substance.painter.SimplisticSoftBorderReverseGradientPainter;
+import org.jvnet.substance.skin.SubstanceAbstractSkin;
+import org.jvnet.substance.theme.SubstanceComplexTheme;
+import org.jvnet.substance.theme.SubstanceEbonyTheme;
+import org.jvnet.substance.theme.SubstanceTheme;
 import org.jvnet.substance.title.ArcHeaderPainter;
-import org.jvnet.substance.SubstanceLookAndFeel;
-import org.jvnet.substance.SubstanceToggleButtonUI;
-import org.jvnet.substance.SubstanceButtonUI;
-import org.jvnet.substance.SubstanceLabelUI;
+import org.jvnet.substance.watermark.SubstanceNoneWatermark;
 
+import javax.media.jai.IHSColorSpace;
+import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 import javax.swing.plaf.FontUIResource;
-import javax.swing.plaf.ComponentUI;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.color.ColorSpace;
-
-import contrib.com.jgoodies.looks.common.FontSet;
-import contrib.com.jgoodies.looks.common.FontPolicy;
-import javax.media.jai.IHSColorSpace;
+import java.util.Map;
 
 public class LightZoneSkin extends SubstanceAbstractSkin {
     public static String NAME = "LightZone";
@@ -216,98 +213,15 @@ public class LightZoneSkin extends SubstanceAbstractSkin {
         return new EtchedBorder(EtchedBorder.LOWERED, new Color(48, 48, 48), new Color(23, 23, 23));
     }
 
-    private static final RenderingHints aliasingRenderHints;
-
-    static {
-        aliasingRenderHints = new RenderingHints(
-            RenderingHints.KEY_ANTIALIASING,
-            RenderingHints.VALUE_ANTIALIAS_ON
-        );
-        aliasingRenderHints.put(
-            RenderingHints.KEY_TEXT_ANTIALIASING,
-            RenderingHints.VALUE_TEXT_ANTIALIAS_ON
-        );
-        aliasingRenderHints.put(
-            RenderingHints.KEY_RENDERING,
-            RenderingHints.VALUE_RENDER_QUALITY
-        );
-    }
-
-    public static class LightZoneButtonUI extends SubstanceButtonUI {
-        public static ComponentUI createUI(JComponent b) {
-            AbstractButton button = (AbstractButton) b;
-            button.setRolloverEnabled(true);
-            button.setOpaque(false);
-            button.setFocusable(false);
-            button.setFocusPainted(false);
-            return new LightZoneButtonUI();
-        }
-
-        // On Windows text aliasing is off for some reason...
-        public void paint(java.awt.Graphics graphics, javax.swing.JComponent jComponent) {
-            Graphics2D g = (Graphics2D) graphics;
-            g.setRenderingHints(aliasingRenderHints);
-            super.paint(graphics, jComponent);
-        }
-
-        public void installDefaults(final AbstractButton b) {
-            super.installDefaults(b);
-            b.setBorder(BorderFactory.createEmptyBorder(4, 6, 4, 6));
-        }
-    }
-
-    public static class LightZoneToggleButtonUI extends SubstanceToggleButtonUI {
-        public static ComponentUI createUI(JComponent b) {
-            AbstractButton button = (AbstractButton) b;
-            button.setRolloverEnabled(true);
-            button.setFocusable(false);
-            button.setFocusPainted(false);
-            return new LightZoneToggleButtonUI();
-        }
-
-        // On Windows text aliasing is off for some reason...
-        public void paint(java.awt.Graphics graphics, javax.swing.JComponent jComponent) {
-            Graphics2D g = (Graphics2D) graphics;
-            g.setRenderingHints(aliasingRenderHints);
-            super.paint(graphics, jComponent);
-        }
-
-        public void installDefaults(final AbstractButton b) {
-            super.installDefaults(b);
-            b.setBorder(BorderFactory.createEmptyBorder(4, 6, 4, 6));
-        }
-    }
-
-    public static class LightZoneLookAndFeel extends SubstanceLookAndFeel {
-        protected void initClassDefaults(UIDefaults table) {
-            super.initClassDefaults(table);
-            Object[] uiDefaults = {
-                "ButtonUI", LightZoneButtonUI.class.getName(),
-                "ToggleButtonUI", LightZoneToggleButtonUI.class.getName()
-            };
-            table.putDefaults(uiDefaults);
-        }
-    }
-
     public static LookAndFeel getLightZoneLookAndFeel() {
-        LookAndFeel substance = new LightZoneLookAndFeel();
+        final Color accentColor = Colors.LZOrange.darker();
+        final int r = accentColor.getRed();
+        final int g = accentColor.getGreen();
+        final int b = accentColor.getBlue();
+        final String colorString = String.format("#%02x%02x%02x", r, g, b);
 
-        LightZoneLookAndFeel.setSkin(new LightZoneSkin());
-
-        FontPolicy newFontPolicy = new FontPolicy() {
-            public FontSet getFontSet(String lafName,
-                                      UIDefaults table) {
-                return new LightZoneSkin.LightZoneFontSet();
-            }
-        };
-
-        LightZoneLookAndFeel.setFontPolicy(newFontPolicy);
-
-        UIManager.put(SubstanceLookAndFeel.NO_EXTRA_ELEMENTS, Boolean.TRUE);
-
-        UIManager.put("ToolTip.backgroundInactive", substance.getDefaults().get("ToolTip.background"));
-        UIManager.put("ToolTip.foregroundInactive", substance.getDefaults().get("ToolTip.foreground"));
-
-        return substance;
+        final FlatLaf laf = new FlatDarculaLaf();
+        laf.setExtraDefaults(Map.of("@accentColor", colorString));
+        return laf;
     }
 }
