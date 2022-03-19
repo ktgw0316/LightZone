@@ -1,26 +1,24 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2022-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.operation;
 
 import com.lightcrafts.model.LayerMode;
 import com.lightcrafts.model.Operation;
 import com.lightcrafts.ui.LightZoneSkin;
-
-import static com.lightcrafts.ui.operation.Locale.LOCALE;
 import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlNode;
-import org.jvnet.substance.color.ColorScheme;
-import org.jvnet.substance.utils.SubstanceCoreUtilities;
-import org.jvnet.substance.utils.SubstanceSizeUtils;
 
 import javax.swing.*;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.List;
+
+import static com.lightcrafts.ui.LightZoneSkin.Colors.LZOrange;
+import static com.lightcrafts.ui.operation.Locale.LOCALE;
 
 class OpFooter extends Box implements PropertyChangeListener {
     private LayerControls layerControls;
@@ -33,32 +31,32 @@ class OpFooter extends Box implements PropertyChangeListener {
             if (evt.getNewValue() == Boolean.TRUE)
                 tabPane.setIconAt(1, getThemeIcon(null, false));
             else
-                tabPane.setIconAt(1, getThemeIcon(orangeScheme, false));
+                tabPane.setIconAt(1, getThemeIcon(LZOrange, false));
         }
         if (layerControls != null && evt.getPropertyName().equals(LayerControls.BLENDING_MODES)) {
             if (evt.getNewValue() == Boolean.TRUE)
                 tabPane.setIconAt(0, getThemeIcon(null, true));
             else
-                tabPane.setIconAt(0, getThemeIcon(orangeScheme, true));
+                tabPane.setIconAt(0, getThemeIcon(LZOrange, true));
         }
     }
 
-    private static Icon getThemeIcon(ColorScheme colorScheme, boolean square) {
-        int iSize = SubstanceSizeUtils.getTitlePaneIconSize();
-        BufferedImage result = SubstanceCoreUtilities.getBlankImage(iSize, iSize);
+    private static Icon getThemeIcon(Color color, boolean square) {
+//        int iSize = LightZoneSkin.LightZoneFontSet.TitleFont.getSize() / 2;
+        BufferedImage result = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics = (Graphics2D) result.getGraphics().create();
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                   RenderingHints.VALUE_ANTIALIAS_ON);
 
-        Color color1 = (colorScheme == null)
+        Color color1 = (color == null)
                        ? Color.red
-                       : colorScheme.getUltraDarkColor();
-        Color color2 = (colorScheme == null)
+                       : color.darker().darker();
+        Color color2 = (color == null)
                        ? Color.green
-                       : colorScheme.getMidColor();
-        Color color3 = (colorScheme == null)
+                       : color.darker();
+        Color color3 = (color == null)
                        ? Color.blue
-                       : colorScheme.getExtraLightColor();
+                       : color;
 
         graphics.setColor(color1);
         if (square)
@@ -99,8 +97,6 @@ class OpFooter extends Box implements PropertyChangeListener {
 
     private final PropertyChangeSupport pcs = new PropertyChangeSupport( this );
 
-    ColorScheme orangeScheme = new LightZoneSkin.CustomColorScheme(LightZoneSkin.Colors.LZOrange);
-
     OpFooter(OpControl control, List<LayerMode> layerModes) {
         super(BoxLayout.X_AXIS);
 
@@ -122,8 +118,8 @@ class OpFooter extends Box implements PropertyChangeListener {
         tabPane.add(LOCALE.get( "ToolSettingsTabName" ), blendBox);
         tabPane.add(LOCALE.get( "ColorSelectionTabName"), colorControls);
 
-        tabPane.setIconAt(0, getThemeIcon(orangeScheme, true));
-        tabPane.setIconAt(1, getThemeIcon(orangeScheme, false));
+        tabPane.setIconAt(0, getThemeIcon(LZOrange, true));
+        tabPane.setIconAt(1, getThemeIcon(LZOrange, false));
 
         add(tabPane, BorderLayout.NORTH);
 

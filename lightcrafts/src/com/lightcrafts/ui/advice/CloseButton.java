@@ -8,8 +8,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.net.URL;
 
-import org.jvnet.substance.SubstanceLookAndFeel;
-
 class CloseButton extends ImageOnlyButton {
 
     private final static Icon NormalIcon;
@@ -39,6 +37,5 @@ class CloseButton extends ImageOnlyButton {
         super(NormalIcon, PressedIcon);
         setRolloverIcon(HighlightIcon);
         setRolloverEnabled(true);
-        putClientProperty(SubstanceLookAndFeel.BUTTON_NO_MIN_SIZE_PROPERTY, Boolean.TRUE);
     }
 }

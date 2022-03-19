@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2022-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.operation;
 
@@ -19,19 +20,18 @@ import com.lightcrafts.ui.toolkit.LCSliderUI;
 import com.lightcrafts.utils.LCMS;
 import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlNode;
-import org.jvnet.substance.SubstanceLookAndFeel;
-import org.jvnet.substance.color.ColorScheme;
-import org.jvnet.substance.theme.SubstanceTheme;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.undo.AbstractUndoableEdit;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeSupport;
-import java.util.Enumeration;
 
 import static com.lightcrafts.ui.operation.Locale.LOCALE;
 
@@ -44,14 +44,14 @@ final class ColorSelectionControls extends Box {
 
     public static final String COLOR_SELECTION = "Color Selection";
 
-    private static LCMS.Transform ts = new LCMS.Transform(
+    private static final LCMS.Transform ts = new LCMS.Transform(
         new LCMS.Profile( JAIContext.linearProfile ), LCMS.TYPE_RGB_8,
         new LCMS.Profile( JAIContext.systemProfile ), LCMS.TYPE_RGB_8,
         LCMS.INTENT_PERCEPTUAL, 0
     );
 
     public static JRadioButton getSelection( ButtonGroup group ) {
-        for ( Enumeration e = group.getElements(); e.hasMoreElements(); ) {
+        for ( final var e = group.getElements(); e.hasMoreElements(); ) {
             final JRadioButton b = (JRadioButton)e.nextElement();
             if ( b.getModel() == group.getSelection() ) {
                 return b;
@@ -103,29 +103,17 @@ final class ColorSelectionControls extends Box {
                         final Color color = new Color(0xff & systemColor[0],
                                                 0xff & systemColor[1],
                                                 0xff & systemColor[2]);
-
-                        if (false) {
-                            final ColorScheme colorScheme = new LightZoneSkin.CustomColorScheme(color);
-                            final SubstanceTheme theme = LightZoneSkin.makeTheme(colorScheme, p.name());
-                            button.putClientProperty(SubstanceLookAndFeel.THEME_PROPERTY, theme);
-                            button.putClientProperty(SubstanceLookAndFeel.PAINT_ACTIVE_PROPERTY, Boolean.TRUE);
-                        } else {
-                            button.setBackground(color);
-                        }
+                        button.setBackground(color);
                         button.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 3));
                     }
 
-                    button.addItemListener(
-                        new ItemListener() {
-                            public void itemStateChanged( ItemEvent ie ) {
-                                if ( ie.getStateChange() == ItemEvent.SELECTED ) {
-                                    final ColorButton b =
-                                        (ColorButton)ie.getItem();
-                                    selectPreset( b.m_preset );
-                                }
-                            }
+                    button.addItemListener(ie -> {
+                        if ( ie.getStateChange() == ItemEvent.SELECTED ) {
+                            final ColorButton b =
+                                    (ColorButton)ie.getItem();
+                            selectPreset( b.m_preset );
                         }
-                    );
+                    });
                 }
             }
 
@@ -141,8 +129,7 @@ final class ColorSelectionControls extends Box {
 
         void setSelectedItem( RGBColorSelectionPreset p ) {
             if ( !p.equals( RGBColorSelectionPreset.SampledColors ) ) {
-                final Enumeration e = group.getElements();
-                while ( e.hasMoreElements() ) {
+                for (final var e = group.getElements(); e.hasMoreElements(); ) {
                     final ColorButton b = (ColorButton)e.nextElement();
                     if ( b.m_preset.equals( p ) ) {
                         b.setSelected( true );
@@ -244,13 +231,7 @@ final class ColorSelectionControls extends Box {
         );
 
         final ResetColorSelectionButton resetButton =
-            new ResetColorSelectionButton(
-                new ActionListener() {
-                    public void actionPerformed( ActionEvent ae ) {
-                        resetColorSelection();
-                    }
-                }
-            );
+            new ResetColorSelectionButton(ae -> resetColorSelection());
 
         setBackground( LightZoneSkin.Colors.ToolPanesBackground );
 
@@ -393,56 +374,57 @@ final class ColorSelectionControls extends Box {
     }
 
     void restore( XmlNode node ) throws XMLException {
-        if ( node.hasChild( ColorSelectionKey ) ) {
-            node = node.getChild( ColorSelectionKey );
-            try {
-                final float red = Float.parseFloat(
-                    node.getAttribute( HueRedKey )
-                );
-                final float green = Float.parseFloat(
-                    node.getAttribute( HueGreenKey )
-                );
-                final float blue = Float.parseFloat(
-                    node.getAttribute( HueBlueKey )
-                );
-                final float radius = Float.parseFloat(
-                    node.getAttribute( HueRadiusKey )
-                );
-                final boolean isHueEnabled = Boolean.parseBoolean(
-                    node.getAttribute( HueEnabledKey )
-                );
+        if (!node.hasChild(ColorSelectionKey)) {
+            return;
+        }
+        node = node.getChild( ColorSelectionKey );
+        try {
+            final float red = Float.parseFloat(
+                node.getAttribute( HueRedKey )
+            );
+            final float green = Float.parseFloat(
+                node.getAttribute( HueGreenKey )
+            );
+            final float blue = Float.parseFloat(
+                node.getAttribute( HueBlueKey )
+            );
+            final float radius = Float.parseFloat(
+                node.getAttribute( HueRadiusKey )
+            );
+            final boolean isHueEnabled = Boolean.parseBoolean(
+                node.getAttribute( HueEnabledKey )
+            );
 
-                final float blv = Float.parseFloat(
-                    node.getAttribute( LuminosityLowerKey )
-                );
-                final float blfv = Float.parseFloat(
-                    node.getAttribute( LuminosityLowerFeatherKey )
-                );
-                final float buv = Float.parseFloat(
-                    node.getAttribute( LuminosityUpperKey )
-                );
-                final float bufv = Float.parseFloat(
-                    node.getAttribute( LuminosityUpperFeatherKey )
-                );
-                final boolean isLuminosityEnabled = Boolean.parseBoolean(
-                    node.getAttribute( LuminosityEnabledKey )
-                );
+            final float blv = Float.parseFloat(
+                node.getAttribute( LuminosityLowerKey )
+            );
+            final float blfv = Float.parseFloat(
+                node.getAttribute( LuminosityLowerFeatherKey )
+            );
+            final float buv = Float.parseFloat(
+                node.getAttribute( LuminosityUpperKey )
+            );
+            final float bufv = Float.parseFloat(
+                node.getAttribute( LuminosityUpperFeatherKey )
+            );
+            final boolean isLuminosityEnabled = Boolean.parseBoolean(
+                node.getAttribute( LuminosityEnabledKey )
+            );
 
-                final boolean isInverted = Boolean.parseBoolean(
-                    node.getAttribute( InvertedKey )
-                );
+            final boolean isInverted = Boolean.parseBoolean(
+                node.getAttribute( InvertedKey )
+            );
 
-                final RGBColorSelection cs = new RGBColorSelection(
-                    red, green, blue, radius, blv, blfv, buv, bufv,
-                    isInverted, isHueEnabled, isLuminosityEnabled
-                );
-                colorSelectionToControls( cs, false );
-                m_op.setColorSelection( cs );
-                m_currentEdit = new ColorSelectionEdit();
-            }
-            catch ( IllegalArgumentException e ) {
-                throw new XMLException( e );
-            }
+            final RGBColorSelection cs = new RGBColorSelection(
+                red, green, blue, radius, blv, blfv, buv, bufv,
+                isInverted, isHueEnabled, isLuminosityEnabled
+            );
+            colorSelectionToControls( cs, false );
+            m_op.setColorSelection( cs );
+            m_currentEdit = new ColorSelectionEdit();
+        }
+        catch ( IllegalArgumentException e ) {
+            throw new XMLException( e );
         }
     }
 
@@ -459,10 +441,12 @@ final class ColorSelectionControls extends Box {
             m_afterHueModel = controlsToColorSelection();
         }
 
+        @Override
         public String getPresentationName() {
             return m_name;
         }
 
+        @Override
         public void undo() {
             super.undo();
             colorSelectionToControls( m_beforeHueModel, true );
@@ -470,6 +454,7 @@ final class ColorSelectionControls extends Box {
             m_currentEdit = new ColorSelectionEdit();
         }
 
+        @Override
         public void redo() {
             super.redo();
             colorSelectionToControls( m_afterHueModel, true );
@@ -485,17 +470,19 @@ final class ColorSelectionControls extends Box {
     // enable/disable checkboxes.
     private final class EnablerListener implements ItemListener {
 
+        @Override
         public void itemStateChanged( ItemEvent ie ) {
-            if ( !m_isUpdatingControls ) {
-                m_op.setColorSelection( controlsToColorSelection() );
-                final JComponent comp = (JComponent)ie.getSource();
-                if ( ie.getStateChange() == ItemEvent.SELECTED ) {
-                    postEdit( m_enabledEditName );
-                    comp.setToolTipText( m_selectedTip );
-                } else {
-                    postEdit( m_disabledEditName );
-                    comp.setToolTipText( m_unselectedTip );
-                }
+            if (m_isUpdatingControls) {
+                return;
+            }
+            m_op.setColorSelection( controlsToColorSelection() );
+            final JComponent comp = (JComponent)ie.getSource();
+            if ( ie.getStateChange() == ItemEvent.SELECTED ) {
+                postEdit( m_enabledEditName );
+                comp.setToolTipText( m_selectedTip );
+            } else {
+                postEdit( m_disabledEditName );
+                comp.setToolTipText( m_unselectedTip );
             }
         }
 
@@ -526,23 +513,27 @@ final class ColorSelectionControls extends Box {
     private final class LocalListener
         extends MouseAdapter implements ChangeListener
     {
+        @Override
         public void mousePressed( MouseEvent me ) {
             m_op.changeBatchStarted();
         }
 
+        @Override
         public void mouseReleased( MouseEvent me ) {
             m_op.changeBatchEnded();
             postEdit( LOCALE.get( "ColorSelectorEditName" ) );
         }
 
+        @Override
         public void stateChanged( ChangeEvent ce ) {
-            if ( !m_isUpdatingControls ) {
-                final RGBColorSelection cs = controlsToColorSelection();
-                m_lowerLuminosityFeather = cs.luminosityLowerFeather;
-                m_upperLuminosityFeather = cs.luminosityUpperFeather;
-                m_op.setColorSelection( cs );
-                m_prevCS = cs;
+            if (m_isUpdatingControls) {
+                return;
             }
+            final RGBColorSelection cs = controlsToColorSelection();
+            m_lowerLuminosityFeather = cs.luminosityLowerFeather;
+            m_upperLuminosityFeather = cs.luminosityUpperFeather;
+            m_op.setColorSelection( cs );
+            m_prevCS = cs;
         }
     }
 
@@ -672,24 +663,23 @@ final class ColorSelectionControls extends Box {
         m_dropperButton.setToolTips(
             ColorSelectStartToolTip, ColorSelectEndToolTip
         );
-        m_dropperButton.addItemListener(
-            new ItemListener() {
-                public void itemStateChanged( ItemEvent ie ) {
-                    if ( ie.getStateChange() == ItemEvent.SELECTED ) {
-                        getComboFrame().getEditor().setMode( EditorMode.ARROW );
-                        control.notifyListenersEnterMode( m_dropperMode );
-                    } else if ( !m_isDropperModeCancelling )
-                        control.notifyListenersExitMode( m_dropperMode );
-                }
-            }
-        );
+        m_dropperButton.addItemListener(ie -> {
+            if ( ie.getStateChange() == ItemEvent.SELECTED ) {
+                getComboFrame().getEditor().setMode( EditorMode.ARROW );
+                control.notifyListenersEnterMode( m_dropperMode );
+            } else if ( !m_isDropperModeCancelling )
+                control.notifyListenersExitMode( m_dropperMode );
+        });
 
         m_dropperMode = new DropperMode( control );
         m_dropperMode.addListener(
             new DropperMode.Listener() {
+                @Override
                 public void pointSelected( Point2D p ) {
                     selectColorAt( p );
                 }
+
+                @Override
                 public void modeCancelled() {
                     // Reset the toggle button, without firing notifications:
                     m_isDropperModeCancelling = true;
@@ -826,8 +816,8 @@ final class ColorSelectionControls extends Box {
 
     private RGBColorSelection m_prevCS;
 
-    private JCheckBox m_hueEnabled;
-    private JCheckBox m_luminosityEnabled;
+    private final JCheckBox m_hueEnabled;
+    private final JCheckBox m_luminosityEnabled;
 
     // Flag dropper button state changes that just synchronize the button
     // when the dropper Mode is externally cancelled, so OpControlModeListener
@@ -838,7 +828,7 @@ final class ColorSelectionControls extends Box {
     // controls are being slewed to a new ColorSelection.
     private boolean m_isUpdatingControls;
 
-    private OpControl.OpControlUndoSupport m_undoSupport;
+    private final OpControl.OpControlUndoSupport m_undoSupport;
 
     private final static String ColorSelectStartToolTip =
         LOCALE.get( "ColorSelectStartToolTip" );

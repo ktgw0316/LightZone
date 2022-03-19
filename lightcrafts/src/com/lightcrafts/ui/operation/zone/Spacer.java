@@ -1,8 +1,7 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2022-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.operation.zone;
-
-import org.jvnet.substance.SubstanceLookAndFeel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,16 +27,16 @@ class Spacer extends JPanel
     private final static Cursor ClickCursor =
         Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
 
-    private ZoneModel model;
-    private int index;
-    private JButton unstickButton;  // If stuck, a button to unstick.
+    private final ZoneModel model;
+    private final int index;
+    private final JButton unstickButton;  // If stuck, a button to unstick.
 
     // The set of spacers in a ZoneWidget share knobs.
     static class SpacerHandle {
         Spacer spacer;
     }
-    private SpacerHandle knobHandle;
-    private KnobPainter knobPainter;
+    private final SpacerHandle knobHandle;
+    private final KnobPainter knobPainter;
 
     Spacer(
         ZoneModel model, int index, SpacerHandle knobHandle
@@ -64,19 +63,12 @@ class Spacer extends JPanel
         unstickButton.setRolloverEnabled(true);
         unstickButton.setRolloverIcon(highlightIcon);
         unstickButton.setBorder(null);
-        unstickButton.putClientProperty(SubstanceLookAndFeel.BUTTON_PAINT_NEVER_PROPERTY, Boolean.TRUE);
         unstickButton.setBorderPainted(false);
         unstickButton.setRolloverEnabled(true);
         unstickButton.setOpaque(false);
         unstickButton.setCursor(ClickCursor);
         unstickButton.setFocusable(false);
-        unstickButton.addActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    Spacer.this.model.removePoint(Spacer.this.index);
-                }
-            }
-        );
+        unstickButton.addActionListener(event -> Spacer.this.model.removePoint(Spacer.this.index));
         if (model.containsPoint(index)) {
             add(unstickButton);
         }
@@ -98,6 +90,7 @@ class Spacer extends JPanel
         return 0;
     }
 
+    @Override
     public void doLayout() {
         if (isStuck()) {
             Dimension size = getSize();
@@ -109,9 +102,11 @@ class Spacer extends JPanel
         }
     }
 
+    @Override
     public void zoneModelBatchStart(ZoneModelEvent event) {
     }
 
+    @Override
     public void zoneModelChanged(ZoneModelEvent event) {
         if ((! isStuck()) && model.containsPoint(index)) {
             add(unstickButton);
@@ -125,27 +120,34 @@ class Spacer extends JPanel
         }
     }
 
+    @Override
     public void zoneModelBatchEnd(ZoneModelEvent event) {
     }
 
+    @Override
     public void focusGained(FocusEvent e) {
         setFocusedKnob();
     }
 
+    @Override
     public void focusLost(FocusEvent e) {
         repaint();
     }
 
+    @Override
     public void mouseClicked(MouseEvent e) {
     }
 
+    @Override
     public void mousePressed(MouseEvent e) {
         requestFocusInWindow();
     }
 
+    @Override
     public void mouseReleased(MouseEvent e) {
     }
 
+    @Override
     public void mouseEntered(MouseEvent e) {
         if (knobHandle.spacer != null) {
             knobHandle.spacer.knobPainter.knobOff(false);
@@ -154,6 +156,7 @@ class Spacer extends JPanel
         knobPainter.knobOn(false);
     }
 
+    @Override
     public void mouseExited(MouseEvent e) {
 //        if (knobHandle.spacer == this) {
 //            knobPainter.knobOff(false);
@@ -161,6 +164,7 @@ class Spacer extends JPanel
 //        knobHandle.spacer = null;
     }
 
+    @Override
     protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
 
@@ -225,6 +229,7 @@ class Spacer extends JPanel
         // Down-arrow nudges this Spacer downward:
         registerKeyboardAction(
             new AbstractAction() {
+                @Override
                 public void actionPerformed(ActionEvent event) {
                     Point p = getLocation();
                     moveTo(p.y + 1);
@@ -236,6 +241,7 @@ class Spacer extends JPanel
         // Up-arrow nudges this Spacer upward:
         registerKeyboardAction(
             new AbstractAction() {
+                @Override
                 public void actionPerformed(ActionEvent event) {
                     Point p = getLocation();
                     moveTo(p.y - 1);
@@ -247,6 +253,7 @@ class Spacer extends JPanel
         // Space sticks this Spacer where it is:
         registerKeyboardAction(
             new AbstractAction() {
+                @Override
                 public void actionPerformed(ActionEvent event) {
                     Point p = getLocation();
                     moveTo(p.y);
@@ -258,6 +265,7 @@ class Spacer extends JPanel
         // Delete unsticks this Spacer:
         registerKeyboardAction(
             new AbstractAction() {
+                @Override
                 public void actionPerformed(ActionEvent event) {
                     model.removePoint(index);
                 }
@@ -268,6 +276,7 @@ class Spacer extends JPanel
         // Backspace is same as Delete:
         registerKeyboardAction(
             new AbstractAction() {
+                @Override
                 public void actionPerformed(ActionEvent event) {
                     model.removePoint(index);
                 }
@@ -279,8 +288,7 @@ class Spacer extends JPanel
 
     // Loading resources over and over again turns out to be really expensive
     // at document initialization, use a cache.
-    private static Map<String, Icon> IconCache =
-        new WeakHashMap<String, Icon>();
+    private static final Map<String, Icon> IconCache = new WeakHashMap<>();
 
     private static Icon getIcon(String name) {
         String path = "resources/" + name + ".png";

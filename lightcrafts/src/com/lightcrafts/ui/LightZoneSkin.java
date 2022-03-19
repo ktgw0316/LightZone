@@ -5,18 +5,6 @@ package com.lightcrafts.ui;
 
 import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatMaterialDarkerIJTheme;
 import contrib.com.jgoodies.looks.common.FontSet;
-import org.jvnet.substance.button.ClassicButtonShaper;
-import org.jvnet.substance.color.BaseColorScheme;
-import org.jvnet.substance.color.ColorScheme;
-import org.jvnet.substance.painter.AlphaControlBackgroundComposite;
-import org.jvnet.substance.painter.GlassGradientPainter;
-import org.jvnet.substance.painter.SimplisticSoftBorderReverseGradientPainter;
-import org.jvnet.substance.skin.SubstanceAbstractSkin;
-import org.jvnet.substance.theme.SubstanceComplexTheme;
-import org.jvnet.substance.theme.SubstanceEbonyTheme;
-import org.jvnet.substance.theme.SubstanceTheme;
-import org.jvnet.substance.title.ArcHeaderPainter;
-import org.jvnet.substance.watermark.SubstanceNoneWatermark;
 
 import javax.media.jai.IHSColorSpace;
 import javax.swing.*;
@@ -26,7 +14,7 @@ import javax.swing.plaf.FontUIResource;
 import java.awt.*;
 import java.awt.color.ColorSpace;
 
-public class LightZoneSkin extends SubstanceAbstractSkin {
+public class LightZoneSkin {
     public static String NAME = "LightZone";
 
     public static class Colors {
@@ -69,92 +57,16 @@ public class LightZoneSkin extends SubstanceAbstractSkin {
 
         public final static Color LZOrange = new Color(254, 155, 14);
         public final static Color SelectedToolBorder = relight(LZOrange, 0.7f);
-    }
 
-    static Color relight(Color color, float amount) {
-        IHSColorSpace ihs = IHSColorSpace.getInstance();
+        private static Color relight(Color color, float amount) {
+            IHSColorSpace ihs = IHSColorSpace.getInstance();
 
-        float[] components = new float[3];
-        components = ihs.fromRGB(color.getColorComponents(components));
-        components[0] *= amount;
-        components = ihs.toRGB(components);
-        return new Color(components[0], components[1], components[2]);
-    }
-
-    public static class CustomColorScheme extends BaseColorScheme {
-        private final Color mainUltraLightColor;
-        private final Color mainExtraLightColor;
-        private final Color mainLightColor;
-        private final Color mainMidColor;
-        private final Color mainDarkColor;
-        private final Color mainUltraDarkColor;
-        private final Color foregroundColor;
-
-        public CustomColorScheme(Color baseColor) {
-            mainUltraLightColor = relight(baseColor, 0.95f);
-            mainExtraLightColor = relight(baseColor, 0.85f);
-            mainLightColor = relight(baseColor, 0.7f);
-            mainMidColor = relight(baseColor, 0.6f);
-            mainDarkColor = relight(baseColor, 0.5f);
-            mainUltraDarkColor = relight(baseColor, 0.4f);
-            foregroundColor = Color.white;
+            float[] components = new float[3];
+            components = ihs.fromRGB(color.getColorComponents(components));
+            components[0] *= amount;
+            components = ihs.toRGB(components);
+            return new Color(components[0], components[1], components[2]);
         }
-
-        public Color getForegroundColor() { return foregroundColor; }
-        public Color getUltraLightColor() { return mainUltraLightColor; }
-        public Color getExtraLightColor() { return mainExtraLightColor; }
-        public Color getLightColor() { return mainLightColor; }
-        public Color getMidColor() { return mainMidColor; }
-        public Color getDarkColor() { return mainDarkColor; }
-        public Color getUltraDarkColor() { return mainUltraDarkColor; }
-    }
-
-    public static SubstanceTheme makeTheme(ColorScheme colorScheme, String name) {
-        SubstanceTheme activeTheme = new SubstanceTheme(colorScheme, name, SubstanceTheme.ThemeKind.DARK);
-
-        SubstanceTheme basicTheme = new SubstanceEbonyTheme().tint(0.05);
-        SubstanceTheme defaultTheme = basicTheme.shade(0.2);
-        SubstanceTheme disabledTheme = basicTheme.shade(0.3);
-        SubstanceTheme activeTitleTheme = defaultTheme;
-
-        SubstanceComplexTheme theme = new SubstanceComplexTheme(name + " Theme",
-                                                                SubstanceTheme.ThemeKind.DARK, activeTheme, defaultTheme, disabledTheme,
-                                                                activeTitleTheme);
-
-        theme.setNonActivePainter(new SimplisticSoftBorderReverseGradientPainter());
-        theme.setSelectedTabFadeStart(0.4);
-        theme.setSelectedTabFadeEnd(0.7);
-        theme.setCellRendererBackgroundTheme(new SubstanceEbonyTheme());
-
-        return theme;
-    }
-
-    public static final SubstanceTheme orangeTheme = makeTheme(new CustomColorScheme(Colors.LZOrange), "Orange");
-
-    public LightZoneSkin() {
-        SubstanceTheme activeTheme = new SubstanceEbonyTheme();
-        SubstanceTheme defaultTheme = activeTheme.shade(0.2);
-        SubstanceTheme disabledTheme = activeTheme.shade(0.3);
-        SubstanceTheme activeTitleTheme = defaultTheme;
-
-        SubstanceComplexTheme theme = new SubstanceComplexTheme(NAME,
-                                                                SubstanceTheme.ThemeKind.DARK, activeTheme, defaultTheme, disabledTheme,
-                                                                activeTitleTheme);
-        theme.setNonActivePainter(new SimplisticSoftBorderReverseGradientPainter());
-        theme.setSelectedTabFadeStart(0.3);
-        theme.setSelectedTabFadeEnd(0.6);
-        theme.setCellRendererBackgroundTheme(new SubstanceEbonyTheme());
-
-        this.theme = theme;
-        this.shaper = new ClassicButtonShaper();
-        this.watermark = new SubstanceNoneWatermark();
-        this.gradientPainter = new GlassGradientPainter();
-        this.titlePainter = new ArcHeaderPainter();
-        this.tabBackgroundComposite = new AlphaControlBackgroundComposite(0.5f);
-    }
-
-    public String getDisplayName() {
-        return NAME;
     }
 
     public static class LightZoneFontSet implements FontSet {

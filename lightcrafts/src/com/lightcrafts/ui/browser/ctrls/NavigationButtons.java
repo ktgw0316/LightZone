@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2022-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.browser.ctrls;
 
@@ -8,14 +9,11 @@ import com.lightcrafts.ui.browser.folders.FolderTreeListener;
 import com.lightcrafts.ui.toolkit.CoolButton;
 import com.lightcrafts.ui.toolkit.IconFactory;
 import com.lightcrafts.ui.toolkit.MenuButton;
-import org.jvnet.substance.SubstanceLookAndFeel;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -24,13 +22,13 @@ import static com.lightcrafts.ui.browser.ctrls.Locale.LOCALE;
 
 public class NavigationButtons extends JPanel {
 
-    private static Icon ImgFwd =
+    private static final Icon ImgFwd =
         IconFactory.createInvertedIcon(NavigationButtons.class, "forward.png");
 
-    private static Icon ImgBack =
+    private static final Icon ImgBack =
             IconFactory.createInvertedIcon(NavigationButtons.class, "back.png");
 
-    private static Icon imgPath;
+    private static final Icon imgPath;
 
     static {
         try {
@@ -41,7 +39,7 @@ public class NavigationButtons extends JPanel {
         }
     }
 
-    private FolderBrowserPane browser;
+    private final FolderBrowserPane browser;
 
     private JButton btnBack;
     private JButton btnForward;
@@ -74,31 +72,21 @@ public class NavigationButtons extends JPanel {
         btnForward.setEnabled(false);
 
         btnPath.setIcon(imgPath);
-        btnPath.putClientProperty(SubstanceLookAndFeel.FLAT_PROPERTY, Boolean.FALSE);
         btnPath.setToolTipText(LOCALE.get("PathToolTip"));
     }
 
     private void plumbComponents() {
-        btnBack.addActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    browser.goBack();
-                }
-            }
-        );
-        btnForward.addActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    browser.goForward();
-                }
-            }
-        );
+        btnBack.addActionListener(e -> browser.goBack());
+        btnForward.addActionListener(e -> browser.goForward());
         browser.addSelectionListener(
             new FolderTreeListener() {
+                @Override
                 public void folderSelectionChanged(File folder) {
                     btnBack.setEnabled(browser.isBackAvailable());
                     btnForward.setEnabled(browser.isForwardAvailable());
                 }
+
+                @Override
                 public void folderDropAccepted(List<File> files, File folder) {
                 }
             }
