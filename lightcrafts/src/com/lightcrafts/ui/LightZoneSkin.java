@@ -3,8 +3,7 @@
 
 package com.lightcrafts.ui;
 
-import com.formdev.flatlaf.FlatDarculaLaf;
-import com.formdev.flatlaf.FlatLaf;
+import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatMaterialDarkerIJTheme;
 import contrib.com.jgoodies.looks.common.FontSet;
 import org.jvnet.substance.button.ClassicButtonShaper;
 import org.jvnet.substance.color.BaseColorScheme;
@@ -26,7 +25,6 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.plaf.FontUIResource;
 import java.awt.*;
 import java.awt.color.ColorSpace;
-import java.util.Map;
 
 public class LightZoneSkin extends SubstanceAbstractSkin {
     public static String NAME = "LightZone";
@@ -214,14 +212,6 @@ public class LightZoneSkin extends SubstanceAbstractSkin {
     }
 
     public static LookAndFeel getLightZoneLookAndFeel() {
-        final Color accentColor = Colors.LZOrange.darker();
-        final int r = accentColor.getRed();
-        final int g = accentColor.getGreen();
-        final int b = accentColor.getBlue();
-        final String colorString = String.format("#%02x%02x%02x", r, g, b);
-
-        final FlatLaf laf = new FlatDarculaLaf();
-        laf.setExtraDefaults(Map.of("@accentColor", colorString));
-        return laf;
+        return new FlatMaterialDarkerIJTheme();
     }
 }
