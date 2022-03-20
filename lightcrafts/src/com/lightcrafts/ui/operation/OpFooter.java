@@ -113,7 +113,7 @@ class OpFooter extends Box implements PropertyChangeListener {
         invertRegionSwitch.setAlignmentX( Component.LEFT_ALIGNMENT );
 
         tabPane = new JTabbedPane();
-        tabPane.setFont(LightZoneSkin.fontSet.getSmallFont());
+        tabPane.setFont(LightZoneSkin.LightZoneFontSet.SmallFont);
         tabPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         tabPane.add(LOCALE.get( "ToolSettingsTabName" ), blendBox);
         tabPane.add(LOCALE.get( "ColorSelectionTabName"), colorControls);

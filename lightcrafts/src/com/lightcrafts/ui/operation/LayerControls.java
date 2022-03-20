@@ -76,13 +76,13 @@ final class LayerControls extends Box {
 
         final Box blendingModeBox = Box.createHorizontalBox();
         JLabel blendLabel = new JLabel( LOCALE.get( "BlendingModeMenuLabel" ) + ": " );
-        blendLabel.setFont(LightZoneSkin.fontSet.getSmallFont());
+        blendLabel.setFont(LightZoneSkin.LightZoneFontSet.SmallFont);
         blendingModeBox.add(blendLabel);
         blendingModeBox.add(combo);
 
         final Box opacityBox = Box.createHorizontalBox();
         JLabel opacityLabel = new JLabel( LOCALE.get( "ToolOpacitySliderLabel" ) + ":  " );
-        opacityLabel.setFont(LightZoneSkin.fontSet.getSmallFont());
+        opacityLabel.setFont(LightZoneSkin.LightZoneFontSet.SmallFont);
         opacityBox.add(opacityLabel);
         opacityBox.add(slider);
 

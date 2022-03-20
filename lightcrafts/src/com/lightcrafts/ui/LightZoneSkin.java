@@ -4,7 +4,6 @@
 package com.lightcrafts.ui;
 
 import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatMaterialDarkerIJTheme;
-import contrib.com.jgoodies.looks.common.FontSet;
 
 import javax.media.jai.IHSColorSpace;
 import javax.swing.*;
@@ -69,51 +68,11 @@ public class LightZoneSkin {
         }
     }
 
-    public static class LightZoneFontSet implements FontSet {
-        FontUIResource controlFont;
-        FontUIResource menuFont;
-        FontUIResource titleFont;
-        FontUIResource windowTitleFont;
-        FontUIResource smallFont;
-        FontUIResource messageFont;
-
-        String fontFamily = Font.SANS_SERIF;
-
-        public LightZoneFontSet() {
-            controlFont = new FontUIResource(fontFamily, Font.PLAIN, 13);
-            menuFont = new FontUIResource(fontFamily, Font.PLAIN, 13);
-            titleFont = new FontUIResource(fontFamily, Font.BOLD, 11);
-            windowTitleFont = new FontUIResource(fontFamily, Font.BOLD, 16);
-            smallFont = new FontUIResource(fontFamily, Font.PLAIN, 13);
-            messageFont = new FontUIResource(fontFamily, Font.BOLD, 13);
-        }
-
-        public FontUIResource getControlFont() {
-            return controlFont;
-        }
-
-        public FontUIResource getMenuFont() {
-            return menuFont;
-        }
-
-        public FontUIResource getTitleFont() {
-            return titleFont;
-        }
-
-        public FontUIResource getWindowTitleFont() {
-            return windowTitleFont;
-        }
-
-        public FontUIResource getSmallFont() {
-            return smallFont;
-        }
-
-        public FontUIResource getMessageFont() {
-            return messageFont;
-        }
+    public static class LightZoneFontSet {
+        // cf. https://www.formdev.com/flatlaf/typography/#available
+        public static final FontUIResource TitleFont = new FontUIResource(UIManager.getFont("small.font"));
+        public static final FontUIResource SmallFont = new FontUIResource(UIManager.getFont("small.font"));
     }
-
-    public static final FontSet fontSet = new LightZoneFontSet();
 
     public static Border getImageBorder() {
         return getPaneBorder(); // new CompoundBorder(getPaneBorder(), new MatteBorder(6, 6, 6, 6, Colors.EditorBackground));

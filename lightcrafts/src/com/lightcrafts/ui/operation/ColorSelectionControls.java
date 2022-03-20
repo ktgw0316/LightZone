@@ -187,7 +187,7 @@ final class ColorSelectionControls extends Box {
             new JLabel( LOCALE.get( "ColorRangeLabel" ) + ':' );
         colorRadiusLabel.setBackground( OpControl.Background );
         colorRadiusLabel.setFocusable( false );
-        colorRadiusLabel.setFont( LightZoneSkin.fontSet.getSmallFont() );
+        colorRadiusLabel.setFont(LightZoneSkin.LightZoneFontSet.SmallFont);
         m_colorRangeSlider = new JSlider(
             SLIDER_RADIUS_MIN, SLIDER_RADIUS_MAX,
             COLOR_RADIUS_DEFAULT
@@ -216,7 +216,7 @@ final class ColorSelectionControls extends Box {
         m_invertSelection = new JCheckBox(
             LOCALE.get( "InvertColorSelectionLabel" )
         );
-        m_invertSelection.setFont(LightZoneSkin.fontSet.getSmallFont());
+        m_invertSelection.setFont(LightZoneSkin.LightZoneFontSet.SmallFont);
         m_invertSelection.setFocusable( false );
         m_invertSelection.setToolTipText(
             LOCALE.get( "InvertColorSelectionEnableToolTip" )

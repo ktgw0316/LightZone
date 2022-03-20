@@ -25,6 +25,8 @@ import java.awt.*;
 public class ToggleTitleBorder
     extends CompoundBorder implements PreferenceChangeListener
 {
+    public static final Font font = LightZoneSkin.LightZoneFontSet.TitleFont;
+
     /**
      * Set the border on the given component to a ToggleTitledBorder that
      * will update dynamically when the global preference changes.
@@ -131,6 +133,7 @@ public class ToggleTitleBorder
     private ToggleTitleBorder(JComponent comp, String text) {
         this.comp = comp;
         title = new LZTitleBorder(this, text);
+        title.setTitleFont(font);
         title.setTitleJustification(TitledBorder.CENTER);
         title.setTitlePosition(TitledBorder.BOTTOM);
         Insets insets = getBorderInsets(comp);

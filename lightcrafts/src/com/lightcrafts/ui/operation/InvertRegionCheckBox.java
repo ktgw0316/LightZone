@@ -2,18 +2,19 @@
 
 package com.lightcrafts.ui.operation;
 
+import com.lightcrafts.model.RedEyeOperation;
+import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.ui.operation.clone.CloneControl;
 import com.lightcrafts.ui.operation.clone.SpotControl;
-import static com.lightcrafts.ui.operation.Locale.LOCALE;
-import com.lightcrafts.ui.LightZoneSkin;
-import com.lightcrafts.model.RedEyeOperation;
-import com.lightcrafts.utils.xml.XmlNode;
 import com.lightcrafts.utils.xml.XMLException;
+import com.lightcrafts.utils.xml.XmlNode;
 
 import javax.swing.*;
-import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.beans.PropertyChangeSupport;
+
+import static com.lightcrafts.ui.operation.Locale.LOCALE;
 
 /**
  * Created by IntelliJ IDEA.
@@ -34,7 +35,7 @@ class InvertRegionCheckBox extends JCheckBox implements ItemListener {
         super(LOCALE.get("InvertMaskLabel"));
         this.control = control;
         undoSupport = control.undoSupport;
-        setFont(LightZoneSkin.fontSet.getSmallFont());
+        setFont(LightZoneSkin.LightZoneFontSet.SmallFont);
         this.pcs = pcs;
 
         addItemListener(this);
