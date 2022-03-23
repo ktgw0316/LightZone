@@ -135,10 +135,12 @@ public final class DocUndoHistory
     public void horizontalMouseWheelMoved(MouseWheelEvent e) {
         if (e.getScrollType() >= 2) {
             if (scroll.isWheelScrollingEnabled()) {
+                final int rot = e.getWheelRotation();
+                if (rot == 0) return;
+                final int dir = rot < 0 ? -1 : 1;
                 JScrollBar bar = scroll.getHorizontalScrollBar();
-                int dir = e.getWheelRotation() < 0 ? -1 : 1;
-                int inc = bar.getUnitIncrement(dir);
-                int value = bar.getValue() - e.getWheelRotation() * inc;
+                final int inc = bar.getUnitIncrement(dir);
+                final int value = bar.getValue() - rot * inc;
                 bar.setValue(value);
             }
         }

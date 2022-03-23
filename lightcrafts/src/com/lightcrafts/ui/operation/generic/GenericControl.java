@@ -10,6 +10,7 @@ import com.lightcrafts.ui.operation.OpControl;
 import com.lightcrafts.ui.operation.OpStack;
 import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlNode;
+import lombok.val;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -17,8 +18,6 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
-
-import lombok.val;
 
 public class GenericControl extends OpControl {
 
@@ -67,21 +66,18 @@ public class GenericControl extends OpControl {
             val values = new Vector<String>(op.getChoiceValues(key));
             val choice = new JComboBox(values);
             choice.addActionListener(choiceActionListener(key, choice));
-            choice.addMouseWheelListener(
-                    new MouseWheelListener() {
-                        @Override
-                        public void mouseWheelMoved(MouseWheelEvent e) {
-                            val source = (JComboBox) e.getComponent();
-                            if (!source.hasFocus()) {
-                                return;
-                            }
-                            val ni = source.getSelectedIndex() + e.getWheelRotation();
-                            if (ni >= 0 && ni < source.getItemCount()) {
-                                source.setSelectedIndex(ni);
-                            }
-                        }
-                    }
-            );
+            choice.addMouseWheelListener(e -> {
+                val source = (JComboBox) e.getComponent();
+                if (!source.hasFocus()) {
+                    return;
+                }
+                val rot = e.getWheelRotation();
+                if (rot == 0) return;
+                val ni = source.getSelectedIndex() + rot;
+                if (ni >= 0 && ni < source.getItemCount()) {
+                    source.setSelectedIndex(ni);
+                }
+            });
             val oldChoice = choices.get(key);
             if (oldChoice != null) {
                 choice.setSelectedItem(oldChoice.getSelectedItem());

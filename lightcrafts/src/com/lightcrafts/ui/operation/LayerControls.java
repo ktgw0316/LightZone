@@ -5,29 +5,22 @@ package com.lightcrafts.ui.operation;
 import com.lightcrafts.model.LayerConfig;
 import com.lightcrafts.model.LayerMode;
 import com.lightcrafts.model.Operation;
-
-import static com.lightcrafts.ui.operation.Locale.LOCALE;
-
-import com.lightcrafts.ui.toolkit.LCSliderUI;
 import com.lightcrafts.ui.LightZoneSkin;
+import com.lightcrafts.ui.toolkit.LCSliderUI;
 import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlNode;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.awt.*;
+import java.awt.event.*;
+import java.beans.PropertyChangeSupport;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
-import java.beans.PropertyChangeSupport;
+
+import static com.lightcrafts.ui.operation.Locale.LOCALE;
 
 /** Manage a combo box and a slider to control LayerConfig settings on
   * an Operation.  This includes initialization from Operation defaults
@@ -136,20 +129,18 @@ final class LayerControls extends Box {
                 }
             }
         );
-        combo.addMouseWheelListener(
-            new MouseWheelListener() {
-                public void mouseWheelMoved(MouseWheelEvent e) {
-                    JComboBox source = (JComboBox) e.getComponent();
-                    if (!source.hasFocus()) {
-                        return;
-                    }
-                    int ni = source.getSelectedIndex() + e.getWheelRotation();
-                    if (ni >= 0 && ni < source.getItemCount()) {
-                        source.setSelectedIndex(ni);
-                    }
-                }
+        combo.addMouseWheelListener(e -> {
+            JComboBox source = (JComboBox) e.getComponent();
+            if (!source.hasFocus()) {
+                return;
             }
-        );
+            final int rot = e.getWheelRotation();
+            if (rot == 0) return;
+            final int ni = source.getSelectedIndex() + rot;
+            if (ni >= 0 && ni < source.getItemCount()) {
+                source.setSelectedIndex(ni);
+            }
+        });
     }
 
     private final static String ModeTag = "Mode";

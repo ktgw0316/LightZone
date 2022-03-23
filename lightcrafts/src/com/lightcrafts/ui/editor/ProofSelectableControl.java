@@ -2,16 +2,14 @@
 
 package com.lightcrafts.ui.editor;
 
+import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.model.Engine;
 import com.lightcrafts.model.PrintSettings;
 import com.lightcrafts.model.RenderingIntent;
 import com.lightcrafts.platform.Platform;
+import com.lightcrafts.ui.help.HelpConstants;
 import com.lightcrafts.ui.operation.SelectableControl;
 import com.lightcrafts.ui.toolkit.WidePopupComboBox;
-import com.lightcrafts.image.color.ColorProfileInfo;
-
-import static com.lightcrafts.ui.editor.Locale.LOCALE;
-import com.lightcrafts.ui.help.HelpConstants;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -24,6 +22,8 @@ import java.awt.event.MouseWheelListener;
 import java.util.Collection;
 import java.util.List;
 import java.util.prefs.Preferences;
+
+import static com.lightcrafts.ui.editor.Locale.LOCALE;
 
 /**
  * A SelectableControl to control the argument to Engine.preview(),
@@ -106,34 +106,28 @@ final class ProofSelectableControl extends SelectableControl {
         // Avoid scroll bars in menus, even if some items may not be accessible:
         printerProfile.setMaximumRowCount(25);
 
-        printerProfile.addItemListener(
-            new ItemListener() {
-                public void itemStateChanged(ItemEvent e) {
-                    if (e.getStateChange() == ItemEvent.SELECTED) {
-                        ColorProfileInfo cpi =
-                            (ColorProfileInfo) printerProfile.getSelectedItem();
-                        ICC_Profile profile = cpi.getICCProfile();
-                        settings.setColorProfile(profile);
-                        engine.preview(settings);
-                        Prefs.put(ProofProfileKey, cpi.getName());
-                    }
-                }
+        printerProfile.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                ColorProfileInfo cpi =
+                    (ColorProfileInfo) printerProfile.getSelectedItem();
+                ICC_Profile profile = cpi.getICCProfile();
+                settings.setColorProfile(profile);
+                engine.preview(settings);
+                Prefs.put(ProofProfileKey, cpi.getName());
             }
-        );
-        printerProfile.addMouseWheelListener(
-            new MouseWheelListener() {
-                public void mouseWheelMoved(MouseWheelEvent e) {
-                    JComboBox source = (JComboBox) e.getComponent();
-                    if (!source.hasFocus()) {
-                        return;
-                    }
-                    int ni = source.getSelectedIndex() + e.getWheelRotation();
-                    if (ni >= 0 && ni < source.getItemCount()) {
-                        source.setSelectedIndex(ni);
-                    }
-                }
+        });
+        printerProfile.addMouseWheelListener(e -> {
+            JComboBox source = (JComboBox) e.getComponent();
+            if (!source.hasFocus()) {
+                return;
             }
-        );
+            final int rot = e.getWheelRotation();
+            if (rot == 0) return;
+            final int ni = source.getSelectedIndex() + rot;
+            if (ni >= 0 && ni < source.getItemCount()) {
+                source.setSelectedIndex(ni);
+            }
+        });
     }
 
     private void initRenderingIntent() {
@@ -173,7 +167,9 @@ final class ProofSelectableControl extends SelectableControl {
                     if (!source.hasFocus()) {
                         return;
                     }
-                    int ni = source.getSelectedIndex() + e.getWheelRotation();
+                    final int rot = e.getWheelRotation();
+                    if (rot == 0) return;
+                    final int ni = source.getSelectedIndex() + rot;
                     if (ni >= 0 && ni < source.getItemCount()) {
                         source.setSelectedIndex(ni);
                     }

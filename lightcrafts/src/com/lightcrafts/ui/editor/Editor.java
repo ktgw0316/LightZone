@@ -190,7 +190,9 @@ public class Editor implements HorizontalMouseWheelSupport {
     class PanningMouseWheelListener implements MouseWheelListener {
         public void mouseWheelMoved(MouseWheelEvent e) {
             if (imageScroll.isWheelScrollingEnabled() && e.getScrollAmount() != 0) {
-                int direction = e.getWheelRotation() < 0 ? -1 : 1;
+                final int rot = e.getWheelRotation();
+                if (rot == 0) return;
+                final int direction = rot < 0 ? -1 : 1;
                 if (overlay.peekMode() == transientPanMode) {
                     scale.scaleUpDown(-direction);
                 } else {
@@ -203,7 +205,7 @@ public class Editor implements HorizontalMouseWheelSupport {
                                MouseWheelEvent.WHEEL_BLOCK_SCROLL) {
                         scrollByBlock(toScroll, direction);
                     } else {
-                        scrollByUnits(toScroll, -direction, Math.abs(e.getWheelRotation()));
+                        scrollByUnits(toScroll, -direction, Math.abs(rot));
                     }
                 }
             }

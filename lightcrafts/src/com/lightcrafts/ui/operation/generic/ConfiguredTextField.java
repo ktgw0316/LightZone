@@ -206,8 +206,9 @@ class ConfiguredTextField
     // Increment/decrement by smallInc on mouse wheel events, if we're focused:
     public void mouseWheelMoved(MouseWheelEvent event) {
         double value = model.getConfiguredValue();
-        int count = event.getWheelRotation();
-        int sign = (count > 0) ? 1 : -1;
+        final int count = event.getWheelRotation();
+        if (count == 0) return;
+        final int sign = (count > 0) ? 1 : -1;
         for (int n=0; n<sign*count; n++) {
             if (sign > 0) {
                 value = getNextRoundValueDown(value);

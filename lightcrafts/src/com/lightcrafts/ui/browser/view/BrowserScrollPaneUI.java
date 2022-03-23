@@ -73,7 +73,6 @@ class BrowserScrollPaneUI extends BasicScrollPaneUI {
             if (scrollpane.isWheelScrollingEnabled() &&
                 e.getScrollAmount() != 0) {
                 JScrollBar toScroll = scrollpane.getVerticalScrollBar();
-                int direction;
                 // find which scrollbar to scroll, or return if none
                 if (toScroll == null || !toScroll.isVisible()) {
                     toScroll = scrollpane.getHorizontalScrollBar();
@@ -81,7 +80,9 @@ class BrowserScrollPaneUI extends BasicScrollPaneUI {
                         return;
                     }
                 }
-                direction = e.getWheelRotation() < 0 ? -1 : 1;
+                final int rot = e.getWheelRotation();
+                if (rot == 0) return;
+                final int direction = rot < 0 ? -1 : 1;
                 if (e.getScrollType() == MouseWheelEvent.WHEEL_UNIT_SCROLL) {
                     // For Windows, lock the scrollAmount to 1
                     scrollByUnits(toScroll, direction, 1 /*e.getScrollAmount()*/);

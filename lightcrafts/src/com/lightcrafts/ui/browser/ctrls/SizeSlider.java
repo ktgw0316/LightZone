@@ -3,16 +3,15 @@
 
 package com.lightcrafts.ui.browser.ctrls;
 
-import static com.lightcrafts.ui.browser.ctrls.Locale.LOCALE;
 import com.lightcrafts.ui.browser.view.AbstractImageBrowser;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.util.prefs.Preferences;
+
+import static com.lightcrafts.ui.browser.ctrls.Locale.LOCALE;
 
 public class SizeSlider extends Box {
 
@@ -65,15 +64,11 @@ public class SizeSlider extends Box {
             }
         );
         slider.setFocusable(false);
-        slider.addMouseWheelListener(
-                new MouseWheelListener() {
-                    @Override
-                    public void mouseWheelMoved(MouseWheelEvent e) {
-                        slider.setValue(slider.getValue()
-                                + (e.getWheelRotation() < 0 ? 1 : -1));
-                    }
-                }
-        );
+        slider.addMouseWheelListener(e -> {
+            final int rot = e.getWheelRotation();
+            if (rot == 0) return;
+            slider.setValue(slider.getValue() + (rot < 0 ? 1 : -1));
+        });
     }
 
     public int getValue() {

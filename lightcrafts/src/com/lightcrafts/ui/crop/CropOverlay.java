@@ -4,17 +4,16 @@
 
 package com.lightcrafts.ui.crop;
 
-import javax.media.jai.Interpolation;
-import javax.media.jai.RenderedOp;
-import javax.media.jai.operator.RotateDescriptor;
 import com.lightcrafts.model.CropBounds;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.utils.awt.geom.HiDpi;
 
 import javax.imageio.ImageIO;
+import javax.media.jai.Interpolation;
+import javax.media.jai.RenderedOp;
+import javax.media.jai.operator.RotateDescriptor;
 import javax.swing.*;
 import javax.swing.event.MouseInputListener;
-
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -25,10 +24,9 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ResourceBundle;
 import java.util.LinkedList;
 import java.util.List;
-import java.lang.*;
+import java.util.ResourceBundle;
 
 // This is a translucent white overlay in the shape of the complement of
 // a rectangle that can be dragged, turned, and resized with the mouse.
@@ -972,7 +970,8 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
 
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
-        int count = e.getWheelRotation();
+        final int count = e.getWheelRotation();
+        if (count == 0) return;
 
         rotateAngleStart = crop.getAngle();
         double deg = rotateAngleStart * 180 / Math.PI;

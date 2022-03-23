@@ -64,9 +64,11 @@ public class FolderCtrl extends JPanel implements HorizontalMouseWheelSupport {
         if (e.getScrollType() >= 2) {
             if (tree.isWheelScrollingEnabled()) {
                 JScrollBar bar = tree.getHorizontalScrollBar();
-                int dir = e.getWheelRotation() < 0 ? -1 : 1;
-                int inc = bar.getUnitIncrement(dir);
-                int value = bar.getValue() - e.getWheelRotation() * inc;
+                final int rot = e.getWheelRotation();
+                if (rot == 0) return;
+                final int dir = rot < 0 ? -1 : 1;
+                final int inc = bar.getUnitIncrement(dir);
+                final int value = bar.getValue() - rot * inc;
                 bar.setValue(value);
             }
         }

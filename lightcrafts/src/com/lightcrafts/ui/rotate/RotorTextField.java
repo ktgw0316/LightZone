@@ -2,6 +2,8 @@
 
 package com.lightcrafts.ui.rotate;
 
+import com.lightcrafts.ui.LightZoneSkin;
+
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -16,7 +18,6 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 
 import static com.lightcrafts.ui.rotate.Locale.LOCALE;
-import com.lightcrafts.ui.LightZoneSkin;
 
 // A validating text field that synchronizes with the RotorControl sliders.
 
@@ -107,7 +108,8 @@ class RotorTextField
         InputVerifier verifier = getInputVerifier();
         boolean verified = verifier.verify(this);
         if (verified) {
-            int count = e.getWheelRotation();
+            final int count = e.getWheelRotation();
+            if (count == 0) return;
             String text = getText();
             try {
                 double value = Format.parse(text).doubleValue();
