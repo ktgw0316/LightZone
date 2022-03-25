@@ -12,7 +12,7 @@ on:
     # The branches below must be a subset of the branches above
     branches: [master]
   schedule:
-    - cron: '0 3 * * 5'
+    - cron: "0 3 * * 5"
 
 jobs:
   analyze:
@@ -22,37 +22,46 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Override automatic language detection by changing the below list
-        # Supported options are ['csharp', 'cpp', 'go', 'java', 'javascript', 'python']
-        language: ['java', 'cpp']
-        # Learn more...
-        # https://docs.github.com/en/github/finding-security-vulnerabilities-and-errors-in-your-code/configuring-code-scanning#overriding-automatic-language-detection
+        language: ["java", "cpp"]
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Setup Java JDK
-      uses: actions/setup-java@v1.3.0
-      with:
-        java-version: 11
+      - name: Setup Java JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: '11'
 
-    # Initializes the CodeQL tools for scanning.
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v1
-      with:
-        languages: ${{ matrix.language }}
+      # Initializes the CodeQL tools for scanning.
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v1
+        with:
+          languages: ${{ matrix.language }}
 
-    - run: |
-      
-    - sh: sudo apt-get update
-    - sh: sudo 
+      - name: Build
+        run: |
+          sudo add-apt-repository -y ppa:lightzone-team/lightzone
+          sudo apt update -y
+          sudo apt install -y \
+            ant \
+            javahelp2 \
+            libejml-java \
+            libglib2.0-dev \
+            libjaxb-java \
+            libjetbrains-annotations-java \
+            libjiconfont-font-awesome-java \
+            libjiconfont-google-material-design-icons-java \
+            libjiconfont-swing-java \
+            liblensfun-dev \
+            liblcms2-dev \
+            liblombok-java \
+            librefuel-java \
+            libslf4j-java \
+            libtiff5-dev \
+            tidy
+          ant -f linux/build.xml -Dno-ivy=true
 
-  build_script:
-       sudo add-apt-repository --yes ppa:lightzone-team/lightzone
-       sudo apt-get update
-       sudo apt-get install -y apt-get install -y ant autoconf javahelp2 libejml-java libglib2.0-dev libjaxb-java libjetbrains-annotations-java libjiconfont-font-awesome-java libjiconfont-google-material-design-icons-java libjiconfont-swing-java liblensfun-dev liblcms2-dev liblombok-java librefuel-java libslf4j-java libtiff5-dev tidy
-       ant -f linux/build.xml -Doffline=true
-
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v1
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v1
