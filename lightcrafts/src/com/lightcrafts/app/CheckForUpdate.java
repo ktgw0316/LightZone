@@ -537,7 +537,7 @@ public final class CheckForUpdate {
 
     public static void main( String[] args ) throws MalformedURLException {
         val isAvailable = checkIfUpdateIsAvailable(
-                "4.2.4", new URL("file:///tmp/lightzone/appcast.xml"));
+                "4.2.5", new URL("file:///tmp/lightzone/appcast.xml"));
         System.exit(isAvailable ? 0 : 1);
     }
 }
