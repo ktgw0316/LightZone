@@ -22,6 +22,7 @@ for:
       - cmd: SET MSSDK_HOME=/c/Program Files (x86)/Windows Kits/10
       - cmd: SET JAVA_HOME=/c/Program Files/Java/jdk15
       - cmd: SET ANT_SCRIPT=/c/projects/lightzone/windows/build.xml
+      - cmd: SET ANT_LIB_DIR=/c/projects/lightzone/lightcrafts/lib/
 
     install:
       - cmd: cinst ant
@@ -33,9 +34,9 @@ for:
       - cmd: bash -lc "pacboy --noconfirm --disable-download-timeout -S lcms2:m lensfun:m ntldd-git:m pkg-config:m"
 
     build_script:
-      - cmd: bash -lc "MINGW_DIR=/c/$MINGW64_PATH ant -f $ANT_SCRIPT build-installer"
+      - cmd: bash -lc "MINGW_DIR=/c/$MINGW64_PATH ant -f $ANT_SCRIPT -lib $ANT_LIB_DIR build-installer"
       - cmd: bash -lc "ant -f $ANT_SCRIPT clean-native"
-      - cmd: bash -lc "TARGET_ARCH=i686 MINGW_DIR=/c/$MINGW32_PATH ant -f $ANT_SCRIPT -Dno-ivy=true build-installer"
+      - cmd: bash -lc "TARGET_ARCH=i686 MINGW_DIR=/c/$MINGW32_PATH ant -f $ANT_SCRIPT -Dno-ivy=true -lib $ANT_LIB_DIR build-installer"
 
     artifacts:
       - path: "windows/LightZone_Installer_*.exe"
