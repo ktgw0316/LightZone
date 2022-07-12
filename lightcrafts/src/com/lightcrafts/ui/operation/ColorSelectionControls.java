@@ -33,6 +33,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeSupport;
 
+import static com.lightcrafts.ui.LightZoneSkin.Colors.LZOrange;
 import static com.lightcrafts.ui.operation.Locale.LOCALE;
 
 /**
@@ -86,9 +87,52 @@ final class ColorSelectionControls extends Box {
                             0xff & systemColor[0],
                             0xff & systemColor[1],
                             0xff & systemColor[2]);
-                    setBackground(color);
+                    setIcon(new DefaultIcon(color, false, false));
+                    setRolloverIcon(new DefaultIcon(color, true, false));
+                    setSelectedIcon(new DefaultIcon(color, false, true));
+                    setRolloverSelectedIcon(new DefaultIcon(color, true, true));
                 }
                 setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 3));
+            }
+
+            private class DefaultIcon implements Icon {
+
+                private final boolean rollover;
+                private final boolean selected;
+                private final Color color;
+
+                public DefaultIcon(Color color, boolean rollover, boolean selected) {
+                    this.color = color;
+                    this.rollover = rollover;
+                    this.selected = selected;
+                }
+
+                @Override
+                public void paintIcon(Component c, Graphics g, int x, int y) {
+                    final var oldColor = g.getColor();
+                    g.setColor(color);
+                    g.fillOval(x, y, getIconWidth(), getIconHeight());
+                    if (rollover) {
+                        g.setColor(Color.LIGHT_GRAY);
+                        g.drawOval(x, y, getIconWidth(), getIconHeight());
+                    }
+                    if (selected) {
+                        g.setColor(LZOrange);
+                        g.fillOval(x + 4, y + 4,
+                                getIconWidth() - 8, getIconHeight() - 8);
+                    }
+                    g.setColor(oldColor);
+                }
+
+                @Override
+                public int getIconWidth() {
+                    return 14;
+                }
+
+                @Override
+                public int getIconHeight() {
+                    return 14;
+                }
             }
         }
 
