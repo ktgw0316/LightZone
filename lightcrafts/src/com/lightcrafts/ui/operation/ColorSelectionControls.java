@@ -67,6 +67,28 @@ final class ColorSelectionControls extends Box {
             ColorButton( RGBColorSelectionPreset preset ) {
                 m_preset = preset;
                 setFocusable( false );
+
+                if (preset.equals(RGBColorSelectionPreset.AllColors)) {
+                    setText( LOCALE.get( "AllLabel" ) );
+                    setSelected(true);
+                } else {
+                    final var cs = new RGBColorSelection(preset, false);
+                    final byte[] systemColor = new byte[3];
+                    ts.doTransform(
+                            new byte[]{
+                                    (byte)(0xff * cs.red),
+                                    (byte)(0xff * cs.green),
+                                    (byte)(0xff * cs.blue)
+                            },
+                            systemColor
+                    );
+                    final var color = new Color(
+                            0xff & systemColor[0],
+                            0xff & systemColor[1],
+                            0xff & systemColor[2]);
+                    setBackground(color);
+                }
+                setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 3));
             }
         }
 
@@ -80,33 +102,6 @@ final class ColorSelectionControls extends Box {
                     final ColorButton button = new ColorButton(p);
                     group.add(button);
                     add(button);
-
-                    if (p.equals(RGBColorSelectionPreset.AllColors)) {
-                        button.setText( LOCALE.get( "AllLabel" ) );
-                        button.setSelected(true);
-
-                        button.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 3));
-                    } else {
-                        final RGBColorSelection cs =
-                            new RGBColorSelection(p, false);
-
-                        final byte[] systemColor = new byte[3];
-                        ts.doTransform(
-                            new byte[]{
-                                (byte)(0xff * cs.red),
-                                (byte)(0xff * cs.green),
-                                (byte)(0xff * cs.blue)
-                            },
-                            systemColor
-                        );
-
-                        final Color color = new Color(0xff & systemColor[0],
-                                                0xff & systemColor[1],
-                                                0xff & systemColor[2]);
-                        button.setBackground(color);
-                        button.setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 3));
-                    }
-
                     button.addItemListener(ie -> {
                         if ( ie.getStateChange() == ItemEvent.SELECTED ) {
                             final ColorButton b =
