@@ -17,7 +17,7 @@ Download and install (or unpack) following:
 - __MSYS2__
   1. Install MSYS2 and update packages as described in <https://msys2.github.io/>
   1. Install required packages.
-  - `pacman -S diffutils git make pkgconf tar`
+  - `pacman -S diffutils git make tar`
   1. Install target-specific toolchain.
   - For 32-bit: `pacman -S mingw-w64-i686-toolchain`
   - For 64-bit: `pacman -S mingw-w64-x86_64-toolchain`
@@ -25,10 +25,16 @@ Download and install (or unpack) following:
   1. Install __lcms2__. This will also install __libtiff__ and __libjpeg-turbo__.
   - For 32-bit: `pacman -S mingw-w64-i686-lcms2`
   - For 64-bit: `pacman -S mingw-w64-x86_64-lcms2`
+  1. Install __lensfun__.
+  - For 32-bit: `pacman -S mingw-w64-i686-lensfun`
+  - For 64-bit: `pacman -S mingw-w64-x86_64-lensfun`
+  1. Install __pkgconf__.
+  - For 32-bit: `pacman -S mingw-w64-i686-pkgconf`
+  - For 64-bit: `pacman -S mingw-w64-x86_64-pkgconf`
   1. Install __ntldd__.
   - For 32-bit: `pacman -S mingw-w64-i686-ntldd-git`
   - For 64-bit: `pacman -S mingw-w64-x86_64-ntldd-git`
-- __Java Development Kit__ (JDK) version 11 from [AdoptOpenJDK](https://adoptopenjdk.net/).
+- __Java Development Kit__ (JDK) version 17 from [Bellsoft](https://bell-sw.com/pages/downloads/).
 - __Microsoft Windows SDK__
     Pick the right version based on your Windows version. Information and download links are
     available at
