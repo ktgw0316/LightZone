@@ -17,7 +17,7 @@ JNI_WINDOWS_CFLAGS:=	-std=c++0x
 JNI_WINDOWS_INCLUDES:=	-I$(ROOT)/windows
 JNI_WINDOWS_LDFLAGS:=	-L.
 JNI_WINDOWS_LINK:= 	-lcomdlg32 -lgdi32 -lshlwapi -lole32 -luuid -lWininet \
-			-lhtmlhelp -lbufferoverflow -lLCJNI
+			-lhtmlhelp -lBufferOverflowU -lLCJNI
 
 JAVAH_CLASSES:=	com.lightcrafts.platform.windows.WindowsColorProfileManager \
 		com.lightcrafts.platform.windows.WindowsFileUtil \

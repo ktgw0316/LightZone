@@ -19,15 +19,16 @@ for:
       - cmd: SET MINGW64_PATH=msys64/mingw64
       - cmd: SET MINGW32_PATH=msys64/mingw32
       - cmd: SET PATH=C:/%MINGW64_PATH%/bin/;C:/%MINGW32_PATH%/bin/;C:/msys64/usr/bin/;%PATH%
-      - cmd: SET MSSDK_HOME=/c/Program Files (x86)/Windows Kits/10
+      - cmd: SET MSSDK_HOME=/c/Program Files (x86)/Windows Kits/10/Lib/10.0.22000.0
       - cmd: SET JAVA_HOME=/c/Program Files/Java/jdk15
       - cmd: SET ANT_SCRIPT=/c/projects/lightzone/windows/build.xml
       - cmd: SET ANT_LIB_DIR=/c/projects/lightzone/lightcrafts/lib/
 
     install:
       - cmd: cinst ant
-      - cmd: bash -lc 'cp "$MSSDK_HOME/../8.1/Lib/winv6.3/um/x64/Htmlhelp.Lib" /c/$MINGW64_PATH/lib/libhtmlhelp.a'
-      - cmd: bash -lc 'cp "$MSSDK_HOME/../8.1/Lib/winv6.3/um/x86/Htmlhelp.Lib" /c/$MINGW32_PATH/lib/libhtmlhelp.a'
+      - cmd: bash -lc 'cp "$MSSDK_HOME/um/x64/Htmlhelp.Lib" /c/$MINGW64_PATH/lib/libhtmlhelp.a'
+      - cmd: bash -lc 'cp "$MSSDK_HOME/um/x86/Htmlhelp.Lib" /c/$MINGW32_PATH/lib/libhtmlhelp.a'
+
       - ps: (new-object net.webclient).DownloadFile('https://download-gcdn.ej-technologies.com/install4j/install4j_windows-x64_8_0_8.exe', 'install4j-installer.exe')
       - ps: install4j-installer.exe -q
       - cmd: bash -lc "pacman --noconfirm --disable-download-timeout -S pactoys"

@@ -59,9 +59,9 @@ or vim) and enter following environmental variables. (Modify the paths to match 
 
     export JAVA_HOME="/c/Program Files/AdoptOpenJDK/jdk-11.0.4.11-hotspot"
     export ANT_HOME="/c/Program Files/apache-ant-1.9.8"
-    export MSSDK_HOME="/c/Program Files (x86)/Windows Kits/10"
+    export MSSDK_HOME="/c/Program Files (x86)/Windows Kits/10/Lib/10.0.22000.0"
     export INSTALL4J_HOME="/c/Program Files/install4j5"
-    export PATH=$PATH:${JAVA_HOME}/bin:${ANT_HOME}/bin:${MSSDK_HOME}/bin/x86:${INSTALL4J_HOME}/bin;
+    export PATH=$PATH:${JAVA_HOME}/bin:${ANT_HOME}/bin:${INSTALL4J_HOME}/bin;
 
 If you close and open your shell again it will automatically set these variables.
 
@@ -69,8 +69,8 @@ Do NOT set C_INCLUDE_PATH=/usr/include for mingw compilers.
 
 Before starting your first build, you have to copy HtmlHelp.lib to mingw library path:
 
-    cp "${MSSDK_HOME}/Lib/10.0.14393.0/um/x86/Htmlhelp.Lib" /mingw32/lib/libhtmlhelp.a
-    cp "${MSSDK_HOME}/Lib/10.0.14393.0/um/x64/Htmlhelp.Lib" /mingw64/lib/libhtmlhelp.a
+    cp "${MSSDK_HOME}/um/x86/Htmlhelp.Lib" /mingw32/lib/libhtmlhelp.a
+    cp "${MSSDK_HOME}/um/x64/Htmlhelp.Lib" /mingw64/lib/libhtmlhelp.a
 
 Checkout your project with Git. If you have problems with line endings in build (the \r stuff), do
 following:
