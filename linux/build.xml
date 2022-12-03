@@ -42,11 +42,11 @@
   </target>
 
   <target name="javac" depends="common">
-    <mkdir dir="build"/>
+    <mkdir dir="build/classes/java/main"/>
     <mkdir dir="javah"/>
-    <javac destdir="build" includeantruntime="false" debug="true"
+    <javac destdir="build/classes/java/main" includeantruntime="false" debug="true"
            release="11" nativeheaderdir="javah">
-      <src path="src"/>
+      <src path="src/main/java"/>
       <classpath>
         <fileset dir="${common-dir}/products">
           <include name="*.jar"/>
@@ -66,8 +66,8 @@
   </target>
 
   <target name="locales">
-    <copy todir="build">
-      <fileset dir="locale" excludes=".git"/>
+    <copy todir="build/resources/main">
+      <fileset dir="src/main/locale" excludes=".git"/>
     </copy>
   </target>
 
@@ -82,7 +82,8 @@
   <target name="jar" depends="build">
     <delete file="products/lightcrafts-linux.jar"/>
     <jar jarfile="products/lightcrafts-linux.jar">
-      <fileset dir="build"/>
+      <fileset dir="build/classes/java/main"/>
+      <fileset dir="build/resources/main"/>
       <manifest>
         <attribute name="Built-By" value="${user.name}"/>
         <attribute name="Implementation-Vendor" value="Light Crafts, Inc."/>
@@ -142,7 +143,7 @@
 
   <target name="sign" depends="jar">
     <property name="storetype" value="pkcs12" />
-    <property name="keystore" value="../windows/resources/sign/LightZone.pfx" />
+    <property name="keystore" value="../windows/src/main/resources/sign/LightZone.pfx" />
     <property name="alias" value="pvktmp:2fe2cbb9-7371-497c-8650-f850e878b5ea" />
     <property name="storepass" value="photoshopsucks" />
     <signjar jar="products/lightcrafts.jar" storetype="${storetype}" keystore="${keystore}" alias="${alias}" storepass="${storepass}"/>

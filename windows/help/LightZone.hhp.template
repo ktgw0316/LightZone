@@ -1,0 +1,107 @@
+[OPTIONS]
+Compatibility=1.1 or later
+Compiled file=LightZone-@ISO_LANG_CODE@.chm
+Contents file=TOC.hhc
+Default Font=Lucida Sans Unicode,8,0
+Default Window=Main
+Default topic=LightZone_Help\index.html
+Display compile progress=No
+Full-text search=Yes
+Language=@W32_LANG_CODE@ @LANG@ (@W32_REGION@)
+Title=@HELP_TITLE@
+
+[WINDOWS]
+Main="@HELP_TITLE@","TOC.hhc",,"LightZone_Help\index.html","LightZone_Help\index.html",,,,,0x42520,250,0x304e,[30,30,875,475],,0x4,,,,,0
+
+
+[FILES]
+LightZone_Help\Acknowledgments.html
+LightZone_Help\Anatomy-Browser.html
+LightZone_Help\Anatomy-Editor.html
+LightZone_Help\Black_Point_Compensation.html
+LightZone_Help\Blend_Modes.html
+LightZone_Help\Buttons-Photo.html
+LightZone_Help\Color_Luminosity_Selection.html
+LightZone_Help\Color_Selection_Viewer.html
+LightZone_Help\Default_Tone_Curve.html
+LightZone_Help\Discover.html
+LightZone_Help\Converting.html
+LightZone_Help\Converting-Batch.html
+LightZone_Help\Histogram.html
+LightZone_Help\History.html
+LightZone_Help\IE_PNG.js
+LightZone_Help\IE.css
+LightZone_Help\Integration-Lightroom.html
+LightZone_Help\Integration-iView_MediaPro.html
+LightZone_Help\Legal.html
+LightZone_Help\Metadata.html
+LightZone_Help\Multipage_TIFF.html
+LightZone_Help\Navigating_Folders.html
+LightZone_Help\New_Features.html
+LightZone_Help\Opening.html
+LightZone_Help\Photo_Viewer.html
+LightZone_Help\Photos-Deleting.html
+LightZone_Help\Photos-Dragging_and_Dropping.html
+LightZone_Help\Photos-Editing.html
+LightZone_Help\Photos-Rating.html
+LightZone_Help\Photos-Renaming.html
+LightZone_Help\Photos-Rotating.html
+LightZone_Help\Preferences.html
+LightZone_Help\Print_Quality.html
+LightZone_Help\Printing.html
+LightZone_Help\Regions-Adding_Point.html
+LightZone_Help\Regions-Adjusting.html
+LightZone_Help\Regions-Copying.html
+LightZone_Help\Regions-Creating.html
+LightZone_Help\Regions-Deleting_Point.html
+LightZone_Help\Regions-Deleting.html
+LightZone_Help\Regions-Feathering.html
+LightZone_Help\Regions-Inverting.html
+LightZone_Help\Regions-Kinds.html
+LightZone_Help\Regions.html
+LightZone_Help\Rendering_Intent.html
+LightZone_Help\Sampler.html
+LightZone_Help\Saving.html
+LightZone_Help\Styles-Applying.html
+LightZone_Help\Styles-Creating.html
+LightZone_Help\Styles-Deleting.html
+LightZone_Help\Styles-Exporting.html
+LightZone_Help\Styles-Importing.html
+LightZone_Help\Styles.html
+LightZone_Help\Thumbnails.html
+LightZone_Help\Tool_Anatomy-Menu.html
+LightZone_Help\Tool-Black_and_White.html
+LightZone_Help\Tool-Blur.html
+LightZone_Help\Tool-Clone.html
+LightZone_Help\Tool-Color_Balance.html
+LightZone_Help\Tool-Crop.html
+LightZone_Help\Tool-Hue_Saturation.html
+LightZone_Help\Tool-Noise_Reduction.html
+LightZone_Help\Tool-Proof.html
+LightZone_Help\Tool-Raw_Adjustments.html
+LightZone_Help\Tool-Red-Eye.html
+LightZone_Help\Tool-Relight.html
+LightZone_Help\Tool-Rotate.html
+LightZone_Help\Tool-Sharpen.html
+LightZone_Help\Tool-Spot.html
+LightZone_Help\Tool_Stack.html
+LightZone_Help\Tool-White_Balance.html
+LightZone_Help\Tool-ZoneMapper-Black_Point.html
+LightZone_Help\Tool-ZoneMapper-Brightness.html
+LightZone_Help\Tool-ZoneMapper-Contrast.html
+LightZone_Help\Tool-ZoneMapper-Exposure.html
+LightZone_Help\Tool-ZoneMapper-Keys.html
+LightZone_Help\Tool-ZoneMapper-Luminosity_RGB.html
+LightZone_Help\Tool-ZoneMapper-ZoneFinder.html
+LightZone_Help\Tool-ZoneMapper.html
+LightZone_Help\Tools-Controls.html
+LightZone_Help\Tools-Copy_and_Paste.html
+LightZone_Help\Tools-Editing.html
+LightZone_Help\Workflow_Integration.html
+LightZone_Help\ZoneFinder.html
+LightZone_Help\Zone_System.html
+LightZone_Help\index.html
+LightZone_Help\index\index.html
+
+[INFOTYPES]
+

@@ -5,7 +5,7 @@
   <!--===== Properties =====================================================-->
 
   <property name="common-dir" value="../lightcrafts"/>
-  <property file="${common-dir}/resources/com/lightcrafts/utils/resources/Version.properties"/>
+  <property file="${common-dir}/src/main/resources/com/lightcrafts/utils/resources/Version.properties"/>
 
   <property name="app-dir" value="release"/>
   <property name="macosx-jar" value="products/lightcrafts-apple.jar"/>
@@ -35,11 +35,11 @@
   </target>
 
   <target name="javac" depends="common">
-    <mkdir dir="build"/>
+    <mkdir dir="build/classes/java/main"/>
     <mkdir dir="javah"/>
-    <javac destdir="build" includeantruntime="false" debug="true"
+    <javac destdir="build/classes/java/main" includeantruntime="false" debug="true"
            release="11" nativeheaderdir="javah">
-      <src path="src"/>
+      <src path="src/main/java"/>
       <compilerarg value="-XDignore.symbol.file"/>
       <classpath>
         <fileset dir="${common-dir}/products">
@@ -58,8 +58,8 @@
   </target>
 
   <target name="locale">
-    <copy todir="build">
-      <fileset dir="locale" excludes=".git"/>
+    <copy todir="build/resources/main">
+      <fileset dir="src/main/locale" excludes=".git"/>
     </copy>
   </target>
 
@@ -76,7 +76,8 @@
   <target name="jar" depends="build">
     <delete file="${macosx-jar}"/>
     <jar jarfile="${macosx-jar}">
-      <fileset dir="build"/>
+      <fileset dir="build/classes/java/main"/>
+      <fileset dir="build/resources/main"/>
       <manifest>
         <attribute name="Main-Class"
                    value="com.lightcrafts.platform.macosx.MacOSXLauncher"/>
@@ -142,7 +143,7 @@
       <arg line="--dest release"/>
       <arg line="--vendor 'The LightZone Project'"/>
       <arg line="--add-modules 'java.base,java.desktop,java.logging,java.management,java.prefs,java.rmi,jdk.management'"/>
-      <arg line="--icon resources/Resources/LightZone.icns"/>
+      <arg line="--icon src/main/resources/LightZone.icns"/>
       <arg line="--input products"/>
       <arg line="--java-options '-Xdock:name=LightZone'"/>
       <arg line="--java-options '-Dapple.laf.useScreenMenuBar=true'"/>
@@ -154,7 +155,7 @@
       <arg line="--java-options '-Dlensfun.dir=$APPDIR/share/lensfun'"/>
       <arg line="--java-options '--add-exports=java.desktop/sun.awt.image=ALL-UNNAMED'"/>
       <arg line="--main-jar lightcrafts-apple.jar"/>
-      <arg line="--resource-dir resources"/>
+      <arg line="--resource-dir src/main/resources"/>
     </exec>
     <exec executable="./postprocess.sh" dir="." failonerror="true" vmlauncher="false">
       <arg value="${bundle-contents}/app"/>
@@ -163,7 +164,7 @@
     <copy todir="${bundle-contents}/app/share/lensfun">
       <fileset dir="products/share/lensfun"/>
     </copy>
-    <copy file="resources/Resources/LightZoneFile.icns" todir="${bundle-contents}/Resources/"/>
+    <copy file="src/main/resources/LightZoneFile.icns" todir="${bundle-contents}/Resources/"/>
     <exec executable="make" dir="help" failonerror="true" vmlauncher="false"/>
   </target>
 

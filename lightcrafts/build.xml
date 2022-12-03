@@ -4,7 +4,7 @@
 
   <!--===== Properties =====================================================-->
 
-  <property file="resources/com/lightcrafts/utils/resources/Version.properties"/>
+  <property file="src/main/resources/com/lightcrafts/utils/resources/Version.properties"/>
 
   <property name="common-jar" value="products/lightcrafts.jar"/>
 
@@ -92,9 +92,9 @@
           vmlauncher="true">
       <arg value="-j"/>
     </exec>
-    <mkdir dir="build"/>
+    <mkdir dir="build/classes/java/main"/>
     <mkdir dir="javah"/>
-    <javac srcdir="src" destdir="build" includeantruntime="false" debug="true"
+    <javac srcdir="src/main/java" destdir="build/classes/java/main" includeantruntime="false" debug="true"
       release="11" nativeheaderdir="javah" classpathref="compile.classpath"/>
   </target>
 
@@ -107,25 +107,25 @@
   </target>
 
   <target name="revision">
-    <mkdir dir="build/com/lightcrafts/utils/resources"/>
+    <mkdir dir="build/resources/main/com/lightcrafts/utils/resources"/>
     <exec executable="git">
       <arg line="log -1"/>
-      <redirector output="build/com/lightcrafts/utils/resources/Revision"
+      <redirector output="build/resources/main/com/lightcrafts/utils/resources/Revision"
                   logError="true"/>
     </exec>
     <exec executable="git">
       <arg line="config --list"/>
-      <redirector output="build/com/lightcrafts/utils/resources/Revision"
+      <redirector output="build/resources/main/com/lightcrafts/utils/resources/Revision"
                   logError="true" append="true"/>
     </exec>
     <copy file="version.txt"
-          tofile="build/com/lightcrafts/utils/resources/Version"/>
+          tofile="build/resources/main/com/lightcrafts/utils/resources/Version"/>
   </target>
 
   <target name="resources" depends="revision">
-    <copy todir="build">
-      <fileset dir="resources" excludes=".git"/>
-      <fileset dir="locale" excludes=".git"/>
+    <copy todir="build/resources/main">
+      <fileset dir="src/main/resources" excludes=".git"/>
+      <fileset dir="src/main/locale" excludes=".git"/>
     </copy>
   </target>
 
@@ -143,7 +143,8 @@
   <target name="jar" depends="build">
     <delete file="${common-jar}"/>
     <jar jarfile="${common-jar}">
-      <fileset dir="build"/>
+      <fileset dir="build/classes/java/main"/>
+      <fileset dir="build/resources/main"/>
       <manifest>
         <attribute name="Built-By" value="${user.name}"/>
         <attribute name="Main-Class" value="com.lightcrafts.app.Application"/>
@@ -168,8 +169,8 @@
 	<!--===== Make test ======================================================-->
 
   <target name="test" depends="build">
-    <ant dir="test" target="build"/>
-    <ant dir="test" target="docs-test"/>
+    <ant dir="src/test" target="build"/>
+    <ant dir="src/test" target="docs-test"/>
   </target>
 
 	<!--===== Run the application ============================================-->
@@ -196,7 +197,7 @@
         <fileset dir="products">
           <include name="*.jar"/>
         </fileset>
-        <pathelement path="test/build"/>
+        <pathelement path="src/test/build"/>
       </classpath>
       <assertions>
         <enable/>
@@ -254,7 +255,7 @@
       <arg value="-j"/>
       <arg value="${clean-method}"/>
     </exec>
-    <ant dir="test" target="${clean-method}"/>
+    <ant dir="src/test" target="${clean-method}"/>
   </target>
 
   <target name="distclean">

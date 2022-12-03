@@ -5,7 +5,7 @@
   <!--===== Properties =====================================================-->
 
   <property name="common-dir" value="../lightcrafts"/>
-  <property file="${common-dir}/resources/com/lightcrafts/utils/resources/Version.properties"/>
+  <property file="${common-dir}/src/main/resources/com/lightcrafts/utils/resources/Version.properties"/>
 
   <exec executable="uname" vmlauncher="false" failonerror="true"
         outputproperty="processor">
@@ -56,11 +56,11 @@
   </target>
 
   <target name="javac" depends="common">
-    <mkdir dir="build"/>
+    <mkdir dir="build/classes/java/main"/>
     <mkdir dir="javah"/>
-    <javac destdir="build" debug="true"
+    <javac destdir="build/classes/java/main" debug="true"
            release="11" nativeheaderdir="javah">
-      <src path="src"/>
+      <src path="src/main/java"/>
       <classpath>
         <fileset dir="${common-dir}/products">
           <include name="*.jar"/>
@@ -81,7 +81,7 @@
   <target name="build" depends="javac, jni"/>
 
   <target name="help">
-    <exec executable="make" dir="resources/help" failonerror="true"
+    <exec executable="make" dir="help" failonerror="true"
           vmlauncher="false">
       <arg value="APP_NAME=${app-name}"/>
     </exec>
@@ -92,7 +92,7 @@
   <target name="jar" depends="build">
     <delete file="${windows-jar}"/>
     <jar jarfile="${windows-jar}">
-      <fileset dir="build"/>
+      <fileset dir="build/classes/java/main"/>
       <manifest>
         <attribute name="Built-By" value="${user.name}"/>
         <attribute name="Implementation-Vendor" value="${company-name}"/>

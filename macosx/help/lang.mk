@@ -4,7 +4,7 @@
 # Paul J. Lucs [paul@lightcrafts.com]
 ##
 
-ROOT:=			../..
+ROOT:=			../../..
 COMMON_DIR:=		$(ROOT)/lightcrafts
 
 APP_NAME?=		LightZone
@@ -18,7 +18,7 @@ HELP_TITLE:=		$(strip $(shell echo $(LANG_LINE) | cut -f5 -d:))
 INDEX_WORD:=		$(strip $(shell echo $(LANG_LINE) | cut -f6 -d:))
 HTML_CHARSET:=		$(strip $(shell echo $(LANG_LINE) | cut -f7 -d:))
 
-SOURCE_LANG_DIR:=	../resources/Resources/$(LANG).lproj
+SOURCE_LANG_DIR:=	./Resources/$(LANG).lproj
 SOURCE_HELP_DIR:=	$(SOURCE_LANG_DIR)/$(HELP)
 
 APP_BUNDLE_DIR:=	../release/$(APP_NAME).app
