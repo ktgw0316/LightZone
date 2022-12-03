@@ -2197,7 +2197,6 @@ public class Application {
             EventQueue.invokeLater(
                 new Runnable() {
                     public void run() {
-                        new LightZoneSkin();
                         if (Platform.isMac()) {
                             // Get a Mac menu bar before setting LaF, then restore.
                             Object menuBarUI = UIManager.get("MenuBarUI");

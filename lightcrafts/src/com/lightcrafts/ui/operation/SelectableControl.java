@@ -15,7 +15,7 @@ public class SelectableControl
 {
     public final static Color Background = LightZoneSkin.Colors.ToolsBackground;
 
-    public final static Font ControlFont = LightZoneSkin.fontSet.getSmallFont();
+    public final static Font ControlFont = LightZoneSkin.LightZoneFontSet.SmallFont;
 
     private final static Border ControlBorder;
     private final static Border SelectedBorder;

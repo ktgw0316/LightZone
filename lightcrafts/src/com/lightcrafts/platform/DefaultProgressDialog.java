@@ -1,20 +1,17 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2022-     Masahiro Kitagawa */
 
 package com.lightcrafts.platform;
 
-import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.utils.ProgressIndicator;
 import com.lightcrafts.utils.ProgressListener;
 import com.lightcrafts.utils.Version;
 import com.lightcrafts.utils.thread.CancelableThread;
 import com.lightcrafts.utils.thread.CancelableThreadMonitor;
 import com.lightcrafts.utils.thread.ProgressThread;
-import org.jvnet.substance.SubstanceLookAndFeel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
 
 /**
@@ -29,13 +26,12 @@ public final class DefaultProgressDialog implements ProgressDialog {
 
     public DefaultProgressDialog() {
         m_progressBar = new JProgressBar();
-        m_progressBar.putClientProperty(SubstanceLookAndFeel.THEME_PROPERTY, LightZoneSkin.orangeTheme);
-        m_progressBar.setBorder(null);
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public Throwable getThrown() {
         return m_threadMonitor.getThrown();
     }
@@ -43,71 +39,58 @@ public final class DefaultProgressDialog implements ProgressDialog {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void incrementBy( final int delta ) {
-        EventQueue.invokeLater(
-            new Runnable() {
-                public void run() {
-                    if (m_progressBar != null)
-                        m_progressBar.setValue( m_progressBar.getValue() + delta );
-                }
-            }
-        );
+        EventQueue.invokeLater(() -> {
+            if (m_progressBar != null)
+                m_progressBar.setValue( m_progressBar.getValue() + delta );
+        });
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setIndeterminate( final boolean indeterminate ) {
-        EventQueue.invokeLater(
-            new Runnable() {
-                public void run() {
-                    if (m_progressBar != null) {
-                        //
-                        // There's a bug in Java: if you make a determinate
-                        // progress bar indeterminate, the "barber pole" is
-                        // partially "frozen" from where the old value was to
-                        // the right.  To fix it, first set the value to the
-                        // maximum value.
-                        //
-                        m_progressBar.setValue( m_progressBar.getMaximum() );
-                        m_progressBar.setIndeterminate( indeterminate );
-                    }
-                }
+        EventQueue.invokeLater(() -> {
+            if (m_progressBar != null) {
+                // There's a bug in Java: if you make a determinate
+                // progress bar indeterminate, the "barber pole" is
+                // partially "frozen" from where the old value was to
+                // the right.  To fix it, first set the value to the
+                // maximum value.
+                m_progressBar.setValue( m_progressBar.getMaximum() );
+                m_progressBar.setIndeterminate( indeterminate );
             }
-        );
+        });
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setMaximum( final int maximum ) {
-        EventQueue.invokeLater(
-            new Runnable() {
-                public void run() {
-                    if (m_progressBar != null)
-                        m_progressBar.setMaximum( maximum );
-                }
-            }
-        );
+        EventQueue.invokeLater(() -> {
+            if (m_progressBar != null)
+                m_progressBar.setMaximum( maximum );
+        });
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setMinimum( final int minimum ) {
-        EventQueue.invokeLater(
-            new Runnable() {
-                public void run() {
-                    if (m_progressBar != null)
-                        m_progressBar.setMinimum( minimum );
-                }
-            }
-        );
+        EventQueue.invokeLater(() -> {
+            if (m_progressBar != null)
+                m_progressBar.setMinimum( minimum );
+        });
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void showProgress( Frame parent, CancelableThread thread,
                               String message, int minValue, int maxValue,
                               boolean hasCancelButton ) {
@@ -120,6 +103,7 @@ public final class DefaultProgressDialog implements ProgressDialog {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void showProgress( Frame parent, CancelableThread thread,
                               String message, boolean hasCancelButton ) {
         final ProgressListenerImpl pli = new ProgressListenerImpl(
@@ -166,6 +150,7 @@ public final class DefaultProgressDialog implements ProgressDialog {
             // looking layout; so do the layout ourselves.
             //
             final JPanel layoutPanel = new JPanel( null ) {
+                @Override
                 public void doLayout() {
                     final Dimension size = getSize();
                     messageLabel.setLocation( 0, 0 );
@@ -178,6 +163,7 @@ public final class DefaultProgressDialog implements ProgressDialog {
                     m_progressBar.setSize( size.width, pSize.height );
                 }
 
+                @Override
                 public Dimension getPreferredSize() {
                     final Dimension mSize = messageLabel.getPreferredSize();
                     final Dimension pSize = m_progressBar.getPreferredSize();
@@ -197,17 +183,13 @@ public final class DefaultProgressDialog implements ProgressDialog {
             );
 
             if ( hasCancelButton ) {
-                cancelButton.addActionListener(
-                    new ActionListener() {
-                        public void actionPerformed( ActionEvent event ) {
-                            messageLabel.setText( "Cancelling..." );
-                            pl.progressCancelled();
-                        }
-                    }
-                );
-            } else
-                cancelButton.setEnabled( false );
-
+                cancelButton.addActionListener(event -> {
+                    messageLabel.setText( "Cancelling..." );
+                    pl.progressCancelled();
+                });
+            } else {
+                cancelButton.setEnabled(false);
+            }
             getContentPane().setLayout( new BorderLayout() );
             getContentPane().add( panel );
             pack();
@@ -218,6 +200,7 @@ public final class DefaultProgressDialog implements ProgressDialog {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void dispose() {
             // apple.laf.AquaProgressBarUI leaks animation Timers,
             // which hold references to the progress bar member:
@@ -225,13 +208,7 @@ public final class DefaultProgressDialog implements ProgressDialog {
                 final Container barParent = m_progressBar.getParent();
                 if ( barParent != null ) {
                     final Component progreesBarCopy = m_progressBar;
-                    EventQueue.invokeLater(
-                        new Runnable() {
-                            public void run() {
-                                barParent.remove( progreesBarCopy );
-                            }
-                        }
-                    );
+                    EventQueue.invokeLater(() -> barParent.remove(progreesBarCopy));
                 }
                 m_progressBar = null;
             }
@@ -289,6 +266,7 @@ public final class DefaultProgressDialog implements ProgressDialog {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void progressCancelled() {
             //
             // Cancel the thread: this will subsequently cause
@@ -311,16 +289,11 @@ public final class DefaultProgressDialog implements ProgressDialog {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void threadTerminated( CancelableThread t ) {
             if ( t != m_threadMonitor.getMonitoredThread() )
                 throw new IllegalStateException();
-            EventQueue.invokeLater(
-                new Runnable() {
-                    public void run() {
-                        m_jProgressDialog.dispose();
-                    }
-                }
-            );
+            EventQueue.invokeLater(() -> m_jProgressDialog.dispose());
         }
 
         ////////// private ////////////////////////////////////////////////////
@@ -352,16 +325,10 @@ public final class DefaultProgressDialog implements ProgressDialog {
                            final int maxValue, final boolean hasCancelButton ) {
             if ( !EventQueue.isDispatchThread() ) {
                 try {
-                    EventQueue.invokeAndWait(
-                        new Runnable() {
-                            public void run() {
-                                init(
-                                    parent, message, indeterminate, minValue,
-                                    maxValue, hasCancelButton
-                                );
-                            }
-                        }
-                    );
+                    EventQueue.invokeAndWait(() -> init(
+                        parent, message, indeterminate, minValue,
+                        maxValue, hasCancelButton
+                    ));
                 }
                 catch ( InterruptedException e ) {
                     // ignore (?)
@@ -400,6 +367,7 @@ public final class DefaultProgressDialog implements ProgressDialog {
             super( indicator );
         }
 
+        @Override
         public void run() {
             for ( int i = 0; i < 20; ++i ) {
                 if ( isCanceled() )

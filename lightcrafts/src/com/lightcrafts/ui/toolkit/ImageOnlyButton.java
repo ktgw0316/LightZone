@@ -2,8 +2,6 @@
 
 package com.lightcrafts.ui.toolkit;
 
-import org.jvnet.substance.SubstanceLookAndFeel;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -74,6 +72,5 @@ public class ImageOnlyButton extends JButton {
         button.setContentAreaFilled(false);
         button.setFocusable(false);
         button.setFocusPainted(false);
-        button.putClientProperty(SubstanceLookAndFeel.BUTTON_PAINT_NEVER_PROPERTY, Boolean.TRUE);
     }
 }

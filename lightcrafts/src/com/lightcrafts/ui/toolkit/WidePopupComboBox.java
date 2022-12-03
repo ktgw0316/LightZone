@@ -1,16 +1,15 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2022-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.toolkit;
 
-import com.lightcrafts.platform.Platform;
 import com.lightcrafts.image.color.ColorProfileInfo;
+import com.lightcrafts.platform.Platform;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.*;
+import java.util.Collection;
 import java.util.List;
-
-import org.jvnet.substance.SubstanceLookAndFeel;
 
 /**
  * There is a problem with the popup component in JComboBox components under
@@ -25,14 +24,15 @@ import org.jvnet.substance.SubstanceLookAndFeel;
  * It also overrides setSelectedItem() to interpret null items as separators,
  * and to guard against the separator items being selected.
  */
-public class WidePopupComboBox extends JComboBox {
+public class WidePopupComboBox<E> extends JComboBox<E> {
 
     public WidePopupComboBox() {
         super(
-            new DefaultComboBoxModel() {
+            new DefaultComboBoxModel<>() {
                 /**
                  * Don't let null items in the list become selected.
                  */
+                @Override
                 public void setSelectedItem(Object o) {
                     if (o != null) {
                         super.setSelectedItem(o);
@@ -40,56 +40,19 @@ public class WidePopupComboBox extends JComboBox {
                 }
             }
         );
-//        if (Platform.getType() == Platform.Linux) {
-//            setUI(
-//                new MetalComboBoxUI() {
-//                    protected ComboPopup createPopup() {
-//                        return new BasicComboPopup(WidePopupComboBox.this) {
-//                            protected Rectangle computePopupBounds(
-//                                int px, int py, int pw, int ph
-//                                ) {
-//                                Rectangle bounds = super.computePopupBounds(
-//                                    px, py, pw, ph
-//                                );
-//                                bounds.width = getPreferredSize().width;
-//                                return bounds;
-//                            }
-//                        };
-//                    }
-//                }
-//            );
-//        }
-//        if (Platform.getType() == Platform.Windows) {
-//            setUI(
-//                new WindowsComboBoxUI() {
-//                    protected ComboPopup createPopup() {
-//                        return new BasicComboPopup(WidePopupComboBox.this) {
-//                            protected Rectangle computePopupBounds(
-//                                int px, int py, int pw, int ph
-//                                ) {
-//                                Rectangle bounds = super.computePopupBounds(
-//                                    px, py, pw, ph
-//                                );
-//                                bounds.width = getPreferredSize().width;
-//                                return bounds;
-//                            }
-//                        };
-//                    }
-//                }
-//            );
-//        }
         setRenderer(new ComboBoxRenderer());
     }
 
     private int maxItemLenght = 0;
-    public void addItem(Object anObject) {
+
+    @Override
+    public void addItem(E anObject) {
         super.addItem(anObject);
 
         if (anObject != null) {
             int lenght = anObject.toString().length();
             if (lenght > maxItemLenght) {
                 maxItemLenght = lenght;
-                putClientProperty(SubstanceLookAndFeel.COMBO_POPUP_PROTOTYPE, anObject);
             }
         }
     }
@@ -105,6 +68,7 @@ public class WidePopupComboBox extends JComboBox {
             Separator.setSize(Separator.getPreferredSize());
         }
 
+        @Override
         public Component getListCellRendererComponent(
             JList list,
             Object value,
@@ -125,8 +89,8 @@ public class WidePopupComboBox extends JComboBox {
 
     public static void main(String[] args) throws Exception {
         UIManager.setLookAndFeel(Platform.getPlatform().getLookAndFeel());
-        WidePopupComboBox combo = new WidePopupComboBox();
-        Collection PrinterProfiles =
+        WidePopupComboBox<ColorProfileInfo> combo = new WidePopupComboBox<>();
+        Collection<ColorProfileInfo> PrinterProfiles =
             Platform.getPlatform().getPrinterProfiles();
         List<ColorProfileInfo> profiles =
             ColorProfileInfo.arrangeForMenu(PrinterProfiles);

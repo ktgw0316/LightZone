@@ -1,29 +1,25 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2022-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.operation;
 
-import static com.lightcrafts.ui.operation.Locale.LOCALE;
-import com.lightcrafts.ui.toolkit.ImageOnlyButton;
-import com.lightcrafts.ui.toolkit.IconFactory;
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.ui.editor.CurveTypeButtons;
+import com.lightcrafts.ui.toolkit.IconFactory;
+import com.lightcrafts.ui.toolkit.ImageOnlyButton;
 import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlNode;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 
-import org.jvnet.substance.SubstanceLookAndFeel;
+import static com.lightcrafts.ui.operation.Locale.LOCALE;
 
 class SelectableTitle extends JPanel implements MouseListener {
-
-    final static int ButtonSpace = 8;
 
     private final static int TitleLeftInset = 2;
 
@@ -39,11 +35,11 @@ class SelectableTitle extends JPanel implements MouseListener {
     Box buttonBox;
     JTextField label;       // give access for the title editor in OpTitle
 
-    private Box buttonBoxBox;  // either the buttonBox or the lockButton
-    private JButton lockButton;
+    private final Box buttonBoxBox;  // either the buttonBox or the lockButton
+    private final JButton lockButton;
     private BufferedImage icon;
-    private CollapseExpandAction collapseAction;
-    private CollapseExpandButton collapseButton;
+    private final CollapseExpandAction collapseAction;
+    private final CollapseExpandButton collapseButton;
     private boolean selected;
     private boolean hasRegions = false;
 
@@ -65,14 +61,10 @@ class SelectableTitle extends JPanel implements MouseListener {
         collapseButton.addMouseListener(this);
 
         lockButton = createLockButton();
-        lockButton.addActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    JPopupMenu menu = getPopupMenu();
-                    menu.show(lockButton, 0, 0);
-                }
-            }
-        );
+        lockButton.addActionListener(e -> {
+            JPopupMenu menu = getPopupMenu();
+            menu.show(lockButton, 0, 0);
+        });
         HelpButton help = new HelpButton(control);
         // Needs a vertical nudge for centered appearance:
         help.setBorder(BorderFactory.createEmptyBorder(1, 0, 0, 0));
@@ -176,6 +168,7 @@ class SelectableTitle extends JPanel implements MouseListener {
         );
     }
 
+    @Override
     protected void paintComponent(Graphics graphics) {
         Graphics2D g = (Graphics2D) graphics;
 
@@ -188,10 +181,6 @@ class SelectableTitle extends JPanel implements MouseListener {
         JButton button = new JButton("");
         button.setSize(size.width, size.height);
         
-        if (selected) {
-            button.putClientProperty(SubstanceLookAndFeel.THEME_PROPERTY, LightZoneSkin.orangeTheme);
-            button.putClientProperty(SubstanceLookAndFeel.PAINT_ACTIVE_PROPERTY, Boolean.TRUE);
-        }
         button.paint(g);
 
         if (hasRegions) {
@@ -213,6 +202,7 @@ class SelectableTitle extends JPanel implements MouseListener {
         g.setRenderingHints(hints);
     }
 
+    @Override
     public void doLayout() {
 
         Dimension size = getSize();
@@ -270,7 +260,7 @@ class SelectableTitle extends JPanel implements MouseListener {
         // Default title is OK.
         if (node.hasAttribute(CollapsedTag)) {
             String value = node.getAttribute(CollapsedTag);
-            boolean collapsed = Boolean.valueOf(value);
+            boolean collapsed = Boolean.parseBoolean(value);
             control.setShowContent(! collapsed);
             if (collapsed) {
                 collapseAction.setState(true);
@@ -285,14 +275,6 @@ class SelectableTitle extends JPanel implements MouseListener {
         return font;
     }
 
-    // Images for background patterns:
-    private static Image getTitleImage(String name) {
-        String path = "resources/" + name + ".png";
-        URL url = OpTitle.class.getResource(path);
-        Toolkit toolkit = Toolkit.getDefaultToolkit();
-        return toolkit.createImage(url);
-    }
-
     // Icons for buttons:
     static Icon getTitleIcon(String name) {
         String path = "resources/" + name + ".png";
@@ -303,6 +285,7 @@ class SelectableTitle extends JPanel implements MouseListener {
         return null;
     }
 
+    @Override
     public void mouseClicked(MouseEvent e) {
         int count = e.getClickCount();
         if (count == 2) {
@@ -315,6 +298,7 @@ class SelectableTitle extends JPanel implements MouseListener {
         }
     }
 
+    @Override
     public void mousePressed(MouseEvent e) {
         if (e.isPopupTrigger()) {
             handlePopup(e);
@@ -328,15 +312,18 @@ class SelectableTitle extends JPanel implements MouseListener {
         }
     }
 
+    @Override
     public void mouseReleased(MouseEvent e) {
         if (e.isPopupTrigger()) {
             handlePopup(e);
         }
     }
 
+    @Override
     public void mouseEntered(MouseEvent e) {
     }
 
+    @Override
     public void mouseExited(MouseEvent e) {
     }
 
@@ -365,73 +352,38 @@ class SelectableTitle extends JPanel implements MouseListener {
         // A long list of JMenuItems whose actions point to the OpStack:
 
         JMenuItem collapseItem = new JMenuItem(LOCALE.get("CollapseMenuItem"));
-        collapseItem.addActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    doCollapse();
-                }
-            }
-        );
+        collapseItem.addActionListener(e -> doCollapse());
         JMenuItem collapseOthers = new JMenuItem(LOCALE.get("CollapseOthersMenuItem"));
-        collapseOthers.addActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    stack.setAutoExpand(false);
-                    stack.collapseAll();
-                    doExpand();
-                }
-            }
-        );
+        collapseOthers.addActionListener(e -> {
+            stack.setAutoExpand(false);
+            stack.collapseAll();
+            doExpand();
+        });
         JMenuItem expandItem = new JMenuItem(LOCALE.get("ExpandMenuItem"));
-        expandItem.addActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    doExpand();
-                }
-            }
-        );
+        expandItem.addActionListener(e -> doExpand());
         JMenuItem autoItem = new JMenuItem(LOCALE.get("AutoExpandMenuItem"));
-        autoItem.addActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    stack.setAutoExpand(true);
-                    stack.collapseAll();
-                    doExpand();
-                }
-            }
-        );
+        autoItem.addActionListener(e -> {
+            stack.setAutoExpand(true);
+            stack.collapseAll();
+            doExpand();
+        });
         JMenuItem noAutoItem = new JMenuItem(LOCALE.get("DontAutoExpandMenuItem"));
-        noAutoItem.addActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    stack.setAutoExpand(false);
-                }
-            }
-        );
+        noAutoItem.addActionListener(e -> stack.setAutoExpand(false));
         JMenuItem collapseAllItem = new JMenuItem(LOCALE.get("CollapseAllMenuItem"));
-        collapseAllItem.addActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    stack.setAutoExpand(false);
-                    stack.collapseAll();
-                }
-            }
-        );
+        collapseAllItem.addActionListener(e -> {
+            stack.setAutoExpand(false);
+            stack.collapseAll();
+        });
         JMenuItem expandAllItem = new JMenuItem(LOCALE.get("ExpandAllMenuItem"));
-        expandAllItem.addActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    stack.setAutoExpand(false);
-                    stack.expandAll();
-                }
-            }
-        );
+        expandAllItem.addActionListener(e -> {
+            stack.setAutoExpand(false);
+            stack.expandAll();
+        });
         if (control.isContentShown()) {
             menu.add(collapseItem);
             menu.add(collapseAllItem);
             menu.add(collapseOthers );
-        }
-        else {
+        } else {
             menu.add(collapseAllItem);
         }
         menu.add(new JSeparator());
@@ -441,8 +393,7 @@ class SelectableTitle extends JPanel implements MouseListener {
 
         if (! stack.getAutoExpand()) {
             menu.add(autoItem);
-        }
-        else {
+        } else {
             menu.add(noAutoItem);
         }
         return menu;
