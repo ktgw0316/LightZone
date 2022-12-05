@@ -50,6 +50,8 @@
 
   <target name="resolve-ivy" unless="no-ivy">
     <antcall target="download-ivy"/>
+    <taskdef resource="org/apache/ivy/ant/antlib.xml"
+             uri="antlib:org.apache.ivy.ant" classpath="${ivy.jar.file}"/>
     <ivy:resolve file="${basedir}/ivy.xml"/>
     <ivy:retrieve/>
   </target>
@@ -57,9 +59,6 @@
   <property name="ivy.version" value="2.5.0"/>
   <property name="ivy.jar.dir" value="${basedir}/lib"/>
   <property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar"/>
-
-  <taskdef resource="org/apache/ivy/ant/antlib.xml"
-           uri="antlib:org.apache.ivy.ant" classpath="${ivy.jar.file}"/>
 
   <target name="download-ivy" unless="no-ivy">
     <mkdir dir="${ivy.jar.dir}"/>

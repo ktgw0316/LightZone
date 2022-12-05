@@ -19,23 +19,25 @@ for:
       - cmd: SET MINGW64_PATH=msys64/mingw64
       - cmd: SET MINGW32_PATH=msys64/mingw32
       - cmd: SET PATH=C:/%MINGW64_PATH%/bin/;C:/%MINGW32_PATH%/bin/;C:/msys64/usr/bin/;%PATH%
-      - cmd: SET MSSDK_HOME=/c/Program Files (x86)/Windows Kits/10
+      - cmd: SET MSSDK_HOME=/c/Program Files (x86)/Windows Kits/10/Lib/10.0.22000.0
       - cmd: SET JAVA_HOME=/c/Program Files/Java/jdk15
       - cmd: SET ANT_SCRIPT=/c/projects/lightzone/windows/build.xml
+      - cmd: SET ANT_LIB_DIR=/c/projects/lightzone/lightcrafts/lib/
 
     install:
       - cmd: cinst ant
-      - cmd: bash -lc 'cp "$MSSDK_HOME/../8.1/Lib/winv6.3/um/x64/Htmlhelp.Lib" /c/$MINGW64_PATH/lib/libhtmlhelp.a'
-      - cmd: bash -lc 'cp "$MSSDK_HOME/../8.1/Lib/winv6.3/um/x86/Htmlhelp.Lib" /c/$MINGW32_PATH/lib/libhtmlhelp.a'
+      - cmd: bash -lc 'cp "$MSSDK_HOME/um/x64/Htmlhelp.Lib" /c/$MINGW64_PATH/lib/libhtmlhelp.a'
+      - cmd: bash -lc 'cp "$MSSDK_HOME/um/x86/Htmlhelp.Lib" /c/$MINGW32_PATH/lib/libhtmlhelp.a'
+
       - ps: (new-object net.webclient).DownloadFile('https://download-gcdn.ej-technologies.com/install4j/install4j_windows-x64_8_0_8.exe', 'install4j-installer.exe')
       - ps: install4j-installer.exe -q
       - cmd: bash -lc "pacman --noconfirm --disable-download-timeout -S pactoys"
       - cmd: bash -lc "pacboy --noconfirm --disable-download-timeout -S lcms2:m lensfun:m ntldd-git:m pkg-config:m"
 
     build_script:
-      - cmd: bash -lc "MINGW_DIR=/c/$MINGW64_PATH ant -f $ANT_SCRIPT build-installer"
+      - cmd: bash -lc "MINGW_DIR=/c/$MINGW64_PATH ant -f $ANT_SCRIPT -lib $ANT_LIB_DIR build-installer"
       - cmd: bash -lc "ant -f $ANT_SCRIPT clean-native"
-      - cmd: bash -lc "TARGET_ARCH=i686 MINGW_DIR=/c/$MINGW32_PATH ant -f $ANT_SCRIPT -Doffline=true build-installer"
+      - cmd: bash -lc "TARGET_ARCH=i686 MINGW_DIR=/c/$MINGW32_PATH ant -f $ANT_SCRIPT -Dno-ivy=true -lib $ANT_LIB_DIR build-installer"
 
     artifacts:
       - path: "windows/LightZone_Installer_*.exe"
@@ -72,4 +74,4 @@ for:
       - sh: sudo apt-get install -y ant javahelp2 libejml-java libglib2.0-dev libjaxb-java libjetbrains-annotations-java libjiconfont-font-awesome-java libjiconfont-google-material-design-icons-java libjiconfont-swing-java liblensfun-dev liblcms2-dev liblombok-java librefuel-java libslf4j-java libtiff5-dev tidy
 
     build_script:
-      - sh: ant -f linux/build.xml -Doffline=true
+      - sh: ant -f linux/build.xml

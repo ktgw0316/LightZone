@@ -190,8 +190,10 @@ ifeq ($(PLATFORM),Windows)
 
   ifeq ($(PROCESSOR),x86_64)
     MINGW:=		x86_64-w64-mingw32
+    PLATFORM_LDFLAGS+=	-L"$(MSSDK_HOME_W32)/um/x64"
   else
     MINGW:=		i686-w64-mingw32
+    PLATFORM_LDFLAGS+=	-L"$(MSSDK_HOME_W32)/um/x86"
   endif
   CC:=		$(MINGW)-gcc
   CXX:=		$(MINGW)-g++
