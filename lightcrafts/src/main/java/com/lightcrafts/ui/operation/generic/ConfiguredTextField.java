@@ -39,13 +39,13 @@ class ConfiguredTextField
         }
     };
 
-    private ConfiguredBoundedRangeModel model;
-    private NumberFormat format;
+    private final ConfiguredBoundedRangeModel model;
+    private final NumberFormat format;
 
-    private double min;     // The minimum numeric value for the text
-    private double max;     // The maximum numeric value for the text
+    private final double min;     // The minimum numeric value for the text
+    private final double max;     // The maximum numeric value for the text
 
-    private double inc;     // An increment/decrement amount, for keystrokes
+    private final double inc;     // An increment/decrement amount, for keystrokes
 
     private boolean isUpdating; // A flag to detect our own model changes
 
@@ -78,16 +78,14 @@ class ConfiguredTextField
         double max = model.getConfiguredMaximum();
         int widest = getWidestNumber(max);
 
-        String tempText = Integer.toString(widest);
+        StringBuilder tempText = new StringBuilder(Integer.toString(widest));
         int places = format.getMaximumFractionDigits();
         if (places > 0) {
-            tempText += ".";
-            for (int n=0; n<places; n++) {
-                tempText += "0";
-            }
+            tempText.append(".");
+            tempText.append("0".repeat(places));
         }
         String text = getText();
-        setText(tempText);
+        setText(tempText.toString());
         setPreferredSize(null); // wipe previous settings
         Dimension size = getPreferredSize();
         setText(text);
@@ -169,37 +167,33 @@ class ConfiguredTextField
         // Override the default input map for spacebar, because that key stroke
         // is used globally to access the editor's pan mode.
         InputMap input = getInputMap(WHEN_FOCUSED);
-        KeyStroke space = KeyStroke.getKeyStroke(new Character(' '), 0);
+        KeyStroke space = KeyStroke.getKeyStroke(' ', 0);
         input.put(space, "none");
 
         // Increment by largeInc on up arrow events:
         registerKeyboardAction(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
+                event -> {
                     double value = model.getConfiguredValue();
                     value = getNextRoundValueUp(value);
                     if ((value >= min) && (value <= max)) {
                         model.setConfiguredValue(value);
                     }
-                }
-            },
-            KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0),
-            WHEN_FOCUSED
+                },
+                KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0),
+                WHEN_FOCUSED
         );
 
         // Decrement by largeInc on down arrow events:
         registerKeyboardAction(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
+                event -> {
                     double value = model.getConfiguredValue();
                     value = getNextRoundValueDown(value);
                     if ((value >= min) && (value <= max)) {
                         model.setConfiguredValue(value);
                     }
-                }
-            },
-            KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0),
-            WHEN_FOCUSED
+                },
+                KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0),
+                WHEN_FOCUSED
         );
     }
 
@@ -252,8 +246,8 @@ class ConfiguredTextField
 
     private class IntervalVerifier extends InputVerifier {
 
-        private double min;
-        private double max;
+        private final double min;
+        private final double max;
 
         IntervalVerifier(double min, double max) {
             this.min = min;

@@ -27,11 +27,11 @@ public final class NativeByteBufferAllocator implements ByteBufferAllocator {
      * @param chunkSize The size of each chunk to allocate.
      */
     public NativeByteBufferAllocator( int chunkSize ) {
-        m_chunkList = new LinkedList<NativeChunk>();
+        m_chunkList = new LinkedList<>();
         m_chunkSize = chunkSize;
-        m_freeBlockManagerList = new LinkedList<FreeBlockManager>();
-        m_allocdBlocks = new HashMap<Long,CacheBlock>();
-        m_allocdFBMs = new HashMap<Long,FreeBlockManager>();
+        m_freeBlockManagerList = new LinkedList<>();
+        m_allocdBlocks = new HashMap<>();
+        m_allocdFBMs = new HashMap<>();
     }
 
     /**
@@ -159,7 +159,7 @@ public final class NativeByteBufferAllocator implements ByteBufferAllocator {
      * @return Returns said hash key.
      */
     private static Long getKeyFor( ByteBuffer buf ) {
-        return new Long( getNativeAddressOf( buf ) );
+        return getNativeAddressOf( buf );
     }
 
     /**

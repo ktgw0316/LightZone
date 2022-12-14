@@ -239,7 +239,7 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
             pb.addSource(front);
             pb.addSource(back);
             pb.add(blendingMode);
-            pb.add(new Double(invertedRegion ? -opacity : opacity));
+            pb.add(invertedRegion ? -opacity : opacity);
             pb.add(mask);
             pb.add(colorSelectionMask);
 

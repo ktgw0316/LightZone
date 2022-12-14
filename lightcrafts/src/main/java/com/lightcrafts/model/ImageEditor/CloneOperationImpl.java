@@ -27,6 +27,7 @@ public class CloneOperationImpl extends BlendedOperation implements CloneOperati
         setHelpTopic(HELP_TOOL_CLONE);
     }
 
+    @Override
     public EditorMode getPreferredMode() {
         return EditorMode.REGION;
     }
@@ -84,10 +85,10 @@ public class CloneOperationImpl extends BlendedOperation implements CloneOperati
 
             pb = new ParameterBlock();
             pb.addSource(translated)
-              .add(dx > 0 ?  dx : 0)
-              .add(dx < 0 ? -dx : 0)
-              .add(dy > 0 ?  dy : 0)
-              .add(dy < 0 ? -dy : 0)
+              .add(Math.max(dx, 0))
+              .add(-Math.min(dx, 0))
+              .add(Math.max(dy, 0))
+              .add(-Math.min(dy, 0))
               .add(BorderExtender.createInstance(BorderExtender.BORDER_ZERO));
             RenderedOp border = JAI.create("Border", pb, JAIContext.noCacheHint);
 
@@ -136,7 +137,7 @@ public class CloneOperationImpl extends BlendedOperation implements CloneOperati
             pb.addSource(formatted)
               .addSource(image)
               .add("Normal")
-              .add(new Double(1))
+              .add(1.0)
               .add(mask);
 
             // RenderingHints blendHints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, new ImageLayout(back));

@@ -3,22 +3,18 @@
 
 package com.lightcrafts.utils.file;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import com.lightcrafts.platform.Platform;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.nio.channels.FileChannel;
 
-import com.lightcrafts.platform.Platform;
-import org.jetbrains.annotations.NotNull;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * A <code>FileUtil</code> is a set of utility functions for files.
@@ -140,8 +136,7 @@ public final class FileUtil {
             final char c = ILLEGAL_FILENAME_CHARS.charAt( i );
             if ( name.indexOf( c ) >= 0 ) {
                 final String from = String.valueOf( c );
-                //noinspection UnnecessaryBoxing
-                final String to = String.format( "%%%02X", new Integer( c ) );
+                final String to = String.format( "%%%02X", (int) c );
                 name = name.replace( from, to );
             }
         }
@@ -395,7 +390,7 @@ public final class FileUtil {
         int bytesRead;
         final StringBuilder sb = new StringBuilder();
         while ( (bytesRead = in.read( buf )) > 0 )
-            sb.append( new String( buf, 0, bytesRead, "UTF-8" ) );
+            sb.append( new String( buf, 0, bytesRead, UTF_8) );
         return sb.toString();
     }
 
@@ -546,10 +541,6 @@ public final class FileUtil {
     private static final Pattern NUMBERED_FILE_PATTERN =
         Pattern.compile( "^.*-(\\d+)\\.[a-z]{3,4}$" );
 
-    private static final FileFilter dirFilter = new FileFilter() {
-        public boolean accept(File file) {
-            return file.isDirectory();
-        }
-    };
+    private static final FileFilter dirFilter = File::isDirectory;
 }
 /* vim:set et sw=4 ts=4: */

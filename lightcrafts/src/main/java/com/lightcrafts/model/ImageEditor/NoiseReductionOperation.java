@@ -84,7 +84,7 @@ public class NoiseReductionOperation extends BlendedOperation {
             pb = new ParameterBlock();
             pb.addSource(cc);
             pb.add(MedianFilterDescriptor.MEDIAN_MASK_SQUARE); // X Shape seems to give the least artifacts
-            pb.add(new Integer(Math.max(2 * (int) (denoiseLevel * scale) + 1, 3)));
+            pb.add(Math.max(2 * (int) (denoiseLevel * scale) + 1, 3));
             denoiser = JAI.create("MedianFilter", pb, mfHints);
 
             RenderingHints layoutHints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, Functions.getImageLayout(ystImage));

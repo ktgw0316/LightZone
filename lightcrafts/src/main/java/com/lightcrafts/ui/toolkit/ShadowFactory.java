@@ -284,9 +284,7 @@ public class ShadowFactory {
             this.opacity = shadowOpacity;
         }
 
-        changeSupport.firePropertyChange(OPACITY_CHANGED_PROPERTY,
-                                         new Float(oldOpacity),
-                                         new Float(this.opacity));
+        changeSupport.firePropertyChange(OPACITY_CHANGED_PROPERTY, oldOpacity, this.opacity);
     }
 
     /**
@@ -322,9 +320,7 @@ public class ShadowFactory {
             this.size = shadowSize;
         }
 
-        changeSupport.firePropertyChange(SIZE_CHANGED_PROPERTY,
-                                         new Integer(oldSize),
-                                         new Integer(this.size));
+        changeSupport.firePropertyChange(SIZE_CHANGED_PROPERTY, oldSize, this.size);
     }
 
     /**

@@ -22,9 +22,7 @@ import java.awt.*;
 import java.awt.image.*;
 import java.lang.ref.SoftReference;
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Observable;
+import java.util.*;
 
 /**
  * A simple implementation of <code>TileFactory</code> wherein the tiles
@@ -125,7 +123,8 @@ public class LCRecyclingTileFactory extends Observable
      * internal data banks of <code>DataBuffer</code>s of tiles wherein the
      * data bank array has the type and dimensions implied by the key.
      */
-    private HashMap recycledArrays = new HashMap(32);
+    private final Map<Long, ArrayList<SoftReference<Object>>> recycledArrays =
+            new HashMap<>(32);
 
     /**
      * The amount of memory currrently used for array storage.
@@ -168,8 +167,8 @@ public class LCRecyclingTileFactory extends Observable
      * Returns a <code>SoftReference</code> to the internal bank
      * data of the <code>DataBuffer</code>.
      */
-    private static SoftReference getBankReference(DataBuffer db) {
-        Object array = null;
+    private static SoftReference<Object> getBankReference(DataBuffer db) {
+        Object array;
 
         switch(db.getDataType()) {
         case DataBuffer.TYPE_BYTE:
@@ -195,7 +194,7 @@ public class LCRecyclingTileFactory extends Observable
 
         }
 
-        return new SoftReference(array);
+        return new SoftReference<>(array);
     }
 
     /**
@@ -203,7 +202,7 @@ public class LCRecyclingTileFactory extends Observable
      * bank array.
      */
     private static long getDataBankSize(int dataType, int numBanks, int size) {
-        int bytesPerElement = 0;
+        final int bytesPerElement;
         switch(dataType) {
         case DataBuffer.TYPE_BYTE:
             bytesPerElement = 1;
@@ -221,9 +220,7 @@ public class LCRecyclingTileFactory extends Observable
             break;
         default:
             throw new UnsupportedOperationException("Unsupported Data Type");
-
         }
-
         return (long) numBanks * size * bytesPerElement;
     }
 
@@ -396,9 +393,9 @@ public class LCRecyclingTileFactory extends Observable
     public void recycleTile(Raster tile) {
         DataBuffer db = tile.getDataBuffer();
 
-        Long key = new Long(((long)db.getDataType() << 56) |
-                            ((long)db.getNumBanks() << 32) |
-                            (long)db.getSize());
+        Long key = ((long)db.getDataType() << 56)
+                | ((long)db.getNumBanks() << 32)
+                | (long)db.getSize();
 
         if(DEBUG) {
             System.out.println("Recycling array for: "+
@@ -409,13 +406,9 @@ public class LCRecyclingTileFactory extends Observable
         }
 
         synchronized(recycledArrays) {
-            Object value = recycledArrays.get(key);
-            ArrayList arrays = null;
-            if(value != null) {
-                arrays = (ArrayList)value;
-            } else {
-                arrays = new ArrayList();
-            }
+            ArrayList<SoftReference<Object>> value = recycledArrays.get(key);
+            ArrayList<SoftReference<Object>> arrays;
+            arrays = Objects.requireNonNullElseGet(value, ArrayList::new);
 
             memoryUsed += getDataBankSize(db.getDataType(),
                                           db.getNumBanks(),
@@ -435,9 +428,7 @@ public class LCRecyclingTileFactory extends Observable
     private Object getRecycledArray(int arrayType,
                                     long numBanks,
                                     long arrayLength) {
-        Long key = new Long(((long)arrayType << 56) |
-                            numBanks << 32 |
-                            arrayLength);
+        Long key = ((long)arrayType << 56) | numBanks << 32 | arrayLength;
 
         if(DEBUG) {
             System.out.println("Attempting to get array for: "+
@@ -446,12 +437,11 @@ public class LCRecyclingTileFactory extends Observable
         }
 
         synchronized(recycledArrays) {
-            Object value = recycledArrays.get(key);
+            ArrayList<SoftReference<Object>> value = recycledArrays.get(key);
 
             if(value != null) {
-                ArrayList arrays = (ArrayList)value;
-                for(int idx = arrays.size() - 1; idx >= 0; idx--) {
-                    SoftReference bankRef = (SoftReference)arrays.remove(idx);
+                for(int idx = value.size() - 1; idx >= 0; idx--) {
+                    SoftReference<Object> bankRef = value.remove(idx);
                     memoryUsed -= getDataBankSize(arrayType,
                                                   (int)numBanks,
                                                   (int)arrayLength);
@@ -472,21 +462,16 @@ public class LCRecyclingTileFactory extends Observable
         // array is null
         switch(arrayType) {
         case DataBuffer.TYPE_BYTE:
-            return Array.newInstance(byte.class,
-                                      new int[]{(int)numBanks, (int)arrayLength});
+            return Array.newInstance(byte.class, (int)numBanks, (int)arrayLength);
         case DataBuffer.TYPE_USHORT:
         case DataBuffer.TYPE_SHORT:
-            return Array.newInstance(short.class,
-                                      new int[]{(int)numBanks, (int)arrayLength});
+            return Array.newInstance(short.class, (int)numBanks, (int)arrayLength);
         case DataBuffer.TYPE_INT:
-            return Array.newInstance(int.class,
-                                      new int[]{(int)numBanks, (int)arrayLength});
+            return Array.newInstance(int.class, (int)numBanks, (int)arrayLength);
         case DataBuffer.TYPE_FLOAT:
-            return Array.newInstance(float.class,
-                                      new int[]{(int)numBanks, (int)arrayLength});
+            return Array.newInstance(float.class, (int)numBanks, (int)arrayLength);
         case DataBuffer.TYPE_DOUBLE:
-            return Array.newInstance(double.class,
-                                      new int[]{(int)numBanks, (int)arrayLength});
+            return Array.newInstance(double.class, (int)numBanks, (int)arrayLength);
         default:
             //throw new IllegalArgumentException("Unsupported Data Type");
             return null;

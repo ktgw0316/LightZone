@@ -14,22 +14,21 @@ import java.util.LinkedList;
 
 public class DraggableStack extends JLayeredPane {
 
-    private final static Integer StackLayer = new Integer(0);
-    private final static Integer DragLayer = new Integer(1);
+    private enum Layer { Stack, Drag }
 
-    private StackLayer stack;
-    private DragLayer drag;
-    private StackDragListener dragListener;
+    private final StackLayer stack;
+    private final DragLayer drag;
+    private final StackDragListener dragListener;
 
-    private LinkedList listeners;       // DraggableStackListeners
+    private final LinkedList<DraggableStackListener> listeners;       // DraggableStackListeners
 
     public DraggableStack() {
         setLayout(null);
         stack = new StackLayer(this);
         drag = new DragLayer();
-        add(stack, StackLayer);
+        add(stack, Layer.Stack);
         dragListener = new StackDragListener(this);
-        listeners = new LinkedList();
+        listeners = new LinkedList<>();
     }
 
     /** Components must be added and removed via push() and pop().  This method
@@ -105,7 +104,7 @@ public class DraggableStack extends JLayeredPane {
 
     void dragStart(JComponent comp, boolean isSwappable) {
         stack.setDragComponent(comp, isSwappable);
-        add(drag, DragLayer);
+        add(drag, Layer.Drag);
         drag.setDragComponent(comp);
         notifyStart();
     }

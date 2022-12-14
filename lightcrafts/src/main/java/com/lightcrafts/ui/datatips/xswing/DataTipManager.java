@@ -33,7 +33,6 @@ import java.awt.*;
 import java.awt.event.AWTEventListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
-import java.security.AccessControlException;
 
 /**
  * <code>DataTipManager</code> provides data tips for tree, table and list components. Whenever the mouse cursor is
@@ -44,20 +43,20 @@ import java.security.AccessControlException;
 public class DataTipManager {
     private static DataTipManager   instance;
 
-    private ListDataTipListener     listMouseListener   = new ListDataTipListener();
-    private TableDataTipListener    tableMouseListener  = new TableDataTipListener();
-    private TreeDataTipListener     treeMouseListener   = new TreeDataTipListener();
-    private Component               parentComponent;
-    private Window                  tipComponentWindow;
-    private MouseEvent              lastMouseEvent;
-    private static boolean          allowUntrustedUsage;
+    private final ListDataTipListener listMouseListener  = new ListDataTipListener();
+    private final TableDataTipListener tableMouseListener = new TableDataTipListener();
+    private final TreeDataTipListener treeMouseListener  = new TreeDataTipListener();
+    private Component parentComponent;
+    private Window tipComponentWindow;
+    private MouseEvent lastMouseEvent;
+    private static boolean allowUntrustedUsage;
 
     private DataTipManager() {
         try {
             long eventMask = AWTEvent.MOUSE_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK | AWTEvent.MOUSE_WHEEL_EVENT_MASK;
             Toolkit.getDefaultToolkit().addAWTEventListener(new MouseEventModifier(), eventMask);
         }
-        catch(AccessControlException e) {
+        catch(SecurityException e) {
             if(!allowUntrustedUsage) {
                 throw new RuntimeException("DataTipManager needs to run in a trusted application", e);
             }
