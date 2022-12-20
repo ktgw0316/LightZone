@@ -26,7 +26,7 @@ default: all
 
 $(SUBDIRS)::
 	@echo "-----> Entering $@"
-	$(MAKE) --no-print-directory -j -C $@ $(MAKECMDGOALS) || exit 1
+	$(MAKE) --no-print-directory -C $@ $(MAKECMDGOALS) || exit 1
 	@echo "-----> Leaving $@"
 
 all clean distclean mostlyclean: $(SUBDIRS)
