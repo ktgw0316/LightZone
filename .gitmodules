@@ -1,3 +1,12 @@
 [submodule "lightcrafts/dependencies"]
 	path = lightcrafts/dependencies
 	url = https://github.com/ktgw0316/lightzone-dependencies.git
+[submodule "submodules/rawspeed"]
+	path = submodules/rawspeed
+	url = https://github.com/darktable-org/rawspeed.git
+[submodule "submodules/LibRaw"]
+	path = submodules/LibRaw
+	url = https://github.com/LibRaw/LibRaw.git
+[submodule "submodules/LibRaw-cmake"]
+	path = submodules/LibRaw-cmake
+	url = https://github.com/LibRaw/LibRaw-cmake.git
