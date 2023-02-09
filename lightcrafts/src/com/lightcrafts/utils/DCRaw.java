@@ -480,6 +480,11 @@ public final class DCRaw implements
         RenderedImage result = null;
         File of = null;
 
+        if (mode == dcrawMode.full) {
+            final var rawler = new Rawler(m_fileName);
+            return rawler.getImage();
+        }
+
         try {
             if (mode == dcrawMode.preview && m_thumbWidth >= 1024 && m_thumbHeight >= 768) {
                 mode = dcrawMode.thumb;
