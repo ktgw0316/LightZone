@@ -253,6 +253,15 @@ return console.askOkCancel(message, true);
                   <property name="itemName" type="string">${compiler:sys.fullName} ${compiler:sys.version}</property>
                 </serializedBean>
               </action>
+              <action id="326" beanClass="com.install4j.runtime.beans.actions.registry.SetRegistryValueAction" actionElevationType="elevated" rollbackBarrierExitCode="0">
+                <serializedBean>
+                  <property name="createKey" type="boolean" value="false" />
+                  <property name="keyName" type="string">SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${compiler:sys.applicationId}</property>
+                  <property name="registryRoot" type="enum" class="com.install4j.api.windows.RegistryRoot" value="HKEY_LOCAL_MACHINE" />
+                  <property name="value" type="string">${compiler:sys.version}</property>
+                  <property name="valueName" type="string">DisplayVersion</property>
+                </serializedBean>
+              </action>
               <action id="165" beanClass="com.install4j.runtime.beans.actions.desktop.CreateProgramGroupAction" actionElevationType="elevated" failureStrategy="askQuit">
                 <serializedBean>
                   <property name="addUninstaller" type="boolean" value="true" />
