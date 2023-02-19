@@ -1,6 +1,56 @@
 use jni::objects::{JClass, JObject, JString, JValue};
-use jni::sys::{jint, jshort, jsize};
+use jni::sys::{jint, jshort, jshortArray, jsize};
 use jni::JNIEnv;
+use rawler::RawImage;
+
+fn get_image(env: JNIEnv, file: JString) -> RawImage {
+    let file: String = env
+        .get_string(file)
+        .expect("Couldn't get java string!")
+        .into();
+    rawler::decode_file(&file).unwrap()
+}
+
+#[no_mangle]
+pub extern "system" fn Java_com_lightcrafts_utils_Rawler_getRawWidth<'local>(
+    env: JNIEnv<'local>,
+    _class: JClass,
+    file: JString<'local>,
+) -> jint {
+    get_image(env, file).width as jint
+}
+
+#[no_mangle]
+pub extern "system" fn Java_com_lightcrafts_utils_Rawler_getRawHeight<'local>(
+    env: JNIEnv<'local>,
+    _class: JClass,
+    file: JString<'local>,
+) -> jint {
+    get_image(env, file).height as jint
+}
+
+#[no_mangle]
+pub extern "system" fn Java_com_lightcrafts_utils_Rawler_getRawData<'local>(
+    env: JNIEnv<'local>,
+    _class: JClass,
+    file: JString<'local>,
+) -> jshortArray {
+    let image = get_image(env, file);
+    let data = match image.data {
+        rawler::RawImageData::Integer(data) => {
+            data.iter().map(|&x| x as jshort).collect::<Vec<_>>()
+        }
+        _ => {
+            eprintln!("Don't know how to process non-integer raw files");
+            Vec::new()
+        }
+    };
+    let buffer = env.new_short_array(data.len() as jsize).unwrap();
+    env.set_short_array_region(buffer, 0, &data).unwrap();
+    buffer
+    // let buffer_obj = unsafe { JObject::from_raw(buffer) };
+    // let data_jvalue = JValue::from(buffer_obj);
+}
 
 #[no_mangle]
 pub extern "system" fn Java_com_lightcrafts_utils_Rawler_decode<'local>(

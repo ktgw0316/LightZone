@@ -5,20 +5,14 @@ package com.lightcrafts.utils;
 import com.lightcrafts.image.metadata.MetadataUtil;
 import com.lightcrafts.image.metadata.providers.*;
 import com.lightcrafts.jai.JAIContext;
-
-import java.awt.color.ColorSpace;
-import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.ComponentColorModel;
-import java.awt.image.DataBufferUShort;
-import java.awt.image.Raster;
-import java.awt.image.RenderedImage;
-import java.io.IOException;
-import java.util.Date;
-
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
+
+import java.awt.color.ColorSpace;
+import java.awt.image.*;
+import java.io.IOException;
+import java.util.Date;
 
 import static java.awt.Transparency.OPAQUE;
 import static java.awt.image.DataBuffer.TYPE_USHORT;
@@ -32,14 +26,19 @@ public final class Rawler implements
     ISOProvider, MakeModelProvider, ShutterSpeedProvider, WidthHeightProvider {
 
     static {
-        System.loadLibrary("RawlerJNI");
+        System.loadLibrary("rawler_jni");
     }
 
     private static native RawlerRawImage decode(String filename);
 
-    public final String fileName;
+    public final String filename;
 
     private RawlerRawImage _raw = null;
+
+    // DEBUG
+    static native int getRawWidth(String filename);
+    static native int getRawHeight(String filename);
+    static native short[] getRawData(String filename);
 
     @NotNull
     public RenderedImage getImage() throws IOException {
@@ -57,13 +56,13 @@ public final class Rawler implements
     @NotNull
     private RawlerRawImage getRaw() {
         if (_raw == null) {
-            _raw = decode(fileName);
+            _raw = decode(filename);
         }
         return _raw;
     }
 
     @NotNull
-    private ColorModel getColorModel(int bands) {
+    static ColorModel getColorModel(int bands) {
         return bands == 1
                 ? new ComponentColorModel(ColorSpace.getInstance(ColorSpace.CS_GRAY),
                     false, false, OPAQUE, TYPE_USHORT)
