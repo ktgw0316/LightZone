@@ -40,19 +40,17 @@ class RawlerTest {
     }
 
     @Test
-    void getSrgb() throws IOException {
+    void getProPhotoRGB() throws IOException {
         final int width = Rawler.getRawWidth(filename);
         final int height = Rawler.getRawHeight(filename);
-        final short[] data = Rawler.getSrgb(filename);
+        final short[] data = Rawler.getProPhotoRGB(filename);
         final var dataBuf = new DataBufferUShort(data, data.length);
         final var bands = 3;
         final var bandOffsets = new int[]{0, 1, 2};
-        System.out.println(width);
-        System.out.println(height);
         final var raster = Raster.createInterleavedRaster(dataBuf, width, height,
                 bands * width, bands, bandOffsets, null);
         final var cm = Rawler.getColorModel(bands);
         final var bi = new BufferedImage(cm, raster, false, null);
-        ImageIO.write(bi, "png", new File(filename + ".srgb.png"));
+        ImageIO.write(bi, "png", new File(filename + ".rgb.png"));
     }
 }

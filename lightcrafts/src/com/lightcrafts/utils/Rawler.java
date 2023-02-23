@@ -39,7 +39,7 @@ public final class Rawler implements
     static native int getRawWidth(String filename);
     static native int getRawHeight(String filename);
     static native short[] getRawData(String filename);
-    static native short[] getSrgb(String filename);
+    static native short[] getProPhotoRGB(String filename);
 
     @NotNull
     public RenderedImage getImage() throws IOException {

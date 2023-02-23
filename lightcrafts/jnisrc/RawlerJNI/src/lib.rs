@@ -1,10 +1,12 @@
+mod lightzone;
+
 use std::path::PathBuf;
 use jni::objects::{JClass, JObject, JString, JValue};
 use jni::sys::{jint, jshort, jshortArray, jsize};
 use jni::JNIEnv;
-use rawler::analyze::raw_to_srgb;
 use rawler::decoders::RawDecodeParams;
 use rawler::RawImage;
+use crate::lightzone::raw_to_prophoto_rgb;
 
 fn get_image(env: JNIEnv, file: JString) -> RawImage {
     let file: String = env
@@ -58,7 +60,7 @@ pub extern "system" fn Java_com_lightcrafts_utils_Rawler_getRawData<'local>(
 }
 
 #[no_mangle]
-pub extern "system" fn Java_com_lightcrafts_utils_Rawler_getSrgb<'local>(
+pub extern "system" fn Java_com_lightcrafts_utils_Rawler_getProPhotoRGB<'local>(
     env: JNIEnv<'local>,
     _class: JClass,
     file: JString<'local>,
@@ -68,7 +70,7 @@ pub extern "system" fn Java_com_lightcrafts_utils_Rawler_getSrgb<'local>(
         .expect("Couldn't get java string!")
         .into();
     let params = RawDecodeParams::default();
-    let (image, dim) = raw_to_srgb(&PathBuf::from(file), params).unwrap();
+    let (image, dim) = raw_to_prophoto_rgb(&PathBuf::from(file), params).unwrap();
     let image = image.iter()
         .map(|&x| x as jshort)
         .collect::<Vec<_>>();
@@ -77,6 +79,8 @@ pub extern "system" fn Java_com_lightcrafts_utils_Rawler_getSrgb<'local>(
     println!("Returning {} x {} pixels", dim.w, dim.h);
     output
 }
+
+
 
 #[no_mangle]
 pub extern "system" fn Java_com_lightcrafts_utils_Rawler_decode<'local>(

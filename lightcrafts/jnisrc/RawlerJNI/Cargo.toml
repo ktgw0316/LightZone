@@ -7,6 +7,9 @@ edition = "2021"
 
 [dependencies]
 jni = "0.20.0"
+log = "0.4.14"
+multiversion = "0.7.1"
+rayon = "1.6.1"
 rawler = { git = "https://github.com/dnglab/dnglab.git" }
 
 [lib]
