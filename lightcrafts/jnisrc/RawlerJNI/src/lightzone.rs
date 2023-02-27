@@ -103,8 +103,7 @@ fn raw_u16_to_float(pix: &[u16]) -> Vec<f32> {
   pix.iter().copied().map(f32::from).collect()
 }
 
-/// Develop a RAW image to ProPhoto RGB
-pub fn develop_raw_prophoto_rgb(pixels: &[u16], params: &DevelopParams) -> Result<(Vec<f32>, Dim2)> {
+fn correct_raw(pixels: &[u16], params: &DevelopParams) -> Result<(Vec<f32>, Dim2)> {
   let black_level: [f32; 4] = match params.blacklevel.levels.len() {
     1 => Ok(collect_array(iter::repeat(params.blacklevel.levels[0].as_f32()))),
     4 => Ok(collect_array(params.blacklevel.levels.iter().map(|p| p.as_f32()))),
@@ -115,9 +114,51 @@ pub fn develop_raw_prophoto_rgb(pixels: &[u16], params: &DevelopParams) -> Resul
     4 => Ok(collect_array(params.whitelevel.iter().map(|p| *p as f32))),
     c => Err(format!("White level sample count of {} is invalid", c)),
   }?;
-  let wb_coeff: [f32; 4] = params.wb_coeff;
 
-  log::debug!("Develop raw, wb: {:?}, black: {:?}, white: {:?}", wb_coeff, black_level, white_level);
+  let mut pixels = raw_u16_to_float(pixels);
+
+  correct_blacklevel(&mut pixels, params.width, params.height, &black_level, &white_level);
+  Ok((pixels, Dim2::new(params.width, params.height)))
+}
+
+pub fn get_raw<P: AsRef<Path>>(path: P, params: RawDecodeParams) -> Result<(Vec<u16>, Dim2)> {
+  let mut raw_file = BufReader::new(File::open(&path).unwrap());
+  // .map_err(|e| RawlerError::with_io_error("load buffer", &path, e))?);
+
+  // Read whole raw file
+  // TODO: Large input file bug, we need to test the raw file before open it
+  let in_buffer = Buffer::new(&mut raw_file).unwrap(); // ?;
+
+  let mut rawfile = in_buffer.into();
+
+  // Get decoder or return
+  let decoder = get_decoder(&mut rawfile).unwrap(); // ?;
+  //decoder.decode_metadata(&mut rawfile)?;
+  let rawimage = decoder.raw_image(&mut rawfile, params, false).unwrap(); // ?;
+  let params = rawimage.develop_params().unwrap(); // ?;
+  let buf = match rawimage.data {
+    RawImageData::Integer(buf) => buf,
+    RawImageData::Float(_) => todo!(),
+  };
+  assert_eq!(rawimage.cpp, 1);
+  let (pixels, dim) = correct_raw(&buf, &params).unwrap();
+  let output = rescale_f32_to_u16(&pixels, 0, u16::MAX);
+  Ok((output, dim))
+}
+
+/// Develop a RAW image to ProPhoto RGB
+fn develop_raw_prophoto_rgb(pixels: &[u16], params: &DevelopParams) -> Result<(Vec<f32>, Dim2)> {
+  let (pixels, _) = correct_raw(pixels, params).unwrap();
+
+  let raw_size = Rect::new_with_points(Point::zero(), Point::new(params.width, params.height));
+  let active_area = params.active_area.unwrap_or(raw_size);
+  let crop_area = params.crop_area.unwrap_or(active_area).adapt(&active_area);
+  let rgb = demosaic_ppg(&pixels, Dim2::new(params.width, params.height), params.cfa.clone(), active_area);
+  let mut cropped_pixels = if raw_size.d != crop_area.d { rgb.crop(crop_area) } else { rgb };
+
+  // Convert to ProPhoto RGB from XYZ
+  let wb_coeff: [f32; 4] = params.wb_coeff;
+  // log::debug!("Develop raw, wb: {:?}, black: {:?}, white: {:?}", wb_coeff, black_level, white_level);
 
   //Color Space Conversion
   let xyz2cam = params
@@ -126,18 +167,6 @@ pub fn develop_raw_prophoto_rgb(pixels: &[u16], params: &DevelopParams) -> Resul
       .find(|m| m.illuminant == Illuminant::D65)
       .ok_or("Illuminant matrix D65 not found")?
       .matrix;
-
-  let raw_size = Rect::new_with_points(Point::zero(), Point::new(params.width, params.height));
-  let active_area = params.active_area.unwrap_or(raw_size);
-  let crop_area = params.crop_area.unwrap_or(active_area).adapt(&active_area);
-  let mut pixels = raw_u16_to_float(pixels);
-
-  correct_blacklevel(&mut pixels, params.width, params.height, &black_level, &white_level);
-
-  let rgb = demosaic_ppg(&pixels, Dim2::new(params.width, params.height), params.cfa.clone(), active_area);
-  let mut cropped_pixels = if raw_size.d != crop_area.d { rgb.crop(crop_area) } else { rgb };
-
-  // Convert to ProPhoto RGB from XYZ
   rgb_to_prophoto_rgb_with_wb(&mut cropped_pixels, &wb_coeff, xyz2cam);
 
   // Flatten into Vec<f32>

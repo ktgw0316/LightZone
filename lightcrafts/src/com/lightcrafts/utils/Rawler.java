@@ -38,6 +38,8 @@ public final class Rawler implements
     // DEBUG
     static native int getRawWidth(String filename);
     static native int getRawHeight(String filename);
+    static native int getCroppedWidth(String filename);
+    static native int getCroppedHeight(String filename);
     static native short[] getRawData(String filename);
     static native short[] getProPhotoRGB(String filename);
 
