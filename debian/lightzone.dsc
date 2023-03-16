@@ -34,4 +34,4 @@ Build-Depends:
  rsync
 Package-List:
  lightzone deb graphics optional
-DEBTRANSFORM-TAR: lightzone-4.2.4.tar.bz2
+DEBTRANSFORM-TAR: lightzone-4.2.4.tar.xz

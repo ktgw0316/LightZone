@@ -99,11 +99,11 @@ from the .src.rpm by yourself.
 
 First of all, you need to install rpm-build using package manager of your distro.
 
-Then extract the containts of the .src.rpm, and copy its source archive to SOURCES
+Then extract the contents of the .src.rpm, and copy its source archive to SOURCES
 directory:
 
     rpm2cpio lightzone-*.src.rpm | cpio -idmv --no-absolute-filenames
-    cp lightzone-*.tar.bz2 ~/rpmbuild/SOURCES/
+    cp lightzone-*.tar.xz ~/rpmbuild/SOURCES/
 
 Then build an .rpm package using .spec file:
 

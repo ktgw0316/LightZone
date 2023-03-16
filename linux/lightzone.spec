@@ -11,7 +11,7 @@ License:	BSD-3-Clause
 Summary:	Open-source professional-level digital darkroom software
 Url:		http://lightzoneproject.org/
 Group:		Productivity/Graphics/Convertors
-Source:		%{name}-%{version}.tar.bz2
+Source:		%{name}-%{version}.tar.xz
 
 %if 0%{?fedora} || 0%{?rhel_version} || 0%{?centos_version}
 %define lcms2_devel lcms2-devel
