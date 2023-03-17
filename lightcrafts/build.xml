@@ -39,9 +39,17 @@
     </or>
   </condition>
 
+  <condition property="submodule-deps" value="true">
+    <and>
+      <istrue value="${no-ivy}"/>
+      <isfalse value="${no-submodule}"/>
+    </and>
+  </condition>
+
   <target name="resolve" depends="resolve-submodule,resolve-ivy"/>
 
-  <target name="resolve-submodule" if="no-ivy">
+  <target name="resolve-submodule" if="submodule-deps">
+    <echo message="Resolving submodule dependencies"/>
     <antcall target="clean-lib"/>
     <copy todir="${basedir}/lib">
       <fileset dir="${basedir}/dependencies" includes="*.jar"/>
