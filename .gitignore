@@ -1,6 +1,7 @@
 !**/GNUMakefile
 !**/lightzone*
 **/.gradle
+**/.pc
 **/.vscode
 **/build
 **/java_jni
@@ -46,7 +47,6 @@ debian/lightzone
 lightcrafts/coprocesses/*/Debug
 lightcrafts/coprocesses/*/Release
 lightcrafts/coprocesses/*/x64
-lightcrafts/coprocesses/dcraw/\.pc/*.patch
 lightcrafts/extbuild
 lightcrafts/jnisrc/**/*config\.h
 lightcrafts/jnisrc/**/arch-*

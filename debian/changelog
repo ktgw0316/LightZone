@@ -2,7 +2,14 @@ lightzone (4.2.5-0obs1) unstable; urgency=medium
 
   * Upstream sync
 
- -- Masahiro Kitagawa <arctica0316@gmail.com>  Wed, 15 Jun 2022 22:12:49 +0900
+ -- Masahiro Kitagawa <arctica0316@gmail.com>  Sat, 18 Mar 2023 22:29:00 +0900
+
+lightzone (4.2.4-0obs2) unstable; urgency=medium
+
+  * Add patch for libjiconfont-font-awesome-java 4.7.0.1
+  * Specify ejml >= 0.38 dependency
+
+ -- Masahiro Kitagawa <arctica0316@gmail.com>  Sat, 18 Mar 2023 21:48:37 +0900
 
 lightzone (4.2.4-0obs1) unstable; urgency=medium
 

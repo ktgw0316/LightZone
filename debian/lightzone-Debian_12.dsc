@@ -10,6 +10,7 @@ Vcs-Browser: https://github.com/ktgw0316/LightZone
 Vcs-Git: https://github.com/ktgw0316/LightZone.git
 Build-Depends:
  ant (>= 1.9.8),
+ autoconf,
  debhelper,
  default-jdk (>= 1.11),
  default-jre-headless (>= 2:1.11),
@@ -34,3 +35,4 @@ Build-Depends:
 Package-List:
  lightzone deb graphics optional
 DEBTRANSFORM-TAR: lightzone-4.2.5.tar.xz
+DEBTRANSFORM-SERIES: debian.series-Debian_12

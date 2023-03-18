@@ -2,7 +2,7 @@
 
 export JAVA_HOME=$(shell readlink -f /usr/bin/javac | sed "s:/bin/javac::")
 
-ANT_OPTIONS=-f $(CURDIR)/linux/build.xml -Dno-ivy=true
+ANT_OPTIONS=-f $(CURDIR)/linux/build.xml -Dno-ivy=true -Dno-submodule=true
 
 %:
 	dh $@ --with javahelper --buildsystem=ant

@@ -21,7 +21,7 @@ Building the LightZone source requires (at least) following packages:
 - __pkg-config__
 - __rsync__
 
-### Debian (>= 10) and Ubuntu (>= 18.04)
+### Debian (>= 11) and Ubuntu (>= 18.04)
 
 _See also [Packaging on Debian or Ubuntu](#.deb-package-(debian-or-ubuntu)) below._
 
@@ -71,11 +71,11 @@ To check if it works fine before installing:
 ### .deb package (Debian or Ubuntu)
 
 You need to place an original source tarball in parent directory.
-For instance, if you want to build v4.2.2 in /tmp directory,
+For instance, if you want to build v4.2.4 in /tmp directory,
 
     cd /tmp
-    curl -L https://github.com/ktgw0316/LightZone/tarball/4.2.2 > lightzone_4.2.2.orig.tar.gz
-    tar xf lightzone_4.2.2.orig.tar.gz -C lightzone --strip-components=1
+    curl -L https://github.com/ktgw0316/LightZone/tarball/4.2.4 > lightzone_4.2.4.orig.tar.gz
+    tar xf lightzone_4.2.4.orig.tar.gz -C lightzone --strip-components=1
     mkdir lightzone
     cd lightzone
 
@@ -99,11 +99,11 @@ from the .src.rpm by yourself.
 
 First of all, you need to install rpm-build using package manager of your distro.
 
-Then extract the containts of the .src.rpm, and copy its source archive to SOURCES
+Then extract the contents of the .src.rpm, and copy its source archive to SOURCES
 directory:
 
     rpm2cpio lightzone-*.src.rpm | cpio -idmv --no-absolute-filenames
-    cp lightzone-*.tar.bz2 ~/rpmbuild/SOURCES/
+    cp lightzone-*.tar.xz ~/rpmbuild/SOURCES/
 
 Then build an .rpm package using .spec file:
 
@@ -131,7 +131,7 @@ In the local overlay use the portage groups:
     mkdir media-gfx/lightroom
 
 Put _linux/lightzone_9999.ebuild_ in the local overlay.
-If you need to build specific version, replace the _9999_ in the filename with the version number such as _4.2.2_.
+If you need to build specific version, replace the _9999_ in the filename with the version number such as _4.2.4_.
 
 Move into the new directory _media-gfx/lightroom_ and do:
 
