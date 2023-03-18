@@ -1,3 +1,10 @@
+lightzone (4.2.4-0obs2) unstable; urgency=medium
+
+  * Add patch for libjiconfont-font-awesome-java 4.7.0.1
+  * Specify ejml >= 0.38 dependency
+
+ -- Masahiro Kitagawa <arctica0316@gmail.com>  Sat, 18 Mar 2023 21:48:37 +0900
+
 lightzone (4.2.4-0obs1) unstable; urgency=medium
 
   * Upstream sync
