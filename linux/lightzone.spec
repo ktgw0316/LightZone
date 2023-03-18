@@ -14,6 +14,7 @@ Group:		Productivity/Graphics/Convertors
 Source:		%{name}-%{version}.tar.xz
 
 %if 0%{?fedora} || 0%{?rhel_version} || 0%{?centos_version}
+%define jdk java-17-openjdk-devel
 %define lcms2_devel lcms2-devel
 %define libjpeg_devel libjpeg-turbo-devel
 %define libX11_devel libX11-devel
@@ -23,6 +24,7 @@ Source:		%{name}-%{version}.tar.xz
 %endif
 
 %if 0%{?sles_version}
+%define jdk java-17-openjdk-devel
 %define lcms2_devel liblcms2-devel
 %define libjpeg_devel libjpeg8-devel
 %define libX11_devel xorg-x11-libX11-devel
@@ -32,6 +34,7 @@ BuildRequires: update-desktop-files
 %endif
 
 %if 0%{?suse_version}
+%define jdk java-17-openjdk-devel
 %define lcms2_devel liblcms2-devel
 %define libjpeg_devel libjpeg8-devel
 %define libX11_devel libX11-devel
@@ -43,6 +46,7 @@ Requires:	xerces-j2-xml-apis
 %endif
 
 %if 0%{?mdkversion} || 0%{?pclinuxos}
+%define jdk java-17-openjdk-devel
 %define lcms2_devel liblcms2-devel
 %define libjpeg_devel libjpeg8-devel
 %define libX11_devel libX11-devel
@@ -53,6 +57,7 @@ Requires:	libgomp1
 %endif
 
 %if 0%{?mageia}
+%define jdk java-11-openjdk-devel
 %define lcms2_devel liblcms2-devel
 %define libjpeg_devel libjpeg-devel
 %define libX11_devel libx11-devel
@@ -62,7 +67,7 @@ BuildRequires:	libgomp-devel
 Requires:	libgomp1
 %endif
 
-BuildRequires:	javapackages-tools, java-17-openjdk-devel, %{libX11_devel}, ant, gcc, gcc-c++, make, git, javahelp2, %{lcms2_devel}, lensfun-devel, %{libjpeg_devel}, libtiff-devel, %{pkg_config}, rsync
+BuildRequires:	javapackages-tools, %{jdk}, %{libX11_devel}, ant, gcc, gcc-c++, make, git, javahelp2, %{lcms2_devel}, lensfun-devel, %{libjpeg_devel}, libtiff-devel, %{pkg_config}, rsync
 Requires:	javahelp2, lcms2, lensfun, %{xmllint}
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
