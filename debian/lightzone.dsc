@@ -18,7 +18,7 @@ Build-Depends:
  git-core,
  javahelp2,
  javahelper,
- libejml-java,
+ libejml-java (>= 0.38),
  libglib2.0-dev,
  libjetbrains-annotations-java,
  libjiconfont-font-awesome-java,

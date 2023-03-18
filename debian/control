@@ -41,7 +41,7 @@ Depends:
  ${shlibs:depends},
  default-jre (>= 2:1.11),
  javahelp2,
- libejml-java,
+ libejml-java (>= 0.38),
  libgomp1,
  libjiconfont-font-awesome-java,
  libjiconfont-google-material-design-icons-java,
