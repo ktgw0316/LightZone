@@ -27,7 +27,7 @@ _See also [Packaging on Debian or Ubuntu](#.deb-package-(debian-or-ubuntu)) belo
 
 Install required packages:
 
-    sudo apt-get install debhelper devscripts build-essential ant autoconf git-core javahelp2 default-jdk default-jre-headless libglib2.0-dev libjiconfont-google-material-design-icons-java liblcms2-dev liblensfun-dev libjpeg-dev libtiff5-dev libx11-dev libxml2-utils pkg-config rsync
+    sudo apt-get install debhelper devscripts build-essential ant autoconf git-core javahelp2 default-jdk default-jre-headless libglib2.0-dev libjiconfont-google-material-design-icons-java liblcms2-dev liblensfun-dev libjpeg-dev libtiff-dev libx11-dev libxml2-utils pkg-config rsync
 
 _Note: gcc, g++, libc6-dev and make shall be installed with the build-essential._
 
