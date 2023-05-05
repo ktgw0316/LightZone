@@ -536,6 +536,24 @@ public final class DCRaw implements
         return result;
     }
 
+    public synchronized RenderedImage getPreview()
+            throws BadImageFileException, UnknownImageTypeException, IOException
+    {
+        return runDCRaw(DCRaw.dcrawMode.preview);
+    }
+
+    public synchronized RenderedImage getThumbnail()
+            throws UnknownImageTypeException, BadImageFileException, IOException
+    {
+        return runDCRaw(DCRaw.dcrawMode.thumb);
+    }
+
+    public synchronized RenderedImage getImage()
+            throws BadImageFileException, UnknownImageTypeException, IOException
+    {
+        return runDCRaw(DCRaw.dcrawMode.full, false);
+    }
+
     private File getDcrawOutputFile(dcrawMode mode, boolean secondaryPixels)
             throws IOException, BadImageFileException
     {

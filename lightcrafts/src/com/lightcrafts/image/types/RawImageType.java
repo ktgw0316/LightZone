@@ -14,7 +14,6 @@ import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.opimage.CachedImage;
 import com.lightcrafts.jai.opimage.RGBDemosaicOpImage;
 import com.lightcrafts.jai.utils.Functions;
-import com.lightcrafts.utils.DCRaw;
 import com.lightcrafts.utils.ProgressIndicator;
 import com.lightcrafts.utils.UserCanceledException;
 import com.lightcrafts.utils.thread.ProgressThread;
@@ -116,7 +115,7 @@ public abstract class RawImageType extends ImageType {
                 Transparency.OPAQUE
         );
 
-        final var dcrawImage = (BufferedImage) dcRaw.runDCRaw(DCRaw.dcrawMode.full, false);
+        final var dcrawImage = (BufferedImage) dcRaw.getImage();
         final var dcrawTime = System.currentTimeMillis();
 
         final var metadata = imageInfo.getMetadata();
@@ -339,9 +338,9 @@ public abstract class RawImageType extends ImageType {
         final var dcRaw = rawInfo.getDCRaw();
 
         if (dcRaw.getThumbHeight() >= 400 && dcRaw.getThumbWidth() >= 600)
-            return dcRaw.runDCRaw(DCRaw.dcrawMode.thumb);
+            return dcRaw.getThumbnail();
         else
-            return dcRaw.runDCRaw(DCRaw.dcrawMode.preview);
+            return dcRaw.getPreview();
     }
 
     @Override
@@ -350,7 +349,7 @@ public abstract class RawImageType extends ImageType {
     {
         final var rawInfo = (RawImageInfo)imageInfo.getAuxiliaryInfo();
         final var dcRaw = rawInfo.getDCRaw();
-        return dcRaw.runDCRaw(DCRaw.dcrawMode.thumb);
+        return dcRaw.getThumbnail();
     }
 
     /**
