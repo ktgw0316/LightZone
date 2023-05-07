@@ -649,7 +649,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
                 return;
             }
             if ( auxInfo instanceof RawImageInfo ) {
-                final DCRaw dcRaw = ((RawImageInfo)auxInfo).getDCRaw();
+                final var dcRaw = ((RawImageInfo)auxInfo).getDCRaw();
                 camera = dcRaw.getCameraMake( true );
             }
         }

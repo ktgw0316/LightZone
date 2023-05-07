@@ -54,7 +54,7 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
         AuxiliaryImageInfo auxInfo = rendering.getEngine().getAuxInfo();
 
         if (false && auxInfo instanceof RawImageInfo) {
-            final DCRaw dcRaw = ((RawImageInfo)auxInfo).getDCRaw();
+            final var dcRaw = ((RawImageInfo)auxInfo).getDCRaw();
 
             float[] daylightMultipliers = dcRaw.getDaylightMultipliers();
             float[] cameraMultipliers = dcRaw.getCameraMultipliers();

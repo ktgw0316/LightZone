@@ -87,7 +87,7 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
         AuxiliaryImageInfo auxInfo = rendering.getEngine().getAuxInfo();
 
         if (auxInfo instanceof RawImageInfo) {
-            final DCRaw dcRaw = ((RawImageInfo)auxInfo).getDCRaw();
+            final var dcRaw = ((RawImageInfo)auxInfo).getDCRaw();
 
             float[] daylightMultipliers = dcRaw.getDaylightMultipliers();
             preMul = daylightMultipliers.clone();
