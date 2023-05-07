@@ -3,7 +3,8 @@
 package com.lightcrafts.image.types;
 
 import com.lightcrafts.image.ImageInfo;
-import com.lightcrafts.utils.raw.DCRaw;
+import com.lightcrafts.image.libs.LibRaw;
+import com.lightcrafts.utils.DCRaw;
 
 /**
  * A <code>RawImageInfo</code> is-an {@link AuxiliaryImageInfo} for holding
@@ -22,7 +23,7 @@ public class RawImageInfo extends AuxiliaryImageInfo {
      * for.
      */
     public RawImageInfo( ImageInfo imageInfo ) {
-        m_dcRaw = DCRaw.getInstanceFor( imageInfo.getFile().getAbsolutePath() );
+        m_dcRaw = new LibRaw( imageInfo.getFile().getAbsolutePath() );
     }
 
     /**
@@ -30,12 +31,12 @@ public class RawImageInfo extends AuxiliaryImageInfo {
      *
      * @return Returns said {@link DCRaw} object.
      */
-    public DCRaw getDCRaw() {
+    public LibRaw getDCRaw() {
         return m_dcRaw;
     }
 
     ////////// private ////////////////////////////////////////////////////////
 
-    private final DCRaw m_dcRaw;
+    private final LibRaw m_dcRaw;
 }
 /* vim:set et sw=4 ts=4: */

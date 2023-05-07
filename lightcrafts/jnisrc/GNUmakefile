@@ -9,6 +9,7 @@ SUBDIRS:=	jniutils \
 		fast_jai \
 		fast_bilateral \
 		lensfun \
+		libraw \
 		jpeg \
 		lcms \
 		tiff

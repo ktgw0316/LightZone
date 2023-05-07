@@ -71,7 +71,7 @@ class RawImageCache extends Thread {
         Date captureDate = metadata.getCaptureDateTime();
         if ( captureDate == null ) {
             final RawImageInfo rawInfo = (RawImageInfo)imageInfo.getAuxiliaryInfo();
-            final DCRaw dcRaw = rawInfo.getDCRaw();
+            final var dcRaw = rawInfo.getDCRaw();
             captureDate = dcRaw.getCaptureDateTime();
         }
         if ( captureDate != null ) {
