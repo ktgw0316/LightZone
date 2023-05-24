@@ -3,7 +3,6 @@ package com.lightcrafts.image.color;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.utils.LCMatrix;
 
-import lombok.val;
 import org.ejml.simple.SimpleMatrix;
 
 import java.awt.color.ICC_ProfileRGB;
@@ -149,8 +148,8 @@ public class ColorScience {
     }
 
     public static LCMatrix RGBtoZYX() {
-        val XYZRGB = new LCMatrix(rgbXYZ);
-        val S = LCMatrix.getArrayFloat(new LCMatrix(1, 3, wtptXYZ).mult(XYZRGB.invert()));
+        final var XYZRGB = new LCMatrix(rgbXYZ);
+        final var S = LCMatrix.getArrayFloat(new LCMatrix(1, 3, wtptXYZ).mult(XYZRGB.invert()));
 
         return new LCMatrix(new float[][] {
                 {S[0][0] * rgbXYZ[0][0], S[0][0] * rgbXYZ[0][1], S[0][0] * rgbXYZ[0][2]},
@@ -180,12 +179,12 @@ public class ColorScience {
         float[] W = {DT[0], DT[1], 1 - DT[0] - DT[1]};
 
         // Compute luminance weights for the primaries using the white point
-        val RGB = vec(R, G, B);
-        val WGB = vec(W, G, B);
-        val RWB = vec(R, W, B);
-        val RGW = vec(R, G, W);
+        final var RGB = vec(R, G, B);
+        final var WGB = vec(W, G, B);
+        final var RWB = vec(R, W, B);
+        final var RGW = vec(R, G, W);
 
-        val rgbDet = (float) RGB.determinant();
+        final var rgbDet = (float) RGB.determinant();
 
         return new float[] {(R[1] * (float) WGB.determinant()) / (W[1] * rgbDet),
                             (G[1] * (float) RWB.determinant()) / (W[1] * rgbDet),
@@ -350,7 +349,7 @@ public class ColorScience {
     }
 
     private static LCMatrix vec(float[] A, float[] B, float[] C) {
-        val ABC = new LCMatrix(3, 3);
+        final var ABC = new LCMatrix(3, 3);
         for (int i = 0; i < 3; i++)
             ABC.set(i, 0, A[i]);
         for (int i = 0; i < 3; i++)
@@ -457,7 +456,7 @@ public class ColorScience {
                 break;
         }
 
-        val B = new LCMatrix(method);
+        final var B = new LCMatrix(method);
 
         // source illuminant tristimulus in cone response domain
         float[] sXYZ = xy2XYZ(D(source));
@@ -498,19 +497,19 @@ public class ColorScience {
         float minT = 0;
         double wbr = 0, wbg = 0, wbb = 0;
 
-        val color = new LCMatrix(3, 1, rgb);
+        final var color = new LCMatrix(3, 1, rgb);
 
         for (int t = 1000; t < 40000; t+= (0.001 * t)) {
-            val B = new LCMatrix(chromaticAdaptation(t, refT, caMethod));
-            val combo = XYZtoRGB.mult(B.mult(RGBtoZYX));
+            final var B = new LCMatrix(chromaticAdaptation(t, refT, caMethod));
+            final var combo = XYZtoRGB.mult(B.mult(RGBtoZYX));
 
-            val adapdedColor = combo.mult(color);
+            final var adapdedColor = combo.mult(color);
 
-            val r = clip(adapdedColor.get(0, 0));
-            val g = clip(adapdedColor.get(1, 0));
-            val b = clip(adapdedColor.get(2, 0));
+            final var r = clip(adapdedColor.get(0, 0));
+            final var g = clip(adapdedColor.get(1, 0));
+            final var b = clip(adapdedColor.get(2, 0));
 
-            val tSat = (float) saturation(r, g, b);
+            final var tSat = (float) saturation(r, g, b);
 
             if (tSat < sat) {
                 sat = tSat;
@@ -537,27 +536,27 @@ public class ColorScience {
         float minDiff = Float.MAX_VALUE;
         float minT = 0;
 
-        val xyzRef = JAIContext.linearColorSpace.toCIEXYZ(rgb);
-        val labRef = JAIContext.labColorSpace.fromCIEXYZ(xyzRef);
+        final var xyzRef = JAIContext.linearColorSpace.toCIEXYZ(rgb);
+        final var labRef = JAIContext.labColorSpace.fromCIEXYZ(xyzRef);
 
         SimpleMatrix gray = new LCMatrix(new float[][]{{0.18f}, {0.18f}, {0.18f}});
 
         for (int t = 1000; t < 40000; t+= (0.001 * t)) {
-            val B = new LCMatrix(chromaticAdaptation(t, refT, caMethod));
-            val combo = XYZtoRGB.mult(B.mult(RGBtoZYX));
+            final var B = new LCMatrix(chromaticAdaptation(t, refT, caMethod));
+            final var combo = XYZtoRGB.mult(B.mult(RGBtoZYX));
 
             gray = combo.mult(gray);
 
-            val r = clip(gray.get(0, 0));
-            val g = clip(gray.get(1, 0));
-            val b = clip(gray.get(2, 0));
+            final var r = clip(gray.get(0, 0));
+            final var g = clip(gray.get(1, 0));
+            final var b = clip(gray.get(2, 0));
 
-            val xyzGray = JAIContext.linearColorSpace.toCIEXYZ(new float[] {(float) r, (float) g, (float) b});
-            val labGray = JAIContext.labColorSpace.fromCIEXYZ(xyzGray);
+            final var xyzGray = JAIContext.linearColorSpace.toCIEXYZ(new float[] {(float) r, (float) g, (float) b});
+            final var labGray = JAIContext.labColorSpace.fromCIEXYZ(xyzGray);
 
             float diff = 0;
             for (int i = 1; i < 3; i++) {
-                val di = labGray[i] - labRef[i];
+                final var di = labGray[i] - labRef[i];
                 diff += di * di;
             }
             diff = (float) Math.sqrt(diff);
@@ -609,7 +608,7 @@ public class ColorScience {
             System.out.println();
         }
 
-        val rgb2xyz = RGBtoZYX();
+        final var rgb2xyz = RGBtoZYX();
 
         System.out.println("rgb2xyz");
         for (int i = 0; i < 3; i++) {

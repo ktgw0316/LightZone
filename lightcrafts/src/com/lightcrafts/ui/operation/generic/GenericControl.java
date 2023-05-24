@@ -18,8 +18,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
-import lombok.val;
-
 public class GenericControl extends OpControl {
 
     // This resource bundle holds the user presentable forms of the
@@ -56,33 +54,33 @@ public class GenericControl extends OpControl {
 
         this.op = (GenericOperation) operation;
 
-        val box = Box.createVerticalBox();
+        final var box = Box.createVerticalBox();
 
         box.add(Box.createVerticalStrut(6));
 
         // Add all the choices:
 
-        val choiceKeys = op.getChoiceKeys();
-        for (val key : choiceKeys) {
-            val values = new Vector<String>(op.getChoiceValues(key));
-            val choice = new JComboBox(values);
+        final var choiceKeys = op.getChoiceKeys();
+        for (final var key : choiceKeys) {
+            final var values = new Vector<String>(op.getChoiceValues(key));
+            final var choice = new JComboBox(values);
             choice.addActionListener(choiceActionListener(key, choice));
             choice.addMouseWheelListener(
                     new MouseWheelListener() {
                         @Override
                         public void mouseWheelMoved(MouseWheelEvent e) {
-                            val source = (JComboBox) e.getComponent();
+                            final var source = (JComboBox) e.getComponent();
                             if (!source.hasFocus()) {
                                 return;
                             }
-                            val ni = source.getSelectedIndex() + e.getWheelRotation();
+                            final var ni = source.getSelectedIndex() + e.getWheelRotation();
                             if (ni >= 0 && ni < source.getItemCount()) {
                                 source.setSelectedIndex(ni);
                             }
                         }
                     }
             );
-            val oldChoice = choices.get(key);
+            final var oldChoice = choices.get(key);
             if (oldChoice != null) {
                 choice.setSelectedItem(oldChoice.getSelectedItem());
             }
@@ -90,8 +88,8 @@ public class GenericControl extends OpControl {
             choice.setFont(ControlFont);
             choice.setPreferredSize(new Dimension(280, 15));
 
-            val panel = new JPanel();
-            val label = new JLabel(key + ":", JLabel.CENTER);
+            final var panel = new JPanel();
+            final var label = new JLabel(key + ":", JLabel.CENTER);
             label.setPreferredSize(new Dimension(50, 15));
             label.setHorizontalAlignment(JLabel.RIGHT);
             label.setForeground(LightZoneSkin.Colors.ToolPanesForeground);
@@ -105,12 +103,12 @@ public class GenericControl extends OpControl {
 
         // Add all the checkboxes:
 
-        val checkboxKeys = op.getCheckboxKeys();
-        for (val key : checkboxKeys) {
-            val userKey = getUserPresentableKey(key);
-            val checkbox = new JCheckBox(userKey);
+        final var checkboxKeys = op.getCheckboxKeys();
+        for (final var key : checkboxKeys) {
+            final var userKey = getUserPresentableKey(key);
+            final var checkbox = new JCheckBox(userKey);
             checkbox.addItemListener(checkboxItemListener(key, checkbox));
-            val oldCheckbox = checkboxes.get(key);
+            final var oldCheckbox = checkboxes.get(key);
             if (oldCheckbox != null) {
                 checkbox.setSelected(oldCheckbox.isSelected());
             }
@@ -125,15 +123,15 @@ public class GenericControl extends OpControl {
 
         // A special layout that aligns the GenericSlider pieces in rows
         // and columns:
-        val sliderContainer = new GenericSliderContainer();
+        final var sliderContainer = new GenericSliderContainer();
 
-        val sliderKeys = op.getSliderKeys();
-        for (val key : sliderKeys) {
-            val userKey = getUserPresentableKey(key);
-            val config = op.getSliderConfig(key);
-            val slider = new GenericSlider(userKey, config);
+        final var sliderKeys = op.getSliderKeys();
+        for (final var key : sliderKeys) {
+            final var userKey = getUserPresentableKey(key);
+            final var config = op.getSliderConfig(key);
+            final var slider = new GenericSlider(userKey, config);
             slider.addChangeListener(sliderChangeListener(key, slider));
-            val oldSlider = sliders.get(key);
+            final var oldSlider = sliders.get(key);
             if (oldSlider != null) {
                 slider.setConfiguredValue(oldSlider.getConfiguredValue());
             }
@@ -172,7 +170,7 @@ public class GenericControl extends OpControl {
         return new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent event) {
-                val value = slider.getConfiguredValue();
+                final var value = slider.getConfiguredValue();
                 op.setSliderValue(key, value);
             }
         };
@@ -183,7 +181,7 @@ public class GenericControl extends OpControl {
         return new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent event) {
-                val value = checkbox.isSelected();
+                final var value = checkbox.isSelected();
                 op.setCheckboxValue(key, value);
                 undoSupport.postEdit(key + " Checkbox");
             }
@@ -195,7 +193,7 @@ public class GenericControl extends OpControl {
         return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                val value = (String) choice.getSelectedItem();
+                final var value = (String) choice.getSelectedItem();
                 op.setChoiceValue(key, value);
                 undoSupport.postEdit(key + " Choice");
             }
@@ -203,7 +201,7 @@ public class GenericControl extends OpControl {
     }
 
     protected void slewSlider(String key, double value) {
-        val slider = sliders.get(key);
+        final var slider = sliders.get(key);
         if (slider != null) {
             slider.setConfiguredValue(value);
         }
@@ -213,10 +211,10 @@ public class GenericControl extends OpControl {
     // checkbox key in the properties.  If none is configured, just
     // return the given String.
     private String getUserPresentableKey(String key) {
-        val type = op.getType();
-        val name = type.getName().replaceAll(" ", "").replaceAll("V[0-9]+\\Z", "");
+        final var type = op.getType();
+        final var name = type.getName().replaceAll(" ", "").replaceAll("V[0-9]+\\Z", "");
         try {
-            val propKey = name + "-" + key;
+            final var propKey = name + "-" + key;
             return Resources.getString(propKey);
         }
         catch (MissingResourceException e) {
@@ -231,25 +229,25 @@ public class GenericControl extends OpControl {
     @Override
     public void save(XmlNode node) {
         super.save(node);
-        val sliderNode = node.addChild(SliderTag);
-        val sliderKeys = sliders.keySet();
-        for (val key : sliderKeys) {
-            val slider = sliders.get(key);
-            val value = slider.getConfiguredValue();
+        final var sliderNode = node.addChild(SliderTag);
+        final var sliderKeys = sliders.keySet();
+        for (final var key : sliderKeys) {
+            final var slider = sliders.get(key);
+            final var value = slider.getConfiguredValue();
             sliderNode.setAttribute(key, Double.toString(value));
         }
-        val checkboxNode = node.addChild(CheckBoxTag);
-        val checkboxKeys = checkboxes.keySet();
-        for (val key : checkboxKeys) {
-            val checkbox = checkboxes.get(key);
-            val value = checkbox.isSelected();
+        final var checkboxNode = node.addChild(CheckBoxTag);
+        final var checkboxKeys = checkboxes.keySet();
+        for (final var key : checkboxKeys) {
+            final var checkbox = checkboxes.get(key);
+            final var value = checkbox.isSelected();
             checkboxNode.setAttribute(key, value ? "True" : "False");
         }
-        val choiceNode = node.addChild(ChoiceTag);
-        val choiceKeys = choices.keySet();
-        for (val key : choiceKeys) {
-            val choice = choices.get(key);
-            val value = (String) choice.getSelectedItem();
+        final var choiceNode = node.addChild(ChoiceTag);
+        final var choiceKeys = choices.keySet();
+        for (final var key : choiceKeys) {
+            final var choice = choices.get(key);
+            final var value = (String) choice.getSelectedItem();
             choiceNode.setAttribute(key, value);
         }
     }
@@ -260,17 +258,17 @@ public class GenericControl extends OpControl {
         undoSupport.restoreStart();
         op.changeBatchStarted();
         if (node.hasChild(SliderTag)) {
-            val sliderNode = node.getChild(SliderTag);
-            val keys = sliders.keySet();
-            for (val key : keys) {
-                val slider = sliders.get(key);
+            final var sliderNode = node.getChild(SliderTag);
+            final var keys = sliders.keySet();
+            for (final var key : keys) {
+                final var slider = sliders.get(key);
                 try {
-                    val version = sliderNode.getVersion();
+                    final var version = sliderNode.getVersion();
                     if ((version >= 3) || (version < 0)) {
-                        val value = Double.parseDouble(sliderNode.getAttribute(key));
+                        final var value = Double.parseDouble(sliderNode.getAttribute(key));
                         slider.setConfiguredValue(value);
                     } else {
-                        val value = Integer.parseInt(sliderNode.getAttribute(key));
+                        final var value = Integer.parseInt(sliderNode.getAttribute(key));
                         slider.setSliderPosition(value);
                     }
                 } catch (NumberFormatException e) {
@@ -281,20 +279,20 @@ public class GenericControl extends OpControl {
             }
         }
         if (node.hasChild(CheckBoxTag)) {
-            val checkboxNode = node.getChild(CheckBoxTag);
-            val keys = checkboxes.keySet();
-            for (val key : keys) {
-                val checkbox = checkboxes.get(key);
-                val value = checkboxNode.getAttribute(key);
+            final var checkboxNode = node.getChild(CheckBoxTag);
+            final var keys = checkboxes.keySet();
+            for (final var key : keys) {
+                final var checkbox = checkboxes.get(key);
+                final var value = checkboxNode.getAttribute(key);
                 checkbox.setSelected(value.equals("True"));
             }
         }
         if (node.hasChild(ChoiceTag)) {
-            val choiceNode = node.getChild(ChoiceTag);
-            val keys = choices.keySet();
-            for (val key : keys) {
-                val choice = choices.get(key);
-                val value = choiceNode.getAttribute(key);
+            final var choiceNode = node.getChild(ChoiceTag);
+            final var keys = choices.keySet();
+            for (final var key : keys) {
+                final var choice = choices.get(key);
+                final var value = choiceNode.getAttribute(key);
                 choice.setSelectedItem(value);
             }
         }

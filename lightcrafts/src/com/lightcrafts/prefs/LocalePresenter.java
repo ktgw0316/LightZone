@@ -5,7 +5,6 @@
 package com.lightcrafts.prefs;
 
 import com.lightcrafts.ui.base.BasePresenter;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedHashMap;
@@ -18,9 +17,9 @@ class LocalePresenter extends BasePresenter<LocaleContract.View>
 
     @Override
     public void restore() {
-        val lang = LocaleModel.setDefaultFromPreference();
+        final var lang = LocaleModel.setDefaultFromPreference();
         if (isViewAttached()) {
-            val item = LanguageItemConverter.languageToItem(lang);
+            final var item = LanguageItemConverter.languageToItem(lang);
             mView.setSelectedItem(item);
         }
     }
@@ -30,11 +29,11 @@ class LocalePresenter extends BasePresenter<LocaleContract.View>
         if (! isViewAttached()) {
             return;
         }
-        val item = mView.getSelectedItem();
+        final var item = mView.getSelectedItem();
         if (item == null || item.equals(LanguageItemConverter.DefaultItem)) {
             LocaleModel.removePreference();
         } else {
-            val lang = LanguageItemConverter.itemToLanguage(item);
+            final var lang = LanguageItemConverter.itemToLanguage(item);
             LocaleModel.setPreference(lang);
         }
     }
@@ -57,7 +56,7 @@ class LocalePresenter extends BasePresenter<LocaleContract.View>
             if (language.isEmpty()) {
                 return DefaultItem;
             }
-            val locale = new Locale(language);
+            final var locale = new Locale(language);
             return locale.getDisplayLanguage(locale);
         }
 

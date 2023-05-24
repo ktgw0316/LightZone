@@ -3,8 +3,6 @@
 
 package com.lightcrafts.ui.region.curves;
 
-import lombok.val;
-
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -33,7 +31,7 @@ public abstract class RationalSpline extends AbstractCurve {
 
         // Pad out the control point list using wraparound,
         // to make a closed spline:
-        val extraPoints = new ArrayList<Point2D>(points);
+        final var extraPoints = new ArrayList<Point2D>(points);
         extraPoints.add(0, points.get(points.size() - 2));
         extraPoints.add(1, points.get(points.size() - 1));
         extraPoints.add(points.get(0));
@@ -42,13 +40,13 @@ public abstract class RationalSpline extends AbstractCurve {
         // Rotate the padded points so generated segment indices will align
         // with indices in the points ArrayList:
 
-        val first = extraPoints.get(0);
+        final var first = extraPoints.get(0);
         extraPoints.remove(0);
         extraPoints.add(first);
 
-        val path = new GeneralPath();
+        final var path = new GeneralPath();
 
-        val m = extraPoints.size();
+        final var m = extraPoints.size();
         ensureBases(m);
 
         segments.clear();
@@ -63,11 +61,11 @@ public abstract class RationalSpline extends AbstractCurve {
 
             // Iterate over control points:
             for (int j = 0; j < m; j++) {
-                val p = extraPoints.get(j);
-                val px = p.getX();
-                val py = p.getY();
+                final var p = extraPoints.get(j);
+                final var px = p.getX();
+                final var py = p.getY();
 
-                val basis = Bases.get(j);
+                final var basis = Bases.get(j);
 
                 Polynomial xSegNum = basis.getSegment(i).multiply(px * Weight);
                 Polynomial ySegNum = basis.getSegment(i).multiply(py * Weight);
@@ -81,7 +79,7 @@ public abstract class RationalSpline extends AbstractCurve {
                 xDen = xDen.add(xSegDen);
                 yDen = yDen.add(ySegDen);
             }
-            val curve = Polynomial.createRationalShape(
+            final var curve = Polynomial.createRationalShape(
                 xNum, xDen, yNum, yDen, i, i + 1, .1
             );
             segments.add(curve);

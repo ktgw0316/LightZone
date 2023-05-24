@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import lombok.NonNull;
-import lombok.val;
 
 import com.lightcrafts.image.metadata.ImageMetadata;
 import com.lightcrafts.image.metadata.ImageMetadataDirectory;
@@ -36,8 +35,8 @@ public abstract class MakerNoteProbe<T extends MakerNotesDirectory> {
      */
     public static Class<? extends MakerNotesDirectory>
     determineMakerNotesFrom(ImageMetadata metadata) {
-        for (val probe : m_makerNoteProbes) {
-            val dirClass = probe.match(metadata);
+        for (final var probe : m_makerNoteProbes) {
+            final var dirClass = probe.match(metadata);
             if (dirClass != null)
                 return dirClass;
         }
@@ -80,7 +79,7 @@ public abstract class MakerNoteProbe<T extends MakerNotesDirectory> {
      * could not be determined.
      */
     final Class<T> matchUsingMake(@NonNull ImageMetadata metadata) {
-        val make = metadata.getCameraMake(false);
+        final var make = metadata.getCameraMake(false);
         if (make == null)
             return null;
         return make.contains(m_make) ? m_dir : null;

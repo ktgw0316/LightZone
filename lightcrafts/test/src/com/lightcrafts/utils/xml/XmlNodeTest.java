@@ -1,6 +1,5 @@
 package com.lightcrafts.utils.xml;
 
-import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Element;
@@ -17,13 +16,13 @@ public class XmlNodeTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        val resource = XmlNodeTest.class.getClassLoader().getResource("test.lzt");
+        final var resource = XmlNodeTest.class.getClassLoader().getResource("test.lzt");
         assertThat(resource).isNotNull();
 
-        val filename = resource.getPath();
-        val factory = DocumentBuilderFactory.newInstance();
-        val docBuilder = factory.newDocumentBuilder();
-        val doc = docBuilder.parse(filename);
+        final var filename = resource.getPath();
+        final var factory = DocumentBuilderFactory.newInstance();
+        final var docBuilder = factory.newDocumentBuilder();
+        final var doc = docBuilder.parse(filename);
 
         Element elem = doc.getDocumentElement();
         xmlNode = new XmlNode(elem);
@@ -36,7 +35,7 @@ public class XmlNodeTest {
 
     @Test
     public void getAttributes() {
-        val attrs = xmlNode.getAttributes();
+        final var attrs = xmlNode.getAttributes();
         assertThat(attrs.length).isEqualTo(1);
         assertThat(attrs[0]).isEqualTo("version");
     }

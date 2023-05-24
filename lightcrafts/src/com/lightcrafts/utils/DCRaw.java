@@ -26,7 +26,6 @@ import java.util.*;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
-import lombok.val;
 
 /**
  * Get raw image data by inrerfacing with dcraw as a coprocess.
@@ -129,7 +128,7 @@ public final class DCRaw implements
                 // Skip carriage returns and line feeds
                 c = s.read();
             }
-            val sb = new StringBuffer();
+            final var sb = new StringBuffer();
             while (c > 0 && c != 255 && c != '\n' && c != '\r') {
                 sb.append((char) c);
                 c = s.read();
@@ -189,8 +188,8 @@ public final class DCRaw implements
     }
 
     private int runDCRawInfo(boolean secondary) throws IOException {
-        val info = new String[]{DCRAW_PATH, "-v", "-i", "-t", "0", m_fileName};
-        val secondaryInfo = new String[]{DCRAW_PATH, "-v", "-i", "-s", "1", "-t", "0", m_fileName};
+        final var info = new String[]{DCRAW_PATH, "-v", "-i", "-t", "0", m_fileName};
+        final var secondaryInfo = new String[]{DCRAW_PATH, "-v", "-i", "-s", "1", "-t", "0", m_fileName};
 
         final int error;
 
@@ -231,7 +230,7 @@ public final class DCRaw implements
         String search;
 
         if (secondary && line.startsWith(search = CAMERA_MULTIPLIERS)) {
-            val multipliers = line.substring(search.length()).split("\\s");
+            final var multipliers = line.substring(search.length()).split("\\s");
             m_secondary_cam_mul[0] = Float.parseFloat(multipliers[0]);
             m_secondary_cam_mul[1] = Float.parseFloat(multipliers[1]);
             m_secondary_cam_mul[2] = Float.parseFloat(multipliers[2]);
@@ -241,24 +240,24 @@ public final class DCRaw implements
 
         String args;
         // if (line.startsWith(search = FILENAME)) {
-        //     val filename = line.substring(search.length());
+        //     final var filename = line.substring(search.length());
         // } else
         if (line.startsWith(search = TIMESTAMP)) {
-            val timestamp = line.substring(search.length());
+            final var timestamp = line.substring(search.length());
             try {
                 m_captureDateTime = new SimpleDateFormat().parse(timestamp).getTime();
             } catch (ParseException e) {
                 m_captureDateTime = 0;
             }
         } else if (line.startsWith(search = CAMERA)) {
-            val camera = line.substring(search.length());
+            final var camera = line.substring(search.length());
             m_make = camera.substring(0, camera.indexOf(' '));
             m_model = camera.substring(m_make.length() + 1);
         } else if (line.startsWith(search = ISO)) {
-            val iso = line.substring(search.length());
+            final var iso = line.substring(search.length());
             m_ISO = Integer.decode(iso);
         } else if (line.startsWith(search = SHUTTER)) {
-            val shutterSpeed = line.substring(search.length() + 2);
+            final var shutterSpeed = line.substring(search.length() + 2);
             try {
                 float exposureTime = Float.valueOf
                         (shutterSpeed.substring(0, shutterSpeed.indexOf(" sec")));
@@ -266,43 +265,43 @@ public final class DCRaw implements
                     m_shutterSpeed = 1 / exposureTime;
             } catch (NumberFormatException ignored) { }
         } else if (line.startsWith(search = APERTURE)) {
-            val aperture = line.substring(search.length() + 2);
+            final var aperture = line.substring(search.length() + 2);
             try {
                 m_aperture = Float.valueOf(aperture);
             } catch (NumberFormatException ignored) { }
         } else if (line.startsWith(search = FOCAL_LENGTH)) {
-            val focalLenght = line.substring(search.length());
+            final var focalLenght = line.substring(search.length());
             try {
                 m_focalLength = Float.valueOf(
                         focalLenght.substring(0, focalLenght.indexOf(" mm")));
             } catch (NumberFormatException ignored) { }
             // } else if (line.startsWith(search = NUM_RAW_IMAGES)) {
-            //     val numRawImages = line.substring(search.length());
+            //     final var numRawImages = line.substring(search.length());
             // } else if (line.startsWith(search = EMBEDDED_ICC_PROFILE)) {
-            //     val embeddedICCProfile = line.substring(search.length());
+            //     final var embeddedICCProfile = line.substring(search.length());
         } else if (line.startsWith(CANNOT_DECODE)) {
             m_decodable = false;
         } else if ((args = match(line, THUMB_SIZE)) != null) {
-            val sizes = args.split(" x ");
+            final var sizes = args.split(" x ");
             m_thumbWidth = Integer.decode(sizes[0]);
             m_thumbHeight = Integer.decode(sizes[1]);
         } else if ((args = match(line, FULL_SIZE)) != null) {
-            val sizes = args.split(" x ");
+            final var sizes = args.split(" x ");
             m_fullWidth = Integer.decode(sizes[0]);
             m_fullHeight = Integer.decode(sizes[1]);
         } else if ((args = match(line, IMAGE_SIZE)) != null) {
-            val sizes = args.split(" x ");
+            final var sizes = args.split(" x ");
             m_rawWidth = Integer.decode(sizes[0]);
             m_rawHeight = Integer.decode(sizes[1]);
         } else if ((args = match(line, OUTPUT_SIZE)) != null) {
-            val sizes = args.split(" x ");
+            final var sizes = args.split(" x ");
             m_imageWidth = Integer.decode(sizes[0]);
             m_imageHeight = Integer.decode(sizes[1]);
         } else if (line.startsWith(search = RAW_COLORS)) {
-            val rawColors = line.substring(search.length());
+            final var rawColors = line.substring(search.length());
             m_rawColors = Integer.decode(rawColors);
         } else if (line.startsWith(search = FILTER_PATTERN)) {
-            val pattern = line.substring(search.length());
+            final var pattern = line.substring(search.length());
             if (pattern.length() >= 8
                     && !pattern.substring(0,4).equals(pattern.substring(4,8)))
                 m_filters = -1;
@@ -317,25 +316,25 @@ public final class DCRaw implements
             else
                 m_filters = -1;
         } else if (line.startsWith(search = DAYLIGHT_MULTIPLIERS)) {
-            val multipliers = line.substring(search.length()).split("\\s");
+            final var multipliers = line.substring(search.length()).split("\\s");
             m_pre_mul[0] = Float.parseFloat(multipliers[0]);
             m_pre_mul[1] = Float.parseFloat(multipliers[1]);
             m_pre_mul[2] = Float.parseFloat(multipliers[2]);
             m_pre_mul[3] = m_pre_mul[1];
         } else if (line.startsWith(search = CAMERA_MULTIPLIERS)) {
-            val multipliers = line.substring(search.length()).split("\\s");
+            final var multipliers = line.substring(search.length()).split("\\s");
             m_cam_mul[0] = Float.parseFloat(multipliers[0]);
             m_cam_mul[1] = Float.parseFloat(multipliers[1]);
             m_cam_mul[2] = Float.parseFloat(multipliers[2]);
             m_cam_mul[3] = Float.parseFloat(multipliers[3]);
         } else if (line.startsWith(CAMERA_RGB_PROFILE)) {
-            val rgb_cam = line.substring(CAMERA_RGB_PROFILE.length()).split("\\s");
+            final var rgb_cam = line.substring(CAMERA_RGB_PROFILE.length()).split("\\s");
             m_rgb_cam = new float[9];
             for (int i = 0; i < 9; i++) {
                 m_rgb_cam[i] = Float.parseFloat(rgb_cam[i]);
             }
         } else if (line.startsWith(CAMERA_XYZ_PROFILE)) {
-            val xyz_cam = line.substring(CAMERA_XYZ_PROFILE.length()).split("\\s");
+            final var xyz_cam = line.substring(CAMERA_XYZ_PROFILE.length()).split("\\s");
             m_xyz_cam = new float[9];
             for (int i = 0; i < 9; i++) {
                 m_xyz_cam[i] = Float.parseFloat(xyz_cam[i]);
@@ -381,7 +380,7 @@ public final class DCRaw implements
 
     private static ImageData readPPM(File file) throws BadImageFileException {
         try (FileInputStream s = new FileInputStream(file)) {
-            val S1 = readln(s);
+            final var S1 = readln(s);
             if (S1 == null) {
                 throw new BadImageFileException(file);
             }
@@ -394,31 +393,31 @@ public final class DCRaw implements
                 case "P5":
                 case "P6":
                     bands = S1.equals("P5") ? 1 : 3;
-                    val S2 = readln(s);
-                    val S3 = readln(s);
+                    final var S2 = readln(s);
+                    final var S3 = readln(s);
                     if (S2 == null || S3 == null) {
                         throw new BadImageFileException(file);
                     }
-                    val dimensions = S2.split("\\s");
+                    final var dimensions = S2.split("\\s");
                     width = Integer.parseInt(dimensions[0]);
                     height = Integer.parseInt(dimensions[1]);
                     dataType = S3.equals("255") ? DataBuffer.TYPE_BYTE : DataBuffer.TYPE_USHORT;
                     break;
                 case "P7":
-                    val SWIDTH = readln(s);
-                    val SHEIGHT = readln(s);
-                    val SDEPTH = readln(s);
-                    val SMAXVAL = readln(s);
+                    final var SWIDTH = readln(s);
+                    final var SHEIGHT = readln(s);
+                    final var SDEPTH = readln(s);
+                    final var SMAXVAL = readln(s);
                     if (SWIDTH == null || SHEIGHT == null || SDEPTH == null || SMAXVAL == null) {
                         throw new BadImageFileException(file);
                     }
-                    val WIDTH = "WIDTH ";
+                    final var WIDTH = "WIDTH ";
                     width = Integer.parseInt(SWIDTH.substring(WIDTH.length()));
-                    val HEIGHT = "HEIGHT ";
+                    final var HEIGHT = "HEIGHT ";
                     height = Integer.parseInt(SHEIGHT.substring(HEIGHT.length()));
-                    val DEPTH = "DEPTH ";
+                    final var DEPTH = "DEPTH ";
                     bands = Integer.parseInt(SDEPTH.substring(DEPTH.length()));
-                    val MAXVAL = "MAXVAL ";
+                    final var MAXVAL = "MAXVAL ";
                     dataType = SMAXVAL.substring(MAXVAL.length()).equals("65535")
                             ? DataBuffer.TYPE_USHORT
                             : DataBuffer.TYPE_BYTE;
@@ -426,8 +425,8 @@ public final class DCRaw implements
                 default:
                     throw new BadImageFileException(file);
             }
-            val imageData = new ImageData(width, height, bands, dataType);
-            val totalData = width * height * bands * (dataType == DataBuffer.TYPE_BYTE ? 1 : 2);
+            final var imageData = new ImageData(width, height, bands, dataType);
+            final var totalData = width * height * bands * (dataType == DataBuffer.TYPE_BYTE ? 1 : 2);
 
             try (FileChannel c = s.getChannel()) {
                 if (file.length() != totalData + c.position()) {
@@ -485,7 +484,7 @@ public final class DCRaw implements
                 mode = dcrawMode.thumb;
             }
 
-            val t1 = System.currentTimeMillis();
+            final var t1 = System.currentTimeMillis();
 
             if (secondaryPixels)
                 runDCRawInfo(true);
@@ -496,8 +495,8 @@ public final class DCRaw implements
             final int totalData;
             if (of.getName().endsWith(".jpg") || of.getName().endsWith(".tiff")) {
                 try {
-                    val readerFactory = new LCImageReaderFactory();
-                    val reader = readerFactory.create(of);
+                    final var readerFactory = new LCImageReaderFactory();
+                    final var reader = readerFactory.create(of);
                     result = reader.getImage();
                 } catch (LCImageLibException | UserCanceledException e) {
                     e.printStackTrace();
@@ -511,18 +510,18 @@ public final class DCRaw implements
                         result.getColorModel().getNumColorComponents() *
                         (result.getColorModel().getTransferType() == DataBuffer.TYPE_BYTE ? 1 : 2);
             } else {
-                val imageData = readPPM(of);
+                final var imageData = readPPM(of);
                 t2 = System.currentTimeMillis();
                 totalData = imageData.width *
                         imageData.height *
                         imageData.bands * (imageData.dataType == DataBuffer.TYPE_BYTE ? 1 : 2);
-                val cm = getColorModel(mode, imageData.bands, imageData.dataType);
-                val bufSize = imageData.bands * imageData.width * imageData.height;
+                final var cm = getColorModel(mode, imageData.bands, imageData.dataType);
+                final var bufSize = imageData.bands * imageData.width * imageData.height;
                 final DataBuffer buf = imageData.dataType == DataBuffer.TYPE_BYTE
                         ? new DataBufferByte(   (byte[]) imageData.data, bufSize)
                         : new DataBufferUShort((short[]) imageData.data, bufSize);
-                val bandOffsets = imageData.bands == 3 ? new int[]{0, 1, 2} : new int[]{0};
-                val raster = Raster.createInterleavedRaster(
+                final var bandOffsets = imageData.bands == 3 ? new int[]{0, 1, 2} : new int[]{0};
+                final var raster = Raster.createInterleavedRaster(
                         buf, imageData.width, imageData.height,
                         imageData.bands * imageData.width, imageData.bands, bandOffsets, null);
 
@@ -543,7 +542,7 @@ public final class DCRaw implements
         File of = File.createTempFile("LZRAWTMP", ".ppm");
         String ofName = null;
 
-        val cmd = dcrawCommandLine(mode, secondaryPixels, of);
+        final var cmd = dcrawCommandLine(mode, secondaryPixels, of);
 
         final int error;
 
@@ -567,7 +566,7 @@ public final class DCRaw implements
             while ((line = readln(dcrawStdErr)) != null) {
                 System.out.println(line);
 
-                val args = match(line, DCRAW_OUTPUT);
+                final var args = match(line, DCRAW_OUTPUT);
                 if (args != null)
                     ofName = args.substring(0, args.indexOf(" ..."));
             }
@@ -609,11 +608,11 @@ public final class DCRaw implements
     }
 
     private String[] dcrawCommandLine(dcrawMode mode, boolean secondaryPixels, File of) {
-        val makeModel = (m_make + ' ' + m_model).toUpperCase();
-        val four_colors = four_color_cameras.contains(makeModel);
-        val path = of.getAbsolutePath();
+        final var makeModel = (m_make + ' ' + m_model).toUpperCase();
+        final var four_colors = four_color_cameras.contains(makeModel);
+        final var path = of.getAbsolutePath();
 
-        val cmd = new ArrayList<String>(Arrays.asList(DCRAW_PATH, "-F", path, "-v"));
+        final var cmd = new ArrayList<String>(Arrays.asList(DCRAW_PATH, "-F", path, "-v"));
 
         switch (mode) {
         case full:

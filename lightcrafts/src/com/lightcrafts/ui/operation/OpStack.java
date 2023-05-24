@@ -20,7 +20,6 @@ import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlNode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 
 import javax.swing.*;
 import javax.swing.event.UndoableEditEvent;
@@ -208,10 +207,10 @@ public class OpStack extends DraggableStack
     }
 
     public OpControl addGenericControl(OperationType type, int index) {
-        val op = (GenericOperation) engine.insertOperation(type, index);
-        val visitor = new VisitorImpl(this);
+        final var op = (GenericOperation) engine.insertOperation(type, index);
+        final var visitor = new VisitorImpl(this);
         op.accept(visitor);
-        val control = visitor.getOpControl();
+        final var control = visitor.getOpControl();
         addControl(control, index);
         return control;
     }

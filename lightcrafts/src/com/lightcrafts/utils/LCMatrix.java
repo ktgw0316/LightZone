@@ -2,7 +2,6 @@
 
 package com.lightcrafts.utils;
 
-import lombok.val;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.simple.SimpleMatrix;
 
@@ -24,21 +23,21 @@ public class LCMatrix extends SimpleMatrix {
     }
 
     static public double[][] getArrayDouble(SimpleMatrix A) {
-        val mat = A.getMatrix();
-        val m = mat.getNumRows();
-        val n = mat.getNumCols();
-        val type = mat.getType();
+        final var mat = A.getMatrix();
+        final var m = mat.getNumRows();
+        final var n = mat.getNumCols();
+        final var type = mat.getType();
 
-        val array = new double[m][n];
+        final var array = new double[m][n];
         switch( type ) {
             case DDRM:
-                val doubleData = A.getDDRM().getData();
+                final var doubleData = A.getDDRM().getData();
                 for (int i = 0; i < m; i++) {
                     System.arraycopy(doubleData, i * n, array[i], 0, n);
                 }
                 break;
             case FDRM:
-                val floatData = A.getFDRM().getData();
+                final var floatData = A.getFDRM().getData();
                 for (int i = 0, idx = 0; i < m; ++i) {
                     for (int j = 0; j < n; ++j, ++idx) {
                         array[i][j] = floatData[idx];
@@ -52,15 +51,15 @@ public class LCMatrix extends SimpleMatrix {
     }
 
     static public float[][] getArrayFloat(SimpleMatrix A) {
-        val mat = A.getMatrix();
-        val m = mat.getNumRows();
-        val n = mat.getNumCols();
-        val type = mat.getType();
+        final var mat = A.getMatrix();
+        final var m = mat.getNumRows();
+        final var n = mat.getNumCols();
+        final var type = mat.getType();
 
-        val array = new float[m][n];
+        final var array = new float[m][n];
         switch( type ) {
             case DDRM:
-                val doubleData = A.getDDRM().getData();
+                final var doubleData = A.getDDRM().getData();
                 for (int i = 0, idx = 0; i < m; ++i) {
                     for (int j = 0; j < n; ++j, ++idx) {
                         array[i][j] = (float) doubleData[idx];
@@ -68,7 +67,7 @@ public class LCMatrix extends SimpleMatrix {
                 }
                 break;
             case FDRM:
-                val floatData = A.getFDRM().getData();
+                final var floatData = A.getFDRM().getData();
                 for (int i = 0; i < m; i++) {
                     System.arraycopy(floatData, i * n, array[i], 0, n);
                 }

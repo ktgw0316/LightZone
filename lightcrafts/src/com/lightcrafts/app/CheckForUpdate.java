@@ -10,7 +10,6 @@ import com.lightcrafts.utils.ProgressIndicator;
 import com.lightcrafts.utils.Version;
 import com.lightcrafts.utils.WebBrowser;
 import com.lightcrafts.utils.thread.ProgressThread;
-import lombok.val;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -264,7 +263,7 @@ public final class CheckForUpdate {
      * @return Returns <code>true</code> only if an update is available.
      */
     private static boolean checkIfUpdateIsAvailable() {
-        val currentVersion = Version.getVersionName();
+        final var currentVersion = Version.getVersionName();
         return checkIfUpdateIsAvailable(currentVersion, CHECK_URL);
     }
 
@@ -536,7 +535,7 @@ public final class CheckForUpdate {
     ////////// main() /////////////////////////////////////////////////////////
 
     public static void main( String[] args ) throws MalformedURLException {
-        val isAvailable = checkIfUpdateIsAvailable(
+        final var isAvailable = checkIfUpdateIsAvailable(
                 "4.2.4", new URL("file:///tmp/lightzone/appcast.xml"));
         System.exit(isAvailable ? 0 : 1);
     }

@@ -7,7 +7,6 @@ import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.Operation;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
-import lombok.val;
 
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
@@ -86,13 +85,13 @@ public class FilmGrainOperation extends BlendedOperation {
 
         @Override
         public PlanarImage setFront() {
-            val grain0 = new FilmGrainOpImage(back, featureSize * scale, color, intensity);
+            final var grain0 = new FilmGrainOpImage(back, featureSize * scale, color, intensity);
             grain0.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
 
             // TODO: Do this in FilmGrainOpImage
-            val grain = Functions.gaussianBlur(grain0, rendering, op, (1.0 - sharpness) * scale);
+            final var grain = Functions.gaussianBlur(grain0, rendering, op, (1.0 - sharpness) * scale);
 
-            val pb = new ParameterBlock();
+            final var pb = new ParameterBlock();
             pb.addSource(back)
                     .addSource(grain)
                     .add("Hard Light");

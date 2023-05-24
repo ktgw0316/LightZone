@@ -34,7 +34,6 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.val;
 
 /**
  * A Document is the public face of an image editor.  It ties together an
@@ -185,8 +184,8 @@ public class Document {
                MissingImageFileException,
                ImagingException
     {
-        val root = doc.getRoot();
-        val version = root.getVersion();
+        final var root = doc.getRoot();
+        final var version = root.getVersion();
         if (version > SavedDocVersion) {
             throw new XMLException(LOCALE.get("FutureLznError"));
         }
@@ -195,7 +194,7 @@ public class Document {
         }
         if (meta == null) {
             // Find the original image:
-            val node = root.getChild(ImageTag);
+            final var node = root.getChild(ImageTag);
             String path = node.getAttribute(ImagePathTag);
             File file = new File(path);
             if (! file.isFile()) {
@@ -204,12 +203,12 @@ public class Document {
             // Override with a relative path, if one was defined:
             if (node.hasAttribute(ImageRelativePathTag)) {
                 path = node.getAttribute(ImageRelativePathTag);
-                val relativeFile = new File(path);
+                final var relativeFile = new File(path);
                 if (relativeFile.isFile()) {
                     file = relativeFile;
                 }
             }
-            val info = ImageInfo.getInstanceFor(file);
+            final var info = ImageInfo.getInstanceFor(file);
             try {
                 meta = info.getMetadata();
             }
@@ -223,11 +222,11 @@ public class Document {
         // coordinate system used for regions and crop bounds:
         XmlNode imageNode = root.getChild(ImageTag);
         if (imageNode.hasAttribute(ImageOrientationTag)) {
-            val value = imageNode.getAttribute(ImageOrientationTag);
+            final var value = imageNode.getAttribute(ImageOrientationTag);
             try {
-                val oldOrientation =
+                final var oldOrientation =
                     ImageOrientation.getOrientationFor(Short.parseShort(value));
-                val newOrientation = meta.getOrientation();
+                final var newOrientation = meta.getOrientation();
                 if (oldOrientation != newOrientation) {
                     meta.setOrientation(oldOrientation);
                 }
@@ -245,7 +244,7 @@ public class Document {
             // Make sure this pre-XMP LZN structure is not a Template.
             // (See Application.saveTemplate().)
             if (! root.getName().equals("Template")) {
-                val origOrient = meta.getOriginalOrientation();
+                final var origOrient = meta.getOriginalOrientation();
                 meta.setOrientation(origOrient);
             }
         }
@@ -257,15 +256,15 @@ public class Document {
         crop = new CropRotateManager(engine, xform);
 
         scaleModel = new ScaleModel(engine);
-        val scaleNode = root.getChild(ScaleTag);
-        val s = new Scale(scaleNode);
+        final var scaleNode = root.getChild(ScaleTag);
+        final var s = new Scale(scaleNode);
         scaleModel.setScale(s);
 
         editor = new Editor(engine, scaleModel, xform, regionManager, crop, this);
         editor.showWait(LOCALE.get("EditorWaitText"));
         crop.setEditor( editor );
 
-        val controlNode = root.getChild(ControlTag);
+        final var controlNode = root.getChild(ControlTag);
 
         // this does the inverse of save(XmlNode):
         try {
@@ -278,17 +277,17 @@ public class Document {
         commonInitialization();
 
         if (root.hasChild(SaveTag)) {
-            val saveNode = root.getChild(SaveTag);
+            final var saveNode = root.getChild(SaveTag);
             saveOptions = SaveOptions.restore(saveNode);
         }
         if (root.hasChild(PrintTag)) {
-            val printNode = root.getChild(PrintTag);
+            final var printNode = root.getChild(PrintTag);
             Dimension size = engine.getNaturalSize();
             print = new PrintLayoutModel(size.width, size.height);
             print.restore(printNode);
         }
         if (root.hasChild(ExportTag)) {
-            val exportNode = root.getChild(ExportTag);
+            final var exportNode = root.getChild(ExportTag);
             exportOptions = ImageExportOptions.read(exportNode);
         }
     }
@@ -488,7 +487,7 @@ public class Document {
     }
 
     private void notifyListeners() {
-        for (val listener : listeners) {
+        for (final var listener : listeners) {
             listener.documentChanged(this, dirty);
         }
     }
@@ -500,7 +499,7 @@ public class Document {
     public PrintLayoutModel getPrintLayout() {
         if (print != null) {
             // Image bounds may have changed due to cropping:
-            val size = engine.getNaturalSize();
+            final var size = engine.getNaturalSize();
             print.updateImageSize(size.width, size.height);
         }
         return print;
@@ -549,10 +548,10 @@ public class Document {
     public void save(XmlNode node) {
         node.setVersion(SavedDocVersion);
 
-        val scaleNode = node.addChild(ScaleTag);
+        final var scaleNode = node.addChild(ScaleTag);
         scaleModel.getCurrentScale().save(scaleNode);
 
-        val imageNode = node.addChild(ImageTag);
+        final var imageNode = node.addChild(ImageTag);
         imageNode.setAttribute(
             ImagePathTag, metadata.getFile().getAbsolutePath()
         );
@@ -572,19 +571,19 @@ public class Document {
             }
             imageNode.setAttribute(ImageRelativePathTag, path);
         }
-        val controlNode = node.addChild(ControlTag);
+        final var controlNode = node.addChild(ControlTag);
         editor.save(controlNode);
 
         if (saveOptions != null) {
-            val saveNode = node.addChild(SaveTag);
+            final var saveNode = node.addChild(SaveTag);
             saveOptions.save(saveNode);
         }
         if (print != null) {
-            val printNode = node.addChild(PrintTag);
+            final var printNode = node.addChild(PrintTag);
             print.save(printNode);
         }
         if (exportOptions != null) {
-            val exportNode = node.addChild(ExportTag);
+            final var exportNode = node.addChild(ExportTag);
             exportOptions.write(exportNode);
         }
     }
@@ -595,19 +594,19 @@ public class Document {
     public void saveTemplate(XmlNode node) {
         node.setVersion(SavedDocVersion);
 
-        val scaleNode = node.addChild(ScaleTag);
+        final var scaleNode = node.addChild(ScaleTag);
         scaleModel.getCurrentScale().save(scaleNode);
 
-        val imageNode = node.addChild(ImageTag);
+        final var imageNode = node.addChild(ImageTag);
         imageNode.setAttribute(ImagePathTag, "");
-        val controlNode = node.addChild(ControlTag);
+        final var controlNode = node.addChild(ControlTag);
         editor.save(controlNode);
     }
 
     public void applyTemplate(XmlNode node)
         throws XMLException
     {
-        val version = node.getVersion();
+        final var version = node.getVersion();
         if (version > SavedDocVersion) {
             throw new XMLException(LOCALE.get("FutureTemplateError"));
         }
@@ -616,7 +615,7 @@ public class Document {
         }
         // Ignore the scale factor under ScaleTag.
 
-        val controlNode = node.getChild(ControlTag);
+        final var controlNode = node.getChild(ControlTag);
         editor.addControls(controlNode);
     }
 
@@ -628,10 +627,10 @@ public class Document {
     }
 
     public static void main(String[] args) throws Exception {
-        val in = new FileInputStream(args[0]);
-        val xml = new XmlDocument(in);
-        val doc = new Document(xml, null);
-        val image = doc.engine.getRendering(new Dimension(100, 100));
+        final var in = new FileInputStream(args[0]);
+        final var xml = new XmlDocument(in);
+        final var doc = new Document(xml, null);
+        final var image = doc.engine.getRendering(new Dimension(100, 100));
         ImageIO.write(image, "jpeg", new File("out.jpg"));
     }
 }

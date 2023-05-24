@@ -68,10 +68,10 @@ public class ImageEditorDisplay extends JPanel {
 
         // COMPONENT_RESIZED events are not reliably forwarded to listeners,
         // so we do so manually.
-        val event = new ComponentEvent(
+        final var event = new ComponentEvent(
             this, ComponentEvent.COMPONENT_RESIZED
         );
-        for (val listener : compListeners) {
+        for (final var listener : compListeners) {
             listener.componentResized(event);
         }
     }
@@ -261,7 +261,7 @@ public class ImageEditorDisplay extends JPanel {
             ro = (OpImage) rendering;
         }
         TileCache cache = ro.getTileCache();
-        @Nullable val tiles = cache.getTiles(ro, tileIndices);
+        @Nullable final var tiles = cache.getTiles(ro, tileIndices);
         return (tiles != null) ? tiles : new Raster[tileIndices.length];
     }
 
@@ -269,9 +269,9 @@ public class ImageEditorDisplay extends JPanel {
             JAIContext.sRGBColorSpace, false, false, Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
 
     private BufferedImage getBackgroundTile(@NotNull WritableRaster tile, int x, int y) {
-        val key = new CacheKey(x, y);
+        final var key = new CacheKey(x, y);
         BufferedImage image = backgroundCache.get(key);
-        val tileImage = new BufferedImage(sRGBColorModel,
+        final var tileImage = new BufferedImage(sRGBColorModel,
                                          (WritableRaster) tile.createTranslatedChild(0, 0),
                                          false, null);
         if (image != null
@@ -318,7 +318,7 @@ public class ImageEditorDisplay extends JPanel {
             return;
         }
 
-        val g2d = (Graphics2D)g;
+        final var g2d = (Graphics2D)g;
 
         HiDpi.resetTransformScaleOf(g2d);
 
@@ -329,7 +329,7 @@ public class ImageEditorDisplay extends JPanel {
             return;
         }
 
-        val tileIndices = source.getTileIndices(g2d.getClipBounds());
+        final var tileIndices = source.getTileIndices(g2d.getClipBounds());
         if (tileIndices == null) {
             return;
         }
@@ -341,7 +341,7 @@ public class ImageEditorDisplay extends JPanel {
             source.getTiles(tileIndices);
         }
 
-        val isCompleted = asyncRepaint(g2d, tileIndices);
+        final var isCompleted = asyncRepaint(g2d, tileIndices);
         progressNotifier.setTiles(tileManager.pendingTiles(source, epoch));
 
         if (isCompleted) {
@@ -352,14 +352,14 @@ public class ImageEditorDisplay extends JPanel {
     }
 
     private boolean asyncRepaint(Graphics2D g2d, Point[] tileIndices) {
-        val originalClipBounds = g2d.getClipBounds();
-        val tiles = availableTiles(tileIndices);
+        final var originalClipBounds = g2d.getClipBounds();
+        final var tiles = availableTiles(tileIndices);
 
         boolean isCompleted = true;
         for (int i = 0; i < tileIndices.length; i++) {
-            val tileIndex = tileIndices[i];
-            @Nullable val tile = (WritableRaster) tiles[i];
-            val tileClipRect = new Rectangle(
+            final var tileIndex = tileIndices[i];
+            @Nullable final var tile = (WritableRaster) tiles[i];
+            final var tileClipRect = new Rectangle(
                     tileIndex.x * JAIContext.TILE_WIDTH, tileIndex.y * JAIContext.TILE_HEIGHT,
                     JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT);
             g2d.setClip(tileClipRect.intersection(originalClipBounds));
@@ -374,8 +374,8 @@ public class ImageEditorDisplay extends JPanel {
 
     private boolean drawBackgroundTile(Graphics2D g2d, Point tileIndex, Rectangle tileClipRect,
                                     @Nullable WritableRaster tile) {
-        val tx = tileIndex.x;
-        val ty = tileIndex.y;
+        final var tx = tileIndex.x;
+        final var ty = tileIndex.y;
 
         if (!validImageBackground[tx][ty] && tile != null) {
             validImageBackground[tx][ty] = true;
@@ -383,15 +383,15 @@ public class ImageEditorDisplay extends JPanel {
         }
 
         // if we don't have a fresh tile, try and see if we have an old one around
-        val backgroundTileCache = backgroundCache.get(new CacheKey(tx, ty));
+        final var backgroundTileCache = backgroundCache.get(new CacheKey(tx, ty));
         if (backgroundTileCache != null) {
             // Recycle the background tile
             return g2d.drawImage(backgroundTileCache, source.tileXToX(tx), source.tileYToY(ty), this);
         }
 
-        val cachedTiles = availableTiles(new Point(tx, ty));
+        final var cachedTiles = availableTiles(new Point(tx, ty));
         if (cachedTiles[0] != null) {
-            val cachedTile = (WritableRaster) cachedTiles[0];
+            final var cachedTile = (WritableRaster) cachedTiles[0];
             return g2d.drawImage(getBackgroundTile(cachedTile, tx, ty),
                     cachedTile.getMinX(), cachedTile.getMinY(), this);
         }
@@ -409,10 +409,10 @@ public class ImageEditorDisplay extends JPanel {
     private boolean computingTiles = false;
 
     private void updateTileComputingStatus(Point[] tileIndices, Rectangle clipBounds) {
-        val tileComparator = new TileComparator(
+        final var tileComparator = new TileComparator(
                 (clipBounds.x + clipBounds.width / 2) / source.getTileWidth(),
                 (clipBounds.y + clipBounds.height / 2) / source.getTileHeight());
-        val dirtyTiles = Stream.of(tileIndices)
+        final var dirtyTiles = Stream.of(tileIndices)
                 .filter(tileIndex -> !validImageBackground[tileIndex.x][tileIndex.y])
                 .sorted(tileComparator)
                 .collect(Collectors.toList());
@@ -422,8 +422,8 @@ public class ImageEditorDisplay extends JPanel {
             tileManager.queueTiles(source, epoch, dirtyTiles, synchronizedImage, false, tileHandler);
         } else if (tileManager.pendingTiles(source, epoch) == 0) {
             if (paintListener != null) {
-                val endGetTiles = System.currentTimeMillis();
-                val time = (computingTiles && synchronizedImage && startGetTiles > 0)
+                final var endGetTiles = System.currentTimeMillis();
+                final var time = (computingTiles && synchronizedImage && startGetTiles > 0)
                         ? endGetTiles - startGetTiles
                         : 0;
                 paintListener.paintDone(source, HiDpi.imageSpaceRectFrom(getVisibleRect()), synchronizedImage, time);

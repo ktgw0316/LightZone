@@ -17,7 +17,6 @@ import com.lightcrafts.ui.region.RegionOverlay;
 import com.lightcrafts.utils.awt.geom.HiDpi;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 
 import javax.swing.*;
 import java.awt.*;
@@ -57,8 +56,8 @@ public class ModeManager
 
             @Override
             public boolean postProcessKeyEvent(KeyEvent e) {
-                val wasPanMode = (overlay.peekMode() == transientPanMode);
-                val keyCode = e.getKeyCode();
+                final var wasPanMode = (overlay.peekMode() == transientPanMode);
+                final var keyCode = e.getKeyCode();
                 if (PanKeyCodeAndTime.containsKey(keyCode)) {
                     switch (e.getID()) {
                         case KeyEvent.KEY_PRESSED:
@@ -67,7 +66,7 @@ public class ModeManager
                             break;
                         case KeyEvent.KEY_RELEASED:
                             // Detect and ignore auto-repeat release events
-                            val lastPressed = PanKeyCodeAndTime.get(keyCode);
+                            final var lastPressed = PanKeyCodeAndTime.get(keyCode);
                             if (e.getWhen() > lastPressed + 1) {
                                 PanKeyCodeAndTime.replace(keyCode, 0L);
                                 isPanMode = PanKeyCodeAndTime.values().stream()
@@ -229,12 +228,12 @@ public class ModeManager
             control.addModeListener(this);
         }
         // Some OpControls don't get regions.
-        val isLocked = control.isLocked();
-        val isRaw = control.isRawCorrection();
+        final var isLocked = control.isLocked();
+        final var isRaw = control.isRawCorrection();
         modeButtons.setRegionsEnabled(! (isLocked || isRaw));
 
-        val op = control.getOperation();
-        val prefMode = op.getPreferredMode();
+        final var op = control.getOperation();
+        final var prefMode = op.getPreferredMode();
         if (isLocked || isRaw ||
                 prefMode != EditorMode.ARROW ||
                 m_editorMode == EditorMode.ARROW ) {
@@ -266,7 +265,7 @@ public class ModeManager
         // be sure to pop out of that mode if it's the current mode at
         // the time a tool is deleted.
         if (overlay.peekMode() == regionMode && this.control != null) {
-            val op = this.control.getOperation();
+            final var op = this.control.getOperation();
             if (op.getPreferredMode() != EditorMode.REGION) {
                 EventQueue.invokeLater(() -> setEditorMode(EditorMode.ARROW));
             }
@@ -324,7 +323,7 @@ public class ModeManager
     public void xFormChanged(AffineTransform xform) {
         // First, validate from the overlay's validate root, because the
         // overlay bounds partly determine the overlay affine transform.
-        val scroll = (JScrollPane) SwingUtilities.getAncestorOfClass(
+        final var scroll = (JScrollPane) SwingUtilities.getAncestorOfClass(
             JScrollPane.class, overlay
         );
         if (scroll != null) {
@@ -362,7 +361,7 @@ public class ModeManager
         //
         this.xform = xform;
 
-        val overlayTransform = getOverlayTransform();
+        final var overlayTransform = getOverlayTransform();
 
         regionMode.setTransform(overlayTransform);
         cropMode.setTransform(overlayTransform);
@@ -375,8 +374,8 @@ public class ModeManager
 
     // Also used from DocPanel to forward mouse motion to the Previews.
     AffineTransform getOverlayTransform() {
-        val overlayXform = overlay.getTransform();
-        val totalXform = (AffineTransform) xform.clone();
+        final var overlayXform = overlay.getTransform();
+        final var totalXform = (AffineTransform) xform.clone();
         totalXform.preConcatenate(overlayXform);
         return totalXform;
     }
@@ -394,8 +393,8 @@ public class ModeManager
             controlMode.setUnderlayBounds(bounds);
         }
         // The default crop bounds depend on the underlay bounds.
-        val crop = cropMode.getCrop();
-        val initCrop = getInitialCropBounds();
+        final var crop = cropMode.getCrop();
+        final var initCrop = getInitialCropBounds();
         if (crop == null) {
             cropMode.setCropWithConstraints(initCrop);
         }
@@ -407,7 +406,7 @@ public class ModeManager
     }
 
     private boolean wasCrop() {
-        val peekMode = overlay.peekMode();
+        final var peekMode = overlay.peekMode();
         return peekMode == cropMode || peekMode == rotateMode;
     }
 
@@ -438,7 +437,7 @@ public class ModeManager
         doc.pushFitMode();
         doc.zoomToFit();
         // The "reset" button in rotate mode depends on the initial crop:
-        val crop = cropMode.getCrop();
+        final var crop = cropMode.getCrop();
         rotateMode.setCrop(crop);
         rotateMode.setResetCropBounds(crop);
         return rotateMode.getControl().getResetButton();
@@ -460,7 +459,7 @@ public class ModeManager
             controlMode = null;
         }
         // See if that did the trick, to avoid duplicate pushes.
-        val oldMode = overlay.peekMode();
+        final var oldMode = overlay.peekMode();
         if (oldMode == newMode) return;
 
         if (oldMode == cropMode) transitFromCropMode(newMode);
@@ -514,10 +513,10 @@ public class ModeManager
     // Get a default CropBounds for the CropMode overlay, in image
     // coordinates.
     private CropBounds getInitialCropBounds() {
-        val inset = new Rectangle(underlayBounds);
-        val crop = new CropBounds(HiDpi.imageSpaceRectFrom(inset));
+        final var inset = new Rectangle(underlayBounds);
+        final var crop = new CropBounds(HiDpi.imageSpaceRectFrom(inset));
         try {
-            val inverse = getOverlayTransform().createInverse();
+            final var inverse = getOverlayTransform().createInverse();
             return CropBounds.transform(inverse, crop);
         }
         catch (NoninvertibleTransformException e) {

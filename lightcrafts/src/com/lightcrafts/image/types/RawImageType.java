@@ -20,7 +20,6 @@ import com.lightcrafts.utils.UserCanceledException;
 import com.lightcrafts.utils.thread.ProgressThread;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.val;
 
 import javax.media.jai.*;
 import java.awt.*;
@@ -53,9 +52,9 @@ public abstract class RawImageType extends ImageType {
     public Dimension getDimension( ImageInfo imageInfo )
         throws BadImageFileException, IOException, UnknownImageTypeException
     {
-        val auxInfo = imageInfo.getAuxiliaryInfo();
+        final var auxInfo = imageInfo.getAuxiliaryInfo();
         assert auxInfo instanceof RawImageInfo;
-        val dcRaw = ((RawImageInfo)auxInfo).getDCRaw();
+        final var dcRaw = ((RawImageInfo)auxInfo).getDCRaw();
         return new Dimension( dcRaw.getImageWidth(), dcRaw.getImageHeight() );
     }
 
@@ -69,29 +68,29 @@ public abstract class RawImageType extends ImageType {
     {
         long startTime = System.currentTimeMillis();
 
-        val rawInfo = (RawImageInfo)imageInfo.getAuxiliaryInfo();
-        val dcRaw = rawInfo.getDCRaw();
+        final var rawInfo = (RawImageInfo)imageInfo.getAuxiliaryInfo();
+        final var dcRaw = rawInfo.getDCRaw();
 
         if (!dcRaw.decodable() || dcRaw.rawColors() != 3)
             throw new UnknownImageTypeException("Unsupported Camera");
 
         String cacheKey = null;
         File imageFile = null;
-        val fileCache = RawImageCache.getCacheFor( imageInfo );
+        final var fileCache = RawImageCache.getCacheFor( imageInfo );
 
         if ( CACHE_CONVERSION && fileCache != null ) {
             System.out.println("Checking cache for: " + imageInfo);
-            val t1 = System.currentTimeMillis();
+            final var t1 = System.currentTimeMillis();
             cacheKey = RawImageCache.getCacheKeyFor( imageInfo );
             if ( cacheKey != null )
                 imageFile = RawImageCache.getCachedImageFileFor( cacheKey );
             if (imageFile != null) {
-                val fileName = imageFile.getAbsolutePath();
+                final var fileName = imageFile.getAbsolutePath();
                 try {
-                    /* val reader = new LCTIFFReader( fileName, true );
-                    val image = reader.getImage( thread ); */
-                    val image = new LCTIFFReader.TIFFImage(fileName);
-                    val t2 = System.currentTimeMillis();
+                    /* final var reader = new LCTIFFReader( fileName, true );
+                    final var image = reader.getImage( thread ); */
+                    final var image = new LCTIFFReader.TIFFImage(fileName);
+                    final var t2 = System.currentTimeMillis();
                     System.out.println("Retrieved Cached image in " + (t2 - t1) + "ms");
                     return image;
                 } catch (LCImageLibException e) {
@@ -110,23 +109,23 @@ public abstract class RawImageType extends ImageType {
             indicator.setMaximum( 3 );
         }
 
-        val filters = dcRaw.getFilters();
+        final var filters = dcRaw.getFilters();
 
-        val colorModel = RasterFactory.createComponentColorModel(
+        final var colorModel = RasterFactory.createComponentColorModel(
                 DataBuffer.TYPE_USHORT, JAIContext.linearColorSpace, false, false,
                 Transparency.OPAQUE
         );
 
-        val dcrawImage = (BufferedImage) dcRaw.runDCRaw(DCRaw.dcrawMode.full, false);
-        val dcrawTime = System.currentTimeMillis();
+        final var dcrawImage = (BufferedImage) dcRaw.runDCRaw(DCRaw.dcrawMode.full, false);
+        final var dcrawTime = System.currentTimeMillis();
 
-        val metadata = imageInfo.getMetadata();
-        val imageWidth = metadata.getImageWidth();
-        val imageHeight = metadata.getImageHeight();
+        final var metadata = imageInfo.getMetadata();
+        final var imageWidth = metadata.getImageWidth();
+        final var imageHeight = metadata.getImageHeight();
         System.out.println("metadata width: " + imageWidth + ", height: " + imageHeight);
 
-        val dcrawWidth  = dcrawImage.getWidth();
-        val dcrawHeight = dcrawImage.getHeight();
+        final var dcrawWidth  = dcrawImage.getWidth();
+        final var dcrawHeight = dcrawImage.getHeight();
         System.out.println("dcraw    width: " + dcrawWidth + ", height: " + dcrawHeight);
 
         if ( thread != null && thread.isCanceled() )
@@ -135,7 +134,7 @@ public abstract class RawImageType extends ImageType {
         if ( indicator != null )
             indicator.incrementBy(1);
 
-        val dcrawLayout = new ImageLayout(
+        final var dcrawLayout = new ImageLayout(
                 0, 0, dcrawWidth, dcrawHeight,
                 0, 0, JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT,
                 colorModel.createCompatibleSampleModel(
@@ -147,18 +146,18 @@ public abstract class RawImageType extends ImageType {
         if (dcrawImage.getSampleModel().getNumBands() == 1 && filters != 0 && filters != -1) {
             rgbImage = new RGBDemosaicOpImage(dcrawImage, null, dcrawLayout, filters);
 
-            val make = dcRaw.getCameraMake(false);
-            val cameraMake = make == null ? "" : make;
+            final var make = dcRaw.getCameraMake(false);
+            final var cameraMake = make == null ? "" : make;
 
             if ((this instanceof RAFImageType
                  || (this instanceof DNGImageType && cameraMake.startsWith("FUJI")))
                 && dcRaw.getImageWidth() != dcRaw.getRawWidth()) {
 
-                val angle =  (dcRaw.getModel().equals("FinePix S2Pro"))
+                final var angle =  (dcRaw.getModel().equals("FinePix S2Pro"))
                         ? 3 * Math.PI / 4
                         : Math.PI / 4;
-                val width  = dcRaw.getImageWidth();
-                val height = dcRaw.getImageHeight();
+                final var width  = dcRaw.getImageWidth();
+                final var height = dcRaw.getImageHeight();
 
                 rgbImage = FujiRotatedImage(rgbImage, colorModel, width, height, angle);
             } else if (cameraMake.equals("NIKON") && dcRaw.getModel().equals("D1X")) {
@@ -171,18 +170,18 @@ public abstract class RawImageType extends ImageType {
                                           rgbImage.getHeight() - 10, JAIContext.noCacheHint);
             }
 
-            val cacheLayout = new ImageLayout(
+            final var cacheLayout = new ImageLayout(
                     0, 0, rgbImage.getWidth(), rgbImage.getHeight(),
                     0, 0, JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT,
                     colorModel.createCompatibleSampleModel(
                             JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT),
                     colorModel);
-            val cache = new CachedImage(cacheLayout, JAIContext.fileCache);
+            final var cache = new CachedImage(cacheLayout, JAIContext.fileCache);
 
             retile(rgbImage, cache);
             rgbImage = cache;
         } else {
-            val cache = new CachedImage(dcrawLayout, JAIContext.fileCache);
+            final var cache = new CachedImage(dcrawLayout, JAIContext.fileCache);
 
             for (int x = 0; x <= cache.getMaxTileX(); x++) {
                 for (int y = 0; y <= cache.getMaxTileY(); y++) {
@@ -195,7 +194,7 @@ public abstract class RawImageType extends ImageType {
         if (indicator != null)
             indicator.incrementBy(1);
 
-        val demosaicTime = System.currentTimeMillis();
+        final var demosaicTime = System.currentTimeMillis();
 
         if (indicator != null)
             indicator.incrementBy(1);
@@ -212,25 +211,25 @@ public abstract class RawImageType extends ImageType {
 
     private PlanarImage FujiRotatedImage(PlanarImage rgbImage, ComponentColorModel colorModel,
                                          int width, int height, double angle) {
-        val interp = Interpolation.getInstance(Interpolation.INTERP_BILINEAR);
-        val rotation = AffineTransform.getRotateInstance(
+        final var interp = Interpolation.getInstance(Interpolation.INTERP_BILINEAR);
+        final var rotation = AffineTransform.getRotateInstance(
                 angle, rgbImage.getWidth() / 2, rgbImage.getHeight() / 2);
-        val sm = colorModel.createCompatibleSampleModel(
+        final var sm = colorModel.createCompatibleSampleModel(
                 JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT);
 
-        val pb2 = new ParameterBlock();
+        final var pb2 = new ParameterBlock();
         pb2.addSource(rgbImage);
         pb2.add(rotation);
         pb2.add(interp);
         RenderedOp rotated = JAI.create("Affine", pb2, null);
 
-        val rotatedLayout = new ImageLayout(
+        final var rotatedLayout = new ImageLayout(
                 rotated.getBounds().x, rotated.getBounds().y,
                 rotated.getBounds().width, rotated.getBounds().height,
                 rotated.getBounds().x, rotated.getBounds().y,
                 JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT,
                 sm, colorModel);
-        val hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, rotatedLayout);
+        final var hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, rotatedLayout);
 
         rotated = JAI.create("Affine", pb2, hints);
 
@@ -248,23 +247,23 @@ public abstract class RawImageType extends ImageType {
                 rgbImage.getWidth() - 10,
                 rgbImage.getHeight() - 10);
 
-        val hints = new RenderingHints(
+        final var hints = new RenderingHints(
                 JAI.KEY_BORDER_EXTENDER,
                 BorderExtender.createInstance(BorderExtender.BORDER_COPY));
 
-        val interp = Interpolation.getInstance(Interpolation.INTERP_BILINEAR);
+        final var interp = Interpolation.getInstance(Interpolation.INTERP_BILINEAR);
 
-        val sm = colorModel.createCompatibleSampleModel(
+        final var sm = colorModel.createCompatibleSampleModel(
                 JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT);
 
-        val newLayout = new ImageLayout(
+        final var newLayout = new ImageLayout(
                 0, 0, 3 * rgbImage.getWidth() / 4, 3 * rgbImage.getHeight() / 2,
                 0, 0, JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT,
                 sm, colorModel);
 
         hints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT, newLayout));
 
-        val pb2 = new ParameterBlock();
+        final var pb2 = new ParameterBlock();
         pb2.addSource(rgbImage);
         pb2.add(AffineTransform.getScaleInstance(3.0 / 4.0, 3.0 / 2.0));
         pb2.add(interp);
@@ -276,21 +275,21 @@ public abstract class RawImageType extends ImageType {
 
         Rectangle bounds = cache.getBounds();
         bounds.translate(rgbImage.getMinX(), rgbImage.getMinY());
-        val tileIndices = rgbImage.getTileIndices(bounds);
+        final var tileIndices = rgbImage.getTileIndices(bounds);
 
-        val processors = Runtime.getRuntime().availableProcessors();
+        final var processors = Runtime.getRuntime().availableProcessors();
 
-        val image = rgbImage;
+        final var image = rgbImage;
 
         if (processors > 1) {
-            val threads = new Thread[processors];
+            final var threads = new Thread[processors];
             int k = 0;
             for (int i = 0; i < processors; ++i) {
                 int jobSize = tileIndices.length / processors;
                 if (i == processors - 1)
                     jobSize += tileIndices.length % processors;
 
-                val job = new Point[jobSize];
+                final var job = new Point[jobSize];
                 for (int j = 0; j < jobSize; ++j) {
                     job[j] = tileIndices[k++];
                 }
@@ -305,7 +304,7 @@ public abstract class RawImageType extends ImageType {
                 threads[i] = new Thread(runnable, "RAW Processor " + i);
                 threads[i].start();
             }
-            for (val t : threads) {
+            for (final var t : threads) {
                 try {
                     t.join();
                 } catch (InterruptedException e) {
@@ -320,7 +319,7 @@ public abstract class RawImageType extends ImageType {
     }
 
     private void setTileData(Point[] tileIndices, PlanarImage image, CachedImage cache) {
-        for (val ti : tileIndices) {
+        for (final var ti : tileIndices) {
             Raster tile = image.getTile(ti.x, ti.y);
             tile = tile.createTranslatedChild(tile.getMinX() - image.getMinX(),
                                               tile.getMinY() - image.getMinY());
@@ -336,8 +335,8 @@ public abstract class RawImageType extends ImageType {
                                           int maxHeight )
         throws BadImageFileException, IOException, UnknownImageTypeException
     {
-        val rawInfo = (RawImageInfo)imageInfo.getAuxiliaryInfo();
-        val dcRaw = rawInfo.getDCRaw();
+        final var rawInfo = (RawImageInfo)imageInfo.getAuxiliaryInfo();
+        final var dcRaw = rawInfo.getDCRaw();
 
         if (dcRaw.getThumbHeight() >= 400 && dcRaw.getThumbWidth() >= 600)
             return dcRaw.runDCRaw(DCRaw.dcrawMode.thumb);
@@ -349,8 +348,8 @@ public abstract class RawImageType extends ImageType {
     public RenderedImage getThumbnailImage( ImageInfo imageInfo )
         throws BadImageFileException, IOException, UnknownImageTypeException
     {
-        val rawInfo = (RawImageInfo)imageInfo.getAuxiliaryInfo();
-        val dcRaw = rawInfo.getDCRaw();
+        final var rawInfo = (RawImageInfo)imageInfo.getAuxiliaryInfo();
+        final var dcRaw = rawInfo.getDCRaw();
         return dcRaw.runDCRaw(DCRaw.dcrawMode.thumb);
     }
 

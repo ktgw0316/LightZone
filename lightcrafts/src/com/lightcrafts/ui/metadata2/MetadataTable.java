@@ -6,7 +6,6 @@ package com.lightcrafts.ui.metadata2;
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.ui.metadata2.UrgencyMetadataEntry.UrgencyObject;
 import com.lightcrafts.utils.WebBrowser;
-import lombok.val;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -73,8 +72,8 @@ class MetadataTable extends JTable {
         //   Select-all on focus gained;
         //   Tab key ends editing.
 
-        val editor = (DefaultCellEditor) getDefaultEditor(Object.class);
-        val editComp = (JTextField) editor.getComponent();
+        final var editor = (DefaultCellEditor) getDefaultEditor(Object.class);
+        final var editComp = (JTextField) editor.getComponent();
         editComp.setForeground(LightZoneSkin.Colors.ToolPanesForeground);
         editComp.setFont(LightZoneSkin.fontSet.getSmallFont());
         editComp.addFocusListener(
@@ -98,11 +97,11 @@ class MetadataTable extends JTable {
         );
 
         // The rating field gets a specialized editor, and make it popup.
-        val ratingEditor = initRatingEditor();
+        final var ratingEditor = initRatingEditor();
         setDefaultEditor(RatingMetadataEntry.RatingObject.class, ratingEditor);
 
         // The urgency field gets a specialized editor, and make it popup.
-        val urgencyEditor = initUrgencyEditor();
+        final var urgencyEditor = initUrgencyEditor();
         setDefaultEditor(UrgencyObject.class, urgencyEditor);
 
         // Setup the default renderer and also a specialized rating renderer.
@@ -124,14 +123,14 @@ class MetadataTable extends JTable {
             @Override
             public Component getListCellRendererComponent(JList<? extends String> list,
                     String value, int index, boolean isSelected, boolean cellHasFocus) {
-                val color = UrgencyObject.colorOf(index);
+                final var color = UrgencyObject.colorOf(index);
                 setBackground(color);
                 setText(Integer.valueOf(index).toString()); // DEBUG
                 return this;
             }
         }
 
-        val urgencyCombo = new JComboBox<String>();
+        final var urgencyCombo = new JComboBox<String>();
         urgencyCombo.setEditable(false);
         urgencyCombo.setRenderer(new UrgencyRenderer());
         for (int urgency = 0; urgency <= 8; urgency++) {
@@ -140,7 +139,7 @@ class MetadataTable extends JTable {
         urgencyCombo.setSelectedIndex(-1);
 
         var urgencyEditor = new DefaultCellEditor(urgencyCombo);
-        val urgencyComp = (JComboBox<?>) urgencyEditor.getComponent();
+        final var urgencyComp = (JComboBox<?>) urgencyEditor.getComponent();
         urgencyComp.addFocusListener(
                 new FocusAdapter() {
                     @Override
@@ -153,7 +152,7 @@ class MetadataTable extends JTable {
     }
 
     private TableCellEditor initRatingEditor() {
-        val ratingCombo = new JComboBox<String>();
+        final var ratingCombo = new JComboBox<String>();
         ratingCombo.setEditable(false);
         ratingCombo.setForeground(LightZoneSkin.Colors.ToolPanesForeground);
         ratingCombo.setFont(RatingTableCellRenderer.RatingFont);
@@ -164,7 +163,7 @@ class MetadataTable extends JTable {
         ratingCombo.setSelectedIndex(-1);
 
         var ratingEditor = new DefaultCellEditor(ratingCombo);
-        val ratingComp = (JComboBox<?>) ratingEditor.getComponent();
+        final var ratingComp = (JComboBox<?>) ratingEditor.getComponent();
         ratingComp.setForeground(LightZoneSkin.Colors.ToolPanesForeground);
         ratingComp.addFocusListener(
                 new FocusAdapter() {
@@ -192,14 +191,14 @@ class MetadataTable extends JTable {
     }
 
     // When editing ends, after changes are committed, refresh the whole
-    // display from its file. 
+    // display from its file.
     @Override
     public void editingStopped(ChangeEvent event) {
         super.editingStopped(event);
         // Must enqueue the refresh; can't mutate the data model in a
         // cell editor callback.
         EventQueue.invokeLater(() -> {
-            val scroll = (MetadataScroll) SwingUtilities.getAncestorOfClass(
+            final var scroll = (MetadataScroll) SwingUtilities.getAncestorOfClass(
                     MetadataScroll.class, MetadataTable.this);
             if (scroll != null) {
                 scroll.refresh();

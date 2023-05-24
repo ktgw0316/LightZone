@@ -10,7 +10,6 @@ import com.lightcrafts.model.Region;
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.ui.toolkit.ShadowFactory;
 import com.lightcrafts.utils.LCMS;
-import lombok.val;
 
 import javax.media.jai.IHSColorSpace;
 import java.awt.*;
@@ -98,11 +97,11 @@ class DropperPreview extends Preview {
         lightness = calcLightness(red, green, blue);
         zone = calcZone(lightness);
 
-        val xyzColor = JAIContext.linearColorSpace.toCIEXYZ(new float[]{red / 255f, green / 255f, blue / 255f});
+        final var xyzColor = JAIContext.linearColorSpace.toCIEXYZ(new float[]{red / 255f, green / 255f, blue / 255f});
         ihsColor = ihsCS.fromCIEXYZ(xyzColor);
 
         short[] labColors = new short[3];
-        val ts = new LCMS.Transform(
+        final var ts = new LCMS.Transform(
                 new LCMS.Profile(JAIContext.linearProfile), LCMS.TYPE_RGB_16,
                 new LCMS.Profile(JAIContext.labProfile), LCMS.TYPE_Lab_16,
                 LCMS.INTENT_RELATIVE_COLORIMETRIC, 0);
@@ -111,8 +110,8 @@ class DropperPreview extends Preview {
         a = ((0xffff & labColors[1]) - 128 * 256) / 256;
         b = ((0xffff & labColors[2]) - 128 * 256) / 256;
 
-        val originalComponents = color.getRGBComponents(null);
-        val components = Functions.fromLinearToCS(JAIContext.systemColorSpace, originalComponents);
+        final var originalComponents = color.getRGBComponents(null);
+        final var components = Functions.fromLinearToCS(JAIContext.systemColorSpace, originalComponents);
         colorInSystemCS = new Color(components[0], components[1], components[2]);
     }
 
@@ -122,30 +121,30 @@ class DropperPreview extends Preview {
             return;
 
         update();
-        
-        val g = (Graphics2D) graphics;
+
+        final var g = (Graphics2D) graphics;
 
         g.setRenderingHints(aliasingRenderHints);
         g.setColor(LightZoneSkin.Colors.NeutralGray);
 
-        val bounds = getSize();
-        val minx = 0;
-        val miny = 0;
-        val width = bounds.width;
-        val height = bounds.height;
+        final var bounds = getSize();
+        final var minx = 0;
+        final var miny = 0;
+        final var width = bounds.width;
+        final var height = bounds.height;
 
         g.fillRect(minx, miny, width, height);
         g.setColor(LightZoneSkin.Colors.ToolPanesForeground);
 
-        val font = new Font("Monospaced", Font.PLAIN, 13);
+        final var font = new Font("Monospaced", Font.PLAIN, 13);
         g.setFont(font);
 
-        val layout = new TextLayout("ABC", font, g.getFontRenderContext());
+        final var layout = new TextLayout("ABC", font, g.getFontRenderContext());
 
-        val textHeight = (float) layout.getBounds().getHeight() + 5;
+        final var textHeight = (float) layout.getBounds().getHeight() + 5;
 
-        val separator = ": ";
-        val fm = getFontMetrics(font);
+        final var separator = ": ";
+        final var fm = getFontMetrics(font);
 
         class Graph {
             private void drawAlignedString(String name, int value, float x, float y) {
@@ -157,7 +156,7 @@ class DropperPreview extends Preview {
             }
         }
 
-        val gg = new Graph();
+        final var gg = new Graph();
 
         gg.drawAlignedString("x", loc.x, minx + 50, miny + 2 + textHeight);
         gg.drawAlignedString("y", loc.y, minx + 50, miny + 2 + 2 * textHeight);
@@ -166,10 +165,10 @@ class DropperPreview extends Preview {
         gg.drawAlignedString(LOCALE.get("Sampler_GreenLabel"), green, minx + 50, 12 + 4 * textHeight);
         gg.drawAlignedString(LOCALE.get("Sampler_BlueLabel"),  blue,  minx + 50, 12 + 5 * textHeight);
 
-        val gap = width - 130;
+        final var gap = width - 130;
         gg.drawAlignedString(LOCALE.get("Sampler_LuminosityLabel"), (int) lightness, minx + gap + 50, miny + 2 + textHeight);
 
-        val format = new DecimalFormat("0.0");
+        final var format = new DecimalFormat("0.0");
         gg.drawAlignedString(LOCALE.get("Sampler_ZoneLabel"), format.format(zone), minx + gap + 50, miny + 2 + 2 * textHeight);
 
         gg.drawAlignedString(LOCALE.get("Sampler_IntensityLabel"),  (int) (100 * ihsColor[0]) + "%",                        minx + gap + 50, miny + 12 + 3 * textHeight);
@@ -180,18 +179,18 @@ class DropperPreview extends Preview {
         gg.drawAlignedString("a", a, minx + 50, miny + 12 + 8 * textHeight);
         gg.drawAlignedString("b", b, minx + 50, miny + 12 + 9 * textHeight);
 
-        val size = new Dimension(width - 20, 60);
-        val image = new BufferedImage(size.width-106, size.height-6, BufferedImage.TYPE_INT_RGB);
+        final var size = new Dimension(width - 20, 60);
+        final var image = new BufferedImage(size.width-106, size.height-6, BufferedImage.TYPE_INT_RGB);
 
-        val imageG = image.getGraphics();
+        final var imageG = image.getGraphics();
         imageG.setColor(colorInSystemCS);
         imageG.fillRect(0, 0, size.width-106, size.height-6);
         imageG.dispose();
 
-        val shadow = new ShadowFactory(3, 1.0f, Color.gray);
+        final var shadow = new ShadowFactory(3, 1.0f, Color.gray);
         shadow.setRenderingHint(ShadowFactory.KEY_BLUR_QUALITY, ShadowFactory.VALUE_BLUR_QUALITY_HIGH);
-        val shadowImage = shadow.createShadow(image);
-        val shadowImageG = shadowImage.getGraphics();
+        final var shadowImage = shadow.createShadow(image);
+        final var shadowImageG = shadowImage.getGraphics();
         shadowImageG.drawImage(image, 3, 2, null);
         shadowImageG.dispose();
 

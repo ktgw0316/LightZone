@@ -8,7 +8,6 @@ import com.lightcrafts.image.metadata.values.RationalMetaValue;
 import com.lightcrafts.utils.Rational;
 import com.lightcrafts.utils.tuple.Pair;
 import lombok.Getter;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -70,14 +69,14 @@ public final class GPSDirectory extends ImageMetadataDirectory
     }
 
     private Double readGPSCoordinate(int tagID, int refTagID, String orientation) {
-        val metadata = readMetadata(tagID, refTagID);
+        final var metadata = readMetadata(tagID, refTagID);
         if (metadata == null) {
             return null;
         }
-        val values = metadata.left;
-        val refString = metadata.right;
+        final var values = metadata.left;
+        final var refString = metadata.right;
 
-        val sign = (refString.equalsIgnoreCase(orientation)) ? 1 : -1;
+        final var sign = (refString.equalsIgnoreCase(orientation)) ? 1 : -1;
 
         return sign * (values[0].doubleValue()
                 + values[1].doubleValue() / 60
@@ -86,12 +85,12 @@ public final class GPSDirectory extends ImageMetadataDirectory
 
     @NotNull
     private String readGPSCoordinateDMS(int tagID, int refTagID) {
-        val metadata = readMetadata(tagID, refTagID);
+        final var metadata = readMetadata(tagID, refTagID);
         if (metadata == null) {
             return "";
         }
-        val values = metadata.left;
-        val refString = metadata.right;
+        final var values = metadata.left;
+        final var refString = metadata.right;
 
         return values[0].intValue() + "\u00B0"
                 + values[1].intValue() + "'"
@@ -100,19 +99,19 @@ public final class GPSDirectory extends ImageMetadataDirectory
     }
 
     private Pair<Rational[], String> readMetadata(int tagID, int refTagID) {
-        val metaValue = getValue(tagID);
+        final var metaValue = getValue(tagID);
         if (metaValue == null) {
             return null;
         }
-        val values = ((RationalMetaValue) metaValue).getRationalValues();
+        final var values = ((RationalMetaValue) metaValue).getRationalValues();
         if (values.length != 3) {
             return null;
         }
-        val refMetaValue = getValue(refTagID);
+        final var refMetaValue = getValue(refTagID);
         if (refMetaValue == null) {
             return null;
         }
-        val refString = refMetaValue.getStringValue();
+        final var refString = refMetaValue.getStringValue();
         if (refString == null) {
             return null;
         }
@@ -152,7 +151,7 @@ public final class GPSDirectory extends ImageMetadataDirectory
      * @param type The tag's {@link ImageMetaType}.
      */
     private static void add( int id, String name, ImageMetaType type ) {
-        val tagInfo = new ImageMetaTagInfo( id, name, type, false );
+        final var tagInfo = new ImageMetaTagInfo( id, name, type, false );
         m_tagsByID.put( id, tagInfo );
         m_tagsByName.put( name, tagInfo );
     }
