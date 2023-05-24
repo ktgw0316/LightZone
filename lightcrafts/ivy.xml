@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
+<ivy-module version="2.0"
+  xmlns:m="http://ant.apache.org/ivy/maven">
   <info organisation="lightcrafts" module="lightcrafts"/>
   <dependencies>
     <dependency name="annotations" rev="20.1.0" org="org.jetbrains"/>
@@ -7,10 +8,9 @@
     <dependency name="jiconfont-font_awesome" rev="4.7.0.0" org="com.github.jiconfont"/>
     <dependency name="jiconfont-google_material_design_icons" rev="2.2.0.2" org="com.github.jiconfont"/>
     <dependency name="jiconfont-swing" rev="1.0.1" org="com.github.jiconfont"/>
-    <dependency name="lombok" rev="1.18.20" org="org.projectlombok"/>
+    <dependency name="lombok" rev="1.18.26" org="org.projectlombok"/>
     <!-- Don't download source or javadocs to save bandwidth -->
     <exclude org="*" ext="*" type="source"/>
     <exclude org="*" ext="*" type="javadoc"/>
   </dependencies>
 </ivy-module>
-
