@@ -2,6 +2,7 @@
 
 // standard
 #include <windows.h>
+#include <cstdint>
 #include <string>
 // local
 #include "LC_JNIUtils.h"
