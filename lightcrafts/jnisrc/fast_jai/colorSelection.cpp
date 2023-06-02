@@ -4,9 +4,9 @@ typedef unsigned char byte;
 typedef unsigned short ushort;
 
 #include "mathlz.h"
-#include <math.h>
+#include <cmath>
+#include <cstdlib>
 #include <omp.h>
-#include <stdlib.h>
 
 static float arctan2(float y, float x) {
     constexpr float coeff_1 = (float) M_PI / 4;

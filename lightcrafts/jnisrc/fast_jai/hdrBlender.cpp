@@ -13,7 +13,7 @@ typedef unsigned short ushort;
 
 #include "mathlz.h"
 #include <algorithm>
-#include <math.h>
+#include <cmath>
 #include <omp.h>
 
 static double softLightBlendPixels(double front, double back) {

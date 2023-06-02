@@ -11,10 +11,10 @@
   http://www.pegtop.net/delphi/articles/blendmodes/
 */
 
+#include <omp.h>
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
-#include <omp.h>
 #include "mathlz.h"
 
 using byte = uint8_t;
@@ -25,200 +25,212 @@ static constexpr double midtonesThreshold = 0.172;
 static constexpr double shadowsThreshold = 0.0425;
 
 class BlendMode {
-    static BlendMode *blendMode[];
+  static BlendMode *blendMode[];
 
-  public:
-    static constexpr ushort maxVal = 0xFFFF;
+public:
+  static constexpr ushort maxVal = 0xFFFF;
 
-    virtual ushort blendPixels(ushort front, ushort back) const = 0;
+  virtual ushort blendPixels(ushort front, ushort back) const = 0;
 
-    static BlendMode *getBlender(int mode) { return blendMode[mode]; }
+  static BlendMode *getBlender(int mode) { return blendMode[mode]; }
 };
 
 class NormalBlendMode : public BlendMode {
-    virtual ushort blendPixels(ushort front, ushort back) const { return front; }
+  virtual ushort blendPixels(ushort front, ushort back) const { return front; }
 };
 
 class AverageBlendMode : public BlendMode {
-    virtual ushort blendPixels(ushort front, ushort back) const { return (front + back) / 2; }
+  virtual ushort blendPixels(ushort front, ushort back) const {
+    return (front + back) / 2;
+  }
 };
 
 class MultiplyBlendMode : public BlendMode {
-    virtual ushort blendPixels(ushort front, ushort back) const {
-        return front * back / (maxVal + 1);
-    }
+  virtual ushort blendPixels(ushort front, ushort back) const {
+    return front * back / (maxVal + 1);
+  }
 };
 
 class ScreenBlendMode : public BlendMode {
-    virtual ushort blendPixels(ushort front, ushort back) const {
-        return maxVal - ((maxVal - front) * (maxVal - back) / (maxVal + 1));
-    }
+  virtual ushort blendPixels(ushort front, ushort back) const {
+    return maxVal - ((maxVal - front) * (maxVal - back) / (maxVal + 1));
+  }
 };
 
 class DarkenBlendMode : public BlendMode {
-    virtual ushort blendPixels(ushort front, ushort back) const { return std::min(front, back); }
+  virtual ushort blendPixels(ushort front, ushort back) const {
+    return std::min(front, back);
+  }
 };
 
 class LightenBlendMode : public BlendMode {
-    virtual ushort blendPixels(ushort front, ushort back) const { return std::max(front, back); }
+  virtual ushort blendPixels(ushort front, ushort back) const {
+    return std::max(front, back);
+  }
 };
 
 class DifferenceBlendMode : public BlendMode {
-    virtual ushort blendPixels(ushort front, ushort back) const { return std::abs(front - back); }
+  virtual ushort blendPixels(ushort front, ushort back) const {
+    return std::abs(front - back);
+  }
 };
 
 class NegationBlendMode : public BlendMode {
-    virtual ushort blendPixels(ushort front, ushort back) const {
-        return maxVal - std::abs(maxVal - front - back);
-    }
+  virtual ushort blendPixels(ushort front, ushort back) const {
+    return maxVal - std::abs(maxVal - front - back);
+  }
 };
 
 class ExclusionBlendMode : public BlendMode {
-    virtual ushort blendPixels(ushort front, ushort back) const {
-        return front + back - (front * back) / (maxVal / 2);
-    }
+  virtual ushort blendPixels(ushort front, ushort back) const {
+    return front + back - (front * back) / (maxVal / 2);
+  }
 };
 
 class OverlayBlendMode : public BlendMode {
-    virtual ushort blendPixels(ushort front, ushort back) const {
-        if (back < maxVal / 2)
-            return (front * back) / (maxVal / 2);
-        else
-            return maxVal - ((maxVal - front) * (maxVal - back) / (maxVal / 2));
-    }
+  virtual ushort blendPixels(ushort front, ushort back) const {
+    if (back < maxVal / 2)
+      return (front * back) / (maxVal / 2);
+    else
+      return maxVal - ((maxVal - front) * (maxVal - back) / (maxVal / 2));
+  }
 };
 
 class HardLightBlendMode : public BlendMode {
-    virtual ushort blendPixels(ushort front, ushort back) const {
-        if (front < maxVal / 2)
-            return (front * back) / (maxVal / 2);
-        else
-            return maxVal - ((maxVal - front) * (maxVal - back) / (maxVal / 2));
-    }
+  virtual ushort blendPixels(ushort front, ushort back) const {
+    if (front < maxVal / 2)
+      return (front * back) / (maxVal / 2);
+    else
+      return maxVal - ((maxVal - front) * (maxVal - back) / (maxVal / 2));
+  }
 };
 
 // original soft light
 class SoftLightBlendMode : public BlendMode {
-    virtual ushort blendPixels(ushort front, ushort back) const {
-        ushort m = (front * back) / (uint32_t(maxVal) + 1);
-        ushort s = maxVal - ((maxVal - front) * (maxVal - back)) / (uint32_t(maxVal) + 1);
+  virtual ushort blendPixels(ushort front, ushort back) const {
+    ushort m = (front * back) / (uint32_t(maxVal) + 1);
+    ushort s =
+        maxVal - ((maxVal - front) * (maxVal - back)) / (uint32_t(maxVal) + 1);
 
-        return ((maxVal - back) * m + (back * s)) / (uint32_t(maxVal) + 1);
-    }
+    return ((maxVal - back) * m + (back * s)) / (uint32_t(maxVal) + 1);
+  }
 };
 
 class SoftLightBlendMode2 : public BlendMode {
-  protected:
-    const double exp;
+protected:
+  const double exp;
 
-  public:
-  public:
-    SoftLightBlendMode2(double exp) : exp(exp) {}
+public:
+public:
+  SoftLightBlendMode2(double exp) : exp(exp) {}
 
-    virtual ushort blendPixels(ushort front, ushort back) const {
-        ushort m = (front * back) / (uint32_t(maxVal) + 1);
-        ushort s = maxVal - ((maxVal - front) * (maxVal - back)) / (uint32_t(maxVal) + 1);
+  virtual ushort blendPixels(ushort front, ushort back) const {
+    ushort m = (front * back) / (uint32_t(maxVal) + 1);
+    ushort s =
+        maxVal - ((maxVal - front) * (maxVal - back)) / (uint32_t(maxVal) + 1);
 
-        double p = pow((back / (double)maxVal), exp);
+    double p = pow((back / (double)maxVal), exp);
 
-        return ushort(m * (1 - p) + s * p);
-    }
+    return ushort(m * (1 - p) + s * p);
+  }
 };
 
 class ColorDodgeBlendMode : public BlendMode {
-    virtual ushort blendPixels(ushort front, ushort back) const {
-        if (front == maxVal)
-            return front;
-        uint32_t c = uint32_t(back) * (maxVal + 1) / (maxVal - front);
-        return std::min(c, uint32_t(maxVal));
-    }
+  virtual ushort blendPixels(ushort front, ushort back) const {
+    if (front == maxVal)
+      return front;
+    uint32_t c = uint32_t(back) * (maxVal + 1) / (maxVal - front);
+    return std::min(c, uint32_t(maxVal));
+  }
 };
 
 class ColorBurnBlendMode : public BlendMode {
-    virtual ushort blendPixels(ushort front, ushort back) const {
-        if (front == 0)
-            return 0;
-        int c = maxVal - uint32_t(maxVal - back) * (maxVal + 1) / front;
-        return std::max(c, 0);
-    }
+  virtual ushort blendPixels(ushort front, ushort back) const {
+    if (front == 0)
+      return 0;
+    int c = maxVal - uint32_t(maxVal - back) * (maxVal + 1) / front;
+    return std::max(c, 0);
+  }
 };
 
 class SoftDodgeBlendMode : public BlendMode {
-    virtual ushort blendPixels(ushort front, ushort back) const {
-        const auto p = std::minmax(back, ushort(maxVal - front));
-        if (p.second == 0)
-            return maxVal;
-        uint32_t c = uint32_t(p.first) * (maxVal / 2) / p.second;
-        return clampUShort(c);
-    }
+  virtual ushort blendPixels(ushort front, ushort back) const {
+    const auto p = std::minmax(back, ushort(maxVal - front));
+    if (p.second == 0)
+      return maxVal;
+    uint32_t c = uint32_t(p.first) * (maxVal / 2) / p.second;
+    return clampUShort(c);
+  }
 };
 
 class SoftBurnBlendMode : public BlendMode {
-    virtual ushort blendPixels(ushort front, ushort back) const {
-        const auto p = std::minmax(front, ushort(maxVal - back));
-        if (p.second == 0)
-            return maxVal;
-        uint32_t c = uint32_t(p.first) * (maxVal / 2) / p.second;
-        return clampUShort(c);
-    }
+  virtual ushort blendPixels(ushort front, ushort back) const {
+    const auto p = std::minmax(front, ushort(maxVal - back));
+    if (p.second == 0)
+      return maxVal;
+    uint32_t c = uint32_t(p.first) * (maxVal / 2) / p.second;
+    return clampUShort(c);
+  }
 };
 
 class LowPassBlendMode : public BlendMode {
-    const ushort threshold;
-    const ushort transition;
+  const ushort threshold;
+  const ushort transition;
 
-  public:
-    LowPassBlendMode(ushort threshold, ushort transition)
-        : threshold(threshold), transition(transition) {}
+public:
+  LowPassBlendMode(ushort threshold, ushort transition)
+      : threshold(threshold), transition(transition) {}
 
-    virtual ushort blendPixels(ushort front, ushort back) const {
-        if (back < threshold - transition)
-            return front;
-        if (back > threshold + transition)
-            return back;
-        /*
-          uint64_t k = back - (threshold - transition);
-          k = (k * k) / (maxVal + 1);
-          uint64_t t4 = 4 * transition * transition;
-          return (ushort) ((k * back + (t4 * maxVal - k) * front) / (t4 * (maxVal + 1)));
-        */
-        double k = (back - (threshold - transition)) / (2.0 * transition);
-        k *= k;
-        return ushort(k * back + (1 - k) * front);
-    }
+  virtual ushort blendPixels(ushort front, ushort back) const {
+    if (back < threshold - transition)
+      return front;
+    if (back > threshold + transition)
+      return back;
+    /*
+      uint64_t k = back - (threshold - transition);
+      k = (k * k) / (maxVal + 1);
+      uint64_t t4 = 4 * transition * transition;
+      return (ushort) ((k * back + (t4 * maxVal - k) * front) / (t4 * (maxVal +
+      1)));
+    */
+    double k = (back - (threshold - transition)) / (2.0 * transition);
+    k *= k;
+    return ushort(k * back + (1 - k) * front);
+  }
 };
 
 class HighPassBlendMode : public BlendMode {
-    const ushort threshold;
-    const ushort transition;
+  const ushort threshold;
+  const ushort transition;
 
-  public:
-    HighPassBlendMode(ushort threshold, ushort transition)
-        : threshold(threshold), transition(transition) {}
+public:
+  HighPassBlendMode(ushort threshold, ushort transition)
+      : threshold(threshold), transition(transition) {}
 
-    virtual ushort blendPixels(ushort front, ushort back) const {
-        if (back > threshold + transition)
-            return front;
-        if (back < threshold - transition)
-            return back;
+  virtual ushort blendPixels(ushort front, ushort back) const {
+    if (back > threshold + transition)
+      return front;
+    if (back < threshold - transition)
+      return back;
 
-        double k = sqrt((back - (threshold - transition)) / (2.0 * transition));
-        return ushort(k * front + (1 - k) * back);
-    }
+    double k = sqrt((back - (threshold - transition)) / (2.0 * transition));
+    return ushort(k * front + (1 - k) * back);
+  }
 };
 
 class BandBlendMode : public BlendMode {
-    const LowPassBlendMode shadows;
-    const HighPassBlendMode hilights;
+  const LowPassBlendMode shadows;
+  const HighPassBlendMode hilights;
 
-  public:
-    BandBlendMode(ushort thresholdLow, ushort transitionLow, ushort thresholdHigh,
-                  ushort transitionHigh)
-        : shadows(thresholdHigh, transitionHigh), hilights(thresholdLow, transitionLow) {}
+public:
+  BandBlendMode(ushort thresholdLow, ushort transitionLow, ushort thresholdHigh,
+                ushort transitionHigh)
+      : shadows(thresholdHigh, transitionHigh),
+        hilights(thresholdLow, transitionLow) {}
 
-    virtual ushort blendPixels(ushort front, ushort back) const {
-        return shadows.blendPixels(hilights.blendPixels(front, back), back);
-    }
+  virtual ushort blendPixels(ushort front, ushort back) const {
+    return shadows.blendPixels(hilights.blendPixels(front, back), back);
+  }
 };
 
 BlendMode *BlendMode::blendMode[] = {
@@ -241,14 +253,14 @@ BlendMode *BlendMode::blendMode[] = {
     new SoftLightBlendMode2(0.4),   // 16
     new SoftLightBlendMode2(1.31),  // 17
     new SoftLightBlendMode2(0.291), // 18
-    new LowPassBlendMode(ushort(midtonesThreshold * maxVal),
-                         ushort(midtonesThreshold * maxVal / 2)), // 19
-    new HighPassBlendMode(ushort(shadowsThreshold * maxVal),
-                          ushort(shadowsThreshold * maxVal / 2)), // 20
-    new BandBlendMode(ushort(shadowsThreshold * maxVal),
-                      ushort(shadowsThreshold * maxVal / 2),
-                      ushort(hilightsThreshold * maxVal),
-                      ushort(hilightsThreshold * maxVal / 2)), // 21
+    new LowPassBlendMode(ushort(midtonesThreshold *maxVal),
+                         ushort(midtonesThreshold *maxVal / 2)), // 19
+    new HighPassBlendMode(ushort(shadowsThreshold *maxVal),
+                          ushort(shadowsThreshold *maxVal / 2)), // 20
+    new BandBlendMode(ushort(shadowsThreshold *maxVal),
+                      ushort(shadowsThreshold *maxVal / 2),
+                      ushort(hilightsThreshold *maxVal),
+                      ushort(hilightsThreshold *maxVal / 2)), // 21
 };
 
 #include "../pixutils/HSB.h"
@@ -256,99 +268,109 @@ BlendMode *BlendMode::blendMode[] = {
 #include <cstdio>
 #include <functional>
 
-void blendLoop(const ushort s1[], const ushort s2[], ushort d[], const byte m[], const byte cs[],
-               int bands, int s1bd, int s2bd, int s1LineOffset, int s2LineOffset, int dLineOffset,
-               int mLineOffset, int csLineOffset, int s1LineStride, int s2LineStride,
-               int dLineStride, int mLineStride, int csLineStride, int s1PixelStride,
-               int s2PixelStride, int dPixelStride, int mPixelStride, int csPixelStride,
-               int dheight, int dwidth, int intOpacity, int mode) {
-    const bool inverted = intOpacity < 0;
-    intOpacity = abs(intOpacity);
+void blendLoop(const ushort s1[], const ushort s2[], ushort d[], const byte m[],
+               const byte cs[], int bands, int s1bd, int s2bd, int s1LineOffset,
+               int s2LineOffset, int dLineOffset, int mLineOffset,
+               int csLineOffset, int s1LineStride, int s2LineStride,
+               int dLineStride, int mLineStride, int csLineStride,
+               int s1PixelStride, int s2PixelStride, int dPixelStride,
+               int mPixelStride, int csPixelStride, int dheight, int dwidth,
+               int intOpacity, int mode) {
+  const bool inverted = intOpacity < 0;
+  intOpacity = abs(intOpacity);
 
-    const BlendMode *const blender = BlendMode::getBlender(mode);
-    const auto blendPixels = [&](ushort f, ushort b) { return blender->blendPixels(f, b); };
-    const ushort maxVal = BlendMode::maxVal;
+  const BlendMode *const blender = BlendMode::getBlender(mode);
+  const auto blendPixels = [&](ushort f, ushort b) {
+    return blender->blendPixels(f, b);
+  };
+  const ushort maxVal = BlendMode::maxVal;
 
 #pragma omp parallel for schedule(guided)
-    for (int h = 0; h < dheight; h++) {
-        int s1PixelOffset = s1LineOffset + h * s1LineStride;
-        int s2PixelOffset = s2LineOffset + h * s2LineStride;
-        int mPixelOffset = mLineOffset + h * mLineStride;
-        int csPixelOffset = csLineOffset + h * csLineStride;
-        int dPixelOffset = dLineOffset + h * dLineStride;
+  for (int h = 0; h < dheight; h++) {
+    int s1PixelOffset = s1LineOffset + h * s1LineStride;
+    int s2PixelOffset = s2LineOffset + h * s2LineStride;
+    int mPixelOffset = mLineOffset + h * mLineStride;
+    int csPixelOffset = csLineOffset + h * csLineStride;
+    int dPixelOffset = dLineOffset + h * dLineStride;
 
-        for (int w = 0; w < dwidth; w++) {
-            int mValue = 0xFF;
-            if (m != nullptr)
-                mValue = inverted ? 0xFF - m[mPixelOffset] : m[mPixelOffset];
-            if (cs != nullptr)
-                mValue = mValue * cs[csPixelOffset] / 0xFF;
+    for (int w = 0; w < dwidth; w++) {
+      int mValue = 0xFF;
+      if (m != nullptr)
+        mValue = inverted ? 0xFF - m[mPixelOffset] : m[mPixelOffset];
+      if (cs != nullptr)
+        mValue = mValue * cs[csPixelOffset] / 0xFF;
 
-            const ushort pixel[3] = {
-                s2[s2PixelOffset],
-                s2[s2PixelOffset + s2bd],
-                s2[s2PixelOffset + 2 * s2bd],
-            };
+      const ushort pixel[3] = {
+          s2[s2PixelOffset],
+          s2[s2PixelOffset + s2bd],
+          s2[s2PixelOffset + 2 * s2bd],
+      };
 
-            for (int i = 0, s1b = 0; i < bands; i++, s1b += s1bd) {
-                const ushort s2Value = pixel[i];
-                ushort value;
-                if (mValue == 0) {
-                    value = s2Value;
-                } else {
-                    const ushort blended = blendPixels(s1[s1PixelOffset + s1b], s2Value);
-                    if (m == nullptr && cs == nullptr) {
-                        if (intOpacity == maxVal) {
-                            value = blended;
-                        } else {
-                            value = (intOpacity * blended + (maxVal - intOpacity) * s2Value) /
-                                    maxVal;
-                        }
-                    } else {
-                        const int maskedOpacity = (intOpacity * mValue) / 0xFF;
-                        value = (maskedOpacity * blended + (maxVal - maskedOpacity) * s2Value) /
-                                maxVal;
-                    }
-                }
-                d[dPixelOffset + i] = value;
+      for (int i = 0, s1b = 0; i < bands; i++, s1b += s1bd) {
+        const ushort s2Value = pixel[i];
+        ushort value;
+        if (mValue == 0) {
+          value = s2Value;
+        } else {
+          const ushort blended = blendPixels(s1[s1PixelOffset + s1b], s2Value);
+          if (m == nullptr && cs == nullptr) {
+            if (intOpacity == maxVal) {
+              value = blended;
+            } else {
+              value = (intOpacity * blended + (maxVal - intOpacity) * s2Value) /
+                      maxVal;
             }
-
-            s1PixelOffset += s1PixelStride;
-            s2PixelOffset += s2PixelStride;
-            mPixelOffset += mPixelStride;
-            csPixelOffset += csPixelStride;
-            dPixelOffset += dPixelStride;
+          } else {
+            const int maskedOpacity = (intOpacity * mValue) / 0xFF;
+            value =
+                (maskedOpacity * blended + (maxVal - maskedOpacity) * s2Value) /
+                maxVal;
+          }
         }
+        d[dPixelOffset + i] = value;
+      }
+
+      s1PixelOffset += s1PixelStride;
+      s2PixelOffset += s2PixelStride;
+      mPixelOffset += mPixelStride;
+      csPixelOffset += csPixelStride;
+      dPixelOffset += dPixelStride;
     }
+  }
 }
 
 #ifndef AUTO_DEP
 #include "javah/com_lightcrafts_jai_opimage_PixelBlender.h"
 #endif
 
-extern "C" JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_PixelBlender_cUShortLoopCS(
-    JNIEnv *env, jclass cls, jshortArray s1, jshortArray s2, jshortArray d, jbyteArray m,
-    jbyteArray cs, jint bands, jint s1bd, jint s2bd, jint s1LineOffset, jint s2LineOffset,
-    jint dLineOffset, jint mLineOffset, jint csLineOffset, jint s1LineStride, jint s2LineStride,
-    jint dLineStride, jint mLineStride, jint csLineStride, jint s1PixelStride, jint s2PixelStride,
-    jint dPixelStride, jint mPixelStride, jint csPixelStride, jint dheight, jint dwidth,
-    jint jintOpacity, jint mode) {
-    ushort *cs1 = (ushort *)env->GetPrimitiveArrayCritical(s1, 0);
-    ushort *cs2 = (ushort *)env->GetPrimitiveArrayCritical(s2, 0);
-    ushort *cd = (ushort *)env->GetPrimitiveArrayCritical(d, 0);
-    byte *cm = (m != nullptr ? (byte *)env->GetPrimitiveArrayCritical(m, 0) : nullptr);
-    byte *ccs = (cs != nullptr ? (byte *)env->GetPrimitiveArrayCritical(cs, 0) : nullptr);
+extern "C" JNIEXPORT void JNICALL
+Java_com_lightcrafts_jai_opimage_PixelBlender_cUShortLoopCS(
+    JNIEnv *env, jclass cls, jshortArray s1, jshortArray s2, jshortArray d,
+    jbyteArray m, jbyteArray cs, jint bands, jint s1bd, jint s2bd,
+    jint s1LineOffset, jint s2LineOffset, jint dLineOffset, jint mLineOffset,
+    jint csLineOffset, jint s1LineStride, jint s2LineStride, jint dLineStride,
+    jint mLineStride, jint csLineStride, jint s1PixelStride, jint s2PixelStride,
+    jint dPixelStride, jint mPixelStride, jint csPixelStride, jint dheight,
+    jint dwidth, jint jintOpacity, jint mode) {
+  ushort *cs1 = (ushort *)env->GetPrimitiveArrayCritical(s1, 0);
+  ushort *cs2 = (ushort *)env->GetPrimitiveArrayCritical(s2, 0);
+  ushort *cd = (ushort *)env->GetPrimitiveArrayCritical(d, 0);
+  byte *cm =
+      (m != nullptr ? (byte *)env->GetPrimitiveArrayCritical(m, 0) : nullptr);
+  byte *ccs =
+      (cs != nullptr ? (byte *)env->GetPrimitiveArrayCritical(cs, 0) : nullptr);
 
-    blendLoop(cs1, cs2, cd, cm, ccs, bands, s1bd, s2bd, s1LineOffset, s2LineOffset, dLineOffset,
-              mLineOffset, csLineOffset, s1LineStride, s2LineStride, dLineStride, mLineStride,
-              csLineStride, s1PixelStride, s2PixelStride, dPixelStride, mPixelStride, csPixelStride,
-              dheight, dwidth, jintOpacity, mode);
+  blendLoop(cs1, cs2, cd, cm, ccs, bands, s1bd, s2bd, s1LineOffset,
+            s2LineOffset, dLineOffset, mLineOffset, csLineOffset, s1LineStride,
+            s2LineStride, dLineStride, mLineStride, csLineStride, s1PixelStride,
+            s2PixelStride, dPixelStride, mPixelStride, csPixelStride, dheight,
+            dwidth, jintOpacity, mode);
 
-    env->ReleasePrimitiveArrayCritical(s1, cs1, 0);
-    env->ReleasePrimitiveArrayCritical(s2, cs2, 0);
-    env->ReleasePrimitiveArrayCritical(d, cd, 0);
-    if (cm != nullptr)
-        env->ReleasePrimitiveArrayCritical(m, cm, 0);
-    if (ccs != nullptr)
-        env->ReleasePrimitiveArrayCritical(cs, ccs, 0);
+  env->ReleasePrimitiveArrayCritical(s1, cs1, 0);
+  env->ReleasePrimitiveArrayCritical(s2, cs2, 0);
+  env->ReleasePrimitiveArrayCritical(d, cd, 0);
+  if (cm != nullptr)
+    env->ReleasePrimitiveArrayCritical(m, cm, 0);
+  if (ccs != nullptr)
+    env->ReleasePrimitiveArrayCritical(cs, ccs, 0);
 }

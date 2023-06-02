@@ -9,17 +9,17 @@
 
 #include "../pixutils/HSB.h"
 #include "mathlz.h"
-#include <algorithm>
 #include <jni.h>
-#include <math.h>
 #include <omp.h>
+#include <algorithm>
+#include <cmath>
 
 typedef unsigned short ushort;
 
 #ifdef USE_SIMD
 #include "simde/x86/sse2.h"
 #include "dvec.h"
-#include "fvec.h"
+
 inline F32vec4 convert_high(const Iu16vec8 &a) {
     return _mm_cvtepi32_ps(unpack_high(a, (__m128i)_mm_setzero_ps()));
 }
