@@ -25,7 +25,7 @@ Build-Depends:
  liblombok-java,
  liblcms2-dev,
  liblensfun-dev (<< 0.3.95),
- libtiff5-dev,
+ libtiff-dev,
  libx11-dev,
  pkg-config,
  rsync
@@ -35,9 +35,9 @@ Architecture: i386 amd64 armhf arm64
 Section: graphics
 Priority: optional
 Depends:
- ${java:depends},
- ${misc:depends},
- ${shlibs:depends},
+ ${java:Depends},
+ ${misc:Depends},
+ ${shlibs:Depends},
  default-jre (>= 2:1.11),
  javahelp2,
  libejml-java (>= 0.38),
@@ -48,7 +48,7 @@ Depends:
  libjpeg62-turbo | libjpeg-turbo8,
  liblcms2-2,
  liblensfun0 | liblensfun1 (<< 0.3.95),
- libtiff5,
+ libtiff5 | libtiff6,
  libxml2-utils,
 Description: Open-source professional-level digital darkroom software
  LightZone is open-source professional-level digital darkroom software for Windows, Mac OS X, and Linux. Rather than using layers as many other photo editors do, LightZone lets the user build up a stack of tools which can be rearranged, turned off and on, and removed from the stack. It's a non-destructive editor, where any of the tools can be re-adjusted or modified later - even in a different editing session. A tool stack can be copied to a batch of photos at one time. LightZone operates in a 16-bit linear color space with the wide gamut of ProPhoto RGB.

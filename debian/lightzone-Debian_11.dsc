@@ -27,10 +27,11 @@ Build-Depends:
  liblombok-java,
  liblcms2-dev,
  liblensfun-dev (<< 0.3.95),
- libtiff5-dev,
+ libtiff-dev,
  libx11-dev,
  pkg-config,
  rsync
 Package-List:
  lightzone deb graphics optional
+DEBTRANSFORM-RELEASE: 1
 DEBTRANSFORM-TAR: lightzone-4.2.5.tar.xz

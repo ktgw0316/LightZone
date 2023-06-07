@@ -21,13 +21,13 @@ Building the LightZone source requires (at least) following packages:
 - __pkg-config__
 - __rsync__
 
-### Debian (>= 11) and Ubuntu (>= 18.04)
+### Debian (>= 11) and Ubuntu (>= 20.04)
 
 _See also [Packaging on Debian or Ubuntu](#.deb-package-(debian-or-ubuntu)) below._
 
 Install required packages:
 
-    sudo apt-get install debhelper devscripts build-essential ant git-core javahelp2 default-jdk default-jre-headless libglib2.0-dev liblcms2-dev liblensfun-dev libjpeg-dev libtiff5-dev libx11-dev libxml2-utils pkg-config rsync
+    sudo apt-get install debhelper devscripts build-essential ant git-core javahelp2 default-jdk default-jre-headless libglib2.0-dev libjiconfont-google-material-design-icons-java liblcms2-dev liblensfun-dev libjpeg-dev libtiff-dev libx11-dev libxml2-utils pkg-config rsync
 
 _Note: gcc, g++, libc6-dev and make shall be installed with the build-essential._
 
@@ -80,6 +80,15 @@ For instance, if you want to build v4.2.4 in /tmp directory,
     cd lightzone
 
 (If you want to build a package including your modification, you need to create its source tarball by yourself and place the tarball in the parent directory of the source code.)
+
+If you are on Debian >= 12 or Ubuntu >= 22.10, you need to do:
+
+    cp debian/lightzone-Debian_12.dsc debian/lightzone.dsc
+    cp debian/patches/series-Debian_12 debian/patches/series
+
+otherwise:
+
+    cp debian/lightzone-Debian_11.dsc debian/lightzone.dsc
 
 Then
 
