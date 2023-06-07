@@ -12,7 +12,6 @@ import com.lightcrafts.model.SliderConfig;
 import com.lightcrafts.utils.DCRaw;
 import com.lightcrafts.utils.LCMatrix;
 import com.lightcrafts.utils.splines;
-import lombok.val;
 import org.ejml.simple.SimpleMatrix;
 
 import javax.media.jai.JAI;
@@ -220,8 +219,8 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
         double wbr = 0, wbg = 0, wbb = 0;
 
         for (int t = 1000; t < 40000; t+= 0.001 * t) {
-            val B = new LCMatrix(ColorScience.chromaticAdaptation(REF_T, t, caMethod));
-            val combo = XYZtoRGB.mult(B.mult(RGBtoZYX));
+            final var B = new LCMatrix(ColorScience.chromaticAdaptation(REF_T, t, caMethod));
+            final var combo = XYZtoRGB.mult(B.mult(RGBtoZYX));
 
             SimpleMatrix color = new LCMatrix(new float[][]{{pixel[0]}, {pixel[1]}, {pixel[2]}});
             color = combo.mult(color);
@@ -230,7 +229,7 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
             g = color.get(1, 0);
             b = color.get(2, 0);
 
-            val tSat = ColorScience.saturation(r, g, b);
+            final var tSat = ColorScience.saturation(r, g, b);
 
             if (tSat < sat) {
                 sat = tSat;
@@ -255,12 +254,12 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
     }
 
     static public float[][] whiteBalanceMatrix(float source, float REF_T, float mult, float[][] cameraRGB, ColorScience.CAMethod caMethod) {
-        val B = new LCMatrix(ColorScience.chromaticAdaptation(REF_T, source, caMethod));
+        final var B = new LCMatrix(ColorScience.chromaticAdaptation(REF_T, source, caMethod));
         SimpleMatrix combo = XYZtoRGB.mult(B.mult(RGBtoZYX));
 
-        val m = combo.mult(new LCMatrix(new float[][]{{1},{1},{1}}));
+        final var m = combo.mult(new LCMatrix(new float[][]{{1},{1},{1}}));
 
-        val max = (float) m.get(1, 0); // Math.max(m.get(1, 0), Math.max(m.get(1, 0), m.get(2, 0)));
+        final var max = (float) m.get(1, 0); // Math.max(m.get(1, 0), Math.max(m.get(1, 0), m.get(2, 0)));
         if (max != 1)
             combo = combo.mult(new LCMatrix(new float[][]{{1/max, 0, 0},{0, 1/max, 0},{0, 0, 1/max}}));
 

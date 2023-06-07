@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import lombok.Getter;
-import lombok.val;
 
 /**
  * A dynamic data model for an image browser, consisting of a sorted list of
@@ -119,7 +118,7 @@ public class ImageList {
             // Perform a synchronous, one-pass scan of the directory, to
             // preempt an avalanche of access to the ImageList when the
             // ImageTaskQueue thread starts.
-            val files = FileUtil.listFiles(directory, ImageFileFilter.INSTANCE, false);
+            final var files = FileUtil.listFiles(directory, ImageFileFilter.INSTANCE, false);
             if (files != null) {
                 progress.setMinimum(0);
                 progress.setMaximum(files.length);
@@ -282,12 +281,12 @@ public class ImageList {
 
     // Used in ImageListPoller when a new File is discovered.
     void addFile(File file) {
-        val datum = new ImageDatum(file, size, queue, cache);
+        final var datum = new ImageDatum(file, size, queue, cache);
         datum.refresh(false); // reads metadata, enqueues thumbnailing
         synchronized(list) {
             list.add(datum);
             sort();
-            val index = list.indexOf(datum);
+            final var index = list.indexOf(datum);
             EventQueue.invokeLater(() -> notifyAdded(datum, index));
         }
     }
@@ -296,7 +295,7 @@ public class ImageList {
     // no longer exists.
     void removeImageData(final ImageDatum datum) {
         synchronized(list) {
-            val index = list.indexOf(datum);
+            final var index = list.indexOf(datum);
             list.remove(datum);
             sort();
             EventQueue.invokeLater(() -> notifyRemoved(datum, index));
@@ -340,7 +339,7 @@ public class ImageList {
                     .sorted(comp)
                     .distinct()
                     .flatMap(leader -> {
-                        val members = leader.getGroup().getImageDatums();
+                        final var members = leader.getGroup().getImageDatums();
                         return Stream.concat(Stream.of(leader),
                                 members.stream()
                                         .filter(m -> !m.equals(leader))
@@ -377,12 +376,12 @@ public class ImageList {
         System.out.println(msg + " " + pauseDepth);
         System.out.println('\t' + Thread.currentThread().getName());
         System.out.println('\t' + this.toString());
-        val t = new Throwable();
-        val stack = t.getStackTrace();
+        final var t = new Throwable();
+        final var stack = t.getStackTrace();
         Arrays.stream(stack)
                 .skip(3)
                 .filter(frame -> {
-                    val name = frame.getClassName();
+                    final var name = frame.getClassName();
                     return (!name.contains("java.awt.") && !name.contains("javax.swing."));
                 })
                 .forEach(frame -> System.out.println("\tat " + frame));

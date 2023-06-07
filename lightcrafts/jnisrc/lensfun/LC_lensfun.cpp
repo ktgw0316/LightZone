@@ -3,6 +3,7 @@
 #include "LC_lensfun.h"
 
 #include <cmath>
+#include <cstdint>
 #include <cstring>
 #include <vector>
 #include <omp.h>

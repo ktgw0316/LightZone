@@ -6,7 +6,6 @@ package com.lightcrafts.image.metadata.makernotes;
 import com.lightcrafts.image.metadata.ImageMetadata;
 
 import lombok.NoArgsConstructor;
-import lombok.val;
 
 /**
  * <code>KodakMakerNoteProbe</code> is-a {@link MakerNoteProbe} for determining
@@ -32,11 +31,11 @@ final class KodakMakerNoteProbe extends MakerNoteProbe<KodakDirectory>
         if (matchUsingMake(metadata) == null) {
             return null;
         }
-        val cameraMakeModel = metadata.getCameraMake(true);
+        final var cameraMakeModel = metadata.getCameraMake(true);
         if (cameraMakeModel == null) {
             return null;
         }
-        for (val model : m_models) {
+        for (final var model : m_models) {
             if (cameraMakeModel.contains(model)) {
                 return KodakDirectory.class;
             }

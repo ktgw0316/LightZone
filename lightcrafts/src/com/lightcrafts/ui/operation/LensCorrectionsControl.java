@@ -5,8 +5,6 @@ package com.lightcrafts.ui.operation;
 import com.lightcrafts.model.GenericOperation;
 import com.lightcrafts.ui.operation.generic.GenericControl;
 
-import lombok.val;
-
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,18 +28,18 @@ public class LensCorrectionsControl extends GenericControl {
         return new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                val value = (String) choice.getSelectedItem();
+                final var value = (String) choice.getSelectedItem();
                 op.setChoiceValue(key, value);
                 undoSupport.postEdit(key + " Choice");
 
                 // Dynamically update lenses based on camera choice
                 if (key.equals(CAMERA_NAME)) {
-                    val _values = op.getChoiceValues(LENS_NAME);
-                    val _choice = choices.get(LENS_NAME);
-                    val _oldSelection = (String)_choice.getSelectedItem();
+                    final var _values = op.getChoiceValues(LENS_NAME);
+                    final var _choice = choices.get(LENS_NAME);
+                    final var _oldSelection = (String)_choice.getSelectedItem();
                     _choice.removeAllItems();
                     String _selection = null;
-                    for (val _value : _values) {
+                    for (final var _value : _values) {
                         _choice.addItem(_value);
                         if (_value.equals(_oldSelection)) {
                             _selection = _value;
@@ -59,15 +57,15 @@ public class LensCorrectionsControl extends GenericControl {
         return new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent event) {
-                val value = checkbox.isSelected();
+                final var value = checkbox.isSelected();
                 op.setCheckboxValue(key, value);
                 undoSupport.postEdit(key + " Checkbox");
 
                 // Enable/disable the choices and the sliders
-                for (val key : choices.keySet()) {
+                for (final var key : choices.keySet()) {
                     choices.get(key).setEnabled(! value);
                 }
-                for (val key : sliders.keySet()) {
+                for (final var key : sliders.keySet()) {
                     sliders.get(key).setEnabled(value);
                 }
             }

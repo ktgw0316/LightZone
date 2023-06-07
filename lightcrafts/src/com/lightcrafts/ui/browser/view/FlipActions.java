@@ -7,8 +7,6 @@ import com.lightcrafts.ui.browser.model.ImageDatum;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 
-import lombok.val;
-
 import static com.lightcrafts.ui.browser.view.Locale.LOCALE;
 
 /**
@@ -57,15 +55,15 @@ class FlipActions {
     }
 
     static void flipHorizontal(AbstractImageBrowser browser) {
-        val datums = browser.getSelectedDatums();
-        for (val datum : datums) {
+        final var datums = browser.getSelectedDatums();
+        for (final var datum : datums) {
             flipHorizontal(datum, browser);
         }
     }
 
     static void flipVertical(AbstractImageBrowser browser) {
-        val datums = browser.getSelectedDatums();
-        for (val datum : datums) {
+        final var datums = browser.getSelectedDatums();
+        for (final var datum : datums) {
             flipVertical(datum, browser);
         }
     }
@@ -93,9 +91,9 @@ class FlipActions {
     }
 
     private static boolean hasNonLznSelection(SelectionAction action) {
-        val datums = action.getSelection();
-        for (val datum : datums) {
-            val type = datum.getType();
+        final var datums = action.getSelection();
+        for (final var datum : datums) {
+            final var type = datum.getType();
             if (! type.hasLznData()) {
                 return true;
             }

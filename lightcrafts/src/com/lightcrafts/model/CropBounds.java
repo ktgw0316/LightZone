@@ -13,7 +13,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.val;
 
 /**
  * A CropBounds is an immutable rectangular shape which may be at an
@@ -104,13 +103,13 @@ public class CropBounds implements Cloneable {
       * screen coordinates, as returned from Engine.getTransform().
       */
     public CropBounds(Rectangle2D screenRect, AffineTransform xform) {
-        val ul = new Point2D.Double(
+        final var ul = new Point2D.Double(
             screenRect.getX(), screenRect.getY()
         );
-        val ll = new Point2D.Double(
+        final var ll = new Point2D.Double(
             screenRect.getX(), screenRect.getY() + screenRect.getHeight()
         );
-        val ur = new Point2D.Double(
+        final var ur = new Point2D.Double(
             screenRect.getX() + screenRect.getWidth(), screenRect.getY()
         );
         if (xform != null) {
@@ -127,11 +126,11 @@ public class CropBounds implements Cloneable {
         center = new Point2D.Double(
             (ur.getX() + ll.getX()) / 2, (ur.getY() + ll.getY()) / 2
         );
-        val topDx = ur.getX() - ul.getX();
-        val topDy = ur.getY() - ul.getY();
+        final var topDx = ur.getX() - ul.getX();
+        final var topDy = ur.getY() - ul.getY();
 
-        val leftDx = ll.getX() - ul.getX();
-        val leftDy = ll.getY() - ul.getY();
+        final var leftDx = ll.getX() - ul.getX();
+        final var leftDy = ll.getY() - ul.getY();
 
         angle = Math.atan2(topDy, topDx);
         width = Math.sqrt(topDx * topDx + topDy * topDy);
@@ -172,24 +171,24 @@ public class CropBounds implements Cloneable {
     ) {
         final CropBounds newBounds;
         if (oldBounds.isAngleOnly()) {
-            val angle = oldBounds.getAngle();
+            final var angle = oldBounds.getAngle();
 
-            val origin = new Point2D.Double(0, 0);
-            val unit = new Point2D.Double(Math.cos(angle), Math.sin(angle));
+            final var origin = new Point2D.Double(0, 0);
+            final var unit = new Point2D.Double(Math.cos(angle), Math.sin(angle));
 
             xform.transform(origin, origin);
             xform.transform(unit, unit);
 
-            val dx = unit.getX() - origin.getX();
-            val dy = unit.getY() - origin.getY();
+            final var dx = unit.getX() - origin.getX();
+            final var dy = unit.getY() - origin.getY();
 
             newBounds = new CropBounds(Math.atan2(dy, dx));
         }
         else {
-            val ul = oldBounds.getUpperLeft();
-            val ur = oldBounds.getUpperRight();
-            val ll = oldBounds.getLowerLeft();
-            val lr = oldBounds.getLowerRight();
+            final var ul = oldBounds.getUpperLeft();
+            final var ur = oldBounds.getUpperRight();
+            final var ll = oldBounds.getLowerLeft();
+            final var lr = oldBounds.getLowerRight();
 
             xform.transform(ul, ul);
             xform.transform(ur, ur);
@@ -198,8 +197,8 @@ public class CropBounds implements Cloneable {
 
             newBounds = new CropBounds(ul, ur, ll, lr);
         }
-        val hFlip = oldBounds.isFlippedHorizontally();
-        val vFlip = oldBounds.isFlippedVertically();
+        final var hFlip = oldBounds.isFlippedHorizontally();
+        final var vFlip = oldBounds.isFlippedVertically();
         if (hFlip || vFlip) {
             newBounds.flip(hFlip, vFlip);
         }
@@ -215,15 +214,15 @@ public class CropBounds implements Cloneable {
     }
 
     public CropBounds(Point2D ul, Point2D ur, Point2D ll, Point2D lr) {
-        val topDx = ur.getX() - ul.getX();
-        val topDy = ur.getY() - ul.getY();
-//        val bottomDx = lr.getX() - ll.getX();
-//        val bottomDy = lr.getY() - ll.getY();
+        final var topDx = ur.getX() - ul.getX();
+        final var topDy = ur.getY() - ul.getY();
+//        final var bottomDx = lr.getX() - ll.getX();
+//        final var bottomDy = lr.getY() - ll.getY();
 
-        val leftDx = ll.getX() - ul.getX();
-        val leftDy = ll.getY() - ul.getY();
-//        val rightDx = lr.getX() - ur.getX();
-//        val rightDy = lr.getY() - ur.getY();
+        final var leftDx = ll.getX() - ul.getX();
+        final var leftDy = ll.getY() - ul.getY();
+//        final var rightDx = lr.getX() - ur.getX();
+//        final var rightDy = lr.getY() - ur.getY();
 
         angle = Math.atan2(topDy, topDx);
 //        angle = Math.atan2(bottomDy, bottomDx);
@@ -236,16 +235,16 @@ public class CropBounds implements Cloneable {
         height = Math.sqrt(leftDx * leftDx + leftDy * leftDy);
 //        height = Math.sqrt(rightDx * rightDx + rightDy * rightDy);
 
-        val x = (ul.getX() + lr.getX()) / 2;
-        val y = (ul.getY() + lr.getY()) / 2;
+        final var x = (ul.getX() + lr.getX()) / 2;
+        final var y = (ul.getY() + lr.getY()) / 2;
         center = new Point2D.Double(x, y);
     }
 
     public Point2D getUpperLeft() {
-        val p = new Point2D.Double(
+        final var p = new Point2D.Double(
             center.getX() - width / 2, center.getY() - height / 2
         );
-        val xform = AffineTransform.getRotateInstance(
+        final var xform = AffineTransform.getRotateInstance(
             angle, center.getX(), center.getY()
         );
         xform.transform(p, p);
@@ -253,10 +252,10 @@ public class CropBounds implements Cloneable {
     }
 
     public Point2D getUpperRight() {
-        val p = new Point2D.Double(
+        final var p = new Point2D.Double(
             center.getX() + width / 2, center.getY() - height / 2
         );
-        val xform = AffineTransform.getRotateInstance(
+        final var xform = AffineTransform.getRotateInstance(
             angle, center.getX(), center.getY()
         );
         xform.transform(p, p);
@@ -264,10 +263,10 @@ public class CropBounds implements Cloneable {
     }
 
     public Point2D getLowerLeft() {
-        val p = new Point2D.Double(
+        final var p = new Point2D.Double(
             center.getX() - width / 2, center.getY() + height / 2
         );
-        val xform = AffineTransform.getRotateInstance(
+        final var xform = AffineTransform.getRotateInstance(
             angle, center.getX(), center.getY()
         );
         xform.transform(p, p);
@@ -275,10 +274,10 @@ public class CropBounds implements Cloneable {
     }
 
     public Point2D getLowerRight() {
-        val p = new Point2D.Double(
+        final var p = new Point2D.Double(
             center.getX() + width / 2, center.getY() + height / 2
         );
-        val xform = AffineTransform.getRotateInstance(
+        final var xform = AffineTransform.getRotateInstance(
             angle, center.getX(), center.getY()
         );
         xform.transform(p, p);

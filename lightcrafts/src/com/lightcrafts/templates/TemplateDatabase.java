@@ -11,8 +11,6 @@ import com.lightcrafts.utils.file.FileUtil;
 import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlDocument;
 
-import lombok.val;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -88,7 +86,7 @@ public class TemplateDatabase {
                 return false;
             }
         };
-        val files = FileUtil.listFiles(TemplateDir, filter, false);
+        final var files = FileUtil.listFiles(TemplateDir, filter, false);
         if (files == null) {
             throw new TemplateException(
                 "Couldn't read Template names from " +
@@ -96,7 +94,7 @@ public class TemplateDatabase {
             );
         }
         List<TemplateKey> keys = new ArrayList<TemplateKey>();
-        for (val file : files) {
+        for (final var file : files) {
             TemplateKey key = new TemplateKey(file);
             keys.add(key);
         }
@@ -177,7 +175,7 @@ public class TemplateDatabase {
     public static void setDefaultTemplate(ImageMetadata meta, TemplateKey key)
         throws TemplateException
     {
-        val camera = meta.getCameraMake(true);
+        final var camera = meta.getCameraMake(true);
         if (camera == null) {
             return;
         }
@@ -198,12 +196,12 @@ public class TemplateDatabase {
         if (!isRaw) {
             return null;
         }
-        val camera = meta.getCameraMake(true);
+        final var camera = meta.getCameraMake(true);
         if (camera == null) {
             return null;
         }
 
-        val key = new TemplateKey(CameraDefaultNamespace, camera);
+        final var key = new TemplateKey(CameraDefaultNamespace, camera);
         XmlDocument xml;
         try {
             xml = getTemplateDocument(key);
@@ -222,17 +220,17 @@ public class TemplateDatabase {
 
     // Legacy preferences-based default mechanism.
     private static TemplateKey getDefaultFromPrefs(ImageMetadata meta) {
-        val camera = meta.getCameraMake(true);
+        final var camera = meta.getCameraMake(true);
         if (camera == null) {
             return null;
         }
-        val name = Prefs.get(camera, null);
+        final var name = Prefs.get(camera, null);
         if (name == null) {
             return null;
         }
 
         XmlDocument xml = null;
-        val key = new TemplateKey(CameraDefaultNamespace, name);
+        final var key = new TemplateKey(CameraDefaultNamespace, name);
         try {
             xml = getTemplateDocument(key);
         }
@@ -294,8 +292,8 @@ public class TemplateDatabase {
     // successful, the preferences are erased.
     private static void migratePrefsTemplates() {
         try {
-            val names = getPrefsTemplateNames();
-            for (val name : names) {
+            final var names = getPrefsTemplateNames();
+            for (final var name : names) {
                 try {
                     XmlDocument doc = getPrefsTemplateDocument(name);
                     TemplateKey newKey = new TemplateKey("", name);
@@ -340,24 +338,24 @@ public class TemplateDatabase {
             return;
         }
 
-        val home = System.getProperty("user.home");
-        val oldTemplateDir = new File(home, oldPath);
+        final var home = System.getProperty("user.home");
+        final var oldTemplateDir = new File(home, oldPath);
         if (!oldTemplateDir.isDirectory()) {
             return;
         }
-        val oldFiles = FileUtil.listFiles(oldTemplateDir);
+        final var oldFiles = FileUtil.listFiles(oldTemplateDir);
         if (oldFiles == null) {
             return;
         }
-        for (val oldFile : oldFiles) {
-            val newFile = new File(TemplateDir, oldFile.getName());
+        for (final var oldFile : oldFiles) {
+            final var newFile = new File(TemplateDir, oldFile.getName());
             try {
                 FileUtil.copyFile(oldFile, newFile);
                 System.out.println(
                     "Copied a template from " +
                     oldFile + " to " + newFile
                 );
-                val msg = oldTemplateDir.delete()
+                final var msg = oldTemplateDir.delete()
                         ? "Deleted an old template at "
                         : "Failed to delete an old template at ";
                 System.out.println(msg + oldFile);
@@ -372,7 +370,7 @@ public class TemplateDatabase {
             }
         }
         // All files in the old folder were successfully copied.
-        val msg = oldTemplateDir.delete()
+        final var msg = oldTemplateDir.delete()
                 ? "Deleted old template folder "
                 : "Failed to delete old template folder ";
         System.out.println(msg + oldTemplateDir.getAbsolutePath());
@@ -414,10 +412,10 @@ public class TemplateDatabase {
         throws TemplateException
     {
         try {
-            val keys = Prefs.keys();
+            final var keys = Prefs.keys();
             ArrayList<String> names = new ArrayList<String>();
-            for (val key : keys) {
-                val name = getNameFromPrefsKey(key);
+            for (final var key : keys) {
+                final var name = getNameFromPrefsKey(key);
                 if (name != null) {
                     names.add(name);
                 }
@@ -435,15 +433,15 @@ public class TemplateDatabase {
         throws TemplateException
     {
         try {
-            val key = getPrefsKeyFromName(name);
-            val text = Prefs.get(key, null);
+            final var key = getPrefsKeyFromName(name);
+            final var text = Prefs.get(key, null);
             if (text == null) {
                 throw new TemplateException(
                     "No template named \"" + name + "\""
                 );
             }
-            val bytes = text.getBytes();
-            val in = new ByteArrayInputStream(bytes);
+            final var bytes = text.getBytes();
+            final var in = new ByteArrayInputStream(bytes);
             return new XmlDocument(in);
         }
         catch (IOException e) {
@@ -454,7 +452,7 @@ public class TemplateDatabase {
     }
 
     private static void removePrefsTemplateDocument(String name) {
-        val key = getPrefsKeyFromName(name);
+        final var key = getPrefsKeyFromName(name);
         Prefs.remove(key);
     }
 

@@ -8,7 +8,6 @@ import com.lightcrafts.image.UnknownImageTypeException;
 import com.lightcrafts.platform.AlertDialog;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.ui.export.ExportNameUtility;
-import lombok.val;
 
 import javax.swing.*;
 import java.awt.*;
@@ -47,7 +46,7 @@ class FileActions {
         );
         if (option != 0) return;
 
-        val desktop = getAwtDesktop();
+        final var desktop = getAwtDesktop();
 
         for (File file : files) {
             boolean deleted = desktop.map(d -> d.moveToTrash(file)).orElse(false);
@@ -72,7 +71,7 @@ class FileActions {
     private static Optional<Desktop> getAwtDesktop() {
         if (! Desktop.isDesktopSupported())
             return Optional.empty();
-        val desktop = Desktop.getDesktop();
+        final var desktop = Desktop.getDesktop();
         return desktop.isSupported(Desktop.Action.MOVE_TO_TRASH)
                 ? Optional.of(desktop)
                 : Optional.empty();

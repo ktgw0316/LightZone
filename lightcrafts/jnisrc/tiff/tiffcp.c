@@ -41,15 +41,15 @@
 #include <inttypes.h>
 
 #if UINTPTR_MAX == 0xffffffffffffffff
-#  define TIFF_SSIZE_FORMAT PRId64
+#define TIFF_SSIZE_FORMAT PRId64
 #elif UINTPTR_MAX == 0xffffffff
-#  define TIFF_SSIZE_FORMAT PRId32
+#define TIFF_SSIZE_FORMAT PRId32
 #else
-#  error "Unsupported size_t size; please submit a bug report"
+#error "Unsupported size_t size; please submit a bug report"
 #endif
 
-
 #include <limits.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -96,7 +96,7 @@ static uint16_t orientation;
 static uint32_t rowsperstrip;
 static uint32_t g3opts;
 static int ignore = FALSE; /* if true, ignore read errors */
-static int quality = 75; /* JPEG quality */
+static int quality = 75;   /* JPEG quality */
 static int jpegcolormode = JPEGCOLORMODE_RGB;
 static int subcodec = -1;
 

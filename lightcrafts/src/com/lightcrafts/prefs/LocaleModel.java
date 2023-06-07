@@ -5,7 +5,6 @@
 package com.lightcrafts.prefs;
 
 import lombok.Getter;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -25,13 +24,13 @@ public class LocaleModel {
     private static final List<String> availableLanguages = new ArrayList<>();
     static {
         availableLanguages.add(defaultLanguage);
-        val langList = Arrays.asList(resource.getString("availableLanguages").split(","));
+        final var langList = Arrays.asList(resource.getString("availableLanguages").split(","));
         availableLanguages.addAll(langList);
     }
 
     @NotNull
     public static String setDefaultFromPreference() {
-        val lang = Prefs.get(Key, defaultLanguage);
+        final var lang = Prefs.get(Key, defaultLanguage);
         if (!lang.equals(defaultLanguage) && availableLanguages.contains(lang)) {
             Locale.setDefault(new Locale(lang));
             return lang;

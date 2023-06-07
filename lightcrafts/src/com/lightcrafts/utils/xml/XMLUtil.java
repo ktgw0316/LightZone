@@ -6,7 +6,6 @@ package com.lightcrafts.utils.xml;
 import com.lightcrafts.utils.TextUtil;
 import com.lightcrafts.utils.file.FileUtil;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 import org.w3c.dom.CharacterData;
 import org.w3c.dom.*;
 import org.xml.sax.ErrorHandler;
@@ -163,9 +162,9 @@ public final class XMLUtil {
      * satisfy the given filter.
      */
     public static Node[] getChildrenOf( Element parent, XMLFilter filter ) {
-        val result = new ArrayList<Node>();
-        val children = asList(parent.getChildNodes());
-        for (val child : children) {
+        final var result = new ArrayList<Node>();
+        final var children = asList(parent.getChildNodes());
+        for (final var child : children) {
             if ( filter.accept( child ) )
                 result.add( child );
         }
@@ -180,9 +179,9 @@ public final class XMLUtil {
      * @return Returns the coalesced text.
      */
     public static String getCoalescedTextChildrenOf( Element parent ) {
-        val buf = new StringBuilder();
-        val children = asList(parent.getChildNodes());
-        for (val child : children) {
+        final var buf = new StringBuilder();
+        final var children = asList(parent.getChildNodes());
+        for (final var child : children) {
             if ( child instanceof Text )
                 buf.append( ((CharacterData)child).getData() );
         }
@@ -200,8 +199,8 @@ public final class XMLUtil {
      * filter.
      */
     public static Node getFirstChildOf( Element parent, XMLFilter filter ) {
-        val children = asList(parent.getChildNodes());
-        for (val child : children) {
+        final var children = asList(parent.getChildNodes());
+        for (final var child : children) {
             if ( filter.accept( child ) )
                 return child;
         }
@@ -230,8 +229,8 @@ public final class XMLUtil {
      * child node that satisfies the given filter.
      */
     public static boolean hasChild( Element parent, XMLFilter filter ) {
-        val children = asList(parent.getChildNodes());
-        for (val child : children) {
+        final var children = asList(parent.getChildNodes());
+        for (final var child : children) {
             if ( filter.accept( child ) )
                 return true;
         }
@@ -294,7 +293,7 @@ public final class XMLUtil {
      */
     public static void removeChildrenFrom( Element parent ) {
         while ( true ) {
-            val child = parent.getLastChild();
+            final var child = parent.getLastChild();
             if ( child == null )
                 return;
             parent.removeChild( child );
@@ -310,8 +309,8 @@ public final class XMLUtil {
      * @see #removeChildrenFrom(Element)
      */
     public static void removeChildrenFrom( Element parent, XMLFilter filter ) {
-        val children = asReversedArray(parent.getChildNodes());
-        for (val child : children) {
+        final var children = asReversedArray(parent.getChildNodes());
+        for (final var child : children) {
             if (filter.accept(child)) {
                 parent.removeChild(child);
             }
@@ -405,7 +404,7 @@ public final class XMLUtil {
      * @return Said array of Nodes.
      */
     static Node[] asReversedArray(NodeList nodes) {
-        val list = asListReversed(nodes);
+        final var list = asListReversed(nodes);
         return list.toArray(new Node[list.size()]);
     }
 

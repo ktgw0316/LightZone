@@ -10,7 +10,6 @@ import com.lightcrafts.image.metadata.CoreTags;
 import com.lightcrafts.image.metadata.ImageMetadata;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.Color;
@@ -63,9 +62,9 @@ public class UrgencyMetadataEntry extends SimpleMetadataEntry {
     @NotNull
     @Override
     public UrgencyObject getValue(ImageMetadata meta) {
-        val dir = meta.getDirectoryFor(clazz);
-        val metaValue = dir != null ? dir.getValue(tagID) : null;
-        val value = metaValue != null ? metaValue.getIntValue() : 0;
+        final var dir = meta.getDirectoryFor(clazz);
+        final var metaValue = dir != null ? dir.getValue(tagID) : null;
+        final var value = metaValue != null ? metaValue.getIntValue() : 0;
         return new UrgencyObject(value);
     }
 

@@ -12,7 +12,6 @@ import com.lightcrafts.model.Region;
 import com.lightcrafts.model.ZoneOperation;
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.utils.Segment;
-import lombok.val;
 
 import javax.media.jai.BorderExtender;
 import javax.media.jai.JAI;
@@ -47,8 +46,8 @@ public class ZoneFinder extends Preview implements PaintListener {
         if (p == null || engine == null)
             return;
 
-        val sample = engine.getAveragedPixelValue(p.x, p.y);
-        val zone = (sample != null) ? (int) Math.round(calcZone(sample)) : -1;
+        final var sample = engine.getAveragedPixelValue(p.x, p.y);
+        final var zone = (sample != null) ? (int) Math.round(calcZone(sample)) : -1;
         setFocusedZone(zone);
         // repaint();
     }
@@ -220,8 +219,8 @@ public class ZoneFinder extends Preview implements PaintListener {
     static private final int[] colors = new int[steps + 1];
     static {
         for (int i = 0; i < steps; i++) {
-            val color = (float) ((Math.pow(2, i * 8.0 / (steps - 1)) - 1) / 255.);
-            val srgbColor = Functions.fromLinearToCS(JAIContext.systemColorSpace, new float[] {color, color, color});
+            final var color = (float) ((Math.pow(2, i * 8.0 / (steps - 1)) - 1) / 255.);
+            final var srgbColor = Functions.fromLinearToCS(JAIContext.systemColorSpace, new float[] {color, color, color});
             colors[i] = (int) (255 * srgbColor[0]);
         }
         colors[steps] = colors[steps - 1];

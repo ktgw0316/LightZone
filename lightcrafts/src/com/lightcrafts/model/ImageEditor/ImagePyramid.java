@@ -10,8 +10,6 @@ import javax.media.jai.Interpolation;
 import javax.media.jai.JAI;
 import javax.media.jai.RenderedOp;
 
-import lombok.val;
-
 import java.awt.*;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
@@ -64,13 +62,13 @@ class ImagePyramid {
     }
 
     RenderedOp createDownScaleOp(RenderedImage src, int ratio) {
-        val kernel = Functions.getLanczos2Kernel(ratio);
-        val ko = kernel.getXOrigin();
-        val kdata = kernel.getHorizontalKernelData();
-        val qsFilterArray = new float[kdata.length - ko];
+        final var kernel = Functions.getLanczos2Kernel(ratio);
+        final var ko = kernel.getXOrigin();
+        final var kdata = kernel.getHorizontalKernelData();
+        final var qsFilterArray = new float[kdata.length - ko];
         System.arraycopy(kdata, ko, qsFilterArray, 0, qsFilterArray.length);
 
-        val params = new ParameterBlock();
+        final var params = new ParameterBlock();
         params.addSource(src);
         params.add(ratio);
         params.add(ratio);

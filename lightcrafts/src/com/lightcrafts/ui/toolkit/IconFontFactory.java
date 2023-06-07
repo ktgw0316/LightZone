@@ -8,7 +8,6 @@ import jiconfont.IconCode;
 import jiconfont.icons.FontAwesome;
 import jiconfont.icons.google_material_design_icons.GoogleMaterialDesignIcons;
 import jiconfont.swing.IconFontSwing;
-import lombok.val;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -33,19 +32,19 @@ public final class IconFontFactory {
     }
 
     public static Icon buildIcon(String name, float size, @Nullable Color color) {
-        val code = iconCodeMap.get(name);
+        final var code = iconCodeMap.get(name);
         return buildIcon(code, size, color);
     }
 
     public static BufferedImage buildIconImage(String name, float size) {
-        val icon = buildIcon(name, size);
+        final var icon = buildIcon(name, size);
         final int width = icon.getIconWidth();
         final int height = icon.getIconHeight();
         if (width < 0 || height < 0) {
             return null;
         }
-        val bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        val g = bi.createGraphics();
+        final var bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        final var g = bi.createGraphics();
         icon.paintIcon(null, g, 0, 0);
         g.dispose();
         return bi;

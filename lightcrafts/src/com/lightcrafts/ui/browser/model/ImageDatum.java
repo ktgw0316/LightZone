@@ -11,7 +11,6 @@ import com.lightcrafts.utils.filecache.FileCache;
 import com.lightcrafts.utils.tuple.Pair;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.val;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
@@ -152,8 +151,8 @@ public class ImageDatum {
         if ((type == null) || type.hasLznData()) {
             throw new IOException(LOCALE.get("CantFlipLzn"));
         }
-        val info = ImageInfo.getInstanceFor(file);
-        val meta = info.getMetadata();
+        final var info = ImageInfo.getInstanceFor(file);
+        final var meta = info.getMetadata();
         meta.setOrientation(meta.getOrientation().getHFlip());
         commitFlip(info, true, false);
     }
@@ -168,8 +167,8 @@ public class ImageDatum {
         if ((type == null) || type.hasLznData()) {
             throw new IOException(LOCALE.get("CantFlipLzn"));
         }
-        val info = ImageInfo.getInstanceFor(file);
-        val meta = info.getMetadata();
+        final var info = ImageInfo.getInstanceFor(file);
+        final var meta = info.getMetadata();
         meta.setOrientation(meta.getOrientation().getVFlip());
         commitFlip(info, false, true);
     }
@@ -268,7 +267,7 @@ public class ImageDatum {
 
         // Don't assume that our metadata member "meta" is non-null--
         // this method may get called after a refresh and before our task runs.
-        val updater = new PreviewUpdater(cache, preview, getMetadata(true), provider);
+        final var updater = new PreviewUpdater(cache, preview, getMetadata(true), provider);
 
         previews.add(updater);
 
@@ -371,8 +370,8 @@ public class ImageDatum {
     private void updateMetadata(ImageMetadata meta) {
         this.meta = new ImageMetadata();
 
-        val core = meta.getDirectoryFor(CoreDirectory.class, true);
-        val thisCore = this.meta.getDirectoryFor(CoreDirectory.class, true);
+        final var core = meta.getDirectoryFor(CoreDirectory.class, true);
+        final var thisCore = this.meta.getDirectoryFor(CoreDirectory.class, true);
 
         // Tags used for presentation:
         Stream.of(
@@ -393,7 +392,7 @@ public class ImageDatum {
                 .forEach(thisCore::putValue);
 
         // One more tag, used to determine the ImageDatumType for TIFFs
-        val xmpValue = meta.getValue(TIFFDirectory.class, TIFF_XMP_PACKET);
+        final var xmpValue = meta.getValue(TIFFDirectory.class, TIFF_XMP_PACKET);
         if (xmpValue != null) {
             ImageMetadataDirectory thisTiff =
                 this.meta.getDirectoryFor(TIFFDirectory.class, true);
@@ -491,12 +490,12 @@ public class ImageDatum {
         if (image == null) {
             return;
         }
-        val img = image.get();
+        final var img = image.get();
         if (img == null) {
             return;
         }
         // Push a rotation change out to all running PreviewUpdaters.
-        val newRefs = previews.stream()
+        final var newRefs = previews.stream()
                 .filter(Objects::nonNull) // Just in case
                 .map(updater -> new PreviewUpdater(updater, img, meta))
                 .collect(Collectors.toList());
@@ -606,7 +605,7 @@ public class ImageDatum {
         if (key == null) {
             return;
         }
-        try (val out = new ObjectOutputStream(cache.putToStream(key))) {
+        try (final var out = new ObjectOutputStream(cache.putToStream(key))) {
             out.writeObject(obj);
         } catch (IOException e) {
             System.err.println(errorMessage + e.getMessage());

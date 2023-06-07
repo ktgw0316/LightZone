@@ -8,7 +8,6 @@ import com.lightcrafts.image.export.ImageFileExportOptions;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.ui.export.ExportMultiControls;
 import lombok.Setter;
-import lombok.val;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -60,42 +59,42 @@ public class BatchConfiguratorView implements BatchConfiguratorContract.View {
         dirLabel = new JTextField(presenter.getDirLabelText());
         dirLabel.setEditable(false);
 
-        val dirButton = new JButton(LOCALE.get("BatchConfOutputChooserButton"));
+        final var dirButton = new JButton(LOCALE.get("BatchConfOutputChooserButton"));
         dirButton.addActionListener(e -> presenter.onDirButtonPressed());
 
-        val batchLabel = new JTextField(presenter.getBatchLabelText());
+        final var batchLabel = new JTextField(presenter.getBatchLabelText());
         batchLabel.getDocument().addDocumentListener(batchLabelDocumentListener);
         batchLabel.setPreferredSize(new Dimension(160, batchLabel.getPreferredSize().height));
         batchLabel.setMaximumSize(batchLabel.getPreferredSize());
 
-        val exportCtrls = new ExportMultiControls(presenter.getImageExportOptions(), dialog, false);
+        final var exportCtrls = new ExportMultiControls(presenter.getImageExportOptions(), dialog, false);
 
-        val start = new JButton(LOCALE.get("BatchConfStartButton"));
+        final var start = new JButton(LOCALE.get("BatchConfStartButton"));
         start.setAlignmentX(.5f);
         start.addActionListener(e -> presenter.setStarted());
         start.addActionListener(disposeAction);
 
-        val cancel = new JButton(LOCALE.get("BatchConfCancelButton"));
+        final var cancel = new JButton(LOCALE.get("BatchConfCancelButton"));
         cancel.setAlignmentX(.5f);
         cancel.addActionListener(disposeAction);
 
-        val buttons = Box.createHorizontalBox();
+        final var buttons = Box.createHorizontalBox();
         buttons.add(Box.createHorizontalGlue());
         buttons.add(start);
         buttons.add(Box.createHorizontalStrut(8));
         buttons.add(cancel);
         buttons.setMaximumSize(buttons.getPreferredSize());
 
-        val batchLabelBox = new JPanel();
+        final var batchLabelBox = new JPanel();
         batchLabelBox.setLayout(new BoxLayout(batchLabelBox, BoxLayout.X_AXIS));
         batchLabelBox.add(batchLabel);
         batchLabelBox.setBorder(BorderFactory.createTitledBorder(LOCALE.get("BatchConfNameLabel")));
 
-        val batchBox = Box.createHorizontalBox();
+        final var batchBox = Box.createHorizontalBox();
         batchBox.add(batchLabelBox);
         batchBox.add(Box.createHorizontalGlue());
 
-        val dirBox = new JPanel();
+        final var dirBox = new JPanel();
         dirBox.setLayout(new BoxLayout(dirBox, BoxLayout.X_AXIS));
         dirBox.add(new JLabel(presenter.getDirBoxLabel()));
         dirBox.add(Box.createHorizontalStrut(8));
@@ -103,13 +102,13 @@ public class BatchConfiguratorView implements BatchConfiguratorContract.View {
         dirBox.add(Box.createHorizontalStrut(8));
         dirBox.add(dirButton);
 
-        val dirBoxBox = Box.createHorizontalBox();
+        final var dirBoxBox = Box.createHorizontalBox();
         dirBoxBox.add(dirBox);
         dirBoxBox.add(Box.createHorizontalGlue());
 
         exportCtrls.setBorder(BorderFactory.createTitledBorder(LOCALE.get("BatchConfFormatBorder")));
 
-        val content = new JPanel();
+        final var content = new JPanel();
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
         content.add(dirBoxBox);
         content.add(Box.createVerticalStrut(8));
@@ -143,7 +142,7 @@ public class BatchConfiguratorView implements BatchConfiguratorContract.View {
 
     @Override
     public File chooseDirectory(File directory) {
-        val chooser = Platform.getPlatform().getFileChooser();
+        final var chooser = Platform.getPlatform().getFileChooser();
         return chooser.chooseDirectory(
                 LOCALE.get("BatchConfOutputChooserDialogTitle"),
                 directory, dialog, false);

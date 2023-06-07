@@ -3,7 +3,6 @@
 package com.lightcrafts.utils.xml;
 
 import lombok.Getter;
-import lombok.val;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -35,7 +34,7 @@ public class ElementPrefixFilter extends NodeTypeFilter {
     public boolean accept( Node node ) {
         if ( !super.accept( node ) )
             return false;
-        val element = (Element)node;
+        final var element = (Element)node;
         return prefix.equals( element.getPrefix() );
     }
 }

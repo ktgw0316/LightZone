@@ -15,7 +15,6 @@ import com.lightcrafts.model.RawAdjustmentOperation;
 import com.lightcrafts.model.SliderConfig;
 import com.lightcrafts.utils.DCRaw;
 import com.lightcrafts.utils.LCMatrix;
-import lombok.val;
 import org.ejml.simple.SimpleMatrix;
 
 import javax.media.jai.BorderExtender;
@@ -142,8 +141,8 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
                     for (int j = 0; j < 3; j++)
                         cameraRGBWB[j][i] *= wb[i];
 
-                val B = new LCMatrix(ColorScience.chromaticAdaptation(daylightTemperature, originalTemperature, caMethod));
-                val combo = XYZtoRGB.mult(B.mult(RGBtoZYX));
+                final var B = new LCMatrix(ColorScience.chromaticAdaptation(daylightTemperature, originalTemperature, caMethod));
+                final var combo = XYZtoRGB.mult(B.mult(RGBtoZYX));
 
                 cameraRGBWB = LCMatrix.getArrayFloat(
                         combo.invert().mult(new LCMatrix(cameraRGBWB))
@@ -182,15 +181,15 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
         float sat = Float.MAX_VALUE;
         float minT = 0;
         for (int t = 1000; t < 40000; t+= (0.01 * t)) {
-            val B = new LCMatrix(ColorScience.chromaticAdaptation(t, refT, caMethod));
-            val combo = XYZtoRGB.mult(B.mult(RGBtoZYX));
-            val color = combo.mult(new LCMatrix(3, 1, rgb));
+            final var B = new LCMatrix(ColorScience.chromaticAdaptation(t, refT, caMethod));
+            final var combo = XYZtoRGB.mult(B.mult(RGBtoZYX));
+            final var color = combo.mult(new LCMatrix(3, 1, rgb));
 
-            val r = color.get(0, 0);
-            val g = color.get(1, 0);
-            val b = color.get(2, 0);
+            final var r = color.get(0, 0);
+            final var g = color.get(1, 0);
+            final var b = color.get(2, 0);
 
-            val tSat = (float) ColorScience.saturation(r, g, b);
+            final var tSat = (float) ColorScience.saturation(r, g, b);
 
             if (tSat < sat) {
                 sat = tSat;
@@ -368,17 +367,17 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
             }
 
             // Chromatic adaptation matrix
-            val B = new LCMatrix(ColorScience.chromaticAdaptation(daylightTemperature, temperature, caMethod));
+            final var B = new LCMatrix(ColorScience.chromaticAdaptation(daylightTemperature, temperature, caMethod));
             SimpleMatrix CA = XYZtoRGB.mult(B.mult(RGBtoZYX));
 
             // Normalize the CA matrix to keep exposure constant
-            val m = CA.mult(new LCMatrix(new float[][]{{1},{1},{1}}));
-            val max = (float) m.get(1, 0);
+            final var m = CA.mult(new LCMatrix(new float[][]{{1},{1},{1}}));
+            final var max = (float) m.get(1, 0);
             if (max != 1)
                 CA = CA.mult(new LCMatrix(new float[][]{{1/max, 0, 0},{0, 1/max, 0},{0, 0, 1/max}}));
 
             // The matrix taking into account the camera color space and its basic white balance and exposure
-            val camMatrix = LCMatrix.getArrayFloat(
+            final var camMatrix = LCMatrix.getArrayFloat(
                     CA.mult(new LCMatrix(cameraRGB(temperature)).scale(Math.pow(2, exposure)))
             );
 

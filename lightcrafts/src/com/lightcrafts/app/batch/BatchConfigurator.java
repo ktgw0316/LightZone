@@ -4,7 +4,6 @@
 package com.lightcrafts.app.batch;
 
 import com.lightcrafts.platform.Platform;
-import lombok.val;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,8 +22,8 @@ public class BatchConfigurator {
     public static BatchConfig showDialog(
         File[] files, final Frame parent, boolean isBatchExport
     ) {
-        val model = new BatchConfiguratorModel(files, isBatchExport);
-        val presenter = new BatchConfiguratorPresenter(model);
+        final var model = new BatchConfiguratorModel(files, isBatchExport);
+        final var presenter = new BatchConfiguratorPresenter(model);
         final BatchConfiguratorContract.View view =
                 new BatchConfiguratorView(presenter, parent);
         view.createAndShowGUI();
@@ -32,7 +31,7 @@ public class BatchConfigurator {
     }
 
     public static void main(String[] args) throws Exception {
-        val files = new File[100];
+        final var files = new File[100];
         for (int n = 0; n < 100; n++) {
             files[n] = File.createTempFile("test", ".lzn");
             files[n].deleteOnExit();

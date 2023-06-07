@@ -9,7 +9,6 @@ import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
 import com.lightcrafts.utils.Lensfun;
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
 import javax.media.jai.BorderExtender;
@@ -84,7 +83,7 @@ public class LensCorrectionsOperation extends BlendedOperation {
         addCheckboxKey(MANUAL_MODE);
         setCheckboxValue(MANUAL_MODE, false);
 
-        val format = new DecimalFormat("0.0");
+        final var format = new DecimalFormat("0.0");
         distortion_k1_config = new SliderConfig(-50, 50, distortion_k1, 1, false, format);
         distortion_k2_config = new SliderConfig(-50, 50, distortion_k2, 1, false, format);
         tca_r_offset_config  = new SliderConfig(-5, 5, tca_r_offset, 0.1, false, format);
@@ -112,7 +111,7 @@ public class LensCorrectionsOperation extends BlendedOperation {
     }
 
     private void setCameraFromMetadata() {
-        val make = (meta == null) ? null : meta.getCameraMake(false);
+        final var make = (meta == null) ? null : meta.getCameraMake(false);
         if (make == null || make.isEmpty()) {
             cameraMaker = "";
             cameraModel = "";
@@ -120,7 +119,7 @@ public class LensCorrectionsOperation extends BlendedOperation {
         }
 
         cameraMaker = make.equalsIgnoreCase("RICOH") ? "PENTAX" : make;
-        val makeModel = meta.getCameraMake(true);
+        final var makeModel = meta.getCameraMake(true);
         if (makeModel == null || makeModel.isEmpty()) {
             cameraModel = "";
             return;
@@ -128,8 +127,8 @@ public class LensCorrectionsOperation extends BlendedOperation {
 
         // Remove long maker name, such as "RICOH IMAGING COMPANY, LTD." or
         // "OLYMPUS IMAGING CORP." from the makeModel.
-        val ss = new String[] {"LTD.", "CORP."};
-        for (val s : ss) {
+        final var ss = new String[] {"LTD.", "CORP."};
+        for (final var s : ss) {
             int idx = makeModel.toUpperCase().lastIndexOf(s);
             if (idx > 0) {
                 cameraModel = makeModel.substring(idx + s.length()).trim();
@@ -140,7 +139,7 @@ public class LensCorrectionsOperation extends BlendedOperation {
     }
 
     private void setLensFromMetadata() {
-        val lens = (meta == null) ? null : meta.getLens();
+        final var lens = (meta == null) ? null : meta.getLens();
         if (lens == null) {
             lensModel = "";
             focal     = 0f;
@@ -180,7 +179,7 @@ public class LensCorrectionsOperation extends BlendedOperation {
         }
 
         if (key.equals(CAMERA_NAME)) {
-            val names = value.split(SEPARATOR, 2);
+            final var names = value.split(SEPARATOR, 2);
             cameraModel = names[1];
             if (cameraModel.isEmpty()) {
                 setCameraFromMetadata();
@@ -189,7 +188,7 @@ public class LensCorrectionsOperation extends BlendedOperation {
             }
             updateLenses();
         } else if (key.equals(LENS_NAME)) {
-            val names = value.split(SEPARATOR, 2);
+            final var names = value.split(SEPARATOR, 2);
             lensModel = names[1];
             if (lensModel.isEmpty()) {
                 setLensFromMetadata();
@@ -236,12 +235,12 @@ public class LensCorrectionsOperation extends BlendedOperation {
 
         @Override
         public PlanarImage setFront() {
-            val sourceBounds = rendering.getSourceBounds();
+            final var sourceBounds = rendering.getSourceBounds();
             int fullWidth  = sourceBounds.width;
             int fullHeight = sourceBounds.height;
 
-            val transform = rendering.getTransform();
-            val scaleFactor = rendering.getScaleFactor();
+            final var transform = rendering.getTransform();
+            final var scaleFactor = rendering.getScaleFactor();
             if (scaleFactor < 1) {
                 // Append pyramid ratio
                 fullWidth  *= scaleFactor;
@@ -269,12 +268,12 @@ public class LensCorrectionsOperation extends BlendedOperation {
                     lf = Lensfun.updateInstance(cameraMaker, cameraModel, lensMaker, lensModel, focal, aperture)
                             .updateModifier(fullWidth, fullHeight);
                 }
-                val shiftX = back.getMinX();
-                val shiftY = back.getMinY();
-                val shifted = JAI.create("affine", back,
+                final var shiftX = back.getMinX();
+                final var shiftY = back.getMinY();
+                final var shifted = JAI.create("affine", back,
                         AffineTransform.getTranslateInstance(-shiftX, -shiftY));
-                val borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
-                val corrected = new DistortionOpImage(shifted, JAIContext.fileCacheHint, borderExtender, lf);
+                final var borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
+                final var corrected = new DistortionOpImage(shifted, JAIContext.fileCacheHint, borderExtender, lf);
                 front = JAI.create("affine", corrected,
                         AffineTransform.getTranslateInstance(shiftX, shiftY));
             }

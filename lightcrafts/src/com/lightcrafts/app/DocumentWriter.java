@@ -29,8 +29,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import lombok.val;
-
 /**
  * Lengthy procedures that get run during save and export.
  */
@@ -47,13 +45,13 @@ public class DocumentWriter {
         ProgressThread progress
     ) throws IOException {
         // Construct the LZN data that encode the Document's state:
-        val xml = new XmlDocument(
+        final var xml = new XmlDocument(
             Application.LznNamespace, "LightZoneTransform"
         );
         doc.save(xml.getRoot());
 
         try {
-            val options = doc.getSaveOptions();
+            final var options = doc.getSaveOptions();
 
             if (options.isLzn()) {
                 // Just write the XML to a file, with a thumbnail and a preview:
@@ -64,15 +62,15 @@ public class DocumentWriter {
             }
 
             // We're performing some kind of Engine export:
-            val engine = doc.getEngine();
-            val export = SaveOptions.getExportOptions(options);
+            final var engine = doc.getEngine();
+            final var export = SaveOptions.getExportOptions(options);
             if (export == null) {
                 return false;
             }
-            val app = (OtherApplication)doc.getSource();
+            final var app = (OtherApplication)doc.getSource();
 
             // Mangle LZN and add it to the export options as appropriate:
-            val shouldAddLzn = mangleLzn(xml, options, app);
+            final var shouldAddLzn = mangleLzn(xml, options, app);
             if (shouldAddLzn) {
                 addLznMetadata(export, xml);
             }
@@ -82,7 +80,7 @@ public class DocumentWriter {
                 return true;
             }
 
-            val message = (app != null && app != UnknownApplication.INSTANCE
+            final var message = (app != null && app != UnknownApplication.INSTANCE
                     && saveDirectly)
                     ? LOCALE.get("SavingToMessage", app.getName())
                     : LOCALE.get("SavingMessage");
@@ -102,7 +100,7 @@ public class DocumentWriter {
     ) throws XMLException {
         if (options.isSidecarJpeg() || options.isSidecarTiff()) {
             if (app instanceof LightroomApplication) {
-                val file = LightroomApplication.getOriginalFile(
+                final var file = LightroomApplication.getOriginalFile(
                         options.getFile()
                 );
                 mangleLznSidecarFile(xml,file);
@@ -125,8 +123,8 @@ public class DocumentWriter {
         final String title,
         final Frame parent
     ) throws IOException {
-        val dialog = Platform.getPlatform().getProgressDialog();
-        val thread = new ProgressThread(dialog) {
+        final var dialog = Platform.getPlatform().getProgressDialog();
+        final var thread = new ProgressThread(dialog) {
             @Override
             public void run() {
                 try {
@@ -143,7 +141,7 @@ public class DocumentWriter {
         dialog.showProgress(parent, thread, title, 0, 10, true);
 
         // Unpack any Throwable, in case it hides a checked exception:
-        val error = dialog.getThrown();
+        final var error = dialog.getThrown();
         if (error != null) {
             if ( error instanceof IOException )
                 throw (IOException) error;
@@ -159,9 +157,9 @@ public class DocumentWriter {
      */
     private static void saveLzn(Document doc, XmlDocument xmlDoc)
             throws IOException {
-        val engine = doc.getEngine();
-        val options = doc.getSaveOptions();
-        val file = options.getFile();
+        final var engine = doc.getEngine();
+        final var options = doc.getSaveOptions();
+        final var file = options.getFile();
 
         // Fill up the LZN file:
         try (OutputStream out = new FileOutputStream(file)) {
@@ -169,17 +167,17 @@ public class DocumentWriter {
         }
 
         // Add thumbnail data for the browser:
-        val thumbRendering = (PlanarImage) engine.getRendering(new Dimension(320, 320));
+        final var thumbRendering = (PlanarImage) engine.getRendering(new Dimension(320, 320));
         // divorce the preview from the document
-        val thumb = new CachedImage(thumbRendering, JAIContext.fileCache);
-        val info = ImageInfo.getInstanceFor(file);
+        final var thumb = new CachedImage(thumbRendering, JAIContext.fileCache);
+        final var info = ImageInfo.getInstanceFor(file);
         LZNImageType.INSTANCE.putImage(info, thumb);
 
         // Cache a high resolution preview:
-        val size = PreviewUpdater.PreviewSize;
-        val previewRendering = (PlanarImage) engine.getRendering(new Dimension(size, size));
+        final var size = PreviewUpdater.PreviewSize;
+        final var previewRendering = (PlanarImage) engine.getRendering(new Dimension(size, size));
         // divorce the preview from the document
-        val preview = new CachedImage(previewRendering, JAIContext.fileCache);
+        final var preview = new CachedImage(previewRendering, JAIContext.fileCache);
         PreviewUpdater.cachePreviewForImage(file, preview);
     }
 
@@ -190,9 +188,9 @@ public class DocumentWriter {
      */
     private static void addLznMetadata(ImageExportOptions export,
                                        XmlDocument xml) throws IOException {
-        val out = new ByteArrayOutputStream();
+        final var out = new ByteArrayOutputStream();
         xml.write(out);
-        val bytes = out.toByteArray();
+        final var bytes = out.toByteArray();
         export.setAuxData(bytes);
     }
 
@@ -200,8 +198,8 @@ public class DocumentWriter {
         throws XMLException
     {
         // Tags cloned from com.lightcrafts.ui.editor.Document:
-        val root = xml.getRoot();
-        val imageNode = root.getChild("Image");
+        final var root = xml.getRoot();
+        final var imageNode = root.getChild("Image");
         imageNode.setAttribute("path", file.getAbsolutePath());
         imageNode.setAttribute("relativePath", file.getName());
     }
@@ -210,8 +208,8 @@ public class DocumentWriter {
         throws XMLException
     {
         // Tags cloned from com.lightcrafts.ui.editor.Document:
-        val root = xml.getRoot();
-        val imageNode = root.getChild("Image");
+        final var root = xml.getRoot();
+        final var imageNode = root.getChild("Image");
         imageNode.setAttribute("path", "");
         imageNode.setAttribute("relativePath", "");
         imageNode.setAttribute("self", "true");
@@ -230,8 +228,8 @@ public class DocumentWriter {
         File tempFile = null;
         try {
             // Set up the temp file where the export goes first:
-            val exportFile = options.getExportFile();
-            val exportDir = exportFile.getParentFile();
+            final var exportFile = options.getExportFile();
+            final var exportDir = exportFile.getParentFile();
             tempFile = File.createTempFile(
                 "LZExport", ".tmp", exportDir
             );

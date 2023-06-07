@@ -5,7 +5,6 @@ package com.lightcrafts.templates;
 import com.lightcrafts.utils.file.FileUtil;
 
 import lombok.Getter;
-import lombok.val;
 
 import java.io.File;
 import java.util.regex.Pattern;
@@ -45,8 +44,8 @@ public class TemplateKey implements Comparable<TemplateKey> {
     public TemplateKey(String namespace, String name) {
         this.namespace = namespace;
         this.name = name;
-        val encodedNamespace = FileUtil.encodeFilename(namespace);
-        val encodedName = FileUtil.encodeFilename(name);
+        final var encodedNamespace = FileUtil.encodeFilename(namespace);
+        final var encodedName = FileUtil.encodeFilename(name);
         file = new File(
             TemplateDatabase.TemplateDir,
             encodedNamespace + ';' + encodedName + ".lzt"
@@ -55,11 +54,11 @@ public class TemplateKey implements Comparable<TemplateKey> {
 
     TemplateKey(File file) {
         this.file = file;
-        val fileName = file.getName();
-        val baseName = FileUtil.trimExtensionOf(fileName);
-        val matcher = NamePattern.matcher(baseName);
-        val encodedNamespace = matcher.replaceAll("$1");
-        val encodedName = matcher.replaceAll("$2");
+        final var fileName = file.getName();
+        final var baseName = FileUtil.trimExtensionOf(fileName);
+        final var matcher = NamePattern.matcher(baseName);
+        final var encodedNamespace = matcher.replaceAll("$1");
+        final var encodedName = matcher.replaceAll("$2");
         namespace = FileUtil.decodeFilename(encodedNamespace);
         name = FileUtil.decodeFilename(encodedName);
     }

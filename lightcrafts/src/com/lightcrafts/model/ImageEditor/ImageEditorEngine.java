@@ -26,7 +26,6 @@ import com.lightcrafts.utils.UserCanceledException;
 import com.lightcrafts.utils.thread.ProgressThread;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.val;
 
 import javax.media.jai.BorderExtender;
 import javax.media.jai.ImageLayout;
@@ -149,7 +148,7 @@ public class ImageEditorEngine implements Engine {
     }
 
     void setFocusedZone(int index, double[][] controlPoints) {
-        for (val preview : previews){
+        for (final var preview : previews){
             if (preview.isShowing()) {
                 if (preview instanceof ZoneFinder) {
                     ((ZoneFinder) preview).setFocusedZone(index);
@@ -170,8 +169,8 @@ public class ImageEditorEngine implements Engine {
         throws BadImageFileException, ColorProfileException, IOException,
                UnknownImageTypeException, UserCanceledException
     {
-        val imagePath = imageMetadata.getPath();
-        val imageFile = new File(imagePath).getCanonicalFile();
+        final var imagePath = imageMetadata.getPath();
+        final var imageFile = new File(imagePath).getCanonicalFile();
         m_imageInfo = ImageInfo.getInstanceFor(imageFile);
         System.out.println("Opening " + imageFile);
 
@@ -183,14 +182,14 @@ public class ImageEditorEngine implements Engine {
         if (sourceImage == null)
             throw new IOException("Something wrong with opening " + metadata.getFile().getName());
 
-        val orientation = metadata.getOrientation();
+        final var orientation = metadata.getOrientation();
         if (orientation != null) {
-            val transposeAngle = orientation.getCorrection();
+            final var transposeAngle = orientation.getCorrection();
             if (transposeAngle != null) {
-                val pb = new ParameterBlock();
+                final var pb = new ParameterBlock();
                 pb.addSource(sourceImage);
                 pb.add(transposeAngle);
-                val transposed = JAI.create("Transpose", pb, null);
+                final var transposed = JAI.create("Transpose", pb, null);
                 transposed.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
                 sourceImage = copyImageDataFrom(transposed);
                 transposed.dispose();
@@ -202,17 +201,17 @@ public class ImageEditorEngine implements Engine {
     }
 
     private static CachedImage copyImageDataFrom(PlanarImage src) {
-        val dst = new CachedImage(new ImageLayout(src), JAIContext.fileCache);
+        final var dst = new CachedImage(new ImageLayout(src), JAIContext.fileCache);
 
         // Fast hack for data copy, assumes that images have identical layout
-        val maxTileX = dst.getMaxTileX();
-        val maxTileY = dst.getMaxTileY();
+        final var maxTileX = dst.getMaxTileX();
+        final var maxTileY = dst.getMaxTileY();
         switch(src.getSampleModel().getDataType()){
         case DataBuffer.TYPE_USHORT:
             for (int x = 0; x <= maxTileX; x++) {
                 for (int y = 0; y <= maxTileY; y++) {
-                    val srcData = ((DataBufferUShort) src.getTile(x, y).getDataBuffer()).getData();
-                    val dstData = ((DataBufferUShort) dst.getWritableTile(x, y).getDataBuffer()).getData();
+                    final var srcData = ((DataBufferUShort) src.getTile(x, y).getDataBuffer()).getData();
+                    final var dstData = ((DataBufferUShort) dst.getWritableTile(x, y).getDataBuffer()).getData();
                     System.arraycopy(srcData, 0, dstData, 0, srcData.length);
                 }
             }
@@ -220,8 +219,8 @@ public class ImageEditorEngine implements Engine {
         case DataBuffer.TYPE_BYTE:
             for (int x = 0; x <= maxTileX; x++) {
                 for (int y = 0; y <= maxTileY; y++) {
-                    val srcData = ((DataBufferByte) src.getTile(x, y).getDataBuffer()).getData();
-                    val dstData = ((DataBufferByte) dst.getWritableTile(x, y).getDataBuffer()).getData();
+                    final var srcData = ((DataBufferByte) src.getTile(x, y).getDataBuffer()).getData();
+                    final var dstData = ((DataBufferByte) dst.getWritableTile(x, y).getDataBuffer()).getData();
                     System.arraycopy(srcData, 0, dstData, 0, srcData.length);
                 }
             }
@@ -338,7 +337,7 @@ public class ImageEditorEngine implements Engine {
 
     @Override
     public com.lightcrafts.model.Operation insertOperation(OperationType type, int position) {
-        val opClass = operationsSet.get(type);
+        final var opClass = operationsSet.get(type);
 
         if (opClass.equals(RawAdjustmentsOperation.class)) {
             if (! (getAuxInfo() instanceof RawImageInfo)) {
@@ -354,14 +353,14 @@ public class ImageEditorEngine implements Engine {
 
         try {
             try {
-                val c = opClass.getConstructor(Rendering.class, OperationType.class, ImageMetadata.class);
+                final var c = opClass.getConstructor(Rendering.class, OperationType.class, ImageMetadata.class);
                 op = c.newInstance(rendering, type, metadata);
             } catch (NoSuchMethodException e3) {
                 try {
-                    val c = opClass.getConstructor(Rendering.class, OperationType.class);
+                    final var c = opClass.getConstructor(Rendering.class, OperationType.class);
                     op = c.newInstance(rendering, type);
                 } catch (NoSuchMethodException e2) {
-                    val c = opClass.getConstructor(Rendering.class);
+                    final var c = opClass.getConstructor(Rendering.class);
                     op = c.newInstance(rendering);
                 }
             }
@@ -385,36 +384,36 @@ public class ImageEditorEngine implements Engine {
 
     @Override
     public ZoneOperation insertZoneOperation(int position) {
-        val op = new ZoneOperationImpl(rendering);
+        final var op = new ZoneOperationImpl(rendering);
         rendering.addOperation(position, op);
         return op;
     }
 
     @Override
     public CloneOperation insertCloneOperation(int position) {
-        val op = new CloneOperationImpl(rendering);
+        final var op = new CloneOperationImpl(rendering);
         rendering.addOperation(position, op);
         return op;
     }
 
     @Override
     public SpotOperation insertSpotOperation(int position) {
-        val op = new SpotOperationImpl(rendering);
+        final var op = new SpotOperationImpl(rendering);
         rendering.addOperation(position, op);
         return op;
     }
 
     @Override
     public WhitePointOperation insertWhitePointOperation(int position) {
-        val op = new WhitePointOperationImpl(rendering);
+        final var op = new WhitePointOperationImpl(rendering);
         rendering.addOperation(position, op);
         return op;
     }
 
     @Override
     public LensCorrectionsOperation insertLensCorrectionsOperation(int position) {
-        val type = LensCorrectionsOperation.type;
-        val op = new LensCorrectionsOperation(rendering, type, metadata);
+        final var type = LensCorrectionsOperation.type;
+        final var op = new LensCorrectionsOperation(rendering, type, metadata);
         rendering.addOperation(position, op);
         return op;
     }
@@ -431,11 +430,11 @@ public class ImageEditorEngine implements Engine {
 
     @Override
     public void removeOperation(int position) {
-        val currentSelection = selectedOperation >= 0
+        final var currentSelection = selectedOperation >= 0
                 ? rendering.getOperation(selectedOperation)
                 : null;
 
-        val op = (OperationImpl) rendering.removeOperation(position);
+        final var op = (OperationImpl) rendering.removeOperation(position);
         op.dispose();
 
         if (currentSelection != null)
@@ -446,11 +445,11 @@ public class ImageEditorEngine implements Engine {
 
     @Override
     public void swap(int position) {
-        val currentSelection = selectedOperation >= 0
+        final var currentSelection = selectedOperation >= 0
                 ? rendering.getOperation(selectedOperation)
                 : null;
 
-        val op = (OperationImpl) rendering.removeOperation(position);
+        final var op = (OperationImpl) rendering.removeOperation(position);
         rendering.addOperation(position + 1, op);
 
         if (currentSelection != null)
@@ -474,10 +473,10 @@ public class ImageEditorEngine implements Engine {
 
     @Override
     public Scale setScale(Rectangle rect) {
-        val dimension = getNaturalSize();
+        final var dimension = getNaturalSize();
 
-        val hScale = rect.height / (float) dimension.height;
-        val wScale = rect.width  / (float) dimension.width;
+        final var hScale = rect.height / (float) dimension.height;
+        final var wScale = rect.width  / (float) dimension.width;
 
         rendering.setScaleFactor(Math.min(hScale, wScale));
         update(null, false);
@@ -485,21 +484,21 @@ public class ImageEditorEngine implements Engine {
     }
 
     PlanarImage scaleFinal(PlanarImage image) {
-        val scale = rendering.getScaleFactor() > 1 ? rendering.getScaleFactor() : 1f;
+        final var scale = rendering.getScaleFactor() > 1 ? rendering.getScaleFactor() : 1f;
 
         if (scale == 1)
             return image;
 
-        val scaleX = (float) Math.floor(scale * image.getWidth())  / image.getWidth();
-        val scaleY = (float) Math.floor(scale * image.getHeight()) / image.getHeight();
+        final var scaleX = (float) Math.floor(scale * image.getWidth())  / image.getWidth();
+        final var scaleY = (float) Math.floor(scale * image.getHeight()) / image.getHeight();
 
-        val xform = AffineTransform.getScaleInstance(scaleX, scaleY);
+        final var xform = AffineTransform.getScaleInstance(scaleX, scaleY);
 
-        val formatHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
+        final var formatHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
                 BorderExtender.createInstance(BorderExtender.BORDER_COPY));
 
-        val interp = Interpolation.getInstance(Interpolation.INTERP_NEAREST);
-        val params = new ParameterBlock();
+        final var interp = Interpolation.getInstance(Interpolation.INTERP_NEAREST);
+        final var params = new ParameterBlock();
         params.addSource(image);
         params.add(xform);
         params.add(interp);
@@ -515,7 +514,7 @@ public class ImageEditorEngine implements Engine {
 
     @Override
     public synchronized void setSelectedOperation(int position, boolean selected) {
-        val op = (OperationImpl) rendering.getOperation(position);
+        final var op = (OperationImpl) rendering.getOperation(position);
         if (op != null)
             op.setSelected(selected);
 
@@ -556,7 +555,7 @@ public class ImageEditorEngine implements Engine {
         if (canvas == null || !event_filter(isLive, updater))
             return;
 
-        val oldProcessedImage = processedImage;
+        final var oldProcessedImage = processedImage;
 
         // TODO: use disconnected cached images instead of PERSISTENT_CACHE_TAG
 
@@ -581,7 +580,7 @@ public class ImageEditorEngine implements Engine {
             previewImage.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
         // }
 
-        val finalImage = scaleFinal(previewImage);
+        final var finalImage = scaleFinal(previewImage);
         canvas.set(finalImage, isLive);
     }
 
@@ -608,9 +607,9 @@ public class ImageEditorEngine implements Engine {
                 // System.out.println("slow repaint done");
             // }
 
-            val tileCache = JAI.getDefaultInstance().getTileCache();
+            final var tileCache = JAI.getDefaultInstance().getTileCache();
             if (tileCache instanceof LCTileCache) {
-                val tc = (LCTileCache) tileCache;
+                final var tc = (LCTileCache) tileCache;
                 if (tilesRead != tc.tilesRead()
                         || tilesWritten != tc.tilesWritten()
                         || tilesOnDisk != tc.tilesOnDisk()) {
@@ -623,14 +622,14 @@ public class ImageEditorEngine implements Engine {
                 }
             }
 
-            for (val preview : previews) {
+            for (final var preview : previews) {
                 // TODO: Java8 Stream filter
                 if (!preview.isShowing() || !(preview instanceof PaintListener))
                     continue;
 
-                val renderingScale = rendering.getScaleFactor();
+                final var renderingScale = rendering.getScaleFactor();
 
-                val previewVisibleRect = (renderingScale > 1)
+                final var previewVisibleRect = (renderingScale > 1)
                         ? new Rectangle((int) (visibleRect.x / renderingScale),
                                         (int) (visibleRect.y / renderingScale),
                                         (int) (visibleRect.width  / renderingScale),
@@ -679,11 +678,11 @@ public class ImageEditorEngine implements Engine {
         }
 
         // During live updates wait until the user stays put for at least the current average repaint time
-        val timeNow = System.currentTimeMillis();
-        val timeDiff = (lastTime == -1) ? 0 : timeNow - lastTime;
+        final var timeNow = System.currentTimeMillis();
+        final var timeDiff = (lastTime == -1) ? 0 : timeNow - lastTime;
         lastTime = timeNow;
 
-        val delay = Math.min(Math.max(synchImageRepaintTime, 300), 1000);
+        final var delay = Math.min(Math.max(synchImageRepaintTime, 300), 1000);
 
         if (timeDiff < delay) {
             if (swingTimer != null) {
@@ -778,16 +777,16 @@ public class ImageEditorEngine implements Engine {
     public PlanarImage getRendering(Dimension bounds, ICC_Profile profile,
                                     LCMSColorConvertDescriptor.RenderingIntent intent,
                                     boolean isEightBits) {
-        val scale = (bounds != null) ? rendering.getScaleToFit(bounds) : 1;
+        final var scale = (bounds != null) ? rendering.getScaleToFit(bounds) : 1;
 
-        val newRendering = canvas != null ? rendering.clone() : rendering;
+        final var newRendering = canvas != null ? rendering.clone() : rendering;
 
         newRendering.setCropAndScale(getCropBounds(), scale);
 
         PlanarImage image = newRendering.getRendering();
 
         if (profile != null) {
-            val exportColorSpace = (profile == JAIContext.sRGBColorProfile)
+            final var exportColorSpace = (profile == JAIContext.sRGBColorProfile)
                 ? JAIContext.sRGBColorSpace
                 : new ICC_ColorSpace(profile);
             image = Functions.toColorSpace(image, exportColorSpace, intent, null);
@@ -804,12 +803,12 @@ public class ImageEditorEngine implements Engine {
     @Override
     public void write( ProgressThread thread,
                        ImageExportOptions exportOptions ) throws IOException {
-        val fileOptions = (ImageFileExportOptions)exportOptions;
-        val exportType = exportOptions.getImageType();
-        val exportWidth = fileOptions.resizeWidth.getValue();
-        val exportHeight = fileOptions.resizeHeight.getValue();
+        final var fileOptions = (ImageFileExportOptions)exportOptions;
+        final var exportType = exportOptions.getImageType();
+        final var exportWidth = fileOptions.resizeWidth.getValue();
+        final var exportHeight = fileOptions.resizeHeight.getValue();
 
-        val exportProfileName = fileOptions.colorProfile.getValue();
+        final var exportProfileName = fileOptions.colorProfile.getValue();
         ICC_Profile profile =
             ColorProfileInfo.getExportICCProfileFor( exportProfileName );
         if ( profile == null )
@@ -823,12 +822,12 @@ public class ImageEditorEngine implements Engine {
 
         // Uprez output images
 
-        val scale = Math.min(exportWidth / (double) exportImage.getWidth(),
+        final var scale = Math.min(exportWidth / (double) exportImage.getWidth(),
                              exportHeight / (double) exportImage.getHeight());
 
         if (scale > 1) {
-            val xform = AffineTransform.getScaleInstance(scale, scale);
-            val formatHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
+            final var xform = AffineTransform.getScaleInstance(scale, scale);
+            final var formatHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
                     BorderExtender.createInstance(BorderExtender.BORDER_COPY));
 
             Interpolation interp = Interpolation.getInstance(Interpolation.INTERP_BICUBIC_2);
@@ -849,13 +848,13 @@ public class ImageEditorEngine implements Engine {
         }
 
         if (exportImage instanceof RenderedOp) {
-            val rop = (RenderedOp) exportImage;
+            final var rop = (RenderedOp) exportImage;
             rop.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
         }
 
         // LZN editor state data
-        val lzn = exportOptions.getAuxData();
-        val imageInfo = (m_exportInfo != null) ? m_exportInfo : m_imageInfo;
+        final var lzn = exportOptions.getAuxData();
+        final var imageInfo = (m_exportInfo != null) ? m_exportInfo : m_imageInfo;
         exportType.putImage(imageInfo, exportImage, exportOptions, lzn, thread);
     }
 
@@ -865,30 +864,30 @@ public class ImageEditorEngine implements Engine {
     }
 
     private Color getExactPixelValue(final int _x, final int _y) {
-        val p = rendering.getInputTransform().transform(new Point(_x, _y), null);
-        val x = (int) p.getX();
-        val y = (int) p.getY();
+        final var p = rendering.getInputTransform().transform(new Point(_x, _y), null);
+        final var x = (int) p.getX();
+        final var y = (int) p.getY();
 
-        val bounds = processedImage.getBounds();
+        final var bounds = processedImage.getBounds();
         if (!bounds.contains(x, y))
             return null;
 
         int[] rgb = new int[3];
-        val tile = processedImage.getTile(processedImage.XToTileX(x), processedImage.YToTileY(y));
+        final var tile = processedImage.getTile(processedImage.XToTileX(x), processedImage.YToTileY(y));
         rgb = tile.getPixel(x, y, rgb);
         return new Color(rgb[0] / (float) 0xffff, rgb[1] / (float) 0xffff, rgb[2] / (float) 0xffff);
     }
 
     public Color getAveragedPixelValue(final int _x, final int _y) {
-        val p = rendering.getInputTransform().transform(new Point(_x, _y), null);
-        val x = (int) p.getX();
-        val y = (int) p.getY();
+        final var p = rendering.getInputTransform().transform(new Point(_x, _y), null);
+        final var x = (int) p.getX();
+        final var y = (int) p.getY();
 
-        val bounds = processedImage.getBounds();
+        final var bounds = processedImage.getBounds();
         if (!bounds.contains(x, y))
             return null;
 
-        val rgb = new int[3];
+        final var rgb = new int[3];
         int numSamples = 0;
         int red = 0;
         int green = 0;
@@ -897,16 +896,16 @@ public class ImageEditorEngine implements Engine {
         //Take a 3x3 sample centered at pointer location, and average the samples.
         for (int i = -1; i <= 1; ++i) {
             for (int j = -1; j <= 1; ++j) {
-                val sampleX = x + i;
-                val sampleY = y + j;
-                val tile = processedImage.getTile(processedImage.XToTileX(x), processedImage.YToTileY(y));
-                val tileBounds = tile.getBounds();
+                final var sampleX = x + i;
+                final var sampleY = y + j;
+                final var tile = processedImage.getTile(processedImage.XToTileX(x), processedImage.YToTileY(y));
+                final var tileBounds = tile.getBounds();
 
                 //max and min (x,y) coordinates of the bounds
-                val minX = tileBounds.x;
-                val maxX = tileBounds.x + tileBounds.width - 1;
-                val minY = tileBounds.y;
-                val maxY = tileBounds.y + tileBounds.height - 1;
+                final var minX = tileBounds.x;
+                final var maxX = tileBounds.x + tileBounds.width - 1;
+                final var minY = tileBounds.y;
+                final var maxY = tileBounds.y + tileBounds.height - 1;
                 // Check bounds, if in bounds take sample and increment numSamples, else do nothing
                 if (sampleX >= minX && sampleX <= maxX && sampleY >= minY && sampleY <= maxY) {
                     tile.getPixel(sampleX, sampleY, rgb);
@@ -927,7 +926,7 @@ public class ImageEditorEngine implements Engine {
 
     @Override
     public List<JMenuItem> getDebugItems() {
-        val items = new ArrayList<JMenuItem>();
+        final var items = new ArrayList<JMenuItem>();
 
         /*
         JMenuItem tctool = new JMenuItem("TCTool");
@@ -976,7 +975,7 @@ public class ImageEditorEngine implements Engine {
     }
 
     public void notifyListeners(int level) {
-        for (val listener : listeners) {
+        for (final var listener : listeners) {
             listener.engineActive(level);
         }
     }

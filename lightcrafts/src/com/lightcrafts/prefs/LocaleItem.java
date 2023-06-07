@@ -2,7 +2,6 @@
 
 package com.lightcrafts.prefs;
 
-import lombok.val;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -43,7 +42,7 @@ class LocaleItem extends PreferencesItem implements LocaleContract.View {
 
     @Override
     public JComponent getComponent() {
-        val box = Box.createHorizontalBox();
+        final var box = Box.createHorizontalBox();
         box.add(combo);
         box.add(Box.createHorizontalGlue());
         return box;

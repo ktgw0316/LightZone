@@ -7,7 +7,6 @@ import com.lightcrafts.platform.Platform;
 import com.lightcrafts.ui.action.ToggleAction;
 import com.lightcrafts.utils.file.FileUtil;
 import lombok.Getter;
-import lombok.val;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -90,7 +89,7 @@ public class ImageBrowserActions {
         editAction = new LeadSelectionAction("EditMenuItem", browser, true) {
             @Override
             public void actionPerformed(ActionEvent event) {
-                val lead = getLeadDatum();
+                final var lead = getLeadDatum();
                 browser.notifyDoubleClicked(lead);
             }
         };
@@ -98,16 +97,16 @@ public class ImageBrowserActions {
         copyAction = new LeadSelectionAction("CopyMenuItem", browser, true) {
             @Override
             public void actionPerformed(ActionEvent event) {
-                val datum = getLeadDatum();
+                final var datum = getLeadDatum();
                 TemplateClipboard = datum.getFile();
             }
             @Override
             void update() {
                 super.update();
                 if (isEnabled()) {
-                    val lead = getLeadDatum();
-                    val type = lead.getType();
-                    val hasLzn = type.hasLznData();
+                    final var lead = getLeadDatum();
+                    final var type = lead.getType();
+                    final var hasLzn = type.hasLznData();
                     copyAction.setEnabled(hasLzn);
                 }
             }
@@ -117,13 +116,13 @@ public class ImageBrowserActions {
         ) {
             @Override
             public void actionPerformed(ActionEvent event) {
-                val selection = getSelection();
-                val files = new ArrayList<File>();
-                for (val datum : selection) {
-                    val file = datum.getFile();
+                final var selection = getSelection();
+                final var files = new ArrayList<File>();
+                for (final var datum : selection) {
+                    final var file = datum.getFile();
                     files.add(file);
                 }
-                val templates = browser.getTemplateProvider();
+                final var templates = browser.getTemplateProvider();
                 templates.applyTemplate(
                     TemplateClipboard, files.toArray(new File[0])
                 );
@@ -132,11 +131,11 @@ public class ImageBrowserActions {
             void update() {
                 super.update();
                 if (isEnabled()) {
-                    val templates = browser.getTemplateProvider();
-                    val selection = getSelection();
-                    val hasTemplates = (templates != null);
-                    val hasSelection = ! selection.isEmpty();
-                    val hasClipboard = (TemplateClipboard != null);
+                    final var templates = browser.getTemplateProvider();
+                    final var selection = getSelection();
+                    final var hasTemplates = (templates != null);
+                    final var hasSelection = ! selection.isEmpty();
+                    final var hasClipboard = (TemplateClipboard != null);
                     setEnabled(hasTemplates && hasSelection && hasClipboard);
                 }
             }
@@ -146,8 +145,8 @@ public class ImageBrowserActions {
         ) {
             @Override
             public void actionPerformed(ActionEvent e) {
-                val selection = getSelection();
-                for (val datum : selection) {
+                final var selection = getSelection();
+                for (final var datum : selection) {
                     datum.refresh(false);   // don't use caches
                 }
             }
@@ -166,7 +165,7 @@ public class ImageBrowserActions {
         renameAction = new LeadSelectionAction("RenameMenuItem", browser, true) {
             @Override
             public void actionPerformed(ActionEvent event) {
-                val datum = browser.getLeadSelectedDatum();
+                final var datum = browser.getLeadSelectedDatum();
                 FileActions.renameFile(
                     datum.getFile(), browser
                 );
@@ -190,7 +189,7 @@ public class ImageBrowserActions {
 
         // This accelerator key setup should be localized and maybe unified
         // with the centralized menu configuration in MenuFactory.
-        val modifier = Platform.isMac() ? "meta" : "ctrl";
+        final var modifier = Platform.isMac() ? "meta" : "ctrl";
         selectAllAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(
                 modifier + " " + "A"
         ));
@@ -225,10 +224,10 @@ public class ImageBrowserActions {
         ) {
             @Override
             public void actionPerformed(ActionEvent event) {
-                val datums = browser.getSelectedDatums();
-                val files = new ArrayList<File>();
-                for (val datum : datums) {
-                    val file = datum.getFile();
+                final var datums = browser.getSelectedDatums();
+                final var files = new ArrayList<File>();
+                for (final var datum : datums) {
+                    final var file = datum.getFile();
                     files.add(file);
                 }
                 FileActions.deleteFiles(files.toArray(new File[0]), browser);
@@ -239,16 +238,16 @@ public class ImageBrowserActions {
         ) {
             @Override
             public void actionPerformed(ActionEvent event) {
-                val datums = browser.getSelectedDatums();
-                val files = new ArrayList<File>();
-                for (val datum : datums) {
-                    val file = datum.getFile();
+                final var datums = browser.getSelectedDatums();
+                final var files = new ArrayList<File>();
+                for (final var datum : datums) {
+                    final var file = datum.getFile();
                     files.add(file);
                 }
-                val platform = Platform.getPlatform();
-                for (val f : files) {
-                    val file = FileUtil.resolveAliasFile(f);
-                    val path = file.getAbsolutePath();
+                final var platform = Platform.getPlatform();
+                for (final var f : files) {
+                    final var file = FileUtil.resolveAliasFile(f);
+                    final var path = file.getAbsolutePath();
                     platform.showFileInFolder(path);
                 }
             }

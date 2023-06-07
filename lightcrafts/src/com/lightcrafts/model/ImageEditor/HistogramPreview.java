@@ -7,7 +7,6 @@ import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.model.Preview;
 import com.lightcrafts.model.Region;
-import lombok.val;
 
 import javax.media.jai.Histogram;
 import javax.media.jai.PlanarImage;
@@ -40,7 +39,7 @@ public class HistogramPreview extends Preview implements PaintListener {
             return;
 
         sample = engine.getPixelValue(p.x, p.y);
-        val zone = (sample != null) ? (int) Math.round(calcZone(sample)) : -1;
+        final var zone = (sample != null) ? (int) Math.round(calcZone(sample)) : -1;
         setFocusedZone(zone, null);
     }
 
@@ -173,9 +172,9 @@ public class HistogramPreview extends Preview implements PaintListener {
                 g2d.draw(gp);
 
                 if (sample != null) {
-                    val value = 255 * sample.getRGBColorComponents(null)[c];
-                    val position = calcZone(value) / 16;
-                    val sampleX = (int) (position * width + minx);
+                    final var value = 255 * sample.getRGBColorComponents(null)[c];
+                    final var position = calcZone(value) / 16;
+                    final var sampleX = (int) (position * width + minx);
                     g2d.drawLine(sampleX, zeroY, sampleX, maxY);
                 }
             }

@@ -1,7 +1,6 @@
 package com.lightcrafts.jai.opimage;
 
 import com.lightcrafts.utils.OpenSimplexNoise;
-import lombok.val;
 
 import javax.media.jai.ImageLayout;
 import javax.media.jai.PlanarImage;
@@ -64,11 +63,11 @@ public final class FilmGrainOpImage extends SourcelessOpImage {
             for (int y = 0, pos0 = 0; y < dstHeight; ++y, pos0 += dstLineStride) {
                 for (int x = 0, pos = pos0; x < dstWidth; ++x, pos += dstPixelStride) {
                     for (int c = 0; c < numBands; ++c) {
-                        val value = noise.eval(
+                        final var value = noise.eval(
                                 (dstX + x) / featureSize,
                                 (dstY + y) / featureSize,
                                 (c - 1) * color);
-                        val rgb = (short) ((value * intensity + 1) * 32767.5);
+                        final var rgb = (short) ((value * intensity + 1) * 32767.5);
                         dstData[pos + dstBandOffset[c]] = rgb;
                     }
                 }
@@ -76,11 +75,11 @@ public final class FilmGrainOpImage extends SourcelessOpImage {
         } else {
             for (int y = 0, pos0 = 0; y < dstHeight; ++y, pos0 += dstLineStride) {
                 for (int x = 0, pos = pos0; x < dstWidth; ++x, pos += dstPixelStride) {
-                    val value = noise.eval(
+                    final var value = noise.eval(
                             (dstX + x) / featureSize,
                             (dstY + y) / featureSize,
                             0);
-                    val rgb = (short) ((value * intensity + 1) * 32767.5);
+                    final var rgb = (short) ((value * intensity + 1) * 32767.5);
                     for (int c = 0; c < numBands; ++c) {
                         dstData[pos + dstBandOffset[c]] = rgb;
                     }

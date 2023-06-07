@@ -5,8 +5,6 @@ package com.lightcrafts.utils.xml;
 import java.util.ArrayList;
 import java.util.Base64;
 
-import lombok.val;
-
 import org.w3c.dom.*;
 
 import static com.lightcrafts.utils.xml.XMLUtil.asList;
@@ -29,10 +27,10 @@ public class XmlNode {
     XmlNode(Element element) {
         this.element = element;
         children = new ArrayList<XmlNode>();
-        val nodes = asList(element.getChildNodes());
-        for (val node : nodes) {
+        final var nodes = asList(element.getChildNodes());
+        for (final var node : nodes) {
             if (node.getNodeType() == Node.ELEMENT_NODE) {
-                val child = new XmlNode((Element) node);
+                final var child = new XmlNode((Element) node);
                 children.add(child);
             }
         }
@@ -192,11 +190,11 @@ public class XmlNode {
      * returns null.
      */
     public byte[] getData() {
-        val sb = new StringBuilder();
-        val nodes = asList(element.getChildNodes());
-        for (val node : nodes) {
+        final var sb = new StringBuilder();
+        final var nodes = asList(element.getChildNodes());
+        for (final var node : nodes) {
             if ( node.getNodeType() == Node.TEXT_NODE ) {
-                val text = (Text)node;
+                final var text = (Text)node;
                 sb.append( text.getData() );
             }
         }
@@ -209,8 +207,8 @@ public class XmlNode {
      * null.
      */
     public void clearData() {
-        val nodes = asReversedArray(element.getChildNodes());
-        for (val node : nodes) {
+        final var nodes = asReversedArray(element.getChildNodes());
+        for (final var node : nodes) {
             if (node.getNodeType() == Node.TEXT_NODE) {
                 element.removeChild(node);
             }
