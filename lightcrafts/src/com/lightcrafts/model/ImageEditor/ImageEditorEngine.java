@@ -830,7 +830,7 @@ public class ImageEditorEngine implements Engine {
             final var formatHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
                     BorderExtender.createInstance(BorderExtender.BORDER_COPY));
 
-            Interpolation interp = Interpolation.getInstance(Interpolation.INTERP_BICUBIC_2);
+            Interpolation interp = Interpolation.getInstance(Interpolation.INTERP_BICUBIC);
             ParameterBlock params = new ParameterBlock();
             params.addSource(exportImage);
             params.add(xform);
