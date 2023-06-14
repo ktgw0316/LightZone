@@ -33,11 +33,26 @@ HEDLEY_DIAGNOSTIC_PUSH
 SIMDE_DISABLE_UNWANTED_DIAGNOSTICS
 SIMDE_BEGIN_DECLS_
 
+// Workaround on ARM64 windows due to windows SDK bug
+// https://developercommunity.visualstudio.com/t/In-arm64_neonh-vsqaddb_u8-vsqaddh_u16/10271747?sort=newest
+#if (defined _MSC_VER) && (defined SIMDE_ARM_NEON_A64V8_NATIVE)
+#undef vuqaddh_s16
+#define vuqaddh_s16(src1, src2) neon_suqadds16(__int16ToN16_v(src1), __uint16ToN16_v(src2)).n16_i16[0]
+#undef vuqadds_s32
+#define vuqadds_s32(src1, src2) _CopyInt32FromFloat(neon_suqadds32(_CopyFloatFromInt32(src1), _CopyFloatFromUInt32(src2)))
+#undef vuqaddd_s64
+#define vuqaddd_s64(src1, src2) neon_suqadds64(__int64ToN64_v(src1), __uint64ToN64_v(src2)).n64_i64[0]
+#endif
+
 SIMDE_FUNCTION_ATTRIBUTES
 int8_t
 simde_vuqaddb_s8(int8_t a, uint8_t b) {
   #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
-    return vuqaddb_s8(a, b);
+    #if defined(SIMDE_BUG_CLANG_GIT_4EC445B8)
+      return vuqaddb_s8(a, HEDLEY_STATIC_CAST(int8_t, b));
+    #else
+      return vuqaddb_s8(a, b);
+    #endif
   #else
     int16_t r_ = HEDLEY_STATIC_CAST(int16_t, a) + HEDLEY_STATIC_CAST(int16_t, b);
     return (r_ < INT8_MIN) ? INT8_MIN : ((r_ > INT8_MAX) ? INT8_MAX : HEDLEY_STATIC_CAST(int8_t, r_));
@@ -52,7 +67,11 @@ SIMDE_FUNCTION_ATTRIBUTES
 int16_t
 simde_vuqaddh_s16(int16_t a, uint16_t b) {
   #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
-    return vuqaddh_s16(a, b);
+    #if defined(SIMDE_BUG_CLANG_GIT_4EC445B8)
+      return vuqaddh_s16(a, HEDLEY_STATIC_CAST(int16_t, b));
+    #else
+      return vuqaddh_s16(a, b);
+    #endif
   #else
     int32_t r_ = HEDLEY_STATIC_CAST(int32_t, a) + HEDLEY_STATIC_CAST(int32_t, b);
     return (r_ < INT16_MIN) ? INT16_MIN : ((r_ > INT16_MAX) ? INT16_MAX : HEDLEY_STATIC_CAST(int16_t, r_));
@@ -67,7 +86,11 @@ SIMDE_FUNCTION_ATTRIBUTES
 int32_t
 simde_vuqadds_s32(int32_t a, uint32_t b) {
   #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
-    return vuqadds_s32(a, b);
+    #if defined(SIMDE_BUG_CLANG_GIT_4EC445B8)
+      return vuqadds_s32(a, HEDLEY_STATIC_CAST(int32_t, b));
+    #else
+      return vuqadds_s32(a, b);
+    #endif
   #else
     int64_t r_ = HEDLEY_STATIC_CAST(int64_t, a) + HEDLEY_STATIC_CAST(int64_t, b);
     return (r_ < INT32_MIN) ? INT32_MIN : ((r_ > INT32_MAX) ? INT32_MAX : HEDLEY_STATIC_CAST(int32_t, r_));
@@ -82,7 +105,11 @@ SIMDE_FUNCTION_ATTRIBUTES
 int64_t
 simde_vuqaddd_s64(int64_t a, uint64_t b) {
   #if defined(SIMDE_ARM_NEON_A64V8_NATIVE)
-    return vuqaddd_s64(a, b);
+    #if defined(SIMDE_BUG_CLANG_GIT_4EC445B8)
+      return vuqaddd_s64(a, HEDLEY_STATIC_CAST(int64_t, b));
+    #else
+      return vuqaddd_s64(a, b);
+    #endif
   #else
     /* TODO: I suspect there is room for improvement here.  This is
      * just the first thing that worked, and I don't feel like messing
