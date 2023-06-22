@@ -57,7 +57,6 @@ jobs:
             liblensfun-dev \
             liblcms2-dev \
             liblombok-java \
-            librefuel-java \
             libslf4j-java \
             libtiff-dev \
             tidy
