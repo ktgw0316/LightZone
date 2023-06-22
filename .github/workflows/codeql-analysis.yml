@@ -60,7 +60,7 @@ jobs:
             libslf4j-java \
             libtiff-dev \
             tidy
-          ant -f linux/build.xml -Dno-ivy=true
+          ant -f linux/build.xml
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2

@@ -63,7 +63,7 @@ for:
 
   - matrix:
       only:
-        - image: Ubuntu2004
+        - image: Ubuntu2204
 
     init:
       - sh: export JAVA_HOME=/usr/lib/jvm/java-15-openjdk-amd64
