@@ -21,8 +21,8 @@ override_dh_auto_install:
 
 	install -dm 0755 debian/lightzone/usr/share/java/lightzone
 	cp -pH lightcrafts/lib/jai-lightzone-*.jar debian/lightzone/usr/share/java/lightzone
-	install -m 644 lightcrafts/lib/laf-widget.jar debian/lightzone/usr/share/java/lightzone
-	install -m 644 lightcrafts/lib/substance-lite.jar debian/lightzone/usr/share/java/lightzone
+	install -m 644 lightcrafts/lib/flatlaf-2.1.jar debian/lightzone/usr/share/java/lightzone
+	install -m 644 lightcrafts/lib/flatlaf-intellij-themes-2.1.jar debian/lightzone/usr/share/java/lightzone
 	install -m 644 lightcrafts/products/lightcrafts.jar debian/lightzone/usr/share/java/lightzone
 	install -m 644 linux/products/lightcrafts-linux.jar debian/lightzone/usr/share/java/lightzone
 	install -m 644 linux/products/lightzonehelp.jar debian/lightzone/usr/share/java/lightzone

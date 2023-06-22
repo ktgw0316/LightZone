@@ -52,10 +52,9 @@ Files: lightcrafts/lib/ejml-*.jar
 Copyright: 2009 Peter Abeles
 License: Apache-2.0
 
-Files: lightcrafts/lib/substance-lite.jar
-       lightcrafts/lib/laf-widget.jar
-Copyright: 2005-2010 Kirill Grouchnikov
-License: BSD
+Files: lightcrafts/lib/flatlaf-*.jar
+Copyright: 2019-2023 FormDev Software GmbH
+License: Apache-2.0
 
 License: Apache-2.0
  [LICENSE TEXT]

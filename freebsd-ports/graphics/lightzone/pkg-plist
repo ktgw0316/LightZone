@@ -28,11 +28,11 @@ bin/lightzone
 %%JAVASHAREDIR%%/jiconfont-font_awesome-4.7.0.0.jar
 %%JAVASHAREDIR%%/jiconfont-google_material_design_icons-2.2.0.2.jar
 %%JAVASHAREDIR%%/jiconfont-swing-1.0.1.jar
-%%JAVASHAREDIR%%/lightzone/laf-widget.jar
+%%JAVASHAREDIR%%/lightzone/flatlaf-2.1.jar
+%%JAVASHAREDIR%%/lightzone/flatlaf-intellij-themes-2.1.jar
 %%JAVASHAREDIR%%/lightzone/lightcrafts-linux.jar
 %%JAVASHAREDIR%%/lightzone/lightcrafts.jar
 %%JAVASHAREDIR%%/lightzone/lightzonehelp.jar
-%%JAVASHAREDIR%%/lightzone/substance-lite.jar
 share/applications/lightzone.desktop
 share/icons/hicolor/16x16/apps/lightzone.png
 share/icons/hicolor/32x32/apps/lightzone.png
