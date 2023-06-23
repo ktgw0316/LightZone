@@ -3,10 +3,10 @@
   xmlns:m="http://ant.apache.org/ivy/maven">
   <info organisation="lightcrafts" module="lightcrafts"/>
   <dependencies>
-    <dependency name="annotations" rev="20.1.0" org="org.jetbrains"/>
+    <dependency name="annotations" rev="24.0.1" org="org.jetbrains"/>
     <dependency name="ejml-simple" rev="0.40" org="org.ejml"/>
-    <dependency name="flatlaf" rev="2.1" org="com.formdev" />
-    <dependency name="flatlaf-intellij-themes" rev="2.1" org="com.formdev" />
+    <dependency name="flatlaf" rev="3.1.1" org="com.formdev" />
+    <dependency name="flatlaf-intellij-themes" rev="3.1.1" org="com.formdev" />
     <dependency name="jiconfont-font_awesome" rev="4.7.0.0" org="com.github.jiconfont"/>
     <dependency name="jiconfont-google_material_design_icons" rev="2.2.0.2" org="com.github.jiconfont"/>
     <dependency name="jiconfont-swing" rev="1.0.1" org="com.github.jiconfont"/>

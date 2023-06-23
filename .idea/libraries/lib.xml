@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="lib">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lightcrafts/lib/annotations-20.1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lightcrafts/lib/annotations-24.0.1.jar!/" />
       <root url="jar://$PROJECT_DIR$/lightcrafts/lib/ejml-cdense-0.40.jar!/" />
       <root url="jar://$PROJECT_DIR$/lightcrafts/lib/ejml-core-0.40.jar!/" />
       <root url="jar://$PROJECT_DIR$/lightcrafts/lib/ejml-ddense-0.40.jar!/" />
@@ -15,9 +15,9 @@
       <root url="jar://$PROJECT_DIR$/lightcrafts/lib/jiconfont-font_awesome-4.7.0.0.jar!/" />
       <root url="jar://$PROJECT_DIR$/lightcrafts/lib/jiconfont-google_material_design_icons-2.2.0.2.jar!/" />
       <root url="jar://$PROJECT_DIR$/lightcrafts/lib/jiconfont-swing-1.0.1.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lightcrafts/lib/lombok-1.18.20.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lightcrafts/lib/flatlaf-2.1.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lightcrafts/lib/flatlaf-intellij-themes-2.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lightcrafts/lib/lombok-1.18.26.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lightcrafts/lib/flatlaf-3.1.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lightcrafts/lib/flatlaf-intellij-themes-3.1.1.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
