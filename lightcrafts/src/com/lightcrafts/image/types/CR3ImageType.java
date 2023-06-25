@@ -147,10 +147,34 @@ public final class CR3ImageType extends RawImageType {
     public void readMetadata( ImageInfo imageInfo )
         throws BadImageFileException, IOException
     {
-        final TIFFMetadataReader reader = new TIFFMetadataReader( imageInfo );
-//        final ImageMetadata metadata = reader.readMetadata();
-//        MetadataUtil.removePreviewMetadataFrom( metadata );
-//        MetadataUtil.removeWidthHeightFrom( metadata );
+        final LCByteBuffer buf = imageInfo.getByteBuffer();
+        final ByteOrder origOrder = buf.order();
+        buf.order(ByteOrder.BIG_ENDIAN);
+
+        int cmt1BoxPos = -1;
+        for (int boxPos = 0; boxPos < buf.limit();) {
+            final var boxType = buf.getBytes(boxPos + 4, 4);
+            if (Arrays.equals(boxType, cmt1Tag)) {
+                cmt1BoxPos = boxPos;
+                break;
+            } else if (Arrays.equals(boxType, moovTag)) {
+                boxPos += headerSize;
+            } else if (Arrays.equals(boxType, uuidTag)) {
+                boxPos += headerSize + extendedTypeSize;
+            } else {
+                // Just skip other boxes.
+                boxPos += getBoxSize(buf, boxPos);
+            }
+        }
+
+        buf.order(origOrder);
+
+        final var reader = new TIFFMetadataReader(
+                imageInfo, buf.initialOffset(cmt1BoxPos + headerSize));
+        final ImageMetadata metadata = reader.readMetadata();
+        MetadataUtil.removePreviewMetadataFrom(metadata);
+        MetadataUtil.removeWidthHeightFrom(metadata);
+        buf.initialOffset(0); // TODO: Is this necessary?
     }
 
     ////////// private ////////////////////////////////////////////////////////
@@ -179,6 +203,7 @@ public final class CR3ImageType extends RawImageType {
     private static final byte[] ctboTag = "CTBO".getBytes(UTF_8);
     private static final byte[] prvwTag = "PRVW".getBytes(UTF_8);
     private static final byte[] thmbTag = "THMB".getBytes(UTF_8);
+    private static final byte[] cmt1Tag = "CMT1".getBytes(UTF_8);
     private static final int headerSize = 8;
     private static final int extendedTypeSize = 16;
     private static final byte[] prvwUuid = new byte[] {
