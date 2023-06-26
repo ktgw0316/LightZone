@@ -2,7 +2,7 @@ Format: 3.0 (quilt)
 Source: lightzone
 Binary: lightzone
 Architecture: i386 amd64 armhf arm64
-Version: 4.2.5
+Version: 5.0.0~beta1
 Maintainer: Masahiro Kitagawa <arctica0316@gmail.com>
 Homepage: http://lightzoneproject.org/
 Standards-Version: 4.4.1
@@ -35,5 +35,5 @@ Build-Depends:
 Package-List:
  lightzone deb graphics optional
 DEBTRANSFORM-RELEASE: 1
-DEBTRANSFORM-TAR: lightzone-4.2.5.tar.xz
+DEBTRANSFORM-TAR: lightzone-5.0.0.beta1.tar.xz
 DEBTRANSFORM-SERIES: debian.series-Debian_12

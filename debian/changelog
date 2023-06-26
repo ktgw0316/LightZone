@@ -1,3 +1,9 @@
+lightzone (5.0.0~beta1-0obs1) unstable; urgency=medium
+
+  * Upstream sync
+
+ -- Masahiro Kitagawa <arctica0316@gmail.com>  Mon, 26 Jun 2023 22:30:00 +0900
+
 lightzone (4.2.5-0obs1) unstable; urgency=medium
 
   * Upstream sync

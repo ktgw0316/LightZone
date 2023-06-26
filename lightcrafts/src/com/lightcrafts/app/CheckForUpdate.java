@@ -536,7 +536,7 @@ public final class CheckForUpdate {
 
     public static void main( String[] args ) throws MalformedURLException {
         final var isAvailable = checkIfUpdateIsAvailable(
-                "4.2.5", new URL("file:///tmp/lightzone/appcast.xml"));
+                "5.0.0", new URL("file:///tmp/lightzone/appcast.xml"));
         System.exit(isAvailable ? 0 : 1);
     }
 }
