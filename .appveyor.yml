@@ -1,9 +1,9 @@
 version: 5.0.0.beta1.{build}-{branch}
 
 image:
-  - macos
-  - Visual Studio 2019
-  - Ubuntu2004
+  - Visual Studio 2022
+  - macos-monterey
+  - Ubuntu2204
 
 clone_depth: 1
 
@@ -13,14 +13,14 @@ matrix:
 for:
   - matrix:
       only:
-        - image: Visual Studio 2019
+        - image: Visual Studio 2022
 
     init:
       - cmd: SET MINGW64_PATH=msys64/mingw64
       - cmd: SET MINGW32_PATH=msys64/mingw32
       - cmd: SET PATH=C:/%MINGW64_PATH%/bin/;C:/%MINGW32_PATH%/bin/;C:/msys64/usr/bin/;%PATH%
-      - cmd: SET MSSDK_HOME=/c/Program Files (x86)/Windows Kits/10/Lib/10.0.22000.0
-      - cmd: SET JAVA_HOME=/c/Program Files/Java/jdk15
+      - cmd: SET MSSDK_HOME=/c/Program Files (x86)/Windows Kits/10/Lib/10.0.22621.0
+      - cmd: SET JAVA_HOME=/c/Program Files/Java/jdk17
       - cmd: SET ANT_SCRIPT=/c/projects/lightzone/windows/build.xml
       - cmd: SET ANT_LIB_DIR=/c/projects/lightzone/lightcrafts/lib/
 
@@ -29,7 +29,7 @@ for:
       - cmd: bash -lc 'cp "$MSSDK_HOME/um/x64/Htmlhelp.Lib" /c/$MINGW64_PATH/lib/libhtmlhelp.a'
       - cmd: bash -lc 'cp "$MSSDK_HOME/um/x86/Htmlhelp.Lib" /c/$MINGW32_PATH/lib/libhtmlhelp.a'
 
-      - ps: (new-object net.webclient).DownloadFile('https://download-gcdn.ej-technologies.com/install4j/install4j_windows-x64_8_0_8.exe', 'install4j-installer.exe')
+      - ps: (new-object net.webclient).DownloadFile('https://download-gcdn.ej-technologies.com/install4j/install4j_windows-x64_8_0_11.exe', 'install4j-installer.exe')
       - ps: install4j-installer.exe -q
       - cmd: bash -lc "pacman --noconfirm --disable-download-timeout -S pactoys"
       - cmd: bash -lc "pacboy --noconfirm --disable-download-timeout -S lcms2:m lensfun:m ntldd-git:m pkg-config:m"
@@ -45,7 +45,7 @@ for:
 
   - matrix:
       only:
-        - image: macos
+        - image: macos-monterey
 
     init:
       - sh: export JAVA_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-15.jdk/Contents/Home
@@ -66,7 +66,7 @@ for:
         - image: Ubuntu2204
 
     init:
-      - sh: export JAVA_HOME=/usr/lib/jvm/java-15-openjdk-amd64
+      - sh: export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 
     install:
       - sh: sudo add-apt-repository --yes ppa:lightzone-team/lightzone
