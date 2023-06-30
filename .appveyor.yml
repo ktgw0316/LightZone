@@ -3,7 +3,7 @@ version: 5.0.0.beta1.{build}-{branch}
 image:
   - Visual Studio 2022
   - macos-monterey
-  - Ubuntu2204
+  - Ubuntu2004
 
 clone_depth: 1
 
@@ -60,7 +60,7 @@ for:
 
   - matrix:
       only:
-        - image: Ubuntu2204
+        - image: Ubuntu2004
 
     init:
       - sh: export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
