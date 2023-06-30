@@ -1497,7 +1497,10 @@ public final class DCRaw implements
             "YI M1"
     ));
 
-    public static boolean isSupported(String make, String model) {
+    public boolean isSupported(String make, String model) {
+        if (m_fileName.toLowerCase().endsWith(".dng")) {
+            return true;
+        }
         var makeModel = (make + ' ' + model).toUpperCase();
         if (makeModel.startsWith("CANON EOS ")) {
             makeModel = makeModel.replace(" DIGITAL", "");
