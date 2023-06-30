@@ -67,11 +67,6 @@ If you close and open your shell again it will automatically set these variables
 
 Do NOT set C_INCLUDE_PATH=/usr/include for mingw compilers.
 
-Before starting your first build, you have to copy HtmlHelp.lib to mingw library path:
-
-    cp "${MSSDK_HOME}/um/x86/Htmlhelp.Lib" /mingw32/lib/libhtmlhelp.a
-    cp "${MSSDK_HOME}/um/x64/Htmlhelp.Lib" /mingw64/lib/libhtmlhelp.a
-
 Checkout your project with Git. If you have problems with line endings in build (the \r stuff), do
 following:
 

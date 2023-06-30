@@ -1,8 +1,12 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2023-     Masahiro Kitagawa */
 
 package com.lightcrafts.platform.windows;
 
-import java.util.HashSet;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
+import java.util.Set;
 import java.util.Locale;
 
 /**
@@ -24,6 +28,9 @@ public final class WindowsHelp {
         String iso639LangCode = Locale.getDefault().getLanguage();
         if ( !m_availableISO639LangCodes.contains( iso639LangCode ) )
             iso639LangCode = "en";
+        if (topic == null) {
+            topic = "index";
+        }
         showHelpForLanguage( topic, iso639LangCode );
     }
 
@@ -32,30 +39,32 @@ public final class WindowsHelp {
     /**
      * Launches the Windows HTML Help Viewer to show our application's help.
      *
-     * @param htmlFile The HTML file to show (without the <code>.html</code>
-     * extension) or <code>null</code> to show the cover page.
-     * @param iso639LangCode The 2-letter ISO 639 language code.  Must be in
+     * @param topic The topic to show (without the <code>.html</code> extension)
+     * @param iso639LangCode The 2-letter ISO 639 language code.
      */
-    private static native void showHelpForLanguage( String htmlFile,
-                                                    String iso639LangCode );
+    private static void showHelpForLanguage(@NotNull String topic, String iso639LangCode) {
+        final var chm = "LightZone-" + iso639LangCode + ".chm";
+        final var html = "LightZone_Help/" + topic + ".html";
+        final var param = chm + "::/" + html;
+        try {
+            Runtime.getRuntime().exec("hh.exe " + param);
+        } catch (IOException e) {
+            System.err.println("Unable to launch help viewer for " + param + ": " + e);
+        }
+    }
 
     /**
      * The set of languages (specified as ISO 639 language codes) the help is
      * available in.
      */
-    private static final HashSet<String> m_availableISO639LangCodes =
-        new HashSet<String>();
-
-    static {
-        System.loadLibrary( "Windows" );
-
-        m_availableISO639LangCodes.add( "en" ); // English
-        m_availableISO639LangCodes.add( "da" ); // Danish
-        m_availableISO639LangCodes.add( "nl" ); // Dutch
-        m_availableISO639LangCodes.add( "fr" ); // French
-        m_availableISO639LangCodes.add( "it" ); // Italian
-        m_availableISO639LangCodes.add( "ja" ); // Japanese
-        m_availableISO639LangCodes.add( "es" ); // Spanish
-    }
+    private static final Set<String> m_availableISO639LangCodes = Set.of(
+            "en", // English
+            "da", // Danish
+            "nl", // Dutch
+            "fr", // French
+            "it", // Italian
+            "ja", // Japanese
+            "es"  // Spanish
+    );
 }
 /* vim:set et sw=4 ts=4: */
