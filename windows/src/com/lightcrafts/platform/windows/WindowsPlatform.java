@@ -3,7 +3,6 @@
 package com.lightcrafts.platform.windows;
 
 import com.lightcrafts.image.color.ColorProfileInfo;
-import com.lightcrafts.platform.FileChooser;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.platform.PrinterLayer;
 import com.lightcrafts.utils.Version;
@@ -14,9 +13,10 @@ import java.awt.color.ICC_Profile;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
 import java.util.Collection;
-
-import static com.lightcrafts.platform.windows.WindowsFileUtil.FOLDER_MY_PICTURES;
 
 public final class WindowsPlatform extends Platform {
 
@@ -24,9 +24,7 @@ public final class WindowsPlatform extends Platform {
 
     @Override
     public File getDefaultImageDirectory() {
-        final String path =
-            WindowsFileUtil.getFolderPathOf( FOLDER_MY_PICTURES );
-        return path != null ? new File( path ) : null;
+        return new File(System.getProperty("user.home"), "Pictures");
     }
 
     @Override
@@ -109,7 +107,8 @@ public final class WindowsPlatform extends Platform {
 
     @Override
     public void hideFile( File file ) throws IOException {
-        WindowsFileUtil.hideFile( file.getAbsolutePath() );
+        final Path path = file.toPath();
+        Files.setAttribute(path, "dos:hidden", Boolean.TRUE, LinkOption.NOFOLLOW_LINKS); //< set hidden attribute
     }
 
     @Override
@@ -141,7 +140,11 @@ public final class WindowsPlatform extends Platform {
 
     @Override
     public String resolveAliasFile( File file ) {
-        return WindowsFileUtil.resolveShortcut( file.getAbsolutePath() );
+        try {
+            return file.getCanonicalPath();
+        } catch (IOException e) {
+            return null;
+        }
     }
 
     @Override
