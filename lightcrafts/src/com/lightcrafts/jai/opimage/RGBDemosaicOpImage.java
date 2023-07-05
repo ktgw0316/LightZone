@@ -3,7 +3,7 @@
 package com.lightcrafts.jai.opimage;
 
 import com.lightcrafts.jai.utils.Functions;
-import com.lightcrafts.utils.DCRaw;
+import com.lightcrafts.utils.raw.DCRaw;
 
 import javax.media.jai.AreaOpImage;
 import javax.media.jai.BorderExtender;

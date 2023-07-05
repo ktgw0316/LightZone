@@ -9,7 +9,7 @@ import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.ColorDropperOperation;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
-import com.lightcrafts.utils.DCRaw;
+import com.lightcrafts.utils.raw.DCRaw;
 import com.lightcrafts.utils.LCMatrix;
 import com.lightcrafts.utils.splines;
 import org.ejml.simple.SimpleMatrix;

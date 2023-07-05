@@ -32,7 +32,7 @@ JNI_PPC_DEFINES=	$(ALTIVEC_CFLAGS)
 ##
 C_SOURCES:=		dcrawUtils.c
 
-JAVAH_CLASSES:=		com.lightcrafts.utils.DCRaw
+JAVAH_CLASSES:=		com.lightcrafts.utils.raw.DCRaw
 
 ROOT:=			../../..
 include			../jni.mk

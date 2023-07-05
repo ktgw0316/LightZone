@@ -6,14 +6,14 @@
 #include <jni.h>
 
 #ifndef AUTO_DEP
-#include "javah/com_lightcrafts_utils_DCRaw.h"
+#include "javah/com_lightcrafts_utils_raw_DCRaw.h"
 #endif
 
 #include "LC_JNIUtils.h"
 #include "mathlz.h"
 
 #define DCRaw_METHOD(method) \
-        name4(Java_,com_lightcrafts_utils_DCRaw,_,method)
+        name4(Java_,com_lightcrafts_utils_raw_DCRaw,_,method)
 
 #define srcDatum(x, y) \
         srcData[(y) * srcLineStride + (x) + srcOffset]

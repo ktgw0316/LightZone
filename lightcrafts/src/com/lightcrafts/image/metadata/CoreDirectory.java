@@ -9,7 +9,7 @@ import com.lightcrafts.image.metadata.values.*;
 import com.lightcrafts.image.types.AuxiliaryImageInfo;
 import com.lightcrafts.image.types.ImageType;
 import com.lightcrafts.image.types.RawImageInfo;
-import com.lightcrafts.utils.DCRaw;
+import com.lightcrafts.utils.raw.DCRaw;
 import com.lightcrafts.utils.TextUtil;
 import com.lightcrafts.utils.Version;
 import com.lightcrafts.utils.xml.XMLUtil;

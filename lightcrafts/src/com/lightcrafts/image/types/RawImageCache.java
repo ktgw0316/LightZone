@@ -11,7 +11,7 @@ import javax.media.jai.PlanarImage;
 
 import com.lightcrafts.utils.filecache.FileCache;
 import com.lightcrafts.utils.filecache.FileCacheFactory;
-import com.lightcrafts.utils.DCRaw;
+import com.lightcrafts.utils.raw.DCRaw;
 import com.lightcrafts.utils.UserCanceledException;
 import com.lightcrafts.utils.thread.ProgressThread;
 import com.lightcrafts.image.libs.LCTIFFWriter;

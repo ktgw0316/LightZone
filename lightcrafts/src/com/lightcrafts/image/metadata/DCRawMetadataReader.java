@@ -8,7 +8,7 @@ import java.util.Date;
 import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.image.metadata.values.*;
 import com.lightcrafts.image.types.RawImageInfo;
-import com.lightcrafts.utils.DCRaw;
+import com.lightcrafts.utils.raw.DCRaw;
 import com.lightcrafts.utils.LightCraftsException;
 
 import static com.lightcrafts.image.metadata.EXIFTags.*;

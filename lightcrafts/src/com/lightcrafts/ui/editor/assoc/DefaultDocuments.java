@@ -9,11 +9,11 @@ import com.lightcrafts.image.UnknownImageTypeException;
 import com.lightcrafts.image.metadata.ImageMetadata;
 import com.lightcrafts.image.types.ImageType;
 import com.lightcrafts.image.types.RawImageType;
+import com.lightcrafts.utils.raw.Camera;
 import com.lightcrafts.utils.xml.XmlDocument;
 
 import java.io.*;
 import java.net.URL;
-import java.util.Properties;
 
 /**
  * A resolver from ImageMetadata objects to resource URL's for
@@ -36,26 +36,8 @@ class DefaultDocuments {
             // is available.
             String make = meta.getCameraMake(true);
             if (make != null) {
-                make = make.replace('*', '_') // For the Pentax *ist
-                           .replace('/', '_')
-                           .replace(':', '_');
-                make = getCompatibleCameraName(make);
-
-                URL url = DefaultDocuments.class.getResource(
-                    "resources/" + make + ".lzn"
-                );
-                if (url == null)
-                    url = DefaultDocuments.class.getResource(
-                        "resources/" + make + ".lzt"
-                    );
-                if ((url == null) && Debug) {
-                    System.err.println(
-                        "No default Document for \"" + make + "\""
-                    );
-                }
-                return url;
-            }
-            else if (Debug) {
+                return Camera.getLztUrl(make);
+            } else if (Debug) {
                 System.err.println(
                     "No camera make found for RAW file \"" +
                     meta.getFile().getName() +
@@ -64,21 +46,6 @@ class DefaultDocuments {
             }
         }
         return null;
-    }
-
-    private static String getCompatibleCameraName(final String name) {
-        final Properties properties = new Properties();
-
-        // TODO: Java7 try-with-resources, multi-catch
-        try (Reader reader = new InputStreamReader(DefaultDocuments.class.getResourceAsStream(
-                        "resources/CompatibleCameras.properties"), "UTF-8")) {
-            properties.load(reader);
-        } catch (IOException e) {
-            return name;
-        }
-
-        final String newName = properties.getProperty(name);
-        return newName != null ? newName : name;
     }
 
     /**

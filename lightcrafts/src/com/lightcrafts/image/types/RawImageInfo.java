@@ -3,7 +3,7 @@
 package com.lightcrafts.image.types;
 
 import com.lightcrafts.image.ImageInfo;
-import com.lightcrafts.utils.DCRaw;
+import com.lightcrafts.utils.raw.DCRaw;
 
 /**
  * A <code>RawImageInfo</code> is-an {@link AuxiliaryImageInfo} for holding

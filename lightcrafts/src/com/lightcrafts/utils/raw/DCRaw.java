@@ -1,7 +1,7 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
 /* Copyright (C) 2015-     Masahiro Kitagawa */
 
-package com.lightcrafts.utils;
+package com.lightcrafts.utils.raw;
 
 import com.lightcrafts.image.BadImageFileException;
 import com.lightcrafts.image.UnknownImageTypeException;
@@ -10,6 +10,9 @@ import com.lightcrafts.image.libs.LCImageReaderFactory;
 import com.lightcrafts.image.metadata.providers.*;
 import com.lightcrafts.image.metadata.MetadataUtil;
 import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.utils.ForkDaemon;
+import com.lightcrafts.utils.LRUHashMap;
+import com.lightcrafts.utils.UserCanceledException;
 import com.lightcrafts.utils.bytebuffer.ByteBufferUtil;
 
 import java.awt.*;
@@ -1527,6 +1530,7 @@ public final class DCRaw implements
             return true;
         }
         var makeModel = (make + ' ' + model).toUpperCase();
+        makeModel = Camera.getCompatibleCameraName(makeModel);
         if (makeModel.startsWith("CANON EOS ")) {
             makeModel = makeModel.replace(" DIGITAL", "");
         } else if (makeModel.startsWith("LEICA ")) {
