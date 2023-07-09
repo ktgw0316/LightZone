@@ -13,7 +13,6 @@ import com.lightcrafts.model.ColorDropperOperation;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.RawAdjustmentOperation;
 import com.lightcrafts.model.SliderConfig;
-import com.lightcrafts.utils.raw.DCRaw;
 import com.lightcrafts.utils.LCMatrix;
 import org.ejml.simple.SimpleMatrix;
 
@@ -87,7 +86,7 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
         AuxiliaryImageInfo auxInfo = rendering.getEngine().getAuxInfo();
 
         if (auxInfo instanceof RawImageInfo) {
-            final var dcRaw = ((RawImageInfo)auxInfo).getDCRaw();
+            final var dcRaw = ((RawImageInfo)auxInfo).getRawDecoder();
 
             float[] daylightMultipliers = dcRaw.getDaylightMultipliers();
             preMul = daylightMultipliers.clone();
