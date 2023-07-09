@@ -42,7 +42,7 @@ public final class DCRaw implements
 
     //////////  public ////////////////////////////////////////////////////////
 
-    static private Map<String,DCRaw> dcrawCache =
+    static private final Map<String,DCRaw> dcrawCache =
         new LRUHashMap<>(100);
 
     public static synchronized DCRaw getInstanceFor( String fileName ) {
@@ -127,11 +127,11 @@ public final class DCRaw implements
     private static String readln(InputStream s) {
         try {
             int c = '\n';
-            while (c > 0 && c != 255 && (c == '\n' || c == '\r')) {
+            while (c == '\n' || c == '\r') {
                 // Skip carriage returns and line feeds
                 c = s.read();
             }
-            final var sb = new StringBuffer();
+            final var sb = new StringBuilder();
             while (c > 0 && c != 255 && c != '\n' && c != '\r') {
                 sb.append((char) c);
                 c = s.read();
@@ -263,7 +263,7 @@ public final class DCRaw implements
         } else if (line.startsWith(search = SHUTTER)) {
             final var shutterSpeed = line.substring(search.length() + 2);
             try {
-                float exposureTime = Float.valueOf
+                float exposureTime = Float.parseFloat
                         (shutterSpeed.substring(0, shutterSpeed.indexOf(" sec")));
                 if (exposureTime != 0)
                     m_shutterSpeed = 1 / exposureTime;
@@ -271,12 +271,12 @@ public final class DCRaw implements
         } else if (line.startsWith(search = APERTURE)) {
             final var aperture = line.substring(search.length() + 2);
             try {
-                m_aperture = Float.valueOf(aperture);
+                m_aperture = Float.parseFloat(aperture);
             } catch (NumberFormatException ignored) { }
         } else if (line.startsWith(search = FOCAL_LENGTH)) {
             final var focalLenght = line.substring(search.length());
             try {
-                m_focalLength = Float.valueOf(
+                m_focalLength = Float.parseFloat(
                         focalLenght.substring(0, focalLenght.indexOf(" mm")));
             } catch (NumberFormatException ignored) { }
             // } else if (line.startsWith(search = NUM_RAW_IMAGES)) {
@@ -634,7 +634,7 @@ public final class DCRaw implements
         final var four_colors = four_color_cameras.contains(makeModel);
         final var path = of.getAbsolutePath();
 
-        final var cmd = new ArrayList<String>(Arrays.asList(DCRAW_PATH, "-F", path, "-v"));
+        final var cmd = new ArrayList<>(Arrays.asList(DCRAW_PATH, "-F", path, "-v"));
 
         switch (mode) {
         case full:
@@ -742,11 +742,11 @@ public final class DCRaw implements
     @Getter @Accessors(prefix = "m_", fluent = true)
     private int m_rawColors;
 
-    private float[] m_cam_mul = new float[4];
-    private float[] m_pre_mul = new float[4];
+    private final float[] m_cam_mul = new float[4];
+    private final float[] m_pre_mul = new float[4];
     private float[] m_rgb_cam;
     private float[] m_xyz_cam;
-    private float[] m_secondary_cam_mul = new float[4];
+    private final float[] m_secondary_cam_mul = new float[4];
 
     private static final Set<String> four_color_cameras = new HashSet<>(Arrays.asList(
             // "OLYMPUS E-3",
