@@ -1,37 +1,19 @@
 package com.lightcrafts.image.libs;
 
-import java.awt.Transparency;
-import java.awt.color.ColorSpace;
-import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.ComponentColorModel;
-import java.awt.image.DataBuffer;
-import java.awt.image.DataBufferByte;
-import java.awt.image.DataBufferUShort;
-import java.awt.image.Raster;
-import java.awt.image.RenderedImage;
-import java.awt.image.WritableRaster;
+import com.lightcrafts.image.BadImageFileException;
+import com.lightcrafts.image.UnknownImageTypeException;
+import com.lightcrafts.image.types.JPEGImageType;
+import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.utils.raw.RawDecoder;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.*;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Date;
 
-import com.lightcrafts.image.BadImageFileException;
-import com.lightcrafts.image.UnknownImageTypeException;
-import com.lightcrafts.image.metadata.providers.ApertureProvider;
-import com.lightcrafts.image.metadata.providers.CaptureDateTimeProvider;
-import com.lightcrafts.image.metadata.providers.FocalLengthProvider;
-import com.lightcrafts.image.metadata.providers.ISOProvider;
-import com.lightcrafts.image.metadata.providers.MakeModelProvider;
-import com.lightcrafts.image.metadata.providers.ShutterSpeedProvider;
-import com.lightcrafts.image.metadata.providers.WidthHeightProvider;
-import com.lightcrafts.image.types.JPEGImageType;
-import com.lightcrafts.jai.JAIContext;
-
-import javax.imageio.ImageIO;
-
-public class LibRaw implements
-        ApertureProvider, CaptureDateTimeProvider, FocalLengthProvider,
-        ISOProvider, MakeModelProvider, ShutterSpeedProvider, WidthHeightProvider {
+public class LibRaw extends RawDecoder {
     final String filePath;
 
     int         progress_flags;

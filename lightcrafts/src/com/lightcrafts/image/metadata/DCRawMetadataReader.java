@@ -7,11 +7,10 @@ import java.util.Date;
 import java.util.stream.Stream;
 
 import com.lightcrafts.image.ImageInfo;
-import com.lightcrafts.image.libs.LibRaw;
 import com.lightcrafts.image.metadata.values.*;
 import com.lightcrafts.image.types.RawImageInfo;
-import com.lightcrafts.utils.raw.DCRaw;
 import com.lightcrafts.utils.LightCraftsException;
+import com.lightcrafts.utils.raw.RawDecoder;
 
 import static com.lightcrafts.image.metadata.EXIFTags.*;
 
@@ -47,7 +46,7 @@ public final class DCRawMetadataReader extends ImageMetadataReader {
         catch ( LightCraftsException e ) {
             return;
         }
-        final LibRaw dcraw = info.getDCRaw();
+        final RawDecoder dcraw = info.getRawDecoder();
 
         final ImageMetadata metadata = m_imageInfo.getCurrentMetadata();
         final EXIFDirectory exifDir =

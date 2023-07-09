@@ -9,7 +9,6 @@ import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.ColorDropperOperation;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
-import com.lightcrafts.utils.raw.DCRaw;
 import com.lightcrafts.utils.LCMatrix;
 import com.lightcrafts.utils.splines;
 import org.ejml.simple.SimpleMatrix;
@@ -54,7 +53,7 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
         AuxiliaryImageInfo auxInfo = rendering.getEngine().getAuxInfo();
 
         if (false && auxInfo instanceof RawImageInfo) {
-            final var dcRaw = ((RawImageInfo)auxInfo).getDCRaw();
+            final var dcRaw = ((RawImageInfo)auxInfo).getRawDecoder();
 
             float[] daylightMultipliers = dcRaw.getDaylightMultipliers();
             float[] cameraMultipliers = dcRaw.getCameraMultipliers();
