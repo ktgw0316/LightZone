@@ -256,7 +256,7 @@ public final class DCRaw implements
             final var camera = line.substring(search.length());
             m_make = camera.substring(0, camera.indexOf(' '));
             m_model = camera.substring(m_make.length() + 1);
-            m_decodable &= isSupported(m_make, m_model);
+            m_decodable = isSupported();
         } else if (line.startsWith(search = ISO)) {
             final var iso = line.substring(search.length());
             m_ISO = Integer.decode(iso);
@@ -1525,40 +1525,52 @@ public final class DCRaw implements
             "YI M1"
     ));
 
-    public boolean isSupported(String make, String model) {
-        if (m_fileName.toLowerCase().endsWith(".dng")) {
-            return true;
-        }
-        var makeModel = (make + ' ' + model).toUpperCase();
+    private String shortCameraName() {
+        var makeModel = (m_make + ' ' + m_model).toUpperCase();
         makeModel = Camera.getCompatibleCameraName(makeModel);
-        if (makeModel.startsWith("CANON EOS ")) {
-            makeModel = makeModel.replace(" DIGITAL", "");
-        } else if (makeModel.startsWith("LEICA ")) {
-            makeModel = makeModel
-                    .replace(" CAMERA AG", "")
-                    .replace(" DIGITAL CAMERA", "");
-        } else if (make.startsWith("KONICA ") || make.startsWith("MINOLTA ")) {
-            makeModel = makeModel
-                    .replace("KONICA MINOLTA ", "MINOLTA ")
-                    .replace(" CAMERA, INC.", "")
-                    .replace(" CO., LTD.", "");
-        } else if (makeModel.startsWith("NIKON ")) {
-            makeModel = makeModel.replace(" CORPORATION", "");
-        } else if (makeModel.startsWith("OLYMPUS ")) {
-            makeModel = makeModel
-                    .replace(" CORPORATION", "")
-                    .replace(" IMAGING", "")
-                    .replace(" CORP.", "")
-                    .replace(" OPTICAL CO., LTD", "");
-        } else if (makeModel.startsWith("RICOH IMAGING COMPANY, LTD.")) {
-            // e.g. "RICOH IMAGING COMPANY, LTD. PENTAX 645Z" or "RICOH IMAGING COMPANY, LTD. GR II"
-            makeModel = makeModel
-                    .replace("RICOH IMAGING COMPANY, LTD.", "PENTAX")
-                    .replace("PENTAX PENTAX", "PENTAX");
-        } else if (makeModel.startsWith("SAMSUNG ")) {
-            makeModel = makeModel.replace(" TECHWIN", "");
+        switch (m_make.toUpperCase()) {
+            case "CANON":
+                if (m_model.toUpperCase().startsWith("EOS ")) {
+                    makeModel = makeModel.replace(" DIGITAL", "");
+                }
+                break;
+            case "LEICA":
+                makeModel = makeModel
+                        .replace(" CAMERA AG", "")
+                        .replace(" DIGITAL CAMERA", "");
+                break;
+            case "KONICA":
+            case "MINOLTA":
+                makeModel = makeModel
+                        .replace("KONICA MINOLTA ", "MINOLTA ")
+                        .replace(" CAMERA, INC.", "")
+                        .replace(" CO., LTD.", "");
+                break;
+            case "NIKON":
+                makeModel = makeModel.replace(" CORPORATION", "");
+                break;
+            case "OLYMPUS":
+                makeModel = makeModel
+                        .replace(" CORPORATION", "")
+                        .replace(" IMAGING", "")
+                        .replace(" CORP.", "")
+                        .replace(" OPTICAL CO., LTD", "");
+                break;
+            case "RICOH":
+                // e.g. "RICOH IMAGING COMPANY, LTD. PENTAX 645Z" or "RICOH IMAGING COMPANY, LTD. GR II"
+                makeModel = makeModel
+                        .replace("RICOH IMAGING COMPANY, LTD.", "PENTAX")
+                        .replace("PENTAX PENTAX", "PENTAX");
+                break;
+            case "SAMSUNG":
+                makeModel = makeModel.replace(" TECHWIN", "");
+                break;
         }
-        return supported_cameras.contains(makeModel);
+        return makeModel;
+    }
+
+    public boolean isSupported() {
+        return m_fileName.toLowerCase().endsWith(".dng") || supported_cameras.contains(shortCameraName());
     }
 
     public native static void interpolateGreen(
