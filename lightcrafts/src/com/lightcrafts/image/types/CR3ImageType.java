@@ -7,6 +7,8 @@ import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.image.UnknownImageTypeException;
 import com.lightcrafts.image.metadata.*;
 import com.lightcrafts.utils.bytebuffer.LCByteBuffer;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.image.RenderedImage;
 import java.io.IOException;
@@ -43,46 +45,15 @@ public final class CR3ImageType extends RawImageType {
     /**
      * {@inheritDoc}
      */
-    public RenderedImage getPreviewImage(ImageInfo imageInfo, int maxWidth, int maxHeight)
+    @Override
+    public RenderedImage getPreviewImage(@NotNull ImageInfo imageInfo, int maxWidth, int maxHeight)
             throws BadImageFileException, IOException, UnknownImageTypeException
     {
         final LCByteBuffer buf = imageInfo.getByteBuffer();
-        final ByteOrder origOrder = buf.order();
-        buf.order(ByteOrder.BIG_ENDIAN);
-
-        int prvwBoxPos = -1;
-        for (int boxPos = 0; boxPos < buf.limit();) {
-            final var boxType = buf.getBytes(boxPos + 4, 4);
-            if (Arrays.equals(boxType, prvwTag)) {
-                prvwBoxPos = boxPos;
-                break;
-            } else if (Arrays.equals(boxType, moovTag)) {
-                boxPos += headerSize;
-            } else if (Arrays.equals(boxType, ctboTag)) {
-                // cf. https://github.com/lclevy/canon_cr3#ctbo
-                final int recodeSize = 20;
-                final long prvwUuidOffset = buf.getLong(boxPos + headerSize + 4 + recodeSize + 4);
-                boxPos = (int) prvwUuidOffset;
-            } else if (Arrays.equals(boxType, uuidTag)) {
-                byte[] uuid = buf.getBytes(boxPos + headerSize, extendedTypeSize);
-                boxPos += headerSize + extendedTypeSize;
-                if (Arrays.equals(uuid, prvwUuid)) {
-                    boxPos += 8; // to skip unknown data
-                }
-            } else {
-                // Just skip other boxes.
-                boxPos += getBoxSize(buf, boxPos);
-            }
-        }
-
-        // cf. https://github.com/lclevy/canon_cr3#prvw-preview
-        final int length = buf.getInt(prvwBoxPos + 20);
-        final int offset = prvwBoxPos + 24;
-
-        buf.order( origOrder );
+        final ImageParams params = parsePrvwBox(buf);
 
         final RenderedImage image = JPEGImageType.getImageFromBuffer(
-                buf, offset, length, null, maxWidth, maxHeight);
+                buf, params.offset(), params.length(), null, maxWidth, maxHeight);
         return (image != null)
                 ? image
                 : super.getPreviewImage( imageInfo, maxWidth, maxHeight );
@@ -97,78 +68,36 @@ public final class CR3ImageType extends RawImageType {
     /**
      * {@inheritDoc}
      */
-    public RenderedImage getThumbnailImage(ImageInfo imageInfo)
+    @Override
+    public RenderedImage getThumbnailImage(@NotNull ImageInfo imageInfo)
             throws BadImageFileException, IOException, UnknownImageTypeException
     {
         if (!USE_EMBEDDED_PREVIEW)
             return getPreviewImage(imageInfo, 640, 480);
 
         final LCByteBuffer buf = imageInfo.getByteBuffer();
-        final ByteOrder origOrder = buf.order();
-        buf.order(ByteOrder.BIG_ENDIAN);
+        final ImageParams params = parseThmbBox(buf);
 
-        int thmbBoxPos = -1;
-        for (int boxPos = 0; boxPos < buf.limit();) {
-            final var boxType = buf.getBytes(boxPos + 4, 4);
-            if (Arrays.equals(boxType, thmbTag)) {
-                thmbBoxPos = boxPos;
-                break;
-            } else if (Arrays.equals(boxType, moovTag)) {
-                boxPos += headerSize;
-            } else if (Arrays.equals(boxType, uuidTag)) {
-                boxPos += headerSize + extendedTypeSize;
-            } else {
-                // Just skip other boxes.
-                boxPos += getBoxSize(buf, boxPos);
-            }
-        }
-
-        // cf. https://github.com/lclevy/canon_cr3#thmb-thumbnail
-        final byte version = buf.get(thmbBoxPos + 8);
-        final int length = buf.getInt(thmbBoxPos + 16);
-        final int offset = thmbBoxPos + 24;
-
-        buf.order(origOrder);
-
-        final boolean isThmbBoxCorrect = thmbBoxPos >= 0 && (version == 0 || version == 1);
-        final RenderedImage image = isThmbBoxCorrect
-                ? JPEGImageType.getImageFromBuffer(buf, offset, length, null, 160, 120)
+        final RenderedImage image = (params != null)
+                ? JPEGImageType.getImageFromBuffer(buf, params.offset, params.length, null, 160, 120)
                 : null;
         return (image != null)
                 ? image
                 : super.getPreviewImage(imageInfo, 160, 120);
     }
 
+
     /**
      * Reads all the metadata for a given CR3 image file.
      *
      * @param imageInfo The image to read the metadata from.
      */
-    public void readMetadata( ImageInfo imageInfo )
+    @Override
+    public void readMetadata(@NotNull ImageInfo imageInfo)
         throws BadImageFileException, IOException
     {
         final LCByteBuffer buf = imageInfo.getByteBuffer();
-        final ByteOrder origOrder = buf.order();
-        buf.order(ByteOrder.BIG_ENDIAN);
-
-        int cmt1BoxPos = -1;
-        for (int boxPos = 0; boxPos < buf.limit();) {
-            final var boxType = buf.getBytes(boxPos + 4, 4);
-            if (Arrays.equals(boxType, cmt1Tag)) {
-                cmt1BoxPos = boxPos;
-                break;
-            } else if (Arrays.equals(boxType, moovTag)) {
-                boxPos += headerSize;
-            } else if (Arrays.equals(boxType, uuidTag)) {
-                boxPos += headerSize + extendedTypeSize;
-            } else {
-                // Just skip other boxes.
-                boxPos += getBoxSize(buf, boxPos);
-            }
-        }
-
-        buf.order(origOrder);
-
+        final int cmt1BoxPos = parseCmt1Box(buf);
         final var reader = new TIFFMetadataReader(
                 imageInfo, buf.initialOffset(cmt1BoxPos + headerSize));
         final ImageMetadata metadata = reader.readMetadata();
@@ -218,14 +147,107 @@ public final class CR3ImageType extends RawImageType {
     private static long getBoxSize(LCByteBuffer buf, int boxPos)
             throws IOException {
         final int boxSize = buf.getInt(boxPos);
-        switch (boxSize) {
-            case 0:
-                return buf.limit() - boxPos; // box extends to end of file
-            case 1:
-                return buf.getLong(boxPos + headerSize);
-            default:
-                return boxSize;
+        return switch (boxSize) {
+            case 0 -> buf.limit() - boxPos; // box extends to end of file
+            case 1 -> buf.getLong(boxPos + headerSize);
+            default -> boxSize;
+        };
+    }
+
+    private record ImageParams(int offset, int length) { }
+
+    @NotNull
+    private static CR3ImageType.ImageParams parsePrvwBox(@NotNull LCByteBuffer buf) throws IOException {
+        final ByteOrder origOrder = buf.order();
+        buf.order(ByteOrder.BIG_ENDIAN);
+
+        int prvwBoxPos = -1;
+        for (int boxPos = 0; boxPos < buf.limit();) {
+            final var boxType = buf.getBytes(boxPos + 4, 4);
+            if (Arrays.equals(boxType, prvwTag)) {
+                prvwBoxPos = boxPos;
+                break;
+            } else if (Arrays.equals(boxType, moovTag)) {
+                boxPos += headerSize;
+            } else if (Arrays.equals(boxType, ctboTag)) {
+                // cf. https://github.com/lclevy/canon_cr3#ctbo
+                final int recodeSize = 20;
+                final long prvwUuidOffset = buf.getLong(boxPos + headerSize + 4 + recodeSize + 4);
+                boxPos = (int) prvwUuidOffset;
+            } else if (Arrays.equals(boxType, uuidTag)) {
+                byte[] uuid = buf.getBytes(boxPos + headerSize, extendedTypeSize);
+                boxPos += headerSize + extendedTypeSize;
+                if (Arrays.equals(uuid, prvwUuid)) {
+                    boxPos += 8; // to skip unknown data
+                }
+            } else {
+                // Just skip other boxes.
+                boxPos += getBoxSize(buf, boxPos);
+            }
         }
+
+        // cf. https://github.com/lclevy/canon_cr3#prvw-preview
+        final int length = buf.getInt(prvwBoxPos + 20);
+        final int offset = prvwBoxPos + 24;
+
+        buf.order( origOrder );
+        return new ImageParams(offset, length);
+    }
+
+    @Nullable
+    private static ImageParams parseThmbBox(LCByteBuffer buf) throws IOException {
+        final ByteOrder origOrder = buf.order();
+        buf.order(ByteOrder.BIG_ENDIAN);
+
+        int thmbBoxPos = -1;
+        for (int boxPos = 0; boxPos < buf.limit();) {
+            final var boxType = buf.getBytes(boxPos + 4, 4);
+            if (Arrays.equals(boxType, thmbTag)) {
+                thmbBoxPos = boxPos;
+                break;
+            } else if (Arrays.equals(boxType, moovTag)) {
+                boxPos += headerSize;
+            } else if (Arrays.equals(boxType, uuidTag)) {
+                boxPos += headerSize + extendedTypeSize;
+            } else {
+                // Just skip other boxes.
+                boxPos += getBoxSize(buf, boxPos);
+            }
+        }
+
+        // cf. https://github.com/lclevy/canon_cr3#thmb-thumbnail
+        final byte version = buf.get(thmbBoxPos + 8);
+        final int length = buf.getInt(thmbBoxPos + 16);
+        final int offset = thmbBoxPos + 24;
+
+        buf.order(origOrder);
+        if (thmbBoxPos < 0 || (version != 0 && version != 1))
+            return null;
+        return new ImageParams(offset, length);
+    }
+
+    private static int parseCmt1Box(LCByteBuffer buf) throws IOException {
+        final ByteOrder origOrder = buf.order();
+        buf.order(ByteOrder.BIG_ENDIAN);
+
+        int cmt1BoxPos = -1;
+        for (int boxPos = 0; boxPos < buf.limit();) {
+            final var boxType = buf.getBytes(boxPos + 4, 4);
+            if (Arrays.equals(boxType, cmt1Tag)) {
+                cmt1BoxPos = boxPos;
+                break;
+            } else if (Arrays.equals(boxType, moovTag)) {
+                boxPos += headerSize;
+            } else if (Arrays.equals(boxType, uuidTag)) {
+                boxPos += headerSize + extendedTypeSize;
+            } else {
+                // Just skip other boxes.
+                boxPos += getBoxSize(buf, boxPos);
+            }
+        }
+
+        buf.order(origOrder);
+        return cmt1BoxPos;
     }
 
 }
