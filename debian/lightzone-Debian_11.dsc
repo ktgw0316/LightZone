@@ -11,8 +11,8 @@ Vcs-Git: https://github.com/ktgw0316/LightZone.git
 Build-Depends:
  ant (>= 1.9.8),
  debhelper,
- default-jdk (>= 1.11),
- default-jre-headless (>= 2:1.11),
+ default-jdk (>= 1.17),
+ default-jre-headless (>= 2:1.17),
  devscripts,
  git-core,
  javahelp2,

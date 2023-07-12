@@ -17,7 +17,7 @@ Building the LightZone source requires (at least) following packages:
 - __libtiff__
 - __libxml2-utils__ for xmllint
 - __make__
-- __openjdk-11-jdk__ or later
+- __openjdk-17-jdk__ or later
 - __pkg-config__
 - __rsync__
 

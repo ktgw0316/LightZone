@@ -7,14 +7,14 @@ url="http://lightzoneproject.org/"
 license=('custom:BSD-3-Clause')
 arch=('x86_64')
 
-depends=('java-runtime>11'
+depends=('java-runtime>15'
  'javahelp2'
  'lcms2'
  'lensfun'
  'libjpeg-turbo'
  'libtiff'
  'libxml2')
-makedepends=('java-environment>11'
+makedepends=('java-environment>15'
  'ant'
  'gcc'
  'make'
@@ -35,8 +35,6 @@ build() {
   # Set $JAVA_HOME and $ANT_HOME
   if [ -d /usr/lib/jvm/java-17-openjdk ]; then
     export JAVA_HOME=/usr/lib/jvm/java-17-openjdk
-  elif [ -d /usr/lib/jvm/java-15-openjdk ]; then
-    export JAVA_HOME=/usr/lib/jvm/java-15-openjdk
   else
     export JAVA_HOME=/usr/lib/jvm/default
   fi

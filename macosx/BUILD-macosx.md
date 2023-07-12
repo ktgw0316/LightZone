@@ -17,7 +17,7 @@ from LightZone/macosx/resources/Info.plist and launch the MainClass defined ther
 
 Building the LightZone source requires the following software:
 
-- __Java__ version 11 or later
+- __Java__ version 17 or later
 - __clang__
 - __git__
 - __homebrew__ from <http://brew.sh/>

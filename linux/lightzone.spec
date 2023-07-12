@@ -57,7 +57,7 @@ Requires:	libgomp1
 %endif
 
 %if 0%{?mageia}
-%define jdk java-11-openjdk-devel
+%define jdk java-17-openjdk-devel
 %define lcms2_devel liblcms2-devel
 %define libjpeg_devel libjpeg-devel
 %define libX11_devel libx11-devel

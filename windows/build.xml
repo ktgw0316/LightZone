@@ -59,7 +59,7 @@
     <mkdir dir="build"/>
     <mkdir dir="javah"/>
     <javac destdir="build" debug="true"
-           release="11" nativeheaderdir="javah">
+           release="17" nativeheaderdir="javah">
       <src path="src"/>
       <classpath>
         <fileset dir="${common-dir}/products">
