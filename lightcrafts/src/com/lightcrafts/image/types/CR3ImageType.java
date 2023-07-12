@@ -15,6 +15,8 @@ import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.nio.ByteOrder;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -51,7 +53,7 @@ public final class CR3ImageType extends RawImageType {
             throws BadImageFileException, IOException, UnknownImageTypeException
     {
         final LCByteBuffer buf = imageInfo.getByteBuffer();
-        final ImageParam params = CR3ImageParser.getInstance(imageInfo).getPrvwBox();
+        final ImageParam params = CR3ImageParser.getInstance(imageInfo).getPrvwParam();
 
         final RenderedImage image = JPEGImageType.getImageFromBuffer(
                 buf, params.offset(), params.length(), null, maxWidth, maxHeight);
@@ -77,7 +79,7 @@ public final class CR3ImageType extends RawImageType {
             return getPreviewImage(imageInfo, 640, 480);
 
         final LCByteBuffer buf = imageInfo.getByteBuffer();
-        final ImageParam params = CR3ImageParser.getInstance(imageInfo).getThmbBox();
+        final ImageParam params = CR3ImageParser.getInstance(imageInfo).getThmbParam();
 
         final RenderedImage image = (params != null)
                 ? JPEGImageType.getImageFromBuffer(buf, params.offset, params.length, null, 160, 120)
@@ -98,12 +100,17 @@ public final class CR3ImageType extends RawImageType {
         throws BadImageFileException, IOException
     {
         final LCByteBuffer buf = imageInfo.getByteBuffer();
-        final int tiffOffset = CR3ImageParser.getInstance(imageInfo).getCmt1TiffBufferOffset();
-        final var reader = new TIFFMetadataReader(imageInfo, buf.initialOffset(tiffOffset));
-        final ImageMetadata metadata = reader.readMetadata();
-        MetadataUtil.removePreviewMetadataFrom(metadata);
-        MetadataUtil.removeWidthHeightFrom(metadata);
-        buf.initialOffset(0); // TODO: Is this necessary?
+        final var tiffOffsets = CR3ImageParser.getInstance(imageInfo).getCmtTiffBufferOffsets();
+        try {
+            for (final var tiffOffset : tiffOffsets) {
+                final var reader = new TIFFMetadataReader(imageInfo, buf.initialOffset(tiffOffset));
+                final ImageMetadata metadata = reader.readMetadata();
+                MetadataUtil.removePreviewMetadataFrom(metadata);
+                MetadataUtil.removeWidthHeightFrom(metadata);
+            }
+        } finally {
+            buf.initialOffset(0);
+        }
     }
 
     ////////// private ////////////////////////////////////////////////////////
@@ -128,6 +135,8 @@ public final class CR3ImageType extends RawImageType {
     private record ImageParam(int offset, int length) { }
 
     private static class CR3ImageParser {
+        private final boolean DEBUG = false;
+
         private CR3ImageParser(ImageInfo imageInfo) throws IOException {
             this.imageInfo = imageInfo;
             parse();
@@ -148,18 +157,14 @@ public final class CR3ImageType extends RawImageType {
         // constants for the CR3's ISO/IEC 14496-12 file format
 
         private static final byte[] moovTag = "moov".getBytes(UTF_8);
-        private static final byte[] uuidTag = "uuid".getBytes(UTF_8);
         private static final byte[] ctboTag = "CTBO".getBytes(UTF_8);
-        private static final byte[] prvwTag = "PRVW".getBytes(UTF_8);
         private static final byte[] thmbTag = "THMB".getBytes(UTF_8);
         private static final byte[] cmt1Tag = "CMT1".getBytes(UTF_8);
-        private static final int headerSize = 8;
+        private static final byte[] cmt2Tag = "CMT2".getBytes(UTF_8);
+        private static final int boxLengthSize = 4;
+        private static final int boxNameSize = 4;
+        private static final int headerSize = boxLengthSize + boxNameSize;
         private static final int extendedTypeSize = 16;
-        private static final byte[] prvwUuid = new byte[]{
-                (byte) 0xea, (byte) 0xf4, 0x2b, 0x5e,
-                0x1c, (byte) 0x98, 0x4b, (byte) 0x88,
-                (byte) 0xb9, (byte) 0xfb, (byte) 0xb7, (byte) 0xdc,
-                0x40, 0x6e, 0x4d, 0x16};
 
         /**
          * get a box size of the ISO/IEC 14496-12 file format
@@ -174,22 +179,22 @@ public final class CR3ImageType extends RawImageType {
             };
         }
 
-        private int cmt1BoxPos;
+        private final Set<Integer> cmtTiffBufferOffsets = new HashSet<>();
         private ImageParam prvwParam;
         private ImageParam thmbParam;
 
         @NotNull
-        public CR3ImageType.ImageParam getPrvwBox() {
+        public CR3ImageType.ImageParam getPrvwParam() {
             return prvwParam;
         }
 
         @Nullable
-        public CR3ImageType.ImageParam getThmbBox() {
+        public CR3ImageType.ImageParam getThmbParam() {
             return thmbParam;
         }
 
-        public int getCmt1TiffBufferOffset() {
-            return cmt1BoxPos + headerSize;
+        public Set<Integer> getCmtTiffBufferOffsets() {
+            return cmtTiffBufferOffsets;
         }
 
         private void parse() throws IOException {
@@ -197,33 +202,44 @@ public final class CR3ImageType extends RawImageType {
             final ByteOrder origOrder = buf.order();
             buf.order(ByteOrder.BIG_ENDIAN);
 
+            int boxPos = 0;
+
+            // Seek MOOV box.
+            int moovBoxEnd = -1;
+            while (boxPos < buf.limit()) {
+                final var boxType = buf.getBytes(boxPos + boxLengthSize, boxNameSize);
+                if (DEBUG)
+                    System.out.println("boxType: " + new String(boxType, UTF_8) + ", pos: " + boxPos);
+                if (Arrays.equals(boxType, moovTag)) {
+                    moovBoxEnd = boxPos + (int) getBoxSize(buf, boxPos);
+                    final var moovUuidTagPos = boxPos + headerSize;
+                    // byte[] moovUuid = buf.getBytes(moovUuidTagPos + headerSize, extendedTypeSize);
+                    boxPos = moovUuidTagPos + headerSize + extendedTypeSize; // skip uuid
+                    break;
+                }
+                boxPos += getBoxSize(buf, boxPos);
+            }
+
+            // Check sub-boxes in the MOOV box.
             int thmbBoxPos = -1;
             int prvwBoxPos = -1;
-            for (int boxPos = 0; boxPos < buf.limit(); ) {
-                final var boxType = buf.getBytes(boxPos + 4, 4);
+            while (boxPos < moovBoxEnd) {
+                final var boxType = buf.getBytes(boxPos + boxLengthSize, boxNameSize);
+                if (DEBUG)
+                    System.out.println("boxType: " + new String(boxType, UTF_8) + ", pos: " + boxPos);
                 if (Arrays.equals(boxType, ctboTag)) {
                     // cf. https://github.com/lclevy/canon_cr3#ctbo
                     final int recodeSize = 20;
-                    final long prvwUuidOffset = buf.getLong(boxPos + headerSize + 4 + recodeSize + 4);
-                    boxPos = (int) prvwUuidOffset;
-                } else if (Arrays.equals(boxType, uuidTag)) {
-                    byte[] uuid = buf.getBytes(boxPos + headerSize, extendedTypeSize);
-                    boxPos += headerSize + extendedTypeSize;
-                    if (Arrays.equals(uuid, prvwUuid)) {
-                        boxPos += 8; // to skip unknown data
-                    }
-                } else if (Arrays.equals(boxType, moovTag)) {
-                    boxPos += headerSize;
-                } else {
-                    if (Arrays.equals(boxType, cmt1Tag)) {
-                        cmt1BoxPos = boxPos;
-                    } else if (Arrays.equals(boxType, thmbTag)) {
-                        thmbBoxPos = boxPos;
-                    } else if (Arrays.equals(boxType, prvwTag)) {
-                        prvwBoxPos = boxPos;
-                    }
-                    boxPos += getBoxSize(buf, boxPos);
+                    final int xpacketRecordPos = boxPos + headerSize + 4; // 4 for number of records
+                    final int prvwRecordPos = xpacketRecordPos + recodeSize;
+                    final long prvwUuidOffset = buf.getLong(prvwRecordPos + 4); // 4 for recode index
+                    prvwBoxPos = (int) (prvwUuidOffset + headerSize + extendedTypeSize + 8); // 8 to skip unknown data
+                } else if (Arrays.equals(boxType, cmt1Tag) || Arrays.equals(boxType, cmt2Tag)) {
+                    cmtTiffBufferOffsets.add(boxPos + headerSize);
+                } else if (Arrays.equals(boxType, thmbTag)) {
+                    thmbBoxPos = boxPos;
                 }
+                boxPos += getBoxSize(buf, boxPos);
             }
 
             buf.order(origOrder);
