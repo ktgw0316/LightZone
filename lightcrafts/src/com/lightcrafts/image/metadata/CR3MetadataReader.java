@@ -46,14 +46,14 @@ public class CR3MetadataReader extends ImageMetadataReader {
     @Override
     protected void readAllDirectories() throws IOException {
         final LCByteBuffer buf = m_imageInfo.getByteBuffer();
-        final var tiffOffsets = getCmtTiffBufferOffsets();
         try {
-            for (final var tiffOffset : tiffOffsets) {
-                buf.initialOffset(tiffOffset);
-                final var tiffReader = new TIFFMetadataReader(m_imageInfo, buf);
+            for (final var p : cmtTiffBufferParams) {
+                buf.initialOffset(p.offset);
+                final var tiffReader = new TIFFMetadataReader(m_imageInfo, buf, p.dirClass);
                 tiffReader.readMetadata();
-                m_metadata.mergeFrom(tiffReader.m_metadata);
             }
+            MetadataUtil.removePreviewMetadataFrom(m_metadata);
+            MetadataUtil.removeWidthHeightFrom(m_metadata);
         } catch (BadImageFileException ignored) {
         } finally {
             buf.initialOffset(0);
@@ -87,7 +87,10 @@ public class CR3MetadataReader extends ImageMetadataReader {
         };
     }
 
-    private final List<Integer> cmtTiffBufferOffsets = new ArrayList<>();
+    private record CmtTiffBufferParam(Class<? extends ImageMetadataDirectory> dirClass, int offset) {
+    }
+
+    private final List<CmtTiffBufferParam> cmtTiffBufferParams = new ArrayList<>();
     private ImageParam prvwParam;
     private ImageParam thmbParam;
 
@@ -99,10 +102,6 @@ public class CR3MetadataReader extends ImageMetadataReader {
     @Nullable
     public ImageParam getThmbParam() {
         return thmbParam;
-    }
-
-    public List<Integer> getCmtTiffBufferOffsets() {
-        return cmtTiffBufferOffsets;
     }
 
     private void parse() throws IOException {
@@ -142,8 +141,10 @@ public class CR3MetadataReader extends ImageMetadataReader {
                 final int prvwRecordPos = xpacketRecordPos + recodeSize;
                 final long prvwUuidOffset = buf.getLong(prvwRecordPos + 4); // 4 for recode index
                 prvwBoxPos = (int) (prvwUuidOffset + headerSize + extendedTypeSize + 8); // 8 to skip unknown data
-            } else if (Arrays.equals(boxType, cmt1Tag) || Arrays.equals(boxType, cmt2Tag)) {
-                cmtTiffBufferOffsets.add(boxPos + headerSize);
+            } else if (Arrays.equals(boxType, cmt1Tag)) {
+                cmtTiffBufferParams.add(new CmtTiffBufferParam(TIFFDirectory.class, boxPos + headerSize));
+            } else if (Arrays.equals(boxType, cmt2Tag)) {
+                cmtTiffBufferParams.add(new CmtTiffBufferParam(EXIFDirectory.class, boxPos + headerSize));
             } else if (Arrays.equals(boxType, thmbTag)) {
                 thmbBoxPos = boxPos;
             }
