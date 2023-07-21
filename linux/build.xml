@@ -62,7 +62,7 @@
     </javac>
   </target>
 
-  <target name="locales">
+  <target name="locale">
     <copy todir="build">
       <fileset dir="locale" excludes=".git"/>
     </copy>
@@ -72,11 +72,11 @@
     <ant dir="help" target="build"/>
   </target>
 
-  <target name="build" depends="javac, locales, help"/>
+  <target name="build" depends="javac, locale, help"/>
 
   <!--===== Make the jar files =============================================-->
 
-  <target name="jar" depends="build">
+  <target name="jar" depends="javac, locale">
     <delete file="products/lightcrafts-linux.jar"/>
     <jar jarfile="products/lightcrafts-linux.jar">
       <fileset dir="build"/>

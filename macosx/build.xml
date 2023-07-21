@@ -71,7 +71,7 @@
 
   <!--===== Make a jar file ================================================-->
 
-  <target name="jar" depends="build">
+  <target name="jar" depends="javac, locale">
     <delete file="${macosx-jar}"/>
     <jar jarfile="${macosx-jar}">
       <fileset dir="build"/>

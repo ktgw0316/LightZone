@@ -143,7 +143,7 @@
 
 	<!--===== Make a jar file ================================================-->
 
-  <target name="jar" depends="build">
+  <target name="jar" depends="javac,resources">
     <delete file="${common-jar}"/>
     <jar jarfile="${common-jar}">
       <fileset dir="build"/>

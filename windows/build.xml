@@ -86,7 +86,7 @@
 
   <!--===== Make a jar file ================================================-->
 
-  <target name="jar" depends="build">
+  <target name="jar" depends="javac">
     <delete file="${windows-jar}"/>
     <jar jarfile="${windows-jar}">
       <fileset dir="build"/>
