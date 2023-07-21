@@ -1,15 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0">
   <info organisation="lightcrafts" module="lightcrafts"/>
+  <configurations>
+    <conf name="compile" visibility="public" />
+    <conf name="test" visibility="public" extends="compile" />
+  </configurations>
+  <publications>
+    <artifact name="${project.name}" type="jar"  conf="compile" ext="jar"/>
+    <artifact name="${project.name}-test" type="jar"  conf="test" ext="jar"/>
+  </publications>
   <dependencies>
-    <dependency name="annotations" rev="24.0.1" org="org.jetbrains"/>
-    <dependency name="ejml-simple" rev="0.40" org="org.ejml"/>
-    <dependency name="flatlaf" rev="3.1.1" org="com.formdev" />
-    <dependency name="flatlaf-intellij-themes" rev="3.1.1" org="com.formdev" />
-    <dependency name="jiconfont-font_awesome" rev="4.7.0.0" org="com.github.jiconfont"/>
-    <dependency name="jiconfont-google_material_design_icons" rev="2.2.0.2" org="com.github.jiconfont"/>
-    <dependency name="jiconfont-swing" rev="1.0.1" org="com.github.jiconfont"/>
-    <dependency name="lombok" rev="1.18.26" org="org.projectlombok"/>
+    <dependency name="annotations" rev="24.0.1" org="org.jetbrains" conf="compile->default"/>
+    <dependency name="ejml-simple" rev="0.40" org="org.ejml" conf="compile->default"/>
+    <dependency name="flatlaf" rev="3.1.1" org="com.formdev"  conf="compile->default"/>
+    <dependency name="flatlaf-intellij-themes" rev="3.1.1" org="com.formdev"  conf="compile->default"/>
+    <dependency name="jiconfont-font_awesome" rev="4.7.0.0" org="com.github.jiconfont" conf="compile->default"/>
+    <dependency name="jiconfont-google_material_design_icons" rev="2.2.0.2" org="com.github.jiconfont" conf="compile->default"/>
+    <dependency name="jiconfont-swing" rev="1.0.1" org="com.github.jiconfont" conf="compile->default"/>
+    <dependency name="lombok" rev="1.18.26" org="org.projectlombok" conf="compile->default"/>
+    <!-- Test dependencies -->
+    <dependency name="junit-jupiter-api" rev="5.9.3" org="org.junit.jupiter" conf="test->default"/>
+    <dependency name="junit-jupiter-params" rev="5.9.3" org="org.junit.jupiter" conf="test->default"/>
     <!-- Don't download source or javadocs to save bandwidth -->
     <exclude org="*" ext="*" type="source"/>
     <exclude org="*" ext="*" type="javadoc"/>

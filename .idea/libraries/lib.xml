@@ -18,6 +18,8 @@
       <root url="jar://$PROJECT_DIR$/lightcrafts/lib/lombok-1.18.26.jar!/" />
       <root url="jar://$PROJECT_DIR$/lightcrafts/lib/flatlaf-3.1.1.jar!/" />
       <root url="jar://$PROJECT_DIR$/lightcrafts/lib/flatlaf-intellij-themes-3.1.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lightcrafts/lib/junit-jupiter-api-5.9.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lightcrafts/lib/junit-jupiter-params-5.9.3.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
