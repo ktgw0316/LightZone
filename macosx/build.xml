@@ -13,10 +13,7 @@
   <!-- The default maxmemory for the run target. -->
   <property name="maxmemory" value="512m"/>
 
-<!--  <exec executable="cat" vmlauncher="false" failonerror="true"-->
-<!--        outputproperty="app-version">-->
-<!--    <arg value="${common-dir}/version.txt"/>-->
-<!--  </exec>-->
+<!--  <loadfile property="app-version" srcFile="${common-dir}/version.txt"/>-->
   <property name="app-version" value="5.0.0"/>
 
   <condition property="UNIVERSAL" value="1" else="0">

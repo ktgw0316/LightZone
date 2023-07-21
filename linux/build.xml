@@ -9,10 +9,7 @@
   <!-- The default maxmemory for the run* targets. -->
   <property name="maxmemory" value="512m"/>
 
-  <exec executable="cat" vmlauncher="true" failonerror="true"
-        outputproperty="app-version">
-    <arg value="${common-dir}/version.txt"/>
-  </exec>
+  <loadfile property="app-version" srcFile="${common-dir}/version.txt"/>
 
   <property name="JVMARG" value="--add-exports=java.desktop/sun.awt.image=ALL-UNNAMED"/>
 

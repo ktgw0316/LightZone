@@ -5,13 +5,9 @@
   <!--===== Properties =====================================================-->
 
   <property file="resources/com/lightcrafts/utils/resources/Version.properties"/>
+  <loadfile property="app-version" srcFile="version.txt"/>
 
   <property name="common-jar" value="products/lightcrafts.jar"/>
-
-	<exec executable="cat" vmlauncher="true" failonerror="true"
-	      outputproperty="app-version">
-		<arg value="version.txt"/>
-	</exec>
 
   <condition property="UNIVERSAL" value="1" else="0">
     <isset property="UNIVERSAL"/>
