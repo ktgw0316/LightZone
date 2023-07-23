@@ -45,7 +45,8 @@ public final class CR3ImageType extends RawImageType {
             throws BadImageFileException, IOException, UnknownImageTypeException
     {
         final LCByteBuffer buf = imageInfo.getByteBuffer();
-        final CR3MetadataReader.ImageParam params = CR3MetadataReader.getInstance(imageInfo).getPrvwParam();
+        final var reader = new CR3MetadataReader(imageInfo);
+        final CR3MetadataReader.ImageParam params = reader.getPrvwParam();
 
         final RenderedImage image = JPEGImageType.getImageFromBuffer(
                 buf, params.offset(), params.length(), null, maxWidth, maxHeight);
@@ -71,7 +72,8 @@ public final class CR3ImageType extends RawImageType {
             return getPreviewImage(imageInfo, 640, 480);
 
         final LCByteBuffer buf = imageInfo.getByteBuffer();
-        final CR3MetadataReader.ImageParam params = CR3MetadataReader.getInstance(imageInfo).getThmbParam();
+        final var reader = new CR3MetadataReader(imageInfo);
+        final CR3MetadataReader.ImageParam params = reader.getThmbParam();
 
         final RenderedImage image = (params != null)
                 ? JPEGImageType.getImageFromBuffer(buf, params.offset(), params.length(), null, 160, 120)
@@ -91,7 +93,7 @@ public final class CR3ImageType extends RawImageType {
     public void readMetadata(@NotNull ImageInfo imageInfo)
         throws BadImageFileException, IOException
     {
-        final var reader = CR3MetadataReader.getInstance(imageInfo);
+        final var reader = new CR3MetadataReader(imageInfo);
         final ImageMetadata metadata = reader.readMetadata();
         MetadataUtil.removePreviewMetadataFrom(metadata);
         MetadataUtil.removeWidthHeightFrom(metadata);

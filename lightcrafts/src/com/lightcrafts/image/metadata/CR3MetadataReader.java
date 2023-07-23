@@ -2,7 +2,6 @@ package com.lightcrafts.image.metadata;
 
 import com.lightcrafts.image.BadImageFileException;
 import com.lightcrafts.image.ImageInfo;
-import com.lightcrafts.utils.LRUHashMap;
 import com.lightcrafts.utils.bytebuffer.LCByteBuffer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,21 +21,10 @@ public class CR3MetadataReader extends ImageMetadataReader {
     public record ImageParam(int offset, int length) {
     }
 
-    private CR3MetadataReader(ImageInfo imageInfo) throws IOException {
+    public CR3MetadataReader(ImageInfo imageInfo) throws IOException {
         super(imageInfo, imageInfo.getByteBuffer());
         m_imageInfo = imageInfo;
         parse();
-    }
-
-    private static final LRUHashMap<ImageInfo, CR3MetadataReader> cache = new LRUHashMap<>(100);
-
-    public static CR3MetadataReader getInstance(final ImageInfo imageInfo) throws IOException {
-        if (cache.containsKey(imageInfo))
-            return cache.get(imageInfo);
-
-        final var instance = new CR3MetadataReader(imageInfo);
-        cache.put(imageInfo, instance);
-        return instance;
     }
 
     @Override
