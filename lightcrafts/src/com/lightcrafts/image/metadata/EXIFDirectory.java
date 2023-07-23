@@ -1,16 +1,16 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2023-     Masahiro Kitagawa */
 
 package com.lightcrafts.image.metadata;
 
 import com.lightcrafts.image.metadata.providers.*;
-import com.lightcrafts.image.metadata.values.DateMetaValue;
-import com.lightcrafts.image.metadata.values.ImageMetaValue;
-import com.lightcrafts.image.metadata.values.RationalMetaValue;
+import com.lightcrafts.image.metadata.values.*;
 import com.lightcrafts.utils.TextUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 import static com.lightcrafts.image.metadata.EXIFTags.*;
 import static com.lightcrafts.image.metadata.ImageMetaType.*;
@@ -171,8 +171,44 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
      */
     @Override
     public int getISO() {
-        final ImageMetaValue value = getValue( EXIF_ISO_SPEED_RATINGS );
-        return value != null ? value.getIntValue() : 0;
+        final int iso = Optional.of(EXIF_ISO_SPEED_RATINGS)
+                .map(this::getValue)
+                .map(ImageMetaValue::getUnsignedShortValue)
+                .orElse(0);
+        if (iso < 65535)
+            return iso;
+        return Optional.of(EXIF_SENSITIVITY_TYPE)
+                .map(this::getValue)
+                .map(ImageMetaValue::getUnsignedShortValue)
+                .map(type -> switch (type) {
+                    case 1, 4, 5, 7 -> EXIF_STANDARD_OUTPUT_SENSITIVITY;
+                    case 2, 6 -> EXIF_RECOMMENDED_EXPOSURE_INDEX;
+                    case 3 -> EXIF_ISO_SPEED;
+                    default -> null;
+                })
+                .map(this::getValue)
+                .map(ImageMetaValue::getIntValue)
+                .orElse(0);
+    }
+
+    /**
+     * Puts ISO speed value into this directory.
+     *
+     * This method should be used if a value is being put into the directory
+     * for the first time, e.g., to populate it from metadata parsed from an
+     * image.
+     *
+     * @param iso The ISO speed value to put.
+     */
+    public void putISO(int iso) {
+        if (iso > 0) {
+            putValue(EXIF_ISO_SPEED_RATINGS, new UnsignedShortMetaValue(iso));
+        }
+        if (iso >= 65535) {
+            putValue(EXIF_SENSITIVITY_TYPE, new UnsignedShortMetaValue(7));
+            Stream.of(EXIF_STANDARD_OUTPUT_SENSITIVITY, EXIF_RECOMMENDED_EXPOSURE_INDEX, EXIF_ISO_SPEED)
+                    .forEach(tag -> putValue(tag, new UnsignedLongMetaValue(iso)));
+        }
     }
 
     /**
@@ -502,6 +538,10 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
         add( EXIF_IMAGE_WIDTH, "ImageWidth", META_USHORT, false );
         add( EXIF_INTEROPERABILITY_POINTER, "InteroperabilityPointer", META_ULONG, false );
         add( EXIF_ISO_SPEED_RATINGS, "ISOSpeedRatings", META_USHORT, false );
+        add( EXIF_SENSITIVITY_TYPE, "SensitivityType", META_USHORT, false );
+        add( EXIF_STANDARD_OUTPUT_SENSITIVITY, "StandardOutputSensitivity", META_ULONG, false );
+        add( EXIF_RECOMMENDED_EXPOSURE_INDEX, "RecommendedExposureIndex", META_ULONG, false );
+        add( EXIF_ISO_SPEED, "ISOSpeed", META_USHORT, false );
         add( EXIF_JPEG_INTERCHANGE_FORMAT, "JPEGInterchangeFormat", META_ULONG, false );
         add( EXIF_JPEG_INTERCHANGE_FORMAT_LENGTH, "JPEGInterchangeFormatLength", META_ULONG, false );
         add( EXIF_LIGHT_SOURCE, "LightSource", META_USHORT, false );

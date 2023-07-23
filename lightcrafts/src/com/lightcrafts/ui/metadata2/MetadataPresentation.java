@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2023-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.metadata2;
 
@@ -76,9 +77,7 @@ class MetadataPresentation {
             )
         );
         miscSection.addEntry(
-            new SimpleMetadataEntry(
-                CoreDirectory.class, CoreTags.CORE_ISO
-            )
+            new ISOMetadataEntry()
         );
         miscSection.addEntry(
             new SimpleMetadataEntry(

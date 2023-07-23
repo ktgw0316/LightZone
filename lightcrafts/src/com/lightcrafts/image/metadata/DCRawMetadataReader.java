@@ -4,6 +4,7 @@ package com.lightcrafts.image.metadata;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.stream.Stream;
 
 import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.image.metadata.values.*;
@@ -85,10 +86,7 @@ public final class DCRawMetadataReader extends ImageMetadataReader {
         }
 
         final int iso = dcraw.getISO();
-        if ( iso > 0 )
-            exifDir.putValue(
-                EXIF_ISO_SPEED_RATINGS, new UnsignedShortMetaValue( iso )
-            );
+        exifDir.putISO(iso);
 
         final String make = dcraw.getMake();
         if ( make != null )

@@ -382,8 +382,48 @@ public interface EXIFTags extends ImageMetaTags {
      * as specified in ISO 12232.
      * <p>
      * Type: Unsigned short.
+     *
+     * @see #EXIF_SENSITIVITY_TYPE
      */
     int EXIF_ISO_SPEED_RATINGS              = 0x8827;
+
+    /**
+     * Indicate which tag is used to record the ISO Speed, if value of
+     * {@link #EXIF_ISO_SPEED_RATINGS} is 65535 (maximum of unsigned short).
+     * <ul><li>  0 = Unknown.
+     * </li><li> 1 = {@link #EXIF_STANDARD_OUTPUT_SENSITIVITY} (SOS).
+     * </li><li> 2 = {@link #EXIF_RECOMMENDED_EXPOSURE_INDEX} (REI).
+     * </li><li> 3 = {@link #EXIF_ISO_SPEED} (IS).
+     * </li><li> 4 = SOS and REI.
+     * </li><li> 5 = SOS and IS.
+     * </li><li> 6 = REI and IS.
+     * </li><li> 7 = SOS, REI and IS.
+     * </li></ul>
+     * <p>
+     * Type: Unsigned short.
+     */
+    int EXIF_SENSITIVITY_TYPE               = 0x8830;
+
+    /**
+     * Type: Unsigned long.
+     *
+     * @see #EXIF_SENSITIVITY_TYPE
+     */
+    int EXIF_STANDARD_OUTPUT_SENSITIVITY    = 0x8831;
+
+    /**
+     * Type: Unsigned long.
+     *
+     * @see #EXIF_SENSITIVITY_TYPE
+     */
+    int EXIF_RECOMMENDED_EXPOSURE_INDEX     = 0x8832;
+
+    /**
+     * Type: Unsigned long.
+     *
+     * @see #EXIF_SENSITIVITY_TYPE
+     */
+    int EXIF_ISO_SPEED                      = 0x8833;
 
     /**
      * @see TIFFTags#TIFF_JPEG_INTERCHANGE_FORMAT

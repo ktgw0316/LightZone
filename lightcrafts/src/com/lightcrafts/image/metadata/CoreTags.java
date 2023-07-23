@@ -56,7 +56,10 @@ public interface CoreTags extends ImageMetaTags {
     int CORE_APERTURE               = 0x0101;
 
     /**
-     * ISO.
+     * ISO speed.
+     * If actual ISO value is greater than or equals to 65535
+     * (maximum of unsigned short), value of this tag must be 65535
+     * and the actual value must be stored in {@link #CORE_ISO_EXP} tag.
      * <p>
      * Type: Unsigned short.
      */
@@ -209,5 +212,14 @@ public interface CoreTags extends ImageMetaTags {
      * Type: Unsigned short.
      */
     int CORE_URGENCY                = 0x0304;
+
+    /**
+     * ISO speed, which is greater than or equals to 65535.
+     * <p>
+     * Type: Unsigned long.
+     *
+     * @see #CORE_ISO
+     */
+    int CORE_ISO_EXP                = 0x0305;
 }
 /* vim:set et sw=4 ts=4: */

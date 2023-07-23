@@ -236,8 +236,16 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
      */
     @Override
     public int getISO() {
-        final ImageMetaValue value = getValue( CORE_ISO );
-        return value != null ? value.getIntValue() : 0;
+        final int iso = Optional.of(CORE_ISO)
+                .map(this::getValue)
+                .map(ImageMetaValue::getUnsignedShortValue)
+                .orElse(0);
+        if (iso < 65535)
+            return iso;
+        return Optional.of(CORE_ISO_EXP)
+                .map(this::getValue)
+                .map(ImageMetaValue::getIntValue)
+                .orElse(0);
     }
 
     /**
@@ -832,10 +840,15 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
      * @param metadata The {@link ImageMetadata} to add into.
      */
     private void addISO( ImageMetadata metadata ) {
-        removeValue( CORE_ISO );
+        removeValue(CORE_ISO);
+        removeValue(CORE_ISO_EXP);
         final int iso = metadata.getISO();
-        if ( iso > 0 )
-            putValue( CORE_ISO, new UnsignedShortMetaValue( iso ) );
+        if (iso > 0) {
+            putValue(CORE_ISO, new UnsignedShortMetaValue(iso));
+        }
+        if (iso >= 65535) {
+            putValue(CORE_ISO_EXP, new UnsignedLongMetaValue(iso));
+        }
     }
 
     /**
