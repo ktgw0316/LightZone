@@ -186,7 +186,7 @@ public class TIFFMetadataReader extends ImageMetadataReader {
      * @param dirClass The class of the {@link ImageMetadataDirectory} class to
      * create.
      */
-    private TIFFMetadataReader( ImageInfo imageInfo, LCByteBuffer tiffBuf,
+    TIFFMetadataReader( ImageInfo imageInfo, LCByteBuffer tiffBuf,
                                 Class<? extends ImageMetadataDirectory> dirClass ) {
         super( imageInfo, tiffBuf );
         m_dirClass = dirClass;
