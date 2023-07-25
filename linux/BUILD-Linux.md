@@ -128,7 +128,7 @@ then execute the rpmbuild command again. Your .rpm package will be created in
 
 ### ebuild (Gentoo Linux)
 
-Install Lightzone in a local overlay. First you need _app-portage/layman_:
+Install LightZone in a local overlay. First you need _app-portage/layman_:
 
     USE=git emerge app-portage/layman
 

@@ -50,7 +50,7 @@ Optionally, install following:
 Few points for MSYS2 beginners
 
 - It is POSIX evnironment for Windows (emulates a lot of stuff that is in Linux)
-- It is case sensitive
+- It is case-sensitive
 - Computer drives under it are available under / (root) directory, e.g. /c/
 - Home directory is abbreviated with ~
 

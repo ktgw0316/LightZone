@@ -18,12 +18,12 @@ LightZone has advanced features including:
 
 ## Installing
 
-Install instruction for Windows, macOS and Linux are available on github [Release](https://github.com/ktgw0316/LightZone/releases/latest) page.
+Install instruction for Windows, macOS and Linux are available on GitHub [Release](https://github.com/ktgw0316/LightZone/releases/latest) page.
 
 
 ## Resources
 
-* Video training is available on the [LightZone Youtube channel](https://www.youtube.com/channel/UCGob3KtUcRJqz-GwA5Owbdg)
+* Video training is available on the [LightZone YouTube channel](https://www.youtube.com/channel/UCGob3KtUcRJqz-GwA5Owbdg)
 * [Tutorial on the LightZone ZoneMapper tool](http://doonster.blogspot.com/2008/01/lightzone-zonemapper-primer-for-curves.html)
 * [Understanding & Using Ansel Adam's Zone System](http://photography.tutsplus.com/tutorials/understanding-using-ansel-adams-zone-system--photo-5607)
 * [Zone System](http://en.wikipedia.org/wiki/Zone_System) on Wikipedia

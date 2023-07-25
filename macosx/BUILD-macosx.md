@@ -80,7 +80,7 @@ If you're already using Eclipse for other development, you may want to make a ne
 
 - Eclipse prefs -> Java -> Installed JREs -> whatever you selected in Java Preferences (1.6 for me)
 
-If you can't find it in the list, click Add -> MacOS X JVM and browse to
+If you can't find it in the list, click Add -> Mac OS X JVM and browse to
 /System/Library/Frameworks/JavaVM.framework/Versions/1.6/Home  (or 1.7/Home)
 
 - Eclipse prefs -> java -> compiler -> compliance level: 1.6
@@ -214,7 +214,7 @@ If this appears, then some of the project was built with java 1.7, some with jav
 
 ### "java.lang.UnsatisfiedLinkError" ending with "mach-o, but wrong architecture" or "Couldn't link with native library: DCRaw: libDCRaw.jnilib: mach-o, but wrong architecture"
 
-Probably some code was compiled as 64-bit but you're running the app in a 32-bit JVM.
+Probably some code was compiled as 64-bit, but you're running the app in a 32-bit JVM.
 
 - Use the "`file`" command on the library:
 
