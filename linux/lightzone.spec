@@ -9,7 +9,7 @@ Version:	5.0.0.beta1
 Release:	0%{?dist}
 License:	BSD-3-Clause
 Summary:	Open-source professional-level digital darkroom software
-Url:		http://lightzoneproject.org/
+Url:		https://github.com/ktgw0316/LightZone/
 Group:		Productivity/Graphics/Convertors
 Source:		%{name}-%{version}.tar.xz
 

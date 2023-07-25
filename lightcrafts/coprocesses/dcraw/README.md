@@ -9,5 +9,4 @@ This software is based on
 
 _dcraw_lz_ is developed as part of _LightZone_ open-source photo editor, which includes the `dcraw_lz` executable.
 
-* <http://www.lightzoneproject.org/>
 * <https://github.com/ktgw0316/LightZone/>

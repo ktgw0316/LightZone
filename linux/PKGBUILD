@@ -3,7 +3,7 @@ pkgname=lightzone
 pkgver=5.0.0.beta1
 pkgrel=0
 pkgdesc="Open-source professional-level digital darkroom software"
-url="http://lightzoneproject.org/"
+url="https://github.com/ktgw0316/LightZone/"
 license=('custom:BSD-3-Clause')
 arch=('x86_64')
 

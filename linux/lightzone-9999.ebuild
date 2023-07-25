@@ -13,7 +13,7 @@ else
 fi
 
 DESCRIPTION="Open-source professional-level digital darkroom software"
-HOMEPAGE="http://lightzoneproject.org/"
+HOMEPAGE="https://github.com/ktgw0316/LightZone/"
 
 LICENSE="BSD"
 SLOT="0"

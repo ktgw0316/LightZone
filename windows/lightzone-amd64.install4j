@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="8.0.11" transformSequenceNumber="8">
   <directoryPresets config="./resources/icons" />
-  <application name="LightZone" applicationId="3263-1164-2624-0047" mediaDir="." mediaFilePattern="${compiler:sys.shortName}_Installer_${compiler:sys.version}_${compiler:sys.date}_${compiler:sys.platform}" compression="9" lzmaCompression="true" shortName="LightZone" publisher="LightZone Project" publisherWeb="http://lightzoneproject.org/" version="${compiler:LC_VERSION}" allPathsRelative="true" macVolumeId="6aa6c745610221f5" javaMinVersion="17">
+  <application name="LightZone" applicationId="3263-1164-2624-0047" mediaDir="." mediaFilePattern="${compiler:sys.shortName}_Installer_${compiler:sys.version}_${compiler:sys.date}_${compiler:sys.platform}" compression="9" lzmaCompression="true" shortName="LightZone" publisher="LightZone Project" publisherWeb="https://github.com/ktgw0316/LightZone/" version="${compiler:LC_VERSION}" allPathsRelative="true" macVolumeId="6aa6c745610221f5" javaMinVersion="17">
     <languages languageSelectionInPrincipalLanguage="true">
       <additionalLanguages>
         <language id="da" />

@@ -4,7 +4,7 @@ Binary: lightzone
 Architecture: i386 amd64 armhf arm64
 Version: 5.0.0~beta1
 Maintainer: Masahiro Kitagawa <arctica0316@gmail.com>
-Homepage: http://lightzoneproject.org/
+Homepage: https://github.com/ktgw0316/LightZone
 Standards-Version: 4.4.1
 Vcs-Browser: https://github.com/ktgw0316/LightZone
 Vcs-Git: https://github.com/ktgw0316/LightZone.git
