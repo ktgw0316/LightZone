@@ -30,8 +30,10 @@
 
   <property name="installer-name" value="${app-name}-Installer-${jre-arch}.exe"/>
   <property name="windows-jar" value="products/lightcrafts-windows.jar"/>
+  <property name="main-class" value="com.lightcrafts.platform.windows.WindowsLauncher"/>
 
-  <property name="JVMARG" value="--add-exports=java.desktop/sun.awt.image=ALL-UNNAMED"/>
+  <property name="add-exports" value="java.desktop/sun.awt.image"/>
+  <property name="JVMARG" value="--add-exports=${add-exports}=ALL-UNNAMED"/>
 
   <!-- The default maxmemory for the run* targets. -->
   <property name="maxmemory" value="512m"/>
@@ -86,11 +88,24 @@
 
   <!--===== Make a jar file ================================================-->
 
+  <path id="jarlist">
+    <fileset dir="products">
+      <include name="*.jar"/>
+    </fileset>
+  </path>
+
+  <manifestclasspath property="manifestclasspath" jarfile="${windows-jar}">
+    <classpath refid="jarlist" />
+  </manifestclasspath>
+
   <target name="jar" depends="build">
     <delete file="${windows-jar}"/>
     <jar jarfile="${windows-jar}">
       <fileset dir="build"/>
       <manifest>
+        <attribute name="Main-Class" value="${main-class}"/>
+        <attribute name="Class-Path" value=".${manifestclasspath}"/>
+        <attribute name="Add-Exports" value="${add-exports}"/>
         <attribute name="Built-By" value="${user.name}"/>
         <attribute name="Implementation-Vendor" value="${company-name}"/>
         <attribute name="Implementation-Version"
@@ -112,14 +127,12 @@
   <!--===== Run the application ============================================-->
 
   <target name="run" depends="jar-if-necessary">
-    <java classname="com.lightcrafts.platform.windows.WindowsLauncher"
+    <java classname="${main-class}"
           dir="products" failonerror="true" fork="true"
           maxmemory="${maxmemory}">
       <jvmarg line="${JVMARG}"/>
       <classpath>
-        <fileset dir="products">
-          <include name="*.jar"/>
-        </fileset>
+        <path refid="jarlist"/>
       </classpath>
       <sysproperty key="java.library.path" value="."/>
       <sysproperty key="com.lightcrafts.zorn" value="true"/>

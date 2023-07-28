@@ -9,6 +9,7 @@
 
   <property name="app-dir" value="release"/>
   <property name="macosx-jar" value="products/lightcrafts-apple.jar"/>
+  <property name="main-class" value="com.lightcrafts.platform.macosx.MacOSXLauncher"/>
 
   <!-- The default maxmemory for the run target. -->
   <property name="maxmemory" value="512m"/>
@@ -20,7 +21,8 @@
     <isset property="UNIVERSAL"/>
   </condition>
 
-  <property name="JVMARG" value="--add-exports=java.desktop/sun.awt.image=ALL-UNNAMED"/>
+  <property name="add-exports" value="java.desktop/sun.awt.image"/>
+  <property name="JVMARG" value="--add-exports=${add-exports}=ALL-UNNAMED"/>
 
   <!--===== Application build ==============================================-->
 
@@ -71,13 +73,24 @@
 
   <!--===== Make a jar file ================================================-->
 
+  <path id="jarlist">
+    <fileset dir="products">
+      <include name="*.jar"/>
+    </fileset>
+  </path>
+
+  <manifestclasspath property="manifestclasspath" jarfile="${macosx-jar}">
+    <classpath refid="jarlist" />
+  </manifestclasspath>
+
   <target name="jar" depends="build">
     <delete file="${macosx-jar}"/>
     <jar jarfile="${macosx-jar}">
       <fileset dir="build"/>
       <manifest>
-        <attribute name="Main-Class"
-                   value="com.lightcrafts.platform.macosx.MacOSXLauncher"/>
+        <attribute name="Main-Class" value="${main-class}"/>
+        <attribute name="Class-Path" value=".${manifestclasspath}"/>
+        <attribute name="Add-Exports" value="${add-exports}"/>
         <attribute name="Built-By" value="${user.name}"/>
         <attribute name="Implementation-Vendor" value="${company-name}"/>
         <attribute name="Implementation-Version"
@@ -104,9 +117,7 @@
           maxmemory="${maxmemory}">
       <jvmarg line="${JVMARG}"/>
       <classpath>
-        <fileset dir="products">
-          <include name="*.jar"/>
-        </fileset>
+        <path refid="jarlist"/>
       </classpath>
       <env key="JAVA_JVM_VERSION" value="${jvm-version}"/>
       <sysproperty key="java.library.path" value="."/>

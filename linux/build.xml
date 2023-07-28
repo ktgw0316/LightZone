@@ -6,12 +6,16 @@
 
   <property name="common-dir" value="../lightcrafts"/>
 
+  <property name="linux-jar" value="products/lightcrafts-linux.jar"/>
+  <property name="main-class" value="com.lightcrafts.platform.linux.LinuxLauncher"/>
+
   <!-- The default maxmemory for the run* targets. -->
   <property name="maxmemory" value="512m"/>
 
   <loadfile property="app-version" srcFile="${common-dir}/version.txt"/>
 
-  <property name="JVMARG" value="--add-exports=java.desktop/sun.awt.image=ALL-UNNAMED"/>
+  <property name="add-exports" value="java.desktop/sun.awt.image"/>
+  <property name="JVMARG" value="--add-exports=${add-exports}=ALL-UNNAMED"/>
 
   <!--===== Application build ==============================================-->
 
@@ -76,11 +80,24 @@
 
   <!--===== Make the jar files =============================================-->
 
+  <path id="jarlist">
+    <fileset dir="products">
+      <include name="*.jar"/>
+    </fileset>
+  </path>
+
+  <manifestclasspath property="manifestclasspath" jarfile="${linux-jar}">
+    <classpath refid="jarlist" />
+  </manifestclasspath>
+
   <target name="jar" depends="build">
-    <delete file="products/lightcrafts-linux.jar"/>
-    <jar jarfile="products/lightcrafts-linux.jar">
+    <delete file="${linux-jar}"/>
+    <jar jarfile="${linux-jar}">
       <fileset dir="build"/>
       <manifest>
+        <attribute name="Main-Class" value="${main-class}"/>
+        <attribute name="Class-Path" value=".${manifestclasspath}"/>
+        <attribute name="Add-Exports" value="${add-exports}"/>
         <attribute name="Built-By" value="${user.name}"/>
         <attribute name="Implementation-Vendor" value="Light Crafts, Inc."/>
         <attribute name="Implementation-Version"
