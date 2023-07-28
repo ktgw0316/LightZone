@@ -4,10 +4,13 @@ include			$(ROOT)/lightcrafts/mk/platform.mk
 RM:=			rm -fr
 
 EXCLUDED_LIBS:=		$(wildcard \
-			../lib/ivy.jar \
-			../lib/lombok*.jar \
 			../lib/annotations*.jar \
+			../lib/apiguardian*.jar \
+			../lib/ivy*.jar \
 			../lib/jsr305*.jar \
+			../lib/junit*.jar \
+			../lib/lombok*.jar \
+			../lib/opentest4j*.jar \
 			../lib/*-javadoc.jar \
 			../lib/*-sources.jar \
 			)
