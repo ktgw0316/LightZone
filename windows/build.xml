@@ -32,6 +32,8 @@
   <property name="windows-jar" value="products/lightcrafts-windows.jar"/>
   <property name="main-class" value="com.lightcrafts.platform.windows.WindowsLauncher"/>
 
+  <property name="windows-zip" value="${app-name}-windows.zip"/>
+
   <property name="add-exports" value="java.desktop/sun.awt.image"/>
   <property name="JVMARG" value="--add-exports=${add-exports}=ALL-UNNAMED"/>
 
@@ -122,6 +124,18 @@
   
   <target name="jar-if-necessary" depends="check-for-jar" unless="jar-exists">
     <ant target="jar"/>
+  </target>
+
+  <!--===== Make a zip archive ================================================-->
+
+  <target name="zip" depends="jar-if-necessary">
+    <delete file="${windows-jar}"/>
+    <zip destfile="${windows-jar}">
+      <fileset dir="products">
+        <exclude name="GNUmakefile"/>
+        <exclude name="copydeps.sh"/>
+      </fileset>
+    </zip>
   </target>
 
   <!--===== Run the application ============================================-->
