@@ -11,6 +11,8 @@
   <property name="macosx-jar" value="products/lightcrafts-apple.jar"/>
   <property name="main-class" value="com.lightcrafts.platform.macosx.MacOSXLauncher"/>
 
+  <property name="macosx-zip" value="${app-name}-macosx.zip"/>
+
   <!-- The default maxmemory for the run target. -->
   <property name="maxmemory" value="512m"/>
 
@@ -107,6 +109,18 @@
 
   <target name="jar-if-necessary" depends="check-for-jar" unless="jar-exists">
     <antcall target="jar"/>
+  </target>
+
+  <!--===== Make a zip archive ================================================-->
+
+  <target name="zip" depends="jar-if-necessary">
+    <delete file="${macosx-zip}"/>
+    <zip destfile="${macosx-zip}">
+      <fileset dir="products">
+        <exclude name="GNUmakefile"/>
+        <exclude name="copydeps.sh"/>
+      </fileset>
+    </zip>
   </target>
 
   <!--===== Run the application ============================================-->
