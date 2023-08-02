@@ -10,6 +10,9 @@
   <property name="app-dir" value="release"/>
   <property name="macosx-jar" value="products/lightcrafts-apple.jar"/>
   <property name="main-class" value="com.lightcrafts.platform.macosx.MacOSXLauncher"/>
+  <property name="modules" value="java.base,java.desktop,java.logging,java.management,java.prefs,java.rmi,jdk.management"/>
+
+  <property name="macosx-zip" value="${app-name}-macosx.zip"/>
 
   <!-- The default maxmemory for the run target. -->
   <property name="maxmemory" value="512m"/>
@@ -71,6 +74,10 @@
 
   <target name="build" depends="javac, locale, jni"/>
 
+  <target name="help">
+    <exec executable="make" dir="help" failonerror="true" vmlauncher="false"/>
+  </target>
+
   <!--===== Make a jar file ================================================-->
 
   <path id="jarlist">
@@ -109,6 +116,25 @@
     <antcall target="jar"/>
   </target>
 
+  <!--===== Make a custom JRE ==============================================-->
+
+  <target name="jlink">
+    <delete file="products/jre"/>
+    <link destDir="products/jre" modulepath="${env.JAVA_HOME}/jmods"
+          modules="${modules}" compress="zip"/>
+  </target>
+
+  <!--===== Make a zip archive =============================================-->
+
+  <target name="zip" depends="jar-if-necessary, help, jlink">
+    <delete file="${macosx-zip}"/>
+    <zip destfile="${macosx-zip}">
+      <fileset dir="products">
+        <exclude name="GNUmakefile copydeps.sh"/>
+      </fileset>
+    </zip>
+  </target>
+
   <!--===== Run the application ============================================-->
 
   <target name="run" depends="jar-if-necessary">
@@ -140,7 +166,7 @@
     <delete dir="${app-dir}" quiet="true"/>
   </target>
 
-  <target name="build-bundle" depends="jar, delete-bundle">
+  <target name="build-bundle" depends="jar, delete-bundle, help">
     <!-- <exec executable="${common-dir}/tools/bin/lc-git-revision"
           outputproperty="git-revision" vmlauncher="false" failonerror="true"/> -->
     <exec executable="${jpackage-path}" dir="." failonerror="true" vmlauncher="false">
@@ -150,7 +176,7 @@
       <arg line="--copyright 'Copyright 2005-2011 Light Crafts, Inc. All Rights Reserved. Copyright 2013- The LightZone Project. All Rights Reserved.'"/>
       <arg line="--dest release"/>
       <arg line="--vendor 'The LightZone Project'"/>
-      <arg line="--add-modules 'java.base,java.desktop,java.logging,java.management,java.prefs,java.rmi,jdk.management'"/>
+      <arg line="--add-modules '${modules}'"/>
       <arg line="--icon resources/Resources/LightZone.icns"/>
       <arg line="--input products"/>
       <arg line="--java-options '-Xdock:name=LightZone'"/>
@@ -173,7 +199,6 @@
       <fileset dir="products/share/lensfun"/>
     </copy>
     <copy file="resources/Resources/LightZoneFile.icns" todir="${bundle-contents}/Resources/"/>
-    <exec executable="make" dir="help" failonerror="true" vmlauncher="false"/>
   </target>
 
   <!--===== Make a dmg file ================================================-->
