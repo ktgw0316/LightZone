@@ -10,6 +10,7 @@
   <property name="app-dir" value="release"/>
   <property name="macosx-jar" value="products/lightcrafts-apple.jar"/>
   <property name="main-class" value="com.lightcrafts.platform.macosx.MacOSXLauncher"/>
+  <property name="modules" value="java.base,java.desktop,java.logging,java.management,java.prefs,java.rmi,jdk.management"/>
 
   <property name="macosx-zip" value="${app-name}-macosx.zip"/>
 
@@ -115,9 +116,17 @@
     <antcall target="jar"/>
   </target>
 
-  <!--===== Make a zip archive ================================================-->
+  <!--===== Make a custom JRE ==============================================-->
 
-  <target name="zip" depends="jar-if-necessary, help">
+  <target name="jlink">
+    <delete file="products/jre"/>
+    <link destDir="products/jre" modulepath="${env.JAVA_HOME}/jmods"
+          modules="${modules}" compress="zip"/>
+  </target>
+
+  <!--===== Make a zip archive =============================================-->
+
+  <target name="zip" depends="jar-if-necessary, help, jlink">
     <delete file="${macosx-zip}"/>
     <zip destfile="${macosx-zip}">
       <fileset dir="products">
@@ -167,7 +176,7 @@
       <arg line="--copyright 'Copyright 2005-2011 Light Crafts, Inc. All Rights Reserved. Copyright 2013- The LightZone Project. All Rights Reserved.'"/>
       <arg line="--dest release"/>
       <arg line="--vendor 'The LightZone Project'"/>
-      <arg line="--add-modules 'java.base,java.desktop,java.logging,java.management,java.prefs,java.rmi,jdk.management'"/>
+      <arg line="--add-modules '${modules}'"/>
       <arg line="--icon resources/Resources/LightZone.icns"/>
       <arg line="--input products"/>
       <arg line="--java-options '-Xdock:name=LightZone'"/>

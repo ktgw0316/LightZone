@@ -31,6 +31,7 @@
   <property name="installer-name" value="${app-name}-Installer-${jre-arch}.exe"/>
   <property name="windows-jar" value="products/lightcrafts-windows.jar"/>
   <property name="main-class" value="com.lightcrafts.platform.windows.WindowsLauncher"/>
+  <property name="modules" value="java.base,java.desktop,java.logging,java.management,java.prefs,java.rmi,jdk.management"/>
 
   <property name="windows-zip" value="${app-name}-windows.zip"/>
 
@@ -126,9 +127,17 @@
     <ant target="jar"/>
   </target>
 
-  <!--===== Make a zip archive ================================================-->
+  <!--===== Make a custom JRE ==============================================-->
 
-  <target name="zip" depends="jar-if-necessary, help">
+  <target name="jlink">
+    <delete file="products/jre"/>
+    <link destDir="products/jre" modulepath="${env.JAVA_HOME}/jmods"
+          modules="${modules}" compress="zip"/>
+  </target>
+
+  <!--===== Make a zip archive =============================================-->
+
+  <target name="zip" depends="jar-if-necessary, help, jlink">
     <delete file="${windows-jar}"/>
     <zip destfile="${windows-jar}">
       <fileset dir="products">
