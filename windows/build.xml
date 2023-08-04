@@ -138,8 +138,8 @@
   <!--===== Make a zip archive =============================================-->
 
   <target name="zip" depends="jar-if-necessary, help, jlink">
-    <delete file="${windows-jar}"/>
-    <zip destfile="${windows-jar}">
+    <delete file="${windows-zip}"/>
+    <zip destfile="${windows-zip}">
       <fileset dir="products">
         <exclude name="GNUmakefile copydeps.sh"/>
       </fileset>
