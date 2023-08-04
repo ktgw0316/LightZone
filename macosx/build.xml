@@ -73,6 +73,10 @@
 
   <target name="build" depends="javac, locale, jni"/>
 
+  <target name="help">
+    <exec executable="make" dir="help" failonerror="true" vmlauncher="false"/>
+  </target>
+
   <!--===== Make a jar file ================================================-->
 
   <path id="jarlist">
@@ -113,12 +117,11 @@
 
   <!--===== Make a zip archive ================================================-->
 
-  <target name="zip" depends="jar-if-necessary">
+  <target name="zip" depends="jar-if-necessary, help">
     <delete file="${macosx-zip}"/>
     <zip destfile="${macosx-zip}">
       <fileset dir="products">
-        <exclude name="GNUmakefile"/>
-        <exclude name="copydeps.sh"/>
+        <exclude name="GNUmakefile copydeps.sh"/>
       </fileset>
     </zip>
   </target>
@@ -154,7 +157,7 @@
     <delete dir="${app-dir}" quiet="true"/>
   </target>
 
-  <target name="build-bundle" depends="jar, delete-bundle">
+  <target name="build-bundle" depends="jar, delete-bundle, help">
     <!-- <exec executable="${common-dir}/tools/bin/lc-git-revision"
           outputproperty="git-revision" vmlauncher="false" failonerror="true"/> -->
     <exec executable="${jpackage-path}" dir="." failonerror="true" vmlauncher="false">
@@ -187,7 +190,6 @@
       <fileset dir="products/share/lensfun"/>
     </copy>
     <copy file="resources/Resources/LightZoneFile.icns" todir="${bundle-contents}/Resources/"/>
-    <exec executable="make" dir="help" failonerror="true" vmlauncher="false"/>
   </target>
 
   <!--===== Make a dmg file ================================================-->
