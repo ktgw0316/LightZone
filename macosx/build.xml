@@ -129,9 +129,14 @@
   <target name="zip" depends="jar-if-necessary, help, jlink">
     <delete file="${macosx-zip}"/>
     <zip destfile="${macosx-zip}">
-      <fileset dir="products">
+      <zipfileset dir="products">
         <exclude name="GNUmakefile copydeps.sh"/>
-      </fileset>
+      </zipfileset>
+      <zipfileset dir="products" filemode="0755">
+        <include name="LightZone-forkd"/>
+        <include name="dcraw_lz"/>
+        <include name="lightzone.command"/>
+      </zipfileset>
     </zip>
   </target>
 
