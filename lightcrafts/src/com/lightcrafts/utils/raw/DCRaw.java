@@ -937,16 +937,22 @@ public final class DCRaw implements
             "FOCULUS 531C",
             "FUJIFILM FINEPIX E550",
             "FUJIFILM FINEPIX E900",
+            "FUJIFILM FINEPIX F500EXR",
+            "FUJIFILM FINEPIX F505EXR", // no raw sample
             "FUJIFILM FINEPIX F550EXR",
             "FUJIFILM FINEPIX F600EXR",
+            "FUJIFILM FINEPIX F605EXR", // no raw sample
             "FUJIFILM FINEPIX F700",
             "FUJIFILM FINEPIX F710",
             "FUJIFILM FINEPIX F770EXR",
+            "FUJIFILM FINEPIX F775EXR", // no raw sample
             "FUJIFILM FINEPIX F800EXR",
+            "FUJIFILM FINEPIX F810", // no raw sample
             "FUJIFILM FINEPIX F900EXR",
             "FUJIFILM FINEPIX S1",
             "FUJIFILM FINEPIX S100FS",
             "FUJIFILM FINEPIX S200EXR",
+            "FUJIFILM FINEPIX S205EXR", // no raw sample
             "FUJIFILM FINEPIX S20PRO",
             "FUJIFILM FINEPIX S2PRO",
             "FUJIFILM FINEPIX S3PRO",
@@ -955,15 +961,23 @@ public final class DCRaw implements
             "FUJIFILM FINEPIX S5200", "FUJIFILM FINEPIX S5600",
             "FUJIFILM FINEPIX S5PRO",
             "FUJIFILM FINEPIX S6000FD",
+            "FUJIFILM FINEPIX S6500FD", // no raw sample
             "FUJIFILM FINEPIX S7000",
             "FUJIFILM FINEPIX S9000", "FUJIFILM FINEPIX S9500",
             "FUJIFILM FINEPIX S9100", "FUJIFILM FINEPIX S9600",
             "FUJIFILM FINEPIX X100",
             "FUJIFILM FINEPIXS2PRO",
+            "FUJIFILM GFX100", // NG: wrong image size
+            "FUJIFILM GFX100S", // NG: wrong image size
             "FUJIFILM GFX 50S",
+            "FUJIFILM GFX50S II", // NG: wrong image size
+            "FUJIFILM GFX 50R", // OK
             "FUJIFILM HS11", "FUJIFILM HS10",
             "FUJIFILM HS20EXR",
+            "FUJIFILM HS22EXR", // no raw sample
             "FUJIFILM HS30EXR",
+            "FUJIFILM HS33EXR", // no raw sample
+            "FUJIFILM HS35EXR", // no raw sample
             "FUJIFILM HS50EXR",
             "FUJIFILM IS-1",
             "FUJIFILM SL1000",
@@ -975,22 +989,33 @@ public final class DCRaw implements
             "FUJIFILM X-E2",
             "FUJIFILM X-E2S",
             "FUJIFILM X-H1",
+            "FUJIFILM X-H2S", // NG: wrong image size
             "FUJIFILM X-M1",
             "FUJIFILM X-PRO1",
             "FUJIFILM X-PRO2",
+//            "FUJIFILM X-PRO3", // NG: bad color and wrong image size
             "FUJIFILM X-S1",
+            "FUJIFILM X-S10", // no raw sample
             "FUJIFILM X-T1",
             "FUJIFILM X-T10",
+            "FUJIFILM X-T100", // OK
             "FUJIFILM X-T2",
             "FUJIFILM X-T20",
-            "FUJIFILM X10",
+            "FUJIFILM X-T200", // OK
+            "FUJIFILM X-T3",
+            "FUJIFILM X-T30", // NG: wrong image size
+            "FUJIFILM X-T30 II",
+            "FUJIFILM X-T4", // NG: wrong image size
+            "FUJIFILM X10", // no raw sample
             "FUJIFILM X100F",
             "FUJIFILM X100S",
             "FUJIFILM X100T",
+            "FUJIFILM X100V", // NG: wrong image size
             "FUJIFILM X20",
             "FUJIFILM X30",
             "FUJIFILM X70",
             "FUJIFILM XF1",
+            "FUJIFILM XF10",
             "FUJIFILM XQ1",
             "FUJIFILM XQ2",
             "HASSELBLAD CFV",
