@@ -45,6 +45,6 @@ $(DEST_MACOSX_SHARE):
 .PHONY: clean distclean mostlyclean
 
 clean distclean mostlyclean:
-	$(RM) $(filter-out GNUmakefile,$(wildcard *))
+	$(RM) *.dylib *.jar *.jnilib *.nib *.log share dcraw_lz LightZone-forkd
 
 # vim:set noet sw=8 ts=8:
