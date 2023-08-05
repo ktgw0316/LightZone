@@ -26,37 +26,38 @@ for:
 
     install:
       - cmd: cinst ant
-      - ps: (new-object net.webclient).DownloadFile('https://download-gcdn.ej-technologies.com/install4j/install4j_windows-x64_8_0_11.exe', 'install4j-installer.exe')
-      - ps: install4j-installer.exe -q
       - cmd: bash -lc "pacman --noconfirm --disable-download-timeout -S pactoys"
       - cmd: bash -lc "pacboy --noconfirm --disable-download-timeout -S lcms2:m lensfun:m ntldd-git:m pkg-config:m"
 
     build_script:
-      - cmd: bash -lc "MINGW_DIR=/c/$MINGW64_PATH ant -f $ANT_SCRIPT -lib $ANT_LIB_DIR build-installer"
+      - cmd: bash -lc "MINGW_DIR=/c/$MINGW64_PATH ant -f $ANT_SCRIPT -lib $ANT_LIB_DIR zip"
+      - cmd: bash -lc "mv windows/lightzone.zip windows/lightzone-64bit.zip"
       - cmd: bash -lc "ant -f $ANT_SCRIPT clean-native"
-      - cmd: bash -lc "TARGET_ARCH=i686 MINGW_DIR=/c/$MINGW32_PATH ant -f $ANT_SCRIPT -Dno-ivy=true -lib $ANT_LIB_DIR build-installer"
+      - cmd: bash -lc "TARGET_ARCH=i686 MINGW_DIR=/c/$MINGW32_PATH ant -f $ANT_SCRIPT -Dno-ivy=true -lib $ANT_LIB_DIR zip"
+      - cmd: bash -lc "mv windows/lightzone.zip windows/lightzone-32bit.zip"
 
     artifacts:
-      - path: "windows/LightZone_Installer_*.exe"
-        name: windows installer
+      - path: "windows/lightzone-*.zip"
+        name: windows zip archives
 
   - matrix:
       only:
         - image: macos-monterey
 
     init:
-      - sh: export JAVA_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-15.jdk/Contents/Home
+      - sh: export JAVA_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-17.jdk/Contents/Home
       - sh: export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
 
     install:
       - sh: HOMEBREW_NO_AUTO_UPDATE=1 brew install ant lensfun libjpeg-turbo libomp libtiff libxml2 little-cms2 rsync
 
     build_script:
-      - sh: ant -f macosx/build.xml dmg
+      - sh: ant -f macosx/build.xml zip
+      - sh: mv macosx/lightzone.zip macosx/lightzone-intel.zip
 
     artifacts:
-      - path: "macosx/LightZone-*.dmg"
-        name: macos installer
+      - path: "macosx/lightzone-*.zip"
+        name: macos zip archives
 
   - matrix:
       only:
