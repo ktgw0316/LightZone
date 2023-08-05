@@ -34,6 +34,7 @@
 *.status
 *.swp
 *.tlog
+*.zip
 *~
 -
 .idea/**/workspace.xml
