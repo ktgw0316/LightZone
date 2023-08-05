@@ -31,10 +31,8 @@ for:
 
     build_script:
       - cmd: bash -lc "MINGW_DIR=/c/$MINGW64_PATH ant -f $ANT_SCRIPT -lib $ANT_LIB_DIR zip"
-      - cmd: bash -lc "mv windows/lightzone.zip windows/lightzone-64bit.zip"
       - cmd: bash -lc "ant -f $ANT_SCRIPT clean-native"
       - cmd: bash -lc "TARGET_ARCH=i686 MINGW_DIR=/c/$MINGW32_PATH ant -f $ANT_SCRIPT -Dno-ivy=true -lib $ANT_LIB_DIR zip"
-      - cmd: bash -lc "mv windows/lightzone.zip windows/lightzone-32bit.zip"
 
     artifacts:
       - path: "windows/lightzone-*.zip"

@@ -1,0 +1,25 @@
+<project name="windows-installer">
+
+  <import file="build.xml"/>
+
+  <!--===== Properties =====================================================-->
+
+  <property name="installer-name" value="${app-name}-Installer-${jre-arch}.exe"/>
+
+  <!--===== Make a Windows installer =======================================-->
+
+  <taskdef name="install4j"
+           classname="com.install4j.Install4JTask"
+           classpath="C:\Program Files\install4j8\bin\ant.jar"/>
+
+  <target name="build-installer-only">
+    <install4j projectfile="lightzone-${jre-arch}.install4j"
+               license="${env.INSTALL4J_LICENSE}"
+               winKeystorePassword="${env.WIN_KEYSTORE_PASSWORD}">
+      <vmparameter value="-DLC_VERSION=${app-version}"/>
+    </install4j>
+  </target>
+  <target name="build-installer" depends="jar, help, build-installer-only"/>
+
+</project>
+<!-- vim:set et sw=2 ts=2: -->

@@ -28,12 +28,11 @@
     <isset property="64bit"/>
   </condition>
 
-  <property name="installer-name" value="${app-name}-Installer-${jre-arch}.exe"/>
   <property name="windows-jar" value="products/lightcrafts-windows.jar"/>
   <property name="main-class" value="com.lightcrafts.platform.windows.WindowsLauncher"/>
   <property name="modules" value="java.base,java.desktop,java.logging,java.management,java.prefs,java.rmi,jdk.management"/>
 
-  <property name="windows-zip" value="${app-name}-windows.zip"/>
+  <property name="windows-zip" value="${app-name}-windows-${jre-arch}.zip"/>
 
   <property name="add-exports" value="java.desktop/sun.awt.image"/>
   <property name="JVMARG" value="--add-exports=${add-exports}=ALL-UNNAMED"/>
@@ -165,21 +164,6 @@
     </java>
   </target>
 
-  <!--===== Make a Windows installer =======================================-->
-
-  <taskdef name="install4j"
-         classname="com.install4j.Install4JTask"
-         classpath="C:\Program Files\install4j8\bin\ant.jar"/>
-
-  <target name="build-installer-only">
-    <install4j projectfile="lightzone-${jre-arch}.install4j"
-               license="${env.INSTALL4J_LICENSE}"
-               winKeystorePassword="${env.WIN_KEYSTORE_PASSWORD}">
-      <vmparameter value="-DLC_VERSION=${app-version}"/>
-    </install4j>
-  </target>
-  <target name="build-installer" depends="jar, help, build-installer-only"/>
-
   <!--===== Clean up =======================================================-->
 
   <target name="clean-up-native">
@@ -203,7 +187,6 @@
     <parallel>
       <delete dir="build"/>
       <delete dir="javah"/>
-      <delete file="${installer-name}"/>
       <delete file="products/lightzone.jvmargs"/>
     </parallel>
     <antcall target="clean-native"/>
