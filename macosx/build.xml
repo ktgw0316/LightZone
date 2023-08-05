@@ -86,11 +86,10 @@
     </fileset>
   </path>
 
-  <manifestclasspath property="manifestclasspath" jarfile="${macosx-jar}">
-    <classpath refid="jarlist" />
-  </manifestclasspath>
-
   <target name="jar" depends="build">
+    <manifestclasspath property="manifestclasspath" jarfile="${macosx-jar}">
+      <classpath refid="jarlist" />
+    </manifestclasspath>
     <delete file="${macosx-jar}"/>
     <jar jarfile="${macosx-jar}">
       <fileset dir="build"/>

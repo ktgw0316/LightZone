@@ -96,11 +96,10 @@
     </fileset>
   </path>
 
-  <manifestclasspath property="manifestclasspath" jarfile="${windows-jar}">
-    <classpath refid="jarlist" />
-  </manifestclasspath>
-
   <target name="jar" depends="build">
+    <manifestclasspath property="manifestclasspath" jarfile="${windows-jar}">
+      <classpath refid="jarlist" />
+    </manifestclasspath>
     <delete file="${windows-jar}"/>
     <jar jarfile="${windows-jar}">
       <fileset dir="build"/>
