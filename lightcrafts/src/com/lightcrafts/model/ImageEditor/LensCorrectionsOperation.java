@@ -236,17 +236,21 @@ public class LensCorrectionsOperation extends BlendedOperation {
         @Override
         public PlanarImage setFront() {
             final var sourceBounds = rendering.getSourceBounds();
-            int fullWidth  = sourceBounds.width;
-            int fullHeight = sourceBounds.height;
 
             final var transform = rendering.getTransform();
             final var scaleFactor = rendering.getScaleFactor();
+
+            final int fullWidth;
+            final int fullHeight;
             if (scaleFactor < 1) {
                 // Append pyramid ratio
-                fullWidth  *= scaleFactor;
-                fullHeight *= scaleFactor;
-
+                fullWidth  = (int) (scaleFactor * sourceBounds.width);
+                fullHeight = (int) (scaleFactor * sourceBounds.height);
                 transform.concatenate(AffineTransform.getScaleInstance(1 / scaleFactor, 1 / scaleFactor));
+            }
+            else {
+                fullWidth = sourceBounds.width;
+                fullHeight = sourceBounds.height;
             }
 
             final PlanarImage front;

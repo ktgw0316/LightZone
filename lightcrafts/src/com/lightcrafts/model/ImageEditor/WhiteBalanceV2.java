@@ -218,7 +218,7 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
         int minT = (int) source;
         double wbr = 0, wbg = 0, wbb = 0;
 
-        for (int t = 1000; t < 40000; t+= 0.001 * t) {
+        for (int t = 1000; t < 40000; t += t / 1000) {
             final var B = new LCMatrix(ColorScience.chromaticAdaptation(REF_T, t, caMethod));
             final var combo = XYZtoRGB.mult(B.mult(RGBtoZYX));
 

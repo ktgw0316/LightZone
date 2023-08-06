@@ -499,7 +499,7 @@ public class ColorScience {
 
         final var color = new LCMatrix(3, 1, rgb);
 
-        for (int t = 1000; t < 40000; t+= (0.001 * t)) {
+        for (int t = 1000; t < 40000; t += t / 1000) {
             final var B = new LCMatrix(chromaticAdaptation(t, refT, caMethod));
             final var combo = XYZtoRGB.mult(B.mult(RGBtoZYX));
 
@@ -541,7 +541,7 @@ public class ColorScience {
 
         SimpleMatrix gray = new LCMatrix(new float[][]{{0.18f}, {0.18f}, {0.18f}});
 
-        for (int t = 1000; t < 40000; t+= (0.001 * t)) {
+        for (int t = 1000; t < 40000; t += t / 1000) {
             final var B = new LCMatrix(chromaticAdaptation(t, refT, caMethod));
             final var combo = XYZtoRGB.mult(B.mult(RGBtoZYX));
 

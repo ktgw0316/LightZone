@@ -25,6 +25,7 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_RAW_ADJUSTMENTS;
 
@@ -116,12 +117,9 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
             } else
                 originalTemperature = temperature = daylightTemperature;
 
-            // we preserve the hilights in dcraw, here we have to make sure that
-            // we clip them appropratedly together with white balance
-            // double dmin = Math.min(daylightMultipliers[0], Math.min(daylightMultipliers[1], daylightMultipliers[2]));
-            double dmax = Math.max(daylightMultipliers[0], Math.max(daylightMultipliers[1], daylightMultipliers[2]));
-
-            // System.out.println("dmax: " + dmax + ", dmin: " + dmin);
+            // we preserve the highlights in dcraw, here we have to make sure that
+            // we clip them appropriately together with white balance
+            final float dmax = Math.max(daylightMultipliers[0], Math.max(daylightMultipliers[1], daylightMultipliers[2]));
 
             for (int c=0; c < 3; c++)
                 daylightMultipliers[c] /= dmax;
@@ -180,7 +178,7 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
     static float neutralTemperature(float[] rgb, float refT) {
         float sat = Float.MAX_VALUE;
         float minT = 0;
-        for (int t = 1000; t < 40000; t+= (0.01 * t)) {
+        for (int t = 1000; t < 40000; t += t / 100) {
             final var B = new LCMatrix(ColorScience.chromaticAdaptation(t, refT, caMethod));
             final var combo = XYZtoRGB.mult(B.mult(RGBtoZYX));
             final var color = combo.mult(new LCMatrix(3, 1, rgb));
@@ -313,7 +311,7 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
             if (dsum[c] != 0)
                 pre_mul[c] = (float) (dsum[c + 3] / dsum[c]);
 
-        double dmax = Math.max(pre_mul[0], Math.max(pre_mul[1], pre_mul[2]));
+        final float dmax = Math.max(pre_mul[0], Math.max(pre_mul[1], pre_mul[2]));
 
         for (int c = 0; c < 3; c++)
             pre_mul[c] /= dmax;

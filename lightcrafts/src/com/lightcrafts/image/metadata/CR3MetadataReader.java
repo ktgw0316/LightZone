@@ -65,12 +65,12 @@ public class CR3MetadataReader extends ImageMetadataReader {
     /**
      * get a box size of the ISO/IEC 14496-12 file format
      */
-    private static long getBoxSize(LCByteBuffer buf, int boxPos)
+    private static long getBoxSize(LCByteBuffer buf, long boxPos)
             throws IOException {
-        final int boxSize = buf.getInt(boxPos);
+        final int boxSize = buf.getInt((int) boxPos);
         return switch (boxSize) {
             case 0 -> buf.limit() - boxPos; // box extends to end of file
-            case 1 -> buf.getLong(boxPos + headerSize);
+            case 1 -> buf.getLong((int) (boxPos + headerSize));
             default -> boxSize;
         };
     }
@@ -97,12 +97,12 @@ public class CR3MetadataReader extends ImageMetadataReader {
         final ByteOrder origOrder = buf.order();
         buf.order(ByteOrder.BIG_ENDIAN);
 
-        int boxPos = 0;
+        long boxPos = 0;
 
         // Seek MOOV box.
-        int moovBoxEnd = -1;
+        long moovBoxEnd = -1;
         while (boxPos < buf.limit()) {
-            final var boxType = buf.getBytes(boxPos + boxLengthSize, boxNameSize);
+            final var boxType = buf.getBytes((int) (boxPos + boxLengthSize), boxNameSize);
             if (DEBUG)
                 System.out.println("boxType: " + new String(boxType, UTF_8) + ", pos: " + boxPos);
             if (Arrays.equals(boxType, moovTag)) {
@@ -116,23 +116,23 @@ public class CR3MetadataReader extends ImageMetadataReader {
         }
 
         // Check sub-boxes in the MOOV box.
-        int thmbBoxPos = -1;
-        int prvwBoxPos = -1;
+        long thmbBoxPos = -1;
+        long prvwBoxPos = -1;
         while (boxPos < moovBoxEnd) {
-            final var boxType = buf.getBytes(boxPos + boxLengthSize, boxNameSize);
+            final var boxType = buf.getBytes((int) (boxPos + boxLengthSize), boxNameSize);
             if (DEBUG)
                 System.out.println("boxType: " + new String(boxType, UTF_8) + ", pos: " + boxPos);
             if (Arrays.equals(boxType, ctboTag)) {
                 // cf. https://github.com/lclevy/canon_cr3#ctbo
                 final int recodeSize = 20;
-                final int xpacketRecordPos = boxPos + headerSize + 4; // 4 for number of records
-                final int prvwRecordPos = xpacketRecordPos + recodeSize;
-                final long prvwUuidOffset = buf.getLong(prvwRecordPos + 4); // 4 for recode index
-                prvwBoxPos = (int) (prvwUuidOffset + headerSize + extendedTypeSize + 8); // 8 to skip unknown data
+                final long xpacketRecordPos = boxPos + headerSize + 4; // 4 for number of records
+                final long prvwRecordPos = xpacketRecordPos + recodeSize;
+                final long prvwUuidOffset = buf.getLong((int) (prvwRecordPos + 4)); // 4 for recode index
+                prvwBoxPos = prvwUuidOffset + headerSize + extendedTypeSize + 8; // 8 to skip unknown data
             } else if (Arrays.equals(boxType, cmt1Tag)) {
-                cmtTiffBufferParams.add(new CmtTiffBufferParam(TIFFDirectory.class, boxPos + headerSize));
+                cmtTiffBufferParams.add(new CmtTiffBufferParam(TIFFDirectory.class, (int) (boxPos + headerSize)));
             } else if (Arrays.equals(boxType, cmt2Tag)) {
-                cmtTiffBufferParams.add(new CmtTiffBufferParam(EXIFDirectory.class, boxPos + headerSize));
+                cmtTiffBufferParams.add(new CmtTiffBufferParam(EXIFDirectory.class, (int) (boxPos + headerSize)));
             } else if (Arrays.equals(boxType, thmbTag)) {
                 thmbBoxPos = boxPos;
             }
@@ -142,18 +142,18 @@ public class CR3MetadataReader extends ImageMetadataReader {
         buf.order(origOrder);
 
         // cf. https://github.com/lclevy/canon_cr3#thmb-thumbnail
-        final byte thmbVersion = buf.get(thmbBoxPos + 8);
+        final byte thmbVersion = buf.get((int) (thmbBoxPos + 8));
         if (thmbBoxPos >= 0 && (thmbVersion == 0 || thmbVersion == 1)) {
-            final int thmbLength = buf.getInt(thmbBoxPos + 16);
-            final int thmbOffset = thmbBoxPos + 24;
-            thmbParam = new ImageParam(thmbOffset, thmbLength);
+            final int thmbLength = buf.getInt((int) (thmbBoxPos + 16));
+            final long thmbOffset = thmbBoxPos + 24;
+            thmbParam = new ImageParam((int) thmbOffset, thmbLength);
         }
 
         // cf. https://github.com/lclevy/canon_cr3#prvw-preview
         if (prvwBoxPos >= 0) {
-            final int prvwLength = buf.getInt(prvwBoxPos + 20);
-            final int prvwOffset = prvwBoxPos + 24;
-            prvwParam = new ImageParam(prvwOffset, prvwLength);
+            final int prvwLength = buf.getInt((int) (prvwBoxPos + 20));
+            final long prvwOffset = prvwBoxPos + 24;
+            prvwParam = new ImageParam((int) prvwOffset, prvwLength);
         }
     }
 }
