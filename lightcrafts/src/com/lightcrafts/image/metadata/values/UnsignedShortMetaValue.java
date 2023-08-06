@@ -81,7 +81,7 @@ public final class UnsignedShortMetaValue extends LongMetaValue {
      * {@inheritDoc}
      */
     protected long constrain( long value ) {
-        return value < 0 ? 0 : value > 65536 ? 65536 : value;
+        return value < 0 ? 0 : value > 65535 ? 65535 : value;
     }
 
     /**
@@ -94,7 +94,7 @@ public final class UnsignedShortMetaValue extends LongMetaValue {
      */
     protected long parseValue( String newValue ) {
         final long n = Long.parseLong( newValue );
-        if ( n < 0 || n > 65536 )
+        if ( n < 0 || n > 65535 )
             throw new NumberFormatException();
         return n;
     }

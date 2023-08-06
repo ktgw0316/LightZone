@@ -70,7 +70,7 @@ public final class UnsignedByteMetaValue extends ByteMetaValue {
      * {@inheritDoc}
      */
     protected long constrain( long value ) {
-        return value < 0 ? 0 : value > 256 ? 256 : value;
+        return value < 0 ? 0 : value > 255 ? 255 : value;
     }
 
     /**
@@ -83,7 +83,7 @@ public final class UnsignedByteMetaValue extends ByteMetaValue {
      */
     protected long parseValue( String newValue ) {
         final long n = Long.parseLong( newValue );
-        if ( n < 0 || n > 256 )
+        if ( n < 0 || n > 255 )
             throw new NumberFormatException();
         return n;
     }
