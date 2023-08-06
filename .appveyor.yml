@@ -3,7 +3,6 @@ version: 5.0.0.beta1.{build}-{branch}
 image:
   - Visual Studio 2022
   - macos-monterey
-  - Ubuntu2004
 
 clone_depth: 1
 
@@ -56,18 +55,3 @@ for:
     artifacts:
       - path: "macosx/lightzone-*.zip"
         name: macos zip archives
-
-  - matrix:
-      only:
-        - image: Ubuntu2004
-
-    init:
-      - sh: export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-
-    install:
-      - sh: sudo add-apt-repository --yes ppa:lightzone-team/lightzone
-      - sh: sudo apt-get update
-      - sh: sudo apt-get install -y ant javahelp2 libejml-java libglib2.0-dev libjaxb-java libjetbrains-annotations-java libjiconfont-font-awesome-java libjiconfont-google-material-design-icons-java libjiconfont-swing-java liblensfun-dev liblcms2-dev liblombok-java libslf4j-java libtiff5-dev tidy
-
-    build_script:
-      - sh: ant -f linux/build.xml
