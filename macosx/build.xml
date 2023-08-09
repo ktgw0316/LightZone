@@ -129,7 +129,7 @@
     <delete file="${macosx-zip}"/>
     <zip destfile="${macosx-zip}">
       <zipfileset dir="products">
-        <exclude name="GNUmakefile copydeps.sh"/>
+        <exclude name="GNUmakefile"/>
       </zipfileset>
       <zipfileset dir="products" filemode="0755">
         <include name="LightZone-forkd"/>

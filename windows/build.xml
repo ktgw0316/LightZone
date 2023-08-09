@@ -139,7 +139,8 @@
     <delete file="${windows-zip}"/>
     <zip destfile="${windows-zip}">
       <fileset dir="products">
-        <exclude name="GNUmakefile copydeps.sh"/>
+        <exclude name="GNUmakefile"/>
+        <exclude name="copydeps.sh"/>
       </fileset>
     </zip>
   </target>
