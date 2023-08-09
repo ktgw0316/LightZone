@@ -74,6 +74,21 @@ manually download Apache Ant, unpack it somewhere (e.g. to your home directory) 
 export PATH=/home/yourusername/apache-ant-1.10.5/bin/:$PATH
 ```
 
+### Offline build
+
+If you want to build LightZone without internet connection, you need to download
+the dependency files into the directory `lightcrafts/lib`, then:
+
+```shell
+ant -f linux/build.xml -Dno-ivy=true -Dno-submodule=true
+```
+
+Alternatively, if you cannot use `ivy` but you can use git submodule:
+
+```shell
+ant -f linux/build.xml -Dno-ivy=true -Dno-submodule=false
+```
+
 ## Test Run
 
 To check if it works fine before installing:
