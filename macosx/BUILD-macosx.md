@@ -1,6 +1,6 @@
 # Development guide
 
-Written and tested on MacOSX 10.13 with Java 8 64-bit.
+Written and tested on MacOSX 13.5 with Java 17 64-bit.
 
 LightZone can be built with Ant, and edited with any java IDE; these instructions use Eclipse for convenience,
 since it's a common IDE with Ant built in.

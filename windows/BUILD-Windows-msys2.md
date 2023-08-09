@@ -57,11 +57,13 @@ Few points for MSYS2 beginners
 If you haven't changed anything, your default shell is Bash. Open `~/.bashrc` with an editor (nano
 or vim) and enter following environmental variables. (Modify the paths to match your environment.):
 
-    export JAVA_HOME="/c/Program Files/AdoptOpenJDK/jdk-11.0.4.11-hotspot"
-    export ANT_HOME="/c/Program Files/apache-ant-1.9.8"
-    export MSSDK_HOME="/c/Program Files (x86)/Windows Kits/10/Lib/10.0.22000.0"
-    export INSTALL4J_HOME="/c/Program Files/install4j5"
-    export PATH=$PATH:${JAVA_HOME}/bin:${ANT_HOME}/bin:${INSTALL4J_HOME}/bin;
+```shell
+export JAVA_HOME="/c/Program Files/AdoptOpenJDK/jdk-11.0.4.11-hotspot"
+export ANT_HOME="/c/Program Files/apache-ant-1.9.8"
+export MSSDK_HOME="/c/Program Files (x86)/Windows Kits/10/Lib/10.0.22000.0"
+export INSTALL4J_HOME="/c/Program Files/install4j5"
+export PATH=$PATH:${JAVA_HOME}/bin:${ANT_HOME}/bin:${INSTALL4J_HOME}/bin;
+```
 
 If you close and open your shell again it will automatically set these variables.
 
@@ -70,17 +72,23 @@ Do NOT set C_INCLUDE_PATH=/usr/include for mingw compilers.
 Checkout your project with Git. If you have problems with line endings in build (the \r stuff), do
 following:
 
-    git rm --cached -r .
-    git reset --hard
+```shell
+git rm --cached -r .
+git reset --hard
+```
 
 To start the build:
 
-    cd windows
-    ant build-installer
+```shell
+cd windows
+ant build-installer
+```
 
 If you want to build a 32-bit binary on 64-bit machine, specify TARGET_ARCH variable:
 
-    TARGET_ARCH=i386 ant build-installer
+```shell
+TARGET_ARCH=i386 ant build-installer
+```
 
 ### Known build issues
 
