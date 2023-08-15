@@ -27,6 +27,7 @@ DEPEND="virtual/jdk
 	media-libs/lensfun
 	media-libs/lcms
 	media-libs/libjpeg-turbo
+	media-libs/libraw
 	media-libs/tiff
 	net-misc/rsync
 	x11-libs/libX11"
@@ -37,6 +38,7 @@ RDEPEND="virtual/jre
 	media-libs/lensfun
 	media-libs/lcms
 	media-libs/libjpeg-turbo
+	media-libs/libraw
 	media-libs/tiff"
 
 pkg_setup() {

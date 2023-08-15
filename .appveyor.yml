@@ -26,7 +26,7 @@ for:
     install:
       - cmd: cinst ant
       - cmd: bash -lc "pacman --noconfirm --disable-download-timeout -S pactoys"
-      - cmd: bash -lc "pacboy --noconfirm --disable-download-timeout -S lcms2:m lensfun:m ntldd-git:m pkg-config:m"
+      - cmd: bash -lc "pacboy --noconfirm --disable-download-timeout -S lcms2:m libraw:m lensfun:m ntldd-git:m pkg-config:m"
 
     build_script:
       - cmd: bash -lc "MINGW_DIR=/c/$MINGW64_PATH ant -f $ANT_SCRIPT -lib $ANT_LIB_DIR zip"
@@ -46,7 +46,7 @@ for:
       - sh: export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
 
     install:
-      - sh: HOMEBREW_NO_AUTO_UPDATE=1 brew install ant lensfun libjpeg-turbo libomp libtiff libxml2 little-cms2 rsync
+      - sh: HOMEBREW_NO_AUTO_UPDATE=1 brew install ant lensfun libjpeg-turbo libomp libraw libtiff libxml2 little-cms2 rsync
 
     build_script:
       - sh: ant -f macosx/build.xml zip
