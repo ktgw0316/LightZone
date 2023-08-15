@@ -48,15 +48,13 @@ jobs:
             javahelp2 \
             libejml-java \
             libglib2.0-dev \
-            libjaxb-java \
             libjetbrains-annotations-java \
             libjiconfont-font-awesome-java \
             libjiconfont-google-material-design-icons-java \
             libjiconfont-swing-java \
-            liblensfun-dev \
             liblcms2-dev \
+            liblensfun-dev \
             liblombok-java \
-            libslf4j-java \
             libraw-dev \
             libtiff-dev \
             tidy
