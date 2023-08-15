@@ -17,6 +17,7 @@ Source:		%{name}-%{version}.tar.xz
 %define jdk java-17-openjdk-devel
 %define lcms2_devel lcms2-devel
 %define libjpeg_devel libjpeg-turbo-devel
+%define libraw LibRaw
 %define libX11_devel libX11-devel
 %define pkg_config pkgconfig
 %define xmllint libxml2
@@ -27,6 +28,7 @@ Source:		%{name}-%{version}.tar.xz
 %define jdk java-17-openjdk-devel
 %define lcms2_devel liblcms2-devel
 %define libjpeg_devel libjpeg8-devel
+%define libraw libraw
 %define libX11_devel xorg-x11-libX11-devel
 %define pkg_config pkg-config
 %define xmllint libxml2
@@ -37,6 +39,7 @@ BuildRequires: update-desktop-files
 %define jdk java-17-openjdk-devel
 %define lcms2_devel liblcms2-devel
 %define libjpeg_devel libjpeg8-devel
+%define libraw libraw
 %define libX11_devel libX11-devel
 %define pkg_config pkg-config
 %define xmllint libxml2-tools
@@ -49,6 +52,7 @@ Requires:	xerces-j2-xml-apis
 %define jdk java-17-openjdk-devel
 %define lcms2_devel liblcms2-devel
 %define libjpeg_devel libjpeg8-devel
+%define libraw libraw
 %define libX11_devel libX11-devel
 %define pkg_config pkg-config
 %define xmllint libxml2-utils
@@ -60,6 +64,7 @@ Requires:	libgomp1
 %define jdk java-17-openjdk-devel
 %define lcms2_devel liblcms2-devel
 %define libjpeg_devel libjpeg-devel
+%define libraw libraw
 %define libX11_devel libx11-devel
 %define pkg_config pkg-config
 %define xmllint libxml2-utils
@@ -67,8 +72,8 @@ BuildRequires:	libgomp-devel
 Requires:	libgomp1
 %endif
 
-BuildRequires:	javapackages-tools, %{jdk}, %{libX11_devel}, ant, gcc, gcc-c++, make, git, javahelp2, %{lcms2_devel}, lensfun-devel, %{libjpeg_devel}, libtiff-devel, %{pkg_config}, rsync
-Requires:	javahelp2, lcms2, lensfun, %{xmllint}
+BuildRequires:	javapackages-tools, %{jdk}, %{libX11_devel}, ant, gcc, gcc-c++, make, git, javahelp2, %{lcms2_devel}, lensfun-devel, %{libjpeg_devel}, %{libraw}-devel, libtiff-devel, %{pkg_config}, rsync
+Requires:	javahelp2, lcms2, lensfun, %{libraw}, %{xmllint}
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
