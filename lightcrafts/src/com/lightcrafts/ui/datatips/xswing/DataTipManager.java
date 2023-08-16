@@ -33,7 +33,6 @@ import java.awt.*;
 import java.awt.event.AWTEventListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
-import java.security.AccessControlException;
 
 /**
  * <code>DataTipManager</code> provides data tips for tree, table and list components. Whenever the mouse cursor is
@@ -44,28 +43,16 @@ import java.security.AccessControlException;
 public class DataTipManager {
     private static DataTipManager   instance;
 
-    private ListDataTipListener     listMouseListener   = new ListDataTipListener();
-    private TableDataTipListener    tableMouseListener  = new TableDataTipListener();
-    private TreeDataTipListener     treeMouseListener   = new TreeDataTipListener();
+    private final ListDataTipListener listMouseListener = new ListDataTipListener();
+    private final TableDataTipListener tableMouseListener = new TableDataTipListener();
+    private final TreeDataTipListener treeMouseListener = new TreeDataTipListener();
     private Component               parentComponent;
     private Window                  tipComponentWindow;
     private MouseEvent              lastMouseEvent;
-    private static boolean          allowUntrustedUsage;
 
     private DataTipManager() {
-        try {
-            long eventMask = AWTEvent.MOUSE_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK | AWTEvent.MOUSE_WHEEL_EVENT_MASK;
-            Toolkit.getDefaultToolkit().addAWTEventListener(new MouseEventModifier(), eventMask);
-        }
-        catch(AccessControlException e) {
-            if(!allowUntrustedUsage) {
-                throw new RuntimeException("DataTipManager needs to run in a trusted application", e);
-            }
-        }
-    }
-
-    static void enableUntrustedUsage(boolean enable) {
-        allowUntrustedUsage = enable;
+        long eventMask = AWTEvent.MOUSE_EVENT_MASK | AWTEvent.MOUSE_MOTION_EVENT_MASK | AWTEvent.MOUSE_WHEEL_EVENT_MASK;
+        Toolkit.getDefaultToolkit().addAWTEventListener(new MouseEventModifier(), eventMask);
     }
 
     /**
@@ -82,7 +69,7 @@ public class DataTipManager {
      * Enable data tips for a list component.
      * @param list the list which should be enhanced with data tips.
      */
-    public synchronized void register(JList list) {
+    public synchronized void register(JList<ListDataTipListener> list) {
         list.addMouseListener(listMouseListener);
         list.addMouseMotionListener(listMouseListener);
         list.addComponentListener(listMouseListener);
@@ -112,7 +99,7 @@ public class DataTipManager {
      * Undo register(JList).
      * @param list A JList that was passed to <code>register</code>
      */
-    public synchronized void unregister(JList list) {
+    public synchronized void unregister(JList<ListDataTipListener> list) {
         list.removeMouseListener(listMouseListener);
         list.removeMouseMotionListener(listMouseListener);
         list.removeComponentListener(listMouseListener);
@@ -156,7 +143,7 @@ public class DataTipManager {
         int         x = mouseEvent.getX();
         int         y = mouseEvent.getY();
         long        when = mouseEvent.getWhen();
-        int         modifiers = mouseEvent.getModifiers();
+        int         modifiers = mouseEvent.getModifiersEx();
         int         clickCount = mouseEvent.getClickCount();
         boolean     isPopupTrigger = mouseEvent.isPopupTrigger();
         if(id == MouseEvent.MOUSE_EXITED) {
@@ -186,7 +173,7 @@ public class DataTipManager {
                 return;
             }
             long        when            = mouseEvent.getWhen();
-            int         modifiers       = mouseEvent.getModifiers();
+            int         modifiers       = mouseEvent.getModifiersEx();
             int         clickCount      = mouseEvent.getClickCount();
             boolean     isPopupTrigger  = mouseEvent.isPopupTrigger();
             MouseEvent newEvent;
