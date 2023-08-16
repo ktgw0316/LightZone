@@ -53,9 +53,6 @@
           <include name="annotations*.jar"/>
           <include name="jsr305*.jar"/>
         </fileset>
-        <fileset dir="lib">
-          <include name="*.jar"/>
-        </fileset>
       </classpath>
     </javac>
   </target>
