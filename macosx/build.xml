@@ -127,12 +127,17 @@
     <zip destfile="${macosx-zip}">
       <zipfileset dir="products">
         <exclude name="GNUmakefile"/>
+        <exclude name="LightZone-forkd"/>
+        <exclude name="dcraw_lz"/>
+        <exclude name="lightzone.command"/>
+        <exclude name="jre/bin/**"/>
       </zipfileset>
       <zipfileset dir="products" filemode="0755">
         <include name="LightZone-forkd"/>
         <include name="dcraw_lz"/>
         <include name="lightzone.command"/>
       </zipfileset>
+      <zipfileset dir="products/jre/bin" prefix="jre/bin" filemode="755"/>
     </zip>
   </target>
 
