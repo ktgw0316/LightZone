@@ -34,7 +34,7 @@ for:
       - cmd: bash -lc "TARGET_ARCH=i686 MINGW_DIR=/c/$MINGW32_PATH ant -f $ANT_SCRIPT -Dno-ivy=true -lib $ANT_LIB_DIR zip"
 
     artifacts:
-      - path: "windows/lightzone-*.zip"
+      - path: "windows/LightZone-windows*.zip"
         name: windows zip archives
 
   - matrix:
@@ -52,8 +52,8 @@ for:
 
     build_script:
       - sh: ant -f macosx/build.xml zip
-      - sh: mv macosx/lightzone.zip macosx/lightzone-intel.zip
+      - sh: mv macosx/LightZone-macosx.zip macosx/LightZone-macosx-intel.zip
 
     artifacts:
-      - path: "macosx/lightzone-*.zip"
+      - path: "macosx/LightZone-macosx*.zip"
         name: macos zip archives
