@@ -51,10 +51,8 @@ public class CloneOperationImpl extends BlendedOperation implements CloneOperati
         for (final Contour c : contours) {
             // Protect from clone copy bug
             // TODO: Anton fixme
-            if (!(c instanceof CloneContour))
+            if (!(c instanceof CloneContour cloneContour))
                 continue;
-
-            CloneContour cloneContour = (CloneContour) c;
 
             // This is the mask for the clone operation:
             final Contour contour = cloneContour;
@@ -136,7 +134,7 @@ public class CloneOperationImpl extends BlendedOperation implements CloneOperati
             pb.addSource(formatted)
               .addSource(image)
               .add("Normal")
-              .add(new Double(1))
+              .add(1.0)
               .add(mask);
 
             // RenderingHints blendHints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, new ImageLayout(back));

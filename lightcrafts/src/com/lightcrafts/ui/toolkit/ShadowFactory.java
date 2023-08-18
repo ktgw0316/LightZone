@@ -20,7 +20,9 @@ import java.awt.image.Kernel;
 import java.awt.image.WritableRaster;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * <p>A shadow factory generates a drop shadow for any given picture, respecting
@@ -145,10 +147,10 @@ public class ShadowFactory {
     private Color color = Color.BLACK;
 
     // rendering hints map
-    private HashMap hints;
+    private final HashMap<String, String> hints;
 
     // notifies listeners of properties changes
-    private PropertyChangeSupport changeSupport;
+    private final PropertyChangeSupport changeSupport;
 
     /**
      * <p>Creates a default good looking shadow generator.
@@ -181,10 +183,10 @@ public class ShadowFactory {
      * @param size The size of the shadow in pixels. Defines the fuzziness.
      * @param opacity The opacity of the shadow.
      * @param color The color of the shadow.
-     * @see #setRenderingHint(Object, Object)
+     * @see #setRenderingHint(String, String)
      */
     public ShadowFactory(final int size, final float opacity, final Color color) {
-        hints = new HashMap();
+        hints = new HashMap<>();
         hints.put(KEY_BLUR_QUALITY, VALUE_BLUR_QUALITY_FAST);
 
         changeSupport = new PropertyChangeSupport(this);
@@ -225,7 +227,7 @@ public class ShadowFactory {
      * @param key The rendering hint key
      * @param value The rendering hint value
      */
-    public void setRenderingHint(final Object key, final Object value) {
+    public void setRenderingHint(final String key, final String value) {
         hints.put(key, value);
     }
 
@@ -274,19 +276,11 @@ public class ShadowFactory {
      * @param shadowOpacity the generated shadows opacity
      */
     public void setOpacity(final float shadowOpacity) {
-        float oldOpacity = this.opacity;
-
-        if (shadowOpacity < 0.0) {
-            this.opacity = 0.0f;
-        } else if (shadowOpacity > 1.0f) {
-            this.opacity = 1.0f;
-        } else {
-            this.opacity = shadowOpacity;
-        }
-
+        final Float oldOpacity = this.opacity;
+        this.opacity = Math.max(0.0f, Math.min(shadowOpacity, 1.0f));
+        final Float newOpacity = this.opacity;
         changeSupport.firePropertyChange(OPACITY_CHANGED_PROPERTY,
-                                         new Float(oldOpacity),
-                                         new Float(this.opacity));
+                                         oldOpacity, newOpacity);
     }
 
     /**
@@ -314,17 +308,10 @@ public class ShadowFactory {
      * @param shadowSize the generated shadows size in pixels (fuzziness)
      */
     public void setSize(final int shadowSize) {
-        int oldSize = this.size;
-
-        if (shadowSize < 0) {
-            this.size = 0;
-        } else {
-            this.size = shadowSize;
-        }
-
+        final int oldSize = this.size;
+        this.size = Math.max(shadowSize, 0);
         changeSupport.firePropertyChange(SIZE_CHANGED_PROPERTY,
-                                         new Integer(oldSize),
-                                         new Integer(this.size));
+                                         oldSize, this.size);
     }
 
     /**
@@ -342,7 +329,7 @@ public class ShadowFactory {
      * @return the picture containing the shadow of <code>image</code>
      */
     public BufferedImage createShadow(final BufferedImage image) {
-        if (hints.get(KEY_BLUR_QUALITY) == VALUE_BLUR_QUALITY_HIGH) {
+        if (Objects.equals(hints.get(KEY_BLUR_QUALITY), VALUE_BLUR_QUALITY_HIGH)) {
             BufferedImage subject = prepareImage(image);
             BufferedImage shadowMask = createShadowMask(subject);
             return getGaussianBlur(size, shadowMask);
@@ -530,9 +517,7 @@ public class ShadowFactory {
     private ConvolveOp getLinearBlurOp(final int size) {
         float[] data = new float[size * size];
         float value = 1.0f / (float) (size * size);
-        for (int i = 0; i < data.length; i++) {
-            data[i] = value;
-        }
+        Arrays.fill(data, value);
         return new ConvolveOp(new Kernel(size, size, data));
     }
 }

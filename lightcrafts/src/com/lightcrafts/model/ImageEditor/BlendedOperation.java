@@ -70,7 +70,7 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
     public void setRegion(Region region) {
         if (validRegion(region)) {
             mask = new LCROIShape(region, rendering.getInputTransform());
-        } else if (region == null || region.getContours().size() == 0)
+        } else if (region == null || region.getContours().isEmpty())
             mask = null;
         lastTransform = rendering.getInputTransform();
         super.setRegion(region);
@@ -239,7 +239,7 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
             pb.addSource(front);
             pb.addSource(back);
             pb.add(blendingMode);
-            pb.add(new Double(invertedRegion ? -opacity : opacity));
+            pb.add(invertedRegion ? -opacity : opacity);
             pb.add(mask);
             pb.add(colorSelectionMask);
 

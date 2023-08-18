@@ -14,8 +14,8 @@ import java.util.LinkedList;
 
 public class DraggableStack extends JLayeredPane {
 
-    private final static Integer StackLayer = new Integer(0);
-    private final static Integer DragLayer = new Integer(1);
+    private final static Integer StackLayer = 0;
+    private final static Integer DragLayer = 1;
 
     private StackLayer stack;
     private DragLayer drag;

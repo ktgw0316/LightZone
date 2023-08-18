@@ -31,10 +31,11 @@ package com.lightcrafts.ui.datatips.xswing;
 import javax.swing.*;
 import java.awt.*;
 
-class ListDataTipListener extends DataTipListener {
+public class ListDataTipListener extends DataTipListener {
     ListDataTipListener() {
     }
 
+    @Override
     DataTipCell getCell(JComponent component, Point point) {
         JList   list    = (JList) component;
         int     index   = list.locationToIndex(point);

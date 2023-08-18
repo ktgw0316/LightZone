@@ -1,3 +1,3 @@
 #!/bin/sh
 cd `dirname $0`
-java -jar ./lightcrafts-apple.jar
+jre/bin/java -jar ./lightcrafts-apple.jar

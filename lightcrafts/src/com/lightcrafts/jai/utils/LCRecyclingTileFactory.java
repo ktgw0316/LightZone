@@ -396,9 +396,9 @@ public class LCRecyclingTileFactory extends Observable
     public void recycleTile(Raster tile) {
         DataBuffer db = tile.getDataBuffer();
 
-        Long key = new Long(((long)db.getDataType() << 56) |
-                            ((long)db.getNumBanks() << 32) |
-                            (long)db.getSize());
+        Long key = (long)db.getDataType() << 56
+                | (long)db.getNumBanks() << 32
+                | (long)db.getSize();
 
         if(DEBUG) {
             System.out.println("Recycling array for: "+

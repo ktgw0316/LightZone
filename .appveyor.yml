@@ -34,7 +34,7 @@ for:
       - cmd: bash -lc "TARGET_ARCH=i686 MINGW_DIR=/c/$MINGW32_PATH ant -f $ANT_SCRIPT -Dno-ivy=true -lib $ANT_LIB_DIR zip"
 
     artifacts:
-      - path: "windows/lightzone-*.zip"
+      - path: "windows/LightZone-windows*.zip"
         name: windows zip archives
 
   - matrix:
@@ -42,16 +42,18 @@ for:
         - image: macos-monterey
 
     init:
-      - sh: export JAVA_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-17.jdk/Contents/Home
+      - sh: export JAVA_HOME=/Library/Java/JavaVirtualMachines/liberica-jdk-17-full.jdk/Contents/Home
       - sh: export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
 
     install:
       - sh: HOMEBREW_NO_AUTO_UPDATE=1 brew install ant lensfun libjpeg-turbo libomp libraw libtiff libxml2 little-cms2 rsync
+      - sh: HOMEBREW_NO_AUTO_UPDATE=1 brew tap bell-sw/liberica
+      - sh: HOMEBREW_NO_AUTO_UPDATE=1 brew install --cask liberica-jdk17-full
 
     build_script:
       - sh: ant -f macosx/build.xml zip
-      - sh: mv macosx/lightzone.zip macosx/lightzone-intel.zip
+      - sh: mv macosx/LightZone-macosx.zip macosx/LightZone-macosx-intel.zip
 
     artifacts:
-      - path: "macosx/lightzone-*.zip"
+      - path: "macosx/LightZone-macosx*.zip"
         name: macos zip archives

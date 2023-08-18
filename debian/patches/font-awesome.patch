@@ -10,4 +10,4 @@ Index: LightZone/lightcrafts/src/com/lightcrafts/ui/toolkit/IconFontFactory.java
 +import jiconfont.icons.font_awesome.FontAwesome;
  import jiconfont.icons.google_material_design_icons.GoogleMaterialDesignIcons;
  import jiconfont.swing.IconFontSwing;
- import lombok.val;
+ import org.jetbrains.annotations.Nullable;
