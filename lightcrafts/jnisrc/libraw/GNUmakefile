@@ -12,8 +12,6 @@ JNI_LINUX_CFLAGS:=	-fopenmp
 JNI_MACOSX_CFLAGS:=	-Xpreprocessor -fopenmp
 
 JNI_EXTRA_DEFINES:=	-DNO_JPEG
-JNI_LINUX_DEFINES:=	-Dfgetc=getc_unlocked
-JNI_MACOSX_DEFINES:=	$(JNI_LINUX_DEFINES)
 
 JNI_EXTRA_INCLUDES+=	-I../include
 
