@@ -12,7 +12,7 @@ Build-Depends:
  ant (>= 1.9.8),
  autoconf,
  debhelper,
- default-jdk (>= 1.17),
+ default-jdk (>= 2:1.17),
  default-jre-headless (>= 2:1.17),
  devscripts,
  git-core,
