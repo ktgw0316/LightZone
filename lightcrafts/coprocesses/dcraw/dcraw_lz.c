@@ -6803,8 +6803,14 @@ void CLASS adobe_coeff (const char *make, const char *model)
 	{ 10004,-3219,-1201,-7036,15047,2107,-1863,2565,7736 } },
     { "Fujifilm F8", 0, 0,
 	{ 13690,-5358,-1474,-3369,11600,1998,-132,1554,4395 } },
-    { "Fujifilm GFX 50S", 0, 0,
+    { "Fujifilm GFX 50", 0, 0x3e80, /* GFX 50S & 50R */
 	{ 11756,-4754,-874,-3056,11045,2305,-381,1457,6006 } },
+    { "Fujifilm GFX 100", 0, 0,
+	{ 16212,-8423,-1583,-4336,12583,1937,-195,726,6199 } },
+    { "Fujifilm GFX50S II", 0, 0x3e80,
+	{ 11756,-4754,-874,-3056,11045,2305,-381,1457,6006 } },
+    { "Fujifilm GFX100S", 0, 0,
+	{ 16212,-8423,-1583,-4336,12583,1937,-195,726,6199 } },
     { "Fujifilm S100FS", 514, 0,
 	{ 11521,-4355,-1065,-6524,13767,3058,-1466,1984,6045 } },
     { "Fujifilm S1", 0, 0,
@@ -6863,6 +6869,8 @@ void CLASS adobe_coeff (const char *make, const char *model)
 	{ 10592,-4262,-1008,-3514,11355,2465,-870,2025,6386 } },
     { "Fujifilm X100T", 0, 0,
 	{ 10592,-4262,-1008,-3514,11355,2465,-870,2025,6386 } },
+    { "Fujifilm X100V", 0, 0,
+    { 13426,-6334,-1177,-4244,12136,2371,-580,1303,5980 } },
     { "Fujifilm X100", 0, 0,
 	{ 12161,-4457,-1069,-5034,12874,2400,-795,1724,6904 } },
     { "Fujifilm X10", 0, 0,
@@ -6877,6 +6885,8 @@ void CLASS adobe_coeff (const char *make, const char *model)
 	{ 10413,-3996,-993,-3721,11640,2361,-733,1540,6011 } },
     { "Fujifilm X-Pro2", 0, 0,
 	{ 11434,-4948,-1210,-3746,12042,1903,-666,1479,5235 } },
+    { "Fujifilm X-Pro3", 0, 0,
+	{ 13426,-6334,-1177,-4244,12136,2371,-580,1303,5980 } },
     { "Fujifilm X-A10", 0, 0,
 	{ 11540,-4999,-991,-2949,10963,2278,-382,1049,5605 } },
     { "Fujifilm X-A20", 0, 0,
@@ -6895,18 +6905,32 @@ void CLASS adobe_coeff (const char *make, const char *model)
 	{ 11562,-5118,-961,-3022,11007,2311,-525,1569,6097 } },
     { "Fujifilm X-E2", 0, 0,
 	{ 8458,-2451,-855,-4597,12447,2407,-1475,2482,6526 } },
-    { "Fujifilm X-E3", 0, 0,
+    { "Fujifilm X-E3", 0, 0x3ee4,
 	{ 11434,-4948,-1210,-3746,12042,1903,-666,1479,5235 } },
+    { "Fujifilm X-E4", 0, 0,
+	{ 13426,-6334,-1177,-4244,12136,2371,-580,1303,5980 } },
     { "Fujifilm X-H1", 0, 0,
 	{ 11434,-4948,-1210,-3746,12042,1903,-666,1479,5235 } },
+    { "Fujifilm X-H2", 0, 0,
+	{ 11809,-5358,-1141,-4248,12164,2343,-514,1097,5848 } },
     { "Fujifilm X-M1", 0, 0,
 	{ 10413,-3996,-993,-3721,11640,2361,-733,1540,6011 } },
+    { "Fujifilm X-S10", 0, 0,
+	{ 13426,-6334,-1177,-4244,12136,2371,-580,1303,5980 } },
     { "Fujifilm X-S1", 0, 0,
 	{ 13509,-6199,-1254,-4430,12733,1865,-331,1441,5022 } },
+    { "Fujifilm X-T100", 0, 0x3ee4,
+	{ 11673,-4760,-1041,-3988,12058,2166,-771,1417,5568 } },
     { "Fujifilm X-T1", 0, 0,	/* also X-T10 */
 	{ 8458,-2451,-855,-4597,12447,2407,-1475,2482,6526 } },
     { "Fujifilm X-T2", 0, 0,	/* also X-T20 */
 	{ 11434,-4948,-1210,-3746,12042,1903,-666,1479,5235 } },
+    { "Fujifilm X-T3", 0, 0,	/* also X-T30 & X-T30 II */
+	{ 13426,-6334,-1177,-4244,12136,2371,-580,1303,5980 } },
+    { "Fujifilm X-T4", 0, 0,
+	{ 13426,-6334,-1177,-4244,12136,2371,-580,1303,5980 } },
+    { "Fujifilm X-T5", 0, 0,
+	{ 11809,-5358,-1141,-4248,12164,2343,-514,1097,5848 } },
     { "Fujifilm XF1", 0, 0,
 	{ 13509,-6199,-1254,-4430,12733,1865,-331,1441,5022 } },
     { "Fujifilm XQ", 0, 0,	/* XQ1 and XQ2 */
@@ -8142,6 +8166,11 @@ void CLASS identify()
     parse_tiff (data_offset = get4());
     parse_tiff (thumb_offset+12);
     apply_tiff();
+    if (!strcmp(model,"X-T3")) {
+      height = raw_height - 2;
+    } else if (!strcmp(model,"GFX 100") || !strcmp(model,"GFX100S")) {
+      load_flags = 0;
+    }
     if (!load_raw) {
       load_raw = &CLASS unpacked_load_raw;
       tiff_bps = 14;
@@ -8580,6 +8609,8 @@ canon_a5:
       height = 2144;
       width  = 2880;
       flip = 6;
+    } else if (!strcmp(model,"GFX50S II")) {
+      width = 8280;
     }
     top_margin = (raw_height - height) >> 2 << 1;
     left_margin = (raw_width - width ) >> 2 << 1;
@@ -8587,6 +8618,33 @@ canon_a5:
     if (width == 4032 || width == 4952 || width == 6032 || width == 8280) left_margin = 0;
     if (width == 3328 && (width -= 66)) left_margin = 34;
     if (width == 4936) left_margin = 4;
+    if (!strcmp(model,"X-Pro3") || !strcmp(model,"X-T3") || !strncmp(model,"X-T30",5)
+        || !strcmp(model,"X-T4") || !strcmp(model,"X100V") || !strcmp(model,"X-S10")
+        || !strcmp(model,"X-H2S")) {
+      width = 6252;
+      height = 4176;
+      left_margin = 0;
+      top_margin = 5;
+    } else if (!strcmp(model,"X-E4")) {
+      width = 6252;
+      height = 4126;
+      left_margin = 0;
+      top_margin = 5;
+    } else if (!strcmp(model,"X-T5") || !strcmp(model,"X-H2")) {
+      width = 7752;
+      height = 5184;
+      left_margin = 0;
+      top_margin = 5;
+    } else if (!strcmp(model,"GFX 100") || !strcmp(model,"GFX100S")) {
+      if (width < 23328) {
+        width = 11664;
+        top_margin = 2;
+      } else {
+        width = 23328;
+        top_margin = 4;
+      }
+      left_margin = 0;
+    }
     if (!strcmp(model,"HS50EXR") ||
 	!strcmp(model,"F900EXR")) {
       width += 2;
