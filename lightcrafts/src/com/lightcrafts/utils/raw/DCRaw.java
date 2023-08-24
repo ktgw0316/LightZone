@@ -965,10 +965,10 @@ public final class DCRaw extends RawDecoder {
             "FUJIFILM FINEPIX S9100", "FUJIFILM FINEPIX S9600",
             "FUJIFILM FINEPIX X100",
             "FUJIFILM FINEPIXS2PRO",
-            "FUJIFILM GFX100", // NG: wrong image size
-            "FUJIFILM GFX100S", // NG: wrong image size
+            "FUJIFILM GFX 100", // OK
+            "FUJIFILM GFX100S", // OK
             "FUJIFILM GFX 50S",
-            "FUJIFILM GFX50S II", // NG: wrong image size
+            "FUJIFILM GFX50S II", // OK
             "FUJIFILM GFX 50R", // OK
             "FUJIFILM HS11", "FUJIFILM HS10",
             "FUJIFILM HS20EXR",
@@ -983,17 +983,18 @@ public final class DCRaw extends RawDecoder {
             "FUJIFILM X-A2",
             "FUJIFILM X-A3",
             "FUJIFILM X-A5",
+            "FUJIFILM X-A7", // no raw sample
             "FUJIFILM X-E1",
             "FUJIFILM X-E2",
             "FUJIFILM X-E2S",
-//            "FUJIFILM X-E3", // TODO
-//            "FUJIFILM X-E4", // TODO
+            "FUJIFILM X-E3", // OK
+            "FUJIFILM X-E4", // OK
             "FUJIFILM X-H1",
             "FUJIFILM X-H2S", // NG: wrong image size
             "FUJIFILM X-M1",
             "FUJIFILM X-PRO1",
             "FUJIFILM X-PRO2",
-//            "FUJIFILM X-PRO3", // NG: bad color and wrong image size
+            "FUJIFILM X-PRO3", // OK
             "FUJIFILM X-S1",
             "FUJIFILM X-S10", // no raw sample
             "FUJIFILM X-T1",
@@ -1003,14 +1004,15 @@ public final class DCRaw extends RawDecoder {
             "FUJIFILM X-T20",
             "FUJIFILM X-T200", // OK
             "FUJIFILM X-T3",
-            "FUJIFILM X-T30", // NG: wrong image size
+            "FUJIFILM X-T30", // OK
             "FUJIFILM X-T30 II",
-            "FUJIFILM X-T4", // NG: wrong image size
+            "FUJIFILM X-T4", // OK
+            "FUJIFILM X-T5", // OK
             "FUJIFILM X10", // no raw sample
             "FUJIFILM X100F",
             "FUJIFILM X100S",
             "FUJIFILM X100T",
-            "FUJIFILM X100V", // NG: wrong image size
+            "FUJIFILM X100V", // OK
             "FUJIFILM X20",
             "FUJIFILM X30",
             "FUJIFILM X70",
