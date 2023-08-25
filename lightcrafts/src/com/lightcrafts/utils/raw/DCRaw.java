@@ -808,7 +808,7 @@ public final class DCRaw extends RawDecoder {
             "CANON EOS 700D", "CANON EOS REBEL T5I", "CANON EOS KISS X7I",
             "CANON EOS 70D",
             "CANON EOS 750D", "CANON EOS REBEL T6I", "CANON EOS KISS X8I",
-            "CANON EOS 760D", "CANON EOS REBEL T6S", "CANON EOS KISS X9",
+            "CANON EOS 760D", "CANON EOS REBEL T6S", "CANON EOS KISS X9", "CANON EOS 8000D",
             "CANON EOS 77D",
             "CANON EOS 7D MARK II",
             "CANON EOS 7D",
@@ -822,10 +822,11 @@ public final class DCRaw extends RawDecoder {
             "CANON EOS M",
             "CANON EOS M10",
             "CANON EOS M100",
+            "CANON EOS M2", // no raw sample
             "CANON EOS M3",
             "CANON EOS M5",
             "CANON EOS M6",
-            "CANON EOS REBEL SL2",
+            "CANON EOS REBEL SL2", "CANON EOS 200D",
             "CANON EOS-1D MARK II N",
             "CANON EOS-1D MARK II",
             "CANON EOS-1D MARK III",
@@ -985,6 +986,8 @@ public final class DCRaw extends RawDecoder {
             "FUJIFILM X-E1",
             "FUJIFILM X-E2",
             "FUJIFILM X-E2S",
+//            "FUJIFILM X-E3", // TODO
+//            "FUJIFILM X-E4", // TODO
             "FUJIFILM X-H1",
             "FUJIFILM X-H2S", // NG: wrong image size
             "FUJIFILM X-M1",
@@ -1148,6 +1151,7 @@ public final class DCRaw extends RawDecoder {
             "NIKON 1 J4",
             "NIKON 1 J5",
             "NIKON 1 S1",
+//            "NIKON 1 S2", // TODO
             "NIKON 1 V1",
             "NIKON 1 V2",
             "NIKON 1 V3",
@@ -1177,6 +1181,7 @@ public final class DCRaw extends RawDecoder {
             "NIKON D3200",
             "NIKON D3300",
             "NIKON D3400",
+//            "NIKON D3500", // TODO
             "NIKON D3S",
             "NIKON D3X",
             "NIKON D4",
@@ -1192,6 +1197,7 @@ public final class DCRaw extends RawDecoder {
             "NIKON D5300",
             "NIKON D5500",
             "NIKON D5600",
+//            "NIKON D6", // TODO
             "NIKON D60",
             "NIKON D600",
             "NIKON D610",
@@ -1203,6 +1209,7 @@ public final class DCRaw extends RawDecoder {
             "NIKON D7200",
             "NIKON D750",
             "NIKON D7500",
+//            "NIKON D780", // TODO
             "NIKON D80",
             "NIKON D800",
             "NIKON D800E",
@@ -1229,6 +1236,12 @@ public final class DCRaw extends RawDecoder {
             "NIKON E950", // ("DIAG RAW" HACK)
             "NIKON E990", // ("DIAG RAW" HACK)
             "NIKON E995", // ("DIAG RAW" HACK)
+//            "NIKON Z 5", // TODO
+//            "NIKON Z 50", // TODO
+//            "NIKON Z 6", // TODO
+//            "NIKON Z 7", // TODO
+//            "NIKON Z 9", // TODO
+//            "NIKON Z FC", // TODO
             "NOKIA 1200X1600",
             "NOKIA LUMIA 1020",
             "NOKIA N9",
@@ -1253,16 +1266,22 @@ public final class DCRaw extends RawDecoder {
             "OLYMPUS E-400",
             "OLYMPUS E-410",
             "OLYMPUS E-420",
+//            "OLYMPUS E-450", // TODO
             "OLYMPUS E-5",
             "OLYMPUS E-500",
             "OLYMPUS E-510",
             "OLYMPUS E-520",
+//            "OLYMPUS E-600", // TODO
             "OLYMPUS E-620",
             "OLYMPUS E-M1",
             "OLYMPUS E-M10",
             "OLYMPUS E-M10MARKII",
             "OLYMPUS E-M10MARKIII",
+//            "OLYMPUS E-M10MARKIIIS", // TODO
+//            "OLYMPUS E-M10MARKIV", // TODO
             "OLYMPUS E-M1MARKII",
+//            "OLYMPUS E-M1MARKIII", // TODO
+//            "OLYMPUS E-M1X", // TODO
             "OLYMPUS E-M5",
             "OLYMPUS E-M5MARKII",
             "OLYMPUS E-P1",
@@ -1270,15 +1289,18 @@ public final class DCRaw extends RawDecoder {
             "OLYMPUS E-P3",
             "OLYMPUS E-P5",
             "OLYMPUS E-PL1",
+//            "OLYMPUS E-PL10", // TODO
             "OLYMPUS E-PL1S",
             "OLYMPUS E-PL2",
             "OLYMPUS E-PL3",
             "OLYMPUS E-PL5",
+//            "OLYMPUS E-PL6", // TODO
             "OLYMPUS E-PL7",
             "OLYMPUS E-PL8",
             "OLYMPUS E-PL9",
             "OLYMPUS E-PM1",
             "OLYMPUS E-PM2",
+//            "OLYMPUS OM-1", // TODO
             "OLYMPUS PEN-F",
             "OLYMPUS SH-2",
             "OLYMPUS SP310",
@@ -1288,10 +1310,12 @@ public final class DCRaw extends RawDecoder {
             "OLYMPUS SP510UZ",
             "OLYMPUS SP550UZ",
             "OLYMPUS SP560UZ",
+//            "OLYMPUS SP565UZ", // TODO
             "OLYMPUS SP570UZ",
             "OLYMPUS STYLUS1",
             "OLYMPUS TG-4",
             "OLYMPUS TG-5",
+//            "OLYMPUS TG-6", // TODO
             "OLYMPUS XZ-1",
             "OLYMPUS XZ-10",
             "OLYMPUS XZ-2",
@@ -1374,6 +1398,7 @@ public final class DCRaw extends RawDecoder {
             "PENTAX 645D",
             "PENTAX 645Z",
             "PENTAX K-1",
+//            "PENTAX K-1 MARK II", // TODO
             "PENTAX K-3 II",
             "PENTAX K-3",
             "PENTAX K-5 II S",
@@ -1390,6 +1415,7 @@ public final class DCRaw extends RawDecoder {
             "PENTAX K100D SUPER",
             "PENTAX K100D",
             "PENTAX K10D",
+//            "PENTAX K110D", // TODO
             "PENTAX K2000", "PENTAX K-M",
             "PENTAX K200D",
             "PENTAX K20D",
@@ -1475,6 +1501,7 @@ public final class DCRaw extends RawDecoder {
             "SONY DSC-F828",
             "SONY DSC-R1",
             "SONY DSC-RX0",
+//            "SONY DSC-RX0M2", // TODO
             "SONY DSC-RX1",
             "SONY DSC-RX10",
             "SONY DSC-RX100",
@@ -1482,6 +1509,9 @@ public final class DCRaw extends RawDecoder {
             "SONY DSC-RX100M3",
             "SONY DSC-RX100M4",
             "SONY DSC-RX100M5",
+//            "SONY DSC-RX100M5A", // TODO
+//            "SONY DSC-RX100M6", // TODO
+//            "SONY DSC-RX100M7", // TODO
             "SONY DSC-RX10M2",
             "SONY DSC-RX10M3",
             "SONY DSC-RX10M4",
@@ -1496,9 +1526,11 @@ public final class DCRaw extends RawDecoder {
             "SONY DSLR-A330",
             "SONY DSLR-A350",
             "SONY DSLR-A380",
+//            "SONY DSLR-A390", // TODO
             "SONY DSLR-A450",
             "SONY DSLR-A500",
             "SONY DSLR-A550",
+//            "SONY DSLR-A560", // TODO
             "SONY DSLR-A580",
             "SONY DSLR-A700",
             "SONY DSLR-A850",
@@ -1506,20 +1538,29 @@ public final class DCRaw extends RawDecoder {
             "SONY ILCA-68",
             "SONY ILCA-77M2",
             "SONY ILCA-99M2",
+//            "SONY ILCE-1", // TODO
             "SONY ILCE-3000",
+//            "SONY ILCE-3500", // TODO
             "SONY ILCE-5000",
             "SONY ILCE-5100",
             "SONY ILCE-6000",
             "SONY ILCE-6300",
             "SONY ILCE-6500",
             "SONY ILCE-7",
+//            "SONY ILCE-7C", // TODO
             "SONY ILCE-7M2",
             "SONY ILCE-7M3",
+//            "SONY ILCE-7M4", // TODO
             "SONY ILCE-7R",
             "SONY ILCE-7RM2",
             "SONY ILCE-7RM3",
+//            "SONY ILCE-7RM3A", // TODO
+//            "SONY ILCE-7RM4", // TODO
+//            "SONY ILCE-7RM4A", // TODO
+//            "SONY ILCE-7RM5", // TODO
             "SONY ILCE-7S",
             "SONY ILCE-7SM2",
+//            "SONY ILCE-7SM3", // TODO
             "SONY ILCE-9",
             "SONY ILCE-QX1",
             "SONY NEX-3",
@@ -1535,11 +1576,15 @@ public final class DCRaw extends RawDecoder {
             "SONY SLT-A33",
             "SONY SLT-A35",
             "SONY SLT-A37",
+//            "SONY SLT-A55", // TODO
             "SONY SLT-A55V",
             "SONY SLT-A57",
             "SONY SLT-A58",
+//            "SONY SLT-A65", // TODO
             "SONY SLT-A65V",
+//            "SONY SLT-A77", // TODO
             "SONY SLT-A77V",
+//            "SONY SLT-A99", // TODO
             "SONY SLT-A99V",
             "SONY XCD-SX910CR",
             "STV680 VGA",
