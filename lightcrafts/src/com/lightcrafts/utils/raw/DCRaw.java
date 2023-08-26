@@ -1503,7 +1503,7 @@ public final class DCRaw extends RawDecoder {
             "SONY DSC-F828",
             "SONY DSC-R1",
             "SONY DSC-RX0",
-//            "SONY DSC-RX0M2", // TODO
+            "SONY DSC-RX0M2", // OK
             "SONY DSC-RX1",
             "SONY DSC-RX10",
             "SONY DSC-RX100",
@@ -1511,9 +1511,9 @@ public final class DCRaw extends RawDecoder {
             "SONY DSC-RX100M3",
             "SONY DSC-RX100M4",
             "SONY DSC-RX100M5",
-//            "SONY DSC-RX100M5A", // TODO
-//            "SONY DSC-RX100M6", // TODO
-//            "SONY DSC-RX100M7", // TODO
+            "SONY DSC-RX100M5A", // OK
+            "SONY DSC-RX100M6", // OK
+            "SONY DSC-RX100M7", // OK
             "SONY DSC-RX10M2",
             "SONY DSC-RX10M3",
             "SONY DSC-RX10M4",
@@ -1528,11 +1528,11 @@ public final class DCRaw extends RawDecoder {
             "SONY DSLR-A330",
             "SONY DSLR-A350",
             "SONY DSLR-A380",
-//            "SONY DSLR-A390", // TODO
+            "SONY DSLR-A390",
             "SONY DSLR-A450",
             "SONY DSLR-A500",
             "SONY DSLR-A550",
-//            "SONY DSLR-A560", // TODO
+            "SONY DSLR-A560",
             "SONY DSLR-A580",
             "SONY DSLR-A700",
             "SONY DSLR-A850",
@@ -1540,30 +1540,35 @@ public final class DCRaw extends RawDecoder {
             "SONY ILCA-68",
             "SONY ILCA-77M2",
             "SONY ILCA-99M2",
-//            "SONY ILCE-1", // TODO
+            "SONY ILCE-1", // OK
             "SONY ILCE-3000",
-//            "SONY ILCE-3500", // TODO
+            "SONY ILCE-3500", // OK
             "SONY ILCE-5000",
             "SONY ILCE-5100",
             "SONY ILCE-6000",
+            "SONY ILCE-6001", // TODO: Check
+            "SONY ILCE-6100", // TODO: Check
             "SONY ILCE-6300",
+            "SONY ILCE-6400", // TODO: Check
             "SONY ILCE-6500",
+            "SONY ILCE-6600", // TODO: Check
             "SONY ILCE-7",
-//            "SONY ILCE-7C", // TODO
+            "SONY ILCE-7C", // OK
             "SONY ILCE-7M2",
             "SONY ILCE-7M3",
-//            "SONY ILCE-7M4", // TODO
+            "SONY ILCE-7M4", // OK
             "SONY ILCE-7R",
             "SONY ILCE-7RM2",
             "SONY ILCE-7RM3",
-//            "SONY ILCE-7RM3A", // TODO
-//            "SONY ILCE-7RM4", // TODO
-//            "SONY ILCE-7RM4A", // TODO
-//            "SONY ILCE-7RM5", // TODO
+            "SONY ILCE-7RM3A", // TODO: Check
+            "SONY ILCE-7RM4", // OK
+            "SONY ILCE-7RM4A", // TODO: Check
+            "SONY ILCE-7RM5", // TODO: no dcraw matrix
             "SONY ILCE-7S",
             "SONY ILCE-7SM2",
-//            "SONY ILCE-7SM3", // TODO
+            "SONY ILCE-7SM3", // OK
             "SONY ILCE-9",
+            "SONY ILCE-9M2", // TODO: Check
             "SONY ILCE-QX1",
             "SONY NEX-3",
             "SONY NEX-3N",
@@ -1578,16 +1583,12 @@ public final class DCRaw extends RawDecoder {
             "SONY SLT-A33",
             "SONY SLT-A35",
             "SONY SLT-A37",
-//            "SONY SLT-A55", // TODO
-            "SONY SLT-A55V",
+            "SONY SLT-A55", "SONY SLT-A55V",
             "SONY SLT-A57",
             "SONY SLT-A58",
-//            "SONY SLT-A65", // TODO
-            "SONY SLT-A65V",
-//            "SONY SLT-A77", // TODO
-            "SONY SLT-A77V",
-//            "SONY SLT-A99", // TODO
-            "SONY SLT-A99V",
+            "SONY SLT-A65", "SONY SLT-A65V",
+            "SONY SLT-A77", "SONY SLT-A77V",
+            "SONY SLT-A99", "SONY SLT-A99V",
             "SONY XCD-SX910CR",
             "STV680 VGA",
             "XIRO XPLORER V",
