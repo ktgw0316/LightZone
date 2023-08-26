@@ -1183,7 +1183,7 @@ public final class DCRaw extends RawDecoder {
             "NIKON D3200",
             "NIKON D3300",
             "NIKON D3400",
-//            "NIKON D3500", // TODO
+            "NIKON D3500", // OK
             "NIKON D3S",
             "NIKON D3X",
             "NIKON D4",
@@ -1199,7 +1199,7 @@ public final class DCRaw extends RawDecoder {
             "NIKON D5300",
             "NIKON D5500",
             "NIKON D5600",
-//            "NIKON D6", // TODO
+            "NIKON D6", // OK
             "NIKON D60",
             "NIKON D600",
             "NIKON D610",
@@ -1211,7 +1211,7 @@ public final class DCRaw extends RawDecoder {
             "NIKON D7200",
             "NIKON D750",
             "NIKON D7500",
-//            "NIKON D780", // TODO
+            "NIKON D780", // OK
             "NIKON D80",
             "NIKON D800",
             "NIKON D800E",
@@ -1238,12 +1238,12 @@ public final class DCRaw extends RawDecoder {
             "NIKON E950", // ("DIAG RAW" HACK)
             "NIKON E990", // ("DIAG RAW" HACK)
             "NIKON E995", // ("DIAG RAW" HACK)
-//            "NIKON Z 5", // TODO
-//            "NIKON Z 50", // TODO
-//            "NIKON Z 6", // TODO
-//            "NIKON Z 7", // TODO
-//            "NIKON Z 9", // TODO
-//            "NIKON Z FC", // TODO
+            "NIKON Z 5", // OK
+            "NIKON Z 50", // OK
+            "NIKON Z 6", // OK
+            "NIKON Z 7", // OK
+            "NIKON Z 9", // OK
+            "NIKON Z FC", // OK
             "NOKIA 1200X1600",
             "NOKIA LUMIA 1020",
             "NOKIA N9",
