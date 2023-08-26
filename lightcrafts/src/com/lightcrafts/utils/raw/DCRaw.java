@@ -1399,8 +1399,8 @@ public final class DCRaw extends RawDecoder {
             "PENTAX _IST DS2",
             "PENTAX 645D",
             "PENTAX 645Z",
+            "PENTAX K-1 II", // no raw sample
             "PENTAX K-1",
-//            "PENTAX K-1 MARK II", // TODO
             "PENTAX K-3 II",
             "PENTAX K-3",
             "PENTAX K-5 II S",
@@ -1417,7 +1417,7 @@ public final class DCRaw extends RawDecoder {
             "PENTAX K100D SUPER",
             "PENTAX K100D",
             "PENTAX K10D",
-//            "PENTAX K110D", // TODO
+            "PENTAX K110D", // no raw sample
             "PENTAX K2000", "PENTAX K-M",
             "PENTAX K200D",
             "PENTAX K20D",
