@@ -1278,12 +1278,12 @@ public final class DCRaw extends RawDecoder {
             "OLYMPUS E-M1",
             "OLYMPUS E-M10",
             "OLYMPUS E-M10MARKII",
-            "OLYMPUS E-M10MARKIII",
-//            "OLYMPUS E-M10MARKIIIS", // TODO
-//            "OLYMPUS E-M10MARKIV", // TODO
+            "OLYMPUS E-M10 MARK III", // OK
+            "OLYMPUS E-M10 MARK IIIS", // OK
+            "OLYMPUS E-M10MARKIV", // OK
             "OLYMPUS E-M1MARKII",
-//            "OLYMPUS E-M1MARKIII", // TODO
-//            "OLYMPUS E-M1X", // TODO
+            "OLYMPUS E-M1MARKIII", // OK
+            "OLYMPUS E-M1X", // OK
             "OLYMPUS E-M5",
             "OLYMPUS E-M5MARKII",
             "OLYMPUS E-P1",
@@ -1291,12 +1291,12 @@ public final class DCRaw extends RawDecoder {
             "OLYMPUS E-P3",
             "OLYMPUS E-P5",
             "OLYMPUS E-PL1",
-//            "OLYMPUS E-PL10", // TODO
+            "OLYMPUS E-PL10", // OK
             "OLYMPUS E-PL1S",
             "OLYMPUS E-PL2",
             "OLYMPUS E-PL3",
             "OLYMPUS E-PL5",
-//            "OLYMPUS E-PL6", // TODO
+            "OLYMPUS E-PL6",
             "OLYMPUS E-PL7",
             "OLYMPUS E-PL8",
             "OLYMPUS E-PL9",
@@ -1314,10 +1314,10 @@ public final class DCRaw extends RawDecoder {
             "OLYMPUS SP560UZ",
 //            "OLYMPUS SP565UZ", // TODO
             "OLYMPUS SP570UZ",
-            "OLYMPUS STYLUS1",
+            "OLYMPUS STYLUS1", "OLYMPUS STYLUS1,1S",
             "OLYMPUS TG-4",
             "OLYMPUS TG-5",
-//            "OLYMPUS TG-6", // TODO
+            "OLYMPUS TG-6", // OK
             "OLYMPUS XZ-1",
             "OLYMPUS XZ-10",
             "OLYMPUS XZ-2",
