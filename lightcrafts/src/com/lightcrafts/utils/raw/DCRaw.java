@@ -1116,6 +1116,7 @@ public final class DCRaw extends RawDecoder {
             "LEICA V-LUX2",
             "LEICA V-LUX3",
             "LEICA V-LUX4",
+            "LEICA V-LUX5", // TODO: Check
             "LEICA X (TYP 113)",
             "LEICA X VARIO (TYP 107)",
             "LEICA X-E (TYP 102)",
@@ -1323,16 +1324,36 @@ public final class DCRaw extends RawDecoder {
             "OLYMPUS XZ-2",
 //            "OLYMPUS X200,D560Z,C350Z",
             "OMNIVISION RP_OV5647", // (RASPBERRY PI)
-            "PANASONIC DC-FZ80",
+//            "PANASONIC AG-GH4", // TODO
+            "PANASONIC DC-FZ1000M2", "PANASONIC DC-FZ10002", // OK
+//            "PANASONIC DC-FZ45", // TODO
+            "PANASONIC DC-FZ80", "PANASONIC DC-FZ82", "PANASONIC DC-FZ85",
+            "PANASONIC DC-FZ81", "PANASONIC DC-FZ83", // no raw sample
+            "PANASONIC DC-G100", "PANASONIC DC-G110", // OK
             "PANASONIC DC-G9",
+            "PANASONIC DC-G90", "PANASONIC DC-G91", "PANASONIC DC-G95", "PANASONIC DC-G95D", "PANASONIC DC-G99", "PANASONIC DC-G99D", // OK
+            "PANASONIC DC-GF10", "PANASONIC DC-GF90", // no raw sample
+            "PANASONIC DC-GF9",
             "PANASONIC DC-GH5",
+            "PANASONIC DC-GH5M2", // TODO: Check
+            "PANASONIC DC-GH5S",
+            "PANASONIC DC-GX7MK3",
             "PANASONIC DC-GX800",
+            "PANASONIC DC-GX850",
+//            "PANASONIC DC-GX880", // TODO
             "PANASONIC DC-GX9",
-            "PANASONIC DC-TZ200",
+            "PANASONIC DC-LX100M2", // OK
+//            "PANASONIC DC-S1", "PANASONIC DC-S5", // NG
+//            "PANASONIC DC-S1H", // no raw sample
+//            "PANASONIC DC-S1R", // NG
             "PANASONIC DC-TZ90",
-            "PANASONIC DC-ZS200",
+//            "PANASONIC DC-TZ96", // TODO
+//            "PANASONIC DC-TZ97", // TODO
+            "PANASONIC DC-ZS70", "PANASONIC DC-TZ90", "PANASONIC DC-TZ91", "PANASONIC DC-TZ92", "PANASONIC DC-TZ93", "PANASONIC DC-TZ95",
+            "PANASONIC DC-ZS200", "PANASONIC DC-TX2", "PANASONIC DC-TZ200", "PANASONIC DC-TZ202", "PANASONIC DC-TZ220", "PANASONIC DC-ZS220",
             "PANASONIC DMC-CM1",
             "PANASONIC DMC-FX150",
+//            "PANASONIC DMC-FX180", // TODO
             "PANASONIC DMC-FZ100",
             "PANASONIC DMC-FZ1000",
             "PANASONIC DMC-FZ150",
@@ -1346,17 +1367,20 @@ public final class DCRaw extends RawDecoder {
             "PANASONIC DMC-FZ330",
             "PANASONIC DMC-FZ35",
             "PANASONIC DMC-FZ38",
-            "PANASONIC DMC-FZ40",
+            "PANASONIC DMC-FZ40", "PANASONIC DMC-FZ45",
+//            "PANASONIC DMC-FZ42", // TODO
             "PANASONIC DMC-FZ50",
-            "PANASONIC DMC-FZ70",
+            "PANASONIC DMC-FZ70", "PANASONIC DMC-FZ72",
             "PANASONIC DMC-FZ8",
             "PANASONIC DMC-G1",
+            "PANASONIC DMC-G10",
             "PANASONIC DMC-G2",
             "PANASONIC DMC-G3",
             "PANASONIC DMC-G5",
             "PANASONIC DMC-G6",
-            "PANASONIC DMC-G7",
+            "PANASONIC DMC-G7", "PANASONIC DMC-G70",
             "PANASONIC DMC-G80",
+            "PANASONIC DMC-G81",
             "PANASONIC DMC-G85",
             "PANASONIC DMC-GF1",
             "PANASONIC DMC-GF2",
@@ -1369,29 +1393,27 @@ public final class DCRaw extends RawDecoder {
             "PANASONIC DMC-GH3",
             "PANASONIC DMC-GH4",
             "PANASONIC DMC-GM1",
+            "PANASONIC DMC-GM1S", // TODO: Check
             "PANASONIC DMC-GM5",
             "PANASONIC DMC-GX1",
             "PANASONIC DMC-GX7",
             "PANASONIC DMC-GX8",
-            "PANASONIC DMC-GX80",
-            "PANASONIC DMC-GX85",
+            "PANASONIC DMC-GX80", "PANASONIC DMC-GX85", "PANASONIC DMC-GX7MK2",
             "PANASONIC DMC-L1",
             "PANASONIC DMC-L10",
             "PANASONIC DMC-LC1",
             "PANASONIC DMC-LF1",
             "PANASONIC DMC-LX1",
             "PANASONIC DMC-LX100",
-            "PANASONIC DMC-LX15",
             "PANASONIC DMC-LX2",
             "PANASONIC DMC-LX3",
             "PANASONIC DMC-LX5",
             "PANASONIC DMC-LX7",
-            "PANASONIC DMC-TZ100",
-            "PANASONIC DMC-TZ61",
-            "PANASONIC DMC-TZ80",
-            "PANASONIC DMC-ZS100",
-            "PANASONIC DMC-ZS40",
-            "PANASONIC DMC-ZS50",
+            "PANASONIC DMC-LX9", "PANASONIC DMC-LX15", "PANASONIC DMC-LX10",
+            "PANASONIC DMC-ZS100", "PANASONIC DMC-ZS110", "PANASONIC DMC-TZ100", "PANASONIC DMC-TZ101", "PANASONIC DMC-TZ110", "PANASONIC DMC-TX1",
+            "PANASONIC DMC-ZS40", "PANASONIC DMC-TZ60", "PANASONIC DMC-TZ61",
+            "PANASONIC DMC-ZS50", "PANASONIC DMC-TZ70", "PANASONIC DMC-TZ71",
+            "PANASONIC DMC-ZS60", "PANASONIC DMC-TZ80", "PANASONIC DMC-TZ81", "PANASONIC DMC-TZ85", // OK
             "PENTAX _IST D",
             "PENTAX _IST DL",
             "PENTAX _IST DL2",
