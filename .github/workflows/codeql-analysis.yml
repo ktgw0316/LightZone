@@ -57,6 +57,7 @@ jobs:
             liblcms2-dev \
             liblombok-java \
             libslf4j-java \
+            libraw-dev \
             libtiff-dev \
             tidy
           ant -f linux/build.xml
