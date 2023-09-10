@@ -242,8 +242,8 @@ Java_com_lightcrafts_image_libs_LibRaw_unpackImage(JNIEnv *env, jobject obj,
   else
     libRaw->set_interpolate_bayer_handler(interpolate_bayer);
 
-  libRaw->imgdata.params.use_camera_wb = 1;  // -w
-//  libRaw->imgdata.params.use_camera_matrix = 1;  // -M
+//  libRaw->imgdata.params.use_camera_wb = 1;  // -w
+  libRaw->imgdata.params.use_camera_matrix = 1;  // -M
 
   libRaw->imgdata.params.use_fuji_rotate = 0;  // -j
   libRaw->imgdata.params.highlight = 1;  // -H 1
