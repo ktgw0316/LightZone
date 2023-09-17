@@ -251,7 +251,7 @@ Java_com_lightcrafts_image_libs_LibRaw_unpackImage(JNIEnv *env, jobject obj,
   libRaw->imgdata.params.gamm[0] = libRaw->imgdata.params.gamm[1] = 1;  // -g 1 1
   libRaw->imgdata.params.no_auto_bright = 1;  // -W
   libRaw->imgdata.params.output_bps = 16;  // -6
-  libRaw->imgdata.params.output_color = 4; // -o 4 (Kodak ProPhoto RGB D65)
+  libRaw->imgdata.params.output_color = 0; // -o 0 (raw)
   // libRaw->imgdata.params.output_tiff = 1;  // -T
 
   jclass cls = env->GetObjectClass(obj);

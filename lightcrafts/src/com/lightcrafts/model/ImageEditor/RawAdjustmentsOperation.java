@@ -3,6 +3,7 @@
 package com.lightcrafts.model.ImageEditor;
 
 import com.lightcrafts.image.color.ColorScience;
+import com.lightcrafts.image.libs.LibRaw;
 import com.lightcrafts.image.types.AuxiliaryImageInfo;
 import com.lightcrafts.image.types.RawImageInfo;
 import com.lightcrafts.jai.JAIContext;
@@ -24,7 +25,6 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.stream.Stream;
 
 import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_RAW_ADJUSTMENTS;
 
@@ -38,7 +38,7 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
     private final float originalTemperature;
     private final float daylightTemperature;
 
-    private float temperature = 5000;
+    private float temperature;
     private float tint = 0;
     private float exposure = 0;
     private float color_noise = 4;
@@ -90,10 +90,13 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
 
             float[] daylightMultipliers = dcRaw.getDaylightMultipliers();
             preMul = daylightMultipliers.clone();
+
             float[] cameraMultipliers = dcRaw.getCameraMultipliers();
 
+            final int referenceTemperature = (dcRaw instanceof LibRaw) ? 6500 : 5000;
+
             if (daylightMultipliers[0] != 0) {
-                daylightTemperature = neutralTemperature(daylightMultipliers, 5000);
+                daylightTemperature = neutralTemperature(daylightMultipliers, referenceTemperature);
 
                 System.out.println("daylightMultipliers: "
                         + daylightMultipliers[0] + ", "
@@ -102,10 +105,10 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
 
                 System.out.println("Daylight Temperature : " + daylightTemperature);
             } else
-                daylightTemperature = 5000;
+                daylightTemperature = referenceTemperature;
 
             if (cameraMultipliers[0] != 0) {
-                originalTemperature = temperature = neutralTemperature(cameraMultipliers, 5000);
+                originalTemperature = temperature = neutralTemperature(cameraMultipliers, referenceTemperature);
 
                 System.out.println("cameraMultipliers: "
                         + cameraMultipliers[0] + ", "
@@ -125,12 +128,12 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
 
             // Apply camera white balance
             if (cameraMultipliers[0] > 0) {
-                float[] wb = new float[] {(cameraMultipliers[0] / (cameraMultipliers[1] * daylightMultipliers[0])),
-                                          (cameraMultipliers[1] / (cameraMultipliers[1] * daylightMultipliers[1])),
-                                          (cameraMultipliers[2] / (cameraMultipliers[1] * daylightMultipliers[2]))};
+                float[] wb = new float[]{(cameraMultipliers[0] / (cameraMultipliers[1] * daylightMultipliers[0])),
+                        (cameraMultipliers[1] / (cameraMultipliers[1] * daylightMultipliers[1])),
+                        (cameraMultipliers[2] / (cameraMultipliers[1] * daylightMultipliers[2]))};
 
                 System.out.println("Scaling with: " + wb[0] + ", " + wb[1] + ", " + wb[2]);
-                System.out.println("Correlated Temperature: " + neutralTemperature(wb, 5000));
+                System.out.println("Correlated Temperature: " + neutralTemperature(wb, referenceTemperature));
 
                 cameraRGBWB = dcRaw.getCameraRGB();
 
@@ -153,8 +156,10 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
                 for (int j = 0; j < 3; j++)
                     cameraRGBCA[j][i] *= dmax;
         } else {
+            temperature = 5000;
             originalTemperature = 5000;
             daylightTemperature = 5000;
+            cameraRGBCA = new float[][]{{1, 0, 0, 0},{0, 1, 0, 0},{0, 0, 1, 0}};
         }
 
         addSliderKey(EXPOSURE);
