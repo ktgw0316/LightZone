@@ -25,10 +25,16 @@ public class RawImageInfo extends AuxiliaryImageInfo {
      * for.
      */
     public RawImageInfo( ImageInfo imageInfo ) {
-        final var dcRaw = DCRaw.getInstanceFor(imageInfo.getFile().getAbsolutePath());
-        decoder = (dcRaw.decodable())
-                ? dcRaw
-                : new LibRaw(imageInfo.getFile().getAbsolutePath());
+        final var absolutePath = imageInfo.getFile().getAbsolutePath();
+        final var forceLibraw = Boolean.getBoolean("lightzone.force_libraw");
+        if (!forceLibraw) {
+            final var dcRaw = DCRaw.getInstanceFor(absolutePath);
+            if (dcRaw.decodable()) {
+                decoder = dcRaw;
+                return;
+            }
+        }
+        decoder = new LibRaw(absolutePath);
     }
 
     /**
