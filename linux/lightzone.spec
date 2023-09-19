@@ -97,6 +97,8 @@ cp -pH linux/products/*.jar "%buildroot/%{_javadir}/%{name}"
 # create icons and shortcuts
 install -dm 0755 "%buildroot/%{_datadir}/applications"
 install -m 644 linux/products/lightzone.desktop "%buildroot/%{_datadir}/applications/"
+install -dm 0755 "%buildroot/%{_datadir}/metainfo"
+install -m 644 linux/products/io.github.ktgw0316.LightZone.metainfo.xml "%buildroot/%{_datadir}/metainfo/"
 cp -pHR linux/icons "%buildroot/%{_datadir}/"
 
 install -dm 755 %{buildroot}/%{_bindir}
