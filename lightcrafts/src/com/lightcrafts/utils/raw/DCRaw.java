@@ -7,7 +7,6 @@ import com.lightcrafts.image.BadImageFileException;
 import com.lightcrafts.image.UnknownImageTypeException;
 import com.lightcrafts.image.libs.LCImageLibException;
 import com.lightcrafts.image.libs.LCImageReaderFactory;
-import com.lightcrafts.image.metadata.providers.*;
 import com.lightcrafts.image.metadata.MetadataUtil;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.utils.ForkDaemon;
@@ -36,9 +35,7 @@ import lombok.experimental.Accessors;
  * @author Fabio Riccardi [fabio@lightcrafts.com]
  * @author Masahiro Kitagawa [arctica0316@gmail.com]
  */
-public final class DCRaw implements
-    ApertureProvider, CaptureDateTimeProvider, FocalLengthProvider,
-    ISOProvider, MakeModelProvider, ShutterSpeedProvider, WidthHeightProvider {
+public final class DCRaw extends RawDecoder {
 
     //////////  public ////////////////////////////////////////////////////////
 

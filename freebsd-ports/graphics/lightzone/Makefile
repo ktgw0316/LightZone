@@ -18,6 +18,7 @@ BUILD_DEPENDS=	ant:${PORTSDIR}/devel/apache-ant \
 		rsync:${PORTSDIR}/net/rsync
 LIB_DEPENDS=	liblcms2.so:${PORTSDIR}/graphics/lcms2 \
 		liblensfun.so:${PORTSDIR}/graphics/lensfun \
+		libraw.so:${PORTSDIR}/graphics/libraw \
 		libtiff.so:${PORTSDIR}/graphics/tiff
 
 USE_GITHUB=	yes

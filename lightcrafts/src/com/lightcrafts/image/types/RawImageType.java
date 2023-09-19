@@ -30,8 +30,8 @@ import java.io.IOException;
 
 /**
  * A <code>RawImageType</code> is-an {@link ImageType} that is the base class
- * for raw images.  It factors out common code that uses Dave Coffin's
- * <i>dcraw</i> to extract information from camera raw image files.
+ * for raw images.  It factors out common code that uses one of
+ * <i>RawDecoder</i>'s subclasses to extract information from camera raw image files.
  *
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */
@@ -53,7 +53,7 @@ public abstract class RawImageType extends ImageType {
     {
         final var auxInfo = imageInfo.getAuxiliaryInfo();
         assert auxInfo instanceof RawImageInfo;
-        final var dcRaw = ((RawImageInfo)auxInfo).getDCRaw();
+        final var dcRaw = ((RawImageInfo)auxInfo).getRawDecoder();
         return new Dimension( dcRaw.getImageWidth(), dcRaw.getImageHeight() );
     }
 
@@ -68,9 +68,9 @@ public abstract class RawImageType extends ImageType {
         long startTime = System.currentTimeMillis();
 
         final var rawInfo = (RawImageInfo)imageInfo.getAuxiliaryInfo();
-        final var dcRaw = rawInfo.getDCRaw();
+        final var rawDecoder = rawInfo.getRawDecoder();
 
-        if (!dcRaw.decodable() || dcRaw.rawColors() != 3)
+        if (!rawDecoder.decodable() || rawDecoder.rawColors() != 3)
             throw new UnknownImageTypeException("Unsupported Camera");
 
         String cacheKey = null;
@@ -108,24 +108,24 @@ public abstract class RawImageType extends ImageType {
             indicator.setMaximum( 3 );
         }
 
-        final var filters = dcRaw.getFilters();
+        final var filters = rawDecoder.getFilters();
 
         final var colorModel = RasterFactory.createComponentColorModel(
                 DataBuffer.TYPE_USHORT, JAIContext.linearColorSpace, false, false,
                 Transparency.OPAQUE
         );
 
-        final var dcrawImage = (BufferedImage) dcRaw.getImage();
-        final var dcrawTime = System.currentTimeMillis();
+        final var rawImage = (BufferedImage) rawDecoder.getImage();
+        final var rawDecodeTime = System.currentTimeMillis();
 
         final var metadata = imageInfo.getMetadata();
         final var imageWidth = metadata.getImageWidth();
         final var imageHeight = metadata.getImageHeight();
         System.out.println("metadata width: " + imageWidth + ", height: " + imageHeight);
 
-        final var dcrawWidth  = dcrawImage.getWidth();
-        final var dcrawHeight = dcrawImage.getHeight();
-        System.out.println("dcraw    width: " + dcrawWidth + ", height: " + dcrawHeight);
+        final var rawWidth  = rawImage.getWidth();
+        final var rawHeight = rawImage.getHeight();
+        System.out.println("raw      width: " + rawWidth + ", height: " + rawHeight);
 
         if ( thread != null && thread.isCanceled() )
             return null;
@@ -133,8 +133,8 @@ public abstract class RawImageType extends ImageType {
         if ( indicator != null )
             indicator.incrementBy(1);
 
-        final var dcrawLayout = new ImageLayout(
-                0, 0, dcrawWidth, dcrawHeight,
+        final var rawLayout = new ImageLayout(
+                0, 0, rawWidth, rawHeight,
                 0, 0, JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT,
                 colorModel.createCompatibleSampleModel(
                         JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT),
@@ -142,24 +142,24 @@ public abstract class RawImageType extends ImageType {
 
         PlanarImage rgbImage;
 
-        if (dcrawImage.getSampleModel().getNumBands() == 1 && filters != 0 && filters != -1) {
-            rgbImage = new RGBDemosaicOpImage(dcrawImage, null, dcrawLayout, filters);
+        if (rawImage.getSampleModel().getNumBands() == 1 && filters != 0 && filters != -1) {
+            rgbImage = new RGBDemosaicOpImage(rawImage, null, rawLayout, filters);
 
-            final var make = dcRaw.getCameraMake(false);
+            final var make = rawDecoder.getCameraMake(false);
             final var cameraMake = make == null ? "" : make;
 
             if ((this instanceof RAFImageType
                  || (this instanceof DNGImageType && cameraMake.startsWith("FUJI")))
-                && dcRaw.getImageWidth() != dcRaw.getRawWidth()) {
+                && rawDecoder.getImageWidth() != rawDecoder.getRawWidth()) {
 
-                final var angle =  (dcRaw.getModel().equals("FinePix S2Pro"))
+                final var angle =  (rawDecoder.getModel().equals("FinePix S2Pro"))
                         ? 3 * Math.PI / 4
                         : Math.PI / 4;
-                final var width  = dcRaw.getImageWidth();
-                final var height = dcRaw.getImageHeight();
+                final var width  = rawDecoder.getImageWidth();
+                final var height = rawDecoder.getImageHeight();
 
                 rgbImage = FujiRotatedImage(rgbImage, colorModel, width, height, angle);
-            } else if (cameraMake.equals("NIKON") && dcRaw.getModel().equals("D1X")) {
+            } else if (cameraMake.equals("NIKON") && rawDecoder.getModel().equals("D1X")) {
                 rgbImage = nikonD1XImage(rgbImage, colorModel);
             } else {
                 rgbImage = Functions.crop(rgbImage,
@@ -180,11 +180,11 @@ public abstract class RawImageType extends ImageType {
             retile(rgbImage, cache);
             rgbImage = cache;
         } else {
-            final var cache = new CachedImage(dcrawLayout, JAIContext.fileCache);
+            final var cache = new CachedImage(rawLayout, JAIContext.fileCache);
 
             for (int x = 0; x <= cache.getMaxTileX(); x++) {
                 for (int y = 0; y <= cache.getMaxTileY(); y++) {
-                    Functions.copyData(cache.getWritableTile(x, y), dcrawImage.getRaster());
+                    Functions.copyData(cache.getWritableTile(x, y), rawImage.getRaster());
                 }
             }
             rgbImage = cache;
@@ -198,8 +198,8 @@ public abstract class RawImageType extends ImageType {
         if (indicator != null)
             indicator.incrementBy(1);
 
-        System.out.println("dcraw: " + (dcrawTime - startTime)
-                + "ms, demosaic: " + (demosaicTime - dcrawTime) + "ms");
+        System.out.println("decode: " + (rawDecodeTime - startTime)
+                + "ms, demosaic: " + (demosaicTime - rawDecodeTime) + "ms");
 
         if (CACHE_CONVERSION && fileCache != null && imageFile == null && cacheKey != null) {
             RawImageCache.add(cacheKey, rgbImage);
@@ -335,7 +335,7 @@ public abstract class RawImageType extends ImageType {
         throws BadImageFileException, IOException, UnknownImageTypeException
     {
         final var rawInfo = (RawImageInfo)imageInfo.getAuxiliaryInfo();
-        final var dcRaw = rawInfo.getDCRaw();
+        final var dcRaw = rawInfo.getRawDecoder();
 
         if (dcRaw.getThumbHeight() >= 400 && dcRaw.getThumbWidth() >= 600)
             return dcRaw.getThumbnail();
@@ -348,7 +348,7 @@ public abstract class RawImageType extends ImageType {
         throws BadImageFileException, IOException, UnknownImageTypeException
     {
         final var rawInfo = (RawImageInfo)imageInfo.getAuxiliaryInfo();
-        final var dcRaw = rawInfo.getDCRaw();
+        final var dcRaw = rawInfo.getRawDecoder();
         return dcRaw.getThumbnail();
     }
 
@@ -361,7 +361,7 @@ public abstract class RawImageType extends ImageType {
     }
 
     /**
-     * Reads all the image metadata provided by dcraw.
+     * Reads all the image metadata provided by RawDecoder.
      *
      * @param imageInfo The image to read the metadata from.
      */

@@ -25,6 +25,9 @@ Download and install (or unpack) following:
   1. Install __lcms2__. This will also install __libtiff__ and __libjpeg-turbo__.
   - For 32-bit: `pacman -S mingw-w64-i686-lcms2`
   - For 64-bit: `pacman -S mingw-w64-x86_64-lcms2`
+  1. Install __libraw__.
+  - For 32-bit: `pacman -S mingw-w64-i686-libraw`
+  - For 64-bit: `pacman -S mingw-w64-x86_64-libraw`
   1. Install __lensfun__.
   - For 32-bit: `pacman -S mingw-w64-i686-lensfun`
   - For 64-bit: `pacman -S mingw-w64-x86_64-lensfun`

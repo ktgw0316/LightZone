@@ -11,7 +11,6 @@ import javax.media.jai.PlanarImage;
 
 import com.lightcrafts.utils.filecache.FileCache;
 import com.lightcrafts.utils.filecache.FileCacheFactory;
-import com.lightcrafts.utils.raw.DCRaw;
 import com.lightcrafts.utils.UserCanceledException;
 import com.lightcrafts.utils.thread.ProgressThread;
 import com.lightcrafts.image.libs.LCTIFFWriter;
@@ -71,7 +70,7 @@ class RawImageCache extends Thread {
         Date captureDate = metadata.getCaptureDateTime();
         if ( captureDate == null ) {
             final RawImageInfo rawInfo = (RawImageInfo)imageInfo.getAuxiliaryInfo();
-            final DCRaw dcRaw = rawInfo.getDCRaw();
+            final var dcRaw = rawInfo.getRawDecoder();
             captureDate = dcRaw.getCaptureDateTime();
         }
         if ( captureDate != null ) {

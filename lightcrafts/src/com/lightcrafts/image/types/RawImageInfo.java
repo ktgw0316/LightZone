@@ -1,9 +1,12 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2023-     Masahiro Kitagawa */
 
 package com.lightcrafts.image.types;
 
 import com.lightcrafts.image.ImageInfo;
+import com.lightcrafts.image.libs.LibRaw;
 import com.lightcrafts.utils.raw.DCRaw;
+import com.lightcrafts.utils.raw.RawDecoder;
 
 /**
  * A <code>RawImageInfo</code> is-an {@link AuxiliaryImageInfo} for holding
@@ -22,20 +25,29 @@ public class RawImageInfo extends AuxiliaryImageInfo {
      * for.
      */
     public RawImageInfo( ImageInfo imageInfo ) {
-        m_dcRaw = DCRaw.getInstanceFor( imageInfo.getFile().getAbsolutePath() );
+        final var absolutePath = imageInfo.getFile().getAbsolutePath();
+        final var forceLibraw = Boolean.getBoolean("lightzone.force_libraw");
+        if (!forceLibraw) {
+            final var dcRaw = DCRaw.getInstanceFor(absolutePath);
+            if (dcRaw.decodable()) {
+                decoder = dcRaw;
+                return;
+            }
+        }
+        decoder = new LibRaw(absolutePath);
     }
 
     /**
-     * Get the {@link DCRaw} object for a raw image.
+     * Get the {@link RawDecoder} object for a raw image.
      *
-     * @return Returns said {@link DCRaw} object.
+     * @return Returns said {@link RawDecoder} object.
      */
-    public DCRaw getDCRaw() {
-        return m_dcRaw;
+    public RawDecoder getRawDecoder() {
+        return decoder;
     }
 
     ////////// private ////////////////////////////////////////////////////////
 
-    private final DCRaw m_dcRaw;
+    private final RawDecoder decoder;
 }
 /* vim:set et sw=4 ts=4: */
