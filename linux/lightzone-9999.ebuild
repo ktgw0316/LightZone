@@ -70,6 +70,8 @@ src_install() {
 	_datadir=/usr/share
 	install -dm 0755 "${D}/${_datadir}/applications"
 	install -m 644 linux/products/lightzone.desktop "${D}/${_datadir}/applications/"
+	install -dm 0755 "${D}/${_datadir}/metainfo"
+	install -m 644 linux/products/io.github.ktgw0316.LightZone.metainfo.xml "${D}/${_datadir}/metainfo/"
 	cp -pHR linux/icons "${D}/${_datadir}/"
 
 	_bindir=/usr/bin
