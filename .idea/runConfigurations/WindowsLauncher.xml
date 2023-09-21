@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="WindowsLauncher" type="Application" factoryName="Application" activateToolWindowBeforeRun="false">
+    <envs>
+      <env name="LD_LIBRARY_PATH" value="$ProjectFileDir$/windows/products" />
+    </envs>
+    <option name="MAIN_CLASS_NAME" value="com.lightcrafts.platform.windows.WindowsLauncher" />
+    <module name="windows" />
+    <option name="VM_PARAMETERS" value="-Djava.library.path=$ProjectFileDir$/windows/products --add-exports=java.desktop/sun.awt.image=ALL-UNNAMED" />
+    <option name="WORKING_DIRECTORY" value="$ProjectFileDir$" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
