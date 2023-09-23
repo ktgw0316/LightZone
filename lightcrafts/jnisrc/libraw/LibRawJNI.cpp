@@ -17,7 +17,7 @@ Java_com_lightcrafts_image_libs_LibRaw_createLibRawObject(JNIEnv *env,
                                                           jobject obj) {
   env->SetLongField(
       obj, env->GetFieldID(env->GetObjectClass(obj), "libRawObject", "J"),
-      (long)new LZLibRaw());
+      reinterpret_cast<jlong>(new LZLibRaw()));
 }
 
 JNIEXPORT void JNICALL
