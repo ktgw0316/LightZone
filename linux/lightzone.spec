@@ -122,6 +122,7 @@ install -m 755 linux/products/%{name} %{buildroot}/%{_bindir}
 %{_javadir}/%{name}/*
 %{_bindir}/%{name}
 %{_datadir}/applications/%{name}.desktop
+%{_datadir}/metainfo/*"
 %define icondir %{_datadir}/icons/hicolor
 %dir %{icondir}
 %dir %{icondir}/256x256
