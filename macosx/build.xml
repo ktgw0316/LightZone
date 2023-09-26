@@ -84,15 +84,15 @@
   </path>
 
   <target name="jar" depends="build">
-    <manifestclasspath property="manifestclasspath" jarfile="${macosx-jar}">
-      <classpath refid="jarlist" />
-    </manifestclasspath>
+    <pathconvert property="classpath" refid="jarlist" pathsep=" ">
+      <map from="${basedir}/products/" to=""/>
+    </pathconvert>
     <delete file="${macosx-jar}"/>
     <jar jarfile="${macosx-jar}">
       <fileset dir="build"/>
       <manifest>
         <attribute name="Main-Class" value="${main-class}"/>
-        <attribute name="Class-Path" value=".${manifestclasspath}"/>
+        <attribute name="Class-Path" value="${classpath}"/>
         <attribute name="Add-Exports" value="${add-exports}"/>
         <attribute name="Built-By" value="${user.name}"/>
         <attribute name="Implementation-Vendor" value="${company-name}"/>
