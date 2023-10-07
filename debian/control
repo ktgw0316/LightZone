@@ -39,7 +39,7 @@ Depends:
  ${java:Depends},
  ${misc:Depends},
  ${shlibs:Depends},
- default-jre (>= 2:1.11),
+ default-jre (>= 2:1.17) | openjdk-17-jre,
  javahelp2,
  libejml-java (>= 0.38),
  libgomp1,
