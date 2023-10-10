@@ -124,6 +124,9 @@
 
   <target name="zip" depends="jar-if-necessary, help, jlink">
     <delete file="${macosx-zip}"/>
+    <exec executable="./postprocess.sh" dir="." failonerror="true" vmlauncher="false">
+      <arg value="products"/>
+    </exec>
     <zip destfile="${macosx-zip}">
       <zipfileset dir="products">
         <exclude name="GNUmakefile"/>
