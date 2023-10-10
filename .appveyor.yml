@@ -46,7 +46,9 @@ for:
       - sh: export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
 
     install:
-      - sh: HOMEBREW_NO_AUTO_UPDATE=1 brew install ant lensfun libjpeg-turbo libomp libraw libtiff libxml2 little-cms2 rsync
+      - sh: HOMEBREW_NO_AUTO_UPDATE=1 brew install ant libjpeg-turbo libomp libraw libtiff libxml2 little-cms2 rsync
+      - sh: rm /usr/local/bin/ccmake /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
+      - sh: HOMEBREW_NO_AUTO_UPDATE=1 brew install --build-from-source lensfun
       - sh: HOMEBREW_NO_AUTO_UPDATE=1 brew tap bell-sw/liberica
       - sh: HOMEBREW_NO_AUTO_UPDATE=1 brew install --cask liberica-jdk17-full
 
