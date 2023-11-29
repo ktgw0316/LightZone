@@ -1,7 +1,5 @@
 import java.io.FileOutputStream
 
-val MAKE = "make"
-
 application {
     mainClass.set("com.lightcrafts.app.Application")
 }
@@ -14,11 +12,30 @@ sourceSets {
     }
 }
 tasks {
-    register<Exec> ("coprocesses") {
-        commandLine(MAKE, "-C", "coprocesses", "-j", "-s")
+    val mesonPrefixDir = layout.buildDirectory.dir("products").get().asFile.absolutePath
+    register<Exec> ("dcraw0") {
+        workingDir("coprocesses/dcraw")
+        commandLine("meson", "setup", "--prefix", mesonPrefixDir, "--bindir", ".", "--buildtype", "release", "build")
     }
-    register<Exec> ("cleanCoprocesses") {
-        commandLine(MAKE, "-C", "coprocesses", "-j", "-s", "clean")
+    register<Exec> ("dcraw") {
+        dependsOn("dcraw0")
+        workingDir("coprocesses/dcraw/build")
+        commandLine("meson", "install")
+    }
+    register<Exec> ("forkdaemon0") {
+        workingDir("coprocesses/forkdaemon")
+        commandLine("meson", "setup", "--prefix", mesonPrefixDir, "--bindir", ".", "--buildtype", "release", "build")
+    }
+    register<Exec> ("forkdaemon") {
+        dependsOn("forkdaemon0")
+        workingDir("coprocesses/forkdaemon/build")
+        commandLine("meson", "install")
+    }
+    register<Task> ("coprocesses") {
+        dependsOn("dcraw", "forkdaemon")
+    }
+    getByName("cleanCoprocesses", Delete::class) {
+        delete = setOf("coprocesses/dcraw/build", "coprocesses/forkdaemon/build")
     }
     register<Task> ("revision") {
         val dirProvider = layout.buildDirectory.dir("resources/main/com/lightcrafts/utils/resources")
