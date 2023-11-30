@@ -112,14 +112,9 @@
   <target name="revision">
     <mkdir dir="build/resources/main/com/lightcrafts/utils/resources"/>
     <exec executable="git">
-      <arg line="log -1"/>
+      <arg line="rev-parse HEAD"/>
       <redirector output="build/resources/main/com/lightcrafts/utils/resources/Revision"
                   logError="true"/>
-    </exec>
-    <exec executable="git">
-      <arg line="config --list"/>
-      <redirector output="build/resources/main/com/lightcrafts/utils/resources/Revision"
-                  logError="true" append="true"/>
     </exec>
     <copy file="version.txt"
           tofile="build/resources/main/com/lightcrafts/utils/resources/Version"/>

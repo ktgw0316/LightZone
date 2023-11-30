@@ -2,6 +2,7 @@
 
 package com.lightcrafts.utils;
 
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
@@ -68,62 +69,6 @@ public final class Version {
     }
 
     /**
-     * Gets the Subversion revision number that was current at the time this
-     * class was compiled.
-     */
-    public static String getRevisionNumber() {
-        if ( GITInfo == null )
-            return "";
-        try {
-            String text = RevisionPattern.matcher( GITInfo ).replaceAll( "$1" );
-            if (text != null && 7 < text.length()) {
-                text = text.substring(0,7);
-            }
-            return text;
-        }
-        catch ( NumberFormatException e ) {
-            return "";
-        }
-    }
-
-    private static Date getChangeDate() {
-        if ( GITInfo == null )
-            return null;
-        try {
-            final String text =
-                ChangeDatePattern.matcher( GITInfo ).replaceAll( "$1" );
-            return ChangeDateFormat.parse( text );
-        }
-        catch ( ParseException e ) {
-            return null;
-        }
-    }
-
-    /**
-     * Get the URL of the Subversion repository that provided this class.
-     */
-    public static URI getUri() {
-        if (GITInfo == null) {
-            return null;
-        }
-        try {
-            String text = UrlPattern.matcher(GITInfo ).replaceAll("$1");
-            return new URI(text);
-        }
-        catch (URISyntaxException e) {
-            return null;
-        }
-    }
-
-    /**
-     * Gets the user-presentable version String.
-     */
-    @NotNull
-    public static String getVersionName() {
-        return Version != null ? Version : "";
-    }
-
-    /**
      * Reads a given resource.
      *
      * @param name The name of the resource file to read.
@@ -162,49 +107,24 @@ public final class Version {
     private static final ResourceBundle m_properties =
         ResourceBundle.getBundle( "com.lightcrafts.utils.resources.Version" );
 
-    private static DateFormat ChangeDateFormat =
-        new SimpleDateFormat("MMM dd HH:mm:ss yyyy Z");
+     /**
+      * Git revision number that was current at the time this class was compiled.
+      */
+    @Getter @NotNull
+    private static final String revisionNumber; // Output from "git rev-parse HEAD"
 
-    // The date pattern from "git log -1" looks like
-    // "Date:   Sat Dec 22 10:55:47 2012 -0800":
-    private static Pattern ChangeDatePattern = Pattern.compile(
-        ".*^Date:\\s*... ([^(]+).*",
-        Pattern.DOTALL | Pattern.MULTILINE
-    );
-
-    /**
-     * The output of the <code>git log -1</code> and <code>git config --list</code> command.
+   /**
+     * User-presentable version String.
      */
-    private static String GITInfo;
-
-    private static String Version;  // Contents of "version.txt"
-
-    // The revision number from "git log -1" looks like
-    // "commit 268da1ba96c935681e412f1cbb1146666daafd78":
-    private static Pattern RevisionPattern = Pattern.compile(
-        ".*^commit\\s*([0-9a-fA-F]+).*", Pattern.DOTALL | Pattern.MULTILINE
-    );
-
-    // The URL pattern from "git config --list" looks like
-    // "remote.origin.url=git@github.com:...":
-    private static Pattern UrlPattern = Pattern.compile(
-        ".*^remote.origin.url=([^\\s]+).*", Pattern.DOTALL | Pattern.MULTILINE
-    );
+    @Getter @NotNull
+    private static final String versionName; // Contents of "version.txt"
 
     static {
-        GITInfo = readResource( "Revision" );
-        Version = readResource( "Version" );
-        if ( Version != null )
-            Version = Version.trim();
-    }
+        final String rev = readResource("Revision");
+        revisionNumber = (rev != null && 7 < rev.length()) ? rev.substring(0,7) : "";
 
-    ////////// main() for testing /////////////////////////////////////////////
-
-    public static void main( String[] args ) {
-        System.out.println( getApplicationName() );
-        System.out.println( getUri() );
-        System.out.println( getRevisionNumber() );
-        System.out.println( getChangeDate() );
+        final String ver = readResource("Version");
+        versionName = ver != null ? ver.trim() : "";
     }
 }
 /* vim:set et sw=4 ts=4: */

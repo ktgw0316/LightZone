@@ -100,9 +100,6 @@ public class ErrorLogger {
     }
 
     private static void appendVersion(StringBuffer buffer) {
-        buffer.append("url=");
-        buffer.append(Version.getUri());
-        buffer.append("\n");
         buffer.append("revision=");
         buffer.append(Version.getRevisionNumber());
         buffer.append("\n");
