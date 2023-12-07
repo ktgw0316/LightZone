@@ -111,7 +111,7 @@ public final class MacOSXSmartFolder extends SmartFolder {
      * Gets an array of strings naming the files and directories in the
      * directory denoted by this abstract pathname.  When the pathname refers
      * to a "Smart Folder", its query is performed and the results of said
-     * query are returned.  In that case, the paths are fulll paths because
+     * query are returned.  In that case, the paths are full paths because
      * files satisfying the query can be anywhere on the filesystem.
      *
      * @return Returns an array of strings naming the files and directories in

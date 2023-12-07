@@ -71,7 +71,7 @@ public:
                      double rh, double ch, double rl, double cl,
                      int nMin, int nmxType, int hystTypeHigh, int hystTypeLow);
 
-   // computes confidence map and rank information of sepcified image
+   // computes confidence map and rank information of specified image
    void ComputeEdgeInfo(BgImage*, float*, float*);
 //   void ComputeConfidenceMap1(BgImage*, float*);
    // if have permanent data, call this function (compute only last two steps is same kernel size)

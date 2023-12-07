@@ -201,7 +201,7 @@ public class LibRaw extends RawDecoder {
                 // word "Corporation" in it, e.g., "Nikon Corporation", so this
                 // kind of make won't be in the model.
                 // However, if the make contains the first word of the model,
-                // e.g., "Nikon Coproration" contains "Nikon" (the first word
+                // e.g., "Nikon Corporation" contains "Nikon" (the first word
                 // of "Nikon D2X"), then just return the model.
                 return model;
             }

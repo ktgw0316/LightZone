@@ -1107,7 +1107,7 @@ public interface TIFFTags extends ImageMetaTags {
      *        <td align="right" nowrap>4 =&nbsp;</td><td>transparency mask</td>
      *      </tr>
      *      <tr valign="top">
-     *        <td align="right" nowrap>5 =&nbsp;</td><td>seperated (CMYK)</td>
+     *        <td align="right" nowrap>5 =&nbsp;</td><td>separated (CMYK)</td>
      *      </tr>
      *      <tr valign="top">
      *        <td align="right" nowrap>6 =&nbsp;</td><td>YCbCr</td>

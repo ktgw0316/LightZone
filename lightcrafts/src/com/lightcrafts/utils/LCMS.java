@@ -31,7 +31,7 @@ public class LCMS {
 //            T: Pixeltype
 //            F: Flavor  0=MinIsBlack(Chocolate) 1=MinIsWhite(Vanilla)
 //            P: Planar? 0=Chunky, 1=Planar
-//            X: swap 16 bps endianess?
+//            X: swap 16 bps endianness?
 //            S: Do swap? ie, BGR, KYMC
 //            E: Extra samples
 //            C: Channels (Samples per pixel)
@@ -275,8 +275,8 @@ public class LCMS {
 
     public static final int cmsFLAGS_NOTPRECALC              = 0x0100;
     public static final int cmsFLAGS_NULLTRANSFORM           = 0x0200;    // Don't transform anyway
-    public static final int cmsFLAGS_HIGHRESPRECALC          = 0x0400;    // Use more memory to give better accurancy
-    public static final int cmsFLAGS_LOWRESPRECALC           = 0x0800;    // Use less memory to minimize resouces
+    public static final int cmsFLAGS_HIGHRESPRECALC          = 0x0400;    // Use more memory to give better accuracy
+    public static final int cmsFLAGS_LOWRESPRECALC           = 0x0800;    // Use less memory to minimize resources
 
 
     public static final int cmsFLAGS_WHITEBLACKCOMPENSATION  = 0x2000;

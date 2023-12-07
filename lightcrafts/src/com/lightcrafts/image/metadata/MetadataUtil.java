@@ -152,7 +152,7 @@ public final class MetadataUtil {
     }
 
     /**
-     * Fixes a given F-Stop value.  F-Stops have discreet &quot;legal&quot;
+     * Fixes a given F-Stop value.  F-Stops have discrete &quot;legal&quot;
      * values.  The returned F-Stop value is one of the legal values that is
      * closest to the given value.
      *
@@ -164,7 +164,7 @@ public final class MetadataUtil {
     }
 
     /**
-     * Fixes a given shutter speed value.  Shutter speeds have discreet
+     * Fixes a given shutter speed value.  Shutter speeds have discrete
      * &quot;legal&quot; values.  The returned shutter speed value is one of
      * the legal values that is closest to the given value.
      *
@@ -330,7 +330,7 @@ public final class MetadataUtil {
                 // kind of make won't be in the model.
                 //
                 // However, if the make contains the first word of the model,
-                // e.g., "Nikon Coproration" contains "Nikon" (the first word
+                // e.g., "Nikon Corporation" contains "Nikon" (the first word
                 // of "Nikon D2X"), then just return the model.
                 //
                 return model;

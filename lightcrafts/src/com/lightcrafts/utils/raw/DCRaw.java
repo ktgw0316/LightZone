@@ -474,7 +474,7 @@ public final class DCRaw extends RawDecoder {
             throws IOException, UnknownImageTypeException, BadImageFileException
     {
         if (!m_decodable || (mode == dcrawMode.full && m_rawColors != 3)) {
-            throw new UnknownImageTypeException("Unsuported Camera");
+            throw new UnknownImageTypeException("Unsupported Camera");
         }
 
         RenderedImage result = null;

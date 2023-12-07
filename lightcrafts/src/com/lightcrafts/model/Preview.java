@@ -50,7 +50,7 @@ public abstract class Preview extends JComponent {
 
     /**
      * Sets the selection state of a preview
-     * @param selected wether the preview component is selected or not
+     * @param selected whether the preview component is selected or not
      */
     public abstract void setSelected(Boolean selected);
 

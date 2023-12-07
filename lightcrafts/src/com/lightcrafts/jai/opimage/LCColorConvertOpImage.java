@@ -106,7 +106,7 @@ final class LCColorConvertOpImage extends PointOpImage {
     }
 
     /**
-     * Retrive/cache the ColorConvertOp. Because instantiate a ColorConvertOp
+     * Retrieve/cache the ColorConvertOp. Because instantiate a ColorConvertOp
      * is a time-consuming step, create a hashtable referred to by a
      * SoftReference to cache the ColorConvertOp for using repeatedly.
      *

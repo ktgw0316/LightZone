@@ -147,7 +147,7 @@ public final class Rational extends Number implements Comparable {
      * in the string must either be:
      *  <ul>
      *    <li>
-     *      Two sets of decimal digits seperated by a single ASCII slash
+     *      Two sets of decimal digits separated by a single ASCII slash
      *      <code>'/'</code> (<code>'\u002F'</code>) character
      *      in which case the first set is parsed as the numerator
      *      and the second set is parsed as the denominator.

@@ -169,7 +169,7 @@ class ExportSizeFields {
         }
     };
 
-    // Repsond to valid text changes with color changes and updates to the
+    // Respond to valid text changes with color changes and updates to the
     // ImageExportOptions object:
 
     private final class ExportUpdater implements DocumentListener {

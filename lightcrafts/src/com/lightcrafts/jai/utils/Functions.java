@@ -458,7 +458,7 @@ public class Functions {
     }
 
     /*
-        Build an ImageLayout that works well with the underlaying OS X Core Graphics engine based on RGB buffers.
+        Build an ImageLayout that works well with the underlying OS X Core Graphics engine based on RGB buffers.
         For some reason Java uses BGR buffers by default that require expensive translations at draw time on the Mac.
     */
 

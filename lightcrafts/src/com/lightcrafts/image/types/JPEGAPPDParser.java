@@ -34,7 +34,7 @@ public final class JPEGAPPDParser extends AdobeResourceParser {
     {
         try {
             //
-            // A JPEG APPD segment is a set of Adobe resource blocks preceeded
+            // A JPEG APPD segment is a set of Adobe resource blocks preceded
             // by a "Photoshop 3.0" header.
             //
             if ( !buf.getEquals( PHOTOSHOP_3_IDENT, "ASCII" ) ||

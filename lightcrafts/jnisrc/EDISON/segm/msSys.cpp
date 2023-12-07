@@ -145,13 +145,13 @@ double msSystem::ElapsedTime( void )
 /*Output a text message to the user.                   */
 /*******************************************************/
 /*Pre:                                                 */
-/*      - PromptStr is a string containing delimeters  */
+/*      - PromptStr is a string containing delimiters  */
 /*        that is to be output to the user.            */
 /*      - a variable set of arguments is also passed   */
 /*        to this method that are used to replace      */
-/*        the delimeters contained by PromptStr        */
+/*        the delimiters contained by PromptStr        */
 /*Post:                                                */
-/*      - the delimeters of PromptStr have been        */
+/*      - the delimiters of PromptStr have been        */
 /*        replaced accordingly using the variable      */
 /*        set of arguments and the resulting string    */
 /*        has been output to the user.                 */

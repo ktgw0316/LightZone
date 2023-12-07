@@ -42,7 +42,7 @@ public final class ColorProfileInfo implements Comparable {
      * to arrange.
      * @return Returns a {@link List} of the color profiles arranged for
      * display in a menu.  Entries that are <code>null</code> indicate where a
-     * menu seperator should be.
+     * menu separator should be.
      */
     public static List<ColorProfileInfo>
     arrangeForMenu( Collection<ColorProfileInfo> profiles ) {

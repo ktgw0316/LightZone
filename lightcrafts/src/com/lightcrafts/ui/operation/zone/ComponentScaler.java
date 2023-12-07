@@ -15,7 +15,7 @@ import java.awt.*;
  */
 class ComponentScaler {
 
-    /** Get the scale value correpsonding to the vertical midpoint of the
+    /** Get the scale value corresponding to the vertical midpoint of the
      * Component relative to its parent's height.
      */
     static double componentToScale(Component comp) {

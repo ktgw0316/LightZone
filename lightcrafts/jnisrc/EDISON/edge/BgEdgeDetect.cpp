@@ -529,8 +529,8 @@ void BgEdgeDetect::DoRecompute(BgEdgeList* cel, double nmxr, double nmxc,
    tdh = new float[x_*y_];
    tdl = new float[x_*y_];
    
-   //Nonmaximum supression
-   bgLog("...nonmaxima supression: ");
+   //Nonmaximum suppression
+   bgLog("...nonmaxima suppression: ");
 
    float (BgEdgeDetect::*fcomp)(float,float,float,float);
    float (BgEdgeDetect::*feval)(float,float);
@@ -798,8 +798,8 @@ void BgEdgeDetect::DoEdgeDetect(BgImage* cim, BgEdgeList* cel, double nmxr, doub
    bgLog("...computing ranks\n");
    CompRanks(tr, permRank_);
    
-   // new nonmaxima supression
-   bgLog("...nonmaxima supression: ");
+   // new nonmaxima suppression
+   bgLog("...nonmaxima suppression: ");
 
    // select appropriate function
    float (BgEdgeDetect::*fcomp)(float,float,float,float);
@@ -1221,7 +1221,7 @@ void BgEdgeDetect::CompRanks(float* strength, float* ranks)
       ra[ii] = strength[ii];
    }
 
-   //heap sort with ranks (from numerical recipies)
+   //heap sort with ranks (from numerical recipes)
    unsigned long i, ir, j, l;
    unsigned long n;
    n = x_*y_;

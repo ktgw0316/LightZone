@@ -40,7 +40,7 @@ import java.util.Objects;
  *   <li><i>color</i>: The color of the shadow. Shadows are not meant to be
  *   black only.</li>
  * </ul>
- * You can set these properties using the provided mutaters or the appropriate
+ * You can set these properties using the provided mutators or the appropriate
  * constructor. Here are two ways of creating a green shadow of size 10 and
  * with an opacity of 50%:
  * <pre>
@@ -66,7 +66,7 @@ import java.util.Objects;
  * factory.setRenderingHint(ShadowFactory.KEY_BLUR_QUALITY,
  *                          ShadowFactory.VALUE_BLUR_QUALITY_HIGH);
  * </pre>
- * The default rendering algorihtm is <code>VALUE_BLUR_QUALITY_FAST</code>.</p>
+ * The default rendering algorithm is <code>VALUE_BLUR_QUALITY_FAST</code>.</p>
  * <p>The current implementation should provide the same quality with both
  * algorithms but performances are guaranteed to be better (about 30 times
  * faster) with the <i>fast quality blur</i>.</p>

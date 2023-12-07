@@ -112,7 +112,7 @@ public final class DefaultAlertDialog implements AlertDialog {
     }
 
     /**
-     * The backgorund color of the dialog contents shown by
+     * The background color of the dialog contents shown by
      * JOptionPane.showOptionDialog(), which we would like to match in
      * our JTextAreas.
      */

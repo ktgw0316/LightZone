@@ -9,7 +9,7 @@ import javax.swing.tree.TreeNode;
 import java.util.*;
 
 /**
- * An invisibile, universal root node to hold template namepsace nodes.
+ * An invisible, universal root node to hold template namespace nodes.
  */
 class TemplateRootNode implements TreeNode {
 

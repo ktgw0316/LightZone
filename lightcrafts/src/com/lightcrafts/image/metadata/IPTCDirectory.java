@@ -266,7 +266,7 @@ public final class IPTCDirectory extends ImageMetadataDirectory implements
             case IPTC_EXPIRATION_DATE:
             case IPTC_RELEASE_DATE: {
                 //
-                // IPTC dates don't have times (those are stored seperately --
+                // IPTC dates don't have times (those are stored separately --
                 // see below), so we chop off the "00:00:00" from the Date
                 // value.
                 //

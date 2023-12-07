@@ -34,7 +34,7 @@ endif
 
 TOOLS_BIN:=		$(abspath $(ROOT)/lightcrafts/tools/bin)
 
-# Default to a normal (Unix) classpath seperator.
+# Default to a normal (Unix) classpath separator.
 CLASSPATH_SEP:=		:
 
 # The default C and C++ compilers for Linux, FreeBSD, or OpenIndiana

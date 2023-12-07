@@ -15,7 +15,7 @@ public interface MakeModelProvider extends ImageMetadataProvider {
      *
      * @param includeModel If <code>true</code>, the model is included.
      * @return Returns the make (and possibly model) converted to uppercase and
-     * seperated by a space or <code>null</code> if not available.
+     * separated by a space or <code>null</code> if not available.
      */
     String getCameraMake( boolean includeModel );
 

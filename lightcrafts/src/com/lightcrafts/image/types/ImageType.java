@@ -67,7 +67,7 @@ public abstract class ImageType {
      * <code>'.'</code>).  The extension may be in either upper- or lower-case
      * (or any mixture thereof) because the search is done in a
      * case-insensitive manner.
-     * @return Returns the associatied <code>ImageType</code> or
+     * @return Returns the associated <code>ImageType</code> or
      * <code>null</code> if there is no <code>ImageType</code> uses the given
      * extension.
      */

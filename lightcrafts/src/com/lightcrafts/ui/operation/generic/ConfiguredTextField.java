@@ -60,7 +60,7 @@ class ConfiguredTextField
         setInputVerifier(new IntervalVerifier(min, max));
         setHorizontalAlignment(RIGHT);
 
-        setFont(getFont()); // Figure out the maxiumum text width
+        setFont(getFont()); // Figure out the maximum text width
 
         addListeners();
 

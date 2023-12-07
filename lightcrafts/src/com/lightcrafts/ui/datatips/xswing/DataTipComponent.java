@@ -57,13 +57,13 @@ class DataTipComponent extends JToolTip {
     }
 
     /**
-     * Overriden, so that Swing does not create a ToolTipUI.
+     * Overridden, so that Swing does not create a ToolTipUI.
      */
     public void updateUI() {
     }
 
     /**
-     * Overriden to always return false, so that no component ever receives mouse events.
+     * Overridden to always return false, so that no component ever receives mouse events.
      * Instead a mouse press will be caught on the popup's window ancestor, the popup will be hidden and the mouse press redispatched
      * to the underlying component.
      */

@@ -114,7 +114,7 @@ public final class FileIterator implements Iterator<File> {
     private final FileFilter m_filter;
 
     /**
-     * The cahced next {@link File} to return.
+     * The cached next {@link File} to return.
      */
     private File m_next;
 

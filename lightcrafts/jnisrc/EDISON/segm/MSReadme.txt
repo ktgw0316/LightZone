@@ -52,7 +52,7 @@ The modes returned by GetRegions are not in the RGB space. If DefineImage was us
 	msImageProcessor::RGBtoLUV	- converts data points from the RGB data space to LUV
 	msImageProcessor::LUVtoRGB	- converts data points from the LUV data space to RGB
 
-Alternatively, mean shift may be applyed to data that lies in a space other than LUV. This may be accomplished through the use of the method MeanShift::DefineLInput (see section D).
+Alternatively, mean shift may be applied to data that lies in a space other than LUV. This may be accomplished through the use of the method MeanShift::DefineLInput (see section D).
 
 ================================================================================================
 
@@ -94,7 +94,7 @@ For data that is defined on a lattice, it is always assumed that the spatial dom
 
 -------------------------------------------------------------------------------------------------
 
-Mean shift filtering and segmentation may be performed on an arbitary image data space. Such data is defined through calling the inherited method:
+Mean shift filtering and segmentation may be performed on an arbitrary image data space. Such data is defined through calling the inherited method:
 
 	MeanShift::DefineLInput	- specifies input defined on a lattice
 
@@ -108,7 +108,7 @@ DefineImage() calls this method using the LUV data it generates. Through the use
 
 The mean shift image processor class uses an error message string and error-level flag to perform error handling. These two variables, MeanShift::ErrorMessage and MeanShift::ErrorLevel, are public data members of the class.
 
-Upon the occurance of an error,
+Upon the occurrence of an error,
 
 	* An error message is copied into the error message string.
 	* The error level of the class is set to EL_ERROR.

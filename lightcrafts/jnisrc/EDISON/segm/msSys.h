@@ -20,7 +20,7 @@
 	is desired.
 
 	The prototype for the mean shift system class is provided
-	below. Its defition is provided in "msSys.cc".
+	below. Its definition is provided in "msSys.cc".
 
 The theory is described in the papers:
 
@@ -66,14 +66,14 @@ class msSystem {
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:								     |//
-  //|   ============								     |//
-  //|				  *  Start Timer  *                  |//
+  //|	Method Name:                                       |//
+  //| ============                                       |//
+  //|				  *  Start Timer  *                          |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:								     |//
-  //|	============								     |//
+  //|	Description:                                       |//
+  //|	============                                       |//
   //|                                                    |//
   //|   Initializes the system timer. The timer object   |//
   //|   synthesized by this class is initialized during  |//
@@ -88,14 +88,14 @@ class msSystem {
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:								     |//
-  //|   ============								     |//
-  //|				 *  Elapsed Time  *                  |//
+  //|	Method Name:                                       |//
+  //| ============                                       |//
+  //|				 *  Elapsed Time  *                          |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:								     |//
-  //|	============								     |//
+  //|	Description:                                       |//
+  //|	============                                       |//
   //|                                                    |//
   //|   Returns the amount of time elapsed in seconds    |//
   //|   from when StartTimer() was called. If            |//
@@ -104,13 +104,13 @@ class msSystem {
   //|   msSystem object.                                 |//
   //|                                                    |//
   //|   In order to create a valid kernel the following  |//
-  //|   argumens must be provided this method:           |//
+  //|   arguments must be provided this method:          |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Usage:      								     |//
-  //|   ======      								     |//
-  //|		TimeInSeconds = ElapsedTime()                |//
+  //|	Usage:                                             |//
+  //| ======                                             |//
+  //|		TimeInSeconds = ElapsedTime()                    |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
@@ -124,17 +124,17 @@ class msSystem {
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:								     |//
-  //|   ============								     |//
-  //|				     *  Prompt  *                    |//
+  //|	Method Name:                                       |//
+  //| ============                                       |//
+  //|				     *  Prompt  *                            |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:								     |//
-  //|	============								     |//
+  //|	Description:                                       |//
+  //|	============                                       |//
   //|                                                    |//
   //|   Outputs to a device a character message contain- |//
-  //|   ing delimeters. These delimeters are replaced by |//
+  //|   ing delimiters. These delimiters are replaced by |//
   //|   the variable input parameters passed to prompt.  |//
   //|   (Like printf.)                                   |//
   //|                                                    |//
@@ -145,7 +145,7 @@ class msSystem {
   //|   The arguments to this method are:                |//
   //|                                                    |//
   //|   <* PromptStr *>                                  |//
-  //|   A string possibly containing delimeters that     |//
+  //|   A string possibly containing delimiters that     |//
   //|   is to be output to the user.                     |//
   //|                                                    |//
   //|   <* varArgs *>                                    |//
@@ -154,9 +154,9 @@ class msSystem {
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Usage:      								     |//
-  //|   ======      								     |//
-  //|		Prompt(PromptStr, varArgs)                   |//
+  //|	Usage:                                             |//
+  //| ======                                             |//
+  //|		Prompt(PromptStr, varArgs)                       |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
@@ -166,20 +166,20 @@ class msSystem {
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:								     |//
-  //|   ============								     |//
-  //|				   *  Progress  *                    |//
+  //|	Method Name:                                       |//
+  //| ============                                       |//
+  //|				   *  Progress  *                            |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:								     |//
-  //|	============								     |//
+  //|	Description:                                       |//
+  //|	============                                       |//
   //|                                                    |//
   //|   This method is called by the mean shift library  |//
   //|   methods during the application of a specific     |//
   //|   algorithm in which the progress of the algorithm |//
   //|   is indicated. Its main use is for a multi-thre-  |//
-  //|   aded programming envioronment. Namely, it is     |//
+  //|   aded programming environment. Namely, it is      |//
   //|   called fairly frequently by the mean shift       |//
   //|   library methods. It then can be used to grace-   |//
   //|   fully halt the algorithm, or to simply update    |//
@@ -189,7 +189,7 @@ class msSystem {
   //|   and therefore must be re-implemented to accom-   |//
   //|   odate ones needs.                                |//
   //|                                                    |//
-  //|   To facilitate a multi-threaded enviornment       |//
+  //|   To facilitate a multi-threaded environment       |//
   //|   the prompt function returns a value that         |//
   //|   indicates to the mean shift method whether       |//
   //|   to continue execution. EL_HALT is returned       |//
@@ -210,9 +210,9 @@ class msSystem {
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Usage:      								     |//
-  //|   ======      								     |//
-  //|	 SystemState = Progress(PercentComplete)         |//
+  //|	Usage:                                             |//
+  //| ======                                             |//
+  //|	 SystemState = Progress(PercentComplete)           |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//

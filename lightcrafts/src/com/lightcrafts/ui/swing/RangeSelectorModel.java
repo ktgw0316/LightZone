@@ -26,7 +26,7 @@ public class RangeSelectorModel implements Cloneable {
      * @param lowerThumbFeatheringValue The lower thumb feathering value.
      * @param upperThumbValue The upper thumb value.
      * @param upperThumbFeatheringValue The upper thumb feathering value.
-     * @param minimumTrackValue The minumum track value.
+     * @param minimumTrackValue The minimum track value.
      * @param maximumTrackValue The maximum track value.
      * @param trackValue The track value.
      */
@@ -292,7 +292,7 @@ public class RangeSelectorModel implements Cloneable {
      * min &lt;= LTV &lt;= TV &lt;= UTV &lt;= max
      * </blockquote>
      *
-     * @param minimumTrackValue The minumum track value.
+     * @param minimumTrackValue The minimum track value.
      * @param maximumTrackValue The maximum track value.
      * @param trackValue The track value.
      * @return Returns <code>true</code> only if any of the new values is

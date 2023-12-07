@@ -128,7 +128,7 @@ public class LCRecyclingTileFactory extends Observable
     private HashMap recycledArrays = new HashMap(32);
 
     /**
-     * The amount of memory currrently used for array storage.
+     * The amount of memory currently used for array storage.
      */
     private long memoryUsed = 0L;
 

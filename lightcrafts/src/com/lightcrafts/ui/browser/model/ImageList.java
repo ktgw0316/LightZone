@@ -250,7 +250,7 @@ public class ImageList {
     }
 
     /**
-     * Specify a new thumbnal size.  This immediately queues a background task
+     * Specify a new thumbnail size.  This immediately queues a background task
      * for each image.
      */
     public void setSize(int size) {

@@ -17,7 +17,7 @@ public abstract class ProgressThread extends CancelableThread {
     /**
      * Gets this <code>ProgressThread</code>'s {@link ProgressIndicator}.
      *
-     * @return Retuns said {@link ProgressIndicator}.
+     * @return Returns said {@link ProgressIndicator}.
      */
     public final ProgressIndicator getProgressIndicator() {
         return m_progressIndicator;

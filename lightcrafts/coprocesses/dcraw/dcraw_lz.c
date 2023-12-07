@@ -3140,7 +3140,7 @@ void CLASS remove_zeroes()
 }
 
 /*
-   Seach from the current directory up to the root looking for
+   Search from the current directory up to the root looking for
    a ".badpixels" file, and fix those pixels now.
  */
 void CLASS bad_pixels (const char *cfname)
@@ -4257,7 +4257,7 @@ void CLASS xtrans_interpolate (int passes)
 		homo[d][row][col] += (drv[d][row+v][col+h] <= tr);
 	}
 
-/* Average the most homogenous pixels for the final result:	*/
+/* Average the most homogeneous pixels for the final result:	*/
       if (height-top < TS+4) mrow = height-top+2;
       if (width-left < TS+4) mcol = width-left+2;
       for (row = MIN(top,8); row < mrow-8; row++)
@@ -4387,7 +4387,7 @@ void CLASS ahd_interpolate()
 		homo[d][tr][tc]++;
 	}
       }
-/*  Combine the most homogenous pixels for the final result:	*/
+/*  Combine the most homogeneous pixels for the final result:	*/
       for (row=top+3; row < top+TS-3 && row < height-5; row++) {
 	tr = row-top;
 	for (col=left+3; col < left+TS-3 && col < width-5; col++) {

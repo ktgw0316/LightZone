@@ -24,7 +24,7 @@ public final class AppleScript {
      * Runs an AppleScript.
      *
      * @param script The AppleScript to run.  Note: for multi-line scripts,
-     * don't forget to seperate lines with newlines!
+     * don't forget to separate lines with newlines!
      * @throws IllegalArgumentException if the script contains errors.
      */
     public static native void run( String script );

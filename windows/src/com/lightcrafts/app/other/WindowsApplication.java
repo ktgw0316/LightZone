@@ -20,7 +20,7 @@ public abstract class WindowsApplication extends OtherApplication {
      * @param exe The name of the application executable (including the
      * <code>.exe</code> extension).
      * @return Returns said {@link OtherApplication} or
-     * {@link UnknownApplication#INSTANCE} if the other application is unkown.
+     * {@link UnknownApplication#INSTANCE} if the other application is unknown.
      */
     public static OtherApplication getAppForExe( String exe ) {
         final OtherApplication app = m_exeToApp.get( exe.toLowerCase() );

@@ -150,7 +150,7 @@ public class ModeOverlay extends JLayeredPane {
     }
 
     /**
-     * Prefered size is just the preferred size of the underlay, unless we're
+     * Preferred size is just the preferred size of the underlay, unless we're
      * in a scroll pane, in which case it's the maximum of that size and the
      * size of the viewport.
      */

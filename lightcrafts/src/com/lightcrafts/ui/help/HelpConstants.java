@@ -5,7 +5,7 @@ package com.lightcrafts.ui.help;
 import com.lightcrafts.platform.Platform;
 
 /**
- * These contants can be passed to {@link Platform#showHelpTopic(String)}.
+ * These constants can be passed to {@link Platform#showHelpTopic(String)}.
  *
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */

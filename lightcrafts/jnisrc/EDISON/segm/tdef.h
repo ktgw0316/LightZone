@@ -8,10 +8,10 @@
 	the necessary output will be generated needed
 	to analyze a given input set of data.
 
-  Type Defintions:
-  ===============
+  Type Definitions:
+  ================
 
-	This header file contains the type defintions and
+	This header file contains the type definitions and
 	enumerations shared among the various classes of the mean
 	shift library.
 

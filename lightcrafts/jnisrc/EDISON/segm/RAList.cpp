@@ -65,7 +65,7 @@ RAList::RAList( void )
 	label			= -1;
 	next			= NULL;
 
-	//initialize edge strenght weight and count
+	//initialize edge strength weight and count
 	edgeStrength	= 0;
 	edgePixelCount	= 0;
 }

@@ -12,7 +12,7 @@ import java.awt.*;
  * <p>
  * These backgrounds extend beyond the button's icon, and so they
  * require extra insets in the button layout.  CoolButton takes the Insets
- * declared here and uses them to inialize an empty border on itself.
+ * declared here and uses them to initialize an empty border on itself.
  * CoolButtonBackground then paints over the empty border set up by
  * CoolButton when asked to do so by a call to paint().
  * <p>

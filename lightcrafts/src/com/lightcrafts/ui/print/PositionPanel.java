@@ -94,7 +94,7 @@ class PositionPanel extends JPanel implements PrintLayoutModelListener {
         titlePanel.add(box);
     }
 
-    // Update a dimension text field when its corresonding units change:
+    // Update a dimension text field when its corresponding units change:
 
     private static void syncTextWithUnit(
         final DimensionTextField text, final UnitComboBox unit

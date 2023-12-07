@@ -740,7 +740,7 @@ public interface CIFFTags extends ImageMetaTags {
     int CIFF_JPG_FROM_RAW                   = CIFF_FIELD_TYPE_MIXED | 0x07;
 
     /**
-     * The camera model-name as two null-terminated stings, with an additional
+     * The camera model-name as two null-terminated strings, with an additional
      * null at the end: the first is the manufacturer name (e.g.,
      * &quot;Canon&quot;) and the next is the model name (e.g., &quot;PowerShot
      * ver1.00&quot;), followed by a null.  There will therefore be a total of

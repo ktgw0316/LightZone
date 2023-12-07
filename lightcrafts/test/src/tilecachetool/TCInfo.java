@@ -168,7 +168,7 @@ public final class TCInfo extends JPanel
      }
 
     /**
-     * Responce to slider changes
+     * Response to slider changes
      */
     public void stateChanged(ChangeEvent e) {
         JSlider slider = (JSlider) e.getSource();

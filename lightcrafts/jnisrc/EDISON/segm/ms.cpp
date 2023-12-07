@@ -72,7 +72,7 @@ Implemented by Chris M. Christoudias, Bogdan Georgescu
 MeanShift::MeanShift( void )
 {
 	
-	//intialize input data set parameters...
+	//initialize input data set parameters...
 	P							= NULL;
 	L							= 0;
 	N							= 0;
@@ -86,11 +86,11 @@ MeanShift::MeanShift( void )
 	forest						= NULL;
 	range						= NULL;
 	
-	//intialize lattice structure...
+	//initialize lattice structure...
 	height						= 0;
 	width						= 0;
 	
-	//intialize kernel strucuture...
+	//initialize kernel structure...
 	h							= NULL;
 	kernel						= NULL;
 	w							= NULL;
@@ -101,7 +101,7 @@ MeanShift::MeanShift( void )
 	//initialize weight function linked list...
 	head						= cur	= NULL;
 	
-	//intialize mean shift processing data structures...
+	//initialize mean shift processing data structures...
 	uv							= NULL;
 
 	//set lattice weight map to null
@@ -159,7 +159,7 @@ MeanShift::~MeanShift( void )
 /*******************************************************/
 /*Define Kernel                                        */
 /*******************************************************/
-/*Creats custom user defined Kernel to be used by the  */
+/*Creates custom user defined Kernel to be used by the */
 /*mean shift procedure.                                */
 /*******************************************************/
 /*Pre:                                                 */
@@ -289,7 +289,7 @@ void MeanShift::AddWeightFunction(double g(double), float halfWindow, int sample
 		cur = cur->next;
 	
 	// Entry Exists - Replace It! 
-	// Otherwise insert at the head of the the weight functon list
+	// Otherwise insert at the head of the the weight function list
 	if(cur)
 		delete cur->w;
 	else
@@ -607,7 +607,7 @@ void MeanShift::msVector(double *Mh, double *yk)
 /*Lattice Mean Shift Vector                            */
 /*******************************************************/
 /*Calculates the mean shift vector at a specified data */
-/*point yk, assuming that the data set exhists on a    */
+/*point yk, assuming that the data set exists on a     */
 /*height x width two dimensional lattice.              */
 /*******************************************************/
 /*Pre:                                                 */
@@ -712,7 +712,7 @@ void MeanShift::FindMode(double *mode, double *yk)
 		for(i = 0; i < N; i++)
 			mvAbs	+= Mh[i]*Mh[i];
 		
-		//increment interation count...
+		//increment iteration count...
 		iterationCount++;
 		
 	}
@@ -733,7 +733,7 @@ void MeanShift::FindMode(double *mode, double *yk)
 /*Find Lattice Mode                                    */
 /*******************************************************/
 /*Calculates the mode of a specified data point yk,    */
-/*assuming that the data set exhists on a height x     */
+/*assuming that the data set exists on a height x      */
 /*width two dimensional lattice.                       */
 /*******************************************************/
 /*Pre:                                                 */
@@ -809,7 +809,7 @@ void MeanShift::FindLMode(double *mode, double *yk)
 		for(i = 0; i < gridN; i++)
 			mvAbs	+= Mh[i]*Mh[i];
 		
-		//increment interation count...
+		//increment iteration count...
 		iterationCount++;
 		
 	}
@@ -936,7 +936,7 @@ void MeanShift::MSVector(double *Mh_ptr, double *yk_ptr)
 /*******************************************************/
 /*Lattice Mean Shift Vector                            */
 /*******************************************************/
-/*Computes the mean shift vector at a specfied window  */
+/*Computes the mean shift vector at a specified window  */
 /*yk using the lattice data structure.                 */
 /*******************************************************/
 /*Pre:                                                 */
@@ -994,7 +994,7 @@ void MeanShift::LatticeMSVector(double *Mh_ptr, double *yk_ptr)
 /*******************************************************/
 /*Optimized Lattice Mean Shift Vector                  */
 /*******************************************************/
-/*Computes the mean shift vector at a specfied window  */
+/*Computes the mean shift vector at a specified window  */
 /*yk using the lattice data structure. Also the points */
 /*that lie within the window are stored into the basin */
 /*of attraction structure used by the optimized mean   */
@@ -1095,7 +1095,7 @@ void MeanShift::classConsistencyCheck(int iN, bool usingLattice)
 	//make sure that the lattice is defined if it is being used
 	if((class_state.LATTICE_DEFINED == false)&&(usingLattice))
 	{
-		ErrorHandler("MeanShift", "classConsistencyCheck", "Latice not created.");
+		ErrorHandler("MeanShift", "classConsistencyCheck", "Lattice not created.");
 		return;
 	}
 	
@@ -1194,10 +1194,10 @@ void MeanShift::ErrorHandler(const char *className, const char *methodName, cons
 /*      - uniformKernel is set to true if the kernel   */
 /*        to be used is uniform, false is returned     */
 /*        otherwise                                    */
-/*      - if a user defined weight function is requred */
-/*        for a given subspace but not defined in the  */
-/*        user defined weight function list, an error  */
-/*        is flagged and the program is halted         */
+/*      - if a user defined weight function is requir- */
+/*        ed for a given subspace but not defined in   */
+/*        the user defined weight function list, an    */
+/*        error is flagged and the program is halted   */
 /*******************************************************/
 
 void MeanShift::generateLookupTable( void )
@@ -1219,8 +1219,8 @@ void MeanShift::generateLookupTable( void )
     {
 		switch(kernel[i])
 		{
-			// *Uniform Kernel* has weight funciton w(u) = 1
-			// therefore, a weight funciton lookup table is
+			// *Uniform Kernel* has weight function w(u) = 1
+			// therefore, a weight function lookup table is
 			// not needed for this kernel --> w[i] = NULL indicates
 			// this
 		case Uniform:
@@ -1329,7 +1329,7 @@ void MeanShift::DestroyKernel( void )
       w = NULL;
    }
    
-	//intialize kernel for re-use...
+	//initialize kernel for re-use...
 	kp		= 0;
 	kernel	= NULL;
 	h		= NULL;
@@ -1432,12 +1432,12 @@ void MeanShift::InitializeInput(float *x)
 /*******************************************************/
 /*Reset Input                                          */
 /*******************************************************/
-/*De-allocates memory for and re-intializes input data */
+/*De-allocates memory for and re-initializes input data */
 /*structure.                                           */
 /*******************************************************/
 /*Post:                                                */
 /*      - the memory of the input data structure has   */
-/*        been de-allocated and this strucuture has    */
+/*        been de-allocated and this structure has     */
 /*        been initialized for re-use.                 */
 /*******************************************************/
 
@@ -1839,7 +1839,7 @@ void MeanShift::generalSearch(tree *gt, int gd, double *Mh_ptr, double *yk_ptr)
 							// Linear interpolate values given by
 							// lookup table
 							
-							// Calculate x0 and x1, the points surounding
+							// Calculate x0 and x1, the points surrounding
 							// u
 							x0 = (int)(u/increment[j]);
 							x1 = x0+1;
@@ -1907,7 +1907,7 @@ void MeanShift::generalSearch(tree *gt, int gd, double *Mh_ptr, double *yk_ptr)
 /*                                                     */
 /*NOTE: This method is the only method in the          */
 /*      MeanShift class that uses the weight           */
-/*      map asside from optUniformLSearch.             */
+/*      map aside from optUniformLSearch.              */
 /*******************************************************/
 /*Pre:                                                 */
 /*      - Mh_ptr is a length N array of doubles        */
@@ -2010,7 +2010,7 @@ void MeanShift::uniformLSearch(double *Mh_ptr, double *yk_ptr)
 }
 
 /*******************************************************/
-/*Optimized Uniform Latice Search                      */
+/*Optimized Uniform Lattice Search                     */
 /*******************************************************/
 /*Performs search on data set for all points lying     */
 /*within the search window defined using a uniform     */
@@ -2021,7 +2021,7 @@ void MeanShift::uniformLSearch(double *Mh_ptr, double *yk_ptr)
 /*                                                     */
 /*NOTE: This method is the only method in the          */
 /*      MeanShift class that uses the weight           */
-/*      map asside from uniformLSearch.                */
+/*      map aside from uniformLSearch.                 */
 /*******************************************************/
 /*Pre:                                                 */
 /*      - Mh_ptr is a length N array of doubles        */
@@ -2029,7 +2029,7 @@ void MeanShift::uniformLSearch(double *Mh_ptr, double *yk_ptr)
 /*      - Mh_ptr is the sum of the data points found   */
 /*        within search window having center yk_ptr    */
 /*Post:                                                */
-/*      - a search on the data set using the latice    */
+/*      - a search on the data set using the lattice   */
 /*        has been performed, and all points found to  */
 /*        lie within the search window defined using   */
 /*        a uniform kernel are summed and counted.     */
@@ -2048,12 +2048,12 @@ void MeanShift::optUniformLSearch(double *Mh_ptr, double *yk_ptr)
 	int				s, p, dataPoint, pointIndx, lN;
 	double			diff, el, dx, dy, tx, weight;
 	
-	//Define latice data dimension...
+	//Define lattice data dimension...
 	lN	= N + 2;
 	
-	//Define bounds of latice...
+	//Define bounds of lattice...
 	
-	//the latice is a 2dimensional subspace whose
+	//the lattice is a 2dimensional subspace whose
 	//search window bandwidth is specified by
 	//h[0]:
 	tx = yk_ptr[0] - h[0] + DELTA + 0.99;
@@ -2077,7 +2077,7 @@ void MeanShift::optUniformLSearch(double *Mh_ptr, double *yk_ptr)
 	else
 		UpperBoundY = (int) tx;
 	
-	//Perform search using latice
+	//Perform search using lattice
 	for(i = LowerBoundY; i <= UpperBoundY; i++)
 		for(j = LowerBoundX; j <= UpperBoundX; j++)
 		{
@@ -2256,7 +2256,7 @@ void MeanShift::generalLSearch(double *Mh_ptr, double *yk_ptr)
 						// Linear interpolate values given by
 						// lookup table
 						
-						// Calculate x0 and x1, the points surounding
+						// Calculate x0 and x1, the points surrounding
 						// u
 						x0 = (int)(u/increment[k]);
 						x1 = x0+1;
@@ -2413,7 +2413,7 @@ void MeanShift::optGeneralLSearch(double *Mh_ptr, double *yk_ptr)
 						// Linear interpolate values given by
 						// lookup table
 						
-						// Calculate x0 and x1, the points surounding
+						// Calculate x0 and x1, the points surrounding
 						// u
 						x0 = (int)(u/increment[k]);
 						x1 = x0+1;

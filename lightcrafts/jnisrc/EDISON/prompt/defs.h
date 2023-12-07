@@ -128,7 +128,7 @@ enum {
   CURVE_CUSTOM
 };
 
-//define custum curve parameters
+//define custom curve parameters
 enum {
   CUST_CURVE_HYST_HIGH,
   CUST_CURVE_HYST_LOW,

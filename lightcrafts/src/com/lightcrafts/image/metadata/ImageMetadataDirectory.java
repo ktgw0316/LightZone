@@ -334,7 +334,7 @@ public abstract class ImageMetadataDirectory implements
      *
      * @param tagID The metadata tag ID (the key).
      * @return Returns the value indexed by the tag ID or <code>null</code> if
-     * there is no value assosiated with the given tag ID.
+     * there is no value associated with the given tag ID.
      * @see #getStaticParent()
      */
     public final synchronized ImageMetaValue getValue( Integer tagID ) {
@@ -943,7 +943,7 @@ public abstract class ImageMetadataDirectory implements
      * @param modelTagID The tag ID for the model.
      * @param includeModel If <code>true</code>, the model is included.
      * @return Returns the make (and possibly model) converted to uppercase and
-     * seperated by a space or <code>null</code> if not available.
+     * separated by a space or <code>null</code> if not available.
      */
     protected final String getCameraMake( int makeTagID, int modelTagID,
                                           boolean includeModel ) {
@@ -1138,7 +1138,7 @@ public abstract class ImageMetadataDirectory implements
     protected static final int PROVIDER_PRIORITY_MAX = 10000;
 
     /**
-     * The minumum provider priority.
+     * The minimum provider priority.
      * @see #getProviderPriorityFor(Class)
      */
     protected static final int PROVIDER_PRIORITY_MIN = -10000;

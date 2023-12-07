@@ -279,7 +279,7 @@ public interface IPTCTags extends ImageMetaTags {
     int IPTC_OBJECT_CYCLE                       = IPTC_RECORD_APP << 8 | 0x4B;
 
     /**
-     * A shorthand reference for the news object. While a technical identifer
+     * A shorthand reference for the news object. While a technical identifier
      * goes to an identifier element, Title holds a short verbal and human
      * readable name. Title is not the same as {@link #IPTC_HEADLINE}.
      * <p>
@@ -338,7 +338,7 @@ public interface IPTCTags extends ImageMetaTags {
     int IPTC_RECORD_VERSION                     = IPTC_RECORD_APP << 8;
 
     /**
-     * The release date of the news obejct.
+     * The release date of the news object.
      * <p>
      * Type: ASCII.
      */
@@ -520,7 +520,7 @@ public interface IPTCTags extends ImageMetaTags {
     int IPTC_RIGHTS_USAGE_TERMS                 = 0xF204;
 
     /**
-     * Describes the scene of a photo content. Specifies one ore more terms
+     * Describes the scene of a photo content. Specifies one or more terms
      * from the IPTC "Scene-NewsCodes". Each Scene is represented as a string
      * of 6 digits in an unordered list.
      * <p>

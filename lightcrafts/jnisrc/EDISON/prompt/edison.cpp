@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////
 // Name     : edison.cpp
-// Purpose  : Wrapper class used for segmenation and
+// Purpose  : Wrapper class used for segmentation and
 //            edge detection.
 // Author   : Chris M. Christoudias
 // Modified by
@@ -359,7 +359,7 @@ int EDISON::EdgeDetect( void )
 } 
 
 ////////////////////////////////////////////////////////
-//Image Segmenation
+//Image Segmentation
 ////////////////////////////////////////////////////////
 
 int EDISON::Filter( void )

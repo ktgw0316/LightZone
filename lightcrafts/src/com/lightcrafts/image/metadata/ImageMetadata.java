@@ -224,7 +224,7 @@ public class ImageMetadata implements
      *
      * @param includeModel If <code>true</code>, the model is included.
      * @return Returns the make (and possibly model) converted to uppercase and
-     * seperated by a space or <code>null</code> if not available.
+     * separated by a space or <code>null</code> if not available.
      */
     public final String getCameraMake( boolean includeModel ) {
         final Collection<ImageMetadataDirectory> dirs =
@@ -1167,7 +1167,7 @@ public class ImageMetadata implements
      *
      * @param dir The {@link ImageMetadataDirectory} to put.
      * @return Returns the previous {@link ImageMetadataDirectory} or
-     * <code>null</code> if there was no previos directory.
+     * <code>null</code> if there was no previous directory.
      */
     public ImageMetadataDirectory putDirectory( ImageMetadataDirectory dir ) {
         final Class dirClass = dir.getClass();

@@ -221,7 +221,7 @@ public class ColorScience {
 
             Hue = (Alpha-arctan((Red-intensity)*(3^0.5)/(Green-Blue)))/(2*PI)
             with { Alpha=PI/2 if Green>Blue
-                 { Aplha=3*PI/2 if Green<Blue
+                 { Alpha=3*PI/2 if Green<Blue
                  { Hue=1 if Green=Blue
             Saturation = (Red^2+Green^2+Blue^2-Red*Green-Red*Blue-Blue*Green)^0.5
             Intensity = (Red+Green+Blue)/3

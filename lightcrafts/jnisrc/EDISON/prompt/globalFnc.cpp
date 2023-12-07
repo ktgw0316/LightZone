@@ -191,7 +191,7 @@ void Report(CmCError *error, char *filename, CmCParser *srcParser)
 
   //check for unsupported file formats
   if(errorCode == SYN_UNSUPPORTED_FILETYPE) {
-    fprintf(stderr, "Version incompatability error:\n");
+    fprintf(stderr, "Version incompatibility error:\n");
     fprintf(stderr, "Line %d (argument '%s') Error: %s\n", lineNumber, token, ErrorMsgTable[errorCode-1]);
     return;
   }  
@@ -312,7 +312,7 @@ bool validOutputType(char *outputType)
 }
 
 //************************
-//check for valid intput type
+//check for valid input type
 //************************
 
 bool validInputType(char *inputType)
@@ -561,7 +561,7 @@ CmCError CheckSyntax(char *filename, CmCParser *synParser)
 
 	if(parameterId != UNKNOWN_PARAMETER) {
 	  
-	  //retreive tokens expected given a parameter
+	  //retrieve tokens expected given a parameter
 	  error = GetParamTokenSet(tokenSet, synParser);
 	  if(error == SYN_ERROR) return CmCError(token, SYN_ERROR);
 	  
@@ -603,7 +603,7 @@ CmCError CheckSyntax(char *filename, CmCParser *synParser)
   //reset parser
   synParser->StartOver();
   
-  //file is syntaxically correct
+  //file is syntactically correct
   return CmCError((CmCToken *) NULL, NO_ERRORS);
   
 }
@@ -829,10 +829,10 @@ int EXECUTE(int cmdId, CmCParser *script, void **paramTable)
     token = script->GetToken(); //get flag
     if(!strcmp(token->token_, "ON")) {
       CmCUseCustomWeightMap = true;
-      CmCPrompt("Custum weight map IN-USE (if defined).\n");
+      CmCPrompt("Custom weight map IN-USE (if defined).\n");
     } else {
       CmCUseCustomWeightMap = false;
-      CmCPrompt("Custum weight map IN-ACTIVE.\n");
+      CmCPrompt("Custom weight map IN-ACTIVE.\n");
     }
     script->GetToken(); //skip ';'
     break;
@@ -978,7 +978,7 @@ int EXECUTE(int cmdId, CmCParser *script, void **paramTable)
     break;
   }
 
-  //command executed succesfully!
+  //command executed successfully!
   return NO_ERRORS;
 
 }    
@@ -1043,7 +1043,7 @@ CmCError Run(CmCParser *script)
       if(tokenId != UNKNOWN_PARAMETER) {
 	error = SET(tokenId, script, paramTable);
 	if(error) return CmCError(token, error);
-      //token is custum curve list, so read it
+      //token is custom curve list, so read it
       } else {
 	tokenId = CustomCurve(token->token_);
 	error = READLIST(tokenId, script, paramTable);
@@ -1060,7 +1060,7 @@ CmCError Run(CmCParser *script)
   //reset script parser
   script->StartOver();
   
-  //script has been run succesfully!
+  //script has been run successfully!
   return CmCError((CmCToken *) NULL, NO_ERRORS);
 
 }

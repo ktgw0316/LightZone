@@ -448,7 +448,7 @@ public interface TIFFConstants {
     int TIFF_PHOTOMETRIC_TRANSPARENCY   = 4;
 
     /**
-     * TIFF photometric interpretation: seperated.
+     * TIFF photometric interpretation: separated.
      * This is one of the possible values for the
      * {@link TIFFTags#TIFF_PHOTOMETRIC_INTERPRETATION} metadata tag.
      */

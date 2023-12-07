@@ -59,10 +59,10 @@ public final class TextUtil {
     }
 
     /**
-     * Join an array of strings together seperated by a separator string.
+     * Join an array of strings together separated by a separator string.
      *
      * @param strings The strings to join.
-     * @param sep The seperator or <code>null</code>.
+     * @param sep The separator or <code>null</code>.
      * @return Returns the joined strings.
      */
     public static String join( String[] strings, String sep ) {
