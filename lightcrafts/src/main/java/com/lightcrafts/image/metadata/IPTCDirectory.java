@@ -1,8 +1,10 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2023-     Masahiro Kitagawa */
 
 package com.lightcrafts.image.metadata;
 
 import java.io.UnsupportedEncodingException;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.nio.ByteBuffer;
 
@@ -71,7 +73,7 @@ public final class IPTCDirectory extends ImageMetadataDirectory implements
      * {@inheritDoc}
      */
     @Override
-    public Date getCaptureDateTime() {
+    public ZonedDateTime getCaptureDateTime() {
         final ImageMetaValue value = getValue( IPTC_DATE_CREATED );
         return  value instanceof DateMetaValue ?
                 ((DateMetaValue)value).getDateValue() : null;
@@ -636,6 +638,8 @@ public final class IPTCDirectory extends ImageMetadataDirectory implements
      * {@link DateMetaValue} plus the time.
      */
     private ImageMetaValue mergeDateTime( ImageMetaValue date, int timeTagID ) {
+        // TODO: There might be a better way to do this with ZonedDateTime.
+
         final ImageMetaValue timeValue = getValue( timeTagID );
         if ( timeValue == null )
             return date;
@@ -674,12 +678,10 @@ public final class IPTCDirectory extends ImageMetadataDirectory implements
                     return date;
             }
 
-            final int delta = ((hh+zh) * 60 * 60 + (mm+zm) * 60 + ss) * 1000;
+            final int deltaSeconds = (hh+zh) * 60 * 60 + (mm+zm) * 60 + ss;
 
-            final DateMetaValue newDateValue = (DateMetaValue)date.clone();
-            final Date newDate = newDateValue.getDateValue();
-            newDate.setTime( newDate.getTime() + delta );
-            return newDateValue;
+            final var newDate = ((DateMetaValue)date).getDateValue().plusSeconds(deltaSeconds);
+            return new DateMetaValue(newDate);
         }
         catch ( NumberFormatException e ) {
             return date;

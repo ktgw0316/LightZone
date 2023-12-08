@@ -1,10 +1,9 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2023-     Masahiro Kitagawa */
 
 package com.lightcrafts.image.metadata;
 
 import com.lightcrafts.app.Application;
-
-import java.text.SimpleDateFormat;
 
 /**
  * <code>XMPConstants</code> defines constants for XMP.
@@ -12,10 +11,6 @@ import java.text.SimpleDateFormat;
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */
 public interface XMPConstants {
-
-    /** This is the date format required by XMP. */
-    SimpleDateFormat ISO_8601_DATE_FORMAT =
-        new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss" );
 
     /** The Dublin Core namespace URI. */
     String XMP_DC_NS = "http://purl.org/dc/elements/1.1/";

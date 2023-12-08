@@ -1,21 +1,24 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2023-     Masahiro Kitagawa */
 
 package com.lightcrafts.image.metadata.values;
+
+import com.lightcrafts.image.metadata.ImageMetaType;
+import com.lightcrafts.utils.xml.XMLUtil;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
-import java.util.Date;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import com.lightcrafts.image.metadata.ImageMetaType;
-import com.lightcrafts.utils.TextUtil;
-import com.lightcrafts.utils.xml.XMLUtil;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.lightcrafts.image.metadata.ImageMetaType.META_DATE;
 import static com.lightcrafts.image.metadata.XMPConstants.*;
@@ -43,7 +46,7 @@ public final class DateMetaValue extends ImageMetaValue {
      *
      * @param values The array of values.
      */
-    public DateMetaValue( Date... values ) {
+    public DateMetaValue(ZonedDateTime... values) {
         m_value = values;
     }
 
@@ -52,8 +55,8 @@ public final class DateMetaValue extends ImageMetaValue {
      *
      * @param value The number of milliseconds since epoch.
      */
-    public DateMetaValue( long value ) {
-        this( new Date( value ) );
+    public DateMetaValue(long value) {
+        this(zonedDateTimeFromEpochMillis(value));
     }
 
     /**
@@ -80,48 +83,48 @@ public final class DateMetaValue extends ImageMetaValue {
      * {@inheritDoc}
      */
     public int compareTo( Object o ) {
-        if ( o instanceof DateMetaValue ) {
-            final DateMetaValue rightVal = (DateMetaValue)o;
-            final Date leftDate = getDateValue();
-            final Date rightDate = rightVal.getDateValue();
+        if (o instanceof DateMetaValue rightVal) {
+            final var leftDate = getDateValue();
+            final var rightDate = rightVal.getDateValue();
             return leftDate.compareTo( rightDate );
         }
         return super.compareTo( o );
     }
 
     /**
-     * Get the first native {@link Date} array value.
+     * Get the first native {@link ZonedDateTime} array value.
      *
      * @return Returns said value.
      */
-    public Date getDateValue() {
+    public ZonedDateTime getDateValue() {
         return getDateValueAt(0);
     }
 
     /**
-     * Gets the {@link Date} value at the given index.
+     * Gets the {@link ZonedDateTime} value at the given index.
      *
      * @param index The index of the value to get.
      * @return Returns said value.
      */
-    public Date getDateValueAt( int index ) {
+    public ZonedDateTime getDateValueAt( int index ) {
         return m_value[ index ];
     }
 
     /**
-     * Get the native {@link Date} array value.
+     * Get the native {@link ZonedDateTime} array value.
      *
      * @return Returns said array.
      */
-    public Date[] getDateValues() {
+    public ZonedDateTime[] getDateValues() {
         return m_value;
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public long getLongValueAt(int index) {
-        return getDateValueAt(index).getTime();
+        return getDateValueAt(index).toInstant().toEpochMilli();
     }
 
     /**
@@ -154,15 +157,15 @@ public final class DateMetaValue extends ImageMetaValue {
     }
 
     /**
-     * Sets the {@link Date} value at the given index.
+     * Sets the {@link ZonedDateTime} value at the given index.
      *
      * @param newValue The new value.
      * @param index The index to set the value of.
      */
-    public synchronized void setDateValueAt( Date newValue, int index ) {
+    public synchronized void setDateValueAt(ZonedDateTime newValue, int index) {
         checkIsEditable();
         if ( m_value == null )
-            m_value = new Date[ index + 1 ];
+            m_value = new ZonedDateTime[index + 1];
         else if ( index >= m_value.length )
             m_value = Arrays.copyOf(m_value, index + 1);
         m_value[ index ] = newValue;
@@ -173,7 +176,7 @@ public final class DateMetaValue extends ImageMetaValue {
      * {@inheritDoc}
      */
     public void setLongValue( long newValue ) {
-        setDateValueAt( new Date( newValue ), 0 );
+        setDateValueAt(zonedDateTimeFromEpochMillis(newValue), 0);
     }
 
     /**
@@ -183,27 +186,22 @@ public final class DateMetaValue extends ImageMetaValue {
         final String tagName = getTagName();
         if ( tagName == null )
             return null;
+        final var formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
         final Element tagElement =
             xmpDoc.createElementNS( nsURI, prefix + ':' + tagName );
-        final Date[] values = getDateValues();
-        if ( values.length == 1 )
-            XMLUtil.setTextContentOf(
-                tagElement,
-                TextUtil.dateFormat( ISO_8601_DATE_FORMAT, m_value[0] )
-            );
-        else {
+        final ZonedDateTime[] values = getDateValues();
+        if (values.length == 1) {
+            XMLUtil.setTextContentOf(tagElement, m_value[0].format(formatter));
+        } else {
             final Element seqElement = XMLUtil.addElementChildTo(
-                tagElement, XMP_RDF_NS, XMP_RDF_PREFIX + ":Seq"
+                    tagElement, XMP_RDF_NS, XMP_RDF_PREFIX + ":Seq"
             );
-            for ( Date value : values ) {
+            Arrays.stream(values).forEachOrdered(value -> {
                 final Element listItem = XMLUtil.addElementChildTo(
-                    seqElement, XMP_RDF_NS, XMP_RDF_PREFIX + ":li"
+                        seqElement, XMP_RDF_NS, XMP_RDF_PREFIX + ":li"
                 );
-                XMLUtil.setTextContentOf(
-                    listItem,
-                    TextUtil.dateFormat( ISO_8601_DATE_FORMAT, value )
-                );
-            }
+                XMLUtil.setTextContentOf(listItem, value.format(formatter));
+            });
         }
         return tagElement;
     }
@@ -213,9 +211,10 @@ public final class DateMetaValue extends ImageMetaValue {
      */
     public void readExternal( ObjectInput in ) throws IOException {
         final int length = readHeader( in );
-        m_value = new Date[ length ];
-        for ( int i = 0; i < length; ++i )
-            m_value[i] = new Date( in.readLong() );
+        m_value = new ZonedDateTime[length];
+        for (int i = 0; i < length; i++) {
+            m_value[i] = zonedDateTimeFromEpochMillis(in.readLong());
+        }
     }
 
     /**
@@ -225,8 +224,8 @@ public final class DateMetaValue extends ImageMetaValue {
      */
     public void writeExternal( ObjectOutput out ) throws IOException {
         writeHeader( out );
-        for ( Date value : m_value )
-            out.writeLong( value.getTime() );
+        for ( ZonedDateTime value : m_value )
+            out.writeLong( value.toInstant().toEpochMilli() );
     }
 
     ////////// protected //////////////////////////////////////////////////////
@@ -239,12 +238,13 @@ public final class DateMetaValue extends ImageMetaValue {
      * a parsable date.
      */
     protected void appendValueImpl( String newValue ) {
-        final Date newDate = parseValue( newValue );
+        // TODO: This will be simplified if we declare the m_value as a non-null list.
+        final ZonedDateTime newDateTime = parseValue( newValue );
         if ( m_value == null )
-            m_value = new Date[] { newDate };
+            m_value = new ZonedDateTime[] { newDateTime };
         else {
             m_value = Arrays.copyOf( m_value, m_value.length + 1 );
-            m_value[ m_value.length - 1 ] = newDate;
+            m_value[ m_value.length - 1 ] = newDateTime;
         }
     }
 
@@ -256,10 +256,9 @@ public final class DateMetaValue extends ImageMetaValue {
     protected String[] getValuesImpl() {
         if ( m_value == null )
             return null;
-        final String[] value = new String[ m_value.length ];
-        for ( int i = 0; i < m_value.length; ++i )
-            value[i] = TextUtil.dateFormat( m_canonicalDateFormat, m_value[i] );
-        return value;
+        return Arrays.stream(m_value)
+                .map(v -> v.format(m_canonicalDateFormatter))
+                .toArray(String[]::new);
     }
 
     /**
@@ -271,7 +270,7 @@ public final class DateMetaValue extends ImageMetaValue {
      */
     protected void setValuesImpl( String[] newValue ) {
         if ( m_value == null || m_value.length != newValue.length )
-            m_value = new Date[ newValue.length ];
+            m_value = new ZonedDateTime[ newValue.length ];
         for ( int i = 0; i < newValue.length; ++i )
             m_value[i] = parseValue( newValue[i] );
     }
@@ -285,18 +284,9 @@ public final class DateMetaValue extends ImageMetaValue {
     protected String toStringImpl() {
         if ( m_value == null )
             return null;
-        final StringBuilder sb = new StringBuilder();
-        boolean comma = false;
-        for ( Date value : m_value ) {
-            if ( !comma )
-                comma = true;
-            else
-                sb.append( ',' );
-            sb.append(
-                TextUtil.dateFormat( m_canonicalDateFormat, value ).trim()
-            );
-        }
-        return sb.toString();
+        return Arrays.stream(m_value)
+                .map(v -> v.format(m_canonicalDateFormatter).trim())
+                .collect(Collectors.joining(","));
     }
 
     ////////// private ////////////////////////////////////////////////////////
@@ -305,22 +295,22 @@ public final class DateMetaValue extends ImageMetaValue {
      * Parse a date from a {@link String}.
      *
      * @param value The {@link String} to parse.
-     * @return Returns a {link Date}.
+     * @return Returns a {link ZonedDateTime}.
      * @throws IllegalArgumentException if the {@link String} does not contain
      * a parsable date.
      */
-    private static Date parseValue( String value ) {
+    private static @NotNull ZonedDateTime parseValue(String value) {
         //
         // Try parsing the value using all the expected date formats until one
         // parses successfully.
         //
-        for ( SimpleDateFormat format : m_dateFormats )
+        for (final var formatter : m_dateFormatters) {
             try {
-                return format.parse( value );
-            }
-            catch ( ParseException e ) {
+                return ZonedDateTime.parse(value, formatter);
+            } catch (DateTimeParseException e) {
                 // ignore
             }
+        }
         throw new IllegalArgumentException();
     }
 
@@ -328,25 +318,29 @@ public final class DateMetaValue extends ImageMetaValue {
      * The date format to use by default because this is apparently the
      * format that cameras use for their date metadata.
      */
-    private static final SimpleDateFormat m_canonicalDateFormat =
-        new SimpleDateFormat( "yyyy:MM:dd HH:mm:ss" );
+    private static final DateTimeFormatter m_canonicalDateFormatter =
+            DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss");
+
+    private static @NotNull ZonedDateTime zonedDateTimeFromEpochMillis(long epochMillis) {
+        final var instant = Instant.ofEpochMilli(epochMillis);
+        return ZonedDateTime.ofInstant(instant, ZoneId.systemDefault());
+    }
 
     /**
      * Date formats to be able to parse.
      */
-    private static final SimpleDateFormat[] m_dateFormats = {
-        ISO_8601_DATE_FORMAT,
-        m_canonicalDateFormat,
-        new SimpleDateFormat( "EEE MMM dd HH:mm:ss zzz yyyy" ),
-        new SimpleDateFormat( "yyyyMMdd" ), // IPTC date format
-        new SimpleDateFormat( "yyyy-MM-dd" ),
-        new SimpleDateFormat( "yyyy/MM/dd" ),
-        new SimpleDateFormat( "dd-MMM-yyyy" ),
-        new SimpleDateFormat( "dd/MMM/yyyy" ),
-        new SimpleDateFormat( "MMM dd, yyyy" )
+    private static final List<DateTimeFormatter> m_dateFormatters = Arrays.asList(
+            DateTimeFormatter.ISO_LOCAL_DATE_TIME,
+            m_canonicalDateFormatter,
+            DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy"),
+            DateTimeFormatter.BASIC_ISO_DATE, // IPTC date format
+            DateTimeFormatter.ISO_LOCAL_DATE,
+            DateTimeFormatter.ofPattern("yyyy/MM/dd"),
+            DateTimeFormatter.ofPattern("dd-MMM-yyyy"),
+            DateTimeFormatter.ofPattern("dd/MMM/yyyy"),
+            DateTimeFormatter.ofPattern("MMM dd, yyyy")
+    );
 
-    };
-
-    private Date[] m_value;
+    private ZonedDateTime[] m_value;
 }
 /* vim:set et sw=4 ts=4: */

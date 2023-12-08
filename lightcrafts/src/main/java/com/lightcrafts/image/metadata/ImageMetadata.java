@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2023-     Masahiro Kitagawa */
 
 package com.lightcrafts.image.metadata;
 
@@ -12,10 +13,12 @@ import com.lightcrafts.image.types.TIFFImageType;
 import com.lightcrafts.utils.LightCraftsException;
 import com.lightcrafts.utils.Version;
 import com.lightcrafts.utils.xml.XMLUtil;
+import org.jetbrains.annotations.Nullable;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.io.*;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 import static com.lightcrafts.image.metadata.CoreTags.*;
@@ -255,11 +258,11 @@ public class ImageMetadata implements
     /**
      * {@inheritDoc}
      */
-    public Date getCaptureDateTime() {
+    public ZonedDateTime getCaptureDateTime() {
         final Collection<ImageMetadataDirectory> dirs =
             findProvidersOf( CaptureDateTimeProvider.class );
         for ( ImageMetadataDirectory dir : dirs ) {
-            final Date date =
+            final var date =
                 ((CaptureDateTimeProvider)dir).getCaptureDateTime();
             if ( date != null )
                 return date;
@@ -314,6 +317,7 @@ public class ImageMetadata implements
      * @return Returns the {@link ImageMetadataDirectory} for the given
      * {@link Class} if found; <code>null</code> otherwise.
      */
+    @Nullable
     public ImageMetadataDirectory getDirectoryFor(
         Class<? extends ImageMetadataDirectory> dirClass )
     {
@@ -331,6 +335,7 @@ public class ImageMetadata implements
      * @return Returns the {@link ImageMetadataDirectory} for the given
      * {@link Class} if found or created; <code>null</code> otherwise.
      */
+    @Nullable
     public ImageMetadataDirectory getDirectoryFor(
         Class<? extends ImageMetadataDirectory> dirClass, boolean create )
     {
@@ -364,10 +369,11 @@ public class ImageMetadata implements
     /**
      * {@inheritDoc}
      */
-    public Date getFileDateTime() {
-        final CoreDirectory dir =
-            (CoreDirectory)getDirectoryFor( CoreDirectory.class );
-        return dir != null ? dir.getFileDateTime() : null;
+    @Override
+    public ZonedDateTime getFileDateTime() {
+        final var dir = getDirectoryFor(CoreDirectory.class);
+        return dir instanceof CoreDirectory ?
+                ((CoreDirectory) dir).getFileDateTime() : null;
     }
 
     /**

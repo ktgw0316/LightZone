@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 
 import static com.lightcrafts.image.metadata.makernotes.PentaxTags.PENTAX_DATE;
 import static com.lightcrafts.image.metadata.makernotes.PentaxTags.PENTAX_TIME;
@@ -37,7 +37,7 @@ class PentaxDirectoryTest {
     void putValue() {
         // Given
         final var pattern = "yyyy-MM-dd HH:mm:ss";
-        final var formatter = new SimpleDateFormat(pattern);
+        final var formatter = DateTimeFormatter.ofPattern(pattern);
 
         // When put a PENTAX_DATE value
         final byte[] yymd = { 0x07, (byte) 0xE5, 9, 21 };
@@ -47,7 +47,7 @@ class PentaxDirectoryTest {
         // Then captureDateTime should be set
         final var dateTime = dir.getCaptureDateTime();
         final var dateStr = "2021-09-21 00:00:00";
-        assertThat(formatter.format(dateTime))
+        assertThat(dateTime.format(formatter))
                 .isEqualTo(dateStr);
 
         // When put PENTAX_TIME
@@ -58,7 +58,7 @@ class PentaxDirectoryTest {
         // Then captureDateTime should increase
         final var modifiedDateTime = dir.getCaptureDateTime();
         final var modifiedDateStr = "2021-09-21 06:12:34";
-        assertThat(formatter.format(modifiedDateTime))
+        assertThat(modifiedDateTime.format(formatter))
                 .isEqualTo(modifiedDateStr);
 
         // TODO: Add tests for other tags

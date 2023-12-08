@@ -1,13 +1,15 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2023-     Masahiro Kitagawa */
 
 package com.lightcrafts.utils;
 
-import java.text.MessageFormat;
-import java.util.Date;
+import java.io.OutputStream;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 import java.util.logging.StreamHandler;
-import java.io.OutputStream;
 
 public class TerseLoggingHandler extends StreamHandler {
 
@@ -27,47 +29,40 @@ public class TerseLoggingHandler extends StreamHandler {
 
 class TerseLoggingFormatter extends Formatter {
 
-    private Date date = new Date();
     private final static String format = "{0,date} {0,time}";
-    private MessageFormat formatter;
+    private final static String format = "yyyy:MM:dd HH:mm:ss";
+    private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
 
-    private Object[] args = new Object[1];
+    private static final String LineSeparator = System.getProperty("line.separator");
 
-    private static String LineSeparator = System.getProperty("line.separator");
-
+    @Override
     public synchronized String format(LogRecord record) {
-        StringBuffer sb = new StringBuffer();
-        // Minimize memory allocations here.
-        date.setTime(record.getMillis());
-        args[0] = date;
-        StringBuffer text = new StringBuffer();
-        if (formatter == null) {
-            formatter = new MessageFormat(format);
-        }
-        formatter.format(args, text, null);
-        sb.append(text);
+        final StringBuilder sb = new StringBuilder();
+        final var dateTime = ZonedDateTime.ofInstant(record.getInstant(), ZoneId.systemDefault());
+        sb.append(dateTime.format(formatter));
         sb.append(" ");
-        if (record.getSourceClassName() != null) {
-            sb.append(record.getSourceClassName());
+        String name = record.getSourceClassName();
+        if (name == null) {
+            name = record.getLoggerName();
         }
-        else {
-            sb.append(record.getLoggerName());
-        }
-        if (record.getSourceMethodName() != null) {
+        sb.append(name);
+        final String method = record.getSourceMethodName();
+        if (method != null) {
             sb.append(" ");
-            sb.append(record.getSourceMethodName());
+            sb.append(method);
         }
         sb.append(LineSeparator);
-        String message = formatMessage(record);
+        final String message = formatMessage(record);
         sb.append(record.getLevel().getLocalizedName());
         sb.append(": ");
         sb.append(message);
-        Throwable thrown = record.getThrown();
+        final Throwable thrown = record.getThrown();
         if (thrown != null) {
             sb.append(thrown.getClass().getName());
-            if (thrown.getMessage() != null) {
+            final String thrownMessage = thrown.getMessage();
+            if (thrownMessage != null) {
                 sb.append(": ");
-                sb.append(thrown.getMessage());
+                sb.append(thrownMessage);
             }
         }
         sb.append(LineSeparator);

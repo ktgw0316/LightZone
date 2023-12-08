@@ -13,6 +13,9 @@ import com.lightcrafts.utils.ForkDaemon;
 import com.lightcrafts.utils.LRUHashMap;
 import com.lightcrafts.utils.UserCanceledException;
 import com.lightcrafts.utils.bytebuffer.ByteBufferUtil;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.experimental.Accessors;
 
 import java.awt.*;
 import java.awt.color.ColorSpace;
@@ -21,13 +24,13 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.experimental.Accessors;
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
 /**
  * Get raw image data by inrerfacing with dcraw as a coprocess.
@@ -112,9 +115,11 @@ public final class DCRaw extends RawDecoder {
      * {@inheritDoc}
      */
     @Override
-    public Date getCaptureDateTime() {
-        return  m_captureDateTime > 0 ?
-                new Date( m_captureDateTime * 1000 ) : null;
+    public ZonedDateTime getCaptureDateTime() {
+        if (m_captureDateTime <= 0)
+            return null;
+        final var instant = Instant.ofEpochMilli(m_captureDateTime);
+        return ZonedDateTime.ofInstant(instant, ZoneId.systemDefault());
     }
 
     public float[] getDaylightMultipliers() {
@@ -245,8 +250,10 @@ public final class DCRaw extends RawDecoder {
         if (line.startsWith(search = TIMESTAMP)) {
             final var timestamp = line.substring(search.length());
             try {
-                m_captureDateTime = new SimpleDateFormat().parse(timestamp).getTime();
-            } catch (ParseException e) {
+                m_captureDateTime = ZonedDateTime.parse(timestamp, ISO_LOCAL_DATE_TIME)
+                        .toInstant()
+                        .toEpochMilli();
+            } catch (DateTimeParseException e) {
                 m_captureDateTime = 0;
             }
         } else if (line.startsWith(search = CAMERA)) {
