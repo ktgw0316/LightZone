@@ -9,9 +9,9 @@ import com.lightcrafts.image.ImageInfo;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import com.lightcrafts.mediax.jai.RasterFactory;
-import com.lightcrafts.mediax.jai.PlanarImage;
-import com.lightcrafts.mediax.jai.RenderedOp;
+import javax.media.jai.RasterFactory;
+import javax.media.jai.PlanarImage;
+import javax.media.jai.RenderedOp;
 import java.awt.event.WindowAdapter;
 import java.awt.*;
 import java.awt.image.*;
