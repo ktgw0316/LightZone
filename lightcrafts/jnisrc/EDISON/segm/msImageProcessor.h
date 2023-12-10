@@ -23,7 +23,7 @@
 The theory is described in the papers:
 
   D. Comaniciu, P. Meer: Mean Shift: A robust approach toward feature
-									 space analysis.
+                                     space analysis.
 
   C. Christoudias, B. Georgescu, P. Meer: Synergism in low level vision.
 
@@ -102,14 +102,14 @@ public:
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:								               |//
-  //|   ============								               |//
-  //|				  * Define Image *                        |//
+  //| Method Name:                                       |//
+  //| ============                                       |//
+  //|            * Define Image *                        |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:                                       |//
-  //|	============                                       |//
+  //| Description:                                       |//
+  //| ============                                       |//
   //|                                                    |//
   //|   Uploads an image to be segmented by the image    |//
   //|   segmenter class.                                 |//
@@ -136,9 +136,9 @@ public:
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Usage:                                             |//
+  //| Usage:                                             |//
   //| ======                                             |//
-  //|		DefineImage(data, type, height, width)          |//
+  //|    DefineImage(data, type, height, width)          |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
@@ -154,14 +154,14 @@ public:
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:                                       |//
+  //| Method Name:                                       |//
   //| ============                                       |//
-  //|			     * Set Weight Map *                      |//
+  //|            * Set Weight Map *                      |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:                                       |//
-  //|	============                                       |//
+  //| Description:                                       |//
+  //| ============                                       |//
   //|                                                    |//
   //|   Uploads weight map specifying for each pixel     |//
   //|   in the image a value between 0 and 1 - 1 indica- |//
@@ -186,9 +186,9 @@ public:
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Usage:                                             |//
-  //|   ======                                           |//
-  //|		SetWeightMap(weightMap, epsilon)                |//
+  //| Usage:                                             |//
+  //| ======                                             |//
+  //|    SetWeightMap(weightMap, epsilon)                |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
@@ -198,14 +198,14 @@ public:
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:								     |//
-  //|   ============								     |//
-  //|			   * Remove Weight Map *                 |//
+  //| Method Name:                                       |//
+  //| ============                                       |//
+  //|          * Remove Weight Map *                     |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:								     |//
-  //|	============								     |//
+  //| Description:                                       |//
+  //| ============                                       |//
   //|                                                    |//
   //|   Removes weight map. An error is NOT flagged      |//
   //|   if a weight map was not defined prior to calling |//
@@ -213,9 +213,9 @@ public:
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Usage:      								     |//
-  //|   ======      								     |//
-  //|		RemoveWeightMap(void)                        |//
+  //| Usage:                                             |//
+  //| ======                                             |//
+  //|    RemoveWeightMap(void)                           |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
@@ -229,14 +229,14 @@ public:
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:								     |//
-  //|   ============								     |//
+  //| Method Name:                                       |//
+  //| ============                                       |//
   //|                   *  Filter  *                     |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:								     |//
-  //|	============								     |//
+  //| Description:                                       |//
+  //| ============                                       |//
   //|                                                    |//
   //|   Apply mean shift filter to the defined image,    |//
   //|   defined either via MeanShift::DefineLInput or    |//
@@ -262,9 +262,9 @@ public:
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Usage:      								     |//
-  //|   ======      								     |//
-  //|		Filter(sigmaS, sigmaR, speedUpLevel)         |//
+  //| Usage:                                             |//
+  //| ======                                             |//
+  //|    Filter(sigmaS, sigmaR, speedUpLevel)            |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
@@ -278,14 +278,14 @@ public:
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:								     |//
-  //|   ============								     |//
-  //|				  *  Fuse Regions  *                 |//
+  //| Method Name:                                       |//
+  //| ============                                       |//
+  //|            *  Fuse Regions  *                      |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:								     |//
-  //|	============								     |//
+  //| Description:                                       |//
+  //| ============                                       |//
   //|                                                    |//
   //|   Fuses the regions of a filtered image,           |//
   //|   defined either via MeanShift::DefineLInput or    |//
@@ -309,9 +309,9 @@ public:
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Usage:      								     |//
-  //|   ======      								     |//
-  //|		FuseRegions(sigmaR, minRegion)               |//
+  //| Usage:                                             |//
+  //| ======                                             |//
+  //|    FuseRegions(sigmaR, minRegion)                  |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
@@ -325,14 +325,14 @@ public:
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:								     |//
-  //|   ============								     |//
-  //|				     *  Segment  *                   |//
+  //| Method Name:                                       |//
+  //| ============                                       |//
+  //|               *  Segment  *                        |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:								     |//
-  //|	============								     |//
+  //| Description:                                       |//
+  //| ============                                       |//
   //|                                                    |//
   //|   Segments the defined image, defined either via   |//
   //|   MeanShift::DefineLInput or msImageProcessor::De- |//
@@ -363,9 +363,9 @@ public:
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Usage:      								     |//
-  //|   ======      								     |//
-  //|		Segment(sigmaS, sigmaR, minRegion,           |//
+  //|	Usage:                                             |//
+  //| ======                                             |//
+  //|		Segment(sigmaS, sigmaR, minRegion,              |//
   //|                       speedUpLevel)                |//
   //|                                                    |//
   //<--------------------------------------------------->|//
@@ -380,14 +380,14 @@ public:
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:								     |//
-  //|   ============								     |//
-  //|				 *  RGB To LUV  *                    |//
+  //| Method Name:                                       |//
+  //| ============                                       |//
+  //|           *  RGB To LUV  *                         |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:								     |//
-  //|	============								     |//
+  //| Description:                                       |//
+  //| ============                                       |//
   //|                                                    |//
   //|   Converts an RGB vector to LUV.                   |//
   //|                                                    |//
@@ -403,9 +403,9 @@ public:
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Usage:      								     |//
-  //|   ======      								     |//
-  //|		RGBtoLUV(rgbVal, luvVal)                     |//
+  //| Usage:                                             |//
+  //| ======                                             |//
+  //|    RGBtoLUV(rgbVal, luvVal)                        |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
@@ -415,14 +415,14 @@ public:
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:								     |//
-  //|   ============								     |//
-  //|				 *  LUV To RGB  *                    |//
+  //| Method Name:                                       |//
+  //| ============                                       |//
+  //|           *  LUV To RGB  *                         |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:								     |//
-  //|	============								     |//
+  //| Description:                                       |//
+  //| ============                                       |//
   //|                                                    |//
   //|   Converts an LUV vector to RGB.                   |//
   //|                                                    |//
@@ -438,9 +438,9 @@ public:
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Usage:      								     |//
-  //|   ======      								     |//
-  //|		LUVtoRGB(luvVal, rgbVal)                     |//
+  //|	Usage:                                             |//
+  //| ======                                             |//
+  //|		LUVtoRGB(luvVal, rgbVal)                        |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
@@ -454,14 +454,14 @@ public:
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:								     |//
-  //|   ============								     |//
-  //|			      *  Get Raw Data  *                 |//
+  //| Method Name:                                       |//
+  //| ============                                       |//
+  //|			      *  Get Raw Data  *                     |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:								     |//
-  //|	============								     |//
+  //| Description:                                       |//
+  //| ============                                       |//
   //|                                                    |//
   //|   Returns the resulting filtered or segmented im-  |//
   //|   age data after calling Filter() or Segment().    |//
@@ -478,9 +478,9 @@ public:
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Usage:      								     |//
-  //|   ======      								     |//
-  //|		GetResults(outputImageData)                  |//
+  //| Usage:                                             |//
+  //| ======                                             |//
+  //|    GetResults(outputImageData)                     |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
@@ -490,14 +490,14 @@ public:
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:								     |//
-  //|   ============								     |//
-  //|				 *  Get Results  *                   |//
+  //| Method Name:                                       |//
+  //| ============                                       |//
+  //|           *  Get Results  *                        |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:								     |//
-  //|	============								     |//
+  //|	Description:                                       |//
+  //|	============                                       |//
   //|                                                    |//
   //|   Returns the resulting filtered or segmented im-  |//
   //|   age after calling Filter() or Segment().         |//
@@ -513,9 +513,9 @@ public:
   //|   msImageProcessor::GetRawData().                  |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Usage:      								     |//
-  //|   ======      								     |//
-  //|		GetResults(outputImage)                      |//
+  //| Usage:                                             |//
+  //| ======                                             |//
+  //|    GetResults(outputImage)                         |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
@@ -525,14 +525,14 @@ public:
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:								     |//
-  //|   ============								     |//
-  //|				 *  Get Boundaries  *                |//
+  //| Method Name:                                       |//
+  //| ============                                       |//
+  //|           *  Get Boundaries  *                     |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:								     |//
-  //|	============								     |//
+  //| Description:                                       |//
+  //| ============                                       |//
   //|                                                    |//
   //|   Returns the boundaries of each region of the     |//
   //|   segmented image using a region list object,      |//
@@ -541,9 +541,9 @@ public:
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Usage:      								     |//
-  //|   ======      								     |//
-  //|		regionList = GetBoundaries()                 |//
+  //| Usage:                                             |//
+  //| ======                                             |//
+  //|    regionList = GetBoundaries()                    |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
@@ -553,14 +553,14 @@ public:
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:								     |//
-  //|   ============								     |//
-  //|			        * Get Regions *                  |//
+  //| Method Name:                                       |//
+  //| ============                                       |//
+  //|               * Get Regions *                      |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:								     |//
-  //|	============								     |//
+  //| Description:                                       |//
+  //| ============                                       |//
   //|                                                    |//
   //|   Returns the regions of the processed image.      |//
   //|   Each region in the image is uniquely character-  |//
@@ -607,9 +607,9 @@ public:
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Usage:      								     |//
-  //|   ======      								     |//
-  //|		regionCount = GetRegions(labels, modes       |//
+  //| Usage:                                             |//
+  //| ======                                             |//
+  //|    regionCount = GetRegions(labels, modes          |//
   //|                                modePointCounts)    |//
   //|                                                    |//
   //<--------------------------------------------------->|//
@@ -630,26 +630,26 @@ private:
 	/*\/\/\/\/\/\/\/\/\/*/
 
 	void NonOptimizedFilter(float, float);	// filters the image applying mean shift to each point
-											// Advantage	: most accurate
-											// Disadvantage	: time expensive
+                                          // Advantage: most accurate
+                                          // Disadvantage: time expensive
    void NewNonOptimizedFilter(float, float);
 
 	void OptimizedFilter1(float, float);	// filters the image using previous mode information
-											// to avoid re-applying mean shift to some data points
-											// Advantage	: maintains high level of accuracy,
-											//				  large speed up compared to non-optimized
-											//				  version
-											// Disadvantage	: POSSIBLY not as accurate as non-optimized
-											//				  version
+                                          // to avoid re-applying mean shift to some data points
+                                          // Advantage: maintains high level of accuracy,
+                                          //            large speed up compared to non-optimized
+                                          //            version
+                                          // Disadvantage: POSSIBLY not as accurate as non-optimized
+                                          //            version
    void NewOptimizedFilter1(float, float);
 
 
-	void OptimizedFilter2(float, float);	//filter the image using previous mode information
-											//and window traversals to avoid re-applying mean shift to
-											//some data points
-											// Advantage	: huge speed up - maintains accuracy good enough
-											//				  for segmentation
-											// Disadvantage	: not as accurate as previous filters
+	void OptimizedFilter2(float, float);	// filter the image using previous mode information
+                                          // and window traversals to avoid re-applying mean shift to
+                                          // some data points
+                                          // Advantage: huge speed up - maintains accuracy good
+                                          //            enough for segmentation
+                                          // Disadvantage: not as accurate as previous filters
    void NewOptimizedFilter2(float, float);
 
 	
@@ -657,61 +657,61 @@ private:
 	/* Image Classification */
 	/*\/\/\/\/\/\/\/\/\/\/\/*/
 
-	void Connect( void );					// classifies mean shift filtered image regions using
-											// private classification structure of this class
+	void Connect( void );               // classifies mean shift filtered image regions using
+                                       // private classification structure of this class
 
-	void Fill(int, int);					// used by Connect to perform label each region in the
-											// mean shift filtered image using an eight-connected
-											// fill
+	void Fill(int, int);	               // used by Connect to perform label each region in the
+                                       // mean shift filtered image using an eight-connected
+                                       // fill
 
 	/*/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\*/
 	/* Transitive Closure and Image Pruning */
 	/*\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/*/
 
-	void BuildRAM( void );					// build a region adjacency matrix using the region list
-											// object
+	void BuildRAM( void );              // build a region adjacency matrix using the region list
+                                       // object
 
-	void DestroyRAM( void );				// destroy the region adjacency matrix: de-allocate its memory
-											// initialize it for re-use
+	void DestroyRAM( void );            // destroy the region adjacency matrix: de-allocate its memory
+                                       // initialize it for re-use
 
-	void TransitiveClosure( void );			// use the RAM to apply transitive closure to the image modes
+	void TransitiveClosure( void );     // use the RAM to apply transitive closure to the image modes
 
-	void ComputeEdgeStrengths( void );		// computes the weights of the weighted graph using the weight
-											// map
+	void ComputeEdgeStrengths( void );  // computes the weights of the weighted graph using the weight
+                                       // map
 
 	//Usage: Prune(minRegion)
-	void Prune(int);						// use the RAM to prune the image of spurious regions (regions
-											// whose area is less than minRegion pixels, where minRegion is
-											// an argument of this method)
+	void Prune(int);                    // use the RAM to prune the image of spurious regions (regions
+                                       // whose area is less than minRegion pixels, where minRegion
+                                       // is an argument of this method)
 
 	/*/\/\/\/\/\/\/\/\/\/\/\/\/\/\*/
 	/*  Region Boundary Detection */
 	/*\/\/\/\/\/\/\/\/\/\/\/\/\/\/*/
 
-	void DefineBoundaries( void );			// defines the boundaries of each region using the classified segmented
-											// image storing the resulting boundary locations for each region using
-											// a region list object
+	void DefineBoundaries( void );      // defines the boundaries of each region using the classified
+                                       // segmented image storing the resulting boundary locations
+                                       // for each region using a region list object
 
 	/*/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\*/
 	/*  Image Data Searching/Distance Calculation */
 	/*\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/*/
 
 	//Usage: InWindow(modeIndex1, modeIndex2)
-	bool InWindow(int, int);				//returns true if the range data of the specified data points
-											//are within the defined search window (defined by kernel
-											//bandwidth h[1])
+	bool InWindow(int, int);            //returns true if the range data of the specified data points
+                                       //are within the defined search window (defined by kernel
+                                       //bandwidth h[1])
 
-	float SqDistance(int, int);				// computes the normalized square distance between two modes 
+	float SqDistance(int, int);         // computes the normalized square distance between two modes 
 
 	/*/\/\/\/\/\/\/\/\/\/\*/
 	/* Memory Management  */
 	/*\/\/\/\/\/\/\/\/\/\/*/
 
-	void InitializeOutput( void );			//Allocates memory needed by this class to perform image
-											//filtering and segmentation
+	void InitializeOutput( void );      //Allocates memory needed by this class to perform image
+                                       //filtering and segmentation
 
-	void DestroyOutput( void );				//De-allocates memory needed by this class to perform image
-											//filtering and segmentation
+	void DestroyOutput( void );         //De-allocates memory needed by this class to perform image
+                                       //filtering and segmentation
 
   //=============================
   // *** Private Data Members ***
@@ -722,21 +722,21 @@ private:
    //##########################################
 
 	/////////Image Boundaries/////////
-	RegionList		*regionList;			// stores the boundary locations for each region
+	RegionList		*regionList;         // stores the boundary locations for each region
 
 	/////////Image Regions////////
-	int				regionCount;			// stores the number of connected regions contained by the
-											// image
+	int				regionCount;         // stores the number of connected regions contained by the
+                                       // image
 
 	/////////8 Connected Neighbors/////////
 	int				neigh[8];
 
 	/////////Index Table/////////////////
-	int				*indexTable;			//used during fill algorithm
+	int				*indexTable;         //used during fill algorithm
 
 	/////////LUV_data/////////////////
    //int            *LUV_data;           //stores modes in integer format on lattice
-	float				*LUV_data;				//stores modes in float format on lattice
+	float				*LUV_data;           //stores modes in float format on lattice
    float          LUV_treshold;        //in float mode this determines what "close" means between modes
 
 

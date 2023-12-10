@@ -32,7 +32,7 @@
 The theory is described in the papers:
 
   D. Comaniciu, P. Meer: Mean Shift: A robust approach toward feature
-									 space analysis.
+                                     space analysis.
 
   C. Christoudias, B. Georgescu, P. Meer: Synergism in low level vision.
 
@@ -936,7 +936,7 @@ void MeanShift::MSVector(double *Mh_ptr, double *yk_ptr)
 /*******************************************************/
 /*Lattice Mean Shift Vector                            */
 /*******************************************************/
-/*Computes the mean shift vector at a specified window  */
+/*Computes the mean shift vector at a specified window */
 /*yk using the lattice data structure.                 */
 /*******************************************************/
 /*Pre:                                                 */
@@ -994,7 +994,7 @@ void MeanShift::LatticeMSVector(double *Mh_ptr, double *yk_ptr)
 /*******************************************************/
 /*Optimized Lattice Mean Shift Vector                  */
 /*******************************************************/
-/*Computes the mean shift vector at a specified window  */
+/*Computes the mean shift vector at a specified window */
 /*yk using the lattice data structure. Also the points */
 /*that lie within the window are stored into the basin */
 /*of attraction structure used by the optimized mean   */
@@ -1432,8 +1432,8 @@ void MeanShift::InitializeInput(float *x)
 /*******************************************************/
 /*Reset Input                                          */
 /*******************************************************/
-/*De-allocates memory for and re-initializes input data */
-/*structure.                                           */
+/*De-allocates memory for and re-initializes input     */
+/*data structure.                                      */
 /*******************************************************/
 /*Post:                                                */
 /*      - the memory of the input data structure has   */
