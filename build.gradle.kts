@@ -37,8 +37,10 @@ subprojects {
         "implementation"("com.github.jiconfont:jiconfont-google_material_design_icons:2.2.0.2")
         "implementation"("org.ejml:ejml-simple:0.40")
 //        "implementation"(kotlin("stdlib-jdk8", "1.3.70"))
-        "testImplementation"("org.junit.jupiter:junit-api:5.9.3")
-        "testImplementation"("org.junit.jupiter:junit-params:5.9.3")
+        "testImplementation"("org.assertj:assertj-core:3.11.1")
+        "testImplementation"(platform("org.junit:junit-bom:5.10.1"))
+        "testImplementation"("org.junit.jupiter:junit-jupiter-api")
+        "testImplementation"("org.junit.jupiter:junit-jupiter-params")
     }
     configure<JavaPluginExtension> {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -47,6 +49,12 @@ subprojects {
         options.encoding = "UTF-8"
         options.compilerArgs = listOf("-h", file("javah").absolutePath)
     }
+//    tasks.test {
+//        useJUnitPlatform()
+//        testLogging {
+//            events("passed", "skipped", "failed")
+//        }
+//    }
     // val os = NativePlatform.getOperatingSystem
     // val MAKE = when(os) {
     //     isFreeBSD, isSolaris -> "gmake"
