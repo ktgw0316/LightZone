@@ -32,7 +32,7 @@
 The theory is described in the papers:
 
   D. Comaniciu, P. Meer: Mean Shift: A robust approach toward feature
-									 space analysis.
+                                     space analysis.
 
   C. Christoudias, B. Georgescu, P. Meer: Synergism in low level vision.
 
@@ -257,14 +257,14 @@ class MeanShift {
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:								     |//
-  //|   ============								     |//
+  //|	Method Name:                                       |//
+  //| ============                                       |//
   //|           *  Clear Weight Functions  *             |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:								     |//
-  //|	============								     |//
+  //|	Description:                                       |//
+  //|	============                                       |//
   //|                                                    |//
   //|   Removes all user defined weight functions added  |//
   //|   using method AddWeightFunction() from the        |//
@@ -282,14 +282,14 @@ class MeanShift {
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:								     |//
-  //|   ============								     |//
+  //|	Method Name:                                       |//
+  //| ============                                       |//
   //|               * Define Input *                     |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:								     |//
-  //|	============								     |//
+  //|	Description:                                       |//
+  //|	============                                       |//
   //|                                                    |//
   //|   Uploads a one dimensional array containing L     |//
   //|   N-dimensional data points into the mean shift    |//
@@ -312,8 +312,8 @@ class MeanShift {
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Usage:      								     |//
-  //|   ======      								     |//
+  //|	Usage:                                             |//
+  //| ======                                             |//
   //|       DefineInput(x, L, N)                         |//
   //|                                                    |//
   //<--------------------------------------------------->|//
@@ -324,14 +324,14 @@ class MeanShift {
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:								     |//
-  //|   ============								     |//
+  //|	Method Name:                                       |//
+  //| ============                                       |//
   //|            * Define Lattice Input *                |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:								     |//
-  //|	============								     |//
+  //|	Description:                                       |//
+  //|	============                                       |//
   //|                                                    |//
   //|   Use this method to specify define an input data  |//
   //|   set defined on a lattice.                        |//
@@ -353,8 +353,8 @@ class MeanShift {
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Usage:      								     |//
-  //|   ======      								     |//
+  //|	Usage:                                             |//
+  //| ======                                             |//
   //|       DefineLInput(x, height, width, N)            |//
   //|                                                    |//
   //<--------------------------------------------------->|//
@@ -369,14 +369,14 @@ class MeanShift {
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:								     |//
-  //|   ============								     |//
-  //|			  * Set Lattice Weight Map *             |//
+  //|	Method Name:                                       |//
+  //| ============                                       |//
+  //|			  * Set Lattice Weight Map *                 |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:								     |//
-  //|	============								     |//
+  //|	Description:                                       |//
+  //|	============                                       |//
   //|                                                    |//
   //|   Uploads weight map specifying for each data      |//
   //|   point a value used to weight the uniform kernel  |//
@@ -404,9 +404,9 @@ class MeanShift {
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Usage:      								     |//
-  //|   ======      								     |//
-  //|		SetLatticeWeightMap(weightMap)               |//
+  //|	Usage:                                             |//
+  //| ======                                             |//
+  //|		SetLatticeWeightMap(weightMap)                  |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
@@ -416,14 +416,14 @@ class MeanShift {
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:								     |//
-  //|   ============								     |//
-  //|			* Remove Lattice Weight Map *            |//
+  //|	Method Name:                                       |//
+  //| ============                                       |//
+  //|			* Remove Lattice Weight Map *                |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:								     |//
-  //|	============								     |//
+  //|	Description:                                       |//
+  //|	============                                       |//
   //|                                                    |//
   //|   Removes lattice weight map. An error is NOT      |//
   //|   flagged if a weight map was not defined prior    |//
@@ -431,9 +431,9 @@ class MeanShift {
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Usage:      								     |//
-  //|   ======      								     |//
-  //|		RemoveLatticeWeightMap(weightMap)            |//
+  //|	Usage:                                             |//
+  //| ======                                             |//
+  //|		RemoveLatticeWeightMap(weightMap)               |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
@@ -447,14 +447,14 @@ class MeanShift {
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:								     |//
-  //|   ============								     |//
+  //|	Method Name:                                       |//
+  //| ============                                       |//
   //|               *  Mean Shift Vector  *              |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:								     |//
-  //|	============								     |//
+  //|	Description:                                       |//
+  //|	============                                       |//
   //|                                                    |//
   //|   If a kernel is created and input is uploaded,    |//
   //|   this method calculates the mean shift vector,    |//
@@ -473,8 +473,8 @@ class MeanShift {
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Usage:      								     |//
-  //|   ======      								     |//
+  //|	Usage:                                             |//
+  //| ======                                             |//
   //|       msVector(Mh, yk)                             |//
   //|                                                    |//
   //<--------------------------------------------------->|//
@@ -530,14 +530,14 @@ class MeanShift {
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:								     |//
-  //|   ============								     |//
+  //|	Method Name:                                       |//
+  //| ============                                       |//
   //|                 *  Find Mode  *                    |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:								     |//
-  //|	============								     |//
+  //|	Description:                                       |//
+  //|	============                                       |//
   //|                                                    |//
   //|   If a kernel is created and input is uploaded,    |//
   //|   this method calculates the mode of a specified   |//
@@ -556,8 +556,8 @@ class MeanShift {
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Usage:      								     |//
-  //|   ======      								     |//
+  //|	Usage:                                             |//
+  //| ======                                             |//
   //|       FindMode(mode, yk)                           |//
   //|                                                    |//
   //<--------------------------------------------------->|//
@@ -568,19 +568,19 @@ class MeanShift {
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:								     |//
-  //|   ============								     |//
+  //|	Method Name:                                       |//
+  //| ============                                       |//
   //|              *  Find Lattice Mode  *               |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:								     |//
-  //|	============								     |//
+  //|	Description:                                       |//
+  //|	============                                       |//
   //|                                                    |//
   //|   If a kernel is created and input is uploaded,    |//
   //|   this method calculates the mode of a specified   |//
   //|   data point yk, assuming that the data set        |//
-  //|   exists on a height x width two dimensional      |//
+  //|   exists on a height x width two dimensional       |//
   //|   lattice.                                         |//
   //|                                                    |//
   //|   The arguments of this method are:                |//
@@ -601,8 +601,8 @@ class MeanShift {
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Usage:      								     |//
-  //|   ======      								     |//
+  //|	Usage:                                             |//
+  //| ======                                             |//
   //|       FindLMode(mode, yk)                          |//
   //|                                                    |//
   //<--------------------------------------------------->|//
@@ -617,8 +617,8 @@ class MeanShift {
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:								     |//
-  //|	============								     |//
+  //|	Description:                                       |//
+  //|	============                                       |//
   //|                                                    |//
   //|   ErrorMessage is an error message that is set by  |//
   //|   a mean shift library class when an error occurs. |//
@@ -631,8 +631,8 @@ class MeanShift {
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:								     |//
-  //|	============								     |//
+  //|	Description:                                       |//
+  //|	============                                       |//
   //|                                                    |//
   //|   ErrorStatus indicates if an error has occurred as |//
   //|   a result of improper use of a mean shift library |//
@@ -702,7 +702,7 @@ class MeanShift {
 
    /////////////////////////////////////////////////////
    // <<*>> Usage: ErrorHandler(                <<*>> //
-   //			className, functName, errMessage)     //      
+   //			className, functName, errMessage)         //      
    /////////////////////////////////////////////////////                           
 
    void ErrorHandler(const char*, const char*, const char*);		// flags an error and halts the system
