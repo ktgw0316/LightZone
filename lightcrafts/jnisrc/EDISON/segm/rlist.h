@@ -129,7 +129,7 @@ public:
   //|                                                    |//
   //|   <* indeces *>                                    |//
   //|   An integer array that specifies the set of ind-  |//
-  //|   eces of the data points that are contianed with- |//
+  //|   eces of the data points that are contained with- |//
   //|   in this region.                                  |//
   //|                                                    |//
   //<--------------------------------------------------->|//

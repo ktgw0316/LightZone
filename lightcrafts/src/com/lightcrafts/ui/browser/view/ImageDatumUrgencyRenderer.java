@@ -39,7 +39,7 @@ public class ImageDatumUrgencyRenderer {
     }
 
     // Get coordinates where the text origin should go.
-    // This is the start of the basline, suitable for g.drawString().
+    // This is the start of the baseline, suitable for g.drawString().
     private static Point2D getTextOrigin(
             Rectangle2D rect, Graphics2D g, String text
     ) {

@@ -4,7 +4,7 @@ package com.lightcrafts.image.export;
 
 /**
  * A <code>ResolutionOption</code> is-an {@link IntegerExportOption} for
- * storing the number of pixels per unit measurment for an image.
+ * storing the number of pixels per unit measurement for an image.
  *
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */

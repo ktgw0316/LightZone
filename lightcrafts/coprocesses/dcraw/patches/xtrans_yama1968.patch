@@ -177,7 +177,7 @@ Index: dcraw/dcraw_lz.c
 +		homo[d][row][col] += (drv[d][row+v][col+h] <= tr);
  	}
  
- /* Average the most homogenous pixels for the final result:	*/
+ /* Average the most homogeneous pixels for the final result:	*/
 @@ -4893,8 +4967,11 @@ void CLASS xtrans_interpolate (int passe
  	for (col = MIN(left,8); col < mcol-8; col++) {
  	  for (d=0; d < ndir; d++)

@@ -183,7 +183,7 @@ public final class LCJPEGWriter {
             if (bands == 4 /* CMYK */) {
                 //
                 // Write a mimicked APPE segment so 3rd-party applications that
-                // read CYMK JPEG images will think the creator is Photoshop
+                // read CMYK JPEG images will think the creator is Photoshop
                 // and thus know to invert the image data.
                 //
                 writeAdobeSegment(ADOBE_CTT_UNKNOWN);

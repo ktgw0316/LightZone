@@ -227,7 +227,7 @@ public class RegionOverlay extends JPanel implements Mode {
     }
 
     /**
-     * This method restores CubicCurves and reforms their assocations with
+     * This method restores CubicCurves and reforms their associations with
      * cookie Objects as identified by their order in the argument.  The
      * cookies must already be restored and added to the overlay before this
      * is called.

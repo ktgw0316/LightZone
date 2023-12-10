@@ -61,7 +61,7 @@ public final class CheckForUpdate {
         }
 
         //
-        // Second, check to see if we previosuly determined that an update was
+        // Second, check to see if we previously determined that an update was
         // available.  If so, we don't need to check again.
         //
         if ( isUpdateAvailable( true ) ) {
@@ -129,7 +129,7 @@ public final class CheckForUpdate {
             return;
 
         //
-        // Second, check to see if we previosuly determined that an update was
+        // Second, check to see if we previously determined that an update was
         // available.  If so, we don't need to check again.
         //
         if ( isUpdateAvailable( false ) )
@@ -138,7 +138,7 @@ public final class CheckForUpdate {
         //
         // Finally, check to see if an update is available.  Since this
         // involves internet access, it could potentially take a while.  Hence,
-        // spawn this part in a seperate thread and return now.
+        // spawn this part in a separate thread and return now.
         //
         new BackgroundCheckThread().start();
     }
@@ -356,7 +356,7 @@ public final class CheckForUpdate {
 
     /**
      * Shows an alert to the user indicating that a new version is available.
-     * This method is used by the synchronous check mechamism.
+     * This method is used by the synchronous check mechanism.
      */
     private static void showDownloadNowOrCancelAlert() {
         final AlertDialog alert = Platform.getPlatform().getAlertDialog();

@@ -153,7 +153,7 @@ public final class UndefinedMetaValue extends ImageMetaValue {
     }
 
     /**
-     * Sets the internal byte array to the bytes of the contatenated strings.
+     * Sets the internal byte array to the bytes of the concatenated strings.
      *
      * @param newValue The array of new values.
      */

@@ -37,7 +37,7 @@ import static com.lightcrafts.ui.region.Locale.LOCALE;
  * also a single "editing" Curve, which is drawn with its control points
  * visible and with an extra layer of edit batching for listeners.
  * <p>
- * Every Curve may have an associated ClonePoint, to accomodate the Curves
+ * Every Curve may have an associated ClonePoint, to accommodate the Curves
  * used by the clone tool.
  * <p>
  * There is also one RegionMode per RegionModel, which determines the policies

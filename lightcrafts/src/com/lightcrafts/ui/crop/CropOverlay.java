@@ -1228,7 +1228,7 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
         return p;
     }
 
-//    // Repaint this overlay when the CropBounds udpates, marking dirty as
+//    // Repaint this overlay when the CropBounds updates, marking dirty as
 //    // little of the component as possible to minimize thrash painting of
 //    // the underlay.
 //    private void repaint(CropBounds oldCrop, CropBounds newCrop) {

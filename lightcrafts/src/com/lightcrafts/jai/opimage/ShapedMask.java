@@ -325,7 +325,7 @@ public class ShapedMask extends PlanarImage {
 
                 Rectangle scaledBounds = transform.createTransformedShape(maskImage.getBounds()).getBounds();
 
-                // Avoid scaling underflows resulting into exeptions
+                // Avoid scaling underflows resulting into exceptions
                 if (scaledBounds.width < 3 || scaledBounds.height < 3)
                     continue;
 

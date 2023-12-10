@@ -64,7 +64,7 @@ Implemented by Chris M. Christoudias, Bogdan Georgescu
 msImageProcessor::msImageProcessor( void )
 {
 
-	//intialize basin of attraction structure
+	//initialize basin of attraction structure
 	//used by the filtering algorithm
 	modeTable			= NULL;
 	pointList			= NULL;
@@ -80,7 +80,7 @@ msImageProcessor::msImageProcessor( void )
 	modePointCounts		= NULL;
 	regionCount			= 0;
 
-	//intialize temporary buffers used for
+	//initialize temporary buffers used for
 	//performing connected components
 	indexTable			= NULL;
 	LUV_data			= NULL;
@@ -90,7 +90,7 @@ msImageProcessor::msImageProcessor( void )
 	freeRAList			= NULL;
 	raPool				= NULL;
 
-	//intialize visit table to having NULL entries
+	//initialize visit table to having NULL entries
 	visitTable			= NULL;
 
 	//initialize epsilon such that transitive closure
@@ -145,7 +145,7 @@ msImageProcessor::~msImageProcessor( void )
 /*      - height_ and width_ define the dimension of   */
 /*        the image                                    */
 /*      - if the image is of type GREYSCALE then       */
-/*        data containes only one number per pixel     */
+/*        data contains only one number per pixel      */
 /*        location, where a pixel location is defined  */
 /*        by the index into the data array             */
 /*Post:                                                */
@@ -163,7 +163,7 @@ void msImageProcessor::DefineImage(byte *data_, imageType type, int height_, int
 	else
 		dim = 1;
 
-	//perfor rgb to luv conversion
+	//perform rgb to luv conversion
 	int		i;
 	float	*luv	= new float [height_*width_*dim];
 	if(dim == 1)
@@ -186,7 +186,7 @@ void msImageProcessor::DefineImage(byte *data_, imageType type, int height_, int
 	//defined by user
 	if(!h)
 	{
-		//define default kernel paramerters...
+		//define default kernel parameters...
 		kernelType	k[2]		= {Uniform, Uniform};
 		int			P[2]		= {2, N};
 		float		tempH[2]	= {1.0 , 1.0};
@@ -238,7 +238,7 @@ void msImageProcessor::DefineBgImage(byte* data_, imageType type, int height_, i
 	//defined by user
 	if(!h)
 	{
-		//define default kernel paramerters...
+		//define default kernel parameters...
 		kernelType	k[2]		= {Uniform, Uniform};
 		int			P[2]		= {2, N};
 		float		tempH[2]	= {1.0 , 1.0};
@@ -844,7 +844,7 @@ void msImageProcessor::Segment(int sigmaS, float sigmaR, int minRegion, SpeedUpL
 void msImageProcessor::RGBtoLUV(byte *rgbVal, float *luvVal)
 {
 
-	//delcare variables
+	//declare variables
 	double	x, y, z, L0, u_prime, v_prime, constant;
 
 	//convert RGB to XYZ...
@@ -999,7 +999,7 @@ void msImageProcessor::GetRawData(float *outputImageData)
 /*The output image is returned.                        */
 /*******************************************************/
 /*Pre:                                                 */
-/*      - outputImage is a pre-allocated unsinged char */
+/*      - outputImage is a pre-allocated unsigned char */
 /*        array used to store the filtered or segment- */
 /*        ed image pixels                              */
 /*Post:                                                */
@@ -1280,7 +1280,7 @@ void msImageProcessor::NonOptimizedFilter(float sigmaS, float sigmaR)
 			for(j = 0; j < lN; j++)
 				mvAbs += Mh[j]*Mh[j];
 
-			// Increment interation count
+			// Increment iteration count
 			iterationCount++;
 			
 		}
@@ -1831,7 +1831,7 @@ void msImageProcessor::OptimizedFilter2(float sigmaS, float sigmaR)
 			for(j = 0; j < lN; j++)
 				mvAbs += Mh[j]*Mh[j];
 
-			// Increment interation count
+			// Increment iteration count
 			iterationCount++;
 			
 		}
@@ -1984,13 +1984,13 @@ void msImageProcessor::Connect( void )
 /*Pre:                                                 */
 /*      - regionLoc is a region seed - a pixel that is */
 /*        identified as being part of the region       */
-/*        labled using the label, label.               */
+/*        labeled using the label, label.              */
 /*Post:                                                */
 /*      - all pixels belonging to the region specified */
 /*        by regionLoc (having the same integer LUV    */
 /*        value specified by LUV_data) are classified  */
 /*        as one region by labeling each pixel in the  */
-/*        image clasification structure using label    */
+/*        image classification structure using label   */
 /*        via an eight-connected fill.                 */
 /*******************************************************/
 
@@ -2054,7 +2054,7 @@ void msImageProcessor::Fill(int regionLoc, int label)
 					//increment region point count
 					modePointCounts[label]++;
 					
-					//place index of neighbor i onto the index tabel buffer
+					//place index of neighbor i onto the index table buffer
 					indexTable[++index]	= neighLoc;
 					
 					//indicate that a neighboring region pixel was
@@ -2389,11 +2389,11 @@ void msImageProcessor::TransitiveClosure( void )
 	RAList	*neighbor;
 	for(i = 0; i < regionCount; i++)
 	{
-		//aquire first neighbor in region adjacency list pointed to
+		//acquire first neighbor in region adjacency list pointed to
 		//by raList[i]
 		neighbor	= raList[i].next;
 
-		//compute edge strenght threshold using global and local
+		//compute edge strength threshold using global and local
 		//epsilon
 		if(epsilon > raList[i].edgeStrength)
 			threshold   = epsilon;
@@ -2474,7 +2474,7 @@ void msImageProcessor::TransitiveClosure( void )
 		modes_buffer[i]	= 0;
 
 	//traverse raList accumulating modes and point counts
-	//using canoncial element information...
+	//using canonical element information...
 	int k, iMPC;
 	for(i = 0; i < regionCount; i++)
 	{
@@ -2893,7 +2893,7 @@ void msImageProcessor::Prune(int minRegion)
 			modes_buffer[i]	= 0;
 		
 		//traverse raList accumulating modes and point counts
-		//using canoncial element information...
+		//using canonical element information...
 		for(i = 0; i < regionCount; i++)
 		{
 			
@@ -3134,7 +3134,7 @@ void msImageProcessor::DefineBoundaries( void )
 	//***********************************************************************
 	//***********************************************************************
 
-   // dealocate local used memory
+   // deallocate local used memory
  	delete [] boundaryMap;
    delete [] boundaryCount;
 	delete [] boundaryBuffer;
@@ -3192,7 +3192,7 @@ bool msImageProcessor::InWindow(int mode1, int mode2)
 /*******************************************************/
 /*Square Distance                                      */
 /*******************************************************/
-/*Computs the normalized square distance between two   */
+/*Computes the normalized square distance between two  */
 /*modes.                                               */
 /*******************************************************/
 /*Pre:                                                 */
@@ -4623,7 +4623,7 @@ void msImageProcessor::NewNonOptimizedFilter(float sigmaS, float sigmaR)
          else
             mvAbs += Mh[2]*Mh[2]*sigmaR*sigmaR;
 
-			// Increment interation count
+			// Increment iteration count
 			iterationCount++;
 		}
 

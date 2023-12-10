@@ -21,7 +21,7 @@ import lombok.Getter;
   * </ul>
   * <p>
   * These options have various consistency conditions.  If a consistency
-  * condtion is violated, the SliderConfig constructor will throw
+  * condition is violated, the SliderConfig constructor will throw
   * IllegalArgumentException.
   * <p>
   * @see com.lightcrafts.model.GenericOperation

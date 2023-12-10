@@ -8,7 +8,7 @@ import java.awt.*;
 /** Just like ViewportLayout, except that in layoutContainer(), before
   * setViewSize() gets called (triggering state change events that lead to
   * all kinds of havoc with the visible view bounds), changes in view size
-  * are detected and view bounds are first udpated to preserve the center of
+  * are detected and view bounds are first updated to preserve the center of
   * the visible region.
   */
 

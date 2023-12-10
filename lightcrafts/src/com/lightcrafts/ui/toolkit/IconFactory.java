@@ -25,7 +25,7 @@ public class IconFactory {
 
     /**
      * The resource assumption is that icons are accessible through the
-     * IconFactory's classloader, namespaced by the class of a corresonding
+     * IconFactory's classloader, namespaced by the class of a corresponding
      * object (like a button that uses the icon) with an extra "resources"
      * name at the end.
      */

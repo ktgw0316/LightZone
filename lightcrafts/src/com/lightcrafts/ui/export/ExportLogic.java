@@ -23,7 +23,7 @@ import java.io.File;
  * <ul>
  *   <li>The original image (color space, image type)</li>
  *   <li>Edits made by the user (crop bounds)</li>
- *   <li>User prefences (workflow settings, default directory)</li>
+ *   <li>User preferences (workflow settings, default directory)</li>
  *   <li>Export settings previously used for the current image</li>
  *   <li>The most recent export settings used</li>
  *   <li>The most recent export settings used to export each image type (in

@@ -92,7 +92,7 @@ public class UnSharpMaskDescriptor extends OperationDescriptorImpl {
      * The parameter class list for this operation.
      * The number of constants provided should be either 1, in which case
      * this same constant is applied to all the source bands; or the same
-     * number as the source bands, in which case one contant is applied
+     * number as the source bands, in which case one constant is applied
      * to each band.
      */
     private static final Class[] paramClasses = {

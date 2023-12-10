@@ -17,7 +17,7 @@ import java.util.Iterator;
  */
 class ImagePreservationQueue extends LinkedHashSet<RenderedImage> {
 
-    // The number of recently used images to withold from GC:
+    // The number of recently used images to withhold from GC:
     final static int Limit = 100;
 
     public boolean add(RenderedImage image) {

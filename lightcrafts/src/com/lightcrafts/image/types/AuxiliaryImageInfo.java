@@ -8,7 +8,7 @@ import com.lightcrafts.image.ImageInfo;
  * An <code>AuxiliaryImageInfo</code> is an abstract base class for classes
  * that need to hold auxiliary information for an image.
  * <p>
- * The reason for having a seperate class for this (as opposed to putting
+ * The reason for having a separate class for this (as opposed to putting
  * auxiliary information directly into {@link ImageInfo}) is because:
  *  <ul>
  *    <li>

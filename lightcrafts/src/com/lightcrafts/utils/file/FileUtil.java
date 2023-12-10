@@ -63,7 +63,7 @@ public final class FileUtil {
      *
      * @param files The {@link File}s to delete.
      * @param filter The {@link FileFilter} to use; may be <code>null</code>.
-     * @param recursive If <code>true</code>, also delete all enountered
+     * @param recursive If <code>true</code>, also delete all encountered
      * subdirectories and their contents.
      * @return Returns <code>true</code> only if all the files were deleted
      * successfully and there were no I/O errors.

@@ -80,8 +80,8 @@ abstract class DataTipListener extends MouseInputAdapter implements ComponentLis
     /**
      * If the user presses a mouse button on a popup, Swing's behaviour depends on the popup type:
      * - lightweight popup:
-     *   This case is handled here. Because the TipComponent.contains(int x, int y) is overriden to always return false
-     *   Swing will dispath the event directly to the parent component.
+     *   This case is handled here. Because the TipComponent.contains(int x, int y) is overridden to always return false
+     *   Swing will dispatch the event directly to the parent component.
      * - heavyweight popup:
      *   Swing will dispatch the event to the popup's window, which is handled in DataTipPopup.
      */

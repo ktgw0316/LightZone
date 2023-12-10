@@ -44,7 +44,7 @@ int main(int argc, char **argv)
   }
   
   //parse the source file and check for
-  //syntaxical errors
+  //syntactical errors
   CmCParser *srcParser = new CmCParser;
   CmCError error = CheckSyntax(argv[1], srcParser);
   if(error.errorCode_) {

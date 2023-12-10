@@ -10,7 +10,7 @@ import java.awt.*;
 import java.io.File;
 
 /**
- * This conducts the dialog that must preceed TemplateApplicator.  It lets a
+ * This conducts the dialog that must precede TemplateApplicator.  It lets a
  * user confirm the list of files that will be processed, set a flag to
  * specify whether files should be created or overwritten, and if files will
  * be created, it also lets the user specify a name pattern for the new

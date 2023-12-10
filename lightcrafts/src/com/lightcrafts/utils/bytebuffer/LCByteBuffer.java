@@ -15,7 +15,7 @@ import java.nio.ByteOrder;
  * implement.  This is totally brain-damaged.
  * <p>
  * Despite not being derived from <code>ByteBuffer</code>, the API is designed
- * to mimick <code>ByteBuffer</code>'s API.
+ * to mimic <code>ByteBuffer</code>'s API.
  * <p>
  * Most of the methods are declared to throw {@link IOException} because some
  * implementations may choose to use file I/O as the backing-store for the
@@ -241,7 +241,7 @@ public abstract class LCByteBuffer {
 
     /**
      * Gets a {@link String} that is the same length as the given string
-     * starting at the given position and comares the two strings for equality.
+     * starting at the given position and compares the two strings for equality.
      * The buffer's current position is not changed.
      *
      * @param pos The position to get the {@link String} from.

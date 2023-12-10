@@ -138,14 +138,14 @@ class MeanShift {
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:								     |//
-  //|   ============								     |//
-  //|				  *  Define Kernel  *                |//
+  //|	Method Name:                                       |//
+  //| ============                                       |//
+  //|				  *  Define Kernel  *                     |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:								     |//
-  //|	============								     |//
+  //|	Description:                                       |//
+  //|	============                                       |//
   //|                                                    |//
   //|   Uploads a custom kernel into the private data    |//
   //|   members of the mean shift class. This kernel is  |//
@@ -153,7 +153,7 @@ class MeanShift {
   //|   shift.                                           |//
   //|                                                    |//
   //|   In order to create a valid kernel the following  |//
-  //|   argumens must be provided this method:           |//
+  //|   arguments must be provided for this method:      |//
   //|                                                    |//
   //|   <* kernel *>                                     |//
   //|   A one dimensional array of type kernelType used  |//
@@ -175,9 +175,9 @@ class MeanShift {
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Usage:      								     |//
-  //|   ======      								     |//
-  //|		DefineKernel(kernel, h, P, kp)               |//
+  //|	Usage:                                             |//
+  //| ======                                             |//
+  //|		DefineKernel(kernel, h, P, kp)                  |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
@@ -187,14 +187,14 @@ class MeanShift {
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:								     |//
-  //|   ============								     |//
+  //|	Method Name:                                       |//
+  //| ============                                       |//
   //|               * Add Weight Function *              |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:								     |//
-  //|	============								     |//
+  //|	Description:                                       |//
+  //|	============                                       |//
   //|                                                    |//
   //|   Each subspace specified as User Defined is un-   |//
   //|   quely defined by a correlating weight function   |//
@@ -233,9 +233,9 @@ class MeanShift {
   //|                                                    |//
   //|   If a weight function is added to non-existing    |//
   //|   subspace of the input data set  (example: the    |//
-  //|   input data set containes 3 subspaces and this    |//
+  //|   input data set contains 3 subspaces and this     |//
   //|   method is given subspace = 4) then the weight    |//
-  //|   defintion will simply be ignored by the mean     |//
+  //|   definition will simply be ignored by the mean    |//
   //|   shift class.                                     |//
   //|                                                    |//
   //|   If a subspace is declared as kernel type User    |//
@@ -244,8 +244,8 @@ class MeanShift {
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Usage:      								     |//
-  //|   ======      								     |//
+  //|	Usage:                                             |//
+  //| ======                                             |//
   //|   AddWeightFunction(g(u)        , halfWindow,      |//
   //|                     sampleNumber, subspace);       |//
   //|                                                    |//
@@ -457,7 +457,7 @@ class MeanShift {
   //|	============								     |//
   //|                                                    |//
   //|   If a kernel is created and input is uploaded,    |//
-  //|   this method calcualtes the mean shift vector,    |//
+  //|   this method calculates the mean shift vector,    |//
   //|   Mh, at specific data point yk.                   |//
   //|                                                    |//
   //|   The arguments of this method are:                |//
@@ -485,19 +485,19 @@ class MeanShift {
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:								     |//
-  //|   ============								     |//
+  //|	Method Name:                                       |//
+  //| ============                                       |//
   //|          *  Lattice Mean Shift Vector  *           |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:								     |//
-  //|	============								     |//
+  //|	Description:                                       |//
+  //|	============                                       |//
   //|                                                    |//
   //|   If a kernel is created and input is uploaded,    |//
-  //|   this method calcualtes the mean shift vector,    |//
+  //|   this method calculates the mean shift vector,    |//
   //|   Mh, at specific data point yk, assuming that the |//
-  //|   data set exhists on a height x width two dim-    |//
+  //|   data set exists on a height x width two dim-     |//
   //|   ensional lattice.                                |//
   //|                                                    |//
   //|   The arguments of this method are:                |//
@@ -518,8 +518,8 @@ class MeanShift {
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Usage:      								     |//
-  //|   ======      								     |//
+  //|	Usage:                                             |//
+  //|   ======                                           |//
   //|        latticeMSVector(Mh, yk)                     |//
   //|                                                    |//
   //<--------------------------------------------------->|//
@@ -540,7 +540,7 @@ class MeanShift {
   //|	============								     |//
   //|                                                    |//
   //|   If a kernel is created and input is uploaded,    |//
-  //|   this method calcualtes the mode of a specified   |//
+  //|   this method calculates the mode of a specified   |//
   //|   data point yk.                                   |//
   //|                                                    |//
   //|   The arguments of this method are:                |//
@@ -578,9 +578,9 @@ class MeanShift {
   //|	============								     |//
   //|                                                    |//
   //|   If a kernel is created and input is uploaded,    |//
-  //|   this method calcualtes the mode of a specified   |//
+  //|   this method calculates the mode of a specified   |//
   //|   data point yk, assuming that the data set        |//
-  //|   exhists on a height x width two dimensional      |//
+  //|   exists on a height x width two dimensional      |//
   //|   lattice.                                         |//
   //|                                                    |//
   //|   The arguments of this method are:                |//
@@ -634,11 +634,11 @@ class MeanShift {
   //|	Description:								     |//
   //|	============								     |//
   //|                                                    |//
-  //|   ErrorStatus indicates if an error has occured as |//
+  //|   ErrorStatus indicates if an error has occurred as |//
   //|   a result of improper use of a mean shift library |//
   //|   class method or because of insufficient resour-  |//
   //|   ces. ErrorStatus is set to EL_ERROR (ErrorStatus |//
-  //|   = 1) if an error has occured. If no error occur- |//
+  //|   = 1) if an error has occurred. If no error occur- |//
   //|   ed when calling a particular method ErrorStatus  |//
   //|   is set to EL_OKAY (ErrorStatus = 0).             |//
   //|                                                    |//
@@ -681,7 +681,7 @@ class MeanShift {
 
    void	OptLatticeMSVector     (double*, double*);      // Uses the lattice defined by DefineLattice to compute the
 														// mean shift vector at a specified window location yk using
-														// the basin of attraction optimization for better performace
+														// the basin of attraction optimization for better performance
 														// during mean shift filtering - used by a derived class
 
     /*/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\*/

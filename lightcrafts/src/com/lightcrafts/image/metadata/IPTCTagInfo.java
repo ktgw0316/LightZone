@@ -21,7 +21,7 @@ public final class IPTCTagInfo extends ImageMetaTagInfo {
     public static final int IPTC_TAG_MULTILINE  = 0x0001;
 
     /**
-     * Tag atrribute: multi-value.
+     * Tag attribute: multi-value.
      * <p>
      * If a tag has this attribute, it allows multiple values, e.g., keywords.
      */

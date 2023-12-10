@@ -191,7 +191,7 @@ final class RequestJob implements Job {
     final int offset;            // offset into arrays
 
     boolean done = false;        // flag indicating completion status
-    Exception exception = null;  // Any exception that might have occured
+    Exception exception = null;  // Any exception that might have occurred
                                  // during computeTile
 
     /** Constructor. */
@@ -336,7 +336,7 @@ final class TileJob implements Job {
 
     boolean done = false;       // flag indicating completion status
     Exception exception = null; // The first exception that might have
-                                // occured during computeTile
+                                // occurred during computeTile
 
     /** Constructor. */
     TileJob(LCTileScheduler scheduler, boolean isBlocking,
@@ -870,7 +870,7 @@ public final class LCTileScheduler implements TileScheduler {
      * @return The computed tiles.  This value is meaningless if
      *         <code>listener</code> is non-<code>null</code>.
      */
-    // The allowable arguments are constained as follows:
+    // The allowable arguments are constrained as follows:
     // A) owner and tileIndices non-null.
     // B) (isBlocking,isPrefetch) in {(true,false),(false,false),(false,true)}
     // C) listeners != null <=> (isBlocking,isPrefetch) == (false,false)
@@ -971,10 +971,10 @@ public final class LCTileScheduler implements TileScheduler {
 
                     // Allocate the maximum possible number of multi-tile jobs.
                     // This will be larger than the actual number of jobs but
-                    // a more precise calcuation is not possible and a dynamic
+                    // a more precise calculation is not possible and a dynamic
                     // storage object such as a Collection would not be useful
                     // since as calculated maxNumJobs = 4*numThreads if the
-                    // preceeding values of "frac" and "minTilesPerThread" are
+                    // preceding values of "frac" and "minTilesPerThread" are
                     // 1/(2*numThreads) and frac*numTiles/2, respectively.
                     int maxNumJobs = numThreads == 1 ? 1 :
                         (int)((float)numTiles/(float)minTilesPerThread+0.5F);
@@ -1237,7 +1237,7 @@ public final class LCTileScheduler implements TileScheduler {
      * indicates that all tile computation will be effected in the primary
      * thread.  A parallelism value of <i>N</i> indicates that there will be
      * <i>N</i> worker threads in addition to the primary scheduler thread.
-     * In JAI the parallelism defaults to a value of 2 unless explicity set
+     * In JAI the parallelism defaults to a value of 2 unless explicitly set
      * by the application.
      *
      * @param parallelism The suggested degree of parallelism.

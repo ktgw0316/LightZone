@@ -6,7 +6,7 @@ import java.awt.geom.Point2D;
 
 /**
  * A Contour with one extra piece of information: a Point2D, a location on
- * the image in image coordiantes, that defines a translation interval for
+ * the image in image coordinates, that defines a translation interval for
  * cloning.
  * <p>
  * @see com.lightcrafts.model.CloneOperation

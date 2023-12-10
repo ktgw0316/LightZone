@@ -1945,7 +1945,7 @@ public class Application {
         if (LastSaveOptions != null) {
             // We're remembering the whole SaveOptions object, but
             // SaveOptions.getDefaultSaveOptions() is the authoritative
-            // reposity for sticky options.  The LastSaveOptions is only
+            // repository for sticky options.  The LastSaveOptions is only
             // used to remember the recent folder.
             XmlDocument doc = new XmlDocument(SaveTag);
             LastSaveOptions.save(doc.getRoot());

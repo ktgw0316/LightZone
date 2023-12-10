@@ -15,7 +15,7 @@ public class ColorMatrix2 {
 
     /*
     *	matrixmult -
-    *		multiply two matricies
+    *		multiply two matrices
     */
     static void matrixmult(float[][] a, float[][] b, float[][] c) {
         int x, y;
@@ -45,7 +45,7 @@ public class ColorMatrix2 {
 
     /*
     *	cscalemat -
-    *		make a color scale marix
+    *		make a color scale matrix
     */
     public static void cscalemat(float[][] mat, float rscale, float gscale, float bscale) {
         float[][] mmat = new float[4][4];
@@ -75,7 +75,7 @@ public class ColorMatrix2 {
 
     /*
     *	lummat -
-    *		make a luminance marix
+    *		make a luminance matrix
     */
     public static void lummat(float[][] mat) {
         float[][] mmat = new float[4][4];
@@ -108,7 +108,7 @@ public class ColorMatrix2 {
 
     /*
     *	saturatemat -
-    *		make a saturation marix
+    *		make a saturation matrix
     */
     public static void saturatemat(float[][] mat, float sat) {
         float[][] mmat = new float[4][4];

@@ -41,7 +41,7 @@ public class SaveOptions {
     }
 
     /**
-     * If the save format is LZN, then the auxilliary options are just the File
+     * If the save format is LZN, then the auxiliary options are just the File
      * to use.
      */
     public static class Lzn extends Options {
@@ -84,7 +84,7 @@ public class SaveOptions {
     }
 
     /**
-     * If the save format is Sidecar TIFF, then the auxilliary options are a
+     * If the save format is Sidecar TIFF, then the auxiliary options are a
      * TIFFImageType.ExportOptions.
      */
     public static class SidecarTiff extends Options {
@@ -129,7 +129,7 @@ public class SaveOptions {
     }
 
     /**
-     * If the save format is Sidecar JPEG, then the auxilliary options are a
+     * If the save format is Sidecar JPEG, then the auxiliary options are a
      * JPEGImageType.ExportOptions (guaranteed to have its multilayer flag
      * unset).
      */
@@ -175,7 +175,7 @@ public class SaveOptions {
     }
 
     /**
-     * If the save format is Multilayer TIFF, then the auxilliary option is
+     * If the save format is Multilayer TIFF, then the auxiliary option is
      * a TIFFImageType.ExportOptions that is guaranteed to have its
      * multilayer flag set.
      */

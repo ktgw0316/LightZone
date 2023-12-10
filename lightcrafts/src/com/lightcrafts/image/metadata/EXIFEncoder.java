@@ -490,7 +490,7 @@ public final class EXIFEncoder {
     private final ImageMetadata m_metadata;
 
     /**
-     * EXIF metadata values larger than 4 bytes are stored seperately past all
+     * EXIF metadata values larger than 4 bytes are stored separately past all
      * the directory entries.  This is used to keep track of the next available
      * position for such a value.
      */

@@ -735,7 +735,7 @@ public interface CanonTags extends ImageMetaTags {
         = CANON_CUSTOM_FUNCTIONS << 8 | 0x09;
 
     /**
-     * Custom functions: long exposure noice reduction.
+     * Custom functions: long exposure noise reduction.
      *  <blockquote>
      *    <table border="0" cellpadding="0">
      *      <tr valign="top">

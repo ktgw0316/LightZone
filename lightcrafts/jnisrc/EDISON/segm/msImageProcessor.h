@@ -102,19 +102,19 @@ public:
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:								     |//
-  //|   ============								     |//
-  //|				  * Define Image *                   |//
+  //|	Method Name:								               |//
+  //|   ============								               |//
+  //|				  * Define Image *                        |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:								     |//
-  //|	============								     |//
+  //|	Description:                                       |//
+  //|	============                                       |//
   //|                                                    |//
   //|   Uploads an image to be segmented by the image    |//
   //|   segmenter class.                                 |//
   //|                                                    |//
-  //|   An image is defined by specifying the folloing:  |//
+  //|   An image is defined by specifying the following: |//
   //|                                                    |//
   //|   <* data *>                                       |//
   //|   A one dimensional unsigned char array of RGB     |//
@@ -136,9 +136,9 @@ public:
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Usage:      								     |//
-  //|   ======      								     |//
-  //|		DefineImage(data, type, height, width)       |//
+  //|	Usage:                                             |//
+  //| ======                                             |//
+  //|		DefineImage(data, type, height, width)          |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
@@ -154,18 +154,18 @@ public:
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:								     |//
-  //|   ============								     |//
-  //|			     * Set Weight Map *                  |//
+  //|	Method Name:                                       |//
+  //| ============                                       |//
+  //|			     * Set Weight Map *                      |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:								     |//
-  //|	============								     |//
+  //|	Description:                                       |//
+  //|	============                                       |//
   //|                                                    |//
   //|   Uploads weight map specifying for each pixel     |//
   //|   in the image a value between 0 and 1 - 1 indica- |//
-  //|   ting the presence of an edge and 0 the absense   |//
+  //|   ting the presence of an edge and 0 the absence   |//
   //|   of an edge.                                      |//
   //|                                                    |//
   //|   The arguments to this method are:                |//
@@ -186,9 +186,9 @@ public:
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Usage:      								     |//
-  //|   ======      								     |//
-  //|		SetWeightMap(weightMap, epsilon)             |//
+  //|	Usage:                                             |//
+  //|   ======                                           |//
+  //|		SetWeightMap(weightMap, epsilon)                |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//

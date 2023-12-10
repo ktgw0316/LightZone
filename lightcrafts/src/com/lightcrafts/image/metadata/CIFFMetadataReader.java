@@ -205,7 +205,7 @@ public final class CIFFMetadataReader extends ImageMetadataReader {
      *
      * @param offset The offset of the first character.
      * @param length The length of the string.
-     * @return Returns the make and model seperated by a <code>null</code>
+     * @return Returns the make and model separated by a <code>null</code>
      * byte.
      * @see {@link CIFFTags#CIFF_MAKE_MODEL}
      */

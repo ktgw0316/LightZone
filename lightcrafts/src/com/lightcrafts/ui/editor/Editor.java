@@ -603,7 +603,7 @@ public class Editor implements HorizontalMouseWheelSupport {
             regionMode.dispose();
     }
 
-    // Tell this Editor that save is occuring, and so it should commit any
+    // Tell this Editor that save is occurring, and so it should commit any
     // crop or rotate state from its modes.
     public TemporaryEditorCommitState saveStart() {
         boolean isCropActive = (overlay.peekMode() == cropMode);

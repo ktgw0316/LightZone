@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 \endverbatim
 
  *  This file contains code made by Sylvain Paris under supervision of
- * François Sillion for his PhD work with <a
+ * Franï¿½ois Sillion for his PhD work with <a
  * href="http://www-artis.imag.fr">ARTIS project</a>. ARTIS is a
  * research project in the GRAVIR/IMAG laboratory, a joint unit of
  * CNRS, INPG, INRIA and UJF.
@@ -482,7 +482,7 @@ namespace Geometry {
     //@}
 
     //@{
-    //! Access as a non-homogenous 3D entity.
+    //! Access as a non-homogeneous 3D entity.
 
     inline value_type x() const;
     inline value_type y() const;

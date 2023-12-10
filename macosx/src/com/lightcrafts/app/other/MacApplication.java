@@ -20,7 +20,7 @@ public abstract class MacApplication extends OtherApplication {
      *
      * @param bundleSig The bundle signature for the application.
      * @return Returns said {@link OtherApplication} or
-     * {@link UnknownApplication#INSTANCE} if the other application is unkown.
+     * {@link UnknownApplication#INSTANCE} if the other application is unknown.
      */
     public static OtherApplication getAppForSignature( String bundleSig ) {
         final OtherApplication app = m_bundleSigToApp.get( bundleSig );

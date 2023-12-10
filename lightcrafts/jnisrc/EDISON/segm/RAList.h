@@ -17,7 +17,7 @@
 	and to prune spurious regions during image segmentation.
 
 	The prototype for the RAList class is provided below. Its
-	defition is provided in "RAList.cc".
+	definition is provided in "RAList.cc".
 
 The theory is described in the papers:
 
@@ -62,7 +62,7 @@ public:
 	/* Class Constructor and Destructor */
 	/*\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/*/
 
-	//***Class Constrcutor***
+	//***Class Constructor***
 	RAList( void );
 
 	//***Class Destructor***

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////
 // Name     : edison.h
-// Purpose  : Wrapper class used for segmenation and
+// Purpose  : Wrapper class used for segmentation and
 //            edge detection.
 // Author   : Chris M. Christoudias
 // Modified by

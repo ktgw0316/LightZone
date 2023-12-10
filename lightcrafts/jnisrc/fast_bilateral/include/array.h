@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
  *  This file contains code made by Sylvain Paris under supervision of
- * François Sillion for his PhD work with <a
+ * Franï¿½ois Sillion for his PhD work with <a
  * href="http://www-artis.imag.fr">ARTIS project</a>. ARTIS is a
  * research project in the GRAVIR/IMAG laboratory, a joint unit of
  * CNRS, INPG, INRIA and UJF.
@@ -140,7 +140,7 @@ public:
   inline Array_2D(const Array_2D<T,A>& a);
   //@}
 
-  //! Assignement of a default value.
+  //! Assignment of a default value.
   void assign(const size_type nx,
 	      const size_type ny,
 	      const T& val);
@@ -350,7 +350,7 @@ public:
   inline Array_3D(const Array_3D<T,A>& a);
   //@}
 
-  //! Assignement of a default value.
+  //! Assignment of a default value.
   void assign(const size_type nx,
 	      const size_type ny,
 	      const size_type nz,
