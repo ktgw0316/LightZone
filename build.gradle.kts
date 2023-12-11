@@ -49,12 +49,12 @@ subprojects {
         options.encoding = "UTF-8"
         options.compilerArgs = listOf("-h", file("javah").absolutePath)
     }
-//    tasks.test {
-//        useJUnitPlatform()
-//        testLogging {
-//            events("passed", "skipped", "failed")
-//        }
-//    }
+    tasks.test {
+        useJUnitPlatform()
+        testLogging {
+            events("passed", "skipped", "failed")
+        }
+    }
     // val os = NativePlatform.getOperatingSystem
     // val MAKE = when(os) {
     //     isFreeBSD, isSolaris -> "gmake"
