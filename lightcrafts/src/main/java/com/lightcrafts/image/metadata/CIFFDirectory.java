@@ -2,7 +2,7 @@
 
 package com.lightcrafts.image.metadata;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -130,7 +130,7 @@ public final class CIFFDirectory extends ImageMetadataDirectory implements
      * {@inheritDoc}
      */
     @Override
-    public ZonedDateTime getCaptureDateTime() {
+    public LocalDateTime getCaptureDateTime() {
         final ImageMetaValue value = getValue( CIFF_CAPTURED_TIME );
         return value instanceof DateMetaValue ?
                 ((DateMetaValue)value).getDateValue() : null;

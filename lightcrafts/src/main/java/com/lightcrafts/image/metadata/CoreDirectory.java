@@ -19,7 +19,7 @@ import org.w3c.dom.Element;
 import java.awt.*;
 import java.awt.color.ICC_Profile;
 import java.io.File;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.lightcrafts.image.metadata.CoreTags.*;
@@ -27,7 +27,7 @@ import static com.lightcrafts.image.metadata.ImageMetaType.*;
 import static com.lightcrafts.image.metadata.ImageOrientation.ORIENTATION_LANDSCAPE;
 import static com.lightcrafts.image.metadata.ImageOrientation.ORIENTATION_UNKNOWN;
 import static com.lightcrafts.image.metadata.XMPConstants.*;
-import static java.time.format.DateTimeFormatter.*;
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
 /**
  * A <code>CoreDirectory</code> is-an {@link ImageMetadataDirectory} for
@@ -164,7 +164,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
      * {@inheritDoc}
      */
     @Override
-    public ZonedDateTime getCaptureDateTime() {
+    public LocalDateTime getCaptureDateTime() {
         final ImageMetaValue value = getValue( CORE_CAPTURE_DATE_TIME );
         return value instanceof DateMetaValue ?
                 ((DateMetaValue)value).getDateValue() : null;
@@ -192,7 +192,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
      * {@inheritDoc}
      */
     @Override
-    public ZonedDateTime getFileDateTime() {
+    public LocalDateTime getFileDateTime() {
         final ImageMetaValue value = getValue( CORE_FILE_DATE_TIME );
         return value != null ? ((DateMetaValue)value).getDateValue() : null;
     }
@@ -510,22 +510,17 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
 
         ////////// MetadataDate & ModifyDate
 
-        final var now = ZonedDateTime.now();
+        // final String now = ZonedDateTime.now().format(ISO_OFFSET_DATE_TIME);
+        final String now = LocalDateTime.now().format(ISO_LOCAL_DATE_TIME);
         final Element metadataDateElement = xmpDoc.createElementNS(
             XMP_XAP_NS, XMP_XAP_PREFIX + ":MetadataDate"
         );
-        XMLUtil.setTextContentOf(
-            metadataDateElement,
-                now.format(ISO_OFFSET_DATE_TIME)
-        );
+        XMLUtil.setTextContentOf(metadataDateElement, now);
         xapRDFDescElement.appendChild( metadataDateElement );
         final Element modifyDateElement = xmpDoc.createElementNS(
             XMP_XAP_NS, XMP_XAP_PREFIX + ":ModifyDate"
         );
-        XMLUtil.setTextContentOf(
-            modifyDateElement,
-                now.format(ISO_OFFSET_DATE_TIME)
-        );
+        XMLUtil.setTextContentOf(modifyDateElement, now);
         xapRDFDescElement.appendChild( modifyDateElement );
 
         ////////// Rating

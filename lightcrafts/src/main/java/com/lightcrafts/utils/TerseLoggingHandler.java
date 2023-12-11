@@ -5,7 +5,7 @@ package com.lightcrafts.utils;
 
 import java.io.OutputStream;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
@@ -29,7 +29,6 @@ public class TerseLoggingHandler extends StreamHandler {
 
 class TerseLoggingFormatter extends Formatter {
 
-    private final static String format = "{0,date} {0,time}";
     private final static String format = "yyyy:MM:dd HH:mm:ss";
     private final static DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
 
@@ -38,7 +37,7 @@ class TerseLoggingFormatter extends Formatter {
     @Override
     public synchronized String format(LogRecord record) {
         final StringBuilder sb = new StringBuilder();
-        final var dateTime = ZonedDateTime.ofInstant(record.getInstant(), ZoneId.systemDefault());
+        final var dateTime = LocalDateTime.ofInstant(record.getInstant(), ZoneId.systemDefault());
         sb.append(dateTime.format(formatter));
         sb.append(" ");
         String name = record.getSourceClassName();

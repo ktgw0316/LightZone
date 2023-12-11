@@ -18,7 +18,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.io.*;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.lightcrafts.image.metadata.CoreTags.*;
@@ -258,7 +258,7 @@ public class ImageMetadata implements
     /**
      * {@inheritDoc}
      */
-    public ZonedDateTime getCaptureDateTime() {
+    public LocalDateTime getCaptureDateTime() {
         final Collection<ImageMetadataDirectory> dirs =
             findProvidersOf( CaptureDateTimeProvider.class );
         for ( ImageMetadataDirectory dir : dirs ) {
@@ -370,7 +370,7 @@ public class ImageMetadata implements
      * {@inheritDoc}
      */
     @Override
-    public ZonedDateTime getFileDateTime() {
+    public LocalDateTime getFileDateTime() {
         final var dir = getDirectoryFor(CoreDirectory.class);
         return dir instanceof CoreDirectory ?
                 ((CoreDirectory) dir).getFileDateTime() : null;

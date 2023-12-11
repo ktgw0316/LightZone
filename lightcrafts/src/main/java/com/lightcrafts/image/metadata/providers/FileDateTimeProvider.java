@@ -5,7 +5,7 @@ package com.lightcrafts.image.metadata.providers;
 
 import org.jetbrains.annotations.Nullable;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 /**
  * A <code>FileDateTimeProvider</code> provides the last modified date/time of
@@ -22,7 +22,7 @@ public interface FileDateTimeProvider extends ImageMetadataProvider {
      * available.
      */
     @Nullable
-    ZonedDateTime getFileDateTime();
+    LocalDateTime getFileDateTime();
 
 }
 /* vim:set et sw=4 ts=4: */

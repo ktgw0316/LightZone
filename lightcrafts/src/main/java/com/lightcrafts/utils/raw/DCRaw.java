@@ -26,7 +26,8 @@ import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 
@@ -115,11 +116,11 @@ public final class DCRaw extends RawDecoder {
      * {@inheritDoc}
      */
     @Override
-    public ZonedDateTime getCaptureDateTime() {
+    public LocalDateTime getCaptureDateTime() {
         if (m_captureDateTime <= 0)
             return null;
         final var instant = Instant.ofEpochMilli(m_captureDateTime);
-        return ZonedDateTime.ofInstant(instant, ZoneId.systemDefault());
+        return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
     }
 
     public float[] getDaylightMultipliers() {
@@ -250,8 +251,8 @@ public final class DCRaw extends RawDecoder {
         if (line.startsWith(search = TIMESTAMP)) {
             final var timestamp = line.substring(search.length());
             try {
-                m_captureDateTime = ZonedDateTime.parse(timestamp, ISO_LOCAL_DATE_TIME)
-                        .toInstant()
+                m_captureDateTime = LocalDateTime.parse(timestamp, ISO_LOCAL_DATE_TIME)
+                        .toInstant(ZoneOffset.UTC)
                         .toEpochMilli();
             } catch (DateTimeParseException e) {
                 m_captureDateTime = 0;

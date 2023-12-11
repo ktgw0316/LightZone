@@ -5,7 +5,7 @@ package com.lightcrafts.image.metadata.providers;
 
 import org.jetbrains.annotations.Nullable;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 /**
  * A <code>CaptureDateTimeProvider</code> provides the capture date/time of an
@@ -22,7 +22,7 @@ public interface CaptureDateTimeProvider extends ImageMetadataProvider {
      * available.
      */
     @Nullable
-    ZonedDateTime getCaptureDateTime();
+    LocalDateTime getCaptureDateTime();
 
 }
 /* vim:set et sw=4 ts=4: */

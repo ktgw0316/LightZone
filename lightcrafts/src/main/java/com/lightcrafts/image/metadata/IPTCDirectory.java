@@ -4,7 +4,7 @@
 package com.lightcrafts.image.metadata;
 
 import java.io.UnsupportedEncodingException;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.nio.ByteBuffer;
 
@@ -73,7 +73,7 @@ public final class IPTCDirectory extends ImageMetadataDirectory implements
      * {@inheritDoc}
      */
     @Override
-    public ZonedDateTime getCaptureDateTime() {
+    public LocalDateTime getCaptureDateTime() {
         final ImageMetaValue value = getValue( IPTC_DATE_CREATED );
         return  value instanceof DateMetaValue ?
                 ((DateMetaValue)value).getDateValue() : null;
@@ -638,7 +638,7 @@ public final class IPTCDirectory extends ImageMetadataDirectory implements
      * {@link DateMetaValue} plus the time.
      */
     private ImageMetaValue mergeDateTime( ImageMetaValue date, int timeTagID ) {
-        // TODO: There might be a better way to do this with ZonedDateTime.
+        // TODO: There might be a better way to do this with LocalDateTime.
 
         final ImageMetaValue timeValue = getValue( timeTagID );
         if ( timeValue == null )

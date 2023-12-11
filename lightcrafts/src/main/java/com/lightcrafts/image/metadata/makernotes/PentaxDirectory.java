@@ -18,8 +18,7 @@ import com.lightcrafts.utils.bytebuffer.LCByteBuffer;
 
 import java.awt.image.RenderedImage;
 import java.io.IOException;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -55,7 +54,7 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
      * {@inheritDoc}
      */
     @Override
-    public ZonedDateTime getCaptureDateTime() {
+    public LocalDateTime getCaptureDateTime() {
         final ImageMetaValue value = getValue( PENTAX_DATE );
         return value instanceof DateMetaValue ?
                 ((DateMetaValue)value).getDateValue() : null;
@@ -283,7 +282,7 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
                 final int year = ((int)buf[0] & 0xFF) << 8 | (int)buf[1] & 0xFF;
                 final int month = buf[2];
                 final int day = buf[3];
-                final var dateTime = ZonedDateTime.of(year, month, day, 0, 0, 0, 0, ZoneId.systemDefault());
+                final var dateTime = LocalDateTime.of(year, month, day, 0, 0, 0, 0);
                 value = new DateMetaValue(dateTime);
                 break;
             }

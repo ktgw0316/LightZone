@@ -216,11 +216,11 @@ public class LibRaw extends RawDecoder {
     }
 
     @Override
-    public ZonedDateTime getCaptureDateTime() {
+    public LocalDateTime getCaptureDateTime() {
         if (timestamp == 0)
             return null;
         // TODO: Is the libraw timestamp in UTC?
-        return ZonedDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneOffset.UTC);
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneOffset.UTC);
     }
 
     public float getFocalLength() {

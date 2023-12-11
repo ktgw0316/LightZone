@@ -16,7 +16,7 @@ import org.w3c.dom.Element;
 
 import java.awt.image.RenderedImage;
 import java.io.IOException;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.lightcrafts.image.metadata.ImageMetaType.*;
@@ -90,7 +90,7 @@ public class TIFFDirectory extends ImageMetadataDirectory implements
      * {@inheritDoc}
      */
     @Override
-    public ZonedDateTime getCaptureDateTime() {
+    public LocalDateTime getCaptureDateTime() {
         final ImageMetaValue value = getValue( TIFF_DATE_TIME );
         return value instanceof DateMetaValue ?
                 ((DateMetaValue)value).getDateValue() : null;

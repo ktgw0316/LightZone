@@ -2,7 +2,8 @@ package com.lightcrafts.image.metadata.values;
 
 import org.junit.jupiter.api.Test;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -10,11 +11,11 @@ import static org.junit.jupiter.api.Assertions.*;
 class DateMetaValueTest {
 
     @Test
-    void shouldCreateWithZonedDateTimeArray() {
-        final ZonedDateTime[] dates = {ZonedDateTime.now(), ZonedDateTime.now().plusDays(1)};
+    void shouldCreateWithLocalDateTimeArray() {
+        final LocalDateTime[] dates = {LocalDateTime.now(), LocalDateTime.now().plusDays(1)};
         final var dateMetaValue = new DateMetaValue(dates);
 
-        final List<ZonedDateTime> result = dateMetaValue.getDateValues();
+        final List<LocalDateTime> result = dateMetaValue.getDateValues();
 
         assertArrayEquals(dates, result.toArray());
     }
@@ -24,9 +25,9 @@ class DateMetaValueTest {
         final long epochMillis = System.currentTimeMillis();
         final var dateMetaValue = new DateMetaValue(epochMillis);
 
-        final ZonedDateTime result = dateMetaValue.getDateValue();
+        final LocalDateTime result = dateMetaValue.getDateValue();
 
-        assertEquals(epochMillis, result.toInstant().toEpochMilli());
+        assertEquals(epochMillis, result.toInstant(ZoneOffset.UTC).toEpochMilli());
     }
 
     @Test
@@ -34,10 +35,10 @@ class DateMetaValueTest {
         final String[] dates = {"2022-12-31T23:59:59", "2023-01-01T00:00:00"};
         final var dateMetaValue = new DateMetaValue(dates);
 
-        final List<ZonedDateTime> result = dateMetaValue.getDateValues();
+        final List<LocalDateTime> result = dateMetaValue.getDateValues();
 
-        assertEquals(ZonedDateTime.parse(dates[0]), result.get(0));
-        assertEquals(ZonedDateTime.parse(dates[1]), result.get(1));
+        assertEquals(LocalDateTime.parse(dates[0]), result.get(0));
+        assertEquals(LocalDateTime.parse(dates[1]), result.get(1));
     }
 
     @Test
@@ -64,7 +65,7 @@ class DateMetaValueTest {
     @Test
     void shouldThrowExceptionWhenSettingValueForNonEditableInstance() {
         final var dateMetaValue = new DateMetaValue();
-        final var date = ZonedDateTime.now();
+        final var date = LocalDateTime.now();
 
         assertThrows(IllegalStateException.class, () -> dateMetaValue.setDateValueAt(date, 2));
     }
@@ -73,7 +74,7 @@ class DateMetaValueTest {
     void shouldSetValueAtSpecificIndex() {
         final var dateMetaValue = new DateMetaValue();
         dateMetaValue.setIsChangeable(true);
-        final var date = ZonedDateTime.now();
+        final var date = LocalDateTime.now();
 
         dateMetaValue.setDateValueAt(date, 2);
 
@@ -84,7 +85,7 @@ class DateMetaValueTest {
     void shouldThrowExceptionWhenSettingValueAtNegativeIndex() {
         final var dateMetaValue = new DateMetaValue();
         dateMetaValue.setIsChangeable(true);
-        final var date = ZonedDateTime.now();
+        final var date = LocalDateTime.now();
 
         assertThrows(IndexOutOfBoundsException.class, () -> dateMetaValue.setDateValueAt(date, -1));
     }

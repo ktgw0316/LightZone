@@ -21,6 +21,7 @@ import javax.media.jai.PlanarImage;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
+import java.time.ZoneOffset;
 
 /**
  * TODO.
@@ -73,7 +74,7 @@ class RawImageCache extends Thread {
             captureDate = dcRaw.getCaptureDateTime();
         }
         if ( captureDate != null ) {
-            final long time = captureDate.toInstant().toEpochMilli();
+            final long time = captureDate.toInstant(ZoneOffset.UTC).toEpochMilli();
             return imageInfo.getFile().getName() + time + version;
         }
         return null;

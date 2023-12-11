@@ -13,11 +13,14 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
@@ -48,7 +51,7 @@ public final class DateMetaValue extends ImageMetaValue {
      *
      * @param values The array of values.
      */
-    public DateMetaValue(ZonedDateTime... values) {
+    public DateMetaValue(LocalDateTime... values) {
         m_value = Arrays.asList(values);
     }
 
@@ -58,7 +61,7 @@ public final class DateMetaValue extends ImageMetaValue {
      * @param value The number of milliseconds since epoch.
      */
     public DateMetaValue(long value) {
-        this(zonedDateTimeFromEpochMillis(value));
+        this(localDateTimeFrom(value));
     }
 
     /**
@@ -96,30 +99,30 @@ public final class DateMetaValue extends ImageMetaValue {
     }
 
     /**
-     * Get the first native {@link ZonedDateTime} array value.
+     * Get the first native {@link LocalDateTime} array value.
      *
      * @return Returns said value.
      */
-    public ZonedDateTime getDateValue() {
+    public LocalDateTime getDateValue() {
         return getDateValueAt(0);
     }
 
     /**
-     * Gets the {@link ZonedDateTime} value at the given index.
+     * Gets the {@link LocalDateTime} value at the given index.
      *
      * @param index The index of the value to get.
      * @return Returns said value.
      */
-    public ZonedDateTime getDateValueAt( int index ) {
+    public LocalDateTime getDateValueAt( int index ) {
         return m_value.get(index);
     }
 
     /**
-     * Get the native {@link ZonedDateTime} array value.
+     * Get the native {@link LocalDateTime} array value.
      *
      * @return Returns said array.
      */
-    public List<ZonedDateTime> getDateValues() {
+    public List<LocalDateTime> getDateValues() {
         return m_value;
     }
 
@@ -128,7 +131,7 @@ public final class DateMetaValue extends ImageMetaValue {
      */
     @Override
     public long getLongValueAt(int index) {
-        return getDateValueAt(index).toInstant().toEpochMilli();
+        return epocMilliFrom(getDateValueAt(index));
     }
 
     /**
@@ -164,12 +167,12 @@ public final class DateMetaValue extends ImageMetaValue {
     }
 
     /**
-     * Sets the {@link ZonedDateTime} value at the given index.
+     * Sets the {@link LocalDateTime} value at the given index.
      *
      * @param newValue The new value.
      * @param index The index to set the value of.
      */
-    public synchronized void setDateValueAt(ZonedDateTime newValue, int index) {
+    public synchronized void setDateValueAt(LocalDateTime newValue, int index) {
         checkIsEditable();
         if (index >= m_value.size())
             m_value.addAll(Collections.nCopies(index + 1 - m_value.size(), null));
@@ -182,7 +185,7 @@ public final class DateMetaValue extends ImageMetaValue {
      */
     @Override
     public void setLongValue( long newValue ) {
-        setDateValueAt(zonedDateTimeFromEpochMillis(newValue), 0);
+        setDateValueAt(localDateTimeFrom(newValue), 0);
     }
 
     /**
@@ -227,7 +230,7 @@ public final class DateMetaValue extends ImageMetaValue {
                         throw new RuntimeException(e);
                     }
                 })
-                .mapToObj(DateMetaValue::zonedDateTimeFromEpochMillis)
+                .mapToObj(DateMetaValue::localDateTimeFrom)
                 .collect(Collectors.toList());
     }
 
@@ -239,8 +242,8 @@ public final class DateMetaValue extends ImageMetaValue {
     @Override
     public void writeExternal( ObjectOutput out ) throws IOException {
         writeHeader( out );
-        for ( ZonedDateTime value : m_value )
-            out.writeLong( value.toInstant().toEpochMilli() );
+        for ( var value : m_value )
+            out.writeLong(epocMilliFrom(value));
     }
 
     ////////// protected //////////////////////////////////////////////////////
@@ -254,7 +257,7 @@ public final class DateMetaValue extends ImageMetaValue {
      */
     @Override
     protected void appendValueImpl( String newValue ) {
-        final ZonedDateTime newDateTime = parseValue(newValue);
+        final LocalDateTime newDateTime = parseValue(newValue);
         m_value.add(newDateTime);
     }
 
@@ -303,18 +306,18 @@ public final class DateMetaValue extends ImageMetaValue {
      * Parse a date from a {@link String}.
      *
      * @param value The {@link String} to parse.
-     * @return Returns a {link ZonedDateTime}.
+     * @return Returns a {link LocalDateTime}.
      * @throws IllegalArgumentException if the {@link String} does not contain
      * a parsable date.
      */
-    private static @NotNull ZonedDateTime parseValue(String value) {
+    private static @NotNull LocalDateTime parseValue(String value) {
         //
         // Try parsing the value using all the expected date formats until one
         // parses successfully.
         //
         for (final var formatter : m_dateFormatters) {
             try {
-                return ZonedDateTime.parse(value, formatter);
+                return LocalDateTime.parse(value, formatter);
             } catch (DateTimeParseException e) {
                 // ignore
             }
@@ -329,9 +332,13 @@ public final class DateMetaValue extends ImageMetaValue {
     private static final DateTimeFormatter m_canonicalDateFormatter =
             DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss");
 
-    private static @NotNull ZonedDateTime zonedDateTimeFromEpochMillis(long epochMillis) {
+    private static @NotNull LocalDateTime localDateTimeFrom(long epochMillis) {
         final var instant = Instant.ofEpochMilli(epochMillis);
-        return ZonedDateTime.ofInstant(instant, ZoneId.systemDefault());
+        return LocalDateTime.ofInstant(instant, ZoneOffset.UTC);
+    }
+
+    private static long epocMilliFrom(@NotNull LocalDateTime value) {
+        return value.toInstant(ZoneOffset.UTC).toEpochMilli();
     }
 
     /**
@@ -350,6 +357,6 @@ public final class DateMetaValue extends ImageMetaValue {
     );
 
     @NotNull
-    private List<ZonedDateTime> m_value = new ArrayList<>();
+    private List<LocalDateTime> m_value = new ArrayList<>();
 }
 /* vim:set et sw=4 ts=4: */
