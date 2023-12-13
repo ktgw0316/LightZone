@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2023-     Masahiro Kitagawa */
 
 package com.lightcrafts.image.metadata;
 
@@ -15,6 +16,7 @@ import org.w3c.dom.Element;
 
 import java.awt.image.RenderedImage;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.lightcrafts.image.metadata.ImageMetaType.*;
@@ -87,9 +89,10 @@ public class TIFFDirectory extends ImageMetadataDirectory implements
     /**
      * {@inheritDoc}
      */
-    public Date getCaptureDateTime() {
+    @Override
+    public LocalDateTime getCaptureDateTime() {
         final ImageMetaValue value = getValue( TIFF_DATE_TIME );
-        return  value instanceof DateMetaValue ?
+        return value instanceof DateMetaValue ?
                 ((DateMetaValue)value).getDateValue() : null;
     }
 

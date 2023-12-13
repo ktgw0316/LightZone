@@ -1,27 +1,27 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2023-     Masahiro Kitagawa */
 
 package com.lightcrafts.image.types;
 
+import com.lightcrafts.image.BadImageFileException;
+import com.lightcrafts.image.ImageInfo;
+import com.lightcrafts.image.UnknownImageTypeException;
+import com.lightcrafts.image.libs.LCImageLibException;
+import com.lightcrafts.image.libs.LCTIFFReader;
+import com.lightcrafts.image.libs.LCTIFFWriter;
+import com.lightcrafts.image.metadata.ImageMetadata;
+import com.lightcrafts.image.metadata.TIFFTags;
+import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.utils.UserCanceledException;
+import com.lightcrafts.utils.filecache.FileCache;
+import com.lightcrafts.utils.filecache.FileCacheFactory;
+import com.lightcrafts.utils.thread.ProgressThread;
+
+import javax.media.jai.PlanarImage;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
-
-import javax.media.jai.PlanarImage;
-
-import com.lightcrafts.utils.filecache.FileCache;
-import com.lightcrafts.utils.filecache.FileCacheFactory;
-import com.lightcrafts.utils.UserCanceledException;
-import com.lightcrafts.utils.thread.ProgressThread;
-import com.lightcrafts.image.libs.LCTIFFWriter;
-import com.lightcrafts.image.libs.LCImageLibException;
-import com.lightcrafts.image.libs.LCTIFFReader;
-import com.lightcrafts.image.metadata.TIFFTags;
-import com.lightcrafts.image.metadata.ImageMetadata;
-import com.lightcrafts.image.ImageInfo;
-import com.lightcrafts.image.BadImageFileException;
-import com.lightcrafts.image.UnknownImageTypeException;
-import com.lightcrafts.jai.JAIContext;
+import java.time.ZoneOffset;
 
 /**
  * TODO.
@@ -67,14 +67,14 @@ class RawImageCache extends Thread {
         throws BadImageFileException, IOException, UnknownImageTypeException
     {
         final ImageMetadata metadata = imageInfo.getMetadata();
-        Date captureDate = metadata.getCaptureDateTime();
+        var captureDate = metadata.getCaptureDateTime();
         if ( captureDate == null ) {
             final RawImageInfo rawInfo = (RawImageInfo)imageInfo.getAuxiliaryInfo();
             final var dcRaw = rawInfo.getRawDecoder();
             captureDate = dcRaw.getCaptureDateTime();
         }
         if ( captureDate != null ) {
-            final long time = captureDate.getTime();
+            final long time = captureDate.toInstant(ZoneOffset.UTC).toEpochMilli();
             return imageInfo.getFile().getName() + time + version;
         }
         return null;

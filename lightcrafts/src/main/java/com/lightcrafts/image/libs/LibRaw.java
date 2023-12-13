@@ -10,8 +10,8 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.*;
 import java.io.File;
+import java.time.*;
 import java.util.Arrays;
-import java.util.Date;
 
 public class LibRaw extends RawDecoder {
     final String filePath;
@@ -215,8 +215,12 @@ public class LibRaw extends RawDecoder {
         return aperture;
     }
 
-    public Date getCaptureDateTime() {
-        return new Date(1000 * timestamp);
+    @Override
+    public LocalDateTime getCaptureDateTime() {
+        if (timestamp == 0)
+            return null;
+        // TODO: Is the libraw timestamp in UTC?
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneOffset.UTC);
     }
 
     public float getFocalLength() {
@@ -455,7 +459,13 @@ public class LibRaw extends RawDecoder {
 
         LibRaw libRaw = new LibRaw("/Stuff/Pictures/New Raw Support/Canon 450D/IMG_1598.CR2");
 
-        System.out.println("LibRaw (p:" + libRaw.progress_flags + ", w:" + libRaw.process_warnings + ") - make: " + libRaw.make + ", model: " + libRaw.model + ", timestamp: " + new Date(1000 * libRaw.timestamp));
+        System.out.println(
+                "LibRaw (p:" + libRaw.progress_flags
+                + ", w:" + libRaw.process_warnings
+                + ") - make: " + libRaw.make
+                + ", model: " + libRaw.model
+                + ", timestamp: " + libRaw.timestamp + " (" + libRaw.getCaptureDateTime() + ")"
+        );
         System.out.println("Filter pattern: " + libRaw.filter_pattern);
 
         for (int i = 0; i < 4; i++)

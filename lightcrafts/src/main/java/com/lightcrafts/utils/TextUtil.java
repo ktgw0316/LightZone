@@ -3,8 +3,6 @@
 package com.lightcrafts.utils;
 
 import java.text.Normalizer;
-import java.util.Date;
-import java.text.DateFormat;
 
 /**
  * A <code>TextUtil</code> is a set of utility functions for text.
@@ -23,25 +21,6 @@ public final class TextUtil {
 
     /** The number of bytes in 1 gigabyte. */
     public static final long GB = MB * K;
-
-    /**
-     * Formats a {@link Date} into a date/time string.  The reason this method
-     * is necessary is because date formats are not thread-safe.  From the
-     * {@link DateFormat} Javadoc:
-     * <blockquote>
-     * Date formats are not synchronized.  It is recommended to create separate
-     * format instances for each thread. If multiple threads access a format
-     * concurrently, it must be synchronized externally.
-     * </blockquote>
-     * @param f The {@link DateFormat} to use.
-     * @param d The {@link Date} to be formatted.
-     * @return Returns the formatted string.
-     */
-    public static String dateFormat( DateFormat f, Date d ) {
-        synchronized ( f ) {
-            return f.format( d );
-        }
-    }
 
     /**
      * Convert the <code>byte</code> array to a string of hexadecimal digits.

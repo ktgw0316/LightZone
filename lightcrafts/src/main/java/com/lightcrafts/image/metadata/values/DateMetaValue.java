@@ -1,24 +1,32 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2023-     Masahiro Kitagawa */
 
 package com.lightcrafts.image.metadata.values;
+
+import com.lightcrafts.image.metadata.ImageMetaType;
+import com.lightcrafts.utils.xml.XMLUtil;
+import org.jetbrains.annotations.NotNull;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import com.lightcrafts.image.metadata.ImageMetaType;
-import com.lightcrafts.utils.TextUtil;
-import com.lightcrafts.utils.xml.XMLUtil;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 import static com.lightcrafts.image.metadata.ImageMetaType.META_DATE;
-import static com.lightcrafts.image.metadata.XMPConstants.*;
+import static com.lightcrafts.image.metadata.XMPConstants.XMP_RDF_NS;
+import static com.lightcrafts.image.metadata.XMPConstants.XMP_RDF_PREFIX;
 
 /**
  * A <code>DateMetaValue</code> is-an {@link ImageMetaValue} for holding a date
@@ -43,8 +51,8 @@ public final class DateMetaValue extends ImageMetaValue {
      *
      * @param values The array of values.
      */
-    public DateMetaValue( Date... values ) {
-        m_value = values;
+    public DateMetaValue(LocalDateTime... values) {
+        m_value = Arrays.asList(values);
     }
 
     /**
@@ -52,8 +60,8 @@ public final class DateMetaValue extends ImageMetaValue {
      *
      * @param value The number of milliseconds since epoch.
      */
-    public DateMetaValue( long value ) {
-        this( new Date( value ) );
+    public DateMetaValue(long value) {
+        this(localDateTimeFrom(value));
     }
 
     /**
@@ -70,58 +78,60 @@ public final class DateMetaValue extends ImageMetaValue {
     /**
      * {@inheritDoc}
      */
+    @Override
     public DateMetaValue clone() {
         final DateMetaValue copy = (DateMetaValue)super.clone();
-        copy.m_value = m_value.clone();
+        copy.m_value = List.copyOf(m_value);
         return copy;
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public int compareTo( Object o ) {
-        if ( o instanceof DateMetaValue ) {
-            final DateMetaValue rightVal = (DateMetaValue)o;
-            final Date leftDate = getDateValue();
-            final Date rightDate = rightVal.getDateValue();
+        if (o instanceof DateMetaValue rightVal) {
+            final var leftDate = getDateValue();
+            final var rightDate = rightVal.getDateValue();
             return leftDate.compareTo( rightDate );
         }
         return super.compareTo( o );
     }
 
     /**
-     * Get the first native {@link Date} array value.
+     * Get the first native {@link LocalDateTime} array value.
      *
      * @return Returns said value.
      */
-    public Date getDateValue() {
+    public LocalDateTime getDateValue() {
         return getDateValueAt(0);
     }
 
     /**
-     * Gets the {@link Date} value at the given index.
+     * Gets the {@link LocalDateTime} value at the given index.
      *
      * @param index The index of the value to get.
      * @return Returns said value.
      */
-    public Date getDateValueAt( int index ) {
-        return m_value[ index ];
+    public LocalDateTime getDateValueAt( int index ) {
+        return m_value.get(index);
     }
 
     /**
-     * Get the native {@link Date} array value.
+     * Get the native {@link LocalDateTime} array value.
      *
      * @return Returns said array.
      */
-    public Date[] getDateValues() {
+    public List<LocalDateTime> getDateValues() {
         return m_value;
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public long getLongValueAt(int index) {
-        return getDateValueAt(index).getTime();
+        return epocMilliFrom(getDateValueAt(index));
     }
 
     /**
@@ -129,6 +139,7 @@ public final class DateMetaValue extends ImageMetaValue {
      *
      * @return Always returns <code>META_DATE</code>.
      */
+    @Override
     public ImageMetaType getType() {
         return META_DATE;
     }
@@ -136,13 +147,15 @@ public final class DateMetaValue extends ImageMetaValue {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getValueCount() {
-        return m_value != null ? m_value.length : 0;
+        return m_value.size();
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isLegalValue( String value ) {
         try {
             parseValue( value );
@@ -154,56 +167,51 @@ public final class DateMetaValue extends ImageMetaValue {
     }
 
     /**
-     * Sets the {@link Date} value at the given index.
+     * Sets the {@link LocalDateTime} value at the given index.
      *
      * @param newValue The new value.
      * @param index The index to set the value of.
      */
-    public synchronized void setDateValueAt( Date newValue, int index ) {
+    public synchronized void setDateValueAt(LocalDateTime newValue, int index) {
         checkIsEditable();
-        if ( m_value == null )
-            m_value = new Date[ index + 1 ];
-        else if ( index >= m_value.length )
-            m_value = Arrays.copyOf(m_value, index + 1);
-        m_value[ index ] = newValue;
+        if (index >= m_value.size())
+            m_value.addAll(Collections.nCopies(index + 1 - m_value.size(), null));
+        m_value.set(index, newValue);
         dirty();
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setLongValue( long newValue ) {
-        setDateValueAt( new Date( newValue ), 0 );
+        setDateValueAt(localDateTimeFrom(newValue), 0);
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public Element toXMP( Document xmpDoc, String nsURI, String prefix ) {
         final String tagName = getTagName();
         if ( tagName == null )
             return null;
+        final var formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
         final Element tagElement =
             xmpDoc.createElementNS( nsURI, prefix + ':' + tagName );
-        final Date[] values = getDateValues();
-        if ( values.length == 1 )
-            XMLUtil.setTextContentOf(
-                tagElement,
-                TextUtil.dateFormat( ISO_8601_DATE_FORMAT, m_value[0] )
-            );
-        else {
+        final var values = getDateValues();
+        if (values.size() == 1) {
+            XMLUtil.setTextContentOf(tagElement, m_value.get(0).format(formatter));
+        } else {
             final Element seqElement = XMLUtil.addElementChildTo(
-                tagElement, XMP_RDF_NS, XMP_RDF_PREFIX + ":Seq"
+                    tagElement, XMP_RDF_NS, XMP_RDF_PREFIX + ":Seq"
             );
-            for ( Date value : values ) {
+            values.forEach(value -> {
                 final Element listItem = XMLUtil.addElementChildTo(
-                    seqElement, XMP_RDF_NS, XMP_RDF_PREFIX + ":li"
+                        seqElement, XMP_RDF_NS, XMP_RDF_PREFIX + ":li"
                 );
-                XMLUtil.setTextContentOf(
-                    listItem,
-                    TextUtil.dateFormat( ISO_8601_DATE_FORMAT, value )
-                );
-            }
+                XMLUtil.setTextContentOf(listItem, value.format(formatter));
+            });
         }
         return tagElement;
     }
@@ -211,11 +219,19 @@ public final class DateMetaValue extends ImageMetaValue {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void readExternal( ObjectInput in ) throws IOException {
         final int length = readHeader( in );
-        m_value = new Date[ length ];
-        for ( int i = 0; i < length; ++i )
-            m_value[i] = new Date( in.readLong() );
+        m_value = LongStream.range(0, length)
+                .map(i -> {
+                    try {
+                        return in.readLong();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .mapToObj(DateMetaValue::localDateTimeFrom)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -223,10 +239,11 @@ public final class DateMetaValue extends ImageMetaValue {
      * by the date values (<code>long</code>) where each is the number of
      * milliseconds since epoch.
      */
+    @Override
     public void writeExternal( ObjectOutput out ) throws IOException {
         writeHeader( out );
-        for ( Date value : m_value )
-            out.writeLong( value.getTime() );
+        for ( var value : m_value )
+            out.writeLong(epocMilliFrom(value));
     }
 
     ////////// protected //////////////////////////////////////////////////////
@@ -238,14 +255,10 @@ public final class DateMetaValue extends ImageMetaValue {
      * @throws IllegalArgumentException if the {@link String} does not contain
      * a parsable date.
      */
+    @Override
     protected void appendValueImpl( String newValue ) {
-        final Date newDate = parseValue( newValue );
-        if ( m_value == null )
-            m_value = new Date[] { newDate };
-        else {
-            m_value = Arrays.copyOf( m_value, m_value.length + 1 );
-            m_value[ m_value.length - 1 ] = newDate;
-        }
+        final LocalDateTime newDateTime = parseValue(newValue);
+        m_value.add(newDateTime);
     }
 
     /**
@@ -253,13 +266,11 @@ public final class DateMetaValue extends ImageMetaValue {
      *
      * @return Returns said array.
      */
-    protected String[] getValuesImpl() {
-        if ( m_value == null )
-            return null;
-        final String[] value = new String[ m_value.length ];
-        for ( int i = 0; i < m_value.length; ++i )
-            value[i] = TextUtil.dateFormat( m_canonicalDateFormat, m_value[i] );
-        return value;
+    @Override
+    protected String @NotNull [] getValuesImpl() {
+        return m_value.stream()
+                .map(v -> v.format(m_canonicalDateFormatter))
+                .toArray(String[]::new);
     }
 
     /**
@@ -269,11 +280,11 @@ public final class DateMetaValue extends ImageMetaValue {
      * @throws IllegalArgumentException if any one of the {@link String}s do
      * not contain a parsable date.
      */
+    @Override
     protected void setValuesImpl( String[] newValue ) {
-        if ( m_value == null || m_value.length != newValue.length )
-            m_value = new Date[ newValue.length ];
-        for ( int i = 0; i < newValue.length; ++i )
-            m_value[i] = parseValue( newValue[i] );
+        m_value = Arrays.stream(newValue)
+                .map(DateMetaValue::parseValue)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -282,21 +293,11 @@ public final class DateMetaValue extends ImageMetaValue {
      *
      * @return Returns said string.
      */
+    @Override
     protected String toStringImpl() {
-        if ( m_value == null )
-            return null;
-        final StringBuilder sb = new StringBuilder();
-        boolean comma = false;
-        for ( Date value : m_value ) {
-            if ( !comma )
-                comma = true;
-            else
-                sb.append( ',' );
-            sb.append(
-                TextUtil.dateFormat( m_canonicalDateFormat, value ).trim()
-            );
-        }
-        return sb.toString();
+        return m_value.stream()
+                .map(v -> v.format(m_canonicalDateFormatter).trim())
+                .collect(Collectors.joining(","));
     }
 
     ////////// private ////////////////////////////////////////////////////////
@@ -305,22 +306,22 @@ public final class DateMetaValue extends ImageMetaValue {
      * Parse a date from a {@link String}.
      *
      * @param value The {@link String} to parse.
-     * @return Returns a {link Date}.
+     * @return Returns a {link LocalDateTime}.
      * @throws IllegalArgumentException if the {@link String} does not contain
      * a parsable date.
      */
-    private static Date parseValue( String value ) {
+    private static @NotNull LocalDateTime parseValue(String value) {
         //
         // Try parsing the value using all the expected date formats until one
         // parses successfully.
         //
-        for ( SimpleDateFormat format : m_dateFormats )
+        for (final var formatter : m_dateFormatters) {
             try {
-                return format.parse( value );
-            }
-            catch ( ParseException e ) {
+                return LocalDateTime.parse(value, formatter);
+            } catch (DateTimeParseException e) {
                 // ignore
             }
+        }
         throw new IllegalArgumentException();
     }
 
@@ -328,25 +329,34 @@ public final class DateMetaValue extends ImageMetaValue {
      * The date format to use by default because this is apparently the
      * format that cameras use for their date metadata.
      */
-    private static final SimpleDateFormat m_canonicalDateFormat =
-        new SimpleDateFormat( "yyyy:MM:dd HH:mm:ss" );
+    private static final DateTimeFormatter m_canonicalDateFormatter =
+            DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss");
+
+    private static @NotNull LocalDateTime localDateTimeFrom(long epochMillis) {
+        final var instant = Instant.ofEpochMilli(epochMillis);
+        return LocalDateTime.ofInstant(instant, ZoneOffset.UTC);
+    }
+
+    private static long epocMilliFrom(@NotNull LocalDateTime value) {
+        return value.toInstant(ZoneOffset.UTC).toEpochMilli();
+    }
 
     /**
      * Date formats to be able to parse.
      */
-    private static final SimpleDateFormat[] m_dateFormats = {
-        ISO_8601_DATE_FORMAT,
-        m_canonicalDateFormat,
-        new SimpleDateFormat( "EEE MMM dd HH:mm:ss zzz yyyy" ),
-        new SimpleDateFormat( "yyyyMMdd" ), // IPTC date format
-        new SimpleDateFormat( "yyyy-MM-dd" ),
-        new SimpleDateFormat( "yyyy/MM/dd" ),
-        new SimpleDateFormat( "dd-MMM-yyyy" ),
-        new SimpleDateFormat( "dd/MMM/yyyy" ),
-        new SimpleDateFormat( "MMM dd, yyyy" )
+    private static final List<DateTimeFormatter> m_dateFormatters = Arrays.asList(
+            DateTimeFormatter.ISO_LOCAL_DATE_TIME,
+            m_canonicalDateFormatter,
+            DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy"),
+            DateTimeFormatter.BASIC_ISO_DATE, // IPTC date format
+            DateTimeFormatter.ISO_LOCAL_DATE,
+            DateTimeFormatter.ofPattern("yyyy/MM/dd"),
+            DateTimeFormatter.ofPattern("dd-MMM-yyyy"),
+            DateTimeFormatter.ofPattern("dd/MMM/yyyy"),
+            DateTimeFormatter.ofPattern("MMM dd, yyyy")
+    );
 
-    };
-
-    private Date[] m_value;
+    @NotNull
+    private List<LocalDateTime> m_value = new ArrayList<>();
 }
 /* vim:set et sw=4 ts=4: */

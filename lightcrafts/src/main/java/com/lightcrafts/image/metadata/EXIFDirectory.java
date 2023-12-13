@@ -9,6 +9,7 @@ import com.lightcrafts.utils.TextUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -106,11 +107,11 @@ public class EXIFDirectory extends ImageMetadataDirectory implements
      * {@inheritDoc}
      */
     @Override
-    public Date getCaptureDateTime() {
+    public LocalDateTime getCaptureDateTime() {
         ImageMetaValue value = getValue( EXIF_DATE_TIME_ORIGINAL );
         if ( value == null )
             value = getValue( EXIF_DATE_TIME_DIGITIZED );
-        return  value instanceof DateMetaValue ?
+        return value instanceof DateMetaValue ?
                 ((DateMetaValue)value).getDateValue() : null;
     }
 

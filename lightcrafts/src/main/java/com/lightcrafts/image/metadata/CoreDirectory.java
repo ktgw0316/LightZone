@@ -19,6 +19,7 @@ import org.w3c.dom.Element;
 import java.awt.*;
 import java.awt.color.ICC_Profile;
 import java.io.File;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.lightcrafts.image.metadata.CoreTags.*;
@@ -26,6 +27,7 @@ import static com.lightcrafts.image.metadata.ImageMetaType.*;
 import static com.lightcrafts.image.metadata.ImageOrientation.ORIENTATION_LANDSCAPE;
 import static com.lightcrafts.image.metadata.ImageOrientation.ORIENTATION_UNKNOWN;
 import static com.lightcrafts.image.metadata.XMPConstants.*;
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
 /**
  * A <code>CoreDirectory</code> is-an {@link ImageMetadataDirectory} for
@@ -162,9 +164,10 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
      * {@inheritDoc}
      */
     @Override
-    public Date getCaptureDateTime() {
+    public LocalDateTime getCaptureDateTime() {
         final ImageMetaValue value = getValue( CORE_CAPTURE_DATE_TIME );
-        return value != null ? ((DateMetaValue)value).getDateValue() : null;
+        return value instanceof DateMetaValue ?
+                ((DateMetaValue)value).getDateValue() : null;
     }
 
     /**
@@ -189,7 +192,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
      * {@inheritDoc}
      */
     @Override
-    public Date getFileDateTime() {
+    public LocalDateTime getFileDateTime() {
         final ImageMetaValue value = getValue( CORE_FILE_DATE_TIME );
         return value != null ? ((DateMetaValue)value).getDateValue() : null;
     }
@@ -489,9 +492,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
             );
             XMLUtil.setTextContentOf(
                 createDateElement,
-                TextUtil.dateFormat(
-                    ISO_8601_DATE_FORMAT, captureDateValue.getDateValue()
-                )
+                captureDateValue.getDateValue().format(ISO_LOCAL_DATE_TIME)
             );
             xapRDFDescElement.appendChild( createDateElement );
         }
@@ -509,22 +510,17 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
 
         ////////// MetadataDate & ModifyDate
 
-        final Date now = new Date();
+        // final String now = ZonedDateTime.now().format(ISO_OFFSET_DATE_TIME);
+        final String now = LocalDateTime.now().format(ISO_LOCAL_DATE_TIME);
         final Element metadataDateElement = xmpDoc.createElementNS(
             XMP_XAP_NS, XMP_XAP_PREFIX + ":MetadataDate"
         );
-        XMLUtil.setTextContentOf(
-            metadataDateElement,
-            TextUtil.dateFormat( ISO_8601_DATE_FORMAT, now )
-        );
+        XMLUtil.setTextContentOf(metadataDateElement, now);
         xapRDFDescElement.appendChild( metadataDateElement );
         final Element modifyDateElement = xmpDoc.createElementNS(
             XMP_XAP_NS, XMP_XAP_PREFIX + ":ModifyDate"
         );
-        XMLUtil.setTextContentOf(
-            modifyDateElement,
-            TextUtil.dateFormat( ISO_8601_DATE_FORMAT, now )
-        );
+        XMLUtil.setTextContentOf(modifyDateElement, now);
         xapRDFDescElement.appendChild( modifyDateElement );
 
         ////////// Rating
@@ -675,7 +671,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
      */
     private void addCaptureDateTime( ImageInfo imageInfo ) {
         removeValue( CORE_CAPTURE_DATE_TIME );
-        final Date date = imageInfo.getCurrentMetadata().getCaptureDateTime();
+        final var date = imageInfo.getCurrentMetadata().getCaptureDateTime();
         if ( date != null )
             putValue( CORE_CAPTURE_DATE_TIME, new DateMetaValue( date ) );
     }
@@ -741,8 +737,7 @@ public final class CoreDirectory extends ImageMetadataDirectory implements
         putValue( CORE_DIR_NAME , new StringMetaValue( parentDir ) );
         putValue( CORE_FILE_NAME, new StringMetaValue( file.getName() ) );
         putValue( CORE_FILE_SIZE, new UnsignedLongMetaValue( file.length() ) );
-        final Date date = new Date( file.lastModified() );
-        putValue( CORE_FILE_DATE_TIME, new DateMetaValue( date ) );
+        putValue( CORE_FILE_DATE_TIME, new DateMetaValue(file.lastModified()) );
 
         removeValue( CORE_ORIGINAL_IMAGE_HEIGHT );
         removeValue( CORE_ORIGINAL_IMAGE_WIDTH );

@@ -2,15 +2,13 @@
 
 package com.lightcrafts.image.metadata;
 
-import java.io.IOException;
-import java.util.Date;
-import java.util.stream.Stream;
-
 import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.image.metadata.values.*;
 import com.lightcrafts.image.types.RawImageInfo;
 import com.lightcrafts.utils.LightCraftsException;
 import com.lightcrafts.utils.raw.RawDecoder;
+
+import java.io.IOException;
 
 import static com.lightcrafts.image.metadata.EXIFTags.*;
 
@@ -61,7 +59,7 @@ public final class DCRawMetadataReader extends ImageMetadataReader {
                 new UnsignedRationalMetaValue( (int)(aperture * 10), 10 )
             );
 
-        final Date captureDateTime = dcraw.getCaptureDateTime();
+        final var captureDateTime = dcraw.getCaptureDateTime();
         if ( captureDateTime != null )
             exifDir.putValue(
                 EXIF_DATE_TIME, new DateMetaValue( captureDateTime )

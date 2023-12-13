@@ -1,8 +1,11 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2023-     Masahiro Kitagawa */
 
 package com.lightcrafts.image.metadata.providers;
 
-import java.util.Date;
+import org.jetbrains.annotations.Nullable;
+
+import java.time.LocalDateTime;
 
 /**
  * A <code>FileDateTimeProvider</code> provides the last modified date/time of
@@ -18,7 +21,8 @@ public interface FileDateTimeProvider extends ImageMetadataProvider {
      * @return Returns the date/time or <code>null</code> if no date/time is
      * available.
      */
-    Date getFileDateTime();
+    @Nullable
+    LocalDateTime getFileDateTime();
 
 }
 /* vim:set et sw=4 ts=4: */

@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2023-     Masahiro Kitagawa */
 
 package com.lightcrafts.image.metadata.makernotes;
 
@@ -17,6 +18,7 @@ import com.lightcrafts.utils.bytebuffer.LCByteBuffer;
 
 import java.awt.image.RenderedImage;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -52,9 +54,9 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
      * {@inheritDoc}
      */
     @Override
-    public Date getCaptureDateTime() {
+    public LocalDateTime getCaptureDateTime() {
         final ImageMetaValue value = getValue( PENTAX_DATE );
-        return  value instanceof DateMetaValue ?
+        return value instanceof DateMetaValue ?
                 ((DateMetaValue)value).getDateValue() : null;
     }
 
@@ -277,11 +279,11 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
                     return;
                 final byte[] buf =
                     ((UndefinedMetaValue)value).getUndefinedValue();
-                final Calendar cal = new GregorianCalendar(
-                    ((int)buf[0] & 0xFF) << 8 | (int)buf[1] & 0xFF,
-                    buf[2] - 1, buf[3]
-                );
-                value = new DateMetaValue( cal.getTime() );
+                final int year = ((int)buf[0] & 0xFF) << 8 | (int)buf[1] & 0xFF;
+                final int month = buf[2];
+                final int day = buf[3];
+                final var dateTime = LocalDateTime.of(year, month, day, 0, 0, 0, 0);
+                value = new DateMetaValue(dateTime);
                 break;
             }
             case PENTAX_TIME: {
@@ -296,13 +298,14 @@ public final class PentaxDirectory extends MakerNotesDirectory implements
                 if (dateValue == null) {
                     return;
                 }
-                final Date date = ((DateMetaValue)dateValue).getDateValue();
+                final var date = ((DateMetaValue)dateValue).getDateValue();
                 final byte[] buf =
                     ((UndefinedMetaValue)value).getUndefinedValue();
-                date.setTime(
-                    date.getTime() +
-                    (buf[0] * 60 * 60 + buf[1] * 60 + buf[2]) * 1000
-                );
+                final var dateTime = date
+                        .withHour(buf[0])
+                        .withMinute(buf[1])
+                        .withSecond(buf[2]);
+                super.putValue(PENTAX_DATE, new DateMetaValue(dateTime));
                 return;
             }
             case PENTAX_IMAGE_SIZE:
