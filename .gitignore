@@ -4,6 +4,7 @@
 **/.pc
 **/.vscode
 **/build
+**/gradle.xml
 **/java_jni
 **/javah
 **/out
@@ -38,11 +39,13 @@
 *.zip
 *~
 -
+.idea/**/modules.xml
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/**/uiDesigner.xml
 .idea/**/libraries
 .idea/**/shelf
+.idea/compiler.xml
 Java.runtime
 debian/*.debhelper
 debian/*.substvars
@@ -62,4 +65,3 @@ windows/helpers/JavaAppLauncher/jar_md5_include
 windows/md5sums
 windows/output.txt
 windows/updates.xml
-.idea/compiler.xml
