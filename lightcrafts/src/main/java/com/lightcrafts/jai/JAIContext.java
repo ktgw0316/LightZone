@@ -9,6 +9,7 @@ import com.lightcrafts.jai.utils.LCTileCache;
 import com.lightcrafts.jai.utils.LCRecyclingTileFactory;
 import com.lightcrafts.image.color.ColorScience;
 import com.lightcrafts.image.color.ColorProfileInfo;
+import com.lightcrafts.jai.utils.LCTileScheduler;
 import com.lightcrafts.platform.Platform;
 import com.sun.media.jai.util.SunTileCache;
 
@@ -173,18 +174,16 @@ public class JAIContext {
 
         JAI jaiInstance = JAI.getDefaultInstance();
 
-        // Use our own Tile Scheduler -- TODO: Needs more testing
-        // jaiInstance.setTileScheduler(new LCTileScheduler());
-
         final int processors = Runtime.getRuntime().availableProcessors();
         System.out.println("Running on " + processors + " processors");
 
-        // Use multiple procs only if we have enough heap
-        final int parallelism = (maxMemory >= 400 * MB) ? processors : 1;
-        jaiInstance.getTileScheduler().setParallelism(parallelism);
-        jaiInstance.getTileScheduler().setPrefetchParallelism(parallelism);
-        jaiInstance.getTileScheduler().setPrefetchPriority(7);
-        jaiInstance.getTileScheduler().setPriority(7);
+        // Use multiple processors only if we have enough heap
+        final int parallelism = (maxMemory >= 400 * MB) ? processors - 1 : 1;
+        final int priority = 7;
+
+        // Use our own Tile Scheduler -- TODO: Needs more testing
+        final var tileScheduler = new LCTileScheduler(parallelism, priority);
+        jaiInstance.setTileScheduler(tileScheduler);
 
         final long tileCacheMemory = (maxMemory <= 2048L * MB)
                 ? maxMemory / 2

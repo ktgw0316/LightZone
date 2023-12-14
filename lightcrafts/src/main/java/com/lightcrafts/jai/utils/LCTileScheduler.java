@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2023-     Masahiro Kitagawa */
 
 package com.lightcrafts.jai.utils;
 
@@ -13,30 +14,23 @@ package com.lightcrafts.jai.utils;
  * $Date: 2005/02/11 04:57:02 $
  * $State: Exp $
  */
-import java.awt.Point;
-import java.awt.RenderingHints;
-import java.awt.image.Raster;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import javax.media.jai.OpImage;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.TileCache;
-import javax.media.jai.TileComputationListener;
-import javax.media.jai.TileRequest;
-import javax.media.jai.TileScheduler;
+import com.sun.media.jai.util.ImageUtil;
+import org.jetbrains.annotations.NotNull;
+
+import javax.media.jai.*;
 import javax.media.jai.util.ImagingException;
 import javax.media.jai.util.ImagingListener;
-import com.sun.media.jai.util.ImageUtil;
+import java.awt.*;
+import java.awt.image.Raster;
+import java.math.BigInteger;
+import java.util.List;
+import java.util.*;
+import java.util.concurrent.*;
+
+import static java.lang.Thread.MAX_PRIORITY;
+import static java.lang.Thread.MIN_PRIORITY;
+import static java.lang.Thread.NORM_PRIORITY;
 
 /**
  * A class representing a request for non-prefetch background computation
@@ -99,7 +93,7 @@ class Request implements TileRequest {
         if(tileListeners != null) {
             int numListeners = tileListeners.length;
             if(numListeners > 0) {
-                listeners = new HashSet<TileComputationListener>(numListeners);
+                listeners = new HashSet<>(numListeners);
                 Collections.addAll(listeners, tileListeners);
             } else {
                 listeners = null;
@@ -109,7 +103,7 @@ class Request implements TileRequest {
         }
 
         // Initialize status table.
-        tileStatus = new Hashtable<Point, Integer>(tileIndices.length);
+        tileStatus = new Hashtable<>(tileIndices.length);
     }
 
     // --- TileRequest implementation ---
@@ -119,11 +113,11 @@ class Request implements TileRequest {
     }
 
     public Point[] getTileIndices() {
-        return indices.toArray(new Point[indices.size()]);
+        return indices.toArray(new Point[0]);
     }
 
     public TileComputationListener[] getTileListeners() {
-        return listeners.toArray(new TileComputationListener[listeners.size()]);
+        return listeners.toArray(new TileComputationListener[0]);
     }
 
     public boolean isStatusAvailable() {
@@ -132,15 +126,7 @@ class Request implements TileRequest {
 
     public int getTileStatus(int tileX, int tileY) {
         Point p = new Point(tileX, tileY);
-
-        int status;
-        if(tileStatus.containsKey(p)) {
-            status = tileStatus.get(p);
-        } else {
-            status = TileRequest.TILE_STATUS_PENDING;
-        }
-
-        return status;
+        return tileStatus.getOrDefault(p, TileRequest.TILE_STATUS_PENDING);
     }
 
     public void cancelTiles(Point[] tileIndices) {
@@ -150,7 +136,7 @@ class Request implements TileRequest {
 }
 
 /** A job to put in a job queue. */
-interface Job {
+sealed interface Job permits RequestJob, TileJob {
     /** Computes the job required. */
     void compute();
 
@@ -180,7 +166,7 @@ interface Job {
  * <code>TileRequest</code>s with which this tile is associated of
  * whether the tile was computed or the computation failed.
  */
-final class RequestJob implements Job {
+final class RequestJob implements Job, Comparable<Job>, Runnable {
 
     final LCTileScheduler scheduler; // the TileScheduler
 
@@ -247,7 +233,7 @@ final class RequestJob implements Job {
                 // XXX Do not need empty check in next line.
                 if(listeners != null && !listeners.isEmpty()) {
                     // Get TileRequests as an array for later use.
-                    TileRequest[] requests = reqList.toArray(new TileRequest[reqList.size()]);
+                    TileRequest[] requests = reqList.toArray(new TileRequest[0]);
 
                     // Update tile status as needed.
                     tileStatus = exception == null ?
@@ -317,13 +303,30 @@ final class RequestJob implements Job {
                " tileY = " + Integer.toString(tileY) +
                " tile = " + tString;
     }
+
+    @Override
+    public int compareTo(@NotNull Job o) {
+        if (o instanceof TileJob) {
+            return 1;
+        }
+        return 0;
+    }
+
+    @Override
+    public void run() {
+        compute();
+
+        synchronized (scheduler) {
+            scheduler.notify();
+        }
+    }
 }
 
 /**
  * A <code>Job</code> which computes one or more tiles at a time for either
  * a prefetch job or a blocking job.
  */
-final class TileJob implements Job {
+final class TileJob implements Job, Comparable<Job>, Runnable {
 
     final LCTileScheduler scheduler; // the TileScheduler
 
@@ -382,82 +385,25 @@ final class TileJob implements Job {
     public Exception getException() {
         return exception;
     }
-}
 
-/**
- * Worker thread that takes jobs from the tile computation queue and does
- * the actual computation.
- */
-class WorkerThread extends Thread {
-
-    /** <code>Object</code> indicating the the thread should exit. */
-    public static final Object TERMINATE = new Object();
-
-    /** The scheduler that spawned this thread. */
-    final LCTileScheduler scheduler;
-
-    /** Whether this is a prefetch thread. */
-    boolean isPrefetch;
-
-    /** Constructor. */
-    public WorkerThread(ThreadGroup group,
-                        LCTileScheduler scheduler,
-                        boolean isPrefetch) {
-        super(group, group.getName() + group.activeCount());
-        this.scheduler = scheduler;
-        this.isPrefetch = isPrefetch;
-
-        setDaemon(true);
-        start();
+    @Override
+    public int compareTo(@NotNull Job o) {
+        if (o instanceof RequestJob) {
+            return -1;
+        }
+        return 0;
     }
 
-    /** Does the tile computation. */
+    @Override
     public void run() {
-        LinkedList<Object> jobQueue = scheduler.getQueue(isPrefetch);
+        compute();
 
-        while(true) {
-            Object dequeuedObject = null;
-
-            // Check the job queue.
-            if(jobQueue.size() > 0) {
-                // Remove the first job.
-                dequeuedObject = jobQueue.removeFirst();
-            } else {
-                try {
-                    // Wait for a notify() on the queue.
-                    jobQueue.wait();
-                    continue;
-                } catch(InterruptedException ie) {
-                    // Ignore: should never happen.
-                }
+        // Notify the scheduler only if the Job is blocking.
+        if (isBlocking) {
+            synchronized (scheduler) {
+                scheduler.notify();
             }
-
-            if(dequeuedObject == TERMINATE ||
-               getThreadGroup() == null || getThreadGroup().isDestroyed()) {
-                // Remove WorkerThread from appropriate ArrayList.
-                LinkedList<Thread> threads;
-                synchronized(threads = scheduler.getWorkers(isPrefetch)) {
-                    threads.remove(this);
-                }
-
-                // Exit the thread.
-                return;
-            }
-
-            Job job = (Job)dequeuedObject;
-
-            // Execute tile job.
-            if (job != null) {
-                job.compute();
-
-                // Notify the scheduler only if the Job is blocking.
-                if(job.isBlocking()) {
-                    synchronized(scheduler) {
-                        scheduler.notify();
-                    }
-                }
-            }
-        } // infinite loop
+        }
     }
 }
 
@@ -482,65 +428,17 @@ public final class LCTileScheduler implements TileScheduler {
      */
     private static int numInstances = 0;
 
-    /** The root ThreadGroup, which holds two sub-groups:
-     * the ThreadGroup for the standard jobs, and the ThreadGroup for
-     * the prefetch jobs.
-     */
-    private ThreadGroup rootGroup;
+    @NotNull
+    private final ThreadPoolExecutor executor;
 
-    /** The ThreadGroup contains all the standard jobs. */
-    private ThreadGroup standardGroup;
-
-    /** The ThreadGroup contains all the prefetch jobs. */
-    private ThreadGroup prefetchGroup;
-
-    /** The worker thread parallelism. */
-    private int parallelism = NUM_THREADS_DEFAULT;
-
-    /** The processing thread parallelism. */
-    private int prefetchParallelism = NUM_PREFETCH_THREADS_DEFAULT;
+    @NotNull
+    private final ThreadPoolExecutor prefetchExecutor;
 
     /** The worker thread priority. */
-    private int priority = Thread.NORM_PRIORITY;
+    private int priority = NORM_PRIORITY;
 
     /** The prefetch thread priority. */
-    private int prefetchPriority = Thread.MIN_PRIORITY;
-
-    /** A job queue for tiles waiting to be computed by the worker threads. */
-    private final LinkedList<Object> queue;
-
-    /** A job queue for tiles waiting to be computed by prefetch workers. */
-    private final LinkedList<Object> prefetchQueue;
-
-    /**
-     * A <code>LinkedList</code> of <code>WorkerThread</code>s that persist
-     * to do the actual tile computation for normal processing.  This
-     * variable should never be set to <code>null</code>.
-     */
-    private LinkedList<Thread> workers = new LinkedList<Thread>();
-
-    /**
-     * A <code>LinkedList</code> of <code>WorkerThread</code>s that persist
-     * to do the actual tile computation for prefetch processing.  This
-     * variable should never be set to <code>null</code>.
-     */
-    private LinkedList<Thread> prefetchWorkers = new LinkedList<Thread>();
-
-    /**
-     * The effective number of worker threads; may differ from
-     * <code>workers.size()</code> due to latency.  This value should
-     * equal the size of <code>workers</code> less the number of
-     * <code>WorkerThread.TERMINATE</code>s in <code>queue</code>.
-     */
-    private int numWorkerThreads = 0;
-
-    /**
-     * The effective number of prefetch worker threads; may differ from
-     * <code>prefetchWorkers.size()</code> due to latency.  This value should
-     * equal the size of <code>prefetchWorkers</code> less the number of
-     * <code>WorkerThread.TERMINATE</code>s in <code>prefetchQueue</code>.
-     */
-    private int numPrefetchThreads = 0;
+    private int prefetchPriority = MIN_PRIORITY;
 
     /**
      * <code>Map</code> of tiles currently being computed.  The key is
@@ -550,7 +448,7 @@ public final class LCTileScheduler implements TileScheduler {
      * <code>Object</code> which represent, respectively, that the tile is
      * being computed, the tile itself, and that the tile computation failed.
      */
-    private final Map<Object, Object[]> tilesInProgress = new HashMap<Object, Object[]>();
+    private final Map<Object, Object[]> tilesInProgress = new HashMap<>();
 
     /**
      * <code>Map</code> of tiles to <code>Request</code>s.  The key is
@@ -561,7 +459,7 @@ public final class LCTileScheduler implements TileScheduler {
      * should always be non-null and the <code>List</code> value should
      * have size of at least unity.
      */
-    final Map<Object, List<Request>> tileRequests = new HashMap<Object, List<Request>>();
+    final Map<Object, List<Request>> tileRequests = new HashMap<>();
 
     /**
      * <code>Map</code> of tiles to <code>Job</code>s.The key is
@@ -570,10 +468,7 @@ public final class LCTileScheduler implements TileScheduler {
      * there is no mapping for the tile, then there is no enqueued
      * <code>RequestJob</code>.
      */
-    Map<Object, Job> tileJobs = new HashMap<Object, Job>();
-
-    /** The name of this instance. */
-    private String nameOfThisInstance;
+    Map<Object, Job> tileJobs = new HashMap<>();
 
     /**
      * Returns the hash table "key" as a <code>Object</code> for this
@@ -608,13 +503,24 @@ public final class LCTileScheduler implements TileScheduler {
             // XXX Do not need empty check in next line.
             if (req.listeners != null && !req.listeners.isEmpty()) {
                 if (listeners == null) {
-                    listeners = new HashSet<TileComputationListener>();
+                    listeners = new HashSet<>();
                 }
                 listeners.addAll(req.listeners);
             }
         }
 
         return listeners;
+    }
+
+    /**
+     * Creates a <code>ThreadFactory</code> with the specified priority.
+     */
+    private ThreadFactory threadFactory(int priority) {
+        return r -> {
+            Thread thread = new Thread(r);
+            thread.setPriority(priority);
+            return thread;
+        };
     }
 
     /**
@@ -630,12 +536,17 @@ public final class LCTileScheduler implements TileScheduler {
     public LCTileScheduler(int parallelism, int priority,
                            int prefetchParallelism, int prefetchPriority) {
         // Create queues and set parallelism and priority to default values.
-        this();
-
-        setParallelism(parallelism);
+        executor = new ThreadPoolExecutor(
+                parallelism, parallelism,
+                0L, TimeUnit.MICROSECONDS, new PriorityBlockingQueue<>(),
+                threadFactory(priority));
+        prefetchExecutor = new ThreadPoolExecutor(
+                prefetchParallelism, prefetchParallelism,
+                0L, TimeUnit.MICROSECONDS, new LinkedBlockingQueue<>(),
+                threadFactory(prefetchPriority));
         setPriority(priority);
-        setPrefetchParallelism(prefetchParallelism);
         setPrefetchPriority(prefetchPriority);
+        numInstances++;
     }
 
     /**
@@ -643,25 +554,18 @@ public final class LCTileScheduler implements TileScheduler {
      * parallelism and priority values are set to default values.
      */
     public LCTileScheduler() {
-        queue = new LinkedList<Object>();
-        prefetchQueue = new LinkedList<Object>();
+        this(NUM_THREADS_DEFAULT, NORM_PRIORITY, NUM_PREFETCH_THREADS_DEFAULT, MIN_PRIORITY);
+    }
 
-        // The tile scheduler name.  It is used to compose the name of the
-        // ThreadGroup.
-        String name = "LCTileSchedulerName";
-        nameOfThisInstance = name + numInstances;
-        rootGroup = new ThreadGroup(nameOfThisInstance);
-        rootGroup.setDaemon(true);
-
-        standardGroup = new ThreadGroup(rootGroup,
-                nameOfThisInstance + "Standard");
-        standardGroup.setDaemon(true);
-
-        prefetchGroup = new ThreadGroup(rootGroup,
-                nameOfThisInstance + "Prefetch");
-        prefetchGroup.setDaemon(true);
-
-        numInstances++;
+    /**
+     * Constructor.
+     *
+     * @param parallelism  The number of worker threads to do tile computation.
+     *        If this number is less than 1, no multi-threading is used.
+     * @param priority  The priority of worker threads.
+     */
+    public LCTileScheduler(int parallelism, int priority) {
+        this(parallelism, priority, parallelism, priority);
     }
 
     /**
@@ -692,7 +596,7 @@ public final class LCTileScheduler implements TileScheduler {
                 final Point p = tileIndices[j];
 
                 // Update tile status to "processing".
-                Integer tileStatus = TileRequest.TILE_STATUS_PROCESSING;
+                int tileStatus = TileRequest.TILE_STATUS_PROCESSING;
                 request.tileStatus.put(p, tileStatus);
 
                 try {
@@ -766,6 +670,7 @@ public final class LCTileScheduler implements TileScheduler {
     // waiting threads via the contents of this Object[]. Thus this method does
     // not depend on the TileCache to transfer the data.
     //
+    @Override
     public Raster scheduleTile(OpImage owner,
                                int tileX,
                                int tileY) {
@@ -780,12 +685,14 @@ public final class LCTileScheduler implements TileScheduler {
         final Object tileID = tileKey(owner, tileX, tileY);
 
         // Set the computation flag and initialize or retrieve the tile cache.
-        boolean computeTile;
+        final boolean computeTile;
         final Object[] cache;
         synchronized(tilesInProgress) {
-            if(computeTile = !tilesInProgress.containsKey(tileID)) {
+            computeTile = !tilesInProgress.containsKey(tileID);
+            if(computeTile) {
                 // Computing: add tile ID to the map.
-                tilesInProgress.put(tileID, cache = new Object[1]);
+                cache = new Object[1];
+                tilesInProgress.put(tileID, cache);
             } else {
                 // Waiting: get tile cache from the Map.
                 cache = tilesInProgress.get(tileID);
@@ -828,7 +735,7 @@ public final class LCTileScheduler implements TileScheduler {
                 cache[0] = tile != null ? tile : new Object();
 
                 // Notify the thread(s).
-                cache.notifyAll();
+//                cache.notifyAll();
 
                 // Remove the tile ID from the Map.
                 tilesInProgress.remove(tileID);
@@ -894,192 +801,79 @@ public final class LCTileScheduler implements TileScheduler {
         }
 
         int numTiles = tileIndices.length;
-        Raster[] tiles = new Raster[numTiles];
+        final Raster[] tiles = new Raster[numTiles];
+
+        final var jobExecutor = isPrefetch ? prefetchExecutor : executor;
+        final int numThreads = jobExecutor.getPoolSize();
+        assert numThreads > 0;
+
+        final Job[] jobs = new Job[numTiles];
+
         Object returnValue = tiles;
 
-        final int numThreads;
-        Job[] jobs = null;
-        int numJobs = 0;
+        if(!isBlocking && !isPrefetch) {
+            final var request = new Request(this, owner, tileIndices, listeners);
 
-        synchronized(getWorkers(isPrefetch)) {
-            numThreads = getNumThreads(isPrefetch);
+            // Override return value.
+            returnValue = request;
 
-            if(numThreads > 0) { // worker threads exist
-                if(numTiles <= numThreads ||       // no more tiles than threads
-                   (!isBlocking && !isPrefetch)) { // non-blocking, non-prefetch
+            // Queue all tiles as single-tile jobs.
+            for (int i = 0; i < numTiles; i++) {
+                final Point p = tileIndices[i];
+                final Object tileID = tileKey(owner, p.x, p.y);
 
-                    jobs = new Job[numTiles];
+                synchronized(tileRequests) {
+                    List<Request> reqList = tileRequests.get(tileID);
+                    final boolean isAlreadyQueued = reqList != null;
+                    if (isAlreadyQueued) {
+                        reqList.add(request);
+                        numTiles--;
+                    } else {
+                        reqList = new ArrayList<>();
+                        reqList.add(request);
+                        tileRequests.put(tileID, reqList);
 
-                    if(!isBlocking && !isPrefetch) {
-                        Request request =
-                            new Request(this, owner, tileIndices, listeners);
-
-                        // Override return value.
-                        returnValue = request;
-
-                        // Queue all tiles as single-tile jobs.
-                        while(numJobs < numTiles) {
-                            Point p = tileIndices[numJobs];
-
-                            Object tileID = tileKey(owner, p.x, p.y);
-
-                            synchronized(tileRequests) {
-                                List<Request> reqList = tileRequests.get(tileID);
-                                if (reqList != null) {
-                                    // This tile is already queued in a
-                                    // non-blocking, non-prefetch job.
-                                    reqList.add(request);
-                                    numTiles--;
-                                } else {
-                                    // This tile has not yet been queued.
-                                    reqList = new ArrayList<Request>();
-                                    reqList.add(request);
-                                    tileRequests.put(tileID, reqList);
-
-                                    jobs[numJobs] = new RequestJob(this, owner,
-                                                                   p.x, p.y,
-                                                                   tiles, numJobs);
-                                    tileJobs.put(tileID, jobs[numJobs]);
-
-                                    addJob(jobs[numJobs++], false);
-                                }
-                            }
-                        }
-                    } else { // numTiles <= numThreads
-                        while(numJobs < numTiles) {
-                            jobs[numJobs] = new TileJob(this,
-                                                        isBlocking,
-                                                        owner,
-                                                        tileIndices,
-                                                        tiles,
-                                                        numJobs,
-                                                        1);
-                            addJob(jobs[numJobs++], isPrefetch);
-                        }
-                    }
-                } else { // more tiles than worker threads
-                    // Set the fraction of unqueued tiles to be processed by
-                    // each worker thread.
-                    float frac = 1.0F/(2.0F*numThreads);
-
-                    // Set the minimum number of tiles each thread may process.
-                    // If there is only one thread this will equal the total
-                    // number of tiles.
-                    int minTilesPerThread = numThreads == 1 ? numTiles :
-                        Math.min(Math.max(1, (int)(frac*numTiles/2.0F + 0.5F)),
-                                 numTiles);
-
-                    // Allocate the maximum possible number of multi-tile jobs.
-                    // This will be larger than the actual number of jobs but
-                    // a more precise calculation is not possible and a dynamic
-                    // storage object such as a Collection would not be useful
-                    // since as calculated maxNumJobs = 4*numThreads if the
-                    // preceding values of "frac" and "minTilesPerThread" are
-                    // 1/(2*numThreads) and frac*numTiles/2, respectively.
-                    int maxNumJobs = numThreads == 1 ? 1 :
-                        (int)((float)numTiles/(float)minTilesPerThread+0.5F);
-                    jobs = new TileJob[maxNumJobs];
-
-                    // Set the number of enqueued tiles and the number left.
-                    int numTilesQueued = 0;
-                    int numTilesLeft = numTiles - numTilesQueued;
-
-                    // Assign a number of tiles to each thread determined by
-                    // the number of remaining tiles, the fraction of remaining
-                    // tiles to be processed and the minimum chunk size.
-                    while(numTilesLeft > 0) {
-                        // Set the number of tiles to the pre-calculated
-                        // fraction of tiles yet to be computed.
-                        int numTilesInThread = (int)(frac*numTilesLeft + 0.5F);
-
-                        // Ensure that the number to be processed is at
-                        // least the minimum chunk size.
-                        if(numTilesInThread < minTilesPerThread) {
-                            numTilesInThread = minTilesPerThread;
-                        }
-
-                        // Clamp number of tiles in thread to number unqueued.
-                        if(numTilesInThread > numTilesLeft) {
-                            numTilesInThread = numTilesLeft;
-                        }
-
-                        // Decrement the count of remaining tiles. Note that
-                        // this value will be non-negative due to the clamping
-                        // above.
-                        numTilesLeft -= numTilesInThread;
-
-                        // If the number left is smaller than the minimum chunk
-                        // size then process these tiles in the current job.
-                        if(numTilesLeft < minTilesPerThread) {
-                            numTilesInThread += numTilesLeft;
-                            numTilesLeft = 0;
-                        }
-
-                        // Create a job to process the number of tiles needed.
-                        jobs[numJobs] = new TileJob(this,
-                                                    isBlocking,
-                                                    owner,
-                                                    tileIndices,
-                                                    tiles,
-                                                    numTilesQueued,
-                                                    numTilesInThread);
-
-                        // Queue the job and increment the job count.
-                        addJob(jobs[numJobs++], isPrefetch);
-
-                        // Increment the count of tiles queued.
-                        numTilesQueued += numTilesInThread;
-                    }
-                } // SingleTile vs. MultiTile Jobs
-            } // numThreads > 0
-        } // end synchronized block
-
-        if(numThreads != 0) {
-            // If blocking, wait until all tiles have been computed.
-            // There is no 'else' block for non-blocking as in that
-            // case we just want to continue.
-            if(isBlocking) {
-                for (int i = 0; i < numJobs; i++) {
-                    synchronized(this) {
-                        while (jobs[i].notDone()) {
-                            try {
-                                wait();
-                            } catch(InterruptedException ie) {
-                                // Ignore: should never happen.
-                            }
-                        }
-                    }
-
-                    // XXX: should we re-throw the exception or
-                    //      should we reschedule this job ?? krishnag
-                    Exception e = jobs[i].getException();
-
-                    if (e != null) {
-                        // Throw a RuntimeException with the Exception's
-                        // message concatenated with the stack trace.
-                        String message = "Exception while scheduling tiles: ";
-                        sendExceptionToListener(message,
-                                                new ImagingException(message, e));
+                        jobs[i] = new RequestJob(this, owner,
+                                p.x, p.y, tiles, i);
+                        tileJobs.put(tileID, jobs[i]);
+                        addJob(jobs[i], false);
                     }
                 }
             }
-        } else { // numThreads == 0
-            Request request = null;
-            if(!isBlocking && !isPrefetch) {
-                request = new Request(this, owner, tileIndices, listeners);
-                returnValue = request;
+        } else {
+            for (int i = 0; i < numTiles; i++) {
+                jobs[i] = new TileJob(this, isBlocking, owner,
+                        tileIndices, tiles, i, 1);
+                addJob(jobs[i], isPrefetch);
             }
+        }
 
-            // no workers; sequentially compute tiles in main thread
-            Exception e = compute(owner, tileIndices, tiles, 0, numTiles,
-                                  request);
+        // If blocking, wait until all tiles have been computed.
+        // There is no 'else' block for non-blocking as in that
+        // case we just want to continue.
+        if(isBlocking) {
+            for (final var job : jobs) {
+                synchronized(this) {
+                    while (job.notDone()) {
+                        try {
+                            wait();
+                        } catch(InterruptedException ie) {
+                            // Ignore: should never happen.
+                        }
+                    }
+                }
 
-            // Throw a RuntimeException with the Exception's
-            // message concatenated with the stack trace.
-            if(e != null) {
-                String message = "Exception while scheduling tiles: ";
-                sendExceptionToListener(message,
-                                        new ImagingException(message, e));
+                // XXX: should we re-throw the exception or
+                //      should we reschedule this job ?? krishnag
+                Exception e = job.getException();
+
+                if (e != null) {
+                    // Throw a RuntimeException with the Exception's
+                    // message concatenated with the stack trace.
+                    String message = "Exception while scheduling tiles: ";
+                    sendExceptionToListener(message,
+                            new ImagingException(message, e));
+                }
             }
         }
 
@@ -1094,6 +888,7 @@ public final class LCTileScheduler implements TileScheduler {
      *
      * @return  An array of computed tiles.
      */
+    @Override
     public Raster[] scheduleTiles(OpImage owner,
                                   Point[] tileIndices) {
         if (owner == null || tileIndices == null) {
@@ -1110,6 +905,7 @@ public final class LCTileScheduler implements TileScheduler {
      * implementation which thread invokes the
      * <code>TileComputationListener</code> methods.
      */
+    @Override
     public TileRequest scheduleTiles(PlanarImage target, Point[] tileIndices,
                                      TileComputationListener[] tileListeners) {
         if (target == null || tileIndices == null) {
@@ -1138,6 +934,7 @@ public final class LCTileScheduler implements TileScheduler {
      * Furthermore, cancelling a tile request in no way invalidates the tile
      * as a candidate for future recomputation.
      */
+    @Override
     public void cancelTiles(TileRequest request, Point[] tileIndices) {
         if(request == null) {
             throw new IllegalArgumentException("Null TileRequest");
@@ -1157,9 +954,9 @@ public final class LCTileScheduler implements TileScheduler {
                 // Retain only indices which were actually in the request.
                 tileIndexList.retainAll(reqIndexList);
 
-                indices = tileIndexList.toArray(new Point[tileIndexList.size()]);
+                indices = tileIndexList.toArray(new Point[0]);
             } else {
-                indices = reqIndexList.toArray(new Point[reqIndexList.size()]);
+                indices = reqIndexList.toArray(new Point[0]);
             }
 
             // Cache status value.
@@ -1184,11 +981,9 @@ public final class LCTileScheduler implements TileScheduler {
                 // If the request list is now empty, dequeue the job and
                 // remove the tile from the hashes.
                 if(reqList.isEmpty()) {
-                    synchronized(queue) {
-                        Object job = tileJobs.remove(tileID);
-                        if(job != null) {
-                            queue.remove(job);
-                        }
+                    Object job = tileJobs.remove(tileID);
+                    if(job != null) {
+                        executor.remove((Runnable) job);
                     }
                     tileRequests.remove(tileID);
                 }
@@ -1214,6 +1009,7 @@ public final class LCTileScheduler implements TileScheduler {
      * @param owner  The image the tiles belong to.
      * @param tileIndices  An array of tile X and Y indices.
      */
+    @Override
     public void prefetchTiles(PlanarImage owner,
                               Point[] tileIndices) {
         if(owner == null || tileIndices == null) {
@@ -1244,37 +1040,44 @@ public final class LCTileScheduler implements TileScheduler {
      * @throws IllegalArgumentException if <code>parallelism</code>
      *         is negative.
      */
+    @Override
     public void setParallelism(int parallelism) {
         if (parallelism < 0) {
             throw new IllegalArgumentException("Negative Parallelism?");
         }
-        this.parallelism = parallelism;
+        // Create queues and set parallelism and priority to default values.
+        executor.setCorePoolSize(parallelism);
+        executor.setMaximumPoolSize(parallelism);
     }
 
     /**
      * Returns the degree of parallelism of the scheduler.
      */
+    @Override
     public int getParallelism() {
-        return parallelism;
+        return executor.getPoolSize();
     }
 
     /**
      * Identical to <code>setParallelism()</code> but applies only to
      * <code>prefetchTiles()</code>.
      */
+    @Override
     public void setPrefetchParallelism(int parallelism) {
         if (parallelism < 0) {
             throw new IllegalArgumentException("Negative Parallelism?");
         }
-        prefetchParallelism = parallelism;
+        prefetchExecutor.setCorePoolSize(parallelism);
+        prefetchExecutor.setMaximumPoolSize(parallelism);
     }
 
     /**
      * Identical to <code>getParallelism()</code> but applies only to
      * <code>prefetchTiles()</code>.
      */
+    @Override
     public int getPrefetchParallelism() {
-        return prefetchParallelism;
+        return prefetchExecutor.getPoolSize();
     }
 
     /**
@@ -1291,14 +1094,16 @@ public final class LCTileScheduler implements TileScheduler {
      *
      * @param priority The suggested priority.
      */
+    @Override
     public void setPriority(int priority) {
-        this.priority = Math.max(Math.min(priority, Thread.MAX_PRIORITY),
-                                 Thread.MIN_PRIORITY);
+        this.priority = Math.max(Math.min(priority, MAX_PRIORITY),
+                                 MIN_PRIORITY);
     }
 
     /**
      * Returns the priority of <code>scheduleTiles()</code> processing.
      */
+    @Override
     public int getPriority() {
         return priority;
     }
@@ -1313,169 +1118,30 @@ public final class LCTileScheduler implements TileScheduler {
      * <code>Thread.MIN_PRIORITY</code>.
      */
     public void setPrefetchPriority(int priority) {
-        prefetchPriority = Math.max(Math.min(priority, Thread.MAX_PRIORITY),
-                                    Thread.MIN_PRIORITY);
+        prefetchPriority = Math.max(Math.min(priority, MAX_PRIORITY), MIN_PRIORITY);
     }
 
     /**
      * Identical to <code>getPriority()</code> but applies only to
      * <code>prefetchTiles()</code>.
      */
+    @Override
     public int getPrefetchPriority() {
         return prefetchPriority;
     }
 
-    /** Recreate the <code>ThreadGroup</code>is and <code>WorkThread</code>s.
-     * This happens in the case of applet: the java plugin will exist after
-     * the termination of the applet so that JAI and LCTileScheduler will
-     * also exist.  However, the <code>ThreadGroup</code>s are destroyed.
-     * Thus, the old workers should be terminated and new i
-     * <code>ThreadGroup</code> and workers should be created.
-     */
-//    private synchronized void createThreadGroup(boolean isPrefetch) {
-    private void createThreadGroup(boolean isPrefetch) {
-        if (rootGroup == null || rootGroup.isDestroyed()) {
-            rootGroup = new ThreadGroup(nameOfThisInstance);
-            rootGroup.setDaemon(true);
-        }
-
-        if (isPrefetch &&
-            (prefetchGroup == null || prefetchGroup.isDestroyed())) {
-            prefetchGroup = new ThreadGroup(rootGroup,
-                                            nameOfThisInstance + "Prefetch");
-            prefetchGroup.setDaemon(true);
-        }
-
-        if (!isPrefetch &&
-            (standardGroup == null || standardGroup.isDestroyed())) {
-            standardGroup = new ThreadGroup(rootGroup,
-                                            nameOfThisInstance + "Standard");
-            standardGroup.setDaemon(true);
-        }
-
-        LinkedList<Thread> thr = getWorkers(isPrefetch);
-
-        for(Thread t : thr) {
-            if (!t.isAlive())
-                thr.remove(t);
-        }
-
-        if (isPrefetch)
-            numPrefetchThreads = thr.size();
-        else
-            numWorkerThreads = thr.size();
-
-    }
-
-    /**
-     * Returns the effective number of threads of the specified type.
-     * This method also updates the number and priority of threads of
-     * the specified type according to the global settings. This method
-     * may add <code>WorkerThread.TERMINATE</code>s to the appropriate
-     * queue if there are too many effective threads.
-     */
-    private int getNumThreads(boolean isPrefetch) {
-        createThreadGroup(isPrefetch);
-
-        // Local variables.
-        LinkedList<Thread> thr = getWorkers(isPrefetch);
-        int nthr;
-        final int prll;
-        final int prty;
-
-        // Set local variables depending on the thread type.
-        if(isPrefetch) {
-            nthr = numPrefetchThreads;
-            prll = prefetchParallelism;
-            prty = prefetchPriority;
-        } else {
-            nthr = numWorkerThreads;
-            prll = parallelism;
-            prty = priority;
-        }
-
-        // Update priority if it has changed.
-        if(nthr > 0 &&
-           (thr.get(0)).getPriority() != prty) {
-            for (Thread t : thr) {
-                if (t != null && t.getThreadGroup() != null) {
-                    t.setPriority(prty);
-                }
-            }
-        }
-
-        if(nthr < prll) {
-            // Not enough processing threads.
-            // Add more threads at current priority.
-            while(nthr < prll) {
-                Thread t =
-                        new WorkerThread(isPrefetch ? prefetchGroup : standardGroup,
-                                         this, isPrefetch);
-
-                t.setPriority(prty);
-                thr.add(t);
-                nthr++;
-            }
-        } else {
-            // Too many processing threads: queue WorkerThread.TERMINATEs.
-            // WorkerThread will remove itself later from the appropriate
-            // ArrayList.
-            while(nthr > prll) {
-                addJob(WorkerThread.TERMINATE, isPrefetch);
-                nthr--;
-            }
-        }
-
-        // Update the number of effective threads.
-        if(isPrefetch) {
-            numPrefetchThreads = nthr;
-        } else {
-            numWorkerThreads = nthr;
-        }
-
-        return nthr;
-    }
-
-    /** Returns the appropriate worker list. */
-    LinkedList<Thread> getWorkers(boolean isPrefetch) {
-        return isPrefetch ? workers : prefetchWorkers;
-    }
-
-    /** Returns the appropriate queue. */
-    LinkedList<Object> getQueue(boolean isPrefetch) {
-        return isPrefetch ? prefetchQueue : queue;
-    }
-
     /** Append a job to the appropriate queue. */
-    private void addJob(Object job, boolean isPrefetch) {
-        if(job == null ||
-           (job != WorkerThread.TERMINATE && !(job instanceof Job))) {
+    private void addJob(Job job, boolean isPrefetch) {
+        if (job == null) {
             // Programming error: deliberately no message.
             throw new IllegalArgumentException();
         }
 
-        final LinkedList<Object> jobQueue = getQueue(isPrefetch);
-        if(isPrefetch ||
-           jobQueue.isEmpty() ||
-           job instanceof RequestJob) {
-            // Append job to queue.
-            jobQueue.addLast(job);
+        if (isPrefetch) {
+            prefetchExecutor.execute((Runnable) job);
         } else {
-            // If the queue is non-empty or the job is a TileJob
-            // insert the job after the last TileJob in the queue.
-            boolean inserted = false;
-            for(int idx = jobQueue.size() - 1; idx >= 0; idx--) {
-                if(jobQueue.get(idx) instanceof TileJob) {
-                    jobQueue.add(idx+1, job);
-                    inserted = true;
-                    break;
-                }
-            }
-            if(!inserted) {
-                jobQueue.addFirst(job);
-            }
+            executor.execute((Runnable) job);
         }
-        jobQueue.notify();
     }
 
     /** Queue WorkerThread.TERMINATEs to all workers. */
@@ -1487,17 +1153,10 @@ public final class LCTileScheduler implements TileScheduler {
 
     /** Queue WorkerThread.TERMINATEs to all appropriate workers. */
     private void terminateAll(boolean isPrefetch) {
-        synchronized(getWorkers(isPrefetch)) {
-            int numThreads = isPrefetch ?
-                numPrefetchThreads : numWorkerThreads;
-            for(int i = 0; i < numThreads; i++) {
-                addJob(WorkerThread.TERMINATE, isPrefetch);
-                if(isPrefetch) {
-                    numPrefetchThreads--;
-                } else {
-                    numWorkerThreads--;
-                }
-            }
+        if (isPrefetch) {
+            prefetchExecutor.shutdownNow();
+        } else {
+            executor.shutdownNow();
         }
     }
 
