@@ -1,5 +1,9 @@
 import java.io.FileOutputStream
 
+plugins {
+    kotlin("jvm") version "1.9.21"
+}
+
 val MAKE = "make"
 
 application {
@@ -44,4 +48,13 @@ tasks {
     withType<JavaExec> {
         systemProperty("java.library.path", "${projectDir}/products")
     }
+}
+dependencies {
+    implementation(kotlin("stdlib-jdk8"))
+}
+repositories {
+    mavenCentral()
+}
+kotlin {
+    jvmToolchain(17)
 }
