@@ -13,6 +13,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.border.BevelBorder;
 
 import com.lightcrafts.jai.utils.LCTileCache;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * <p>Title: Tile Cache Monitoring Tool</p>
@@ -28,12 +29,12 @@ import com.lightcrafts.jai.utils.LCTileCache;
 public final class TCInfo extends JPanel
                           implements ChangeListener {
 
-    private JSlider memoryCapacitySlider;
-    private JSlider memoryThresholdSlider;
-    private JLabel  memoryCapacityLabel;
-    private JLabel  memoryThresholdLabel;
+    private final JSlider memoryCapacitySlider;
+    private final JSlider memoryThresholdSlider;
+    private final JLabel  memoryCapacityLabel;
+    private final JLabel  memoryThresholdLabel;
 
-    private LCTileCache cache = null;
+    private final LCTileCache cache = null;
     private Statistics statistics;
 
     private float memoryUsage;
@@ -91,12 +92,12 @@ public final class TCInfo extends JPanel
         memoryThresholdSlider = new JSlider(JSlider.VERTICAL, 0, 100, 75);
 
         memoryThresholdSlider.setBorder(BEVEL_BORDER);
-        Hashtable mt_labels = new Hashtable();
+        Hashtable<Integer, JLabel> mt_labels = new Hashtable<>();
 
         for ( int j = 0; j <= 100; j+=10 ) {
             JLabel label = new JLabel(j + "%");
             label.setForeground(Color.black);
-            mt_labels.put(new Integer(j), label);
+            mt_labels.put(j, label);
         }
 
         memoryThresholdSlider.setBackground(BACKGROUND);
@@ -115,22 +116,10 @@ public final class TCInfo extends JPanel
 
     /**
      * Set cache to a SunTileCache
-     * @param c is a sun tile cache object
-     * @throws IllegalArgumentException is <code>c</code> is <code>null</code>
-     * @throws IllegalArgumentException if <code>c</code> not an instance of SunTileCache
+     * @param cache is a LCTileCache object
      * @since TCT 1.0
      */
-    public void setTileCache(LCTileCache c) {
-        if ( c == null ) {
-            throw new IllegalArgumentException("cache cannot be null.");
-        }
-
-        if ( c instanceof LCTileCache ) {
-            cache = c;
-        } else {
-            throw new IllegalArgumentException("cache not an instance of SunTileCache");
-        }
-
+    public void setTileCache(@NotNull LCTileCache cache) {
         memoryCapacitySlider.setValue((int)(cache.getMemoryCapacity() / (1024L * 1024L)));
         memoryThresholdSlider.setValue((int)(100.0F * cache.getMemoryThreshold()));
     }
@@ -164,7 +153,7 @@ public final class TCInfo extends JPanel
              max_mem = mem_cap;
          }
 
-         memoryCapacitySlider.setMaximum((int) max_mem);
+         memoryCapacitySlider.setMaximum(max_mem);
      }
 
     /**

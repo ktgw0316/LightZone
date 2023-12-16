@@ -325,7 +325,7 @@ public final class TCTool extends JFrame
         }
 
         // obtain cache event actions
-        actions = cache.getCachedTileActions();
+        actions = LCTileCache.getCachedTileActions();
 
         CACHE_EVENT_ADD                      = actions[0].getValue();
         CACHE_EVENT_REMOVE                   = actions[1].getValue();

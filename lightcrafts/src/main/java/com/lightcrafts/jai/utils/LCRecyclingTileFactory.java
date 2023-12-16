@@ -435,9 +435,7 @@ public class LCRecyclingTileFactory extends Observable
     private Object getRecycledArray(int arrayType,
                                     long numBanks,
                                     long arrayLength) {
-        Long key = new Long(((long)arrayType << 56) |
-                            numBanks << 32 |
-                            arrayLength);
+        final Long key = (long)arrayType << 56 | numBanks << 32 | arrayLength;
 
         if(DEBUG) {
             System.out.println("Attempting to get array for: "+
