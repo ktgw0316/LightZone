@@ -743,7 +743,7 @@ public final class LCTileScheduler implements TileScheduler {
         } else {
             // Check the cache: a null value indicates computation is
             // still in progress.
-            if(cache[0] == null) {
+            while (cache[0] == null) {
                 // Wait for the computation to complete.
                 try {
                     cache.wait(); // XXX Should there be a timeout?
