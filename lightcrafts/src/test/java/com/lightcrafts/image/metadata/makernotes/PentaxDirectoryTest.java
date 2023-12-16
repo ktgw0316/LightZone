@@ -21,16 +21,8 @@ class PentaxDirectoryTest {
     private PentaxDirectory dir;
 
     @BeforeEach
-    void setUp() throws UnknownImageTypeException, IOException, BadImageFileException {
-        final var filename = "raw" + File.separator + "sample1.pef";
-        final var url = getClass().getClassLoader().getResource(filename);
-        if (url == null) {
-            throw new IOException("file not found!");
-        }
-        final var file = new File(url.getPath());
-        final var imageInfo = ImageInfo.getInstanceFor(file);
-        final ImageMetadata metadata = imageInfo.getMetadata();
-        dir = (PentaxDirectory) metadata.getDirectoryFor(PentaxDirectory.class, true);
+    void setUp() {
+        dir = new PentaxDirectory();
     }
 
     @Test
