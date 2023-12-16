@@ -10,9 +10,16 @@ import com.lightcrafts.utils.ProgressIndicator;
 import com.lightcrafts.utils.Version;
 import com.lightcrafts.utils.WebBrowser;
 import com.lightcrafts.utils.thread.ProgressThread;
+import org.jetbrains.annotations.NotNull;
+import org.json.JSONObject;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.Objects;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -256,6 +263,50 @@ public final class CheckForUpdate {
         private boolean m_isUpdateAvailable;
     }
 
+    @NotNull
+    private static String checkLatestRelease() {
+        // Check github release page
+        final var client = HttpClient.newHttpClient();
+        final var request = HttpRequest.newBuilder()
+                .uri(CHECK_URI)
+                .header("Content-Type", "application/json")
+                .build();
+        try {
+            final HttpResponse<String> response =
+                    client.send(request, HttpResponse.BodyHandlers.ofString());
+            final var jsonObject = new JSONObject(response.body());
+            return jsonObject.getString("tag_name");
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    static boolean compareVersions(@NotNull String currentVersion, @NotNull String latestVersion) {
+        final var currentVersionParts = currentVersion.split("[.~]");
+        final var latestVersionParts = latestVersion.split("[.~]");
+        final int length = Math.min(currentVersionParts.length, latestVersionParts.length);
+        for (int i = 0; i < length; i++) {
+            final String currentVersionPart = currentVersionParts[i];
+            final String latestVersionPart = latestVersionParts[i];
+            final int result = currentVersionPart.compareTo(latestVersionPart);
+            if (result < 0) {
+                return true;
+            } else if (result > 0) {
+                return false;
+            }
+        }
+        return currentVersion.contains("beta");
+    }
+
+    private static boolean checkIfUpdateIsAvailable(String currentVersion) {
+        final var latestVersion = checkLatestRelease();
+        if (latestVersion.isEmpty()) {
+            return false;
+        }
+        return compareVersions(currentVersion, latestVersion);
+    }
+
     /**
      * Checks if an update is available by fetching the latest version
      * information from a version server.
@@ -264,11 +315,7 @@ public final class CheckForUpdate {
      */
     private static boolean checkIfUpdateIsAvailable() {
         final var currentVersion = Version.getVersionName();
-        return checkIfUpdateIsAvailable(currentVersion, CHECK_URL);
-    }
-
-    static boolean checkIfUpdateIsAvailable(String currentVersion, URL url) {
-        return false;
+        return checkIfUpdateIsAvailable(currentVersion);
     }
 
     /**
@@ -367,7 +414,7 @@ public final class CheckForUpdate {
             LOCALE.get( "DownloadCancelButton" )
         );
         if ( button == DOWNLOAD_NOW )
-            WebBrowser.browse( m_updateURL );
+            WebBrowser.browse( m_updateURI );
     }
 
     /**
@@ -386,7 +433,7 @@ public final class CheckForUpdate {
         try {
             switch ( button ) {
                 case DOWNLOAD_NOW:
-                    WebBrowser.browse( m_updateURL );
+                    WebBrowser.browse( m_updateURI );
                     return;
                 case DO_NOT_REMIND:
                     m_prefs.putInt( REMIND_KEY, DO_NOT_REMIND );
@@ -438,9 +485,9 @@ public final class CheckForUpdate {
     private static final Preferences m_prefs;
 
     /**
-     * The URL to go to to get the update.
+     * The URI to go to to get the update.
      */
-    private static String m_updateURL;
+    private static String m_updateURI;
 
     /**
      * The user-presentable version of the update.
@@ -456,25 +503,25 @@ public final class CheckForUpdate {
     /**
      * Ths fully qualified host name of that we need to check with to see if
      * there's a new version.
-     * @see #CHECK_URL_STRING
+     * @see #CHECK_URI_STRING
      */
-    private static final String CHECK_HOST = "raw.githubusercontent.com";
+    private static final String CHECK_HOST = "api.github.com";
 
     /**
-     * The URL to fetch the <code>versions.xml</code> document from.
-     * @see #CHECK_URL_STRING
+     * The URI to fetch the <code>versions.xml</code> document from.
+     * @see #CHECK_URI_STRING
      */
-    private static URL CHECK_URL;
+    private static URI CHECK_URI;
 
     /**
-     * The string of the URL to fetch the <code>versions.xml</code> document
+     * The string of the URI to fetch the <code>versions.xml</code> document
      * from.
-     * @see #CHECK_URL
+     * @see #CHECK_URI
      */
-    private static final String CHECK_URL_STRING =
+    private static final String CHECK_URI_STRING =
             "https://" + CHECK_HOST
-            + "/ktgw0316/homebrew-" + Version.getApplicationName().toLowerCase()
-            + "/master/appcast.xml";
+            + "/repos/ktgw0316/" + Version.getApplicationName()
+            + "/releases/latest";
 
     /**
      * How many milliseconds in the future "later" is.
@@ -524,20 +571,12 @@ public final class CheckForUpdate {
 
     static {
         try {
-            CHECK_URL = new URL( CHECK_URL_STRING );
+            CHECK_URI = new URI(CHECK_URI_STRING);
         }
-        catch ( MalformedURLException e ) {
+        catch (URISyntaxException e) {
             e.printStackTrace();
         }
         m_prefs = Preferences.userRoot().node( "com/lightcrafts/app" );
-    }
-
-    ////////// main() /////////////////////////////////////////////////////////
-
-    public static void main( String[] args ) throws MalformedURLException {
-        final var isAvailable = checkIfUpdateIsAvailable(
-                "5.0.0", new URL("file:///tmp/lightzone/appcast.xml"));
-        System.exit(isAvailable ? 0 : 1);
     }
 }
 /* vim:set et sw=4 ts=4: */
