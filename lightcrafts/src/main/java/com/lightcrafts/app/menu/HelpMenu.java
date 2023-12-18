@@ -3,6 +3,7 @@
 package com.lightcrafts.app.menu;
 
 import com.lightcrafts.app.Application;
+import com.lightcrafts.app.CheckForUpdate;
 import com.lightcrafts.app.ComboFrame;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.utils.Version;
@@ -21,51 +22,35 @@ class HelpMenu extends UpdatableDisposableMenu {
         JMenuItem menuItem;
 
         menuItem = MenuFactory.createMenuItem("LightZoneHelp");
-        menuItem.addActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    Platform.getPlatform().showHelpTopic(null);
-                }
-            }
-        );
+        menuItem.addActionListener(e -> Platform.getPlatform().showHelpTopic(null));
         add(menuItem);
 
         menuItem = MenuFactory.createMenuItem("VideoLearningCenter");
-        menuItem.addActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    final URL url = Version.getVideoLearningCenterURL();
-                    WebBrowser.browse(url.toString());
-                }
-            }
-        );
+        menuItem.addActionListener(e -> {
+            final URL url = Version.getVideoLearningCenterURL();
+            WebBrowser.browse(url.toString());
+        });
         add(menuItem);
 
         add(new JSeparator());
 
         menuItem = MenuFactory.createMenuItem("ProductPage");
-        menuItem.addActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    final URL url = Version.getApplicationURL();
-                    if (url != null) {
-                        WebBrowser.browse(url.toString());
-                    }
-                }
+        menuItem.addActionListener(e -> {
+            final URL url = Version.getApplicationURL();
+            if (url != null) {
+                WebBrowser.browse(url.toString());
             }
-        );
+        });
+        add(menuItem);
+
+        menuItem = MenuFactory.createMenuItem("CheckForUpdate");
+        menuItem.addActionListener(e -> CheckForUpdate.checkNowAndWait());
         add(menuItem);
 
         if (!Platform.isMac()) {
             // On the Mac, the "About" item lies under the app menu.
             menuItem = MenuFactory.createMenuItem("About");
-            menuItem.addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        Application.showAbout();
-                    }
-                }
-            );
+            menuItem.addActionListener(e -> Application.showAbout());
             add(new JSeparator());
             add(menuItem);
         }
