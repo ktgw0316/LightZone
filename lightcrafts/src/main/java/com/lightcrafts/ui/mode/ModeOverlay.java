@@ -3,6 +3,7 @@
 package com.lightcrafts.ui.mode;
 
 import com.lightcrafts.utils.awt.geom.HiDpi;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputListener;
@@ -24,16 +25,16 @@ public class ModeOverlay extends JLayeredPane {
 
     private Integer OverlayLayer = 1;
 
-    private Component underlay;
-    private Stack<Mode> modes;
-    private MouseMotionListener autoscroller;
+    private final Component underlay;
+    private final Stack<Mode> modes;
+    private final MouseMotionListener autoscroller;
 
-    private Collection<MouseInputListener> mouseListeners;
+    private final Collection<MouseInputListener> mouseListeners;
 
     public ModeOverlay(Component underlay) {
         this.underlay = underlay;
-        modes = new Stack<Mode>();
-        mouseListeners = new LinkedList<MouseInputListener>();
+        modes = new Stack<>();
+        mouseListeners = new LinkedList<>();
         setLayout(null);
         add(underlay, UnderlayLayer);
 
@@ -52,32 +53,23 @@ public class ModeOverlay extends JLayeredPane {
     }
 
     public Mode peekMode() {
-        try {
-            return modes.peek();
-        }
-        catch (EmptyStackException e) {
-            return null;
-        }
+        return modes.empty() ? null : modes.peek();
     }
 
     public Mode popMode() {
-        try {
-            Mode oldMode = modes.pop();
-            if (oldMode != null) {
-                removeMode(oldMode);
-                decLayer();
-                repaint();
-            }
-            return oldMode;
-        }
-        catch (EmptyStackException e) {
+        if (modes.empty())
             return null;
-        }
+
+        @NotNull Mode oldMode = modes.pop();
+        removeMode(oldMode);
+        OverlayLayer--;
+        repaint();
+        return oldMode;
     }
 
-    public void pushMode(Mode mode) {
+    public void pushMode(@NotNull Mode mode) {
         modes.push(mode);
-        incLayer();
+        OverlayLayer++;
         addMode(mode);
         validate();
     }
@@ -113,16 +105,6 @@ public class ModeOverlay extends JLayeredPane {
         mouseListeners.remove(listener);
         removeMouseListener(listener);
         removeMouseMotionListener(listener);
-    }
-
-    private void incLayer() {
-        int i = OverlayLayer;
-        OverlayLayer = ++i;
-    }
-
-    private void decLayer() {
-        int i = OverlayLayer;
-        OverlayLayer = --i;
     }
 
     private void addMode(Mode mode) {
