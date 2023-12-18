@@ -423,11 +423,6 @@ public final class LCTileScheduler implements TileScheduler {
     /** The default number of prefetch threads. */
     private static final int NUM_PREFETCH_THREADS_DEFAULT = 1;
 
-    /** The instance counter.  It is used to compose the name of the
-     *  ThreadGroup.
-     */
-    private static int numInstances = 0;
-
     @NotNull
     private final ThreadPoolExecutor executor;
 
@@ -546,7 +541,6 @@ public final class LCTileScheduler implements TileScheduler {
                 threadFactory(prefetchPriority));
         setPriority(priority);
         setPrefetchPriority(prefetchPriority);
-        numInstances++;
     }
 
     /**
