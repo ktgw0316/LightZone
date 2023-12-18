@@ -119,7 +119,7 @@ public class TileManager implements TileComputationListener {
         final var canceled = requests.stream()
                 .filter(pr -> pr == prefetchRequest)
                 .map(this::cancelRequest)
-                .collect(Collectors.toList());
+                .toList();
         requests.removeAll(canceled);
 
         prefetchRequest = null;
@@ -141,7 +141,7 @@ public class TileManager implements TileComputationListener {
                 .filter(pr -> pr.image == image)
                 .filter(pr -> pr.epoch == epoch)
                 .map(this::cancelRequest)
-                .collect(Collectors.toList());
+                .toList();
         requests.removeAll(canceled);
     }
 
@@ -168,7 +168,7 @@ public class TileManager implements TileComputationListener {
                 .filter(not(PaintRequest::isCancelled))
                 .filter(pr -> pr.image == image)
                 .filter(pr -> pr.epoch == epoch)
-                .collect(Collectors.toList());
+                .toList();
         tiles.removeIf(t -> paintRequests.stream().anyMatch(pr -> pr.hasTile(t)));
 
         if (!tiles.isEmpty()) {
