@@ -304,6 +304,7 @@ public final class CheckForUpdate {
         if (latestVersion.isEmpty()) {
             return false;
         }
+        m_updateVersion = currentVersion;
         return compareVersions(currentVersion, latestVersion);
     }
 
@@ -315,6 +316,9 @@ public final class CheckForUpdate {
      */
     private static boolean checkIfUpdateIsAvailable() {
         final var currentVersion = Version.getVersionName();
+        if (currentVersion.isEmpty()) {
+            return false;
+        }
         return checkIfUpdateIsAvailable(currentVersion);
     }
 
@@ -492,7 +496,7 @@ public final class CheckForUpdate {
     /**
      * The user-presentable version of the update.
      */
-    private static String m_updateVersion;
+    private static String m_updateVersion = "";
 
     /**
      * The value of this preference key stores whether to perform automatic
