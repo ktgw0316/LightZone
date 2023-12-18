@@ -168,18 +168,6 @@ public class ImageEditorDisplay extends JPanel {
     private class LCTileHandler implements TileHandler {
         @Override
         public void handle(int tileX, int tileY, PaintContext ctx) {
-            EventQueue.invokeLater(new AsynchronousRepainter(tileX, tileY, ctx));
-        }
-    }
-
-    @RequiredArgsConstructor
-    private class AsynchronousRepainter implements Runnable {
-        private final int tileX;
-        private final int tileY;
-        private final PaintContext ctx;
-
-        @Override
-        public void run() {
             repaintTile(ctx, tileX, tileY);
         }
     }
@@ -190,22 +178,17 @@ public class ImageEditorDisplay extends JPanel {
         the image while tiles are being painted/computed...
     */
 
-    private synchronized void repaintTile(PaintContext ctx, int tileX, int tileY) {
+    private synchronized void repaintTile(@NotNull PaintContext ctx, int tileX, int tileY) {
         if (ctx.isCancelled() || ctx.getImage() != source) {
             return;
         }
 
         if (!ctx.isPrefetch()) {
-            PlanarImage currentSource = source;
-            boolean currentSynchronized = synchronizedImage;
-            source = ctx.getImage();
-            synchronizedImage = ctx.isSynchronous();
+            // TODO: Should it be replaced with repaint(x, y, w, h)?
             paintImmediately(tileX * source.getTileWidth(),
                              tileY * source.getTileHeight(),
                              source.getTileWidth(),
                              source.getTileHeight());
-            synchronizedImage = currentSynchronized;
-            source = currentSource;
         } else {
             progressNotifier.setTiles(tileManager.pendingTiles(source, epoch));
         }
