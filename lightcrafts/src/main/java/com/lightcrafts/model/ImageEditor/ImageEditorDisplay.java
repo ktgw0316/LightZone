@@ -94,11 +94,7 @@ public class ImageEditorDisplay extends JPanel {
         super.removeComponentListener(listener);
     }
 
-    @RequiredArgsConstructor
-    @EqualsAndHashCode
-    private static class CacheKey {
-        final int tileX;
-        final int tileY;
+    private record CacheKey(int tileX, int tileY) {
     }
 
     private boolean[][] validImageBackground = null;
@@ -231,11 +227,7 @@ public class ImageEditorDisplay extends JPanel {
         }
     }
 
-    @RequiredArgsConstructor
-    private static class TileComparator implements Comparator<Point> {
-        final int x;
-        final int y;
-
+    private record TileComparator(int x, int y) implements Comparator<Point> {
         @Override
         public int compare(Point t1, Point t2) {
             int dx1 = t1.x - x;

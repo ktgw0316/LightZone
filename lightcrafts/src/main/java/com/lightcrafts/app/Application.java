@@ -829,12 +829,7 @@ public class Application {
         This is a hack, if anything breaks you know where to look...
      */
 
-    private static class PrintDoneCallback {
-        private final Document doc;
-
-        PrintDoneCallback(Document doc) {
-            this.doc = doc;
-        }
+    private record PrintDoneCallback(Document doc) {
 
         public void done() {
             doc.dispose();

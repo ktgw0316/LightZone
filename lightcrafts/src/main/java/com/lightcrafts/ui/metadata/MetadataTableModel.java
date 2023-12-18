@@ -19,9 +19,9 @@ class MetadataTableModel extends AbstractTableModel {
     private final static int ValueColumn = 1;
     private final static int IdColumn = 2;
 
-    private ArrayList<KeyValuePair> pairs;
+    private final ArrayList<KeyValuePair> pairs;
 
-    private boolean showIDs;    // Add a column for key ID numbers
+    private final boolean showIDs;    // Add a column for key ID numbers
 
     MetadataTableModel(
         ImageMetadataDirectory dir, boolean filter, boolean sort, boolean showIDs
@@ -48,20 +48,16 @@ class MetadataTableModel extends AbstractTableModel {
     public Object getValueAt(int row, int col) {
         KeyValuePair pair = pairs.get(row);
         if (col == KeyColumn) {
-            return pair.key;
+            return pair.key();
         }
         if (col == ValueColumn) {
-            return pair.value;
+            return pair.value();
         }
         if ((col == IdColumn) && (showIDs)) {
-            int id = pair.tagID;
+            int id = pair.tagID();
             return hexStringOf(id);
         }
         return null;
-    }
-
-    public boolean isCellEditable(int row, int col) {
-        return false;
     }
 
     // This method is copied from ImageMetadataDirectory.hexStringOf():

@@ -154,14 +154,7 @@ public class DefaultPrinterLayer implements PrinterLayer {
 
         private PlanarImage printImage = null;
 
-        private static class PrintResolution {
-            final double resolution;
-            final double scale;
-
-            PrintResolution(double resolution, double scale) {
-                this.resolution = resolution;
-                this.scale = scale;
-            }
+        private record PrintResolution(double resolution, double scale) {
         }
 
         public static PrintResolution effectiveResolution(PrintSettings printSettings, Dimension dimension) {

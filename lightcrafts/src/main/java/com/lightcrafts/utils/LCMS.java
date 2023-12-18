@@ -339,39 +339,7 @@ public class LCMS {
         }
     }
 
-    private static class RGBProfileComponents {
-        final double[] whitePoint;
-        final double[] primaries;
-        final double gamma;
-
-        RGBProfileComponents(double[] whitePoint, double[] primaries, double gamma) {
-            this.whitePoint = whitePoint;
-            this.primaries = primaries;
-            this.gamma = gamma;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            RGBProfileComponents that = (RGBProfileComponents) o;
-
-            return (Double.compare(that.gamma, gamma) == 0
-                    && Arrays.equals(primaries, that.primaries)
-                    && Arrays.equals(whitePoint, that.whitePoint));
-        }
-
-        @Override
-        public int hashCode() {
-            int result;
-            long temp;
-            result = (whitePoint != null ? Arrays.hashCode(whitePoint) : 0);
-            result = 31 * result + (primaries != null ? Arrays.hashCode(primaries) : 0);
-            temp = gamma != +0.0d ? Double.doubleToLongBits(gamma) : 0L;
-            result = 31 * result + (int) (temp ^ (temp >>> 32));
-            return result;
-        }
+    private record RGBProfileComponents(double[] whitePoint, double[] primaries, double gamma) {
     }
 
     public static class Profile {

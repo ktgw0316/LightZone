@@ -8,21 +8,15 @@ import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.image.metadata.CoreDirectory;
 import com.lightcrafts.image.metadata.CoreTags;
 import com.lightcrafts.image.metadata.ImageMetadata;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
 public class UrgencyMetadataEntry extends SimpleMetadataEntry {
 
-    @RequiredArgsConstructor
-    static class UrgencyObject {
-        @Getter
-        final Integer value;
-
+    public record UrgencyObject(Integer value) {
         @Override
         public String toString() {
             return value.toString();

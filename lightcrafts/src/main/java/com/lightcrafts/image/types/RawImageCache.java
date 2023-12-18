@@ -29,16 +29,9 @@ import java.time.ZoneOffset;
  * @author Fabio Riccardi [fabio@lightcrafts.com]
  */
 class RawImageCache extends Thread {
-    private static String version = "V5";
+    private static final String version = "V5";
 
-    private static final class ImageToCache {
-        final String cacheKey;
-        final RenderedImage image;
-
-        ImageToCache(String cacheKey, RenderedImage image) {
-            this.cacheKey = cacheKey;
-            this.image = image;
-        }
+    private record ImageToCache(String cacheKey, RenderedImage image) {
     }
 
     private static final RawImageCache INSTANCE;
