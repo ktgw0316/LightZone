@@ -39,13 +39,9 @@
 *.zip
 *~
 -
-.idea/**/modules.xml
-.idea/**/workspace.xml
-.idea/**/tasks.xml
-.idea/**/uiDesigner.xml
-.idea/**/libraries
-.idea/**/shelf
-.idea/compiler.xml
+.idea/*
+!.idea/misc.xml
+!.idea/runConfigurations
 Java.runtime
 debian/*.debhelper
 debian/*.substvars
