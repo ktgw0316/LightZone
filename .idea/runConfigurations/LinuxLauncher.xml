@@ -1,10 +1,10 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="LinuxLauncher" type="Application" factoryName="Application" activateToolWindowBeforeRun="false">
     <envs>
-      <env name="LD_LIBRARY_PATH" value="$ProjectFileDir$/linux/products" />
+      <env name="LD_LIBRARY_PATH" value="$ProjectFileDir$/products" />
     </envs>
     <option name="MAIN_CLASS_NAME" value="com.lightcrafts.platform.linux.LinuxLauncher" />
-    <module name="linux" />
+    <module name="LightZone.linux.main" />
     <option name="VM_PARAMETERS" value="-Djava.library.path=$ProjectFileDir$/linux/products --add-exports=java.desktop/sun.awt.image=ALL-UNNAMED" />
     <option name="WORKING_DIRECTORY" value="$ProjectFileDir$" />
     <method v="2">
