@@ -15,8 +15,7 @@ JNI_MACOSX_LINK:=	../jniutils/libLCJNI.a
 ##
 JNI_PPC_DEFINES:=	$(ALTIVEC_CFLAGS)
 
-JAVAH_CLASSES:=		com.lightcrafts.jai.opimage.BandCombine \
-			com.lightcrafts.jai.opimage.Convolutions \
+JAVAH_CLASSES:=		com.lightcrafts.jai.opimage.Convolutions \
 			com.lightcrafts.jai.opimage.BilateralFilterOpImage
 
 ROOT:=			../../..
