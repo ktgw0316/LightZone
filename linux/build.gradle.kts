@@ -4,5 +4,4 @@ dependencies {
 }
 application {
     mainClass.set("com.lightcrafts.platform.linux.LinuxLauncher")
-    tasks.run.get().workingDir = file("products")
 }

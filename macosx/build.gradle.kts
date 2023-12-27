@@ -3,5 +3,4 @@ dependencies {
 }
 application {
     mainClass.set("com.lightcrafts.platform.macosx.MacOSXLauncher")
-    tasks.run.get().workingDir = file("products")
 }

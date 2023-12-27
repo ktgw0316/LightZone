@@ -63,7 +63,9 @@ subprojects {
             testLogging {
                 events("passed", "skipped", "failed")
             }
+            workingDir = file("products")
         }
+        run.get().workingDir = file("products")
         register<Exec> ("products") {
             commandLine(MAKE, "-C", "products", "-j")
         }

@@ -50,7 +50,4 @@ tasks {
     getByName("clean") {
         dependsOn("cleanCoprocesses")
     }
-    withType<JavaExec> {
-        systemProperty("java.library.path", "${projectDir}/products")
-    }
 }
