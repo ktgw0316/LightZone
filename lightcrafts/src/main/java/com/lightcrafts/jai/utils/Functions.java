@@ -5,8 +5,8 @@ package com.lightcrafts.jai.utils;
 
 import com.lightcrafts.image.metadata.ImageOrientation;
 import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.jai.operator.FastBoxFilterDescriptor;
 import com.lightcrafts.jai.operator.LCMSColorConvertDescriptor;
-import com.lightcrafts.jai.operator.LCSeparableConvolveDescriptor;
 import com.lightcrafts.model.ImageEditor.ImageProcessor;
 import com.lightcrafts.model.ImageEditor.Rendering;
 import com.lightcrafts.model.Operation;
@@ -127,11 +127,12 @@ public class Functions {
     }
 
     public static RenderedOp fastGaussianBlur(RenderedImage image, double radius) {
-        // TODO: Make this fast
         final var extenderHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
                 BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-        final KernelImageN kernel = getGaussKernel(radius);
-        return LCSeparableConvolveDescriptor.create(image, kernel, extenderHints);
+        radius = Math.max(radius, 0.001);
+        final int size = 2 * (int) Math.ceil(radius) + 1;
+        final int key = size / 2;
+        return FastBoxFilterDescriptor.create(image, size, size, key, key, extenderHints);
     }
 
     public static ImageLayout getImageLayout(RenderedImage image) {
