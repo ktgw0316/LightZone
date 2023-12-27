@@ -233,6 +233,12 @@ public class JAIContext {
         RenderedImageFactory rif = new LCSeparableConvolveRIF();
         RIFRegistry.register(or, desc.getName(), "com.lightcrafts", rif);
 
+        // register FastBoxFilter
+        desc = new FastBoxFilterDescriptor();
+        or.registerDescriptor(desc);
+        rif = new FastBoxFilterRIF();
+        RIFRegistry.register(or, desc.getName(), "com.lightcrafts", rif);
+
         // register NOPOp
         desc = new NOPDescriptor();
         or.registerDescriptor(desc);

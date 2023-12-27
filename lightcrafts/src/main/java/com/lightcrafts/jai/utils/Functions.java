@@ -139,14 +139,22 @@ public class Functions {
     }
 
     public static RenderedOp fastGaussianBlur(RenderedImage image, double radius) {
-        // TODO: Make this fast
         RenderingHints extenderHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
                 BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-        KernelJAI kernel = getGaussKernel(radius);
-        ParameterBlock pb = new ParameterBlock()
-                .addSource(image)
-                .add(kernel);
-        return JAI.create("LCSeparableConvolve", pb, extenderHints);
+
+        if (radius < 0.001)
+            radius = 0.001;
+        final int size = 2 * (int) Math.ceil(radius) + 1;
+        final int key = size / 2;
+
+        final var pb = new ParameterBlock()
+                .add(size)
+                .add(size)
+                .add(key)
+                .add(key);
+        final var tmp1 = JAI.create("FastBoxFilter", pb.addSource(image), extenderHints);
+        final var tmp2 = JAI.create("FastBoxFilter", pb.setSource(tmp1, 0), extenderHints);
+        return JAI.create("FastBoxFilter", pb.setSource(tmp2, 0), extenderHints);
     }
 
     public static ImageLayout getImageLayout(RenderedImage image) {
