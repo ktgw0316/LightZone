@@ -4,13 +4,16 @@
 plugins {
     java
     application
-//    id("kotlin") version "1.3.70" apply false
+    kotlin("jvm") version "1.9.22"
+}
+repositories {
+    mavenCentral()
 }
 
 subprojects {
     apply(plugin = "java")
     apply(plugin = "application")
-//    apply(plugin = "kotlin")
+    apply(plugin = "kotlin")
     group = "com.lightcrafts"
     version = rootProject.file("lightcrafts/version.txt").readText().trim()
     application {
@@ -30,15 +33,8 @@ subprojects {
         "compileOnly"("org.jetbrains:annotations:24.0.1")
         "compileOnly"("org.projectlombok:lombok:1.18.26")
         "implementation"(files("${project.rootDir}/lightcrafts/lib/jai-lightzone-1.1.3.0.jar"))
-        "implementation"("com.formdev:flatlaf:3.1.1")
-        "implementation"("com.formdev:flatlaf-intellij-themes:3.1.1")
-        "implementation"("com.github.jiconfont:jiconfont-swing:1.0.1")
-        "implementation"("com.github.jiconfont:jiconfont-font_awesome:4.7.0.0")
-        "implementation"("com.github.jiconfont:jiconfont-google_material_design_icons:2.2.0.2")
-        "implementation"("org.ejml:ejml-simple:0.40")
-        "implementation"("org.json:json:20231013")
-//        "implementation"(kotlin("stdlib-jdk8", "1.3.70"))
         "testCompileOnly"("org.jetbrains:annotations:24.0.1")
+        "testImplementation"(kotlin("test"))
         "testImplementation"("io.kotest:kotest-runner-junit5:5.8.0")
         "testImplementation"("org.assertj:assertj-core:3.11.1")
         "testImplementation"(platform("org.junit:junit-bom:5.10.1"))
@@ -46,17 +42,9 @@ subprojects {
         "testImplementation"("org.junit.jupiter:junit-jupiter-engine")
         "testImplementation"("org.junit.jupiter:junit-jupiter-params")
     }
-    configure<JavaPluginExtension> {
-        sourceCompatibility = JavaVersion.VERSION_17
-    }
-    tasks.withType<JavaCompile> {
-        options.encoding = "UTF-8"
-        options.compilerArgs = listOf("-h", file("javah").absolutePath)
-    }
-    tasks.test {
-        useJUnitPlatform()
-        testLogging {
-            events("passed", "skipped", "failed")
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(17))
         }
     }
     // val os = NativePlatform.getOperatingSystem
@@ -66,12 +54,16 @@ subprojects {
     // }
     val MAKE = "make"
     tasks {
-//        compileKotlin {
-//            kotlinOptions.jvmTarget = "1.8"
-//        }
-//        compileTestKotlin {
-//            kotlinOptions.jvmTarget = "1.8"
-//        }
+        withType<JavaCompile> {
+            options.encoding = "UTF-8"
+            options.compilerArgs = listOf("-h", file("javah").absolutePath)
+        }
+        test {
+            useJUnitPlatform()
+            testLogging {
+                events("passed", "skipped", "failed")
+            }
+        }
         register<Exec> ("products") {
             commandLine(MAKE, "-C", "products", "-j")
         }
