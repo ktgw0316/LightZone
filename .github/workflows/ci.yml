@@ -39,8 +39,10 @@ jobs:
         brew install ant lensfun libjpeg-turbo libomp libraw libtiff libxml2 little-cms2 rsync
         if [ "${{ matrix.os }}" == "macos-14" ]; then
           export LIBOMP_PATH=/opt/homebrew/opt/libomp
+          TARGET_ARCH=arm64 ant -f macosx/build.xml zip
+        else
+          ant -f macosx/build.xml zip
         fi
-        ant -f macosx/build.xml zip
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
