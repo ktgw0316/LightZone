@@ -23,7 +23,12 @@ jobs:
         echo "JAVA_HOME: $JAVA_HOME"
         echo "PATH: $PATH"
         if [ "${{ matrix.os }}" == "windows-latest" ]; then
-          ls -la /c/Program Files (x86)/Windows Kits/*/Lib/
+          echo "MSSDK_HOME"
+          ls -la /c/Program Files\ \(x86\)/Windows\ Kits/*/Lib/
+          echo "MINGW32"
+          ls -la /mingw32/
+          echo "MSYS64"
+          ls -la /msys64/
         else
           echo "PKG_CONFIG_PATH: $PKG_CONFIG_PATH"
         fi
@@ -31,17 +36,18 @@ jobs:
       shell: bash
       run: |
         if [ "${{ matrix.os }}" == "windows-latest" ]; then
-          export MINGW64_PATH=msys64/mingw64
-          export MINGW32_PATH=msys64/mingw32
+          export MINGW64_PATH=/mingw64
+          export MINGW32_PATH=/mingw32
+          export PATH=$MINGW64_PATH/bin/:$MINGW32_PATH/bin/:/msys64/usr/bin/:$PATH
           export MSSDK_HOME=/c/Program Files (x86)/Windows Kits/10/Lib/10.0.22621.0
 
           choco install ant
           pacman --noconfirm --disable-download-timeout -S pactoys
           pacboy --noconfirm --disable-download-timeout -S lcms2:m libraw:m lensfun:m ntldd-git:m pkg-config:m
         
-          MINGW_DIR=/c/$MINGW64_PATH ant -f windows/build.xml -lib lightcrafts/lib zip
+          MINGW_DIR=$MINGW64_PATH ant -f windows/build.xml -lib lightcrafts/lib zip
           ant -f windows/build.xml clean-native
-          TARGET_ARCH=i686 MINGW_DIR=/c/$MINGW32_PATH ant -f windows/build.xml -Dno-ivy=true -lib lightcrafts zip
+          TARGET_ARCH=i686 MINGW_DIR=$MINGW32_PATH ant -f windows/build.xml -Dno-ivy=true -lib lightcrafts zip
         else
           export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
           brew install ant libjpeg-turbo libomp libraw libtiff libxml2 little-cms2 rsync
