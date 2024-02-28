@@ -21,7 +21,7 @@ jobs:
       if: startsWith(matrix.os, 'windows')
       uses: msys2/setup-msys2@v2
       with:
-        pacboy: lcms2:m libraw:m lensfun:m ntldd-git:m pkg-config:m
+        pacboy: lcms2:m libraw:m lensfun:m ntldd-git:m pkgconf:m
     - name: Build on Windows
       if: startsWith(matrix.os, 'windows')
       shell: bash
