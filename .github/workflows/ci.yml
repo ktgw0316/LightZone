@@ -17,16 +17,6 @@ jobs:
       with:
         java-version: ${{ matrix.java }}
         distribution: 'liberica'
-    - name: Debug
-      shell: bash
-      run: |
-        echo "PATH: $PATH"
-        if [ "${{ matrix.os }}" == "windows-latest" ]; then
-          echo "MSYS64"
-          ls -la /msys64/
-        else
-          which -a pkg-config
-        fi
     - name: Build with Ant
       shell: bash
       run: |
