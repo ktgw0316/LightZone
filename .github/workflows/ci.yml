@@ -22,10 +22,6 @@ jobs:
       run: |
         echo "PATH: $PATH"
         if [ "${{ matrix.os }}" == "windows-latest" ]; then
-          echo "MSSDK_HOME"
-          ls -la /c/Program\ Files\ \(x86\)/Windows\ Kits/*/Lib/
-#          echo "MINGW32"
-#          ls -la /mingw32/
           echo "MSYS64"
           ls -la /msys64/
         else
@@ -36,8 +32,6 @@ jobs:
       run: |
         if [ "${{ matrix.os }}" == "windows-latest" ]; then
           export MINGW64_PATH=/mingw64
-#          export MINGW32_PATH=/mingw32
-#          export PATH=$MINGW64_PATH/bin/:$MINGW32_PATH/bin/:/msys64/usr/bin/:$PATH
           export PATH=/msys64/usr/bin/:$PATH
           export MSSDK_HOME=/c/Program\ Files\ \(x86\)/Windows\ Kits/10/Lib/10.0.22621.0
 
@@ -47,11 +41,9 @@ jobs:
         
           MINGW_DIR=$MINGW64_PATH ant -f windows/build.xml -lib lightcrafts/lib zip
           ant -f windows/build.xml clean-native
-#          TARGET_ARCH=i686 MINGW_DIR=$MINGW32_PATH ant -f windows/build.xml -Dno-ivy=true -lib lightcrafts zip
         else
           export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
           brew install ant lensfun libjpeg-turbo libomp libraw libtiff libxml2 little-cms2 rsync
-#          brew install --build-from-source lensfun
           ant -f macosx/build.xml zip
         fi
 #    - name: Upload Artifacts
