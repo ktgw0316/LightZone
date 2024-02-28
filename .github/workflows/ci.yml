@@ -1,0 +1,57 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+        java: ['17']
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK ${{ matrix.java }}
+      uses: actions/setup-java@v2
+      with:
+        java-version: ${{ matrix.java }}
+        distribution: 'liberica'
+    - name: Debug
+      shell: bash
+      run: |
+        echo "JAVA_HOME: $JAVA_HOME"
+        echo "PATH: $PATH"
+        if [ "${{ matrix.os }}" == "windows-latest" ]; then
+          ls -la /c/Program Files (x86)/Windows Kits/*/Lib/
+        else
+          echo "PKG_CONFIG_PATH: $PKG_CONFIG_PATH"
+        fi
+    - name: Build with Ant
+      shell: bash
+      run: |
+        if [ "${{ matrix.os }}" == "windows-latest" ]; then
+          export MINGW64_PATH=msys64/mingw64
+          export MINGW32_PATH=msys64/mingw32
+          export MSSDK_HOME=/c/Program Files (x86)/Windows Kits/10/Lib/10.0.22621.0
+
+          choco install ant
+          pacman --noconfirm --disable-download-timeout -S pactoys
+          pacboy --noconfirm --disable-download-timeout -S lcms2:m libraw:m lensfun:m ntldd-git:m pkg-config:m
+        
+          MINGW_DIR=/c/$MINGW64_PATH ant -f windows/build.xml -lib lightcrafts/lib zip
+          ant -f windows/build.xml clean-native
+          TARGET_ARCH=i686 MINGW_DIR=/c/$MINGW32_PATH ant -f windows/build.xml -Dno-ivy=true -lib lightcrafts zip
+        else
+          export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+          brew install ant libjpeg-turbo libomp libraw libtiff libxml2 little-cms2 rsync
+          brew install --build-from-source lensfun
+          ant -f macosx/build.xml zip
+        fi
+#    - name: Upload Artifacts
+#      uses: actions/upload-artifact@v2
+#      with:
+#        name: LightZone-${{ matrix.os }}
+#        path: |
+#          windows/LightZone-windows*.zip
+#          macosx/LightZone-macosx*.zip
