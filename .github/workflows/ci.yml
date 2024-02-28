@@ -29,7 +29,6 @@ jobs:
           echo "MSYS64"
           ls -la /msys64/
         else
-          echo "PKG_CONFIG_PATH: $PKG_CONFIG_PATH"
           which -a pkg-config
         fi
     - name: Build with Ant
