@@ -36,7 +36,7 @@ jobs:
       if: startsWith(matrix.os, 'macos')
       run: |
         export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
-        brew install ant lensfun libjpeg-turbo libomp libraw libtiff libxml2 little-cms2 rsync
+        brew install ant lensfun libc++ libjpeg-turbo libomp libraw libtiff libxml2 little-cms2 rsync
         if [ "${{ matrix.os }}" == "macos-14" ]; then
           export LIBOMP_PATH=/opt/homebrew/opt/libomp
           TARGET_ARCH=arm64 ant -f macosx/build.xml zip
