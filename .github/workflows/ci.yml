@@ -20,11 +20,10 @@ jobs:
     - name: Debug
       shell: bash
       run: |
-        echo "JAVA_HOME: $JAVA_HOME"
         echo "PATH: $PATH"
         if [ "${{ matrix.os }}" == "windows-latest" ]; then
           echo "MSSDK_HOME"
-          ls -la /c/Program Files\ \(x86\)/Windows\ Kits/*/Lib/
+          ls -la /c/Program\ Files\ \(x86\)/Windows\ Kits/*/Lib/
           echo "MINGW32"
           ls -la /mingw32/
           echo "MSYS64"
@@ -39,7 +38,7 @@ jobs:
           export MINGW64_PATH=/mingw64
           export MINGW32_PATH=/mingw32
           export PATH=$MINGW64_PATH/bin/:$MINGW32_PATH/bin/:/msys64/usr/bin/:$PATH
-          export MSSDK_HOME=/c/Program Files (x86)/Windows Kits/10/Lib/10.0.22621.0
+          export MSSDK_HOME=/c/Program\ Files\ \(x86\)/Windows\ Kits/10/Lib/10.0.22621.0
 
           choco install ant
           pacman --noconfirm --disable-download-timeout -S pactoys
