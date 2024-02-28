@@ -17,29 +17,33 @@ jobs:
       with:
         java-version: ${{ matrix.java }}
         distribution: 'liberica'
-    - name: Build with Ant
+    - name: Install MSYS2 on Windows
+      if: startsWith(matrix.os, 'windows')
+      uses: msys2/setup-msys2@v2
+      with:
+        install: lcms2:m libraw:m lensfun:m ntldd-git:m pkg-config:m
+    - name: Build on Windows
+      if: startsWith(matrix.os, 'windows')
       shell: bash
       run: |
-        if [ "${{ matrix.os }}" == "windows-latest" ]; then
-          export MINGW64_PATH=/mingw64
-          export PATH=/msys64/usr/bin/:$PATH
-          export MSSDK_HOME=/c/Program\ Files\ \(x86\)/Windows\ Kits/10/Lib/10.0.22621.0
-
-          choco install ant
-          pacman --noconfirm --disable-download-timeout -S pactoys
-          pacboy --noconfirm --disable-download-timeout -S lcms2:m libraw:m lensfun:m ntldd-git:m pkg-config:m
+        export MINGW64_PATH=/mingw64
+        export MINGW32_PATH=/mingw32
+        export PATH=/msys64/usr/bin/:$PATH
+        export MSSDK_HOME=/c/Program\ Files\ \(x86\)/Windows\ Kits/10/Lib/10.0.22621.0
         
-          MINGW_DIR=$MINGW64_PATH ant -f windows/build.xml -lib lightcrafts/lib zip
-          ant -f windows/build.xml clean-native
-        else
-          export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
-          brew install ant lensfun libjpeg-turbo libomp libraw libtiff libxml2 little-cms2 rsync
-          ant -f macosx/build.xml zip
-        fi
-#    - name: Upload Artifacts
-#      uses: actions/upload-artifact@v2
-#      with:
-#        name: LightZone-${{ matrix.os }}
-#        path: |
-#          windows/LightZone-windows*.zip
-#          macosx/LightZone-macosx*.zip
+        MINGW_DIR=$MINGW64_PATH ant -f windows/build.xml -lib lightcrafts/lib zip
+        ant -f windows/build.xml clean-native
+        MSYSTEM=MINGW32 TARGET_ARCH=i686 MINGW_DIR=/$MINGW32_PATH ant -f windows/build.xml -Dno-ivy=true -lib lightcrafts/lib zip
+    - name: Build on macOS
+      if: startsWith(matrix.os, 'macos')
+      run: |
+        export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+        brew install ant lensfun libjpeg-turbo libomp libraw libtiff libxml2 little-cms2 rsync
+        ant -f macosx/build.xml zip
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: LightZone-${{ matrix.os }}
+        path: |
+          windows/LightZone-windows*.zip
+          macosx/LightZone-macosx*.zip
