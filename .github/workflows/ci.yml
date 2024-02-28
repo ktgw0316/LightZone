@@ -37,6 +37,9 @@ jobs:
       run: |
         export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
         brew install ant lensfun libjpeg-turbo libomp libraw libtiff libxml2 little-cms2 rsync
+        if [ "${{ matrix.os }}" == "macos-14" ]; then
+          export LIBOMP_PATH=/opt/homebrew/opt/libomp
+        fi
         ant -f macosx/build.xml zip
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
