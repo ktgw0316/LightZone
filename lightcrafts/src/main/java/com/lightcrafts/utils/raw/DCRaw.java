@@ -24,6 +24,8 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.LocalDateTime;
@@ -171,13 +173,8 @@ public final class DCRaw extends RawDecoder {
     private static final String DCRAW_NAME = "dcraw_lz";
     private static String DCRAW_PATH;
     static {
-        DCRAW_PATH = System.getProperty("java.library.path") + File.separatorChar + DCRAW_NAME;
-        if (! new File(DCRAW_PATH).canExecute()) {
-            String dir = System.getProperty("install4j.appDir");
-            if (dir == null)
-                dir = ".";
-            DCRAW_PATH = dir + File.separatorChar + DCRAW_NAME;
-        }
+        final var appDir = Paths.get(System.getProperty("jpackage.app-path")).getParent();
+        DCRAW_PATH = appDir.resolve("app").resolve(DCRAW_NAME).toString();
     }
 
     private static String match(@NonNull String s, @NonNull String tag) {

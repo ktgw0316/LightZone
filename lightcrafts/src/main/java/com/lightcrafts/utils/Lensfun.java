@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.awt.*;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,12 +33,14 @@ public class Lensfun {
     private int _fullHeight;
 
     private static String pathName = "";
+
     static {
         if (!Platform.isLinux()) {
-            final String baseDirName = System.getProperty("lensfun.dir");
-            try {
-                pathName = Files.find(Paths.get(baseDirName), 1,
-                        (path, attr) -> attr.isDirectory() && path.getFileName().toString().startsWith("version_"))
+            final var appDir = Paths.get(System.getProperty("jpackage.app-path")).getParent();
+            final var lensfunDir = appDir.resolve("app/share/lensfun");
+            try (final var stream = Files.walk(lensfunDir, 1)) {
+                pathName = stream.filter(Files::isDirectory)
+                        .filter(path -> path.getFileName().toString().startsWith("version_"))
                         .findFirst()
                         .orElse(Path.of(""))
                         .toString();

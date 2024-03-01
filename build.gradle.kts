@@ -5,6 +5,7 @@ plugins {
     java
     application
     kotlin("jvm") version "1.9.22"
+    id("org.beryx.runtime") version "1.13.1" apply false
 }
 repositories {
     mavenCentral()
@@ -15,12 +16,12 @@ subprojects {
     apply(plugin = "application")
     apply(plugin = "kotlin")
     group = "com.lightcrafts"
-    version = rootProject.file("lightcrafts/version.txt").readText().trim()
+    version = rootProject.file("lightcrafts/version.txt").readText().trim().substringBefore('~')
     application {
+        applicationName = "LightZone"
         applicationDefaultJvmArgs += listOf(
             "--add-exports=java.desktop/sun.awt.image=ALL-UNNAMED",
             "-Xmx512m",
-            "-Dlensfun.dir=./share/lensfun",
         )
     }
     repositories {
