@@ -20,22 +20,17 @@ for:
       - cmd: SET PATH=C:/%MINGW64_PATH%/bin/;C:/%MINGW32_PATH%/bin/;C:/msys64/usr/bin/;%PATH%
       - cmd: SET MSSDK_HOME=/c/Program Files (x86)/Windows Kits/10/Lib/10.0.22621.0
       - cmd: SET JAVA_HOME=/c/Program Files/Java/jdk17
-      - cmd: SET ANT_SCRIPT=/c/projects/lightzone/windows/build.xml
-      - cmd: SET ANT_LIB_DIR=/c/projects/lightzone/lightcrafts/lib/
 
     install:
-      - cmd: cinst ant
-      - cmd: bash -lc "pacman --noconfirm --disable-download-timeout -S pactoys"
+      - cmd: bash -lc "pacman --noconfirm --disable-download-timeout -S gradle pactoys"
       - cmd: bash -lc "pacboy --noconfirm --disable-download-timeout -S lcms2:m libraw:m lensfun:m ntldd-git:m pkg-config:m"
 
     build_script:
-      - cmd: bash -lc "MINGW_DIR=/c/$MINGW64_PATH ant -f $ANT_SCRIPT -lib $ANT_LIB_DIR zip"
-      - cmd: bash -lc "ant -f $ANT_SCRIPT clean-native"
-      - cmd: bash -lc "TARGET_ARCH=i686 MINGW_DIR=/c/$MINGW32_PATH ant -f $ANT_SCRIPT -Dno-ivy=true -lib $ANT_LIB_DIR zip"
+      - cmd: bash -lc "cd /c/projects/lightzone/ && MINGW_DIR=/c/$MINGW64_PATH gradle windows:jpackage"
 
     artifacts:
-      - path: "windows/LightZone-windows*.zip"
-        name: windows zip archives
+      - path: "windows/build/jpackage/LightZone-Installer*.exe"
+        name: windows installers
 
   - matrix:
       only:
@@ -46,16 +41,14 @@ for:
       - sh: export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
 
     install:
-      - sh: HOMEBREW_NO_AUTO_UPDATE=1 brew install ant libjpeg-turbo libomp libraw libtiff libxml2 little-cms2 rsync
+      - sh: HOMEBREW_NO_AUTO_UPDATE=1 brew install gradle lensfun libjpeg-turbo libomp libraw libtiff libxml2 little-cms2 rsync
       - sh: rm /usr/local/bin/ccmake /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
-      - sh: HOMEBREW_NO_AUTO_UPDATE=1 brew install --build-from-source lensfun
       - sh: HOMEBREW_NO_AUTO_UPDATE=1 brew tap bell-sw/liberica
       - sh: HOMEBREW_NO_AUTO_UPDATE=1 brew install --cask liberica-jdk17-full
 
     build_script:
-      - sh: ant -f macosx/build.xml zip
-      - sh: mv macosx/LightZone-macosx.zip macosx/LightZone-macosx-intel.zip
+      - sh: gradle macosx:jpackage
 
     artifacts:
-      - path: "macosx/LightZone-macosx*.zip"
-        name: macos zip archives
+      - path: "macosx/build/jpackage/LightZone-Installer*.dmg"
+        name: macos installers
