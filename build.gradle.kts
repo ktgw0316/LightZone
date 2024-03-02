@@ -78,7 +78,7 @@ subprojects {
             commandLine(MAKE, "-C", "jnisrc")
         }
         register<Exec> ("cleanJni") {
-            commandLine(MAKE, "-C", "jnisrc", "-j", "-s", "clean")
+            commandLine(MAKE, "-C", "jnisrc", "-j", "-s", "distclean")
         }
         getByName("build") {
             dependsOn("jni", "products")
