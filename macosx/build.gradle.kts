@@ -14,8 +14,11 @@ tasks {
     named("clean") {
         dependsOn(":lightcrafts:clean")
     }
+    register<Exec> ("helpFiles") {
+        commandLine("make", "-C", "help")
+    }
     named("jpackage") {
-        dependsOn("build")
+        dependsOn("build", "helpFiles")
         doFirst {
             copy {
                 from(layout.buildDirectory.file("libs/${project.name}-${project.version}.jar"))

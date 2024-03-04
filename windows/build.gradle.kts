@@ -14,9 +14,17 @@ tasks {
     named("clean") {
         dependsOn(":lightcrafts:clean")
     }
+    register<Exec> ("helpFiles") {
+        commandLine("make", "-C", "help")
+    }
     named("jpackage") {
-        dependsOn("build")
+        dependsOn("build", "helpFiles")
         doFirst {
+            copy {
+                from("products/")
+                include("*.chm")
+                into(layout.buildDirectory.dir("jpackage/LightZone"))
+            }
             copy {
                 from("products/")
                 include("share/**")
