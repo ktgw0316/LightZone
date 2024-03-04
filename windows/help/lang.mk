@@ -1,4 +1,4 @@
-ROOT:=			../../..
+ROOT:=			../..
 COMMON_DIR:=		$(ROOT)/lightcrafts
 
 APP_NAME?=		LightZone
@@ -37,7 +37,7 @@ HTML_HELP_COMPILER:=	$(HTML_HELP_DIR)/HTML\ Help\ Workshop/hhc
 
 HTML_HELP_PROJECT:=	$(APP_NAME).hhp
 HTML_HELP_TOC:=		TOC.hhc
-HTML_HELP_FILE:=	../../products/$(APP_NAME)-$(ISO_LANG_CODE).chm
+HTML_HELP_FILE:=	../products/$(APP_NAME)-$(ISO_LANG_CODE).chm
 
 INDEX_PAGE_COMPILER:=	$(COMMON_DIR)/tools/bin/lc-help-make_index
 INDEX_PAGE_DIR:=	$(TARGET_HELP_DIR)/index

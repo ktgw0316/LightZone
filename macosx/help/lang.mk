@@ -18,7 +18,7 @@ HELP_TITLE:=		$(strip $(shell echo $(LANG_LINE) | cut -f5 -d:))
 INDEX_WORD:=		$(strip $(shell echo $(LANG_LINE) | cut -f6 -d:))
 HTML_CHARSET:=		$(strip $(shell echo $(LANG_LINE) | cut -f7 -d:))
 
-SOURCE_LANG_DIR:=	../resources/Resources/$(LANG).lproj
+SOURCE_LANG_DIR:=	../src/main/resources/Resources/$(LANG).lproj
 SOURCE_HELP_DIR:=	$(SOURCE_LANG_DIR)/$(HELP)
 
 APP_BUNDLE_DIR:=	../release/$(APP_NAME).app

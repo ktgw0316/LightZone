@@ -82,7 +82,7 @@
   <target name="build" depends="javac, jni"/>
 
   <target name="help">
-    <exec executable="make" dir="src/main/resources/help" failonerror="true"
+    <exec executable="make" dir="help" failonerror="true"
           vmlauncher="false">
       <arg value="APP_NAME=${app-name}"/>
     </exec>
