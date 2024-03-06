@@ -8,13 +8,11 @@ FW_DIR:=		/System/Library/Frameworks
 JNI_WINDOWS_CFLAGS:=	-fopenmp
 JNI_LINUX_CFLAGS:=	$(JNI_WINDOWS_CFLAGS)
 JNI_MACOSX_CFLAGS:=	-Xpreprocessor -fopenmp
-JNI_EXTRA_CFLAGS+=	-std=c++0x
+JNI_EXTRA_CFLAGS+=	-std=c++17 -Wall
 
 JNI_EXTRA_INCLUDES+=	-I../include
 
 JNI_MACOSX_LINK:=	-lstdc++ -lomp
-# JNI_WINDOWS_LINK:=	-lLCJNI
-JNI_LINUX_LINK:=	$(JNI_WINDOWS_LINK)
 
 ##
 # Altivec stuff is specified in JNI_PPC_DEFINES rather than JNI_PPC_CFLAGS
