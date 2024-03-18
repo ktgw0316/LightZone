@@ -32,7 +32,7 @@ subprojects {
         "annotationProcessor"("org.jetbrains:annotations:24.0.1")
         "annotationProcessor"("org.projectlombok:lombok:1.18.26")
         "compileOnly"("org.jetbrains:annotations:24.0.1")
-        "compileOnly"("org.projectlombok:lombok:1.18.26")
+        "compileOnly"("org.projectlombok:lombok:1.18.30")
         "implementation"(files("${project.rootDir}/lightcrafts/lib/jai-lightzone-1.1.3.0.jar"))
         "testCompileOnly"("org.jetbrains:annotations:24.0.1")
         "testImplementation"(kotlin("test"))
