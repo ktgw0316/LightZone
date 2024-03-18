@@ -1,7 +1,5 @@
 import java.io.FileOutputStream
 
-val MAKE = "make"
-
 application {
     mainClass.set("com.lightcrafts.app.Application")
 }
@@ -14,13 +12,21 @@ sourceSets {
     }
 }
 dependencies {
-    "implementation"("com.formdev:flatlaf:3.1.1")
-    "implementation"("com.formdev:flatlaf-intellij-themes:3.1.1")
-    "implementation"("com.github.jiconfont:jiconfont-swing:1.0.1")
-    "implementation"("com.github.jiconfont:jiconfont-font_awesome:4.7.0.0")
-    "implementation"("com.github.jiconfont:jiconfont-google_material_design_icons:2.2.0.2")
-    "implementation"("org.ejml:ejml-simple:0.40")
-    "implementation"("org.json:json:20231013")
+    implementation("com.formdev:flatlaf:3.1.1")
+    implementation("com.formdev:flatlaf-intellij-themes:3.1.1")
+    implementation("com.github.jiconfont:jiconfont-swing:1.0.1")
+    implementation("com.github.jiconfont:jiconfont-font_awesome:4.7.0.0")
+    implementation("com.github.jiconfont:jiconfont-google_material_design_icons:2.2.0.2")
+    implementation("org.ejml:ejml-simple:0.40")
+    implementation("org.json:json:20231013")
+}
+val os = System.getProperty("os.name").lowercase()
+val MAKE = with(os) {
+    when {
+        startsWith("sun") -> "gmake"
+        endsWith("bsd") -> "gmake"
+        else -> "make"
+    }
 }
 tasks {
     register<Exec> ("coprocesses") {
