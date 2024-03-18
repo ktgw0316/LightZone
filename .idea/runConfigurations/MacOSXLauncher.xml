@@ -5,7 +5,7 @@
     </envs>
     <option name="MAIN_CLASS_NAME" value="com.lightcrafts.platform.macosx.MacOSXLauncher" />
     <module name="LightZone.macosx.main" />
-    <option name="VM_PARAMETERS" value="-Djava.library.path=$ProjectFileDir$/macosx/products --add-exports=java.desktop/sun.awt.image=ALL-UNNAMED" />
+    <option name="VM_PARAMETERS" value="-Djava.library.path=$ProjectFileDir$/products --add-exports=java.desktop/sun.awt.image=ALL-UNNAMED" />
     <option name="WORKING_DIRECTORY" value="$ProjectFileDir$" />
     <method v="2">
       <option name="Make" enabled="true" />
