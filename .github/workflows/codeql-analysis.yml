@@ -31,7 +31,10 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: "zulu"
-          java-version: "17"
+          java-version: "21"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5 # v3.1.0
 
       # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL
@@ -39,12 +42,11 @@ jobs:
         with:
           languages: ${{ matrix.language }}
 
-      - name: Build
+      - name: Setup
         run: |
           sudo add-apt-repository -y ppa:lightzone-team/lightzone
           sudo apt update -y
           sudo apt install -y \
-            ant \
             javahelp2 \
             libejml-java \
             libglib2.0-dev \
@@ -58,7 +60,9 @@ jobs:
             libraw-dev \
             libtiff-dev \
             tidy
-          ant -f linux/build.xml
+
+      - name: Build with Gradle
+        run: gradle build
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
