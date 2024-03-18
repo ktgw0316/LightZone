@@ -72,18 +72,26 @@ subprojects {
         register<Exec> ("cleanProducts") {
             commandLine(MAKE, "-C", "products", "-j", "-s", "clean")
         }
-        register<Exec> ("jni") {
-            dependsOn("classes")
-            commandLine(MAKE, "-C", "jnisrc")
-        }
-        register<Exec> ("cleanJni") {
-            commandLine(MAKE, "-C", "jnisrc", "-j", "-s", "distclean")
-        }
         getByName("build") {
-            dependsOn("jni", "products")
+            dependsOn("products")
         }
         getByName("clean") {
-            dependsOn("cleanProducts", "cleanJni")
+            dependsOn("cleanProducts")
+        }
+        if (file("jnisrc").exists()) {
+            register<Exec> ("jni") {
+                dependsOn("classes")
+                commandLine(MAKE, "-C", "jnisrc")
+            }
+            register<Exec> ("cleanJni") {
+                commandLine(MAKE, "-C", "jnisrc", "-j", "-s", "distclean")
+            }
+            getByName("build") {
+                dependsOn("jni")
+            }
+            getByName("clean") {
+                dependsOn("cleanJni")
+            }
         }
     }
 }
