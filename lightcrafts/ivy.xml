@@ -19,6 +19,7 @@
     <dependency name="jiconfont-swing" rev="1.0.1" org="com.github.jiconfont" conf="compile->default"/>
     <dependency name="json" rev="20231013" org="org.json" conf="compile->default"/>
     <dependency name="lombok" rev="1.18.26" org="org.projectlombok" conf="compile->default"/>
+    <dependency name="openjson" rev="1.0.13" org="com.github.openjson" conf="compile->default"/>
     <!-- Test dependencies -->
     <dependency name="junit-jupiter-api" rev="5.9.3" org="org.junit.jupiter" conf="test->default"/>
     <dependency name="junit-jupiter-params" rev="5.9.3" org="org.junit.jupiter" conf="test->default"/>

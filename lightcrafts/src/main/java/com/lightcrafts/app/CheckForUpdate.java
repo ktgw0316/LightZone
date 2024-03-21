@@ -3,6 +3,7 @@
 
 package com.lightcrafts.app;
 
+import com.github.openjson.JSONObject;
 import com.lightcrafts.platform.AlertDialog;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.platform.ProgressDialog;
@@ -11,7 +12,6 @@ import com.lightcrafts.utils.Version;
 import com.lightcrafts.utils.WebBrowser;
 import com.lightcrafts.utils.thread.ProgressThread;
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URI;
@@ -19,7 +19,6 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Objects;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
