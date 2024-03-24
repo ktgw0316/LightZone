@@ -33,6 +33,12 @@ tasks {
                 include("*.jnilib")
                 into(layout.buildDirectory.dir("jpackage/LightZone.app/Contents/app"))
             }
+            copy {
+                from(layout.buildDirectory.dir("resources/main/Resources"))
+                include("*.lproj/**")
+                include("*.icns")
+                into(layout.buildDirectory.dir("jpackage/LightZone.app/Contents/Resources"))
+            }
         }
     }
 }
