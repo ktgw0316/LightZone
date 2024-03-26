@@ -1,14 +1,16 @@
 import org.gradle.internal.os.OperatingSystem
 
 plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "0.5.0"
+    kotlin("jvm") version "1.9.22" apply false
+    id("org.beryx.runtime") version "1.13.1" apply false
 }
 
-include(":lightcrafts")
 val os = OperatingSystem.current()!!
 val osName = when {
     os.isWindows -> "windows"
     os.isMacOsX -> "macosx"
     else -> "linux"
 }
-include(osName)
+
+rootProject.name = "lightzone"
+include("lightcrafts", osName)

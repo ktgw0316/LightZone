@@ -1,5 +1,18 @@
 import java.io.FileOutputStream
 
+plugins {
+    kotlin("jvm")
+    id("lightzone.java-conventions")
+}
+dependencies {
+    implementation("com.formdev:flatlaf:3.1.1")
+    implementation("com.formdev:flatlaf-intellij-themes:3.1.1")
+    implementation("com.github.jiconfont:jiconfont-swing:1.0.1")
+    implementation("com.github.jiconfont:jiconfont-font_awesome:4.7.0.0")
+    implementation("com.github.jiconfont:jiconfont-google_material_design_icons:2.2.0.2")
+    implementation("com.github.openjson:openjson:1.0.13")
+    implementation("org.ejml:ejml-simple:0.40")
+}
 application {
     mainClass.set("com.lightcrafts.app.Application")
 }
@@ -10,15 +23,6 @@ sourceSets {
             exclude("**/.git")
         }
     }
-}
-dependencies {
-    implementation("com.formdev:flatlaf:3.1.1")
-    implementation("com.formdev:flatlaf-intellij-themes:3.1.1")
-    implementation("com.github.jiconfont:jiconfont-swing:1.0.1")
-    implementation("com.github.jiconfont:jiconfont-font_awesome:4.7.0.0")
-    implementation("com.github.jiconfont:jiconfont-google_material_design_icons:2.2.0.2")
-    implementation("com.github.openjson:openjson:1.0.13")
-    implementation("org.ejml:ejml-simple:0.40")
 }
 val os = System.getProperty("os.name").lowercase()
 val MAKE = with(os) {
@@ -50,10 +54,10 @@ tasks {
         }
         File("$dir/Version").writeText(version.toString())
     }
-    getByName("build") {
+    named("build") {
         dependsOn("coprocesses", "revision")
     }
-    getByName("clean") {
+    named("clean") {
         dependsOn("cleanCoprocesses")
     }
 }
