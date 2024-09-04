@@ -1,3 +1,7 @@
+plugins {
+    kotlin("jvm")
+    id("lightzone.java-conventions")
+}
 dependencies {
     implementation(project(":lightcrafts"))
     implementation("javax.help:javahelp:2.0.05")

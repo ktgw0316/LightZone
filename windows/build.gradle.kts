@@ -1,4 +1,6 @@
 plugins {
+    kotlin("jvm")
+    id("lightzone.java-conventions")
     id("org.beryx.runtime")
 }
 dependencies {
