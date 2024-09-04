@@ -89,4 +89,10 @@ tasks {
             dependsOn("cleanJni")
         }
     }
+    if (os.contains("windows") && System.getenv("MSSDK_HOME") == null) {
+        withType<Exec>().configureEach {
+            val msSdkHome = "/c/Program Files (x86)/Windows Kits/10/Lib/10.0.22621.0"
+            environment("MSSDK_HOME", msSdkHome)
+        }
+    }
 }
