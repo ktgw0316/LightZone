@@ -37,4 +37,4 @@ Package-List:
  lightzone deb graphics optional
 DEBTRANSFORM-RELEASE: 1
 DEBTRANSFORM-TAR: lightzone-5.0.0.beta2.tar.xz
-DEBTRANSFORM-SERIES: debian.series-Debian_12
+DEBTRANSFORM-SERIES: patches-Debian_12.series
