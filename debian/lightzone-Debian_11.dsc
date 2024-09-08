@@ -27,6 +27,7 @@ Build-Depends:
  liblombok-java,
  liblcms2-dev,
  liblensfun-dev (<< 0.3.95),
+ libopenjson-java,
  libraw-dev,
  libtiff-dev,
  libx11-dev,
