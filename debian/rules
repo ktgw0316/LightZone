@@ -2,8 +2,7 @@
 
 # Patch for JIconFont-FontAwesome 4.7.0.1
 JICONFONT_FONT_AWESOME_VERSION=$(shell dpkg -s libjiconfont-font-awesome-java | grep -oP "(?<=^Version: ).+")
-JICONFONT_FONT_AWESOME_4_7_0_1=$(shell if $(dpkg --compare-versions $(JICONFONT_FONT_AWESOME_VERSION) ge 4.7.0.1); then echo yes; fi)
-ifeq ($(JICONFONT_FONT_AWESOME_4_7_0_1),yes)
+ifneq ($(findstring 4.7.0.0,$(JICONFONT_FONT_AWESOME_VERSION)),)
 export QUILT_PATCH_DIR:=debian/patches-Debian_12
 endif
 
