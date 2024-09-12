@@ -18,6 +18,7 @@ Build-Depends:
  javahelp2,
  javahelper,
  libejml-java (>= 0.38),
+ libflatlaf-java,
  libglib2.0-dev,
  libjetbrains-annotations-java,
  libjiconfont-font-awesome-java,
