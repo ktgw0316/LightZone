@@ -41,7 +41,7 @@ class ColorWheel extends JComponent {
     // Determine the centerpoint of the wheel, in screen coordinates.
     private Point2D getWheelCenter() {
         Dimension size = getSize();
-        return new Point2D.Double(size.width / 2, size.height / 2);
+        return new Point2D.Double(0.5 * size.width, 0.5 * size.height);
     }
 
     // Compute distance from the wheel center, in internal coordinates.
@@ -115,7 +115,7 @@ class ColorWheel extends JComponent {
         Graphics2D g = (Graphics2D) graphics;
 
         Point2D center = getWheelCenter();
-        double radius = getWheelSize() / 2;
+        double radius = 0.5 * getWheelSize();
 
         int minX = (int) Math.round(center.getX() - radius);
         int maxX = (int) Math.round(center.getX() + radius);
@@ -145,36 +145,5 @@ class ColorWheel extends JComponent {
             g.setColor(Color.black);
             g.drawRect(p.x - 2, p.y - 2, 3, 3);
         }
-    }
-
-    public static void main(String[] args) {
-        ColorWheel wheel = new ColorWheel();
-
-        ColorWheelMouseListener listener = new ColorWheelMouseListener(wheel) {
-            void colorPicked(Color color, boolean isChanging) {
-                System.out.println(color);
-            }
-        };
-        wheel.addMouseListener(listener);
-        wheel.addMouseMotionListener(listener);
-
-        Box colorContent = Box.createHorizontalBox();
-
-        colorContent.add(wheel);
-        colorContent.add(Box.createHorizontalStrut(8));
-        colorContent.add(new ColorSwatch(Color.gray));
-        colorContent.add(Box.createHorizontalStrut(8));
-        colorContent.add(new ColorText(Color.gray));
-        colorContent.add(Box.createHorizontalStrut(8));
-        colorContent.add(new DropperButton());
-
-        colorContent.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-
-        JFrame frame = new JFrame("Test");
-        frame.setContentPane(colorContent);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
     }
 }
