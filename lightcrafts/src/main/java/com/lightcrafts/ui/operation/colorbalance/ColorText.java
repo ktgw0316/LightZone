@@ -9,13 +9,12 @@ import java.awt.*;
 
 class ColorText extends Box {
 
-    private Box labels;
-    private Box values;
+    private final Box values;
 
     ColorText(Color color) {
         super(BoxLayout.X_AXIS);
 
-        labels = Box.createVerticalBox();
+        final Box labels = Box.createVerticalBox();
         labels.add(createLabel(LOCALE.get("RedLabel") + ':'));
         labels.add(createLabel(LOCALE.get("GreenLabel") + ':'));
         labels.add(createLabel(LOCALE.get("BlueLabel") + ':'));
@@ -30,6 +29,7 @@ class ColorText extends Box {
         // the color text becomes shorter:
         setColor(Color.white);
         Dimension size = values.getPreferredSize();
+        size.setSize(size.width + 1, size.height);
         values.setMinimumSize(size);
         values.setPreferredSize(size);
         values.setMaximumSize(size);
@@ -56,7 +56,8 @@ class ColorText extends Box {
     private static JLabel createLabel(String text) {
         JLabel label = new JLabel(text);
         label.setFont(ControlFont);
-        label.setAlignmentX(1f);
+        label.setAlignmentX(Component.RIGHT_ALIGNMENT);
+        label.setHorizontalAlignment(JLabel.TRAILING);
         return label;
     }
 }
