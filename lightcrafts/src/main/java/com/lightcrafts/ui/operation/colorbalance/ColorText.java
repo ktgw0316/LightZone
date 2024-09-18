@@ -59,14 +59,4 @@ class ColorText extends Box {
         label.setAlignmentX(1f);
         return label;
     }
-
-    public static void main(String[] args) {
-        JPanel panel = new JPanel(new FlowLayout());
-        panel.add(new ColorText(new Color(1, 2, 3)));
-        JFrame frame = new JFrame();
-        frame.setContentPane(panel);
-        frame.pack();
-        frame.setLocation(100, 100);
-        frame.setVisible(true);
-    }
 }
