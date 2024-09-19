@@ -89,6 +89,6 @@ public final class ColorSwatch extends JComponent {
 
     private Color m_color;
 
-    private final static Dimension PREFERRED_SIZE = new Dimension( 35, 35 );
+    private final static Dimension PREFERRED_SIZE = new Dimension( 50, 50 );
 }
 /* vim:set et sw=4 ts=4: */
