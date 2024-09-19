@@ -2,11 +2,10 @@
 
 package com.lightcrafts.ui.operation.colorbalance;
 
-import com.lightcrafts.ui.toolkit.DropperButton;
-import com.lightcrafts.ui.swing.ColorSwatch;
-
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
@@ -16,9 +15,14 @@ import java.awt.image.BufferedImage;
  */
 class ColorWheel extends JComponent {
 
+    public ColorWheel() {
+        this.addComponentListener(new ResizeListener());
+    }
+
     // The currently picked Color, or null if no Color has been picked.
     private Color picked;
 
+    @Override
     public Dimension getPreferredSize() {
         return new Dimension(100, 100);
     }
@@ -111,6 +115,7 @@ class ColorWheel extends JComponent {
 
     private BufferedImage wheelImage = null;
 
+    @Override
     protected void paintComponent(Graphics graphics) {
         Graphics2D g = (Graphics2D) graphics;
 
@@ -144,6 +149,14 @@ class ColorWheel extends JComponent {
             Point p = colorToPoint(picked, false);
             g.setColor(Color.black);
             g.drawRect(p.x - 2, p.y - 2, 3, 3);
+        }
+    }
+
+    private class ResizeListener extends ComponentAdapter {
+        @Override
+        public void componentResized(ComponentEvent e) {
+            wheelImage = null;
+            repaint();
         }
     }
 }
