@@ -15,10 +15,12 @@ fun horizontalStrut(width: Int): Component = Box.createHorizontalStrut(width)
 
 private fun createAndShowGUI() {
     val wheel = ColorWheel()
+    val colorSwatch = ColorSwatch(Color.gray)
     val colorText = ColorText(Color.gray)
 
     val listener = object : ColorWheelMouseListener(wheel) {
         override fun colorPicked(color: Color, isChanging: Boolean) {
+            colorSwatch.setColor(color)
             colorText.setColor(color)
         }
     }
@@ -30,7 +32,7 @@ private fun createAndShowGUI() {
                 addMouseMotionListener(listener)
             })
             add(horizontalStrut(8))
-            add(ColorSwatch(Color.gray))
+            add(colorSwatch)
             add(horizontalStrut(8))
             add(colorText)
             add(horizontalStrut(8))
