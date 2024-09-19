@@ -24,7 +24,7 @@ class ColorWheel extends JComponent {
 
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(100, 100);
+        return new Dimension(150, 150);
     }
 
     Color getPickedColor() {
