@@ -64,18 +64,15 @@ class ColorWheel extends JComponent {
         return Math.atan2(y, - x);
     }
 
-    Color pointToColor(Point p) {
-        return pointToColor(p, true);
+    Color pointToColor(Point p, boolean linear) {
+        double r = Math.min(getRadius(p), 1);
+        double theta = getAngle(p);
+        return polarToColor(r, theta, linear);
     }
 
     // Note: the 2.2 and 1.2 magic constants make sure that the picked point stays inside the color wheel
 
-    Color pointToColor(Point p, boolean linear) {
-        double r = getRadius(p);
-        double theta = getAngle(p);
-
-        r = Math.min(r, 1);
-
+    static Color polarToColor(double r, double theta, boolean linear) {
         float hue = (1 + (float) (theta / Math.PI)) / 2f;
         float saturation = linear ? (float) r : (float) Math.min(1.1 * (r * r), 1); // non linearity for reduced sensitivity
         float brightness = 1;
@@ -90,30 +87,57 @@ class ColorWheel extends JComponent {
         return new Color(comps[0], comps[1], comps[2], alpha);
     }
 
-    Point colorToPoint(Color c) {
-        return colorToPoint(c, true);
+    Point colorToPoint(Color c, boolean linear) {
+        var polar = colorToPolar(c, linear);
+        double r = polar[0];
+        double theta = polar[1];
+        return polarToPoint(r, theta, linear);
     }
 
-    Point colorToPoint(Color c, boolean linear) {
+    static double[] colorToPolar(Color c, boolean linear) {
         float[] hsb = Color.RGBtoHSB(
-            c.getRed(), c.getGreen(), c.getBlue(), null
+                c.getRed(), c.getGreen(), c.getBlue(), null
         );
         float hue = hsb[0];
         float saturation = hsb[1];
 
         double r = linear ? saturation : Math.sqrt(saturation); // non linearity for reduced sensitivity
         double theta = Math.PI * (2 * hue - 1);
+        return new double[]{r, theta};
+    }
 
+    Point polarToPoint(double r, double theta, boolean linear) {
         Point2D center = getWheelCenter();
         double radius = getWheelSize() / (linear ? 2 : 2.1);
 
         int x = (int) Math.round(center.getX() - radius * r * Math.cos(theta));
         int y = (int) Math.round(center.getY() + radius * r * Math.sin(theta));
-
         return new Point(x, y);
     }
 
     private BufferedImage wheelImage = null;
+
+    public BufferedImage createWheelImage(Point2D center, double radius) {
+        int minX = (int) Math.round(center.getX() - radius);
+        int maxX = (int) Math.round(center.getX() + radius);
+        int minY = (int) Math.round(center.getY() - radius);
+        int maxY = (int) Math.round(center.getY() + radius);
+        int diameter = (int) (2*radius);
+
+        var img = new BufferedImage(diameter, diameter, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D gg = img.createGraphics();
+
+        for (int x=minX; x<=maxX; x++) {
+            for (int y=minY; y<=maxY; y++) {
+                Point p = new Point(x, y);
+                Color color = pointToColor(p, true);
+                gg.setColor(color);
+                gg.fillRect(x - minX, y - minY, 1, 1);
+            }
+        }
+        gg.dispose();
+        return img;
+    }
 
     @Override
     protected void paintComponent(Graphics graphics) {
@@ -122,26 +146,8 @@ class ColorWheel extends JComponent {
         Point2D center = getWheelCenter();
         double radius = 0.5 * getWheelSize();
 
-        int minX = (int) Math.round(center.getX() - radius);
-        int maxX = (int) Math.round(center.getX() + radius);
-        int minY = (int) Math.round(center.getY() - radius);
-        int maxY = (int) Math.round(center.getY() + radius);
-
         if (wheelImage == null) {
-            wheelImage = new BufferedImage((int) (2*radius), (int) (2*radius), BufferedImage.TYPE_INT_ARGB);
-            Graphics2D gg = wheelImage.createGraphics();
-            /* Shape circle = new Ellipse2D.Double(minX, minY, 2 * radius, 2 * radius);
-            gg.setClip(circle); */
-
-            for (int x=minX; x<=maxX; x++) {
-                for (int y=minY; y<=maxY; y++) {
-                    Point p = new Point(x, y);
-                    Color color = pointToColor(p);
-                    gg.setColor(color);
-                    gg.fillRect((int) (x - center.getX() + radius), (int) (y - center.getY() + radius), 1, 1);
-                }
-            }
-            gg.dispose();
+            wheelImage = createWheelImage(center, radius);
         }
         g.drawImage(wheelImage, null, (int) (center.getX() - radius), (int) (center.getY() - radius));
 
