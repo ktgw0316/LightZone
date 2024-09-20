@@ -31,14 +31,13 @@ import java.lang.Math;
 
 public class OkColor {
 
-    private static float clamp(float x, float min, float max) {
-        return Math.min(Math.max(x, min), max);
+    private static int clampU8(float x) {
+        return (int) Math.min(Math.max(x, 0), 255);
     }
 
     private record RGB(float r, float g, float b) {
 
         static RGB fromColor(Color c) {
-            // FIXME
             final float r = c.getRed() / 255.f;
             final float g = c.getGreen() / 255.f;
             final float b = c.getBlue() / 255.f;
@@ -47,11 +46,10 @@ public class OkColor {
         }
 
         public Color toColor() {
-            // FIXME
             return new Color(
-                    (int) clamp(r * 255.f, 0, 255),
-                    (int) clamp(g * 255.f, 0, 255),
-                    (int) clamp(b * 255.f, 0, 255)
+                    clampU8(r * 255.f),
+                    clampU8(g * 255.f),
+                    clampU8(b * 255.f)
             );
         }
     }
