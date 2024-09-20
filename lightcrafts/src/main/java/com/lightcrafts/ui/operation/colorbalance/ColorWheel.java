@@ -2,6 +2,8 @@
 
 package com.lightcrafts.ui.operation.colorbalance;
 
+import com.lightcrafts.image.color.OkColor;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
@@ -73,11 +75,11 @@ class ColorWheel extends JComponent {
     // Note: the 2.2 and 1.2 magic constants make sure that the picked point stays inside the color wheel
 
     static Color polarToColor(double r, double theta, boolean linear) {
-        float hue = (1 + (float) (theta / Math.PI)) / 2f;
-        float saturation = linear ? (float) r : (float) Math.min(1.1 * (r * r), 1); // non linearity for reduced sensitivity
-        float brightness = 1;
+        final float hue = (1 + (float) (theta / Math.PI)) / 2f;
+        final float saturation = linear ? (float) r : (float) Math.min(1.1 * (r * r), 1); // non linearity for reduced sensitivity
+        final float luminosity = 0.5f;
 
-        Color color = new Color(Color.HSBtoRGB(hue, saturation, brightness));
+        final Color color = new OkColor.Okhsl(hue, saturation, luminosity).toColor();
         if (r <= .97 || !linear)
             return color;
 
@@ -95,11 +97,9 @@ class ColorWheel extends JComponent {
     }
 
     static double[] colorToPolar(Color c, boolean linear) {
-        float[] hsb = Color.RGBtoHSB(
-                c.getRed(), c.getGreen(), c.getBlue(), null
-        );
-        float hue = hsb[0];
-        float saturation = hsb[1];
+        final var okhsl = OkColor.Okhsl.from(c);
+        final float hue = okhsl.h();
+        final float saturation = okhsl.s();
 
         double r = linear ? saturation : Math.sqrt(saturation); // non linearity for reduced sensitivity
         double theta = Math.PI * (2 * hue - 1);
