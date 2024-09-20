@@ -229,8 +229,9 @@ public class OkColor {
                 return new RGB(0.f, 0.f, 0.f);
             }
 
-            final var a_ = (float) Math.cos(2.f * Math.PI * h);
-            final var b_ = (float) Math.sin(2.f * Math.PI * h);
+            final var theta = Math.TAU * h;
+            final var a_ = (float) Math.cos(theta);
+            final var b_ = (float) Math.sin(theta);
             final var L = toe_inv(l);
 
             final var cs = Cs.get_Cs(L, a_, b_);
@@ -283,7 +284,7 @@ public class OkColor {
             final var b_ = lab.b / C;
 
             final var L = lab.l;
-            final var h = 0.5f + 0.5f * (float) (Math.atan2(-lab.b, -lab.a) / Math.PI);
+            final var h = 0.5f + (float) (Math.atan2(-lab.b, -lab.a) / Math.TAU);
 
             final var cs = Cs.get_Cs(L, a_, b_);
             final var C_0 = cs.C_0;
@@ -405,14 +406,15 @@ public class OkColor {
         final float k_1 = 0.206f;
         final float k_2 = 0.03f;
         final float k_3 = (1.f + k_1) / (1.f + k_2);
-        return 0.5f * (float) (k_3 * x - k_1 + Math.sqrt((k_3 * x - k_1) * (k_3 * x - k_1) + 4 * k_2 * k_3 * x));
+        final float k_4 = k_3 * x - k_1;
+        return 0.5f * (k_4 + (float) Math.sqrt(k_4 * k_4 + 4 * k_2 * k_3 * x));
     }
 
     static private float toe_inv(float x) {
         final float k_1 = 0.206f;
         final float k_2 = 0.03f;
         final float k_3 = (1.f + k_1) / (1.f + k_2);
-        return (x * x + k_1 * x) / (k_3 * (x + k_2));
+        return (x + k_1) * x / (k_3 * (x + k_2));
     }
 
     private record Cs (float C_0, float C_mid, float C_max) {
@@ -428,19 +430,24 @@ public class OkColor {
 
             ST ST_mid = ST.get_ST_mid(a_, b_);
 
-            // Use a soft minimum function, instead of a sharp triangle shape to get a smooth value for chroma.
             float C_a = L * ST_mid.S;
             float C_b = (1.f - L) * ST_mid.T;
-            final var C_mid = 0.9f * k * (float) Math.sqrt(Math.sqrt(1 / (1 / (C_a * C_a * C_a * C_a) + 1 / (C_b * C_b * C_b * C_b))));
+            final var C_mid = 0.9f * k * (float) Math.sqrt(softMinimum(C_a * C_a, C_b * C_b));
 
-            // for C_0, the shape is independent of hue, so ST are constant. Values picked to roughly be the average values of ST.
+            // for C_0, the shape is independent of hue, so ST are constant.
+            // Values picked to roughly be the average values of ST.
             float C0_a = L * 0.4f;
             float C0_b = (1.f - L) * 0.8f;
-
-            // Use a soft minimum function, instead of a sharp triangle shape to get a smooth value for chroma.
-            final var C_0 = (float) Math.sqrt(1.f / (1.f / (C0_a * C0_a) + 1.f / (C0_b * C0_b)));
+            final var C_0 = softMinimum(C0_a, C0_b);
 
             return new Cs(C_0, C_mid, C_max);
+        }
+
+        /**
+          Calculates a smooth value instead of a sharp triangle shape.
+         */
+        private static float softMinimum(float a, float b) {
+            return a * b / (float) Math.hypot(a, b);
         }
     }
 }
