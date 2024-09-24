@@ -46,11 +46,11 @@ public class ColorPickerControl extends GenericControl {
         text = new ColorText(color);
 
         wheel = new ColorWheel();
-        ColorWheelMouseListener listener = new ColorWheelMouseListener(wheel) {
+        final var listener = new ColorWheelMouseListener(wheel) {
+            @Override
             void colorPicked(Color color, boolean isChanging) {
-                // Colors from the ColorWheel are always fully bright.
-                // This merges wheel color H and S with operation color B:
-                color = getAdjustedWheelColor();
+                final Color opColor = ((ColorPickerOperation) getOperation()).getColor();
+                color = ColorWheel.getAdjustedWheelColor(color, opColor);
                 setColor(color, isChanging);
             }
         };
@@ -108,28 +108,6 @@ public class ColorPickerControl extends GenericControl {
             wheel.pickColor(color);
             isColorWheelUpdating = false;
         }
-    }
-
-    // Colors from the Color wheel are always fully bright.  This method merges
-    // the hue and saturation from the ColorWheel and the brightness from the
-    // ColorPickerOperation into a third Color.
-    private Color getAdjustedWheelColor() {
-        Color wheelColor = wheel.getPickedColor();
-        Color opColor = ((ColorPickerOperation) getOperation()).getColor();
-        float[] wheelHsb = Color.RGBtoHSB(
-            wheelColor.getRed(),
-            wheelColor.getGreen(),
-            wheelColor.getBlue(),
-            null
-        );
-        float[] opHsb = Color.RGBtoHSB(
-            opColor.getRed(),
-            opColor.getGreen(),
-            opColor.getBlue(),
-            null
-        );
-        int rgb = Color.HSBtoRGB(wheelHsb[0], wheelHsb[1], opHsb[2]);
-        return new Color(rgb);
     }
 
     private final static String ColorTag = "Color";

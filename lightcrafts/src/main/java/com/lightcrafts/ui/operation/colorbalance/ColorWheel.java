@@ -29,13 +29,26 @@ class ColorWheel extends JComponent {
         return new Dimension(150, 150);
     }
 
-    Color getPickedColor() {
-        return picked;
-    }
-
     void pickColor(Color color) {
         picked = color;
         repaint();
+    }
+
+    /**
+     * Luminance from the Color wheel is constant.  This method merges
+     * the hue and saturation from the ColorWheel and the brightness from the
+     * ColorPickerOperation into a third Color.
+     */
+    static Color getAdjustedWheelColor(Color wheelColor, Color opColor) {
+        final var wheelOkhsl = OkColor.Okhsl.from(wheelColor);
+        final float wheelHue = wheelOkhsl.h();
+        final float wheelSaturation = wheelOkhsl.s();
+
+        final var opOkhsl = OkColor.Okhsl.from(opColor);
+        final float opLuminance = opOkhsl.l();
+
+        final var adjustedOkhsl = new OkColor.Okhsl(wheelHue, wheelSaturation, opLuminance);
+        return adjustedOkhsl.toColor();
     }
 
     // Determine the size of the wheel, in screen coordinates.
@@ -97,9 +110,12 @@ class ColorWheel extends JComponent {
     }
 
     static double[] colorToPolar(Color c, boolean linear) {
+        if (c == Color.BLACK)
+            return new double[]{0, 0};
+
         final var okhsl = OkColor.Okhsl.from(c);
         final float hue = okhsl.h();
-        final float saturation = okhsl.s();
+        final float saturation = Math.min(okhsl.s(), 1);
 
         double r = linear ? saturation : Math.sqrt(saturation); // non linearity for reduced sensitivity
         double theta = Math.PI * (2 * hue - 1);
