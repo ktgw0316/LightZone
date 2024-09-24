@@ -2,8 +2,10 @@
 
 package com.lightcrafts.ui.toolkit;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.AbstractButton;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import java.awt.Insets;
 
 /**
  * This is just a JButton that is styled to suit a button that is pure icons:
@@ -15,15 +17,6 @@ import java.awt.*;
 
 public class ImageOnlyButton extends JButton {
 
-    public ImageOnlyButton() {
-        setStyle(this);
-    }
-
-    public ImageOnlyButton(Action action) {
-        super(action);
-        setStyle(this);
-    }
-
     public ImageOnlyButton(Icon icon) {
         super(icon);
         setStyle(this);
@@ -32,37 +25,6 @@ public class ImageOnlyButton extends JButton {
     public ImageOnlyButton(Icon normalIcon, Icon pressedIcon) {
         this(normalIcon);
         setPressedIcon(pressedIcon);
-        setStyle(this);
-    }
-
-    public ImageOnlyButton(
-        Icon normalIcon, Icon pressedIcon, Icon disabledIcon
-    ) {
-        this(normalIcon);
-        setPressedIcon(pressedIcon);
-        setDisabledIcon(disabledIcon);
-        setStyle(this);
-    }
-
-    public ImageOnlyButton(
-        Icon normalIcon, Icon rolloverIcon, Icon pressedIcon, Icon disabledIcon
-    ) {
-        super(normalIcon);
-        setPressedIcon(pressedIcon);
-        setDisabledIcon(disabledIcon);
-        setRolloverIcon(rolloverIcon);
-        setRolloverEnabled(true);
-        setStyle(this);
-    }
-
-    public ImageOnlyButton(
-        Action action, Icon rolloverIcon, Icon pressedIcon, Icon disabledIcon
-    ) {
-        super(action);
-        setPressedIcon(pressedIcon);
-        setDisabledIcon(disabledIcon);
-        setRolloverIcon(rolloverIcon);
-        setRolloverEnabled(true);
         setStyle(this);
     }
 

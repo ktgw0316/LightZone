@@ -29,6 +29,7 @@ public class Launcher {
             showJavaVersion();
             checkCpu();
             UIManager.setLookAndFeel(Platform.getPlatform().getLookAndFeel());
+            UIManager.put("Component.focusWidth", 0);
 
             LocaleModel.setDefaultFromPreference();
 
