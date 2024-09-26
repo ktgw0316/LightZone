@@ -15,7 +15,7 @@ import java.nio.channels.WritableByteChannel;
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */
 public final class OutputStreamImageDataReceiver
-        implements LCImageDataReceiver {
+        implements AutoCloseable, LCImageDataReceiver {
 
     /**
      * Construct an <code>OutputStreamImageDataReceiver</code>.
@@ -53,6 +53,11 @@ public final class OutputStreamImageDataReceiver
     protected void finalize() throws Throwable {
         dispose();
         super.finalize();
+    }
+
+    @Override
+    public void close() {
+        dispose();
     }
 
     private WritableByteChannel m_channel;

@@ -50,7 +50,7 @@ import static com.lightcrafts.image.types.JPEGConstants.JPEG_MAX_SEGMENT_SIZE;
  * @author Paul J. Lucas [paul@lightcrafts.com]
  * @see <a href="http://www.ijg.org/">LibJPEG</a>
  */
-public final class LCJPEGWriter {
+public final class LCJPEGWriter implements AutoCloseable {
 
     static {
         System.loadLibrary("LCJPEG");
@@ -160,6 +160,11 @@ public final class LCJPEGWriter {
      * Dispose of an <code>LCJPEGWriter</code>.
      */
     public native void dispose();
+
+    @Override
+    public void close() {
+        dispose();
+    }
 
     /**
      * Puts an image, compressing it into a JPEG.

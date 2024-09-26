@@ -135,18 +135,16 @@ class RawImageCache extends Thread {
                 try {
                     final File cacheFile = fileCache.putToFile(currentJob.cacheKey);
 
-                    try {
-                        LCTIFFWriter writer = new LCTIFFWriter(cacheFile.getAbsolutePath(),
-                                                               currentJob.image.getWidth(),
-                                                               currentJob.image.getHeight());
+                    try (final var writer = new LCTIFFWriter(
+                            cacheFile.getAbsolutePath(),
+                            currentJob.image.getWidth(),
+                            currentJob.image.getHeight())) {
                         writer.setByteField( TIFFTags.TIFF_ICC_PROFILE, JAIContext.linearProfile.getData());
                         writer.putImageTiled(currentJob.image, null);
-                    } catch ( LCImageLibException e) {
-                        e.printStackTrace();
                     } finally {
                         fileCache.notifyAboutCloseOf(cacheFile);
                     }
-                } catch ( IOException e ) {
+                } catch (IOException | LCImageLibException e) {
                     // nevermind, do without cache...
                     e.printStackTrace();
                 }

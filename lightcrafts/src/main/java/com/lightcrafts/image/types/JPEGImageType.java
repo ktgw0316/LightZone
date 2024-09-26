@@ -25,6 +25,7 @@ import com.lightcrafts.utils.thread.ProgressThread;
 import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XMLUtil;
 import com.lightcrafts.utils.xml.XmlNode;
+import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Document;
 
 import javax.media.jai.PlanarImage;
@@ -239,26 +240,15 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
      * {@inheritDoc}
      */
     @Override
-    public Dimension getDimension( ImageInfo imageInfo )
-        throws BadImageFileException, IOException, UnknownImageTypeException
+    public Dimension getDimension(@NotNull ImageInfo imageInfo) throws IOException
     {
-        Dimension d = null;
-        try {
-            LCJPEGReader reader = null;
-            try {
-                final String path = imageInfo.getFile().getAbsolutePath();
-                reader = new LCJPEGReader( path );
-                d = new Dimension( reader.getWidth(), reader.getHeight() );
-            }
-            finally {
-                if ( reader != null )
-                    reader.dispose();
-            }
+        final String path = imageInfo.getFile().getAbsolutePath();
+        try (final var reader = new LCJPEGReader(path)) {
+            return new Dimension(reader.getWidth(), reader.getHeight());
         }
-        catch ( LCImageLibException e ) {
-            // ignore
+        catch (LCImageLibException ignored) {
+            return null;
         }
-        return d;
     }
 
     /**
@@ -274,17 +264,13 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
         );
         if ( iccSegBufs == null ) {
             final String path = imageInfo.getFile().getAbsolutePath();
-            try {
-                switch ( new LCJPEGReader(path).getColorsPerPixel() ) {
-                    case 1:
-                        return JAIContext.gray22Profile;
-                    case 3: // sRGB or uncalibrated
-                        return getICCProfileFromEXIF( imageInfo );
-                    case 4:
-                        return JAIContext.CMYKProfile;
-                    default:
-                        throw new BadColorProfileException( path );
-                }
+            try (final var reader = new LCJPEGReader(path)) {
+                return switch (reader.getColorsPerPixel()) {
+                    case 1 -> JAIContext.gray22Profile;
+                    case 3 -> getICCProfileFromEXIF(imageInfo); // sRGB or uncalibrated
+                    case 4 -> JAIContext.CMYKProfile;
+                    default -> throw new BadColorProfileException(path);
+                };
             } catch (LCImageLibException e) {
                 // ignore
             }
@@ -293,10 +279,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
         try {
             iccProfileData = assembleICCProfile( iccSegBufs );
         }
-        catch ( BufferUnderflowException e ) {
-            throw new BadImageFileException( imageInfo.getFile() );
-        }
-        catch ( IllegalArgumentException e ) {
+        catch ( BufferUnderflowException | IllegalArgumentException e ) {
             throw new BadImageFileException( imageInfo.getFile() );
         }
         try {
@@ -343,13 +326,14 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
                 profile = null;
             }
 
-            final LCJPEGReader reader = new LCJPEGReader(
-                imageInfo.getFile().getAbsolutePath(), maxWidth, maxHeight,
-                (JPEGImageInfo)imageInfo.getAuxiliaryInfo()
-            );
-            final PlanarImage image = reader.getImage(
-                thread, profile != null ? new ICC_ColorSpace( profile ) : null
-            );
+            final var path = imageInfo.getFile().getAbsolutePath();
+            final var jpegInfo = (JPEGImageInfo)imageInfo.getAuxiliaryInfo();
+            final var colorSpace = profile != null ? new ICC_ColorSpace(profile) : null;
+
+            final PlanarImage image;
+            try (final var reader = new LCJPEGReader(path, maxWidth, maxHeight, jpegInfo)) {
+                image = reader.getImage(thread, colorSpace);
+            }
 
             assert image instanceof CachedImage
                     && image.getTileWidth() == JAIContext.TILE_WIDTH
@@ -509,11 +493,10 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
         throws BadImageFileException
     {
         try {
-            final LCJPEGReader reader = new LCJPEGReader(
-                new InputStreamImageDataProvider( stream ),
-                maxWidth, maxHeight
-            );
-            return reader.getImage( cs );
+            final var provider = new InputStreamImageDataProvider(stream);
+            try (final var reader = new LCJPEGReader(provider, maxWidth, maxHeight)) {
+                return reader.getImage(cs);
+            }
         }
         catch ( UserCanceledException e ) {
             //
@@ -692,45 +675,41 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
         try {
             metadata = imageInfo.getMetadata();
         }
-        catch ( BadImageFileException e ) {
-            metadata = new ImageMetadata( this );
-        }
-        catch ( UnknownImageTypeException e ) {
+        catch (BadImageFileException | UnknownImageTypeException e) {
             metadata = new ImageMetadata( this );
         }
 
+        final int numComponents = image.getColorModel().getNumComponents();
+        final int colorSpace = LCJPEGWriter.getColorSpaceFromNumComponents(numComponents);
         try {
-            final int numComponents = image.getColorModel().getNumComponents();
-            final int colorSpace =
-                LCJPEGWriter.getColorSpaceFromNumComponents( numComponents );
             if ( colorSpace == CS_UNKNOWN )
                 throw new LCImageLibException(
                     "Unsupported number of components: " + numComponents
                 );
 
-            final LCJPEGWriter writer = new LCJPEGWriter(
-                options.getExportFile().getPath(),
-                image.getWidth(), image.getHeight(),
-                numComponents, colorSpace,
-                jpegOptions.quality.getValue(),
-                jpegOptions.resolution.getValue(),
-                jpegOptions.resolutionUnit.getValue()
-            );
+            try (final var writer = new LCJPEGWriter(
+                    options.getExportFile().getPath(),
+                    image.getWidth(), image.getHeight(),
+                    numComponents, colorSpace,
+                    jpegOptions.quality.getValue(),
+                    jpegOptions.resolution.getValue(),
+                    jpegOptions.resolutionUnit.getValue())) {
 
-            ICC_Profile profile = ColorProfileInfo.getExportICCProfileFor(
-                jpegOptions.colorProfile.getValue()
-            );
-            if ( profile == null )
-                profile = JAIContext.sRGBExportColorProfile;
-            writer.setICCProfile( profile );
+                ICC_Profile profile = ColorProfileInfo.getExportICCProfileFor(
+                        jpegOptions.colorProfile.getValue()
+                );
+                if (profile == null)
+                    profile = JAIContext.sRGBExportColorProfile;
+                writer.setICCProfile(profile);
 
-            if ( lznDoc != null ) {
-                final byte[] buf = XMLUtil.encodeDocument( lznDoc, false );
-                writer.writeSegment( JPEG_APP4_MARKER, buf );
+                if (lznDoc != null) {
+                    final byte[] buf = XMLUtil.encodeDocument(lznDoc, false);
+                    writer.writeSegment(JPEG_APP4_MARKER, buf);
+                }
+
+                writer.putMetadata(metadata);
+                writer.putImage(image, thread);
             }
-
-            writer.putMetadata( metadata );
-            writer.putImage( image, thread );
         }
         catch ( LCImageLibException e ) {
             final IOException ioe = new IOException( "JPEG export failed" );

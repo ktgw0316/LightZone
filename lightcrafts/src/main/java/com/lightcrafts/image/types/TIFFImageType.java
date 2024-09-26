@@ -22,6 +22,7 @@ import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XMLUtil;
 import com.lightcrafts.utils.xml.XmlDocument;
 import com.lightcrafts.utils.xml.XmlNode;
+import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Document;
 
 import javax.media.jai.ImageLayout;
@@ -202,44 +203,18 @@ public class TIFFImageType extends ImageType implements TrueImageTypeProvider {
      * present).
      * @return Returns said image data.
      */
-    public static PlanarImage getImage( ImageInfo imageInfo,
-                                        ProgressThread thread,
-                                        boolean read2nd )
+    public static PlanarImage getImage(@NotNull ImageInfo imageInfo,
+                                       ProgressThread thread,
+                                       boolean read2nd )
         throws BadImageFileException, UserCanceledException, UnsupportedEncodingException
     {
-        try {
-            final String fileName = imageInfo.getFile().getAbsolutePath();
-            final PlanarImage image;
+        final String fileName = imageInfo.getFile().getAbsolutePath();
+        try (final var reader = new LCTIFFReader(fileName, read2nd)) {
+            final PlanarImage image = reader.getImage(thread);
 
-            if (true) {
-                final LCTIFFReader reader =
-                    new LCTIFFReader( fileName, read2nd );
-                image = reader.getImage( thread );
-
-                assert image instanceof CachedImage
-                        && image.getTileWidth() == JAIContext.TILE_WIDTH
-                        && image.getTileHeight() == JAIContext.TILE_HEIGHT;
-            } else {
-                final PlanarImage tiffImage =
-                    new LCTIFFReader.TIFFImage( fileName );
-                if (tiffImage.getTileWidth() != JAIContext.TILE_WIDTH ||
-                    tiffImage.getTileHeight() != JAIContext.TILE_HEIGHT) {
-                    final RenderingHints formatHints = new RenderingHints(
-                        JAI.KEY_IMAGE_LAYOUT,
-                        new ImageLayout(
-                            0, 0, JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT,
-                            tiffImage.getSampleModel(),
-                            tiffImage.getColorModel()
-                        )
-                    );
-                    final ParameterBlock pb = new ParameterBlock();
-                    pb.addSource(tiffImage);
-                    pb.add(tiffImage.getSampleModel().getDataType());
-                    image = JAI.create("Format", pb, formatHints);
-                    image.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
-                } else
-                    image = tiffImage;
-            }
+            assert image instanceof CachedImage
+                    && image.getTileWidth() == JAIContext.TILE_WIDTH
+                    && image.getTileHeight() == JAIContext.TILE_HEIGHT;
 
             return image;
         }
@@ -371,69 +346,65 @@ public class TIFFImageType extends ImageType implements TrueImageTypeProvider {
                           ProgressThread thread ) throws IOException {
         final ExportOptions tiffOptions = (ExportOptions)options;
         final File exportFile = options.getExportFile();
-        File tempFile = null;
 
         ImageMetadata metadata;
         try {
             metadata = imageInfo.getMetadata();
         }
-        catch ( BadImageFileException e ) {
-            metadata = new ImageMetadata( this );
-        }
-        catch ( UnknownImageTypeException e ) {
+        catch ( BadImageFileException | UnknownImageTypeException e ) {
             metadata = new ImageMetadata( this );
         }
 
-        final LCTIFFWriter writer;
-        try {
-            if ( tiffOptions.multilayer.getValue() ) {
-                File originalFile = imageInfo.getFile();
-                if ( exportFile.equals( originalFile ) ) {
-                    tempFile = File.createTempFile( "LightZone", "tif" );
-                    FileUtil.copyFile( originalFile, tempFile );
-                    originalFile = tempFile;
-                }
-                writer = new LCTIFFWriter(
-                    exportFile.getAbsolutePath(),
-                    originalFile.getAbsolutePath(),
-                    tiffOptions.resizeWidth.getValue(),
-                    tiffOptions.resizeHeight.getValue(),
-                    tiffOptions.resolution.getValue(),
-                    tiffOptions.resolutionUnit.getValue()
-                );
+        final var resizeWidth = tiffOptions.resizeWidth.getValue();
+        final var resizeHeight = tiffOptions.resizeHeight.getValue();
+        final var resolution = tiffOptions.resolution.getValue();
+        final var resolutionUnit = tiffOptions.resolutionUnit.getValue();
+
+        File tempFile = null;
+        final String filename;
+        final String appendFilename;
+        if (tiffOptions.multilayer.getValue()) {
+            filename = exportFile.getAbsolutePath();
+
+            final File originalFile = imageInfo.getFile();
+            if ( exportFile.equals( originalFile ) ) {
+                tempFile = File.createTempFile( "LightZone", "tif" );
+                FileUtil.copyFile( originalFile, tempFile );
+                appendFilename = tempFile.getAbsolutePath();
             } else {
-                writer = new LCTIFFWriter(
-                    options.getExportFile().getAbsolutePath(),
-                    tiffOptions.resizeWidth.getValue(),
-                    tiffOptions.resizeHeight.getValue(),
-                    tiffOptions.resolution.getValue(),
-                    tiffOptions.resolutionUnit.getValue()
-                );
+                appendFilename = originalFile.getAbsolutePath();
             }
+        } else {
+            filename = options.getExportFile().getAbsolutePath();
+            appendFilename = null;
+        }
 
+        try (final var writer = new LCTIFFWriter(
+                filename, appendFilename,
+                resizeWidth, resizeHeight,
+                resolution, resolutionUnit)) {
             writer.setIntField(
-                TIFF_COMPRESSION,
-                tiffOptions.lzwCompression.getValue() ?
-                    TIFF_COMPRESSION_LZW : TIFF_COMPRESSION_NONE
+                    TIFF_COMPRESSION,
+                    tiffOptions.lzwCompression.getValue() ?
+                            TIFF_COMPRESSION_LZW : TIFF_COMPRESSION_NONE
             );
 
             ICC_Profile profile = ColorProfileInfo.getExportICCProfileFor(
-                tiffOptions.colorProfile.getValue()
+                    tiffOptions.colorProfile.getValue()
             );
-            if ( profile == null )
+            if (profile == null)
                 profile = JAIContext.sRGBExportColorProfile;
-            writer.setICCProfile( profile );
+            writer.setICCProfile(profile);
 
-            if ( lznDoc != null ) {
-                final byte[] buf = XMLUtil.encodeDocument( lznDoc, false );
-                writer.setByteField( TIFF_LIGHTZONE, buf );
+            if (lznDoc != null) {
+                final byte[] buf = XMLUtil.encodeDocument(lznDoc, false);
+                writer.setByteField(TIFF_LIGHTZONE, buf);
             }
 
-            writer.putMetadata( metadata );
-            writer.putImageStriped( image, thread );
+            writer.putMetadata(metadata);
+            writer.putImageStriped(image, thread);
             // TODO: allow users to write tiled TIFFs if they want
             // writer.putImageTiled( image, thread );
-            writer.dispose();
         }
         catch ( LCImageLibException e ) {
             final IOException ioe = new IOException( "TIFF export failed" );

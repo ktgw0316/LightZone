@@ -10,7 +10,7 @@ package com.lightcrafts.image.libs;
  * @author Paul J. Lucas [paul@lightcrafts.com]
  * @see <a href="http://www.remotesensing.org/libtiff/">LibTIFF</a>
  */
-class LCTIFFCommon {
+class LCTIFFCommon implements AutoCloseable {
 
     static {
         System.loadLibrary("LCTIFF");
@@ -53,6 +53,11 @@ class LCTIFFCommon {
      */
     protected void finalize() throws Throwable {
         super.finalize();
+        dispose();
+    }
+
+    @Override
+    public void close() {
         dispose();
     }
 

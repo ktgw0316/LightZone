@@ -108,21 +108,19 @@ public class PreviewUpdater extends Thread {
         // Write the given preview to the cache
         final String key = getImageKey(file);
         try (OutputStream out = cache.putToStream(key)) {
-            final OutputStreamImageDataReceiver receiver = new OutputStreamImageDataReceiver(out);
-            try {
-                final LCJPEGWriter writer = new LCJPEGWriter(
-                        receiver, 32 * 1024,
-                        image.getWidth(), image.getHeight(),
-                        image.getColorModel().getNumComponents(),
-                        CS_RGB, 90
-                );
+            try (final var receiver = new OutputStreamImageDataReceiver(out);
+                 final var writer = new LCJPEGWriter(
+                         receiver, 32 * 1024,
+                         image.getWidth(), image.getHeight(),
+                         image.getColorModel().getNumComponents(),
+                         CS_RGB, 90))
+            {
                 writer.putImage(image);
                 writer.dispose();
             } catch (LCImageLibException e) {
                 logNonFatalStatic(file, e, "caching preview");
                 cache.remove(key);
             }
-            receiver.dispose();
         }
         catch (IOException e) {
             logNonFatalStatic(file, e, "caching preview");
@@ -381,21 +379,18 @@ public class PreviewUpdater extends Thread {
         // Write the preview to the cache
         final String key = getImageKey();
         try (OutputStream out = cache.putToStream(key)) {
-            OutputStreamImageDataReceiver receiver = new OutputStreamImageDataReceiver(out);
-            try {
-                final LCJPEGWriter writer = new LCJPEGWriter(
-                        receiver, 32 * 1024,
-                        image.getWidth(), image.getHeight(),
-                        image.getColorModel().getNumComponents(),
-                        CS_RGB, 90
-                );
+            try (final var receiver = new OutputStreamImageDataReceiver(out);
+                 final var writer = new LCJPEGWriter(
+                         receiver, 32 * 1024,
+                         image.getWidth(), image.getHeight(),
+                         image.getColorModel().getNumComponents(),
+                         CS_RGB, 90)) {
                 writer.putImage(image);
                 writer.dispose();
             } catch (LCImageLibException e) {
                 logNonFatal(e, "caching preview");
                 cache.remove(key);
             }
-            receiver.dispose();
         }
         catch (IOException e) {
             logNonFatal(e, "caching preview");
@@ -408,13 +403,13 @@ public class PreviewUpdater extends Thread {
         if ((cache == null) || ! cache.contains(key)) {
             return null;
         }
+
+        final var provRecv = new ImageProviderReceiver();
         try (InputStream in = cache.getStreamFor(key)) {
-            ImageProviderReceiver provRecv = new ImageProviderReceiver();
             provRecv.fill(in);
-            final LCJPEGReader jpeg = new LCJPEGReader(
-                    provRecv, PreviewSize, PreviewSize
-            );
-            return jpeg.getImage();
+            try (final var jpeg = new LCJPEGReader(provRecv, PreviewSize, PreviewSize)) {
+                return jpeg.getImage();
+            }
         }
         catch (Throwable t1) {
             logNonFatal(t1, "reading cached preview");

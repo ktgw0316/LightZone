@@ -115,11 +115,13 @@ public class ImageTask implements Runnable {
         if ((cache == null) || ! cache.contains(key)) {
             return null;
         }
+
+        final var provRecv = new ImageProviderReceiver();
         try (InputStream in = cache.getStreamFor(key)) {
-            ImageProviderReceiver provRecv = new ImageProviderReceiver();
             provRecv.fill(in);
-            LCJPEGReader jpeg = new LCJPEGReader(provRecv, CacheImageSize, CacheImageSize);
-            return jpeg.getImage();
+            try (final var jpeg = new LCJPEGReader(provRecv, CacheImageSize, CacheImageSize)) {
+                return jpeg.getImage();
+            }
         }
         catch (Throwable t1) {
             logNonFatal(t1, "reading cached image");
@@ -138,22 +140,20 @@ public class ImageTask implements Runnable {
         }
         // Write the image to the cache
         try (OutputStream out = cache.putToStream(key)) {
-            OutputStreamImageDataReceiver receiver = new OutputStreamImageDataReceiver(out);
-            try {
-                LCJPEGWriter writer = new LCJPEGWriter(
-                        receiver, 32 * 1024,
-                        image.getWidth(), image.getHeight(),
-                        image.getColorModel().getNumComponents(),
-                        LCJPEGConstants.CS_RGB,
-                        90
-                );
+            try (final var receiver = new OutputStreamImageDataReceiver(out);
+                 final var writer = new LCJPEGWriter(
+                         receiver, 32 * 1024,
+                         image.getWidth(), image.getHeight(),
+                         image.getColorModel().getNumComponents(),
+                         LCJPEGConstants.CS_RGB,
+                         90))
+            {
                 writer.putImage(image);
             } catch (LCImageLibException e) {
                 logNonFatal(e, "caching image");
                 cache.remove(key);
             }
             out.flush();
-            receiver.dispose();
         }
         catch (IOException e) {
             logNonFatal(e, "caching image");

@@ -40,7 +40,7 @@ import static com.lightcrafts.jai.JAIContext.sRGBColorSpace;
  * @author Paul J. Lucas [paul@lightcrafts.com]
  * @see <a href="http://www.ijg.org/">LibJPEG</a>
  */
-public final class LCJPEGReader implements LCImageReader {
+public final class LCJPEGReader implements AutoCloseable, LCImageReader {
 
     /**
      * The default buffer size for use with {@link #LCJPEGReader(LCImageDataProvider).
@@ -291,6 +291,10 @@ public final class LCJPEGReader implements LCImageReader {
      */
     protected void finalize() throws Throwable {
         super.finalize();
+    }
+
+    @Override
+    public void close() throws LCImageLibException {
         dispose();
     }
 

@@ -751,17 +751,19 @@ public final class LCTIFFWriter extends LCTIFFCommon {
 
     public static void main(String[] args) {
         try {
-            final LCTIFFReader tiff = new LCTIFFReader(args[0]);
-            final PlanarImage image = tiff.getImage(null);
+            final PlanarImage image;
+            try (final var reader = new LCTIFFReader(args[0])) {
+                image = reader.getImage(null);
+            }
             if (image == null) {
                 return;
             }
-
-            final LCTIFFWriter writer = new LCTIFFWriter(
-                    System.getProperty("java.io.tmpdir") + File.separator + "out.tiff",
-                    args[1], image.getWidth(), image.getHeight());
-            writer.setStringField(TIFF_SOFTWARE, Version.getApplicationName());
-            writer.putImageStriped(image, null);
+            final var fileName = System.getProperty("java.io.tmpdir") + File.separator + "out.tiff";
+            try (final var writer = new LCTIFFWriter(fileName, args[1],
+                    image.getWidth(), image.getHeight())) {
+                writer.setStringField(TIFF_SOFTWARE, Version.getApplicationName());
+                writer.putImageStriped(image, null);
+            }
         } catch (IOException | LCImageLibException | UserCanceledException e) {
             e.printStackTrace();
         }

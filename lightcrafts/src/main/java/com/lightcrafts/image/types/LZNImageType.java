@@ -80,12 +80,11 @@ public final class LZNImageType extends ImageType
             // no cache data in the file
             throw new BadImageFileException( imageInfo.getFile() );
         }
-        try {
-            final InputStream in = new ByteArrayInputStream( bytes );
-            final LCImageDataProvider provider =
-                new InputStreamImageDataProvider( in );
-            final LCJPEGReader reader = new LCJPEGReader( provider );
-            return reader.getImage( thread, null );
+        try (final var in = new ByteArrayInputStream(bytes)) {
+            final LCImageDataProvider provider = new InputStreamImageDataProvider( in );
+            try (final var reader = new LCJPEGReader(provider)) {
+                return reader.getImage(thread, null);
+            }
         }
         catch ( LCImageLibException e ) {
             throw new BadImageFileException( imageInfo.getFile() );
@@ -117,29 +116,27 @@ public final class LZNImageType extends ImageType
     public void putImage( ImageInfo imageInfo, RenderedImage image )
         throws IOException
     {
-        try {
-            final ByteArrayOutputStream buf = new ByteArrayOutputStream();
-            final LCImageDataReceiver receiver =
-                new OutputStreamImageDataReceiver( buf );
-            final LCJPEGWriter writer = new LCJPEGWriter(
+        final var buf = new ByteArrayOutputStream();
+        final LCImageDataReceiver receiver = new OutputStreamImageDataReceiver(buf);
+
+        try (final var writer = new LCJPEGWriter(
                 receiver, 1024,
                 image.getWidth(), image.getHeight(),
                 image.getSampleModel().getNumBands(),
                 CS_RGB,
-                90
-            );
-            writer.putImage( image );
-
-            final XmlDocument xml = getDocument( imageInfo );
-            final XmlNode cache = getCacheNode( xml );
-            cache.setData( buf.toByteArray() );
-
-            try (OutputStream out = new FileOutputStream(imageInfo.getFile())) {
-                xml.write(out);
-            }
+                90)) {
+            writer.putImage(image);
         }
-        catch ( LCImageLibException e ) {
-            throw new IOException( e.getMessage() );
+        catch (LCImageLibException e) {
+            throw new IOException(e.getMessage());
+        }
+
+        final XmlDocument xml = getDocument(imageInfo);
+        final XmlNode cache = getCacheNode(xml);
+        cache.setData(buf.toByteArray());
+
+        try (OutputStream out = new FileOutputStream(imageInfo.getFile())) {
+            xml.write(out);
         }
     }
 
