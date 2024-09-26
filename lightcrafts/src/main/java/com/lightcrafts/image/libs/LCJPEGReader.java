@@ -286,13 +286,6 @@ public final class LCJPEGReader implements AutoCloseable, LCImageReader {
     public synchronized native int readScanLines(byte[] buf, long offset, int numLines)
             throws LCImageLibException;
 
-    /**
-     * Finalize this class by calling {@link #dispose()}.
-     */
-    protected void finalize() throws Throwable {
-        super.finalize();
-    }
-
     @Override
     public void close() throws LCImageLibException {
         dispose();

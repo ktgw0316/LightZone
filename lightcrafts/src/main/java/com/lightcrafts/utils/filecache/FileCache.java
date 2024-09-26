@@ -1,12 +1,16 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2024-     Masahiro Kitagawa */
 
 package com.lightcrafts.utils.filecache;
 
 import com.lightcrafts.utils.file.FileIterator;
 import com.lightcrafts.utils.file.FileUtil;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
+import java.lang.ref.Cleaner;
 import java.nio.channels.FileChannel;
 
 /**
@@ -46,6 +50,8 @@ public final class FileCache {
             clear();
             createVersionFile( versionFile );
         }
+
+        cleaner.register(this, cleanup(this));
     }
 
     /**
@@ -279,13 +285,6 @@ public final class FileCache {
             );
     }
 
-    ////////// protected //////////////////////////////////////////////////////
-
-    protected void finalize() throws Throwable {
-        dispose();
-        super.finalize();
-    }
-
     ////////// private ////////////////////////////////////////////////////////
 
     /**
@@ -365,6 +364,13 @@ public final class FileCache {
             synchronized ( m_monitor ) {
                 m_monitor.notify();
             }
+    }
+
+    private static final Cleaner cleaner = Cleaner.create();
+
+    @Contract(pure = true)
+    private static @NotNull Runnable cleanup(@NotNull FileCache fileCache) {
+        return fileCache::dispose;
     }
 
     /**

@@ -3,12 +3,15 @@
 package com.lightcrafts.utils.cache;
 
 import java.io.IOException;
+import java.lang.ref.Cleaner;
 import java.nio.ByteBuffer;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Iterator;
 
 import com.lightcrafts.utils.bytebuffer.ByteBufferAllocator;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * An <code>LRUCacheObjectMap</code> is-a {@link CacheObjectMap} that uses a
@@ -48,8 +51,10 @@ public final class LRUCacheObjectMap implements CacheObjectMap {
     public LRUCacheObjectMap( ByteBufferAllocator bufAlloc, long maxSize,
                               int initialCapacity, float loadFactor ) {
         m_bufAlloc = bufAlloc;
-        m_lruMap = new LRUHashMap<Object, ByteBuffer>( initialCapacity, loadFactor );
+        m_lruMap = new LRUHashMap<>(initialCapacity, loadFactor);
         m_maxSize = maxSize;
+
+        cleaner.register(this, cleanup(this));
     }
 
     /**
@@ -144,13 +149,6 @@ public final class LRUCacheObjectMap implements CacheObjectMap {
      */
     public void setCache( Cache cache ) {
         m_cache = cache;
-    }
-
-    ////////// protected //////////////////////////////////////////////////////
-
-    protected void finalize() throws Throwable {
-        dispose();
-        super.finalize();
     }
 
     ////////// private ////////////////////////////////////////////////////////
@@ -262,5 +260,12 @@ public final class LRUCacheObjectMap implements CacheObjectMap {
      * all objects may not exceed.
      */
     private final long m_maxSize;
+
+    private static final Cleaner cleaner = Cleaner.create();
+
+    @Contract(pure = true)
+    private static @NotNull Runnable cleanup(@NotNull LRUCacheObjectMap map) {
+        return map::dispose;
+    }
 }
 /* vim:set et sw=4 ts=4: */

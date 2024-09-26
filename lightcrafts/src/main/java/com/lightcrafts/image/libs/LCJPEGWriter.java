@@ -26,8 +26,12 @@ import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.io.IOException;
+import java.lang.ref.Cleaner;
 import java.nio.ByteBuffer;
 import javax.media.jai.PlanarImage;
+
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Document;
 
 import static com.lightcrafts.image.libs.LCJPEGConstants.CS_CMYK;
@@ -79,6 +83,9 @@ public final class LCJPEGWriter implements AutoCloseable {
     @SuppressWarnings({"UNUSED_SYMBOL"})
     private long m_nativePtr;
 
+    private static final Cleaner cleaner = Cleaner.create();
+    private final Cleaner.Cleanable cleanable;
+
     /**
      * Construct an <code>LCJPEGWriter</code>.
      *
@@ -99,6 +106,7 @@ public final class LCJPEGWriter implements AutoCloseable {
             int colorsPerPixel, int colorSpace, int quality,
             int resolution, int resolutionUnit)
             throws IOException, LCImageLibException {
+        cleanable = cleaner.register(this, cleanup());
         m_exportWidth = width;
         m_exportHeight = height;
         m_resolution = resolution;
@@ -126,6 +134,7 @@ public final class LCJPEGWriter implements AutoCloseable {
             int height, int colorsPerPixel, int colorSpace,
             int quality)
             throws LCImageLibException {
+        cleanable = cleaner.register(this, cleanup());
         m_exportWidth = width;
         m_exportHeight = height;
         m_resolution = ResolutionOption.DEFAULT_VALUE;
@@ -144,16 +153,12 @@ public final class LCJPEGWriter implements AutoCloseable {
      * @return Returns said colorspace constant.
      */
     public static int getColorSpaceFromNumComponents(int numComponents) {
-        switch (numComponents) {
-            case 1:
-                return CS_GRAYSCALE;
-            case 3:
-                return CS_RGB;
-            case 4:
-                return CS_CMYK;
-            default:
-                return CS_UNKNOWN;
-        }
+        return switch (numComponents) {
+            case 1 -> CS_GRAYSCALE;
+            case 3 -> CS_RGB;
+            case 4 -> CS_CMYK;
+            default -> CS_UNKNOWN;
+        };
     }
 
     /**
@@ -163,7 +168,12 @@ public final class LCJPEGWriter implements AutoCloseable {
 
     @Override
     public void close() {
-        dispose();
+        cleanable.clean();
+    }
+
+    @Contract(pure = true)
+    private @NotNull Runnable cleanup() {
+        return this::dispose;
     }
 
     /**
@@ -304,14 +314,6 @@ public final class LCJPEGWriter implements AutoCloseable {
      */
     public native void writeSegment(int marker, byte[] buf)
             throws LCImageLibException;
-
-    /**
-     * Finalize this class by calling {@link #dispose()}.
-     */
-    protected void finalize() throws Throwable {
-        dispose();
-        super.finalize();
-    }
 
     /**
      * Begin using the {@link LCImageDataProvider} to get JPEG image data.

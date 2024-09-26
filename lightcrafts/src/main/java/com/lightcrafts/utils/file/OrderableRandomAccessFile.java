@@ -2,7 +2,11 @@
 
 package com.lightcrafts.utils.file;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.*;
+import java.lang.ref.Cleaner;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 
@@ -41,8 +45,11 @@ public final class OrderableRandomAccessFile
     public OrderableRandomAccessFile( RandomAccessFile file, ByteOrder order ) {
         m_file = file;
         m_order = order;
+
+        cleanable = cleaner.register(this, cleanup(this));
     }
 
+    @Override
     public synchronized void close() throws IOException {
         if ( m_file != null ) {
             m_file.close();
@@ -250,17 +257,25 @@ public final class OrderableRandomAccessFile
         m_file.writeUTF( s );
     }
 
-    ////////// protected //////////////////////////////////////////////////////
-
-    protected void finalize() throws Throwable {
-        close();
-        super.finalize();
-    }
-
     ////////// private ////////////////////////////////////////////////////////
 
     private RandomAccessFile m_file;
 
     private ByteOrder m_order;
+
+    private static final Cleaner cleaner = Cleaner.create();
+    private final Cleaner.Cleanable cleanable;
+
+    @Contract(pure = true)
+    private static @NotNull Runnable cleanup(OrderableRandomAccessFile f) {
+        return () -> {
+            try {
+                f.close();
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+        };
+    }
 }
 /* vim:set et sw=4 ts=4: */

@@ -152,6 +152,7 @@ public final class LCTIFFWriter extends LCTIFFCommon {
     public LCTIFFWriter(String fileName, String appendFileName, int width,
             int height, int resolution, int resolutionUnit)
             throws LCImageLibException, UnsupportedEncodingException {
+        cleaner.register(this, cleanup(this));
         m_fileName = fileName;
         m_appendFileName = appendFileName;
         m_exportWidth = width;

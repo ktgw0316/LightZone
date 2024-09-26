@@ -5,11 +5,14 @@ package com.lightcrafts.utils.bytebuffer;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.Cleaner;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 
 import com.lightcrafts.utils.CloseableManager;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * An <code>LCReopenableMappedByteBuffer</code> is-an {@link LCByteBuffer} that
@@ -93,6 +96,8 @@ public final class LCReopenableMappedByteBuffer extends LCByteBuffer
         m_order = ByteOrder.BIG_ENDIAN;
         m_position = position;
         m_size = size;
+
+        cleaner.register(this, cleanup(this));
     }
 
     /**
@@ -289,14 +294,6 @@ public final class LCReopenableMappedByteBuffer extends LCByteBuffer
         return this;
     }
 
-    ////////// protected //////////////////////////////////////////////////////
-
-    @Override
-    protected void finalize() throws Throwable {
-        close();
-        super.finalize();
-    }
-
     ////////// private ////////////////////////////////////////////////////////
 
     /**
@@ -323,5 +320,12 @@ public final class LCReopenableMappedByteBuffer extends LCByteBuffer
     private ByteOrder m_order;
     private final long m_position;
     private final long m_size;
+
+    private static final Cleaner cleaner = Cleaner.create();
+
+    @Contract(pure = true)
+    private static @NotNull Runnable cleanup(@NotNull LCReopenableMappedByteBuffer buffer) {
+        return buffer::close;
+    }
 }
 /* vim:set et sw=4 ts=4: */

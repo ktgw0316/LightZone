@@ -2,6 +2,11 @@
 
 package com.lightcrafts.utils.cache;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
+import java.lang.ref.Cleaner;
+
 /**
  * A <code>NativeChunk</code> is a chunk of allocated native memory.
  *
@@ -23,6 +28,8 @@ public final class NativeChunk {
         if ( m_addr == 0 )
             throw new OutOfMemoryError( "failed to alloc native chunk" );
         m_size = size;
+
+        cleaner.register(this, cleanup(this));
     }
 
     /**
@@ -53,13 +60,6 @@ public final class NativeChunk {
         return m_size;
     }
 
-    ////////// protected //////////////////////////////////////////////////////
-
-    protected void finalize() throws Throwable {
-        dispose();
-        super.finalize();
-    }
-
     ////////// private ////////////////////////////////////////////////////////
 
     /**
@@ -88,6 +88,13 @@ public final class NativeChunk {
      * The size of the chunk (in bytes).
      */
     private final int m_size;
+
+    private static final Cleaner cleaner = Cleaner.create();
+
+    @Contract(pure = true)
+    private static @NotNull Runnable cleanup(@NotNull NativeChunk chunk) {
+        return chunk::dispose;
+    }
 
     static {
         System.loadLibrary( "LCCache" );

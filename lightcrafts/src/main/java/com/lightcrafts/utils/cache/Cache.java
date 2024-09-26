@@ -2,7 +2,11 @@
 
 package com.lightcrafts.utils.cache;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
+import java.lang.ref.Cleaner;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,12 +34,14 @@ public final class Cache {
      */
     public Cache( CacheObjectBroker objBroker, CacheObjectMap objMap,
                   CacheStore store, FreeBlockManager freeBlockMgr ) {
-        m_blockMap = new HashMap<Object,CacheBlock>();
+        m_blockMap = new HashMap<>();
         m_freeBlockMgr = freeBlockMgr;
         m_objBroker = objBroker;
         m_objMap = objMap;
         m_objMap.setCache( this );
         m_store = store;
+
+        cleaner.register(this, cleanup(this));
     }
 
     /**
@@ -222,16 +228,6 @@ public final class Cache {
         m_blockMap.put( key, block );
     }
 
-    ////////// protected //////////////////////////////////////////////////////
-
-    /**
-     * Finalize a <code>Cache</code>.
-     */
-    protected void finalize() throws Throwable {
-        super.finalize();
-        dispose();
-    }
-
     ////////// private ////////////////////////////////////////////////////////
 
 
@@ -260,5 +256,18 @@ public final class Cache {
      * The {@link CacheStore} to use.
      */
     private final CacheStore m_store;
+
+    private static final Cleaner cleaner = Cleaner.create();
+
+    @Contract(pure = true)
+    private static @NotNull Runnable cleanup(@NotNull Cache cache) {
+        return () -> {
+            try {
+                cache.dispose();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        };
+    }
 }
 /* vim:set et sw=4 ts=4: */

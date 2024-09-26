@@ -3,7 +3,11 @@
 
 package com.lightcrafts.utils.directory;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
+import java.lang.ref.Cleaner;
 import java.nio.file.Path;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
@@ -23,6 +27,9 @@ public abstract class DirectoryMonitor {
     WatchService watcher;
 
     static final boolean DEBUG = false;
+
+    private static final Cleaner cleaner = Cleaner.create();
+    private final Cleaner.Cleanable cleanable = cleaner.register(this, cleanupRunnable(this));
 
     /**
      * Add a directory to be monitored.  Adding the same directory more than
@@ -50,6 +57,11 @@ public abstract class DirectoryMonitor {
      */
     public void dispose() {
         m_monitorThread.stopMonitoring();
+    }
+
+    @Contract(pure = true)
+    private @NotNull Runnable cleanupRunnable(@NotNull DirectoryMonitor monitor) {
+        return monitor::dispose;
     }
 
     /**
@@ -106,15 +118,6 @@ public abstract class DirectoryMonitor {
                     "DirectoryMonitor: suspending (" + m_suspendCount + ')'
             );
         }
-    }
-
-    /**
-     * Finalize this <code>DirectoryMonitor</code> by calling
-     * {@link #dispose()}.
-     */
-    protected void finalize() throws Throwable {
-        dispose();
-        super.finalize();
     }
 
     /**
