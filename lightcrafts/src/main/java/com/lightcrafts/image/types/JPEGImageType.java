@@ -243,12 +243,13 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
     public Dimension getDimension(@NotNull ImageInfo imageInfo) throws IOException
     {
         final String path = imageInfo.getFile().getAbsolutePath();
+        Dimension dimension = null;
         try (final var reader = new LCJPEGReader(path)) {
-            return new Dimension(reader.getWidth(), reader.getHeight());
+            dimension = new Dimension(reader.getWidth(), reader.getHeight());
         }
         catch (LCImageLibException ignored) {
-            return null;
         }
+        return dimension;
     }
 
     /**
@@ -264,16 +265,17 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
         );
         if ( iccSegBufs == null ) {
             final String path = imageInfo.getFile().getAbsolutePath();
+            int colorsPerPixel = 0;
             try (final var reader = new LCJPEGReader(path)) {
-                return switch (reader.getColorsPerPixel()) {
-                    case 1 -> JAIContext.gray22Profile;
-                    case 3 -> getICCProfileFromEXIF(imageInfo); // sRGB or uncalibrated
-                    case 4 -> JAIContext.CMYKProfile;
-                    default -> throw new BadColorProfileException(path);
-                };
-            } catch (LCImageLibException e) {
-                // ignore
+                colorsPerPixel = reader.getColorsPerPixel();
+            } catch (LCImageLibException ignored) {
             }
+            return switch (colorsPerPixel) {
+                case 1 -> JAIContext.gray22Profile;
+                case 3 -> getICCProfileFromEXIF(imageInfo); // sRGB or uncalibrated
+                case 4 -> JAIContext.CMYKProfile;
+                default -> throw new BadColorProfileException(path);
+            };
         }
         final byte[] iccProfileData;
         try {
@@ -1325,7 +1327,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
      * @return Returns the raw ICC profile data (with the header stripped) or
      * <code>null</code> if none.
      */
-    private static byte[] assembleICCProfile( List<ByteBuffer> list ) {
+    private static byte[] assembleICCProfile(@NotNull List<ByteBuffer> list) {
         if ( list.size() == 1 ) {
             //
             // The easy and common case of just 1 segment for the entire
