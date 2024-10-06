@@ -31,6 +31,7 @@ Build-Depends:
  libtiff-dev,
  libx11-dev,
  pkg-config,
+ quilt,
  rsync
 
 Package: lightzone
