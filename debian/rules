@@ -11,7 +11,7 @@ export JAVA_HOME=$(shell readlink -f /usr/bin/javac | sed "s:/bin/javac::")
 ANT_OPTIONS=-f $(CURDIR)/linux/build.xml -Dno-ivy=true -Dno-submodule=true
 
 %:
-	dh $@ --with javahelper --buildsystem=ant
+	dh $@ --with javahelper,quilt --buildsystem=ant
 
 override_dh_auto_build:
 	dh_auto_build -- $(ANT_OPTIONS) jar
