@@ -2,7 +2,7 @@
 
 package com.lightcrafts.jai.utils;
 
-import javax.media.jai.PlanarImage;
+import org.eclipse.imagen.PlanarImage;
 
 /**
  * Created by IntelliJ IDEA.

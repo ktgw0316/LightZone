@@ -5,10 +5,10 @@ package com.lightcrafts.model.ImageEditor;
 
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.utils.Functions;
-import javax.media.jai.BorderExtender;
-import javax.media.jai.Interpolation;
-import javax.media.jai.JAI;
-import javax.media.jai.RenderedOp;
+import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.Interpolation;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.RenderedOp;
 
 import java.awt.*;
 import java.awt.image.RenderedImage;
@@ -74,8 +74,8 @@ class ImagePyramid {
         params.add(ratio);
         params.add(qsFilterArray);
         params.add(Interpolation.getInstance(Interpolation.INTERP_NEAREST));
-        return JAI.create("FilteredSubsample", params,
-                new RenderingHints(JAI.KEY_BORDER_EXTENDER,
+        return ImageN.create("FilteredSubsample", params,
+                new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
                         BorderExtender.createInstance(BorderExtender.BORDER_COPY)));
     }
 

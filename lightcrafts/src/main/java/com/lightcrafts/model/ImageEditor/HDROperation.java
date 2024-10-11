@@ -9,12 +9,11 @@ import com.lightcrafts.model.LayerConfig;
 import com.lightcrafts.model.Operation;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
+import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.RenderedOp;
 
-import javax.media.jai.BorderExtender;
-import javax.media.jai.JAI;
-import javax.media.jai.LookupTableJAI;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.RenderedOp;
 import java.awt.*;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
@@ -81,13 +80,13 @@ public class HDROperation extends BlendedOperation {
         @Override
         public RenderedOp process(RenderedImage source) {
             final RenderedImage singleChannel = createSingleChannel(source);
-            RenderedOp invert = JAI.create("Not", singleChannel, JAIContext.noCacheHint);       // Invert
-            LookupTableJAI table = Functions.computeGammaTable(invert.getColorModel().getTransferType(), gamma);
+            RenderedOp invert = ImageN.create("Not", singleChannel, JAIContext.noCacheHint);       // Invert
+            var table = Functions.computeGammaTable(invert.getColorModel().getTransferType(), gamma);
             ParameterBlock pb = new ParameterBlock();
             pb.addSource(invert);
             pb.add(table);
             // we cache this since convolution scans its input multiple times
-            return JAI.create("lookup", pb, null);
+            return ImageN.create("lookup", pb, null);
         }
     }
 
@@ -113,16 +112,16 @@ public class HDROperation extends BlendedOperation {
                 pb.addSource(singleChannel);
                 pb.add(2f * scale);
                 pb.add(20f);
-                RenderingHints hints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
+                RenderingHints hints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
                                                           BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-                RenderedOp bilateral = JAI.create("BilateralFilter", pb, hints);
+                RenderedOp bilateral = ImageN.create("BilateralFilter", pb, hints);
 
                 pb = new ParameterBlock();
                 pb.addSource(bilateral);
                 pb.addSource(front);
                 pb.add("Overlay");
                 pb.add(detail);
-                front = JAI.create("Blend", pb, null);
+                front = ImageN.create("Blend", pb, null);
             }
 
             return front;

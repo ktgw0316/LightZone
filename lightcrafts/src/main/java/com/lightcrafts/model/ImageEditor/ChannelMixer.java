@@ -8,8 +8,8 @@ import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.image.color.ColorScience;
 
-import javax.media.jai.JAI;
-import javax.media.jai.PlanarImage;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.PlanarImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
 
@@ -81,7 +81,7 @@ public class ChannelMixer extends BlendedOperation {
             ParameterBlock pb = new ParameterBlock();
             pb.addSource(back);
             pb.add(transform);
-            return JAI.create("BandCombine", pb, JAIContext.noCacheHint);  // Desaturate, single banded
+            return ImageN.create("BandCombine", pb, JAIContext.noCacheHint);  // Desaturate, single banded
         }
     }
 

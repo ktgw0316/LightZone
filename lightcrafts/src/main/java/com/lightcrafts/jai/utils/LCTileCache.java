@@ -18,13 +18,13 @@ import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.utils.LCArrays;
 import com.lightcrafts.utils.MemoryLimits;
 import com.lightcrafts.utils.cache.*;
-import com.sun.media.jai.util.CacheDiagnostics;
+import org.eclipse.imagen.media.util.CacheDiagnostics;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
-import javax.media.jai.EnumeratedParameter;
-import javax.media.jai.TileCache;
+import org.eclipse.imagen.EnumeratedParameter;
+import org.eclipse.imagen.TileCache;
 import java.awt.*;
 import java.awt.image.*;
 import java.io.File;
@@ -39,7 +39,7 @@ import java.util.prefs.Preferences;
 
 /**
  * This is Sun Microsystems' reference implementation of the
- * <code>javax.media.jai.TileCache</code> interface.  It provides a
+ * <code>org.eclipse.imagen.TileCache</code> interface.  It provides a
  * central location for images to cache computed tiles, and is used as
  * the default tile cache mechanism when no other tile cache objects
  * are specified.
@@ -52,7 +52,7 @@ import java.util.prefs.Preferences;
  * greatly depends on the type of images involved.  In fact, the tile
  * capacity is rather meaningless.
  *
- * @see javax.media.jai.TileCache
+ * @see org.eclipse.imagen.TileCache
  *
  */
 
@@ -722,17 +722,17 @@ public final class LCTileCache extends Observable
         @Override
         public Object decodeFromByteBuffer( ByteBuffer buf, Object obj ) {
             if ( obj instanceof byte[] )
-                if ( buf.hasArray() ) 
+                if ( buf.hasArray() )
                     LCArrays.copy( buf.array(), 0, (byte[])obj, 0, buf.capacity() );
                 else
                     buf.get( (byte[])obj );
             else if ( obj instanceof short[] )
-                if ( buf.hasArray() ) 
+                if ( buf.hasArray() )
                     LCArrays.copy( buf.array(), 0, (short[])obj, 0, buf.capacity() );
                 else
                     buf.asShortBuffer().get( (short[])obj );
             else if ( obj instanceof int[] )
-                if ( buf.hasArray() ) 
+                if ( buf.hasArray() )
                     LCArrays.copy( buf.array(), 0, (int[])obj, 0, buf.capacity() );
                 else
                     buf.asIntBuffer().get( (int[])obj );
@@ -746,17 +746,17 @@ public final class LCTileCache extends Observable
         @Override
         public void encodeToByteBuffer( ByteBuffer buf, Object obj ) {
             if ( obj instanceof byte[] )
-                if ( buf.hasArray() ) 
+                if ( buf.hasArray() )
                     LCArrays.copy( (byte[])obj, 0, buf.array(), 0, buf.capacity() );
                 else
                     buf.put( (byte[])obj );
             else if ( obj instanceof short[] )
-                if ( buf.hasArray() ) 
+                if ( buf.hasArray() )
                     LCArrays.copy( (short[])obj, 0, buf.array(), 0, buf.capacity() );
                 else
                     buf.asShortBuffer().put( (short[])obj );
             else if ( obj instanceof int[] )
-                if ( buf.hasArray() ) 
+                if ( buf.hasArray() )
                     LCArrays.copy( (int[])obj, 0, buf.array(), 0, buf.capacity() );
                 else
                     buf.asIntBuffer().put( (int[])obj );

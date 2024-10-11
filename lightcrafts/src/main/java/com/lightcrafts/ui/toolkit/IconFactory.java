@@ -2,10 +2,12 @@
 
 package com.lightcrafts.ui.toolkit;
 
-import javax.media.jai.RenderedOp;
-import javax.media.jai.operator.BandMergeDescriptor;
-import javax.media.jai.operator.BandSelectDescriptor;
-import javax.media.jai.operator.InvertDescriptor;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.media.algebra.AlgebraDescriptor;
+import org.eclipse.imagen.media.bandmerge.BandMergeDescriptor;
+import org.eclipse.imagen.media.bandselect.BandSelectDescriptor;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -13,7 +15,12 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
+import java.awt.image.renderable.ParameterBlock;
+import java.awt.image.renderable.RenderableImage;
 import java.net.URL;
+
+import static org.eclipse.imagen.media.algebra.AlgebraDescriptor.Operator.INVERT;
 
 /**
  * Construct icons from resources in a systematic way where scaling can be
@@ -84,8 +91,8 @@ public class IconFactory {
             BandSelectDescriptor.create(image, new int[] { 3 }, null);
         RenderedOp colors =
             BandSelectDescriptor.create(image, new int[] { 0, 1, 2 }, null);
-        colors = InvertDescriptor.create(colors, null);
-        RenderedOp op = BandMergeDescriptor.create(colors, alpha, null);
+        colors = AlgebraDescriptor.create(INVERT, null, null, 0, null, colors);
+        RenderedOp op = BandMergeDescriptor.create(null, 0, true, null, colors, alpha);
         return op.getAsBufferedImage();
     }
     

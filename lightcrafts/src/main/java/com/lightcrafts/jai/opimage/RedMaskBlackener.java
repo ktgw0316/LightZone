@@ -5,10 +5,10 @@ package com.lightcrafts.jai.opimage;
 
 import com.lightcrafts.jai.utils.OpImageUtil;
 
-import javax.media.jai.ImageLayout;
-import javax.media.jai.PointOpImage;
-import javax.media.jai.RasterAccessor;
-import javax.media.jai.RasterFormatTag;
+import org.eclipse.imagen.ImageLayout;
+import org.eclipse.imagen.PointOpImage;
+import org.eclipse.imagen.RasterAccessor;
+import org.eclipse.imagen.RasterFormatTag;
 import java.awt.*;
 import java.awt.image.DataBuffer;
 import java.awt.image.Raster;

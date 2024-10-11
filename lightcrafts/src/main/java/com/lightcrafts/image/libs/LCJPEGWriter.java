@@ -28,8 +28,7 @@ import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.lang.ref.Cleaner;
 import java.nio.ByteBuffer;
-import javax.media.jai.PlanarImage;
-
+import org.eclipse.imagen.PlanarImage;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Document;

@@ -11,7 +11,7 @@ import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.ui.toolkit.ShadowFactory;
 import com.lightcrafts.utils.LCMS;
 
-import javax.media.jai.IHSColorSpace;
+import org.eclipse.imagen.IHSColorSpace;
 import java.awt.*;
 import java.awt.font.TextLayout;
 import java.awt.image.BufferedImage;

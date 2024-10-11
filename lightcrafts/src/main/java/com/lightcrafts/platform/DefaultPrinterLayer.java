@@ -9,12 +9,12 @@ import com.lightcrafts.utils.ProgressIndicator;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.JAIContext;
 
-import javax.media.jai.BorderExtender;
-import javax.media.jai.Interpolation;
-import javax.media.jai.JAI;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.RenderedOp;
-import javax.media.jai.operator.TransposeDescriptor;
+import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.Interpolation;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.operator.TransposeDescriptor;
 import java.awt.print.*;
 import java.awt.image.Raster;
 import java.awt.image.BufferedImage;
@@ -199,14 +199,14 @@ public class DefaultPrinterLayer implements PrinterLayer {
 
             if (printImage instanceof RenderedOp) {
                 RenderedOp rop = (RenderedOp) printImage;
-                rop.setRenderingHint(JAI.KEY_TILE_CACHE, JAIContext.defaultTileCache);
+                rop.setRenderingHint(ImageN.KEY_TILE_CACHE, JAIContext.defaultTileCache);
             }
 
             if (fakeLandscape) {
                 ParameterBlock params = new ParameterBlock();
                 params.addSource(printImage);
                 params.add(TransposeDescriptor.ROTATE_90);
-                printImage = JAI.create("Transpose", params, null);
+                printImage = ImageN.create("Transpose", params, null);
             }
 
             if (printResolution != PRINTER_RESOLUTION) {
@@ -216,17 +216,17 @@ public class DefaultPrinterLayer implements PrinterLayer {
 
                 AffineTransform xform = AffineTransform.getScaleInstance(scale, scale);
 
-                RenderingHints formatHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
+                RenderingHints formatHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
 
                 // Do not recycle these tiles, the canvas will cache them
-                // formatHints.add(new RenderingHints(JAI.KEY_CACHED_TILE_RECYCLING_ENABLED, Boolean.FALSE));
+                // formatHints.add(new RenderingHints(ImageN.KEY_CACHED_TILE_RECYCLING_ENABLED, Boolean.FALSE));
 
                 Interpolation interp = Interpolation.getInstance(Interpolation.INTERP_BICUBIC_2);
                 ParameterBlock params = new ParameterBlock();
                 params.addSource(printImage);
                 params.add(xform);
                 params.add(interp);
-                printImage = JAI.create("Affine", params, formatHints);
+                printImage = ImageN.create("Affine", params, formatHints);
             }
 
             if (!printCancelled) {

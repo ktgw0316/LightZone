@@ -36,7 +36,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Map;
-import javax.media.jai.PlanarImage;
+import org.eclipse.imagen.PlanarImage;
 import org.w3c.dom.Document;
 
 import static com.lightcrafts.image.metadata.EXIFConstants.EXIF_FIELD_SIZE;

@@ -2,11 +2,11 @@
 
 package com.lightcrafts.jai.opimage;
 
-import javax.media.jai.PointOpImage;
-import javax.media.jai.ImageLayout;
-import javax.media.jai.RasterFormatTag;
-import javax.media.jai.RasterAccessor;
-import com.sun.media.jai.util.ImageUtil;
+import org.eclipse.imagen.PointOpImage;
+import org.eclipse.imagen.ImageLayout;
+import org.eclipse.imagen.RasterFormatTag;
+import org.eclipse.imagen.RasterAccessor;
+import org.eclipse.imagen.media.util.ImageUtil;
 
 import java.awt.image.*;
 import java.awt.*;
@@ -54,7 +54,7 @@ public class HDROpImage extends PointOpImage {
 
         this.detail = detail;
         this.intensity = intensity;
-        
+
         for (int i = 0; i < c+1; i++)
             intensityTable[i] = (short) (c * sigmoid(i/(double)c));
 

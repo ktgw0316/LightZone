@@ -7,10 +7,10 @@ import com.lightcrafts.model.ImageEditor.ImageEditorEngine;
 import com.lightcrafts.model.PrintSettings;
 import com.lightcrafts.utils.thread.ProgressThread;
 import com.lightcrafts.jai.JAIContext;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.JAI;
-import javax.media.jai.BorderExtender;
-import javax.media.jai.Interpolation;
+import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.JAI;
+import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.Interpolation;
 
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;

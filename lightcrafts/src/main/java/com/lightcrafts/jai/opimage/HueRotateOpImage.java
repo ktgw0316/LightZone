@@ -7,10 +7,10 @@ import com.lightcrafts.image.color.HSB;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.utils.LCMatrix;
 
-import javax.media.jai.ImageLayout;
-import javax.media.jai.PointOpImage;
-import javax.media.jai.RasterAccessor;
-import javax.media.jai.RasterFormatTag;
+import org.eclipse.imagen.ImageLayout;
+import org.eclipse.imagen.PointOpImage;
+import org.eclipse.imagen.RasterAccessor;
+import org.eclipse.imagen.RasterFormatTag;
 import java.awt.*;
 import java.awt.color.ICC_ProfileRGB;
 import java.awt.image.DataBuffer;

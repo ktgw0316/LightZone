@@ -11,7 +11,9 @@ group = "com.lightcrafts"
 version = rootProject.file("lightcrafts/version.txt").readText().trim().substringBefore('~')
 
 repositories {
-    maven(url = "https://maven.geotoolkit.org/")
+    maven {
+        url = uri("https://repo.osgeo.org/repository/release/")
+    }
     mavenCentral()
 }
 
@@ -22,7 +24,7 @@ dependencies {
     annotationProcessor(lombok)
     compileOnly(jetbrainsAnnotation)
     compileOnly(lombok)
-    implementation(files("${project.rootDir}/lightcrafts/lib/jai-lightzone-1.1.3.0.jar"))
+    implementation("org.eclipse.imagen:imagen-all:0.9.1")
     testCompileOnly(jetbrainsAnnotation)
     testImplementation(kotlin("test"))
     testImplementation("io.kotest:kotest-runner-junit5-jvm:5.9.1")

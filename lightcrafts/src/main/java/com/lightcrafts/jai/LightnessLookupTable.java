@@ -4,10 +4,11 @@ package com.lightcrafts.jai;
 
 import com.lightcrafts.image.color.ColorScience;
 
-import javax.media.jai.LookupTableJAI;
-import javax.media.jai.RasterFactory;
-import javax.media.jai.RasterAccessor;
-import javax.media.jai.RasterFormatTag;
+import org.eclipse.imagen.RasterFactory;
+import org.eclipse.imagen.RasterAccessor;
+import org.eclipse.imagen.RasterFormatTag;
+import org.eclipse.imagen.media.lookup.LookupTable;
+
 import java.awt.image.WritableRaster;
 import java.awt.image.Raster;
 import java.awt.image.SampleModel;
@@ -15,11 +16,11 @@ import java.awt.*;
 
 
 /**
- * Special case of LookupTableJAI to apply the lookup on the lightness of the image.
+ * Special case of LookupTable to apply the lookup on the lightness of the image.
  * Only works on InterleavedSampleModel and on 16 bit images with uniform types
  */
 
-public class LightnessLookupTable extends LookupTableJAI {
+public class LightnessLookupTable extends LookupTable {
     public LightnessLookupTable(short[] shorts, boolean b) {
         super(shorts, b);
     }

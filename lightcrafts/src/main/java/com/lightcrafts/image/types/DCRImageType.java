@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 
-import javax.media.jai.JAI;
-import javax.media.jai.operator.TransposeType;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.operator.TransposeType;
 
 import com.lightcrafts.image.BadImageFileException;
 import com.lightcrafts.image.ImageInfo;
@@ -56,7 +56,7 @@ public final class DCRImageType extends RawImageType {
         final ParameterBlock pb = new ParameterBlock();
         pb.addSource( thumb );
         pb.add( transpose );
-        return JAI.create( "Transpose", pb, null );
+        return ImageN.create( "Transpose", pb, null );
     }
 
     /**

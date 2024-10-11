@@ -17,14 +17,14 @@ import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
-import javax.media.jai.AreaOpImage;
-import javax.media.jai.BorderExtender;
-import javax.media.jai.ImageLayout;
-import javax.media.jai.RasterAccessor;
-import javax.media.jai.RasterFormatTag;
-import javax.media.jai.KernelJAI;
+import org.eclipse.imagen.AreaOpImage;
+import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.ImageLayout;
+import org.eclipse.imagen.RasterAccessor;
+import org.eclipse.imagen.RasterFormatTag;
+import org.eclipse.imagen.KernelImageN;
 import java.util.Map;
-// import com.sun.media.jai.test.OpImageTester;
+// import org.eclipse.imagen.media.test.OpImageTester;
 
 /**
  * An OpImage class to perform separable convolve on a source image.
@@ -37,7 +37,7 @@ final class LCSeparableConvolveOpImage extends AreaOpImage {
         System.loadLibrary("JAI");
     }
 
-    protected KernelJAI kernel;
+    protected KernelImageN kernel;
     protected int kw, kh, kx, ky;
 
     private float[] hValues;
@@ -60,7 +60,7 @@ final class LCSeparableConvolveOpImage extends AreaOpImage {
                                     BorderExtender extender,
                                     Map config,
                                     ImageLayout layout,
-                                    KernelJAI kernel) {
+                                    KernelImageN kernel) {
         super(source,
               layout,
               config,
@@ -395,14 +395,14 @@ final class LCSeparableConvolveOpImage extends AreaOpImage {
 //         float data[] = {0.05f,0.10f,0.05f,
 //                         0.10f,0.20f,0.10f,
 //                         0.05f,0.10f,0.05f};
-//         KernelJAI kJAI = new KernelJAI(3,3,1,1,data);
+//         KernelImageN kImageN = new KernelImageN(3,3,1,1,data);
 //         return new SeparableConvolveOpImage(oit.getSource(), null, null,
 //                                    new ImageLayout(oit.getSource()),
-//                                    kJAI);
+//                                    kImageN);
 //     }
 
 //     public static void main(String args[]) {
-//         String classname = "com.sun.media.jai.opimage.SeparableConvolveOpImage";
+//         String classname = "org.eclipse.imagen.media.opimage.SeparableConvolveOpImage";
 //         OpImageTester.performDiagnostics(classname,args);
 //     }
 }

@@ -16,13 +16,13 @@ package com.lightcrafts.jai.operator;
 import java.awt.RenderingHints;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.RenderableImage;
-import javax.media.jai.JAI;
-import javax.media.jai.OperationDescriptorImpl;
-import javax.media.jai.ParameterBlockJAI;
-import javax.media.jai.RenderableOp;
-import javax.media.jai.RenderedOp;
-import javax.media.jai.registry.RenderableRegistryMode;
-import javax.media.jai.registry.RenderedRegistryMode;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.OperationDescriptorImpl;
+import org.eclipse.imagen.ParameterBlockImageN;
+import org.eclipse.imagen.RenderableOp;
+import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.registry.RenderableRegistryMode;
+import org.eclipse.imagen.registry.RenderedRegistryMode;
 
 /**
  * An <code>OperationDescriptor</code> describing the "Add" operation.
@@ -72,7 +72,7 @@ import javax.media.jai.registry.RenderedRegistryMode;
  *
  * <p> No parameters are needed for this operation.
  *
- * @see javax.media.jai.OperationDescriptor */
+ * @see org.eclipse.imagen.OperationDescriptor */
 public class UnSharpMaskDescriptor extends OperationDescriptorImpl {
 
     /**
@@ -127,12 +127,12 @@ public class UnSharpMaskDescriptor extends OperationDescriptorImpl {
     /**
      * Adds two images.
      *
-     * <p>Creates a <code>ParameterBlockJAI</code> from all
+     * <p>Creates a <code>ParameterBlockImageN</code> from all
      * supplied arguments except <code>hints</code> and invokes
-     * {@link JAI#create(String,java.awt.image.renderable.ParameterBlock,RenderingHints)}.
+     * {@link ImageN#create(String,java.awt.image.renderable.ParameterBlock,RenderingHints)}.
      *
-     * @see JAI
-     * @see ParameterBlockJAI
+     * @see ImageN
+     * @see ParameterBlockImageN
      * @see RenderedOp
      *
      * @param source0 <code>RenderedImage</code> source 0.
@@ -147,8 +147,8 @@ public class UnSharpMaskDescriptor extends OperationDescriptorImpl {
                                     RenderedImage source1,
                                     double gain, int threshold,
                                     RenderingHints hints)  {
-        ParameterBlockJAI pb =
-            new ParameterBlockJAI("LCUnSharpMask",
+        ParameterBlockImageN pb =
+            new ParameterBlockImageN("LCUnSharpMask",
                                   RenderedRegistryMode.MODE_NAME);
 
         pb.setSource("source0", source0);
@@ -156,18 +156,18 @@ public class UnSharpMaskDescriptor extends OperationDescriptorImpl {
         pb.setParameter("gain", gain);
         pb.setParameter("threshold", threshold);
 
-        return JAI.create("LCUnSharpMask", pb, hints);
+        return ImageN.create("LCUnSharpMask", pb, hints);
     }
 
     /**
      * Adds two images.
      *
-     * <p>Creates a <code>ParameterBlockJAI</code> from all
+     * <p>Creates a <code>ParameterBlockImageN</code> from all
      * supplied arguments except <code>hints</code> and invokes
-     * {@link JAI#createRenderable(String,java.awt.image.renderable.ParameterBlock,RenderingHints)}.
+     * {@link ImageN#createRenderable(String,java.awt.image.renderable.ParameterBlock,RenderingHints)}.
      *
-     * @see JAI
-     * @see ParameterBlockJAI
+     * @see ImageN
+     * @see ParameterBlockImageN
      * @see RenderableOp
      *
      * @param source0 <code>RenderableImage</code> source 0.
@@ -182,8 +182,8 @@ public class UnSharpMaskDescriptor extends OperationDescriptorImpl {
                                                 RenderableImage source1,
                                                 double gain, int threshold,
                                                 RenderingHints hints)  {
-        ParameterBlockJAI pb =
-            new ParameterBlockJAI("LCUnSharpMask",
+        ParameterBlockImageN pb =
+            new ParameterBlockImageN("LCUnSharpMask",
                                   RenderableRegistryMode.MODE_NAME);
 
         pb.setSource("source0", source0);
@@ -191,6 +191,6 @@ public class UnSharpMaskDescriptor extends OperationDescriptorImpl {
         pb.setParameter("gain", gain);
         pb.setParameter("threshold", threshold);
 
-        return JAI.createRenderable("LCUnSharpMask", pb, hints);
+        return ImageN.createRenderable("LCUnSharpMask", pb, hints);
     }
 }

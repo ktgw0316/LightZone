@@ -13,16 +13,16 @@
  */
 package com.lightcrafts.jai.operator;
 
-import com.sun.media.jai.util.AreaOpPropertyGenerator;
+import org.eclipse.imagen.media.util.AreaOpPropertyGenerator;
 import java.awt.RenderingHints;
 import java.awt.image.RenderedImage;
-import javax.media.jai.JAI;
-import javax.media.jai.KernelJAI;
-import javax.media.jai.OperationDescriptorImpl;
-import javax.media.jai.ParameterBlockJAI;
-import javax.media.jai.PropertyGenerator;
-import javax.media.jai.RenderedOp;
-import javax.media.jai.registry.RenderedRegistryMode;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.KernelImageN;
+import org.eclipse.imagen.OperationDescriptorImpl;
+import org.eclipse.imagen.ParameterBlockImageN;
+import org.eclipse.imagen.PropertyGenerator;
+import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.registry.RenderedRegistryMode;
 
 /**
  *
@@ -124,17 +124,17 @@ import javax.media.jai.registry.RenderedRegistryMode;
  *
  * It should be noted that this operation automatically adds a
  * value of <code>Boolean.TRUE</code> for the
- * <code>JAI.KEY_REPLACE_INDEX_COLOR_MODEL</code> to the given
+ * <code>ImageN.KEY_REPLACE_INDEX_COLOR_MODEL</code> to the given
  * <code>configuration</code> so that the operation is performed
  * on the pixel values instead of being performed on the indices into
  * the color map if the source(s) have an <code>IndexColorModel</code>.
  * This addition will take place only if a value for the
- * <code>JAI.KEY_REPLACE_INDEX_COLOR_MODEL</code> has not already been
+ * <code>ImageN.KEY_REPLACE_INDEX_COLOR_MODEL</code> has not already been
  * provided by the user. Note that the <code>configuration</code> Map
  * is cloned before the new hint is added to it. The operation can be
- * smart about the value of the <code>JAI.KEY_REPLACE_INDEX_COLOR_MODEL</code>
+ * smart about the value of the <code>ImageN.KEY_REPLACE_INDEX_COLOR_MODEL</code>
  * <code>RenderingHints</code>, i.e. while the default value for the
- * <code>JAI.KEY_REPLACE_INDEX_COLOR_MODEL</code> is
+ * <code>ImageN.KEY_REPLACE_INDEX_COLOR_MODEL</code> is
  * <code>Boolean.TRUE</code>, in some cases the operator could set the
  * default.
  *
@@ -143,7 +143,7 @@ import javax.media.jai.registry.RenderedRegistryMode;
  * <tr><th>Name</th>        <th>Value</th></tr>
  * <tr><td>GlobalName</td>  <td>Erode</td></tr>
  * <tr><td>LocalName</td>   <td>Erode</td></tr>
- * <tr><td>Vendor</td>      <td>com.sun.media.jai</td></tr>
+ * <tr><td>Vendor</td>      <td>org.eclipse.imagen.media</td></tr>
  * <tr><td>Description</td> <td>Performs kernel based Erode on
  *                              an image.</td></tr>
  * <tr><td>DocURL</td>      <td>http://java.sun.com/products/java-media/jai/forD
@@ -157,16 +157,16 @@ evelopers/jai-apidocs/javax/media/jai/operator/ErodeDescriptor.html</td
  * <caption>Parameter List</caption>
  * <tr><th>Name</th>          <th>Class Type</th>
  *                            <th>Default Value</th></tr>
- * <tr><td>kernel</td>        <td>javax.media.jai.KernelJAI</td>
+ * <tr><td>kernel</td>        <td>org.eclipse.imagen.KernelImageN</td>
  *                            <td>NO_PARAMETER_DEFAULT</td>
  * </table></p>
  *
  * </pre>
  *
  *
- * @see javax.media.jai.KernelJAI
+ * @see org.eclipse.imagen.KernelImageN
  *
- * @since JAI 1.1
+ * @since ImageN 1.1
  */
 
 public class LCErodeDescriptor extends OperationDescriptorImpl {
@@ -192,7 +192,7 @@ public class LCErodeDescriptor extends OperationDescriptorImpl {
 
     /** The parameter class types for the Erode operation. */
     private static final Class[] paramClasses = {
-        javax.media.jai.KernelJAI.class
+        org.eclipse.imagen.KernelImageN.class
     };
 
     /** The parameter default values for the Erode operation. */
@@ -221,12 +221,12 @@ public class LCErodeDescriptor extends OperationDescriptorImpl {
     /**
      * Performs binary kernel based Erode operation on the image.
      *
-     * <p>Creates a <code>ParameterBlockJAI</code> from all
+     * <p>Creates a <code>ParameterBlockImageN</code> from all
      * supplied arguments except <code>hints</code> and invokes
-     * {@link JAI#create(String,java.awt.image.renderable.ParameterBlock,RenderingHints)}.
+     * {@link ImageN#create(String,java.awt.image.renderable.ParameterBlock,RenderingHints)}.
      *
-     * @see JAI
-     * @see ParameterBlockJAI
+     * @see ImageN
+     * @see ParameterBlockImageN
      * @see RenderedOp
      *
      * @param source0 <code>RenderedImage</code> source 0.
@@ -238,16 +238,16 @@ public class LCErodeDescriptor extends OperationDescriptorImpl {
      * @throws IllegalArgumentException if <code>kernel</code> is <code>null</code>.
      */
     public static RenderedOp create(RenderedImage source0,
-                                    KernelJAI kernel,
+                                    KernelImageN kernel,
                                     RenderingHints hints)  {
-        ParameterBlockJAI pb =
-            new ParameterBlockJAI("LCErode",
+        ParameterBlockImageN pb =
+            new ParameterBlockImageN("LCErode",
                                   RenderedRegistryMode.MODE_NAME);
 
         pb.setSource("source0", source0);
 
         pb.setParameter("kernel", kernel);
 
-        return JAI.create("LCErode", pb, hints);
+        return ImageN.create("LCErode", pb, hints);
     }
 }

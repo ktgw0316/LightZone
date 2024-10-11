@@ -9,8 +9,8 @@ import com.lightcrafts.model.Preview;
 import com.lightcrafts.model.Region;
 import com.lightcrafts.ui.LightZoneSkin;
 
-import javax.media.jai.JAI;
-import javax.media.jai.PlanarImage;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.PlanarImage;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -128,7 +128,7 @@ public class ColorSelectionPreview extends Preview implements PaintListener {
             pb.add((float) visibleRect.y);
             pb.add((float) visibleRect.width);
             pb.add((float) visibleRect.height);
-            image = JAI.create("Crop", pb, JAIContext.noCacheHint);
+            image = ImageN.create("Crop", pb, JAIContext.noCacheHint);
         }
 
         Dimension previewSize = getSize();
@@ -140,7 +140,7 @@ public class ColorSelectionPreview extends Preview implements PaintListener {
             pb.addSource(image);
             pb.add(scale);
             pb.add(scale);
-            image = JAI.create("Scale", pb, JAIContext.noCacheHint);
+            image = ImageN.create("Scale", pb, JAIContext.noCacheHint);
         }
 
         image = Functions.toColorSpace(image, JAIContext.systemColorSpace, null);

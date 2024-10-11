@@ -12,13 +12,13 @@ import com.lightcrafts.model.Region;
 import com.lightcrafts.model.ZoneOperation;
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.utils.Segment;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.media.lookup.LookupTableFactory;
 import org.jetbrains.annotations.NotNull;
 
-import javax.media.jai.JAI;
-import javax.media.jai.LookupTableJAI;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.RenderedOp;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.color.ICC_ColorSpace;
@@ -188,7 +188,7 @@ public class ZoneFinder extends Preview implements PaintListener {
             pb.add((float) visibleRect.y);
             pb.add((float) visibleRect.width);
             pb.add((float) visibleRect.height);
-            image = JAI.create("Crop", pb, JAIContext.noCacheHint);
+            image = ImageN.create("Crop", pb, JAIContext.noCacheHint);
         }
 
         Dimension previewSize = getSize();
@@ -210,7 +210,7 @@ public class ZoneFinder extends Preview implements PaintListener {
             pb.addSource(image);
             pb.add(scale);
             pb.add(scale);
-            image = JAI.create("Scale", pb, JAIContext.noCacheHint);
+            image = ImageN.create("Scale", pb, JAIContext.noCacheHint);
         }
 
         // avoid keeping references to the input image
@@ -246,7 +246,7 @@ public class ZoneFinder extends Preview implements PaintListener {
             ParameterBlock pb = new ParameterBlock();
             pb.addSource(image);
             pb.add(transform);
-            image = JAI.create("BandCombine", pb, JAIContext.noCacheHint); // Desaturate, single banded
+            image = ImageN.create("BandCombine", pb, JAIContext.noCacheHint); // Desaturate, single banded
         }
 
         return image;
@@ -305,9 +305,9 @@ public class ZoneFinder extends Preview implements PaintListener {
 
         ParameterBlock pb = new ParameterBlock();
         pb.addSource(image);
-        pb.add(new LookupTableJAI(lut));
+        pb.add(LookupTableFactory.create(lut));
 
-        return JAI.create("lookup", pb, JAIContext.noCacheHint);
+        return ImageN.create("lookup", pb, JAIContext.noCacheHint);
     }
 
     // Compute a simple hash of the image for cache comparison
@@ -399,7 +399,7 @@ public class ZoneFinder extends Preview implements PaintListener {
     }
 
     /*
-        BIG NOTE: JAI has all sorts of deadlocks in its notification management,
+        BIG NOTE: ImageN has all sorts of deadlocks in its notification management,
         we just avoid doing any pipeline setup off the main event thread.
         This code sets the pipeline on the main thread but performs the actual computation on a worker thread
     */

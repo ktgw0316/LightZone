@@ -17,7 +17,7 @@ import com.lightcrafts.utils.filecache.FileCache;
 import com.lightcrafts.utils.filecache.FileCacheFactory;
 import com.lightcrafts.utils.thread.ProgressThread;
 
-import javax.media.jai.PlanarImage;
+import org.eclipse.imagen.PlanarImage;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;

@@ -8,11 +8,11 @@ import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.*;
 import com.lightcrafts.ui.editor.EditorMode;
 
-import javax.media.jai.BorderExtender;
-import javax.media.jai.ImageLayout;
-import javax.media.jai.JAI;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.RenderedOp;
+import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.ImageLayout;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.RenderedOp;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.image.renderable.ParameterBlock;
@@ -78,7 +78,7 @@ public class CloneOperationImpl extends BlendedOperation implements CloneOperati
             pb.addSource(back)
               .add((float) dx)
               .add((float) dy);
-            RenderedOp translated = JAI.create("Translate", pb, JAIContext.noCacheHint);
+            RenderedOp translated = ImageN.create("Translate", pb, JAIContext.noCacheHint);
 
             pb = new ParameterBlock();
             pb.addSource(translated)
@@ -87,7 +87,7 @@ public class CloneOperationImpl extends BlendedOperation implements CloneOperati
               .add(dy > 0 ?  dy : 0)
               .add(dy < 0 ? -dy : 0)
               .add(BorderExtender.createInstance(BorderExtender.BORDER_ZERO));
-            RenderedOp border = JAI.create("Border", pb, JAIContext.noCacheHint);
+            RenderedOp border = ImageN.create("Border", pb, JAIContext.noCacheHint);
 
             pb = new ParameterBlock();
             pb.addSource(border)
@@ -95,16 +95,16 @@ public class CloneOperationImpl extends BlendedOperation implements CloneOperati
               .add((float) back.getMinY())
               .add((float) back.getWidth())
               .add((float) back.getHeight());
-            RenderedOp crop = JAI.create("Crop", pb, JAIContext.noCacheHint);
+            RenderedOp crop = ImageN.create("Crop", pb, JAIContext.noCacheHint);
 
             // Format retiles the image
             // TODO: this needs better understanding, can we just specify the layout for Crop?
             pb = new ParameterBlock();
             pb.addSource(crop)
               .add(back.getSampleModel().getDataType());
-            RenderingHints formatHints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, new ImageLayout(back));
+            RenderingHints formatHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, new ImageLayout(back));
             formatHints.add(JAIContext.noCacheHint);
-            RenderedOp formatted = JAI.create("Format", pb, formatHints);
+            RenderedOp formatted = ImageN.create("Format", pb, formatHints);
 
             Region r = new Region() {
                 @Override
@@ -137,10 +137,10 @@ public class CloneOperationImpl extends BlendedOperation implements CloneOperati
               .add(1.0)
               .add(mask);
 
-            // RenderingHints blendHints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, new ImageLayout(back));
+            // RenderingHints blendHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, new ImageLayout(back));
             // NOTE: I guess that it is more efficient to cache the different cloned areas...
             // blendHints.add(JAIContext.noCacheHint);
-            image = JAI.create("Blend", pb, null);
+            image = ImageN.create("Blend", pb, null);
         }
 
         return image;

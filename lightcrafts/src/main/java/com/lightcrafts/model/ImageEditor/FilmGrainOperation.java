@@ -8,8 +8,8 @@ import com.lightcrafts.model.Operation;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
 
-import javax.media.jai.JAI;
-import javax.media.jai.PlanarImage;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.PlanarImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
 
@@ -95,7 +95,7 @@ public class FilmGrainOperation extends BlendedOperation {
             pb.addSource(back)
                     .addSource(grain)
                     .add("Hard Light");
-            return JAI.create("Blend", pb, null);
+            return ImageN.create("Blend", pb, null);
         }
     }
 

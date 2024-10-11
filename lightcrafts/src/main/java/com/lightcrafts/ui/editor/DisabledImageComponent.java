@@ -5,9 +5,9 @@ package com.lightcrafts.ui.editor;
 import static com.lightcrafts.ui.editor.Locale.LOCALE;
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.utils.awt.geom.HiDpi;
-import javax.media.jai.JAI;
-import javax.media.jai.BorderExtender;
-import javax.media.jai.Interpolation;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.Interpolation;
 
 import javax.swing.*;
 import java.awt.image.RenderedImage;
@@ -58,13 +58,13 @@ class DisabledImageComponent extends JComponent implements Scrollable {
 
             RenderedImage xformedImage = image;
             if (!xform.isIdentity()) {
-                RenderingHints extenderHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
+                RenderingHints extenderHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
                                                                   BorderExtender.createInstance(BorderExtender.BORDER_COPY));
                 ParameterBlock params = new ParameterBlock();
                 params.addSource(image);
                 params.add(xform);
                 params.add(Interpolation.getInstance(Interpolation.INTERP_BILINEAR));
-                xformedImage = JAI.create("Affine", params, extenderHints);
+                xformedImage = ImageN.create("Affine", params, extenderHints);
             }
 
             g.drawRenderedImage(xformedImage, identity);

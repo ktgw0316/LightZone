@@ -10,12 +10,12 @@ import com.lightcrafts.model.CropBounds;
 import com.lightcrafts.model.Operation;
 import lombok.Getter;
 
-import javax.media.jai.BorderExtender;
-import javax.media.jai.ImageLayout;
-import javax.media.jai.Interpolation;
-import javax.media.jai.JAI;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.RenderedOp;
+import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.ImageLayout;
+import org.eclipse.imagen.Interpolation;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.RenderedOp;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -313,14 +313,14 @@ public class Rendering implements Cloneable {
 
             if (!transform.isIdentity()) {
                 final var extenderHints = new RenderingHints(
-                        JAI.KEY_BORDER_EXTENDER,
+                        ImageN.KEY_BORDER_EXTENDER,
                         BorderExtender.createInstance(BorderExtender.BORDER_COPY));
                 final var params = new ParameterBlock();
                 params.addSource(image);
                 params.add(transform);
                 params.add(Interpolation.getInstance(
                         cheapScale ? Interpolation.INTERP_BILINEAR : Interpolation.INTERP_BICUBIC));
-                xformedSourceImage = JAI.create("Affine", params, extenderHints);
+                xformedSourceImage = ImageN.create("Affine", params, extenderHints);
             }
             else {
                 xformedSourceImage = image;
