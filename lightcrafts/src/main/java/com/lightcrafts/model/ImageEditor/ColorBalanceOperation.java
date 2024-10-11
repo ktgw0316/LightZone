@@ -7,9 +7,10 @@ import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
 import com.lightcrafts.utils.splines;
 
-import javax.media.jai.JAI;
-import javax.media.jai.LookupTableJAI;
-import javax.media.jai.PlanarImage;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.media.lookup.LookupTableFactory;
+
 import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
 
@@ -139,12 +140,12 @@ public class ColorBalanceOperation extends BlendedOperation {
             for (int i = 0; i < 0x10000; i++)
                 table[2][i] = (short) (0xffff & (int) Math.min(Math.max(i + 10 * 0xff * interpolator.interpolate(i / (double) 0xffff, blueCurve), 0), 0xffff));
 
-            LookupTableJAI lookupTable = new LookupTableJAI(table, true);
+            var lookupTable = LookupTableFactory.create(table, true);
 
             ParameterBlock pb = new ParameterBlock();
             pb.addSource(back);
             pb.add(lookupTable);
-            return JAI.create("lookup", pb, null);
+            return ImageN.create("lookup", pb, null);
         }
     }
 

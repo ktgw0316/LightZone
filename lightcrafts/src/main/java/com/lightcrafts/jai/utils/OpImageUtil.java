@@ -4,16 +4,16 @@
 
 package com.lightcrafts.jai.utils;
 
-import com.sun.media.jai.util.ImageUtil;
+import org.eclipse.imagen.media.util.ImageUtil;
 import org.jetbrains.annotations.NotNull;
 
-import javax.media.jai.RasterFormatTag;
+import org.eclipse.imagen.RasterFormatTag;
 import java.awt.image.ComponentSampleModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
 import java.awt.image.SampleModel;
 
-import static javax.media.jai.RasterAccessor.*;
+import static org.eclipse.imagen.RasterAccessor.*;
 
 public final class OpImageUtil {
     @NotNull
@@ -23,7 +23,7 @@ public final class OpImageUtil {
         return new RasterFormatTag(sm, formatTagID);
     }
 
-    // cf. javax.media.jai.RasterAccessor#findCompatibleTag
+    // cf. org.eclipse.imagen.RasterAccessor#findCompatibleTag
     private static int getFormatTagID(@NotNull SampleModel sampleModel) {
         int dataType = sampleModel.getTransferType();
         final int tag;

@@ -11,13 +11,13 @@ import com.lightcrafts.jai.LCROIShape;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.utils.SoftValueHashMap;
 
-import javax.media.jai.BorderExtender;
-import javax.media.jai.ImageLayout;
-import javax.media.jai.Interpolation;
-import javax.media.jai.JAI;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.RasterFactory;
-import javax.media.jai.TiledImage;
+import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.ImageLayout;
+import org.eclipse.imagen.Interpolation;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.RasterFactory;
+import org.eclipse.imagen.TiledImage;
 
 import java.awt.image.*;
 import java.awt.image.renderable.ParameterBlock;
@@ -333,7 +333,7 @@ public class ShapedMask extends PlanarImage {
                     AffinedImage key = new AffinedImage(maskImage, transform);
                     PlanarImage affinedImage = expandedMasks.get(key);
                     if (affinedImage == null) {
-                        RenderingHints hints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
+                        RenderingHints hints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
                                 BorderExtender.createInstance(BorderExtender.BORDER_COPY));
                         // hints.add(JAIContext.noCacheHint);
                         Interpolation interp = Interpolation.getInstance(Interpolation.INTERP_BILINEAR);
@@ -341,7 +341,7 @@ public class ShapedMask extends PlanarImage {
                         params.addSource(maskImage);
                         params.add(transform);
                         params.add(interp);
-                        maskImage = JAI.create("Affine", params, hints);
+                        maskImage = ImageN.create("Affine", params, hints);
                         expandedMasks.put(key, maskImage);
                     } else {
                         maskImage = affinedImage;

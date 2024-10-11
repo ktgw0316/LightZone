@@ -18,9 +18,9 @@ import java.awt.RenderingHints;
 import java.awt.image.ColorModel;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
-import javax.media.jai.CRIFImpl;
-import javax.media.jai.ImageLayout;
-import com.sun.media.jai.opimage.RIFUtil;
+import org.eclipse.imagen.CRIFImpl;
+import org.eclipse.imagen.ImageLayout;
+import org.eclipse.imagen.media.opimage.RIFUtil;
 import com.lightcrafts.jai.operator.LCColorConvertDescriptor;
 
 
@@ -28,8 +28,8 @@ import com.lightcrafts.jai.operator.LCColorConvertDescriptor;
  * A <code>CRIF</code> supporting the "ColorConvert" operation in the rendered
  * and renderable image layers.
  *
- * @see javax.media.jai.operator.ColorConvertDescriptor
- * @see com.sun.media.jai.opimage.ColorConvertOpImage
+ * @see org.eclipse.imagen.operator.ColorConvertDescriptor
+ * @see org.eclipse.imagen.media.opimage.ColorConvertOpImage
  *
  * @since EA4
  *

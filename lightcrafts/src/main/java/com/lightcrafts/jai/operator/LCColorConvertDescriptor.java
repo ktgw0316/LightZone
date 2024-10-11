@@ -14,14 +14,14 @@
 
 package com.lightcrafts.jai.operator;
 
-import javax.media.jai.EnumeratedParameter;
-import javax.media.jai.JAI;
-import javax.media.jai.OperationDescriptorImpl;
-import javax.media.jai.ParameterBlockJAI;
-import javax.media.jai.RenderableOp;
-import javax.media.jai.RenderedOp;
-import javax.media.jai.registry.RenderableRegistryMode;
-import javax.media.jai.registry.RenderedRegistryMode;
+import org.eclipse.imagen.EnumeratedParameter;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.OperationDescriptorImpl;
+import org.eclipse.imagen.ParameterBlockImageN;
+import org.eclipse.imagen.RenderableOp;
+import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.registry.RenderableRegistryMode;
+import org.eclipse.imagen.registry.RenderedRegistryMode;
 import java.awt.*;
 import java.awt.color.ICC_Profile;
 import java.awt.image.ColorModel;
@@ -46,7 +46,7 @@ import java.awt.image.renderable.RenderableImage;
  * <p> The calculation pathway is selected to optimize performance and
  * accuracy based on which <code>ColorSpace</code> subclasses are used to
  * represent the source and destination color spaces.  The subclass
- * categories are <code>ICC_ColorSpace</code>, <code>ColorSpaceJAI</code>,
+ * categories are <code>ICC_ColorSpace</code>, <code>ColorSpaceImageN</code>,
  * and generic <code>ColorSpace</code>, i.e., one which is not an instance
  * of either the two aforementioned subclasses.  Note that in the Sun
  * Microsystems implementation, an <code>ICC_ColorSpace</code> instance
@@ -79,12 +79,12 @@ import java.awt.image.renderable.RenderableImage;
  *                        <td>NO_PARAMETER_DEFAULT</td>
  * </table></p>
  *
- * @see javax.media.jai.OperationDescriptor
+ * @see org.eclipse.imagen.OperationDescriptor
  * @see java.awt.color.ColorSpace
  * @see java.awt.color.ICC_ColorSpace
  * @see java.awt.image.ColorModel
- * @see javax.media.jai.ColorSpaceJAI
- * @see javax.media.jai.IHSColorSpace
+ * @see org.eclipse.imagen.ColorSpaceImageN
+ * @see org.eclipse.imagen.IHSColorSpace
  */
 public class LCColorConvertDescriptor extends OperationDescriptorImpl {
 
@@ -147,13 +147,13 @@ public class LCColorConvertDescriptor extends OperationDescriptorImpl {
     /**
      * Convert the color space of an image.
      *
-     * <p>Creates a <code>ParameterBlockJAI</code> from all
+     * <p>Creates a <code>ParameterBlockImageN</code> from all
      * supplied arguments except <code>hints</code> and invokes
-     * {@link javax.media.jai.JAI#create(String,java.awt.image.renderable.ParameterBlock,java.awt.RenderingHints)}.
+     * {@link org.eclipse.imagen.ImageN#create(String,java.awt.image.renderable.ParameterBlock,java.awt.RenderingHints)}.
      *
-     * @see javax.media.jai.JAI
-     * @see javax.media.jai.ParameterBlockJAI
-     * @see javax.media.jai.RenderedOp
+     * @see org.eclipse.imagen.ImageN
+     * @see org.eclipse.imagen.ParameterBlockImageN
+     * @see org.eclipse.imagen.RenderedOp
      *
      * @param source0 <code>RenderedImage</code> source 0.
      * @param colorModel The destination color space.
@@ -167,8 +167,8 @@ public class LCColorConvertDescriptor extends OperationDescriptorImpl {
                                     ColorModel colorModel,
                                     RenderingIntent renderingIntent,
                                     RenderingHints hints)  {
-        ParameterBlockJAI pb =
-            new ParameterBlockJAI("LCColorConvert",
+        ParameterBlockImageN pb =
+            new ParameterBlockImageN("LCColorConvert",
                                   RenderedRegistryMode.MODE_NAME);
 
         pb.setSource("source0", source0);
@@ -176,19 +176,19 @@ public class LCColorConvertDescriptor extends OperationDescriptorImpl {
         pb.setParameter("colorModel", colorModel);
         pb.setParameter("renderingIntent", renderingIntent);
 
-        return JAI.create("LCColorConvert", pb, hints);
+        return ImageN.create("LCColorConvert", pb, hints);
     }
 
     /**
      * Convert the color space of an image.
      *
-     * <p>Creates a <code>ParameterBlockJAI</code> from all
+     * <p>Creates a <code>ParameterBlockImageN</code> from all
      * supplied arguments except <code>hints</code> and invokes
-     * {@link JAI#createRenderable(String,java.awt.image.renderable.ParameterBlock,RenderingHints)}.
+     * {@link ImageN#createRenderable(String,java.awt.image.renderable.ParameterBlock,RenderingHints)}.
      *
-     * @see JAI
-     * @see ParameterBlockJAI
-     * @see javax.media.jai.RenderableOp
+     * @see ImageN
+     * @see ParameterBlockImageN
+     * @see org.eclipse.imagen.RenderableOp
      *
      * @param source0 <code>RenderableImage</code> source 0.
      * @param colorModel The destination color space.
@@ -202,8 +202,8 @@ public class LCColorConvertDescriptor extends OperationDescriptorImpl {
                                                 ColorModel colorModel,
                                                 RenderingIntent renderingIntent,
                                                 RenderingHints hints)  {
-        ParameterBlockJAI pb =
-            new ParameterBlockJAI("LCColorConvert",
+        ParameterBlockImageN pb =
+            new ParameterBlockImageN("LCColorConvert",
                                   RenderableRegistryMode.MODE_NAME);
 
         pb.setSource("source0", source0);
@@ -211,6 +211,6 @@ public class LCColorConvertDescriptor extends OperationDescriptorImpl {
         pb.setParameter("colorModel", colorModel);
         pb.setParameter("renderingIntent", renderingIntent);
 
-        return JAI.createRenderable("LCColorConvert", pb, hints);
+        return ImageN.createRenderable("LCColorConvert", pb, hints);
     }
 }

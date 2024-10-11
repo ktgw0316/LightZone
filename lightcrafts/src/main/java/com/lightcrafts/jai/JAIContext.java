@@ -11,16 +11,16 @@ import com.lightcrafts.image.color.ColorScience;
 import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.jai.utils.LCTileScheduler;
 import com.lightcrafts.platform.Platform;
-import com.sun.media.jai.util.SunTileCache;
+import org.eclipse.imagen.media.util.SunTileCache;
 
-import javax.media.jai.JAI;
-import javax.media.jai.OperationDescriptor;
-import javax.media.jai.OperationRegistry;
-import javax.media.jai.RasterFactory;
-import javax.media.jai.TileCache;
-import javax.media.jai.TileFactory;
-import javax.media.jai.registry.CRIFRegistry;
-import javax.media.jai.registry.RIFRegistry;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.OperationDescriptor;
+import org.eclipse.imagen.OperationRegistry;
+import org.eclipse.imagen.RasterFactory;
+import org.eclipse.imagen.TileCache;
+import org.eclipse.imagen.TileFactory;
+import org.eclipse.imagen.registry.CRIFRegistry;
+import org.eclipse.imagen.registry.RIFRegistry;
 import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.color.ICC_ColorSpace;
@@ -172,7 +172,7 @@ public class JAIContext {
         System.out.printf("Max Memory:   %6d MB%n", maxMemory / MB);
         System.out.printf("Total Memory: %6d MB%n", totalMemory / MB);
 
-        JAI jaiInstance = JAI.getDefaultInstance();
+        ImageN jaiInstance = ImageN.getDefaultInstance();
 
         final int processors = Runtime.getRuntime().availableProcessors();
         System.out.println("Running on " + processors + " processors");
@@ -192,16 +192,16 @@ public class JAIContext {
         fileCache = new LCTileCache(tileCacheMemory, true);
         // fileCache.setMemoryThreshold(0.5f);
         jaiInstance.setTileCache(fileCache);
-        fileCacheHint = new RenderingHints(JAI.KEY_TILE_CACHE, fileCache);
+        fileCacheHint = new RenderingHints(ImageN.KEY_TILE_CACHE, fileCache);
         defaultTileCache = jaiInstance.getTileCache();
 
         TileFactory rtf = new LCRecyclingTileFactory();
-        jaiInstance.setRenderingHint(JAI.KEY_TILE_FACTORY, rtf);
-        jaiInstance.setRenderingHint(JAI.KEY_TILE_RECYCLER, rtf);
+        jaiInstance.setRenderingHint(ImageN.KEY_TILE_FACTORY, rtf);
+        jaiInstance.setRenderingHint(ImageN.KEY_TILE_RECYCLER, rtf);
         // TODO: causes rendering artifacts
-        // jaiInstance.setRenderingHint(JAI.KEY_CACHED_TILE_RECYCLING_ENABLED, Boolean.TRUE);
+        // jaiInstance.setRenderingHint(ImageN.KEY_CACHED_TILE_RECYCLING_ENABLED, Boolean.TRUE);
 
-        JAI.setDefaultTileSize(new Dimension(TILE_WIDTH, TILE_HEIGHT));
+        ImageN.setDefaultTileSize(new Dimension(TILE_WIDTH, TILE_HEIGHT));
 
         OperationRegistry or = jaiInstance.getOperationRegistry();
 
@@ -406,8 +406,8 @@ public class JAIContext {
                 e.printStackTrace();
             }
 
-            _noCacheHint = new RenderingHints(JAI.KEY_TILE_CACHE, noTileCache);
-            // _noCacheHint = new RenderingHints(JAI.KEY_TILE_CACHE, defaultTileCache);
+            _noCacheHint = new RenderingHints(ImageN.KEY_TILE_CACHE, noTileCache);
+            // _noCacheHint = new RenderingHints(ImageN.KEY_TILE_CACHE, defaultTileCache);
         } catch (IOException e) {
             e.printStackTrace();
             // Rethrow so the Application will notice the problem:

@@ -8,8 +8,8 @@ import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.image.color.ColorScience;
 
-import javax.media.jai.JAI;
-import javax.media.jai.PlanarImage;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.PlanarImage;
 
 import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
@@ -83,7 +83,7 @@ public class WhiteBalance extends BlendedOperation {
             ParameterBlock pb = new ParameterBlock();
             pb.addSource(back);
             pb.add(Wt);
-            return JAI.create("MultiplyConst", pb, JAIContext.noCacheHint);
+            return ImageN.create("MultiplyConst", pb, JAIContext.noCacheHint);
         }
     }
 

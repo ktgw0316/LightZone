@@ -7,7 +7,7 @@ import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SpotOperation;
 import com.lightcrafts.ui.editor.EditorMode;
 
-import javax.media.jai.PlanarImage;
+import org.eclipse.imagen.PlanarImage;
 
 import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_SPOT;
 

@@ -2,10 +2,10 @@
 
 package com.lightcrafts.jai.opimage;
 
-import javax.media.jai.PointOpImage;
-import javax.media.jai.ImageLayout;
-import javax.media.jai.RasterAccessor;
-import javax.media.jai.RasterFormatTag;
+import org.eclipse.imagen.PointOpImage;
+import org.eclipse.imagen.ImageLayout;
+import org.eclipse.imagen.RasterAccessor;
+import org.eclipse.imagen.RasterFormatTag;
 import com.lightcrafts.model.RGBColorSelection;
 import com.lightcrafts.utils.LCMS;
 import com.lightcrafts.jai.JAIContext;

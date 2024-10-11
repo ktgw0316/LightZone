@@ -2,12 +2,11 @@
 
 package com.lightcrafts.jai.opimage;
 
-import com.sun.media.jai.opimage.RIFUtil;
+import org.eclipse.imagen.media.opimage.RIFUtil;
 
-import javax.media.jai.CRIFImpl;
-import javax.media.jai.ImageLayout;
-import javax.media.jai.NullOpImage;
-import javax.media.jai.OpImage;
+import org.eclipse.imagen.CRIFImpl;
+import org.eclipse.imagen.ImageLayout;
+import org.eclipse.imagen.media.nullop.NullOpImage;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.*;
@@ -40,8 +39,7 @@ public class NOPCRIF extends CRIFImpl {
 
         return new NullOpImage(paramBlock.getRenderedSource(0),
                                layout,
-                               renderHints,
-                               OpImage.OP_COMPUTE_BOUND);
+                               renderHints);
     }
 
 }

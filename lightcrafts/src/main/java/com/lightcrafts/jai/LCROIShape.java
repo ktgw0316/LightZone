@@ -6,7 +6,7 @@ import com.lightcrafts.model.Region;
 import com.lightcrafts.model.Contour;
 import com.lightcrafts.jai.opimage.ShapedMask;
 
-import javax.media.jai.ROIShape;
+import org.eclipse.imagen.ROIShape;
 import java.util.LinkedList;
 import java.util.List;
 import java.awt.*;

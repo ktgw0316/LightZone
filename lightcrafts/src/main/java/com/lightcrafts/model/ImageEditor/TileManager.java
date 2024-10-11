@@ -3,9 +3,9 @@
 
 package com.lightcrafts.model.ImageEditor;
 
-import javax.media.jai.PlanarImage;
-import javax.media.jai.TileComputationListener;
-import javax.media.jai.TileRequest;
+import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.TileComputationListener;
+import org.eclipse.imagen.TileRequest;
 import java.awt.*;
 import java.awt.image.Raster;
 import java.util.HashSet;

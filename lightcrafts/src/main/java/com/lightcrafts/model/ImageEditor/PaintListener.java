@@ -2,7 +2,7 @@
 
 package com.lightcrafts.model.ImageEditor;
 
-import javax.media.jai.PlanarImage;
+import org.eclipse.imagen.PlanarImage;
 import java.awt.*;
 
 /**

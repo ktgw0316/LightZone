@@ -2,10 +2,10 @@
 
 package com.lightcrafts.jai.opimage;
 
-import com.sun.media.jai.opimage.RIFUtil;
+import org.eclipse.imagen.media.opimage.RIFUtil;
 
-import javax.media.jai.CRIFImpl;
-import javax.media.jai.ImageLayout;
+import org.eclipse.imagen.CRIFImpl;
+import org.eclipse.imagen.ImageLayout;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.*;

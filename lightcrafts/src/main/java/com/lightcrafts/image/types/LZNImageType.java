@@ -2,24 +2,23 @@
 
 package com.lightcrafts.image.types;
 
+import com.lightcrafts.image.BadImageFileException;
+import com.lightcrafts.image.ImageInfo;
+import com.lightcrafts.image.export.ImageExportOptions;
+import com.lightcrafts.image.libs.*;
+import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.utils.UserCanceledException;
+import com.lightcrafts.utils.thread.ProgressThread;
+import com.lightcrafts.utils.xml.XMLException;
+import com.lightcrafts.utils.xml.XMLUtil;
+import com.lightcrafts.utils.xml.XmlDocument;
+import com.lightcrafts.utils.xml.XmlNode;
+import org.eclipse.imagen.PlanarImage;
+import org.w3c.dom.Document;
+
 import java.awt.color.ICC_Profile;
 import java.awt.image.RenderedImage;
 import java.io.*;
-import javax.media.jai.PlanarImage;
-
-import org.w3c.dom.Document;
-
-import com.lightcrafts.image.BadImageFileException;
-import com.lightcrafts.image.export.ImageExportOptions;
-import com.lightcrafts.image.ImageInfo;
-import com.lightcrafts.image.libs.*;
-import com.lightcrafts.jai.JAIContext;
-import com.lightcrafts.utils.thread.ProgressThread;
-import com.lightcrafts.utils.UserCanceledException;
-import com.lightcrafts.utils.xml.XmlDocument;
-import com.lightcrafts.utils.xml.XMLException;
-import com.lightcrafts.utils.xml.XmlNode;
-import com.lightcrafts.utils.xml.XMLUtil;
 
 import static com.lightcrafts.image.libs.LCJPEGConstants.CS_RGB;
 

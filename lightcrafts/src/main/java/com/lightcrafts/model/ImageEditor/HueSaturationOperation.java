@@ -10,8 +10,8 @@ import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.opimage.IntVibranceOpImage;
 import com.lightcrafts.jai.opimage.HueRotateOpImage;
 
-import javax.media.jai.JAI;
-import javax.media.jai.PlanarImage;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.PlanarImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
 
@@ -146,7 +146,7 @@ public class HueSaturationOperation extends BlendedOperation {
             ParameterBlock pb = new ParameterBlock();
             pb.addSource(back);
             pb.add(hslTransform);
-            PlanarImage image = JAI.create("BandCombine", pb, JAIContext.noCacheHint);
+            PlanarImage image = ImageN.create("BandCombine", pb, JAIContext.noCacheHint);
 
             if (vibrance != 0.0)
                 image = new IntVibranceOpImage(image, computeVibranceTransform(), null);

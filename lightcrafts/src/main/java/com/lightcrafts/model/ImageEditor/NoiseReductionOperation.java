@@ -9,11 +9,11 @@ import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.image.color.ColorScience;
 
-import javax.media.jai.BorderExtender;
-import javax.media.jai.JAI;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.RenderedOp;
-import javax.media.jai.operator.MedianFilterDescriptor;
+import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.operator.MedianFilterDescriptor;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.*;
 import java.text.DecimalFormat;
@@ -66,38 +66,38 @@ public class NoiseReductionOperation extends BlendedOperation {
             ParameterBlock pb = new ParameterBlock();
             pb.addSource( back );
             pb.add( rgb2yst );
-            RenderedOp ystImage = JAI.create("BandCombine", pb, JAIContext.noCacheHint);
+            RenderedOp ystImage = ImageN.create("BandCombine", pb, JAIContext.noCacheHint);
 
             pb = new ParameterBlock();
             pb.addSource(ystImage);
             pb.add(new int[]{0});
-            RenderedOp y = JAI.create("bandselect", pb, JAIContext.noCacheHint);
+            RenderedOp y = ImageN.create("bandselect", pb, JAIContext.noCacheHint);
 
             pb = new ParameterBlock();
             pb.addSource(ystImage);
             pb.add(new int[]{1, 2});
             // NOTE: we cache this because the median filter is an area op that gets its input multiple times
-            RenderedOp cc = JAI.create("bandselect", pb, null);
+            RenderedOp cc = ImageN.create("bandselect", pb, null);
 
-            RenderingHints mfHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
+            RenderingHints mfHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
             mfHints.add(JAIContext.noCacheHint);
             pb = new ParameterBlock();
             pb.addSource(cc);
             pb.add(MedianFilterDescriptor.MEDIAN_MASK_SQUARE); // X Shape seems to give the least artifacts
             pb.add(Math.max(2 * (int) (denoiseLevel * scale) + 1, 3));
-            denoiser = JAI.create("MedianFilter", pb, mfHints);
+            denoiser = ImageN.create("MedianFilter", pb, mfHints);
 
-            RenderingHints layoutHints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, Functions.getImageLayout(ystImage));
+            RenderingHints layoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, Functions.getImageLayout(ystImage));
             pb = new ParameterBlock();
             pb.addSource(y);
             pb.addSource(denoiser);
             layoutHints.add(JAIContext.noCacheHint);
-            RenderedOp denoisedyst = JAI.create("BandMerge", pb, layoutHints);
+            RenderedOp denoisedyst = ImageN.create("BandMerge", pb, layoutHints);
 
             pb = new ParameterBlock();
             pb.addSource( denoisedyst );
             pb.add( yst2rgb );
-            return JAI.create("BandCombine", pb, JAIContext.noCacheHint);
+            return ImageN.create("BandCombine", pb, JAIContext.noCacheHint);
         }
     }
 

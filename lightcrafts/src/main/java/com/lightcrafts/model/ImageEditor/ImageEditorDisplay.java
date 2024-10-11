@@ -14,10 +14,10 @@ import lombok.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.media.jai.OpImage;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.RenderedOp;
-import javax.media.jai.TileCache;
+import org.eclipse.imagen.OpImage;
+import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.TileCache;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
