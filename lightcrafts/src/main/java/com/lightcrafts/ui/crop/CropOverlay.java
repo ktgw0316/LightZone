@@ -9,9 +9,9 @@ import com.lightcrafts.platform.Platform;
 import com.lightcrafts.utils.awt.geom.HiDpi;
 
 import javax.imageio.ImageIO;
-import javax.media.jai.Interpolation;
-import javax.media.jai.RenderedOp;
-import javax.media.jai.operator.RotateDescriptor;
+import org.eclipse.imagen.Interpolation;
+import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.operator.RotateDescriptor;
 import javax.swing.*;
 import javax.swing.event.MouseInputListener;
 import java.awt.*;

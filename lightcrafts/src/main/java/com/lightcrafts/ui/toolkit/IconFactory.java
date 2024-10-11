@@ -2,10 +2,10 @@
 
 package com.lightcrafts.ui.toolkit;
 
-import javax.media.jai.RenderedOp;
-import javax.media.jai.operator.BandMergeDescriptor;
-import javax.media.jai.operator.BandSelectDescriptor;
-import javax.media.jai.operator.InvertDescriptor;
+import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.operator.BandMergeDescriptor;
+import org.eclipse.imagen.operator.BandSelectDescriptor;
+import org.eclipse.imagen.operator.InvertDescriptor;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

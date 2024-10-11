@@ -13,10 +13,10 @@ import com.lightcrafts.utils.LCMatrix;
 import com.lightcrafts.utils.splines;
 import org.ejml.simple.SimpleMatrix;
 
-import javax.media.jai.JAI;
-import javax.media.jai.LookupTableJAI;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.RenderedOp;
+import org.eclipse.imagen.JAI;
+import org.eclipse.imagen.LookupTableJAI;
+import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.RenderedOp;
 import java.awt.geom.Point2D;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;

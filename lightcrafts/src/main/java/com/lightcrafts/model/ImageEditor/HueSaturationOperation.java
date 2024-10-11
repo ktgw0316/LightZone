@@ -10,8 +10,8 @@ import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.opimage.IntVibranceOpImage;
 import com.lightcrafts.jai.opimage.HueRotateOpImage;
 
-import javax.media.jai.JAI;
-import javax.media.jai.PlanarImage;
+import org.eclipse.imagen.JAI;
+import org.eclipse.imagen.PlanarImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
 

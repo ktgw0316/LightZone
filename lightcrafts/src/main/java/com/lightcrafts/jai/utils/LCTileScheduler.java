@@ -15,12 +15,12 @@ package com.lightcrafts.jai.utils;
  * $State: Exp $
  */
 
-import com.sun.media.jai.util.ImageUtil;
+import org.eclipse.imagen.media.util.ImageUtil;
 import org.jetbrains.annotations.NotNull;
 
-import javax.media.jai.*;
-import javax.media.jai.util.ImagingException;
-import javax.media.jai.util.ImagingListener;
+import org.eclipse.imagen.*;
+import org.eclipse.imagen.util.ImagingException;
+import org.eclipse.imagen.util.ImagingListener;
 import java.awt.*;
 import java.awt.image.Raster;
 import java.lang.ref.Cleaner;
@@ -410,11 +410,11 @@ final class TileJob implements Job, Comparable<Job>, Runnable {
 
 /**
  * This is Sun Microsystems' reference implementation of the
- * <code>javax.media.jai.TileScheduler</code> interface.  It provides
+ * <code>org.eclipse.imagen.TileScheduler</code> interface.  It provides
  * a mechanism for scheduling tile calculation.  Multi-threading is
  * used whenever possible.
  *
- * @see javax.media.jai.TileScheduler
+ * @see org.eclipse.imagen.TileScheduler
  */
 public final class LCTileScheduler implements TileScheduler {
 

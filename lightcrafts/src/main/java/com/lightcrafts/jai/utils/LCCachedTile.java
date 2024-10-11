@@ -15,9 +15,9 @@ package com.lightcrafts.jai.utils;
 
 import lombok.Getter;
 
-import javax.media.jai.CachedTile;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.remote.SerializableRenderedImage;
+import org.eclipse.imagen.CachedTile;
+import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.remote.SerializableRenderedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;

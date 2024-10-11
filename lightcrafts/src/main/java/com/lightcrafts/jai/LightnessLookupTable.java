@@ -4,10 +4,10 @@ package com.lightcrafts.jai;
 
 import com.lightcrafts.image.color.ColorScience;
 
-import javax.media.jai.LookupTableJAI;
-import javax.media.jai.RasterFactory;
-import javax.media.jai.RasterAccessor;
-import javax.media.jai.RasterFormatTag;
+import org.eclipse.imagen.LookupTableJAI;
+import org.eclipse.imagen.RasterFactory;
+import org.eclipse.imagen.RasterAccessor;
+import org.eclipse.imagen.RasterFormatTag;
 import java.awt.image.WritableRaster;
 import java.awt.image.Raster;
 import java.awt.image.SampleModel;

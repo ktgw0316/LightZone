@@ -8,11 +8,11 @@ import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.*;
 import com.lightcrafts.ui.editor.EditorMode;
 
-import javax.media.jai.BorderExtender;
-import javax.media.jai.ImageLayout;
-import javax.media.jai.JAI;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.RenderedOp;
+import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.ImageLayout;
+import org.eclipse.imagen.JAI;
+import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.RenderedOp;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.image.renderable.ParameterBlock;

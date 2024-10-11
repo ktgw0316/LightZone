@@ -25,9 +25,9 @@ import com.lightcrafts.utils.xml.XmlNode;
 import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Document;
 
-import javax.media.jai.ImageLayout;
-import javax.media.jai.JAI;
-import javax.media.jai.PlanarImage;
+import org.eclipse.imagen.ImageLayout;
+import org.eclipse.imagen.JAI;
+import org.eclipse.imagen.PlanarImage;
 import java.awt.*;
 import java.awt.color.ICC_Profile;
 import java.awt.image.RenderedImage;

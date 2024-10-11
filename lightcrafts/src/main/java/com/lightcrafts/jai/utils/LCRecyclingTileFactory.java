@@ -14,10 +14,10 @@ package com.lightcrafts.jai.utils;
  * $State: Exp $
  */
 
-import com.sun.media.jai.util.DataBufferUtils;
+import org.eclipse.imagen.media.util.DataBufferUtils;
 
-import javax.media.jai.TileFactory;
-import javax.media.jai.TileRecycler;
+import org.eclipse.imagen.TileFactory;
+import org.eclipse.imagen.TileRecycler;
 import java.awt.*;
 import java.awt.image.*;
 import java.lang.ref.SoftReference;

@@ -10,10 +10,11 @@ import com.lightcrafts.ui.browser.model.ImageDatum;
 import com.lightcrafts.ui.browser.model.ImageDatumType;
 import com.lightcrafts.utils.awt.geom.HiDpi;
 
-import javax.media.jai.BorderExtender;
-import javax.media.jai.Interpolation;
-import javax.media.jai.JAI;
+import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.Interpolation;
+import org.eclipse.imagen.JAI;
 import javax.swing.*;
+import javax.swing.plaf.FontUIResource;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.RenderedImage;

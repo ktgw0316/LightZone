@@ -4,18 +4,18 @@ package com.lightcrafts.app;
 
 import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.image.types.LZNImageType;
+import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.jai.opimage.CachedImage;
 import com.lightcrafts.model.Engine;
 import com.lightcrafts.ui.browser.model.PreviewUpdater;
 import com.lightcrafts.ui.editor.Document;
-import com.lightcrafts.jai.opimage.CachedImage;
-import com.lightcrafts.jai.JAIContext;
+import org.eclipse.imagen.PlanarImage;
 
-import static com.lightcrafts.app.Locale.LOCALE;
-
-import javax.media.jai.PlanarImage;
 import java.awt.*;
 import java.awt.image.RenderedImage;
 import java.io.File;
+
+import static com.lightcrafts.app.Locale.LOCALE;
 
 class LznPreviewProvider implements PreviewUpdater.Provider {
 

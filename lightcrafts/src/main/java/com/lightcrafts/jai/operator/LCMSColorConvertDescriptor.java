@@ -16,14 +16,14 @@ package com.lightcrafts.jai.operator;
 
 import com.lightcrafts.utils.LCMS;
 
-import javax.media.jai.EnumeratedParameter;
-import javax.media.jai.JAI;
-import javax.media.jai.OperationDescriptorImpl;
-import javax.media.jai.ParameterBlockJAI;
-import javax.media.jai.RenderableOp;
-import javax.media.jai.RenderedOp;
-import javax.media.jai.registry.RenderableRegistryMode;
-import javax.media.jai.registry.RenderedRegistryMode;
+import org.eclipse.imagen.EnumeratedParameter;
+import org.eclipse.imagen.JAI;
+import org.eclipse.imagen.OperationDescriptorImpl;
+import org.eclipse.imagen.ParameterBlockJAI;
+import org.eclipse.imagen.RenderableOp;
+import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.registry.RenderableRegistryMode;
+import org.eclipse.imagen.registry.RenderedRegistryMode;
 import java.awt.*;
 import java.awt.color.ICC_Profile;
 import java.awt.image.ColorModel;
@@ -81,12 +81,12 @@ import java.awt.image.renderable.RenderableImage;
  *                        <td>NO_PARAMETER_DEFAULT</td>
  * </table></p>
  *
- * @see javax.media.jai.OperationDescriptor
+ * @see org.eclipse.imagen.OperationDescriptor
  * @see java.awt.color.ColorSpace
  * @see java.awt.color.ICC_ColorSpace
  * @see java.awt.image.ColorModel
- * @see javax.media.jai.ColorSpaceJAI
- * @see javax.media.jai.IHSColorSpace
+ * @see org.eclipse.imagen.ColorSpaceJAI
+ * @see org.eclipse.imagen.IHSColorSpace
  */
 public class LCMSColorConvertDescriptor extends OperationDescriptorImpl {
 
@@ -158,11 +158,11 @@ public class LCMSColorConvertDescriptor extends OperationDescriptorImpl {
      *
      * <p>Creates a <code>ParameterBlockJAI</code> from all
      * supplied arguments except <code>hints</code> and invokes
-     * {@link javax.media.jai.JAI#create(String,java.awt.image.renderable.ParameterBlock,java.awt.RenderingHints)}.
+     * {@link org.eclipse.imagen.JAI#create(String,java.awt.image.renderable.ParameterBlock,java.awt.RenderingHints)}.
      *
-     * @see javax.media.jai.JAI
-     * @see javax.media.jai.ParameterBlockJAI
-     * @see javax.media.jai.RenderedOp
+     * @see org.eclipse.imagen.JAI
+     * @see org.eclipse.imagen.ParameterBlockJAI
+     * @see org.eclipse.imagen.RenderedOp
      *
      * @param source0 <code>RenderedImage</code> source 0.
      * @param colorModel The destination color space.
@@ -200,7 +200,7 @@ public class LCMSColorConvertDescriptor extends OperationDescriptorImpl {
      *
      * @see JAI
      * @see ParameterBlockJAI
-     * @see javax.media.jai.RenderableOp
+     * @see org.eclipse.imagen.RenderableOp
      *
      * @param source0 <code>RenderableImage</code> source 0.
      * @param colorModel The destination color space.

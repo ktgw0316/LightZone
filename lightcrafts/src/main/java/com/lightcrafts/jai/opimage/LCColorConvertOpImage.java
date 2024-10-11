@@ -25,20 +25,20 @@ import java.awt.image.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import javax.media.jai.ColorSpaceJAI;
-import javax.media.jai.ImageLayout;
-import javax.media.jai.PointOpImage;
-import javax.media.jai.RasterFactory;
+import org.eclipse.imagen.ColorSpaceJAI;
+import org.eclipse.imagen.ImageLayout;
+import org.eclipse.imagen.PointOpImage;
+import org.eclipse.imagen.RasterFactory;
 import java.lang.ref.SoftReference;
 
 /**
  * An <code>OpImage</code> implementing the "LCColorConvert" operation as
- * described in <code>javax.media.jai.operator.ColorConvertDescriptor</code>.
+ * described in <code>org.eclipse.imagen.operator.ColorConvertDescriptor</code>.
  *
  * @since EA4
  *
- * @see javax.media.jai.PointOpImage
- * @see javax.media.jai.operator.ColorConvertDescriptor
+ * @see org.eclipse.imagen.PointOpImage
+ * @see org.eclipse.imagen.operator.ColorConvertDescriptor
  *
  */
 final class LCColorConvertOpImage extends PointOpImage {
@@ -611,4 +611,3 @@ final class LCColorConvertOpImage extends PointOpImage {
         }
     }
 }
-

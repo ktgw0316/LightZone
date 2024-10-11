@@ -20,7 +20,7 @@ import com.lightcrafts.utils.thread.ProgressThread;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import javax.media.jai.*;
+import org.eclipse.imagen.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.*;

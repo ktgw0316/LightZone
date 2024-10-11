@@ -4,8 +4,8 @@ package com.lightcrafts.model.ImageEditor;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.opimage.NonLocalMeansFilterOpImage;
 import com.lightcrafts.jai.utils.Transform;
-import javax.media.jai.BorderExtender;
-import javax.media.jai.PlanarImage;
+import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.PlanarImage;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
 

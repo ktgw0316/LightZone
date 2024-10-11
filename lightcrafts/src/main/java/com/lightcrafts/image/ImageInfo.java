@@ -17,7 +17,7 @@ import com.lightcrafts.utils.xml.XmlDocument;
 import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Document;
 
-import javax.media.jai.PlanarImage;
+import org.eclipse.imagen.PlanarImage;
 import java.awt.image.RenderedImage;
 import java.io.*;
 import java.lang.ref.WeakReference;

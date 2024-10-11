@@ -13,10 +13,10 @@ import java.awt.image.renderable.ParameterBlock;
 import java.awt.print.PageFormat;
 import java.io.File;
 import java.io.IOException;
-import javax.media.jai.BorderExtender;
-import javax.media.jai.Interpolation;
-import javax.media.jai.JAI;
-import javax.media.jai.RenderedOp;
+import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.Interpolation;
+import org.eclipse.imagen.JAI;
+import org.eclipse.imagen.RenderedOp;
 
 // Show a scaled image inside a rectangle representing paper bounds for
 // printing.

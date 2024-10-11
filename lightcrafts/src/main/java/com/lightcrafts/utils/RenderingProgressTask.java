@@ -2,9 +2,9 @@
 
 package com.lightcrafts.utils;
 
-import javax.media.jai.TileComputationListener;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.TileRequest;
+import org.eclipse.imagen.TileComputationListener;
+import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.TileRequest;
 import java.awt.*;
 import java.awt.image.Raster;
 

@@ -28,7 +28,7 @@ import com.lightcrafts.utils.xml.XmlNode;
 import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Document;
 
-import javax.media.jai.PlanarImage;
+import org.eclipse.imagen.PlanarImage;
 import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.color.ICC_ColorSpace;

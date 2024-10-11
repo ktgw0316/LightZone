@@ -11,9 +11,9 @@ import com.lightcrafts.model.SliderConfig;
 import com.lightcrafts.utils.Lensfun;
 import org.jetbrains.annotations.NotNull;
 
-import javax.media.jai.BorderExtender;
-import javax.media.jai.JAI;
-import javax.media.jai.PlanarImage;
+import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.JAI;
+import org.eclipse.imagen.PlanarImage;
 import java.awt.geom.AffineTransform;
 import java.text.DecimalFormat;
 import java.util.List;

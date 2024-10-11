@@ -15,9 +15,9 @@ import com.lightcrafts.ui.editor.EditorMode;
 import com.lightcrafts.utils.LCMS;
 import com.lightcrafts.utils.LCMS_ColorSpace;
 
-import javax.media.jai.JAI;
-import javax.media.jai.KernelJAI;
-import javax.media.jai.PlanarImage;
+import org.eclipse.imagen.JAI;
+import org.eclipse.imagen.KernelJAI;
+import org.eclipse.imagen.PlanarImage;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;

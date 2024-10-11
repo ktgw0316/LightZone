@@ -16,13 +16,13 @@ package com.lightcrafts.jai.operator;
 import java.awt.RenderingHints;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.RenderableImage;
-import javax.media.jai.JAI;
-import javax.media.jai.OperationDescriptorImpl;
-import javax.media.jai.ParameterBlockJAI;
-import javax.media.jai.RenderableOp;
-import javax.media.jai.RenderedOp;
-import javax.media.jai.registry.RenderableRegistryMode;
-import javax.media.jai.registry.RenderedRegistryMode;
+import org.eclipse.imagen.JAI;
+import org.eclipse.imagen.OperationDescriptorImpl;
+import org.eclipse.imagen.ParameterBlockJAI;
+import org.eclipse.imagen.RenderableOp;
+import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.registry.RenderableRegistryMode;
+import org.eclipse.imagen.registry.RenderedRegistryMode;
 
 /**
  * An <code>OperationDescriptor</code> describing the "Add" operation.
@@ -72,7 +72,7 @@ import javax.media.jai.registry.RenderedRegistryMode;
  *
  * <p> No parameters are needed for this operation.
  *
- * @see javax.media.jai.OperationDescriptor */
+ * @see org.eclipse.imagen.OperationDescriptor */
 public class UnSharpMaskDescriptor extends OperationDescriptorImpl {
 
     /**

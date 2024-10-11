@@ -3,12 +3,12 @@
 
 package com.lightcrafts.utils;
 
-import com.sun.media.jai.util.ImageUtil;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.eclipse.imagen.media.util.ImageUtil;
+import org.eclipse.imagen.RasterAccessor;
+import org.eclipse.imagen.RasterFormatTag;
 
-import javax.media.jai.RasterAccessor;
-import javax.media.jai.RasterFormatTag;
 import java.awt.*;
 import java.awt.color.ICC_Profile;
 import java.awt.image.ColorModel;

@@ -8,8 +8,8 @@ import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.model.Preview;
 import com.lightcrafts.model.Region;
 
-import javax.media.jai.Histogram;
-import javax.media.jai.PlanarImage;
+import org.eclipse.imagen.Histogram;
+import org.eclipse.imagen.PlanarImage;
 import java.awt.*;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;

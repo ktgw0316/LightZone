@@ -13,16 +13,16 @@
  */
 package com.lightcrafts.jai.operator;
 
-import com.sun.media.jai.util.AreaOpPropertyGenerator;
+import org.eclipse.imagen.media.util.AreaOpPropertyGenerator;
 import java.awt.RenderingHints;
 import java.awt.image.RenderedImage;
-import javax.media.jai.JAI;
-import javax.media.jai.KernelJAI;
-import javax.media.jai.OperationDescriptorImpl;
-import javax.media.jai.ParameterBlockJAI;
-import javax.media.jai.PropertyGenerator;
-import javax.media.jai.RenderedOp;
-import javax.media.jai.registry.RenderedRegistryMode;
+import org.eclipse.imagen.JAI;
+import org.eclipse.imagen.KernelJAI;
+import org.eclipse.imagen.OperationDescriptorImpl;
+import org.eclipse.imagen.ParameterBlockJAI;
+import org.eclipse.imagen.PropertyGenerator;
+import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.registry.RenderedRegistryMode;
 
 /**
  * An <code>OperationDescriptor</code> describing the "Convolve" operation.
@@ -84,7 +84,7 @@ import javax.media.jai.registry.RenderedRegistryMode;
  * <tr><th>Name</th>        <th>Value</th></tr>
  * <tr><td>GlobalName</td>  <td>Convolve</td></tr>
  * <tr><td>LocalName</td>   <td>Convolve</td></tr>
- * <tr><td>Vendor</td>      <td>com.sun.media.jai</td></tr>
+ * <tr><td>Vendor</td>      <td>org.eclipse.imagen.media</td></tr>
  * <tr><td>Description</td> <td>Performs kernel-based convolution
  *                              on an image.</td></tr>
  * <tr><td>DocURL</td>      <td>http://java.sun.com/products/java-media/jai/forDevelopers/jai-apidocs/javax/media/jai/operator/ConvolveDescriptor.html</td></tr>
@@ -96,12 +96,12 @@ import javax.media.jai.registry.RenderedRegistryMode;
  * <caption>Parameter List</caption>
  * <tr><th>Name</th>   <th>Class Type</th>
  *                     <th>Default Value</th></tr>
- * <tr><td>kernel</td> <td>javax.media.jai.KernelJAI</td>
+ * <tr><td>kernel</td> <td>org.eclipse.imagen.KernelJAI</td>
  *                     <td>NO_PARAMETER_DEFAULT</td>
  * </table></p>
  *
- * @see javax.media.jai.OperationDescriptor
- * @see javax.media.jai.KernelJAI
+ * @see org.eclipse.imagen.OperationDescriptor
+ * @see org.eclipse.imagen.KernelJAI
  */
 public class LCSeparableConvolveDescriptor extends OperationDescriptorImpl {
 
@@ -126,7 +126,7 @@ public class LCSeparableConvolveDescriptor extends OperationDescriptorImpl {
 
     /** The parameter class types for the Convolve operation. */
     private static final Class[] paramClasses = {
-        javax.media.jai.KernelJAI.class
+        org.eclipse.imagen.KernelJAI.class
     };
 
     /** The parameter default values for the Convolve operation. */

@@ -9,9 +9,9 @@ import com.lightcrafts.model.WhitePointOperation;
 import com.lightcrafts.utils.splines;
 import com.lightcrafts.image.color.ColorScience;
 
-import javax.media.jai.JAI;
-import javax.media.jai.LookupTableJAI;
-import javax.media.jai.PlanarImage;
+import org.eclipse.imagen.JAI;
+import org.eclipse.imagen.LookupTableJAI;
+import org.eclipse.imagen.PlanarImage;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.image.renderable.ParameterBlock;
