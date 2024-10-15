@@ -43,7 +43,7 @@
     <javac destdir="build" includeantruntime="false" debug="true"
            release="17" nativeheaderdir="javah">
       <src path="src/main/java"/>
-      <compilerarg value="-XDignore.symbol.file"/>
+      <compilerarg value="-XDignore.symbol.file -proc:full"/>
       <classpath>
         <fileset dir="${common-dir}/products">
           <include name="*.jar"/>

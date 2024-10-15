@@ -98,7 +98,9 @@
     <mkdir dir="build/classes/java/main"/>
     <mkdir dir="javah"/>
     <javac srcdir="src/main/java" destdir="build/classes/java/main" includeantruntime="false" debug="true"
-      release="17" nativeheaderdir="javah" classpathref="compile.classpath"/>
+      release="17" nativeheaderdir="javah" classpathref="compile.classpath">
+      <compilerarg value="-proc:full" />
+    </javac>
   </target>
 
   <target name="coprocesses">

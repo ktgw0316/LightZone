@@ -62,6 +62,7 @@
     <javac destdir="build" debug="true"
            release="17" nativeheaderdir="javah">
       <src path="src/main/java"/>
+      <compilerarg value="-proc:full" />
       <classpath>
         <fileset dir="${common-dir}/products">
           <include name="*.jar"/>
