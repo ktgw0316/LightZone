@@ -121,9 +121,9 @@ void rlm_separable_bf_mono_tile(
     for (int y=wr; y < height - wr; y++) {
         int x=wr;
 #ifdef USE_SIMD
-        for (; x <= width-wr-8; x+=8) {
+        // for (; x <= width-wr-8; x+=8) {
             // TODO
-        }
+        // }
 #endif
         for (; x < width - wr; x++) {
             const int idx = x + y*width;
