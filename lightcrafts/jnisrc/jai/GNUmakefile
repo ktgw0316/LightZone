@@ -15,8 +15,7 @@ JNI_MACOSX_LINK:=	../jniutils/libLCJNI.a
 ##
 JNI_PPC_DEFINES:=	$(ALTIVEC_CFLAGS)
 
-JAVAH_CLASSES:=		com.lightcrafts.jai.opimage.Convolutions \
-			com.lightcrafts.jai.opimage.BilateralFilterOpImage
+JAVAH_CLASSES:=		com.lightcrafts.jai.opimage.Convolutions
 
 ROOT:=			../../..
 include			../jni.mk

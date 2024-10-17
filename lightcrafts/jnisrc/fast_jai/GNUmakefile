@@ -26,6 +26,7 @@ JAVAH_CLASSES:=		com.lightcrafts.jai.opimage.HighlightRecoveryOpImage \
 			com.lightcrafts.jai.opimage.PixelBlender \
 			com.lightcrafts.jai.opimage.ColorSelectionMaskOpImage \
 			com.lightcrafts.jai.opimage.RGBColorSelectionMaskOpImage \
+			com.lightcrafts.jai.opimage.BilateralFilterOpImage \
 			com.lightcrafts.jai.opimage.BilateralFilterRGBOpImage \
 			com.lightcrafts.jai.opimage.NonLocalMeansFilterOpImage \
 			com.lightcrafts.jai.opimage.HDROpImage2
