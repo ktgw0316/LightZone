@@ -42,33 +42,36 @@ static inline F32vec4 v_fast_exp(F32vec4 val)
     return select_lt(val, v_m16, v_zero, result);
 }
 
+static inline __m128i v_clamp_ushort(F32vec4 x) {
+    const F32vec4 v_zero = _mm_setzero_ps();
+    const F32vec4 v_ffff((float) 0xffff);
+    return _mm_cvttps_epi32(simd_max(v_zero, simd_min(x, v_ffff)));
+}
 #endif
 
 /*******************************************************************************
- * rlm_separable_bf_mono_tile()
+ * bf_mono_tile()
  *
- * Apply a separable bilateral filter to a rectangular region of a single-band
- * raster
+ * Apply a bilateral filter to a rectangular region of a single-band raster
  *
  * Dimensions of source and destination rectangles are related by
  *
  *     dst_width = src_width - 2*wr
  *     dst_height = src_height - 2*wr
  *
- * 'kernel' points to the mid-point of a (2*wr + 1)-length array containing
+ * 'kernel' points to the first point of a (2*wr + 1)-length array containing
  * either
  *     1) spatial gaussian filter coefficients for distances 0, 1, ..., wr
  *     2) negated exponents of the spatial gaussian function (this is what Fabio
  *        passes from his BilateralFilterOpImage class)
  *
- * The macro GS_x_GR(x) controls the interpretation.
  *******************************************************************************/
-void rlm_separable_bf_mono_tile(
+void bf_mono_tile(
     unsigned short *srcData,                // pointer to source data buffer
     unsigned short *dstData,                // pointer to origin of the dst ROI
     float sr,                               // the usual range sigma
     int wr,                                 // window radius in pixels
-    float *kernel,                          // half-kernel containing the exponents of the spatial Gaussian
+    float *kernel,                          // kernel containing the exponents of the spatial Gaussian
     int width, int height,                  // dimensions of the source image
     int srcPixelStride, int dstPixelStride, // length in elements (not bytes) of a pixel
     int srcOffset, int dstOffset,           // offsets of the 0th element in src and dst buffers (elements)
@@ -83,13 +86,17 @@ void rlm_separable_bf_mono_tile(
     }
 
     // coefficient of the exponent for the range Gaussian
-    const float Ar = - 1.0f / (2.0f * SQR(sr) );
+    const float Ar = - 1.0f / (2.0f * SQR(sr));
 
     unsigned short *src = &srcData[srcOffset];
     unsigned short *dst = &dstData[dstOffset];
 
 #ifdef USE_SIMD
     const F32vec4 v_inv_norm(1.0f/0xffff);
+    const F32vec4 v_ffff((float) 0xffff);
+    const F32vec4 v_zero = _mm_setzero_ps();
+    const F32vec4 v_one(1.0f);
+    const F32vec4 factor(Ar);
 #endif
 
 #pragma omp parallel
@@ -121,9 +128,43 @@ void rlm_separable_bf_mono_tile(
     for (int y=wr; y < height - wr; y++) {
         int x=wr;
 #ifdef USE_SIMD
-        // for (; x <= width-wr-8; x+=8) {
-            // TODO
-        // }
+        for (; x < width - wr - 4; x += 4) {
+            const int idx = x + y * width;
+            const F32vec4 I_s0 = _mm_loadu_ps(&fsrc[idx]);
+
+            F32vec4 num = v_zero;
+            F32vec4 denom = v_zero;
+
+            for (int ky = 0; ky <= 2 * wr; ky++) {
+                for (int kx = 0; kx <= 2 * wr; kx++) {
+                    const F32vec4 I_s = _mm_loadu_ps(&fsrc[(ky-wr)*width + kx-wr + idx]);
+                    const F32vec4 diff = I_s - I_s0;
+                    const F32vec4 D_sq = diff * diff;
+
+                    const F32vec4 Ar_D_sq = factor * D_sq;
+                    const F32vec4 kernel_val(kernel[ky] + kernel[kx]);
+                    const F32vec4 f = v_fast_exp(Ar_D_sq - kernel_val);
+
+                    num += f * I_s;
+                    denom += f;
+                }
+            }
+
+            // normalize
+            denom = select_eq(denom, v_zero, v_one, denom);
+
+            const int dst_idx0 = (x-wr)*dstPixelStride + (y-wr)*dstStep;
+
+            union {
+                __m128i v_result;
+                uint32_t i_result[4];
+            };
+            v_result = v_clamp_ushort(v_ffff * num / denom);
+
+            for (int i = 0; i < 4; i++) {
+                dst[dst_idx0 + i * dstPixelStride] = i_result[i];
+            }
+        }
 #endif
         for (; x < width - wr; x++) {
             const int idx = x + y*width;
@@ -216,20 +257,19 @@ inline void F32vec4toXYZ(F32vec4& a, F32vec4& b, F32vec4& c, F32vec4& x, F32vec4
  *     dst_width = src_width - 2*wr
  *     dst_height = src_height - 2*wr
  *
- * 'kernel' points to the mid-point of a (2*wr + 1)-length array containing
+ * 'kernel' points to the first point of a (2*wr + 1)-length array containing
  * either
  *     1) spatial gaussian filter coefficients for distances 0, 1, ..., wr
  *     2) negated exponents of the spatial gaussian function (this is what Fabio
  *        passes from his BilateralFilterOpImage class)
  *
- * The macro GS_x_GR(x) controls the interpretation.
  *******************************************************************************/
 void rlm_separable_bf_chroma_tile(
     unsigned short *srcData,                // pointer to the source buffer
     unsigned short *dstData,                // pointer to destination buffer
     float sr,                               // the usual range sigma
     int wr,                                 // window radius in pixels
-    float *kernel,                          // half-kernel containing the exponents of the spatial Gaussian
+    float *kernel,                          // kernel containing the exponents of the spatial Gaussian
     int width, int height,                  // dimensions of the source image
     int src_L_offset, int src_a_offset, int src_b_offset, // source band offsets (in elements)
     int dst_L_offset, int dst_a_offset, int dst_b_offset, // destination band offsets (in elements)
@@ -545,11 +585,11 @@ void rlm_separable_bf_chroma_tile(
 
             const F32vec4 v_cnorm(cnorm);
 
-            v_result = _mm_cvttps_epi32(simd_max(v_zero, simd_min(v_cnorm * a_num / denom, v_ffff)));
+            v_result = v_clamp_ushort(v_cnorm * a_num / denom);
             for (int i = 0; i < 4; i++)
                 dst_a[dst_idx0 + dstStep*i] = a_result[i];
 
-            v_result = _mm_cvttps_epi32(simd_max(v_zero, simd_min(v_cnorm * b_num / denom, v_ffff)));
+            v_result = v_clamp_ushort(v_cnorm * b_num / denom);
             for (int i = 0; i < 4; i++)
                 dst_b[dst_idx0 + dstStep*i] = a_result[i];
         }
@@ -603,7 +643,7 @@ void rlm_separable_bf_chroma_tile(
 }
 
 /*******************************************************************************
- * JNI wrapper for rlm_separable_bf_mono_tile()
+ * JNI wrapper for bf_mono_tile()
  *******************************************************************************/
 extern "C"
 JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_BilateralFilterOpImage_bilateralFilterMonoRLM
@@ -620,9 +660,9 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_BilateralFilterOpImage_b
     float *kernel = (float *) env->GetPrimitiveArrayCritical(jkernel, 0); // + wr; // Keep 0 in the middle...
 
     float sigma_r = sqrt(1.0/(2*scale_r));
-    rlm_separable_bf_mono_tile(srcData, destData, sigma_r, wr, kernel, width, height,
-                               srcPixelStride, destPixelStride,
-                               srcLOffset, destLOffset, srcLineStride, destLineStride);
+    bf_mono_tile(srcData, destData, sigma_r, wr, kernel, width, height,
+                 srcPixelStride, destPixelStride,
+                 srcLOffset, destLOffset, srcLineStride, destLineStride);
 
     env->ReleasePrimitiveArrayCritical(jsrcData, srcData, 0);
     env->ReleasePrimitiveArrayCritical(jdestData, destData, 0);
