@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2011-     Masahiro Kitagawa */
 
 package com.lightcrafts.ui.editor;
 
@@ -25,8 +26,8 @@ import com.lightcrafts.utils.xml.XmlNode;
 import javax.imageio.ImageIO;
 import javax.swing.Action;
 import java.awt.Dimension;
-import java.awt.geom.AffineTransform;
 import java.io.*;
+import java.lang.ref.Cleaner;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,6 +35,8 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A Document is the public face of an image editor.  It ties together an
@@ -51,7 +54,7 @@ public class Document {
      */
     public class MissingImageFileException extends Exception {
         @Getter
-        private File imageFile;
+        private final File imageFile;
 
         private MissingImageFileException(File imageFile) {
             super(LOCALE.get("MissingImageError", imageFile.getPath()));
@@ -129,6 +132,10 @@ public class Document {
     @Getter @Setter
     private Object source;
 
+    // A cleaner to dispose the editor and engine when the document is closed.
+    private static final Cleaner cleaner = Cleaner.create();
+    private Cleaner.Cleanable cleanable;
+
     /**
      * Calls Document(doc, null).
      */
@@ -136,7 +143,6 @@ public class Document {
         throws ColorProfileException,
                UserCanceledException,
                IOException,
-               XMLException,
                MissingImageFileException,
                BadImageFileException,
                UnknownImageTypeException
@@ -151,7 +157,6 @@ public class Document {
         throws UserCanceledException,
                ColorProfileException,
                IOException,
-               XMLException,
                MissingImageFileException,
                BadImageFileException,
                UnknownImageTypeException
@@ -175,8 +180,7 @@ public class Document {
         ImageInfo versionInfo,
         ProgressThread thread
     )
-        throws XMLException,
-               IOException,
+        throws IOException,
                BadImageFileException,
                ColorProfileException,
                UnknownImageTypeException,
@@ -216,7 +220,6 @@ public class Document {
                 throw new MissingImageFileException(file);
             }
         }
-        this.metadata = meta;
 
         // Enforce the saved original image orientation, which defines the
         // coordinate system used for regions and crop bounds:
@@ -248,21 +251,12 @@ public class Document {
                 meta.setOrientation(origOrient);
             }
         }
-        engine = EngineFactory.createEngine(meta, versionInfo, thread);
 
-        xform = new XFormModel(engine);
+        commonInitialization(meta, versionInfo, thread);
 
-        regionManager = new RegionManager();
-        crop = new CropRotateManager(engine, xform);
-
-        scaleModel = new ScaleModel(engine);
         final var scaleNode = root.getChild(ScaleTag);
         final var s = new Scale(scaleNode);
         scaleModel.setScale(s);
-
-        editor = new Editor(engine, scaleModel, xform, regionManager, crop, this);
-        editor.showWait(LOCALE.get("EditorWaitText"));
-        crop.setEditor( editor );
 
         final var controlNode = root.getChild(ControlTag);
 
@@ -273,8 +267,6 @@ public class Document {
             dispose();
             throw e;
         }
-
-        commonInitialization();
 
         if (root.hasChild(SaveTag)) {
             final var saveNode = root.getChild(SaveTag);
@@ -317,42 +309,36 @@ public class Document {
                UnknownImageTypeException,
                UserCanceledException
     {
-        this.metadata = meta;
-
-        engine = EngineFactory.createEngine(meta, null, thread);
-
-        xform = new XFormModel(engine);
-        regionManager = new RegionManager();
-        scaleModel = new ScaleModel(engine);
-
-        crop = new CropRotateManager(engine, xform);
-        editor = new Editor(engine, scaleModel, xform, regionManager, crop, this);
-        crop.setEditor( editor );
-        editor.showWait(LOCALE.get("EditorWaitText"));
-        commonInitialization();
+        commonInitialization(meta, null, thread);
     }
 
-    private void commonInitialization() {
+    private void commonInitialization(
+            ImageMetadata meta, ImageInfo versionInfo, ProgressThread thread)
+        throws BadImageFileException,
+            ColorProfileException,
+            ImagingException,
+            IOException,
+            UnknownImageTypeException,
+            UserCanceledException
+    {
+        this.metadata = meta;
+        engine = EngineFactory.createEngine(meta, versionInfo, thread);
+        scaleModel = new ScaleModel(engine);
+        xform = new XFormModel(engine);
+        regionManager = new RegionManager();
+        crop = new CropRotateManager(engine, xform);
+        editor = new Editor(engine, scaleModel, xform, regionManager, crop, this);
+        editor.showWait(LOCALE.get("EditorWaitText"));
+        crop.setEditor(editor);
+
         undoManager = new DocUndoManager(this);
         editor.addUndoableEditListener(undoManager);
         print = null;
-        scaleModel.addScaleListener(
-            new ScaleListener() {
-                @Override
-                public void scaleChanged(Scale scale) {
-                    xform.update();
-                }
-            }
-        );
-        xform.addXFormListener(
-            new XFormListener() {
-                @Override
-                public void xFormChanged(AffineTransform xform) {
-                    regionManager.setXForm(xform);
-                }
-            }
-        );
-        listeners = new LinkedList<DocumentListener>();
+        scaleModel.addScaleListener(scale -> xform.update());
+        xform.addXFormListener(xform -> regionManager.setXForm(xform));
+        listeners = new LinkedList<>();
+
+        cleanable = cleaner.register(this, dispose(editor, engine));
     }
 
     /**
@@ -521,9 +507,16 @@ public class Document {
         markDirty();
     }
 
+    @Contract(pure = true)
+    private static @NotNull Runnable dispose(Editor editor, Engine engine) {
+        return () -> {
+            editor.dispose();
+            engine.dispose();
+        };
+    }
+
     public void dispose() {
-        editor.dispose();
-        engine.dispose();
+        cleanable.clean();
     }
 
     public TemporaryEditorCommitState saveStart() {
@@ -617,13 +610,6 @@ public class Document {
 
         final var controlNode = node.getChild(ControlTag);
         editor.addControls(controlNode);
-    }
-
-    // Since Anton keeps forgetting to dispose documents, I add a finalizer
-
-    public void finalize() throws Throwable {
-        super.finalize();
-        dispose();
     }
 
     public static void main(String[] args) throws Exception {

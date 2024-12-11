@@ -29,6 +29,7 @@ import java.awt.image.Raster;
 import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
 import java.io.UnsupportedEncodingException;
+import java.lang.ref.Cleaner;
 import javax.media.jai.ImageLayout;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.TileCache;
@@ -70,6 +71,8 @@ import static com.lightcrafts.jai.JAIContext.sRGBColorSpace;
  */
 public final class LCTIFFReader extends LCTIFFCommon implements LCImageReader {
 
+    private final Cleaner.Cleanable cleanable;
+
     /**
      * Construct an <code>LCTIFFReader</code> and open a TIFF file.
      *
@@ -88,6 +91,7 @@ public final class LCTIFFReader extends LCTIFFCommon implements LCImageReader {
      */
     public LCTIFFReader(String fileName, boolean read2nd)
             throws LCImageLibException, UnsupportedEncodingException {
+        cleanable = cleaner.register(this, cleanup(this));
         m_read2nd = read2nd;
         openForReading(fileName);
         //

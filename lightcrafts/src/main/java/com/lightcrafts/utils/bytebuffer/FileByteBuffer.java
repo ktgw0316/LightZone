@@ -6,11 +6,15 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.io.IOException;
+import java.lang.ref.Cleaner;
 import java.nio.BufferOverflowException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteOrder;
 
 import com.lightcrafts.utils.CloseableManager;
+import com.lightcrafts.utils.cache.CacheIOException;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A <code>FileByteBuffer</code> is-an {@link LCByteBuffer} that uses a
@@ -34,6 +38,8 @@ public class FileByteBuffer extends LCByteBuffer implements Closeable {
         m_file = file;
         m_order = ByteOrder.BIG_ENDIAN;
         m_closeableManager = closeableManager;
+
+        cleaner.register(this, cleanup(this));
     }
 
     /**
@@ -283,16 +289,6 @@ public class FileByteBuffer extends LCByteBuffer implements Closeable {
         return this;
     }
 
-    ////////// protected //////////////////////////////////////////////////////
-
-    /**
-     * Finalize a <code>FileByteBuffer</code>.
-     */
-    protected void finalize() throws Throwable {
-        dispose();
-        super.finalize();
-    }
-
     ////////// private ////////////////////////////////////////////////////////
 
     /**
@@ -332,5 +328,19 @@ public class FileByteBuffer extends LCByteBuffer implements Closeable {
      * The {@link RandomAccessFile} to use.
      */
     private RandomAccessFile m_raf;
+
+    private static final Cleaner cleaner = Cleaner.create();
+
+    @Contract(pure = true)
+    private static @NotNull Runnable cleanup(@NotNull FileByteBuffer buffer) {
+        return () -> {
+            try {
+                buffer.dispose();
+            }
+            catch ( IOException e ) {
+                e.printStackTrace();
+            }
+        };
+    }
 }
 /* vim:set et sw=4 ts=4: */

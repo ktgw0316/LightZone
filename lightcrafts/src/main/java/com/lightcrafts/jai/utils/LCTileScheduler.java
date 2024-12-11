@@ -23,6 +23,7 @@ import javax.media.jai.util.ImagingException;
 import javax.media.jai.util.ImagingListener;
 import java.awt.*;
 import java.awt.image.Raster;
+import java.lang.ref.Cleaner;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.*;
@@ -429,6 +430,8 @@ public final class LCTileScheduler implements TileScheduler {
     @NotNull
     private final ThreadPoolExecutor prefetchExecutor;
 
+    private static final Cleaner cleaner = Cleaner.create();
+
     /** The worker thread priority. */
     private int priority = NORM_PRIORITY;
 
@@ -541,6 +544,8 @@ public final class LCTileScheduler implements TileScheduler {
                 threadFactory(prefetchPriority));
         setPriority(priority);
         setPrefetchPriority(prefetchPriority);
+
+        cleaner.register(this, terminate(prefetchExecutor, executor));
     }
 
     /**
@@ -1139,19 +1144,8 @@ public final class LCTileScheduler implements TileScheduler {
     }
 
     /** Queue WorkerThread.TERMINATEs to all workers. */
-    protected void finalize() throws Throwable {
-        terminateAll(false);
-        terminateAll(true);
-        super.finalize();
-    }
-
-    /** Queue WorkerThread.TERMINATEs to all appropriate workers. */
-    private void terminateAll(boolean isPrefetch) {
-        if (isPrefetch) {
-            prefetchExecutor.shutdownNow();
-        } else {
-            executor.shutdownNow();
-        }
+    private static @NotNull Runnable terminate(ThreadPoolExecutor... executors) {
+        return () -> Arrays.stream(executors).forEach(ThreadPoolExecutor::shutdownNow);
     }
 
     void sendExceptionToListener(String message, Throwable e) {

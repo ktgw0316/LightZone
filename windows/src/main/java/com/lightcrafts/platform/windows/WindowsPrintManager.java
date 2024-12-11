@@ -156,13 +156,6 @@ public final class WindowsPrintManager {
      */
     public static native boolean showPrintDialog( Frame parent );
 
-    ////////// protected //////////////////////////////////////////////////////
-
-    protected void finalize() throws Throwable {
-        dispose();
-        super.finalize();
-    }
-
     ////////// private ////////////////////////////////////////////////////////
 
     /**

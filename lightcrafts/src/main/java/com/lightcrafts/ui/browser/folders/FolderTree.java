@@ -4,12 +4,15 @@ package com.lightcrafts.ui.browser.folders;
 
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.ui.LightZoneSkin;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import java.awt.dnd.DropTarget;
 import java.io.File;
+import java.lang.ref.Cleaner;
 import java.util.*;
 
 /**
@@ -48,6 +51,8 @@ class FolderTree extends JTree {
         }
         addTreeSelectionListener(e -> notifyFolderSelected());
         listeners = new LinkedList<>();
+
+        cleaner.register(this, cleanup(this));
     }
 
     void addFolderTreeListener(FolderTreeListener listener) {
@@ -115,10 +120,11 @@ class FolderTree extends JTree {
         model.dispose();
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        dispose();
-        super.finalize();
+    private static final Cleaner cleaner = Cleaner.create();
+
+    @Contract(pure = true)
+    private static @NotNull Runnable cleanup(@NotNull FolderTree tree) {
+        return tree::dispose;
     }
 }
 /* vim:set et sw=4 ts=4: */

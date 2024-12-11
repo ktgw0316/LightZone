@@ -2,9 +2,13 @@
 
 package com.lightcrafts.utils.bytebuffer;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.Cleaner;
 import java.nio.channels.FileChannel;
 
 /**
@@ -52,6 +56,7 @@ public final class LCMappedByteBuffer extends ArrayByteBuffer
     public LCMappedByteBuffer( File file, long position, long size,
                                FileChannel.MapMode mode ) throws IOException {
         super( ByteBufferUtil.map( file, position, size, mode ) );
+        cleaner.register(this, cleanup(this));
     }
 
     /**
@@ -62,13 +67,13 @@ public final class LCMappedByteBuffer extends ArrayByteBuffer
         ByteBufferUtil.clean(getByteBuffer());
     }
 
-    ////////// protected //////////////////////////////////////////////////////
+    ////////// private ////////////////////////////////////////////////////////
 
-    @Override
-    protected void finalize() throws Throwable {
-        close();
-        super.finalize();
+    private static final Cleaner cleaner = Cleaner.create();
+
+    @Contract(pure = true)
+    private static @NotNull Runnable cleanup(@NotNull LCMappedByteBuffer buffer) {
+        return buffer::close;
     }
-
 }
 /* vim:set et sw=4 ts=4: */

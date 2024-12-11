@@ -15,12 +15,10 @@ public class LCImageReaderFactory {
         final var i = path.lastIndexOf('.');
         final var ext = i > 0 ? path.substring(i + 1) : "";
 
-        // TODO: Java7 switch-case
-        if (ext.equals("jpg") || ext.equals("jpeg") ) {
-            return new LCJPEGReader(path);
-        } else if (ext.equals("tiff") || ext.equals("tif")) {
-            return new LCTIFFReader(path);
-        }
-        throw new UnsupportedEncodingException(path);
+        return switch (ext) {
+            case "jpg", "jpeg" -> new LCJPEGReader(path);
+            case "tif", "tiff" -> new LCTIFFReader(path);
+            default -> throw new UnsupportedEncodingException(path);
+        };
     }
 }

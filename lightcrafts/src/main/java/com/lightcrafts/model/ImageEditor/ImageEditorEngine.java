@@ -26,6 +26,8 @@ import com.lightcrafts.utils.UserCanceledException;
 import com.lightcrafts.utils.thread.ProgressThread;
 import lombok.AccessLevel;
 import lombok.Getter;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import javax.media.jai.BorderExtender;
 import javax.media.jai.ImageLayout;
@@ -47,6 +49,7 @@ import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.Cleaner;
 import java.util.List;
 import java.util.*;
 
@@ -198,6 +201,8 @@ public class ImageEditorEngine implements Engine {
 
         rendering = new Rendering(sourceImage, this);
         addFirstPaintLatency = true;
+
+        cleaner.register(this, cleanup(this));
     }
 
     private static CachedImage copyImageDataFrom(PlanarImage src) {
@@ -239,6 +244,8 @@ public class ImageEditorEngine implements Engine {
         sourceImage = (PlanarImage) image;
         rendering = new Rendering(sourceImage, this);
         backgroundImage = image;
+
+        cleaner.register(this, cleanup(this));
     }
 
     private boolean disposed = false;
@@ -253,10 +260,8 @@ public class ImageEditorEngine implements Engine {
 
         if (swingTimer != null) {
             swingTimer.stop();
-            ActionListener[] als = swingTimer.getActionListeners();
-            for (ActionListener al : als)
-                swingTimer.removeActionListener(al);
-
+            Arrays.stream(swingTimer.getActionListeners())
+                    .forEach(al -> swingTimer.removeActionListener(al));
             swingTimer = null;
         }
 
@@ -980,11 +985,11 @@ public class ImageEditorEngine implements Engine {
         }
     }
 
-    // Since Anton keeps forgetting to dispose documents, I add a finalizer
-    @Override
-    public void finalize() throws Throwable {
-        super.finalize();
-        dispose();
+    private static final Cleaner cleaner = Cleaner.create();
+
+    @Contract(pure = true)
+    private static @NotNull Runnable cleanup(@NotNull Engine engine) {
+        return engine::dispose;
     }
 }
 /* vim: set et sw=4 ts=4: */

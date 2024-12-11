@@ -2,6 +2,7 @@
 
 package com.lightcrafts.utils.cache;
 
+import java.lang.ref.Cleaner;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.HashMap;
@@ -10,6 +11,9 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import com.lightcrafts.utils.bytebuffer.ByteBufferAllocator;
+import com.lightcrafts.utils.bytebuffer.FileByteBuffer;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A <code>NativeByteBufferAllocator</code> is-a {@link ByteBufferAllocator}
@@ -32,6 +36,8 @@ public final class NativeByteBufferAllocator implements ByteBufferAllocator {
         m_freeBlockManagerList = new LinkedList<>();
         m_allocdBlocks = new HashMap<>();
         m_allocdFBMs = new HashMap<>();
+
+        cleaner.register(this, cleanup(this));
     }
 
     /**
@@ -78,8 +84,7 @@ public final class NativeByteBufferAllocator implements ByteBufferAllocator {
      * {@inheritDoc}
      */
     public synchronized void dispose() {
-        for ( NativeChunk chunk : m_chunkList )
-            chunk.dispose();
+        m_chunkList.forEach(NativeChunk::dispose);
         m_chunkList.clear();
     }
 
@@ -96,13 +101,6 @@ public final class NativeByteBufferAllocator implements ByteBufferAllocator {
         }
         assert block == null && fbm == null;
         return false;
-    }
-
-    ////////// protected //////////////////////////////////////////////////////
-
-    protected void finalize() throws Throwable {
-        dispose();
-        super.finalize();
     }
 
     ////////// private ////////////////////////////////////////////////////////
@@ -215,6 +213,13 @@ public final class NativeByteBufferAllocator implements ByteBufferAllocator {
      * there is a corresponding entry in {@link #m_chunkList}.
      */
     private final LinkedList<FreeBlockManager> m_freeBlockManagerList;
+
+    private static final Cleaner cleaner = Cleaner.create();
+
+    @Contract(pure = true)
+    private static @NotNull Runnable cleanup(@NotNull NativeByteBufferAllocator allocator) {
+        return allocator::dispose;
+    }
 
     static {
         System.loadLibrary( "LCCache" );
