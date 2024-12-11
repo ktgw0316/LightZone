@@ -19,7 +19,7 @@ for:
       - cmd: SET MINGW32_PATH=msys64/mingw32
       - cmd: SET PATH=C:/%MINGW64_PATH%/bin/;C:/%MINGW32_PATH%/bin/;C:/msys64/usr/bin/;%PATH%
       - cmd: SET MSSDK_HOME=/c/Program Files (x86)/Windows Kits/10/Lib/10.0.22621.0
-      - cmd: SET JAVA_HOME=/c/Program Files/Java/jdk17
+      - cmd: SET JAVA_HOME=/c/Program Files/Java/jdk21
 
     install:
       - cmd: bash -lc "pacman --noconfirm --disable-download-timeout -S gradle pactoys"
@@ -37,14 +37,14 @@ for:
         - image: macos-monterey
 
     init:
-      - sh: export JAVA_HOME=/Library/Java/JavaVirtualMachines/liberica-jdk-17-full.jdk/Contents/Home
+      - sh: export JAVA_HOME=/Library/Java/JavaVirtualMachines/liberica-jdk-21-full.jdk/Contents/Home
       - sh: export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
 
     install:
       - sh: HOMEBREW_NO_AUTO_UPDATE=1 brew install gradle lensfun libjpeg-turbo libomp libraw libtiff libxml2 little-cms2 rsync
       - sh: rm /usr/local/bin/ccmake /usr/local/bin/cmake /usr/local/bin/cpack /usr/local/bin/ctest
       - sh: HOMEBREW_NO_AUTO_UPDATE=1 brew tap bell-sw/liberica
-      - sh: HOMEBREW_NO_AUTO_UPDATE=1 brew install --cask liberica-jdk17-full
+      - sh: HOMEBREW_NO_AUTO_UPDATE=1 brew install --cask liberica-jdk21-full
 
     build_script:
       - sh: gradle macosx:jpackage
