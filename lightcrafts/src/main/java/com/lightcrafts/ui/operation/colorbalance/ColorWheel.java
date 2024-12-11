@@ -2,11 +2,10 @@
 
 package com.lightcrafts.ui.operation.colorbalance;
 
-import com.lightcrafts.ui.toolkit.DropperButton;
-import com.lightcrafts.ui.swing.ColorSwatch;
-
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
@@ -16,11 +15,16 @@ import java.awt.image.BufferedImage;
  */
 class ColorWheel extends JComponent {
 
+    public ColorWheel() {
+        this.addComponentListener(new ResizeListener());
+    }
+
     // The currently picked Color, or null if no Color has been picked.
     private Color picked;
 
+    @Override
     public Dimension getPreferredSize() {
-        return new Dimension(100, 100);
+        return new Dimension(150, 150);
     }
 
     Color getPickedColor() {
@@ -41,7 +45,7 @@ class ColorWheel extends JComponent {
     // Determine the centerpoint of the wheel, in screen coordinates.
     private Point2D getWheelCenter() {
         Dimension size = getSize();
-        return new Point2D.Double(size.width / 2, size.height / 2);
+        return new Point2D.Double(0.5 * size.width, 0.5 * size.height);
     }
 
     // Compute distance from the wheel center, in internal coordinates.
@@ -60,18 +64,15 @@ class ColorWheel extends JComponent {
         return Math.atan2(y, - x);
     }
 
-    Color pointToColor(Point p) {
-        return pointToColor(p, true);
+    Color pointToColor(Point p, boolean linear) {
+        double r = Math.min(getRadius(p), 1);
+        double theta = getAngle(p);
+        return polarToColor(r, theta, linear);
     }
 
     // Note: the 2.2 and 1.2 magic constants make sure that the picked point stays inside the color wheel
 
-    Color pointToColor(Point p, boolean linear) {
-        double r = getRadius(p);
-        double theta = getAngle(p);
-
-        r = Math.min(r, 1);
-
+    static Color polarToColor(double r, double theta, boolean linear) {
         float hue = (1 + (float) (theta / Math.PI)) / 2f;
         float saturation = linear ? (float) r : (float) Math.min(1.1 * (r * r), 1); // non linearity for reduced sensitivity
         float brightness = 1;
@@ -86,57 +87,67 @@ class ColorWheel extends JComponent {
         return new Color(comps[0], comps[1], comps[2], alpha);
     }
 
-    Point colorToPoint(Color c) {
-        return colorToPoint(c, true);
+    Point colorToPoint(Color c, boolean linear) {
+        var polar = colorToPolar(c, linear);
+        double r = polar[0];
+        double theta = polar[1];
+        return polarToPoint(r, theta, linear);
     }
 
-    Point colorToPoint(Color c, boolean linear) {
+    static double[] colorToPolar(Color c, boolean linear) {
         float[] hsb = Color.RGBtoHSB(
-            c.getRed(), c.getGreen(), c.getBlue(), null
+                c.getRed(), c.getGreen(), c.getBlue(), null
         );
         float hue = hsb[0];
         float saturation = hsb[1];
 
         double r = linear ? saturation : Math.sqrt(saturation); // non linearity for reduced sensitivity
         double theta = Math.PI * (2 * hue - 1);
+        return new double[]{r, theta};
+    }
 
+    Point polarToPoint(double r, double theta, boolean linear) {
         Point2D center = getWheelCenter();
         double radius = getWheelSize() / (linear ? 2 : 2.1);
 
         int x = (int) Math.round(center.getX() - radius * r * Math.cos(theta));
         int y = (int) Math.round(center.getY() + radius * r * Math.sin(theta));
-
         return new Point(x, y);
     }
 
     private BufferedImage wheelImage = null;
 
-    protected void paintComponent(Graphics graphics) {
-        Graphics2D g = (Graphics2D) graphics;
-
-        Point2D center = getWheelCenter();
-        double radius = getWheelSize() / 2;
-
+    public BufferedImage createWheelImage(Point2D center, double radius) {
         int minX = (int) Math.round(center.getX() - radius);
         int maxX = (int) Math.round(center.getX() + radius);
         int minY = (int) Math.round(center.getY() - radius);
         int maxY = (int) Math.round(center.getY() + radius);
+        int diameter = (int) (2*radius);
+
+        var img = new BufferedImage(diameter, diameter, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D gg = img.createGraphics();
+
+        for (int x=minX; x<=maxX; x++) {
+            for (int y=minY; y<=maxY; y++) {
+                Point p = new Point(x, y);
+                Color color = pointToColor(p, true);
+                gg.setColor(color);
+                gg.fillRect(x - minX, y - minY, 1, 1);
+            }
+        }
+        gg.dispose();
+        return img;
+    }
+
+    @Override
+    protected void paintComponent(Graphics graphics) {
+        Graphics2D g = (Graphics2D) graphics;
+
+        Point2D center = getWheelCenter();
+        double radius = 0.5 * getWheelSize();
 
         if (wheelImage == null) {
-            wheelImage = new BufferedImage((int) (2*radius), (int) (2*radius), BufferedImage.TYPE_INT_ARGB);
-            Graphics2D gg = wheelImage.createGraphics();
-            /* Shape circle = new Ellipse2D.Double(minX, minY, 2 * radius, 2 * radius);
-            gg.setClip(circle); */
-
-            for (int x=minX; x<=maxX; x++) {
-                for (int y=minY; y<=maxY; y++) {
-                    Point p = new Point(x, y);
-                    Color color = pointToColor(p);
-                    gg.setColor(color);
-                    gg.fillRect((int) (x - center.getX() + radius), (int) (y - center.getY() + radius), 1, 1);
-                }
-            }
-            gg.dispose();
+            wheelImage = createWheelImage(center, radius);
         }
         g.drawImage(wheelImage, null, (int) (center.getX() - radius), (int) (center.getY() - radius));
 
@@ -147,34 +158,11 @@ class ColorWheel extends JComponent {
         }
     }
 
-    public static void main(String[] args) {
-        ColorWheel wheel = new ColorWheel();
-
-        ColorWheelMouseListener listener = new ColorWheelMouseListener(wheel) {
-            void colorPicked(Color color, boolean isChanging) {
-                System.out.println(color);
-            }
-        };
-        wheel.addMouseListener(listener);
-        wheel.addMouseMotionListener(listener);
-
-        Box colorContent = Box.createHorizontalBox();
-
-        colorContent.add(wheel);
-        colorContent.add(Box.createHorizontalStrut(8));
-        colorContent.add(new ColorSwatch(Color.gray));
-        colorContent.add(Box.createHorizontalStrut(8));
-        colorContent.add(new ColorText(Color.gray));
-        colorContent.add(Box.createHorizontalStrut(8));
-        colorContent.add(new DropperButton());
-
-        colorContent.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
-
-        JFrame frame = new JFrame("Test");
-        frame.setContentPane(colorContent);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
+    private class ResizeListener extends ComponentAdapter {
+        @Override
+        public void componentResized(ComponentEvent e) {
+            wheelImage = null;
+            repaint();
+        }
     }
 }
