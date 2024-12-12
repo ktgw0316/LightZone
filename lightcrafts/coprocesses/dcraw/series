@@ -5,3 +5,4 @@ strnlen.patch
 MSVC.patch
 fuji_compressed
 remove_restricted
+incompatible_pointer.patch
