@@ -23,11 +23,13 @@ for LIB in ${FILES} ${DYLIBS}; do
   otool -LX ${LIB} | grep -v "$(otool -DX ${LIB})" | egrep -v "${EXCLUDE_PATTERN}" | grep -o "/.*\.dylib" | while read; do
     sh -x -c "install_name_tool -change ${REPLY} @rpath/$(basename ${REPLY}) ${LIB}"
   done
+  sh -x -c "install_name_tool -add_rpath @loader_path ${LIB}"
 done
 
 otool -LX dcraw_lz | egrep -v "${EXCLUDE_PATTERN}" | grep -o "/.*\.dylib" | while read; do
   sh -x -c "install_name_tool -change ${REPLY} @rpath/$(basename ${REPLY}) dcraw_lz"
 done
+sh -x -c "install_name_tool -add_rpath @loader_path dcraw_lz"
 
 for LIB in ${DYLIBS}; do
     install_name_tool -id @rpath/$(basename ${LIB}) ${LIB}
