@@ -1,6 +1,7 @@
 #!/bin/sh
 
-DEPS=$(otool -L $@ | egrep -v "/(usr/lib|System)" | grep -o "/.*\.dylib" | sort -u)
+EXCLUDE_PATTERN="(/usr/lib|/System|@loader_path|@rpath)"
+DEPS=$(otool -LX $@ | grep -v "$(otool -DX $@)"  | egrep -v "${EXCLUDE_PATTERN}" | grep -o "/.*\.dylib" | sort -u)
 
 if [ "${DEPS}" = "" ]; then exit 0; fi
 
