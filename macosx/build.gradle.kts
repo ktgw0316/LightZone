@@ -23,10 +23,6 @@ tasks {
         dependsOn("build", "helpFiles")
         doFirst {
             copy {
-                from(layout.buildDirectory.file("libs/${project.name}-${project.version}.jar"))
-                into(layout.buildDirectory.dir("jpackage"))
-            }
-            copy {
                 from("products/")
                 include("share/**")
                 include("dcraw_lz")
