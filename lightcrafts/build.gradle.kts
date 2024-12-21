@@ -1,5 +1,3 @@
-import java.io.FileOutputStream
-
 plugins {
     kotlin("jvm")
     id("lightzone.java-conventions")
@@ -32,6 +30,7 @@ val MAKE = with(os) {
         else -> "make"
     }
 }
+val versionDetails: groovy.lang.Closure<com.palantir.gradle.gitversion.VersionDetails> by extra
 tasks {
     register<Exec> ("coprocesses") {
         commandLine(MAKE, "-C", "coprocesses", "-j", "-s")
@@ -45,14 +44,8 @@ tasks {
         mkdir(dir)
         val file = File("$dir/Revision")
         file.delete()
-        FileOutputStream(file).use {
-            project.exec {
-                commandLine("git", "rev-parse", "HEAD")
-                standardOutput = it
-            }
-            it.toString().trim()
-        }
-        File("$dir/Version").writeText(version.toString())
+        file.writeText(versionDetails().gitHashFull) // full 40-character Git commit hash
+        File("$dir/Version").writeText(versionDetails().lastTag)
     }
     named("build") {
         dependsOn("coprocesses", "revision")

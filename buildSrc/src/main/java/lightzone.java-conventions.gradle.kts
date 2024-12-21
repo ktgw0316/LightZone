@@ -5,10 +5,10 @@ import org.gradle.kotlin.dsl.*
 plugins {
     application
     java
+    id("com.palantir.git-version")
 }
 
 group = "com.lightcrafts"
-version = rootProject.file("lightcrafts/version.txt").readText().trim().substringBefore('~')
 
 repositories {
     maven(url = "https://maven.geotoolkit.org/")
@@ -40,6 +40,9 @@ application {
         "-Xmx512m",
     )
 }
+
+val versionDetails: groovy.lang.Closure<com.palantir.gradle.gitversion.VersionDetails> by extra
+version = versionDetails().version
 
 val os = System.getProperty("os.name").lowercase()
 val MAKE = with(os) {

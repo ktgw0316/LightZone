@@ -52,6 +52,7 @@ runtime {
         )
     )
     jpackage {
+        version = version.toString().substringBefore("b") // Remove beta number
         imageName = "LightZone"
         installerName = "LightZone-Installer"
         mainJar = "${project.name}-${project.version}.jar"
