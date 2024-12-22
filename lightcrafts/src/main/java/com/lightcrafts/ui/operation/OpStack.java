@@ -33,6 +33,7 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.*;
 import java.util.prefs.Preferences;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static com.lightcrafts.ui.operation.Locale.LOCALE;
@@ -187,7 +188,13 @@ public class OpStack extends DraggableStack
         return control;
     }
 
-    // The LensCorrections should be placed above the RAW Correction tools.
+    private int getRawCorrectionIndex() {
+        return IntStream.range(0, opControls.size())
+            .filter(i -> opControls.get(i).isRawCorrection())
+            .findFirst()
+            .orElse(-1);
+    }
+
     public OpControl addLensCorrectionsControl() {
         // Check if the LensCorrectionsControl is already added.
         final var first = opControls.stream()
@@ -197,13 +204,8 @@ public class OpStack extends DraggableStack
             return first.get();
         }
 
-        int index = 0;
-        for (final OpControl op : opControls) {
-            if (!op.isRawCorrection()) {
-                break;
-            }
-            index++;
-        }
+        // New LensCorrections should be placed just above the RAW Correction tools.
+        final int index = getRawCorrectionIndex() + 1;
         LensCorrectionsOperation op = engine.insertLensCorrectionsOperation(index);
         OpControl control = new LensCorrectionsControl(op, this);
         addControl(control, index);
