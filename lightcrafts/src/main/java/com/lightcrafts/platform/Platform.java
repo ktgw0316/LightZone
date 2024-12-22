@@ -119,6 +119,19 @@ public class Platform {
     }
 
     /**
+     * Gets a directory where the application is executed.
+     *
+     * @return Returns said directory.
+     */
+    public static Path getApplicationDirectory() {
+        var appPath = System.getProperty("jpackage.app-path");
+        if (appPath == null) {
+            appPath = System.getProperty("user.dir");
+        }
+        return Paths.get(appPath).getParent();
+    }
+
+    /**
      * Gets a directory where images are likely to be found.
      *
      * @return Returns said directory.

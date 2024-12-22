@@ -9,6 +9,7 @@ import com.lightcrafts.image.libs.LCImageLibException;
 import com.lightcrafts.image.libs.LCImageReaderFactory;
 import com.lightcrafts.image.metadata.MetadataUtil;
 import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.platform.Platform;
 import com.lightcrafts.utils.ForkDaemon;
 import com.lightcrafts.utils.LRUHashMap;
 import com.lightcrafts.utils.UserCanceledException;
@@ -173,7 +174,7 @@ public final class DCRaw extends RawDecoder {
     private static final String DCRAW_NAME = "dcraw_lz";
     private static String DCRAW_PATH;
     static {
-        final var appDir = Paths.get(System.getProperty("jpackage.app-path")).getParent();
+        final var appDir = Platform.getApplicationDirectory();
         DCRAW_PATH = appDir.resolve("app").resolve(DCRAW_NAME).toString();
     }
 

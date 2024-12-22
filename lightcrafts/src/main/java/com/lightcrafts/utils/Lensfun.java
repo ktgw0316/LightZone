@@ -36,7 +36,7 @@ public class Lensfun {
 
     static {
         if (!Platform.isLinux()) {
-            final var appDir = Paths.get(System.getProperty("jpackage.app-path")).getParent();
+            final var appDir = Platform.getApplicationDirectory();
             final var lensfunDir = appDir.resolve("app/share/lensfun");
             try (final var stream = Files.walk(lensfunDir, 1)) {
                 pathName = stream.filter(Files::isDirectory)
