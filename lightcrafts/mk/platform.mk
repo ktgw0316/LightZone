@@ -52,7 +52,7 @@ PLATFORM_LDFLAGS=	$(LDFLAGS)
 
 # Default symlink command.  This needs to be defined as a function variable
 # rather than just a simple variable because of the way it's overridden for
-# Windows.  (Must not use := here!)
+# Windows and macOS.  (Must not use := here!)
 SYMLINK=		ln -fs "$1" "$2"
 
 # Miscellaneous commands.
@@ -148,6 +148,11 @@ ifeq ($(PLATFORM),MacOSX)
   DYLIB_PREFIX:=	$(JNILIB_PREFIX)
   DYLIB_EXT:=		.dylib
   NUM_PROCESSORS:=	$(shell /usr/sbin/sysctl -n hw.ncpu)
+  ##
+  # Since macOS @rpath doesn't follow symlinks, we have to copy files instead.
+  # We want to copy files only if they've changed; hence the cmp below.
+  ##
+  SYMLINK=		$(TOOLS_BIN)/lc-cmp "$1" "$2"
 else
   ##
   # JNI on non-Mac platforms doesn't do proper stack alignment when SSE
