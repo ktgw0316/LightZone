@@ -9,11 +9,13 @@ import lombok.RequiredArgsConstructor;
 
 import java.awt.*;
 import java.io.IOException;
+import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * Wrapper for Lensfun C++ library.
@@ -37,14 +39,18 @@ public class Lensfun {
     static {
         if (!Platform.isLinux()) {
             final var appDir = Platform.getApplicationDirectory();
-            final var lensfunDir = appDir.resolve("app/share/lensfun");
-            try (final var stream = Files.walk(lensfunDir, 1)) {
-                pathName = stream.filter(Files::isDirectory)
-                        .filter(path -> path.getFileName().toString().startsWith("version_"))
+            try (final var stream = Files.walk(appDir, FileVisitOption.FOLLOW_LINKS)) {
+                pathName = stream
+                        .filter(Files::isDirectory)
+                        .filter(dir -> dir.getFileName().toString().startsWith("version_"))
+                        .filter(dir -> dir.getParent().getFileName().toString().equals("lensfun"))
                         .findFirst()
-                        .orElse(Path.of(""))
+                        .orElseThrow()
                         .toString();
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (NoSuchElementException e) {
+                System.err.println("Directory lensfun/version_* not found in appDir: " + appDir);
                 e.printStackTrace();
             }
         }

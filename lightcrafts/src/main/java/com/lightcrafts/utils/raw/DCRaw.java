@@ -25,6 +25,7 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
@@ -175,7 +176,19 @@ public final class DCRaw extends RawDecoder {
     private static String DCRAW_PATH;
     static {
         final var appDir = Platform.getApplicationDirectory();
-        DCRAW_PATH = appDir.resolve("app").resolve(DCRAW_NAME).toString();
+        try (final var stream = Files.walk(appDir)) {
+            DCRAW_PATH = stream
+                    .filter(Files::isExecutable)
+                    .filter(path -> path.getFileName().toString().equals(DCRAW_NAME))
+                    .findFirst()
+                    .orElseThrow()
+                    .toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchElementException e) {
+            System.err.println("dcraw_lz not found in appDir: " + appDir);
+            throw new RuntimeException(e);
+        }
     }
 
     private static String match(@NonNull String s, @NonNull String tag) {
