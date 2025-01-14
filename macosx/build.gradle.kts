@@ -41,7 +41,7 @@ tasks {
     }
 }
 runtime {
-    options.set(listOf("--strip-debug", "--compress", "2", "--no-header-files", "--no-man-pages"))
+    options.set(listOf("--strip-debug", "--no-header-files", "--no-man-pages"))
     modules.set(
         listOf(
             "java.base", "java.desktop", "java.logging", "java.management", "java.prefs", "java.rmi", "jdk.management"
