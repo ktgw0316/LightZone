@@ -42,7 +42,7 @@ application {
 }
 
 val versionDetails: groovy.lang.Closure<com.palantir.gradle.gitversion.VersionDetails> by extra
-version = versionDetails().version
+version = versionDetails().lastTag
 
 val os = System.getProperty("os.name").lowercase()
 val MAKE = with(os) {
