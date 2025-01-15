@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm")
+    id("com.palantir.git-version")
     id("lightzone.java-conventions")
 }
 dependencies {
@@ -39,13 +40,16 @@ tasks {
         commandLine(MAKE, "-C", "coprocesses", "-j", "-s", "clean")
     }
     register<Task> ("revision") {
+        val gitHash = versionDetails().gitHashFull // full 40-character Git commit hash
+        project.logger.lifecycle("Git hash: ${gitHash}")
+
         val dirProvider = layout.buildDirectory.dir("resources/main/com/lightcrafts/utils/resources")
         val dir = dirProvider.get().asFile
         mkdir(dir)
         val file = File("$dir/Revision")
         file.delete()
-        file.writeText(versionDetails().gitHashFull) // full 40-character Git commit hash
-        File("$dir/Version").writeText(versionDetails().lastTag)
+        file.writeText(gitHash)
+        File("$dir/Version").writeText(version.toString())
     }
     named("build") {
         dependsOn("coprocesses", "revision")
