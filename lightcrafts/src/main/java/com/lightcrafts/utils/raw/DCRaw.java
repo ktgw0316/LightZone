@@ -179,7 +179,7 @@ public final class DCRaw extends RawDecoder {
         try (final var stream = Files.walk(appDir)) {
             DCRAW_PATH = stream
                     .filter(Files::isExecutable)
-                    .filter(path -> path.getFileName().toString().equals(DCRAW_NAME))
+                    .filter(path -> path.getFileName().toString().replaceAll("\\.exe$", "").equals(DCRAW_NAME))
                     .findFirst()
                     .orElseThrow()
                     .toString();
