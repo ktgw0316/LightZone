@@ -54,7 +54,7 @@ runtime {
         mainJar = "${project.name}-${project.version}.jar"
         skipInstaller = false
         installerOptions = listOf("--vendor", "LightZone Project")
-        imageOptions = listOf("--icon", "macosx/src/main/resources/Resources/LightZone.icns")
+        imageOptions = listOf("--icon", "src/main/resources/Resources/LightZone.icns")
     }
     launcher {
         jvmArgs = listOf(
