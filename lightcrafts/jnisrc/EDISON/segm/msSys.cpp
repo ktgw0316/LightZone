@@ -39,10 +39,10 @@ Implemented by Chris M. Christoudias, Bogdan Georgescu
 #include    "msSys.h"
 
 //include needed system libraries
-#include       <time.h>
-#include       <stdio.h>
-#include       <stdarg.h>
-#include       <stdlib.h>
+#include    <time.h>
+#include    <stdio.h>
+#include    <stdarg.h>
+#include    <stdlib.h>
 
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
 /*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*/
@@ -107,11 +107,11 @@ msSystem::~msSystem( void )
 void msSystem::StartTimer( void )
 {
 
-	//set msSystem time to system time
-	currentTime = clock();
+    //set msSystem time to system time
+    currentTime = clock();
 
-	//done.
-	return;
+    //done.
+    return;
 
 }
 
@@ -215,7 +215,17 @@ extern bool stop_flag;
 extern int	percentDone;
 
 ErrorLevel msSystem::Progress(float percentComplete)
-percentDone	= (int)(percentComplete*100);//check stop flag and return appropriate system statErrorLevel		myState = EL_OKAYif(stop_flag)	myState	= EL_HALT;//donereturn myState;
+{
+    percentDone = (int)(percentComplete*100);
+
+    //check stop flag and return appropriate system state
+    ErrorLevel    myState = EL_OKAY;
+    if(stop_flag) myState = EL_HALT;
+
+    //done.
+    return myState;
+
+}
 
 }
 
