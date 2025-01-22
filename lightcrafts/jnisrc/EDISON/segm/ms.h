@@ -1,33 +1,33 @@
 /*******************************************************
 
                  Mean Shift Analysis Library
-	=============================================
+   =============================================
 
-	The mean shift library is a collection of routines
-	that use the mean shift algorithm. Using this algorithm,
-	the necessary output will be generated needed
-	to analyze a given input set of data.
+   The mean shift library is a collection of routines
+   that use the mean shift algorithm. Using this algorithm,
+   the necessary output will be generated needed
+   to analyze a given input set of data.
 
   MeanShift Base Class:
   ====================
 
-	The mean shift library of routines is realized
-	via the creation of a MeanShift base class. This class
-	provides a mechanism for calculating the mean shift vector
-	at a specified data point, using an arbitrary N-dimensional
-	data set, and a user-defined kernel.
-	
-	For image processing the mean shift base class also allows
-	for the definition of a data set that is on a two-dimensional
-	lattice. The amount of time needed to compute the mean shift
-	vector using such a data set is much less than that of an
-	arbitrary one. Because images usually contain many data points,
-	defining the image input data points as being on a lattice
-	greatly improves computation time and makes algorithms such
-	as image filtering practical.
+   The mean shift library of routines is realized
+   via the creation of a MeanShift base class. This class
+   provides a mechanism for calculating the mean shift vector
+   at a specified data point, using an arbitrary N-dimensional
+   data set, and a user-defined kernel.
 
-	The MeanShift class prototype is provided below. Its
-	definition is provided in 'ms.cc'.
+   For image processing the mean shift base class also allows
+   for the definition of a data set that is on a two-dimensional
+   lattice. The amount of time needed to compute the mean shift
+   vector using such a data set is much less than that of an
+   arbitrary one. Because images usually contain many data points,
+   defining the image input data points as being on a lattice
+   greatly improves computation time and makes algorithms such
+   as image filtering practical.
+
+   The MeanShift class prototype is provided below. Its
+   definition is provided in 'ms.cc'.
 
 The theory is described in the papers:
 
@@ -48,17 +48,17 @@ Implemented by Chris M. Christoudias, Bogdan Georgescu
 //Included needed libraries
 
 //Include type definitions
-#include	"tdef.h"
+#include "tdef.h"
 
 //include mean shift system used
 //for function timing and system output
-#include	"msSys.h"
+#include "msSys.h"
 
 //Include Debugging Constant
-//#define	DEBUG
+//#define   DEBUG
 
 //Define Prompt - Prompts user on progress of Mean Shift algorithm
-#define	PROMPT
+#define  PROMPT
 
 //Define Show Progress - Prompts user on percent complete of a given
 //                       mean shift algorithm
@@ -66,14 +66,14 @@ Implemented by Chris M. Christoudias, Bogdan Georgescu
 
 //Define Progress Rate - Indicates the number of convergences before
 //                       checking progress
-#define PROGRESS_RATE	100
+#define  PROGRESS_RATE  100
 
 // Define Macros
-#define	SWAP(d_a, d_b) temp=(d_a);(d_a)=(d_b);(d_b)=temp;
+#define  SWAP(d_a, d_b) temp=(d_a);(d_a)=(d_b);(d_b)=temp;
 
 // Define Structures 
 
- //k-Dimensional Binary Search Tree
+ // k-Dimensional Binary Search Tree
 struct tree {
   float *x;
   tree  *right;
@@ -92,12 +92,12 @@ struct userWeightFunct {
 
 };
 
-//Define class state structure
+// Define class state structure
 struct ClassStateStruct {
-	bool	KERNEL_DEFINED;
-	bool	INPUT_DEFINED;
-	bool	LATTICE_DEFINED;
-	bool	OUTPUT_DEFINED;
+   bool  KERNEL_DEFINED;
+   bool  INPUT_DEFINED;
+   bool  LATTICE_DEFINED;
+   bool  OUTPUT_DEFINED;
 };
 
 // Define Constants
@@ -319,7 +319,7 @@ class MeanShift {
   //<--------------------------------------------------->|//
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
 
-  void	DefineInput(float*, int, int);
+  void   DefineInput(float*, int, int);
 
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
@@ -360,7 +360,7 @@ class MeanShift {
   //<--------------------------------------------------->|//
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
 
-  void	DefineLInput(float*, int, int, int);
+  void   DefineLInput(float*, int, int, int);
 
  /*/\/\/\/\/\/\/\/\/\/\/\*/
  /*  Lattice Weight Map  */
@@ -480,7 +480,7 @@ class MeanShift {
   //<--------------------------------------------------->|//
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
 
-  void	msVector(double*, double*);
+  void   msVector(double*, double*);
 
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
@@ -525,7 +525,7 @@ class MeanShift {
   //<--------------------------------------------------->|//
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
 
-  void	latticeMSVector(double*, double*);
+  void   latticeMSVector(double*, double*);
 
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
@@ -626,7 +626,7 @@ class MeanShift {
   //<--------------------------------------------------->|//
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
 
-  char			*ErrorMessage;
+  char         *ErrorMessage;
 
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
@@ -646,7 +646,7 @@ class MeanShift {
   //<--------------------------------------------------->|//
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
 
-  ErrorLevel	ErrorStatus;
+  ErrorLevel   ErrorStatus;
 
  protected:
 
@@ -673,17 +673,17 @@ class MeanShift {
    // <<*>> Usage: LatticeMSVector(Mh, yk) <<*>> //
    ////////////////////////////////////////////////
 
-   void	LatticeMSVector     (double*, double*);			// Uses the lattice defined by DefineLattice to compute the
-                                                         // mean shift vector at a specified window location yk
+   void	LatticeMSVector     (double*, double*);        // Uses the lattice defined by DefineLattice to compute the
+                                                        // mean shift vector at a specified window location yk
 
    ///////////////////////////////////////////////////
    // <<*>> Usage: OptLatticeMSVector(Mh, yk) <<*>> //
    ///////////////////////////////////////////////////
 
-   void	OptLatticeMSVector     (double*, double*);      // Uses the lattice defined by DefineLattice to compute the
-                                                         // mean shift vector at a specified window location yk using
-                                                         // the basin of attraction optimization for better performance
-                                                         // during mean shift filtering - used by a derived class
+   void	OptLatticeMSVector     (double*, double*);     // Uses the lattice defined by DefineLattice to compute the
+                                                        // mean shift vector at a specified window location yk using
+                                                        // the basin of attraction optimization for better performance
+                                                        // during mean shift filtering - used by a derived class
 
    /*/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\*/
    /* Kernel-Input Data Consistency  */

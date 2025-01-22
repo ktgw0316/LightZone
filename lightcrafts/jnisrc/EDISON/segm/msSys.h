@@ -1,26 +1,26 @@
 /*******************************************************
 
                  Mean Shift Analysis Library
-	=============================================
+  =============================================
 
-	The mean shift library is a collection of routines
-	that use the mean shift algorithm. Using this algorithm,
-	the necessary output will be generated needed
-	to analyze a given input set of data.
+  The mean shift library is a collection of routines
+  that use the mean shift algorithm. Using this algorithm,
+  the necessary output will be generated needed
+  to analyze a given input set of data.
 
   Mean Shift System:
   ==================
 
-	The Mean Shift System class provides a mechanism for the
-	mean shift library classes to prompt progress and to
-	time its computations. When porting the mean shift library
-	to an application the methods of this class may be changed
-	such that the output of the mean shift class prompts
-	will be given to whatever hardware or software device that
-	is desired.
+  The Mean Shift System class provides a mechanism for the
+  mean shift library classes to prompt progress and to
+  time its computations. When porting the mean shift library
+  to an application the methods of this class may be changed
+  such that the output of the mean shift class prompts
+  will be given to whatever hardware or software device that
+  is desired.
 
-	The prototype for the mean shift system class is provided
-	below. Its definition is provided in "msSys.cc".
+  The prototype for the mean shift system class is provided
+  below. Its definition is provided in "msSys.cc".
 
 The theory is described in the papers:
 
@@ -66,14 +66,14 @@ class msSystem {
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:                                       |//
+  //| Method Name:                                       |//
   //| ============                                       |//
-  //|				  *  Start Timer  *                          |//
+  //|         *  Start Timer  *                          |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:                                       |//
-  //|	============                                       |//
+  //| Description:                                       |//
+  //| ============                                       |//
   //|                                                    |//
   //|   Initializes the system timer. The timer object   |//
   //|   synthesized by this class is initialized during  |//
@@ -88,14 +88,14 @@ class msSystem {
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:                                       |//
+  //| Method Name:                                       |//
   //| ============                                       |//
-  //|				 *  Elapsed Time  *                          |//
+  //|        *  Elapsed Time  *                          |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:                                       |//
-  //|	============                                       |//
+  //| Description:                                       |//
+  //| ============                                       |//
   //|                                                    |//
   //|   Returns the amount of time elapsed in seconds    |//
   //|   from when StartTimer() was called. If            |//
@@ -108,9 +108,9 @@ class msSystem {
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Usage:                                             |//
+  //| Usage:                                             |//
   //| ======                                             |//
-  //|		TimeInSeconds = ElapsedTime()                    |//
+  //|   TimeInSeconds = ElapsedTime()                    |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
@@ -124,14 +124,14 @@ class msSystem {
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:                                       |//
+  //| Method Name:                                       |//
   //| ============                                       |//
-  //|				     *  Prompt  *                            |//
+  //|            *  Prompt  *                            |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:                                       |//
-  //|	============                                       |//
+  //| Description:                                       |//
+  //| ============                                       |//
   //|                                                    |//
   //|   Outputs to a device a character message contain- |//
   //|   ing delimiters. These delimiters are replaced by |//
@@ -154,9 +154,9 @@ class msSystem {
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Usage:                                             |//
+  //| Usage:                                             |//
   //| ======                                             |//
-  //|		Prompt(PromptStr, varArgs)                       |//
+  //|   Prompt(PromptStr, varArgs)                       |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
@@ -166,14 +166,14 @@ class msSystem {
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Method Name:                                       |//
+  //| Method Name:                                       |//
   //| ============                                       |//
-  //|				   *  Progress  *                            |//
+  //|          *  Progress  *                            |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Description:                                       |//
-  //|	============                                       |//
+  //| Description:                                       |//
+  //| ============                                       |//
   //|                                                    |//
   //|   This method is called by the mean shift library  |//
   //|   methods during the application of a specific     |//
@@ -210,9 +210,9 @@ class msSystem {
   //|                                                    |//
   //<--------------------------------------------------->|//
   //|                                                    |//
-  //|	Usage:                                             |//
+  //| Usage:                                             |//
   //| ======                                             |//
-  //|	 SystemState = Progress(PercentComplete)           |//
+  //|  SystemState = Progress(PercentComplete)           |//
   //|                                                    |//
   //<--------------------------------------------------->|//
   //--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//--\\||//
@@ -221,8 +221,8 @@ class msSystem {
 
  private:
 
-	 //Timer object...
-	 time_t currentTime;
+   //Timer object...
+   time_t currentTime;
 
 };
 
