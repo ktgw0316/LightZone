@@ -165,7 +165,7 @@ else
   # See Sun bug ID: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5102720
   ##
   ifeq ($(PROCESSOR),x86_64)
-    P4_CPU_FLAGS:=	-march=athlon64
+    P4_CPU_FLAGS:=	-mtune=generic -m64
   else
     P4_CPU_FLAGS:=	-march=pentium4 -m32
   endif
