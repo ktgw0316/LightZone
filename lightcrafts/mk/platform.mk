@@ -219,7 +219,7 @@ ifeq ($(PLATFORM),Windows)
 
   DLL_DIR:=		$(MINGW_DIR)bin/
 
-  PLATFORM_CFLAGS+=	$(SSE_FLAGS)
+  PLATFORM_CFLAGS:=	$(SSE_FLAGS) $(PLATFORM_CFLAGS)
 
   ifdef HIGH_PERFORMANCE
     ifdef USE_ICC_HERE
@@ -259,16 +259,17 @@ ifeq ($(PLATFORM),$(filter $(PLATFORM),Linux FreeBSD SunOS))
   PLATFORM_CFLAGS+=	-fPIC
 
   ifeq ($(PROCESSOR),$(filter $(PROCESSOR),x86_64 i386))
-    PLATFORM_CFLAGS+=	$(SSE_FLAGS)
+    CPU_FLAGS=	$(SSE_FLAGS)
   else ifeq ($(PROCESSOR),arm64)
-    PLATFORM_CFLAGS+=	-march=armv8-a
+    CPU_FLAGS=	-march=armv8-a
   else ifeq ($(PROCESSOR),$(filter $(PROCESSOR),armhf armv7l))
-    PLATFORM_CFLAGS+=	-march=armv7-a+fp
+    CPU_FLAGS=	-march=armv7-a+fp
   else ifeq ($(PROCESSOR),ppc)
-    PLATFORM_CFLAGS+=	-mcpu=powerpc
+    CPU_FLAGS=	-mcpu=powerpc
   else ifeq ($(PROCESSOR),ppc64)
-    PLATFORM_CFLAGS+=	-mcpu=powerpc64
+    CPU_FLAGS=	-mcpu=powerpc64
   endif
+  PLATFORM_CFLAGS:=	$(CPU_FLAGS) $(PLATFORM_CFLAGS)
 
   ifdef HIGH_PERFORMANCE
     PLATFORM_CFLAGS+=	-O3 \
