@@ -21,6 +21,7 @@ jobs:
       if: startsWith(matrix.os, 'windows')
       uses: msys2/setup-msys2@v2
       with:
+        update: true
         pacboy: lcms2:m libraw:m lensfun:m ntldd-git:m pkgconf:m
     - name: Build on Windows
       if: startsWith(matrix.os, 'windows')
@@ -34,7 +35,7 @@ jobs:
       if: startsWith(matrix.os, 'macos')
       run: |
         export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
-        brew install gradle lensfun libc++ libjpeg-turbo libomp libraw libtiff libxml2 little-cms2 rsync
+        brew install gradle lcms2 lensfun libjpeg-turbo libomp libraw libtiff
         if [ "${{ matrix.os }}" == "macos-14" ]; then
           export LIBOMP_PATH=/opt/homebrew/opt/libomp
           TARGET_ARCH=arm64 gradle macos:jpackage
