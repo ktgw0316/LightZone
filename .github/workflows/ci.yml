@@ -28,25 +28,23 @@ jobs:
       run: |
         export PATH=/msys64/usr/bin/:/msys32/usr/bin/:$PATH
         export MSSDK_HOME=/c/Program\ Files\ \(x86\)/Windows\ Kits/10/Lib/10.0.22621.0
-        
-        ant -f windows/build.xml -lib lightcrafts/lib zip
-        ant -f windows/build.xml clean-native
-        MSYSTEM=MINGW32 TARGET_ARCH=i686 ant -f windows/build.xml -Dno-ivy=true -lib lightcrafts/lib zip
+        gradle windows:jpackage
+        # MSYSTEM=MINGW32 TARGET_ARCH=i686 gradle windows:jpackage
     - name: Build on macOS
       if: startsWith(matrix.os, 'macos')
       run: |
         export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
-        brew install ant lensfun libc++ libjpeg-turbo libomp libraw libtiff libxml2 little-cms2 rsync
+        brew install gradle lensfun libc++ libjpeg-turbo libomp libraw libtiff libxml2 little-cms2 rsync
         if [ "${{ matrix.os }}" == "macos-14" ]; then
           export LIBOMP_PATH=/opt/homebrew/opt/libomp
-          TARGET_ARCH=arm64 ant -f macosx/build.xml zip
+          TARGET_ARCH=arm64 gradle macos:jpackage
         else
-          ant -f macosx/build.xml zip
+          gradle macos:jpackage
         fi
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
         name: LightZone-${{ matrix.os }}
         path: |
-          windows/LightZone-windows*.zip
-          macosx/LightZone-macosx*.zip
+          windows/build/jpackage/LightZone-Installer*.exe
+          macosx/build/jpackage/LightZone-Installer*.dmg
