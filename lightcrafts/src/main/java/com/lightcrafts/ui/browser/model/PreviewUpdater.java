@@ -204,7 +204,7 @@ public class PreviewUpdater extends Thread {
     }
 
     /**
-     * Report our File, as defined in ths PreviewUpdater's ImageMetadata.
+     * Report our File, as defined in the PreviewUpdater's ImageMetadata.
      * This is useful in the application logic for deciding what to do when
      * someone clicks on a preview image.
      */

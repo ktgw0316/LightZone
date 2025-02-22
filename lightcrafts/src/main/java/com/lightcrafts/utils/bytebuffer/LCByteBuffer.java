@@ -500,7 +500,7 @@ public abstract class LCByteBuffer {
     }
 
     /**
-     * Gets ths buffer's initial offset.
+     * Gets the buffer's initial offset.
      *
      * @return Returns said offset.
      * @see #initialOffset(int)
@@ -605,7 +605,7 @@ public abstract class LCByteBuffer {
         //
         // We use a heuristic of extracting a short both using big and little
         // endian byte orders.  The assumption is that reading the bytes in the
-        // right order willl yield a smaller number than the wrong order, e.g.
+        // right order will yield a smaller number than the wrong order, e.g.
         // 0x0100 is 1 when read as little endian is 1 but is 256 when read as
         // big endian.
         //

@@ -121,7 +121,7 @@ public class DefaultPrinterLayer implements PrinterLayer {
             printCancelled = false;
 
             /**
-             * NOTE: Mac OS X has a bug in the landscape printing, this hack rotates te image and prints portrait anyway
+             * NOTE: MacOS X has a bug in the landscape printing, this hack rotates the image and prints portrait anyway
              */
             int orientation = format.getOrientation();
             if (orientation != PageFormat.PORTRAIT && Platform.isMac())
