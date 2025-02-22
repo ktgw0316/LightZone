@@ -199,7 +199,7 @@ public class BlendOpImage extends PointOpImage {
             if (!mask.intersects(destRect)) {
                 if (opacity > 0)
                     return this.getSourceImage(1).getTile(tileX, tileY);
-                // Not a good idea, can come out with teh wrong number of bands
+                // Not a good idea, can come out with the wrong number of bands
                 /* else if (opacity == -1)
                     return this.getSourceImage(0).getTile(tileX, tileY); */
             }
@@ -258,7 +258,7 @@ public class BlendOpImage extends PointOpImage {
 
                     return;
                 }
-                // Not a good idea, can come out with teh wrong number of bands
+                // Not a good idea, can come out with the wrong number of bands
                 /* else if (opacity == -1) {
                     assert dest.getBounds().equals(sources[0].getBounds());
 
