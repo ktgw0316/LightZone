@@ -70,13 +70,13 @@ public interface CIFFConstants {
     int CIFF_DATA_LOC_IN_ENTRY = 0x4000;
 
     /**
-     * Ths size (in bytes) of a CIFF unsigned long.
+     * The size (in bytes) of a CIFF unsigned long.
      * Note that this is not the same size as a Java <code>long</code>.
      */
     int CIFF_FIELD_SIZE_ULONG    = 4;
 
     /**
-     * Ths size (in bytes) of a CIFF unsigned short.
+     * The size (in bytes) of a CIFF unsigned short.
      */
     int CIFF_FIELD_SIZE_USHORT   = 2;
 

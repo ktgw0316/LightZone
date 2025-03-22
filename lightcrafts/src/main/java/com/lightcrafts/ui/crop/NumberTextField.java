@@ -92,7 +92,7 @@ public class NumberTextField extends JTextField implements DocumentListener {
     }
 
     /**
-     * Get the number value fo the current text, or throw IllegalStateException
+     * Get the number value of the current text, or throw IllegalStateException
      * if the current text is not a verifiable number.
      */
     public int getNumber() {

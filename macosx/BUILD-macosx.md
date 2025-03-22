@@ -29,7 +29,7 @@ You need to install following packages using homebrew:
 - __lensfun__
 - __libomp__
 - __libraw__
-- __libtiff__ "brew edit libtiff", replace all "jpeg" occurences with "jpeg-turbo", then "brew install libtiff --build-from-source"
+- __libtiff__ "brew edit libtiff", replace all "jpeg" occurrences with "jpeg-turbo", then "brew install libtiff --build-from-source"
 - __little-cms2__
 - __pkg-config__
 
