@@ -9,13 +9,13 @@ Standards-Version: 4.4.1
 Vcs-Browser: https://github.com/ktgw0316/LightZone
 Vcs-Git: https://github.com/ktgw0316/LightZone.git
 Build-Depends:
- ant (>= 1.9.8),
  autoconf,
  debhelper,
  default-jdk (>= 2:1.17),
  default-jre-headless (>= 2:1.17),
  devscripts,
  git-core,
+ gradle,
  javahelp2,
  javahelper,
  libejml-java (>= 0.38),
