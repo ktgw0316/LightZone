@@ -8,6 +8,7 @@ import com.lightcrafts.utils.Version;
 import com.lightcrafts.utils.directory.DirectoryMonitor;
 import com.lightcrafts.utils.directory.UnixDirectoryMonitor;
 import com.lightcrafts.utils.file.ICC_ProfileFileFilter;
+import org.jetbrains.annotations.NotNull;
 
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
@@ -123,12 +124,11 @@ public class Platform {
      *
      * @return Returns said directory.
      */
-    public static Path getApplicationDirectory() {
-        var appPath = System.getProperty("jpackage.app-path");
-        if (appPath == null) {
-            appPath = System.getProperty("user.dir");
-        }
-        return Paths.get(appPath).getParent();
+    public static @NotNull Path getApplicationDirectory() {
+        final var jarDir = Paths.get(Platform.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent();
+        final var buildDir = jarDir.getParent(); // gradle build directory on development environment
+        final var nativeDir = buildDir.resolve("resources/main/native");
+        return (Files.exists(nativeDir)) ? nativeDir : jarDir;
     }
 
     /**

@@ -57,4 +57,15 @@ tasks {
     named("clean") {
         dependsOn("cleanCoprocesses")
     }
+    processResources {
+        from("products/") {
+            include("share/**")
+            include("dcraw_lz*")
+            include("LightZone-forkd")
+            include("*.dll")
+            include("*.dylib")
+            include("*.jnilib")
+            into("native")
+        }
+    }
 }
