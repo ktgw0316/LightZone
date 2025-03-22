@@ -8,16 +8,11 @@ endif
 
 export JAVA_HOME=$(shell readlink -f /usr/bin/javac | sed "s:/bin/javac::")
 
-ANT_OPTIONS=-f $(CURDIR)/linux/build.xml -Dno-ivy=true -Dno-submodule=true
-
-%:
-	dh $@ --with javahelper,quilt --buildsystem=ant
-
 override_dh_auto_build:
-	dh_auto_build -- $(ANT_OPTIONS) jar
+	gradle build -x test
 
 override_dh_auto_clean:
-	dh_auto_clean -- $(ANT_OPTIONS) clean
+	gradle clean
 
 override_dh_auto_install:
 	install -dm 0755 debian/lightzone/usr/lib/lightzone
@@ -27,8 +22,8 @@ override_dh_auto_install:
 
 	install -dm 0755 debian/lightzone/usr/share/java/lightzone
 	cp -pH lightcrafts/lib/jai-lightzone-*.jar debian/lightzone/usr/share/java/lightzone
-	install -m 644 lightcrafts/products/lightcrafts.jar debian/lightzone/usr/share/java/lightzone
-	install -m 644 linux/products/lightcrafts-linux.jar debian/lightzone/usr/share/java/lightzone
+	install -m 644 lightcrafts/build/libs/lightcrafts-*.jar debian/lightzone/usr/share/java/lightzone
+	install -m 644 linux/build/libs/linux-*.jar debian/lightzone/usr/share/java/lightzone
 	install -m 644 linux/products/lightzonehelp.jar debian/lightzone/usr/share/java/lightzone
 
 	install -dm 0755 debian/lightzone/usr/share/applications
