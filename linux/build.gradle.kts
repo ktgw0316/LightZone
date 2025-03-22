@@ -18,7 +18,7 @@ tasks {
         dependsOn(":lightcrafts:clean")
     }
     register<Exec> ("helpFiles") {
-        commandLine("ant", "-f", "help/build.xml")
+        commandLine("make", "-C", "help")
     }
     named("jpackage") {
         dependsOn("build", "helpFiles")
