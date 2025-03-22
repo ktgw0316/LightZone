@@ -68,10 +68,10 @@ tasks {
     register<Exec> ("cleanProducts") {
         commandLine(MAKE, "-C", "products", "-j", "-s", "clean")
     }
-    named("build") {
+    build {
         dependsOn("products")
     }
-    named("clean") {
+    clean {
         dependsOn("cleanProducts")
     }
     if (file("jnisrc").exists()) {
@@ -82,10 +82,10 @@ tasks {
         register<Exec> ("cleanJni") {
             commandLine(MAKE, "-C", "jnisrc", "-j", "-s", "distclean")
         }
-        named("build") {
+        build {
             dependsOn("jni")
         }
-        named("clean") {
+        clean {
             dependsOn("cleanJni")
         }
     }

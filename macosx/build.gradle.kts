@@ -10,16 +10,16 @@ application {
     mainClass.set("com.lightcrafts.platform.macosx.MacOSXLauncher")
 }
 tasks {
-    named("build") {
+    build {
         dependsOn(":lightcrafts:build")
     }
-    named("clean") {
+    clean {
         dependsOn(":lightcrafts:clean")
     }
     register<Exec> ("helpFiles") {
         commandLine("make", "-C", "help")
     }
-    named("jpackage") {
+    jpackage {
         dependsOn("build", "helpFiles")
         doFirst {
             copy {

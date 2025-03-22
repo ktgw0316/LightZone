@@ -51,10 +51,10 @@ tasks {
         file.writeText(gitHash)
         File("$dir/Version").writeText(version.toString())
     }
-    named("build") {
+    build {
         dependsOn("coprocesses", "revision")
     }
-    named("clean") {
+    clean {
         dependsOn("cleanCoprocesses")
     }
     processResources {
