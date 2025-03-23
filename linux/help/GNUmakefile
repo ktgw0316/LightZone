@@ -1,5 +1,3 @@
-# Makefile for linux-help
-
 LANGUAGES = English Danish Dutch French Italian Japanese Spanish
 BUILD_DIR = build
 NEUTRAL_DIR = neutral
@@ -33,10 +31,13 @@ index:
 	done
 
 jar:
-	jar cf $(JAR_FILE) -C $(BUILD_DIR) . --exclude $(BUILD_DIR)/neutral
+	jar cf $(JAR_FILE) -C $(BUILD_DIR) LightZone*.hs
+	for lang in $(LANGUAGES); do \
+		jar uf $(JAR_FILE) -C $(BUILD_DIR) $$lang; \
+	done
 
 build: clean copy index jar
-	cp $(JAR_FILE) $(PRODUCTS_DIR)
+	cp -f $(JAR_FILE) $(PRODUCTS_DIR)
 
 clean:
 	rm -f $(JAR_FILE)
