@@ -15,7 +15,6 @@ Build-Depends:
  default-jre-headless (>= 2:1.17),
  devscripts,
  git-core,
- gradle,
  javahelp2,
  javahelper,
  libejml-java (>= 0.38),
