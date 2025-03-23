@@ -6,7 +6,7 @@ ifeq ($(findstring 4.7.0.0,$(JICONFONT_FONT_AWESOME_VERSION)),)
 export QUILT_PATCH_DIR:=debian/patches-Debian_12
 endif
 
-GRADLE_OPTIONS=-g $(CURDIR)/.gradle --no-daemon
+GRADLE_OPTIONS=-g $(CURDIR)/.gradle
 
 export JAVA_HOME=$(shell readlink -f /usr/bin/javac | sed "s:/bin/javac::")
 
