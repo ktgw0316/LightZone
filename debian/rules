@@ -6,13 +6,19 @@ ifeq ($(findstring 4.7.0.0,$(JICONFONT_FONT_AWESOME_VERSION)),)
 export QUILT_PATCH_DIR:=debian/patches-Debian_12
 endif
 
+GRADLE_OPTIONS=-g $(CURDIR)/.gradle
+
 export JAVA_HOME=$(shell readlink -f /usr/bin/javac | sed "s:/bin/javac::")
 
+%:
+	dh $@
+
 override_dh_auto_build:
-	gradle build -x test
+	$(CURDIR)/gradlew $(GRADLE_OPTIONS) build -x test
+	$(CURDIR)/gradlew $(GRADLE_OPTIONS) helpFiles
 
 override_dh_auto_clean:
-	gradle clean
+	$(CURDIR)/gradlew $(GRADLE_OPTIONS) clean
 
 override_dh_auto_install:
 	install -dm 0755 debian/lightzone/usr/lib/lightzone

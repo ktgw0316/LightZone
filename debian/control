@@ -12,7 +12,6 @@ Build-Depends:
  default-jre-headless (>= 2:1.17) | openjdk-17-jre-headless,
  devscripts,
  git-core,
- gradle,
  javahelp2,
  javahelper,
  libejml-java,
