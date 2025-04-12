@@ -15,7 +15,7 @@ using std::clamp;
 
 typedef Array_2D<float> image_type;
 
-JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_FastBilateralFilterOpImage_fastBilateralFilterMono
+extern "C" JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_FastBilateralFilterOpImage_fastBilateralFilterMono
 (   JNIEnv *env, jclass cls,
     jshortArray jsrcData, jshortArray jdestData,
     jfloat sigma_s, jfloat sigma_r,
@@ -71,7 +71,7 @@ JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_FastBilateralFilterOpIma
     env->ReleasePrimitiveArrayCritical(jtransform, transform, 0);
 }
 
-JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_FastBilateralFilterOpImage_fastBilateralFilterChroma
+extern "C" JNIEXPORT void JNICALL Java_com_lightcrafts_jai_opimage_FastBilateralFilterOpImage_fastBilateralFilterChroma
 (   JNIEnv *env, jclass cls,
     jshortArray jsrcData, jshortArray jdestData,
     jfloat sigma_s, jfloat sigma_r,
