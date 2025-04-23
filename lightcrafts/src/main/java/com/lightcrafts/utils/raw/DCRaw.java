@@ -1690,7 +1690,12 @@ public final class DCRaw extends RawDecoder {
     }
 
     public boolean isSupported() {
-        return m_fileName.toLowerCase().endsWith(".dng") || supported_cameras.contains(shortCameraName());
+        var extension = m_fileName.substring(m_fileName.lastIndexOf('.')).toLowerCase();
+        return switch (extension) {
+            case ".cr3" -> false;
+            case ".dng" -> true;
+            default -> supported_cameras.contains(shortCameraName());
+        };
     }
 
     public native static void interpolateGreen(
