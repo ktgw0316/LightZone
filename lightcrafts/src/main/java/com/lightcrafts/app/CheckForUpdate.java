@@ -504,7 +504,7 @@ public final class CheckForUpdate {
     private static final String CHECK_FOR_UPDATE_KEY = "CheckForUpdate";
 
     /**
-     * Ths fully qualified host name of that we need to check with to see if
+     * The fully qualified host name of that we need to check with to see if
      * there's a new version.
      * @see #CHECK_URI_STRING
      */

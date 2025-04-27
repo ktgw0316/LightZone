@@ -14,7 +14,7 @@ import java.awt.event.MouseWheelListener;
  * physical wheel click to translate into one scroll unit increment, which
  * the browser interprets as one row of browser thumbnails.
  * <p>
- * On Mac, BasicScrollPaneUI sems to possess this virtue for free.
+ * On Mac, BasicScrollPaneUI seems to possess this virtue for free.
  */
 
 class BrowserScrollPaneUI extends BasicScrollPaneUI {

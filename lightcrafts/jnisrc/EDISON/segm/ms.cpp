@@ -323,7 +323,7 @@ void MeanShift::AddWeightFunction(double g(double), float halfWindow, int sample
 /*private data structure.                              */
 /*******************************************************/
 /*Post:                                                */
-/*      - all user defined weight functions ahve been  */
+/*      - all user defined weight functions have been  */
 /*        cleared from the private data structure of   */
 /*        the mean shift class.                        */
 /*******************************************************/

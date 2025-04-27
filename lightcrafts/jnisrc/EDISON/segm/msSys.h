@@ -178,8 +178,8 @@ class msSystem {
   //|   This method is called by the mean shift library  |//
   //|   methods during the application of a specific     |//
   //|   algorithm in which the progress of the algorithm |//
-  //|   is indicated. Its main use is for a multi-thre-  |//
-  //|   aded programming environment. Namely, it is      |//
+  //|   is indicated. Its main use is for a multi-       |//
+  //|   threaded programming environment. Namely, it is  |//
   //|   called fairly frequently by the mean shift       |//
   //|   library methods. It then can be used to grace-   |//
   //|   fully halt the algorithm, or to simply update    |//

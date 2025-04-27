@@ -307,7 +307,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
      * Gets a JPEG image from the file given by {@link ImageInfo#getFile()}.
      *
      * @param imageInfo The {@link ImageInfo} to get the actual image from.
-     * @param thread The thread that will do othe getting.
+     * @param thread The thread that will do other getting.
      * @param maxWidth The maximum width of the image to get, rescaling if
      * necessary.  A value of 0 means don't scale.
      * @param maxHeight The maximum height of the image to get, rescaling if
