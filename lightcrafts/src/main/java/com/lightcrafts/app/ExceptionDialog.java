@@ -2,9 +2,6 @@
 
 package com.lightcrafts.app;
 
-import com.lightcrafts.ui.toolkit.TextAreaFactory;
-import com.lightcrafts.utils.ErrorLogger;
-
 import static com.lightcrafts.app.Locale.LOCALE;
 
 import javax.swing.*;

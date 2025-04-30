@@ -26,14 +26,14 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeParseException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
@@ -45,7 +45,7 @@ import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
  */
 public final class DCRaw extends RawDecoder {
 
-    //////////  public ////////////////////////////////////////////////////////
+    private static final Logger LOGGER = Logger.getLogger(DCRaw.class.getName());
 
     static private final Map<String,DCRaw> dcrawCache =
         new LRUHashMap<>(100);
@@ -69,7 +69,7 @@ public final class DCRaw extends RawDecoder {
         try {
             runDCRawInfo(false);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error running dcraw", e);
         }
     }
 
@@ -186,7 +186,7 @@ public final class DCRaw extends RawDecoder {
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (NoSuchElementException e) {
-            System.err.println("dcraw_lz not found in appDir: " + appDir);
+            LOGGER.log(Level.SEVERE, "dcraw_lz not found in appDir: " + appDir, e);
             throw new RuntimeException(e);
         }
     }
@@ -217,13 +217,12 @@ public final class DCRaw extends RawDecoder {
             try {
                 String line;
                 while ((line = readln(dcrawStdOut)) != null) {
-                    // System.out.println(line);
                     parseDCRawInfo(line, secondary);
                 }
 
                 // Flush stderr just in case...
-                while ((line = readln(dcrawStdErr)) != null)
-                    ; // System.out.println(line);
+                while (readln(dcrawStdErr) != null)
+                    ;
             } finally {
                 if (p != null) {
                     dcrawStdErr.close();
@@ -231,7 +230,7 @@ public final class DCRaw extends RawDecoder {
                     try {
                         p.waitFor();
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        LOGGER.log(Level.INFO, "Interrupted while waiting for dcraw", e);
                     }
                     error = p.exitValue();
                     p.destroy();
@@ -519,7 +518,7 @@ public final class DCRaw extends RawDecoder {
                     final var reader = readerFactory.create(of);
                     result = reader.getImage();
                 } catch (LCImageLibException | UserCanceledException e) {
-                    e.printStackTrace();
+                    LOGGER.log(Level.SEVERE, "Error reading image", e);
                 }
                 if (result == null) {
                     throw new BadImageFileException(of);
@@ -547,7 +546,7 @@ public final class DCRaw extends RawDecoder {
 
                 result = new BufferedImage(cm, raster, false, null);
             }
-            System.out.println("Read " + totalData + " bytes in " + (t2 - t1) + "ms");
+            LOGGER.log(Level.FINE, "Read " + totalData + " bytes in " + (t2 - t1) + "ms");
         } finally {
             if (of != null && !of.delete()) {
                 System.out.println("Could not delete temporary file: " + of);
@@ -619,7 +618,7 @@ public final class DCRaw extends RawDecoder {
                 try {
                     p.waitFor();
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    LOGGER.log(Level.SEVERE, "Interrupted while waiting for dcraw", e);
                 }
                 error = p.exitValue();
                 p.destroy();
@@ -628,17 +627,17 @@ public final class DCRaw extends RawDecoder {
             }
         }
 
-        System.out.println("dcraw value: " + error);
+        LOGGER.log(Level.FINE, "dcraw value: " + error);
 
         if (error > 0) {
             throw new BadImageFileException(of);
         }
 
         if (ofName == null) {
-            System.out.println("Cannot get output filename. Falling back to: " + of.getPath());
+            LOGGER.log(Level.INFO, "Cannot get output filename. Falling back to: " + of.getPath());
         } else if (!ofName.equals(of.getPath())) {
             if (!of.delete()) {
-                System.out.println("Could not delete temporary file: " + of);
+                LOGGER.log(Level.INFO, "Could not delete temporary file: " + of.getPath());
             }
             of = new File(ofName);
         }
