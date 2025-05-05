@@ -1,14 +1,18 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2025-     Masahiro Kitagawa */
 
 package com.lightcrafts.utils.filecache;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.Cleaner;
 import java.util.HashMap;
 import java.util.PriorityQueue;
 
 import com.lightcrafts.utils.file.FileIterator;
 import com.lightcrafts.utils.file.FileUtil;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A <code>FileCacheMonitor</code> is used to monitor the size of a
@@ -75,6 +79,7 @@ final class FileCacheMonitor extends Thread {
         setDaemon( true );
         setPriority( MIN_PRIORITY );
         m_owningCache = owningCache;
+        m_cleaner.register(this, cleanup(this));
         start();
     }
 
@@ -168,13 +173,6 @@ final class FileCacheMonitor extends Thread {
             return true;
         }
         return false;
-    }
-
-    ////////// protected //////////////////////////////////////////////////////
-
-    protected void finalize() throws Throwable {
-        dispose();
-        super.finalize();
     }
 
     ////////// private ////////////////////////////////////////////////////////
@@ -289,5 +287,12 @@ final class FileCacheMonitor extends Thread {
      * A flag to indicate when this thread should stop.
      */
     private boolean m_stop;
+
+    private static final Cleaner m_cleaner = Cleaner.create();
+
+    @Contract(pure = true)
+    private static @NotNull Runnable cleanup(@NotNull FileCacheMonitor instance) {
+        return instance::dispose;
+    }
 }
 /* vim:set et sw=4 ts=4: */

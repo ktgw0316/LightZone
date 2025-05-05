@@ -1,8 +1,11 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2025-     Masahiro Kitagawa */
 
 package com.lightcrafts.utils;
 
 import com.sun.media.jai.util.ImageUtil;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import javax.media.jai.RasterAccessor;
 import javax.media.jai.RasterFormatTag;
@@ -12,7 +15,7 @@ import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
-import java.util.Arrays;
+import java.lang.ref.Cleaner;
 import java.util.Map;
 
 /**
@@ -320,7 +323,7 @@ public class LCMS {
         }
     }
 
-    private static class RCHandle {
+    protected static class RCHandle {
         final long handle;
         private int refcount = 1;
 
@@ -343,7 +346,7 @@ public class LCMS {
     }
 
     public static class Profile {
-        private static Map<Object, RCHandle> profileCache = new RCHandleHashMap<Object, RCHandle>(20);
+        private static Map<Object, RCHandle> profileCache = new RCHandleHashMap<>(20);
 
         protected RCHandle cmsProfile = null;
 
@@ -360,6 +363,8 @@ public class LCMS {
                 profileCache.put(iccProfile, cmsProfile);
                 cmsProfile.increment(); // for the cache reference
             }
+
+            cleaner.register(this, cleanup(this));
         }
 
         public Profile(double[] whitePoint, double[] primaries, double gamma) {
@@ -373,6 +378,8 @@ public class LCMS {
                 profileCache.put(components, cmsProfile);
                 cmsProfile.increment(); // for the cache reference
             }
+
+            cleaner.register(this, cleanup(this));
         }
 
         public void dispose() {
@@ -382,9 +389,11 @@ public class LCMS {
             cmsProfile = null;
         }
 
-        @Override
-        public void finalize() {
-            dispose();
+        private static final Cleaner cleaner = Cleaner.create();
+
+        @Contract(pure = true)
+        private static @NotNull Runnable cleanup(@NotNull Profile instance) {
+            return instance::dispose;
         }
     }
 
@@ -520,6 +529,8 @@ public class LCMS {
                 transformCache.put(td, cmsTransform);
                 cmsTransform.increment(); // for the cache reference
             }
+
+            cleaner.register(this, cleanup(this));
         }
 
         public Transform(Profile input, int inputType, Profile output, int outputType, Profile proof,
@@ -541,6 +552,8 @@ public class LCMS {
                 transformCache.put(td, cmsTransform);
                 cmsTransform.increment(); // for the cache reference
             }
+
+            cleaner.register(this, cleanup(this));
         }
 
         public void doTransform(RasterAccessor src, RasterFormatTag srcRft, ColorModel srcCm,
@@ -604,9 +617,11 @@ public class LCMS {
             cmsTransform = null;
         }
 
-        @Override
-        public void finalize() {
-            dispose();
+        private static final Cleaner cleaner = Cleaner.create();
+
+        @Contract(pure = true)
+        private static @NotNull Runnable cleanup(@NotNull Transform instance) {
+            return instance::dispose;
         }
     }
 }
