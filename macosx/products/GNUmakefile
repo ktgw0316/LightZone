@@ -48,6 +48,6 @@ $(DEST_MACOSX_SHARE):
 .PHONY: clean distclean mostlyclean
 
 clean distclean mostlyclean:
-	$(RM) *.dylib *.jar *.jnilib *.nib *.log share dcraw_lz LightZone-forkd
+	$(RM) *.dylib *.jar *.jnilib *.nib *.log share dcraw_lz
 
 # vim:set noet sw=8 ts=8:

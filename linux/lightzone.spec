@@ -93,7 +93,6 @@ export NO_BRP_CHECK_BYTECODE_VERSION=true
 
 install -dm 0755 "%buildroot/%{_libexecdir}/%{name}"
 cp -pH lightcrafts/products/dcraw_lz "%buildroot/%{_libexecdir}/%{name}"
-cp -pH lightcrafts/products/LightZone-forkd "%buildroot/%{_libexecdir}/%{name}"
 cp -pH linux/products/*.so "%buildroot/%{_libexecdir}/%{name}"
 
 install -dm 0755 "%buildroot/%{_javadir}/%{name}"

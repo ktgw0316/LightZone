@@ -1,5 +1,4 @@
 bin/lightzone
-%%LIBDIR%%/LightZone-forkd
 %%LIBDIR%%/dcraw_lz
 %%LIBDIR%%/libDCRaw.so
 %%LIBDIR%%/libFASTJAI.so

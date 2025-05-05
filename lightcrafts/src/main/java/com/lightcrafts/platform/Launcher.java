@@ -8,11 +8,9 @@ import com.lightcrafts.app.ExceptionDialog;
 import com.lightcrafts.prefs.LocaleModel;
 import com.lightcrafts.splash.SplashImage;
 import com.lightcrafts.splash.SplashWindow;
-import com.lightcrafts.utils.ForkDaemon;
 import com.lightcrafts.utils.Version;
 
 import javax.swing.*;
-import java.io.IOException;
 
 /**
  * Launch LightZone.
@@ -42,7 +40,6 @@ public class Launcher {
             SplashWindow.splash(splash);
             setColor();
             Application.setStartupProgress(splash.getStartupProgress());
-            startForkDaemon();
             Application.main(args);
             SplashWindow.disposeSplash();
 
@@ -82,10 +79,5 @@ public class Launcher {
     protected void setColor() {
         // Do nothing by default.
     }
-
-    protected void startForkDaemon() throws IOException {
-        ForkDaemon.start();
-    }
-
 }
 

@@ -16,12 +16,5 @@ public final class WindowsLauncher extends Launcher {
         final Launcher launcher = new WindowsLauncher();
         launcher.init(args);
     }
-
-    ////////// protected //////////////////////////////////////////////////////
-
-    @Override
-    protected void startForkDaemon() {
-        // Do nothing.
-    }
 }
 /* vim:set et sw=4 ts=4: */

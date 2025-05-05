@@ -10,7 +10,6 @@ import com.lightcrafts.image.libs.LCImageReaderFactory;
 import com.lightcrafts.image.metadata.MetadataUtil;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.platform.Platform;
-import com.lightcrafts.utils.ForkDaemon;
 import com.lightcrafts.utils.LRUHashMap;
 import com.lightcrafts.utils.UserCanceledException;
 import com.lightcrafts.utils.bytebuffer.ByteBufferUtil;
@@ -26,8 +25,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.LocalDateTime;
@@ -363,24 +360,15 @@ public final class DCRaw extends RawDecoder {
     }
 
     private InputStream getDcrawStdOut(Process p) {
-        return p == null
-                ? ForkDaemon.INSTANCE.getStdOut()
-                : p.getInputStream();
+        return p.getInputStream();
     }
 
     private InputStream getDcrawStdErr(Process p) {
-        return p == null
-                ? ForkDaemon.INSTANCE.getStdErr()
-                : new BufferedInputStream(p.getErrorStream());
+        return new BufferedInputStream(p.getErrorStream());
     }
 
     private Process execProcess(String[] cmd) throws IOException {
-        if (ForkDaemon.INSTANCE != null) {
-            ForkDaemon.INSTANCE.invoke(cmd);
-            return null;
-        } else {
-            return Runtime.getRuntime().exec(cmd);
-        }
+        return Runtime.getRuntime().exec(cmd);
     }
 
     private static class ImageData {
@@ -585,19 +573,9 @@ public final class DCRaw extends RawDecoder {
         final int error;
 
         synchronized (DCRaw.class) {
-            final Process p;
-            final InputStream dcrawStdErr;
-            final InputStream dcrawStdOut;
-            if (ForkDaemon.INSTANCE != null) {
-                p = null;
-                ForkDaemon.INSTANCE.invoke(cmd);
-                dcrawStdErr = ForkDaemon.INSTANCE.getStdErr();
-                dcrawStdOut = ForkDaemon.INSTANCE.getStdOut();
-            } else {
-                p = Runtime.getRuntime().exec(cmd);
-                dcrawStdErr = new BufferedInputStream(p.getErrorStream());
-                dcrawStdOut = p.getInputStream();
-            }
+            final Process p = Runtime.getRuntime().exec(cmd);
+            final InputStream dcrawStdErr = new BufferedInputStream(p.getErrorStream());
+            final InputStream dcrawStdOut = p.getInputStream();
 
             String line;
             // output expected on stderr
@@ -613,19 +591,15 @@ public final class DCRaw extends RawDecoder {
             while ((line = readln(dcrawStdOut)) != null)
                 System.out.println(line);
 
-            if (p != null) {
-                dcrawStdErr.close();
+            dcrawStdErr.close();
 
-                try {
-                    p.waitFor();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                error = p.exitValue();
-                p.destroy();
-            } else {
-                error = 0;
+            try {
+                p.waitFor();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
+            error = p.exitValue();
+            p.destroy();
         }
 
         System.out.println("dcraw value: " + error);

@@ -61,7 +61,6 @@ tasks {
         from("products/") {
             include("share/**")
             include("dcraw_lz*")
-            include("LightZone-forkd")
             include("*.dll")
             include("*.dylib")
             include("*.jnilib")

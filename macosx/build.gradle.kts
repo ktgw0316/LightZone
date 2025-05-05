@@ -26,7 +26,6 @@ tasks {
                 from("products/")
                 include("share/**")
                 include("dcraw_lz")
-                include("LightZone-forkd")
                 include("*.dylib")
                 include("*.jnilib")
                 into(layout.buildDirectory.dir("jpackage/LightZone.app/Contents/app"))

@@ -23,7 +23,6 @@ override_dh_auto_install:
 	install -dm 0755 debian/lightzone/usr/lib/lightzone
 	cp -pH lightcrafts/products/*.so debian/lightzone/usr/lib/lightzone
 	install -m 755 lightcrafts/products/dcraw_lz debian/lightzone/usr/lib/lightzone
-	install -m 755 lightcrafts/products/LightZone-forkd debian/lightzone/usr/lib/lightzone
 
 	install -dm 0755 debian/lightzone/usr/share/java/lightzone
 	cp -pH lightcrafts/lib/jai-lightzone-*.jar debian/lightzone/usr/share/java/lightzone
