@@ -60,7 +60,7 @@ class TestSSE2 {
     private static String getCpuInfoLine(String regex) {
         String line = null;
         try {
-            Process process = Runtime.getRuntime().exec(cmd);
+            final Process process = new ProcessBuilder(cmd).start();
             try (InputStream in = process.getInputStream();
                  BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
                 while ((line = reader.readLine()) != null) {

@@ -45,9 +45,9 @@ public final class WindowsHelp {
     private static void showHelpForLanguage(@NotNull String topic, String iso639LangCode) {
         final var chm = "LightZone-" + iso639LangCode + ".chm";
         final var html = "LightZone_Help/" + topic + ".html";
-        final var param = chm + "::/" + html;
+        final String[] cmd = {"hh.exe", chm + "::/" + html};
         try {
-            Runtime.getRuntime().exec("hh.exe " + param);
+            new ProcessBuilder(cmd).start();
         } catch (IOException e) {
             System.err.println("Unable to launch help viewer for " + param + ": " + e);
         }

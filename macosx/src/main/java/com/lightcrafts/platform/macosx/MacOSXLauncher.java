@@ -56,17 +56,14 @@ public final class MacOSXLauncher extends Launcher {
      */
     @Override
     protected void setColor() {
+        final String[] cmd = {
+                "defaults", "remove", "com.lightcrafts.LightZone", "AppleAquaColorVariant"
+        };
+        final var pb = new ProcessBuilder(cmd);
         try {
-            final Process p = Runtime.getRuntime().exec(
-                // "defaults write com.lightcrafts.LightZone AppleAquaColorVariant -int 6"
-                "defaults remove com.lightcrafts.LightZone AppleAquaColorVariant"
-            );
+            final Process p = pb.start();
             p.waitFor();
-        }
-        catch ( InterruptedException e ) {
-            e.printStackTrace();
-        }
-        catch ( IOException e ) {
+        } catch (InterruptedException | IOException e) {
             e.printStackTrace();
         }
     }

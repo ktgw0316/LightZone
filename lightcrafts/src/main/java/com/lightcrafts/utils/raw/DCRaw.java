@@ -31,6 +31,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeParseException;
 import java.util.*;
+import java.util.List;
 
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
@@ -202,16 +203,18 @@ public final class DCRaw extends RawDecoder {
     }
 
     private int runDCRawInfo(boolean secondary) throws IOException {
-        final var info = new String[]{DCRAW_PATH, "-v", "-i", "-t", "0", m_fileName};
-        final var secondaryInfo = new String[]{DCRAW_PATH, "-v", "-i", "-s", "1", "-t", "0", m_fileName};
+        final var cmd = new ArrayList<>(Arrays.asList(DCRAW_PATH, "-v", "-i", "-t", "0"));
+        if (secondary) {
+            cmd.addAll(Arrays.asList("-s", "1"));
+        }
+        cmd.add(m_fileName);
 
         final int error;
 
         synchronized (DCRaw.class) {
-            final Process p = execProcess(secondary ? secondaryInfo : info);
-            final InputStream dcrawStdErr = getDcrawStdErr(p);
-            final InputStream dcrawStdOut = getDcrawStdOut(p);
-            try {
+            final Process p = new ProcessBuilder(cmd).start();
+            try (final var dcrawStdErr = new BufferedInputStream(p.getErrorStream());
+                 final var dcrawStdOut = p.getInputStream()) {
                 String line;
                 while ((line = readln(dcrawStdOut)) != null) {
                     // System.out.println(line);
@@ -221,20 +224,13 @@ public final class DCRaw extends RawDecoder {
                 // Flush stderr just in case...
                 while ((line = readln(dcrawStdErr)) != null)
                     ; // System.out.println(line);
+
+                p.waitFor();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             } finally {
-                if (p != null) {
-                    dcrawStdErr.close();
-                    dcrawStdOut.close();
-                    try {
-                        p.waitFor();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    error = p.exitValue();
-                    p.destroy();
-                } else {
-                    error = 0;
-                }
+                error = p.exitValue();
+                p.destroy();
             }
         }
         return error;
@@ -357,18 +353,6 @@ public final class DCRaw extends RawDecoder {
                 m_xyz_cam[i] = Float.parseFloat(xyz_cam[i]);
             }
         }
-    }
-
-    private InputStream getDcrawStdOut(Process p) {
-        return p.getInputStream();
-    }
-
-    private InputStream getDcrawStdErr(Process p) {
-        return new BufferedInputStream(p.getErrorStream());
-    }
-
-    private Process execProcess(String[] cmd) throws IOException {
-        return Runtime.getRuntime().exec(cmd);
     }
 
     private static class ImageData {
@@ -573,33 +557,30 @@ public final class DCRaw extends RawDecoder {
         final int error;
 
         synchronized (DCRaw.class) {
-            final Process p = Runtime.getRuntime().exec(cmd);
-            final InputStream dcrawStdErr = new BufferedInputStream(p.getErrorStream());
-            final InputStream dcrawStdOut = p.getInputStream();
+            final Process p = new ProcessBuilder(cmd).start();
+            try (final var dcrawStdErr = new BufferedInputStream(p.getErrorStream());
+                 final var dcrawStdOut = p.getInputStream()) {
+                String line;
+                // output expected on stderr
+                while ((line = readln(dcrawStdErr)) != null) {
+                    System.out.println(line);
 
-            String line;
-            // output expected on stderr
-            while ((line = readln(dcrawStdErr)) != null) {
-                System.out.println(line);
+                    final var args = match(line, DCRAW_OUTPUT);
+                    if (args != null)
+                        ofName = args.substring(0, args.indexOf(" ..."));
+                }
 
-                final var args = match(line, DCRAW_OUTPUT);
-                if (args != null)
-                    ofName = args.substring(0, args.indexOf(" ..."));
-            }
+                // Flush stdout just in case...
+                while ((line = readln(dcrawStdOut)) != null)
+                    ; // System.out.println(line);
 
-            // Flush stdout just in case...
-            while ((line = readln(dcrawStdOut)) != null)
-                System.out.println(line);
-
-            dcrawStdErr.close();
-
-            try {
                 p.waitFor();
             } catch (InterruptedException e) {
                 e.printStackTrace();
+            } finally {
+                error = p.exitValue();
+                p.destroy();
             }
-            error = p.exitValue();
-            p.destroy();
         }
 
         System.out.println("dcraw value: " + error);
@@ -619,7 +600,7 @@ public final class DCRaw extends RawDecoder {
         return of;
     }
 
-    private String[] dcrawCommandLine(dcrawMode mode, boolean secondaryPixels, File of) {
+    private List<String> dcrawCommandLine(dcrawMode mode, boolean secondaryPixels, File of) {
         final var makeModel = (m_make + ' ' + m_model).toUpperCase();
         final var four_colors = four_color_cameras.contains(makeModel);
         final var path = of.getAbsolutePath();
@@ -628,14 +609,15 @@ public final class DCRaw extends RawDecoder {
 
         switch (mode) {
         case full:
+            cmd.addAll(Arrays.asList("-H", "1", "-t", "0"));
             if (four_colors)
-                cmd.addAll(Arrays.asList("-f", "-H", "1", "-t", "0", "-o", "0", "-4"));
+                cmd.addAll(Arrays.asList("-f", "-o", "0", "-4"));
             else if (m_filters == -1 || (m_make != null && m_make.equalsIgnoreCase("SIGMA")))
-                cmd.addAll(Arrays.asList("-H", "1", "-t", "0", "-o", "0", "-4"));
+                cmd.addAll(Arrays.asList("-o", "0", "-4"));
             else if (secondaryPixels)
-                cmd.addAll(Arrays.asList("-j", "-H", "1", "-t", "0", "-s", "1", "-d", "-4"));
+                cmd.addAll(Arrays.asList("-j", "-s", "1", "-d", "-4"));
             else
-                cmd.addAll(Arrays.asList("-j", "-H", "1", "-t", "0", "-d", "-4"));
+                cmd.addAll(Arrays.asList("-j", "-d", "-4"));
             break;
         case preview:
             cmd.addAll(Arrays.asList("-t", "0", "-o", "1", "-w", "-h"));
@@ -647,7 +629,7 @@ public final class DCRaw extends RawDecoder {
             throw new IllegalArgumentException("Unknown mode " + mode);
         }
         cmd.add(m_fileName);
-        return cmd.toArray(new String[0]);
+        return cmd;
     }
 
     private ColorModel getColorModel(dcrawMode mode, int bands, int dataType)
