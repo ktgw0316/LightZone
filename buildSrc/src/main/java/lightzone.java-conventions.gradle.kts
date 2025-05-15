@@ -16,7 +16,7 @@ repositories {
 }
 
 val jetbrainsAnnotation = "org.jetbrains:annotations:24.0.1"
-val lombok = "org.projectlombok:lombok:1.18.34"
+val lombok = "org.projectlombok:lombok:1.18.38"
 dependencies {
     annotationProcessor(jetbrainsAnnotation)
     annotationProcessor(lombok)
