@@ -14,7 +14,7 @@ Group:		Productivity/Graphics/Convertors
 Source:		%{name}-%{version}.tar.xz
 
 %if 0%{?fedora} || 0%{?rhel_version} || 0%{?centos_version}
-%define jdk java-17-openjdk-devel
+%define jdk java-21-openjdk-devel
 %define lcms2_devel lcms2-devel
 %define libjpeg_devel libjpeg-turbo-devel
 %define libraw LibRaw
@@ -25,7 +25,7 @@ Source:		%{name}-%{version}.tar.xz
 %endif
 
 %if 0%{?sles_version}
-%define jdk java-17-openjdk-devel
+%define jdk java-21-openjdk-devel
 %define lcms2_devel liblcms2-devel
 %define libjpeg_devel libjpeg8-devel
 %define libraw libraw
@@ -36,7 +36,7 @@ BuildRequires: update-desktop-files
 %endif
 
 %if 0%{?suse_version}
-%define jdk java-17-openjdk-devel
+%define jdk java-21-openjdk-devel
 %define lcms2_devel liblcms2-devel
 %define libjpeg_devel libjpeg8-devel
 %define libraw libraw
@@ -49,7 +49,7 @@ Requires:	xerces-j2-xml-apis
 %endif
 
 %if 0%{?mdkversion} || 0%{?pclinuxos}
-%define jdk java-17-openjdk-devel
+%define jdk java-21-openjdk-devel
 %define lcms2_devel liblcms2-devel
 %define libjpeg_devel libjpeg8-devel
 %define libraw libraw
@@ -61,7 +61,7 @@ Requires:	libgomp1
 %endif
 
 %if 0%{?mageia}
-%define jdk java-17-openjdk-devel
+%define jdk java-21-openjdk-devel
 %define lcms2_devel liblcms2-devel
 %define libjpeg_devel libjpeg-devel
 %define libraw libraw
