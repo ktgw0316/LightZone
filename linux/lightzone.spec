@@ -22,6 +22,7 @@ Source:		%{name}-%{version}.tar.xz
 %define pkg_config pkgconfig
 %define xmllint libxml2
 %define debug_package %{nil}
+BuildRequires: ant-openjdk21
 %endif
 
 %if 0%{?sles_version}
@@ -61,7 +62,7 @@ Requires:	libgomp1
 %endif
 
 %if 0%{?mageia}
-%define jdk java-21-openjdk-devel
+%define jdk java-latest-openjdk-devel
 %define lcms2_devel liblcms2-devel
 %define libjpeg_devel libjpeg-devel
 %define libraw libraw
