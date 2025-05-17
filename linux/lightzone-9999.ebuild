@@ -6,10 +6,10 @@ EAPI=5
 inherit eutils
 
 if [[ ${PV} == "9999" ]]; then
-	EGIT_REPO_URI=${EGIT_REPO_URI:-"git://github.com/Aries85/LightZone.git"}
+	EGIT_REPO_URI=${EGIT_REPO_URI:-"git://github.com/ktgw0316/LightZone.git"}
 	inherit git-r3
 else
-	SRC_URI="https://github.com/Aries85/LightZone/archive/${PV}.tar.gz"
+	SRC_URI="https://github.com/ktgw0316/LightZone/archive/${PV}.tar.gz"
 fi
 
 DESCRIPTION="Open-source professional-level digital darkroom software"
