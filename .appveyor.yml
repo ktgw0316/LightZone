@@ -1,4 +1,4 @@
-version: 5.0.0.beta2.{build}-{branch}
+version: 5.0.0.beta3.{build}-{branch}
 
 image:
   - Visual Studio 2022
