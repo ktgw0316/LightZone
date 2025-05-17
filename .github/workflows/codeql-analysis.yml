@@ -47,7 +47,6 @@ jobs:
           sudo add-apt-repository -y ppa:lightzone-team/lightzone
           sudo apt update -y
           sudo apt install -y \
-            javahelp2 \
             libejml-java \
             libglib2.0-dev \
             libjetbrains-annotations-java \

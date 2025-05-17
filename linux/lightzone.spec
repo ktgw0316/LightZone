@@ -72,8 +72,8 @@ BuildRequires:	libgomp-devel
 Requires:	libgomp1
 %endif
 
-BuildRequires:	javapackages-tools, %{jdk}, %{libX11_devel}, ant, gcc, gcc-c++, make, git, javahelp2, %{lcms2_devel}, lensfun-devel, %{libjpeg_devel}, %{libraw}-devel, libtiff-devel, %{pkg_config}, rsync
-Requires:	javahelp2, lcms2, lensfun, %{libraw}, %{xmllint}
+BuildRequires:	javapackages-tools, %{jdk}, %{libX11_devel}, ant, gcc, gcc-c++, make, git, %{lcms2_devel}, lensfun-devel, %{libjpeg_devel}, %{libraw}-devel, libtiff-devel, %{pkg_config}, rsync
+Requires:	lcms2, lensfun, %{libraw}, %{xmllint}
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 

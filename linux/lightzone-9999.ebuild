@@ -21,7 +21,6 @@ KEYWORDS="~x86 ~amd64"
 
 DEPEND="virtual/jdk
 	dev-java/ant-core
-	dev-java/javahelp
 	dev-util/pkgconfig
 	dev-vcs/git
 	media-libs/lensfun

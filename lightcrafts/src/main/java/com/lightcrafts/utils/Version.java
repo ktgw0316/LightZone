@@ -4,12 +4,15 @@ package com.lightcrafts.utils;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,22 +36,25 @@ public final class Version {
         return m_properties.getString( "app-name" );
     }
 
-    public static URL getApplicationURL() {
+    private static @Nullable URL getURLOrNull(String propertyKey) {
         try {
-            return new URL( m_properties.getString( "app-URL" ) );
+            return new URI(m_properties.getString(propertyKey)).toURL();
         }
-        catch ( MalformedURLException e ) {
+        catch (MalformedURLException | URISyntaxException e) {
             return null;
         }
     }
 
-    public static URL getVideoLearningCenterURL() {
-        try {
-            return new URL( m_properties.getString( "VideoLearningCenter-URL" ) );
-        }
-        catch ( MalformedURLException e ) {
-            return null;
-        }
+    public static @Nullable URL getApplicationURL() {
+        return getURLOrNull("app-URL");
+    }
+
+    public static @Nullable URL getHelpURL() {
+        return getURLOrNull("Help-URL");
+    }
+
+    public static @Nullable URL getVideoLearningCenterURL() {
+        return getURLOrNull("VideoLearningCenter-URL");
     }
 
     public static Map<String, URL> getVideoURLs() {

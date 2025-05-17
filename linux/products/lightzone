@@ -42,15 +42,6 @@ fi
 if [ -d ${usrdir}/share/java/classes ]; then  # FreeBSD
    classpath=${classpath}:${usrdir}/share/java/classes/'*'
 fi
-for name in javahelp; do  # TODO: Add paths for other jars
-  if [ -d ${usrdir}/share/java/${name} ]; then  # Arch
-     classpath=${classpath}:${usrdir}/share/java/${name}/'*'
-  elif [ -d ${usrdir}/share/${name}/lib ]; then  # Gentoo
-     classpath=${classpath}:${usrdir}/share/${name}/lib/'*'
-  elif [ -d ${usrdir}/j2se/opt/${name}/lib ]; then  # OpenIndiana
-     classpath=${classpath}:${usrdir}/j2se/opt/${name}/lib/'*'
-  fi
-done
 
 # IFS should be \n to handle filenames that include space.
 IFS="

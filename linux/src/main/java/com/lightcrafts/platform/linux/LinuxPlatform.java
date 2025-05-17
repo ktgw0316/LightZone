@@ -9,10 +9,8 @@ import com.lightcrafts.platform.Platform;
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.utils.Version;
+import com.lightcrafts.utils.WebBrowser;
 
-import javax.help.HelpSet;
-import javax.help.HelpSetException;
-import javax.help.JHelp;
 import javax.swing.*;
 
 import java.awt.*;
@@ -130,33 +128,9 @@ public class LinuxPlatform extends Platform {
 
     @Override
     public void showHelpTopic(String topic) {
-        // TODO: use the "topic" argument to pick an initial page
-        try {
-            URL url = HelpSet.findHelpSet(null, "LightZone.hs");
-            HelpSet help = new HelpSet(null, url);
-            String title = help.getTitle();
-            JHelp jhelp = new JHelp(help);
-            help.setHomeID("index");
-            try {
-                jhelp.setCurrentID(topic);
-            }
-            catch (Throwable t) {
-                jhelp.setCurrentID("index");
-            }
-            JFrame frame = new JFrame();
-            frame.setTitle(title);
-            frame.setContentPane(jhelp);
-            frame.pack();
-            frame.setLocationRelativeTo(null);
-            frame.setVisible(true);
-        }
-        catch (HelpSetException e) {
-            getPlatform().getAlertDialog().showAlert(
-                null,
-                "Couldn't initialize the LightZone help system.",
-                e.getClass().getName() + ": " + e.getMessage(),
-                AlertDialog.ERROR_ALERT,
-                "OK");
+        final URL url = Version.getHelpURL();
+        if (url != null) {
+            WebBrowser.browse(url.toString());
         }
     }
 

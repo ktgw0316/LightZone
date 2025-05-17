@@ -14,7 +14,6 @@ LICENSE=	BSD3CLAUSE
 
 BUILD_DEPENDS=	ant:${PORTSDIR}/devel/apache-ant \
 		git:${PORTSDIR}/devel/git \
-		jhindexer:${PORTSDIR}/java/javahelp \
 		rsync:${PORTSDIR}/net/rsync
 LIB_DEPENDS=	liblcms2.so:${PORTSDIR}/graphics/lcms2 \
 		liblensfun.so:${PORTSDIR}/graphics/lensfun \

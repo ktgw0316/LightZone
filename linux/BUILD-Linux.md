@@ -9,7 +9,6 @@ Building the LightZone source requires (at least) following packages:
 - __g++__
 - __gcc__ version 4.4 or later
 - __git__
-- __javahelp2__ for jhindexer
 - __libglib2.0-dev__
 - __liblcms2-dev__
 - __liblensfun-dev__ version 0.3.2
@@ -29,7 +28,7 @@ _See also [Packaging on Debian or Ubuntu](#.deb-package-(debian-or-ubuntu)) belo
 Install required packages:
 
 ```shell
-sudo apt-get install debhelper devscripts build-essential ant git-core javahelp2 default-jdk default-jre-headless libglib2.0-dev libjiconfont-google-material-design-icons-java liblcms2-dev liblensfun-dev libjpeg-dev libraw-dev libtiff-dev libx11-dev libxml2-utils pkg-config rsync
+sudo apt-get install debhelper devscripts build-essential ant git-core default-jdk default-jre-headless libglib2.0-dev libjiconfont-google-material-design-icons-java liblcms2-dev liblensfun-dev libjpeg-dev libraw-dev libtiff-dev libx11-dev libxml2-utils pkg-config rsync
 ```
 
 _Note:_ gcc, g++, libc6-dev and make shall be installed with the build-essential.
@@ -46,7 +45,7 @@ Install required packages:
 
 ```shell
 sudo zypper install ant gcc gcc-c++ make
-git javahelp2 liblcms2-devel lensfun-devel libjpeg8-devel libraw-devel libtiff-devel libxml2-utils rsync libX11-devel java-11-openjdk-devel pkg-config
+git liblcms2-devel lensfun-devel libjpeg8-devel libraw-devel libtiff-devel libxml2-utils rsync libX11-devel java-11-openjdk-devel pkg-config
 ```
 
 Set your `JAVA_HOME` variable to point to installed JDK, e.g.

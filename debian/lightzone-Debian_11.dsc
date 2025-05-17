@@ -15,7 +15,6 @@ Build-Depends:
  openjdk-17-jre-headless,
  devscripts,
  git-core,
- javahelp2,
  javahelper,
  libejml-java (>= 0.38),
  libflatlaf-java,

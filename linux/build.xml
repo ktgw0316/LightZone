@@ -73,11 +73,7 @@
     </copy>
   </target>
 
-  <target name="help">
-    <ant dir="help" target="build"/>
-  </target>
-
-  <target name="build" depends="javac, locales, help"/>
+  <target name="build" depends="javac, locales"/>
 
   <!--===== Make the jar files =============================================-->
 
@@ -135,7 +131,6 @@
 
   <target name="distclean">
     <ant dir="${common-dir}" target="distclean"/>
-    <ant dir="help" target="clean"/>
     <parallel>
       <delete dir="archive"/>
       <delete dir="build"/>
