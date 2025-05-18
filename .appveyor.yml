@@ -29,7 +29,7 @@ for:
       - cmd: bash -lc "cd /c/projects/lightzone/ && MINGW_DIR=/c/$MINGW64_PATH gradle windows:jpackage"
 
     artifacts:
-      - path: "windows/build/jpackage/LightZone-Installer*.exe"
+      - path: "windows/build/jpackage/LightZone-Installer*.msi"
         name: windows installers
 
   - matrix:

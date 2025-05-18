@@ -49,11 +49,13 @@ runtime {
         installerName = "LightZone-Installer"
         skipInstaller = false
         installerOptions = listOf(
+            "--type", "msi",
             "--vendor", "LightZone Project",
             "--win-dir-chooser",
             "--win-menu",
             "--win-menu-group", "LightZone",
             "--win-shortcut",
+            "--win-shortcut-prompt",
             "--win-upgrade-uuid", "8d785df3-7ed8-41f9-8fdb-d0f0f67ee2e9",
         )
         imageOptions = listOf("--icon", "src/main/resources/icons/LightZone.ico")
