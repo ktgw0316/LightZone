@@ -25,6 +25,8 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
@@ -125,7 +127,13 @@ public class Platform {
      * @return Returns said directory.
      */
     public static @NotNull Path getApplicationDirectory() {
-        final var jarDir = Paths.get(Platform.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParent();
+        final URI uri;
+        try {
+            uri = Platform.class.getProtectionDomain().getCodeSource().getLocation().toURI();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+        final var jarDir = Paths.get(uri).getParent();
         final var buildDir = jarDir.getParent(); // gradle build directory on development environment
         final var nativeDir = buildDir.resolve("resources/main/native");
         return (Files.exists(nativeDir)) ? nativeDir : jarDir;
