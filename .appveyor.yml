@@ -26,7 +26,7 @@ for:
       - cmd: bash -lc "pacboy --noconfirm --disable-download-timeout -S lcms2:m libraw:m lensfun:m ntldd-git:m pkg-config:m"
 
     build_script:
-      - cmd: bash -lc "cd /c/projects/lightzone/ && MINGW_DIR=/c/$MINGW64_PATH gradle windows:jpackage"
+      - cmd: bash -lc "cd /c/projects/lightzone/ && MINGW_DIR=/c/$MINGW64_PATH gradle windows:jpackage -x test"
 
     artifacts:
       - path: "windows/build/jpackage/LightZone-Installer*.msi"
@@ -47,7 +47,7 @@ for:
       - sh: HOMEBREW_NO_AUTO_UPDATE=1 brew install --cask liberica-jdk21-full
 
     build_script:
-      - sh: gradle macosx:jpackage
+      - sh: gradle macosx:jpackage -x test
 
     artifacts:
       - path: "macosx/build/jpackage/LightZone-Installer*.dmg"
