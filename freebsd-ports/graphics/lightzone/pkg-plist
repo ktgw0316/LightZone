@@ -31,7 +31,6 @@ bin/lightzone
 %%JAVASHAREDIR%%/lightzone/flatlaf-intellij-themes-3.6.jar
 %%JAVASHAREDIR%%/lightzone/lightcrafts-linux.jar
 %%JAVASHAREDIR%%/lightzone/lightcrafts.jar
-%%JAVASHAREDIR%%/lightzone/lightzonehelp.jar
 share/applications/lightzone.desktop
 share/icons/hicolor/16x16/apps/lightzone.png
 share/icons/hicolor/32x32/apps/lightzone.png

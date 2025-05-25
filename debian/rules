@@ -28,7 +28,6 @@ override_dh_auto_install:
 	cp -pH lightcrafts/lib/jai-lightzone-*.jar debian/lightzone/usr/share/java/lightzone
 	install -m 644 lightcrafts/products/lightcrafts.jar debian/lightzone/usr/share/java/lightzone
 	install -m 644 linux/products/lightcrafts-linux.jar debian/lightzone/usr/share/java/lightzone
-	install -m 644 linux/products/lightzonehelp.jar debian/lightzone/usr/share/java/lightzone
 
 	install -dm 0755 debian/lightzone/usr/share/applications
 	install -m 644 linux/products/lightzone.desktop debian/lightzone/usr/share/applications
