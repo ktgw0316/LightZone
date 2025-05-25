@@ -3,6 +3,7 @@
 **/.gradle
 **/.pc
 **/.vscode
+**/bin
 **/build
 **/gradle.xml
 **/java_jni
