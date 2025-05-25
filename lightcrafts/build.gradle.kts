@@ -4,8 +4,8 @@ plugins {
     id("lightzone.java-conventions")
 }
 dependencies {
-    implementation("com.formdev:flatlaf:3.1.1")
-    implementation("com.formdev:flatlaf-intellij-themes:3.1.1")
+    implementation("com.formdev:flatlaf:3.6")
+    implementation("com.formdev:flatlaf-intellij-themes:3.6")
     implementation("com.github.jiconfont:jiconfont-swing:1.0.1")
     implementation("com.github.jiconfont:jiconfont-font_awesome:4.7.0.0")
     implementation("com.github.jiconfont:jiconfont-google_material_design_icons:2.2.0.2")

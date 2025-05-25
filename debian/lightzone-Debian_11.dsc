@@ -17,7 +17,7 @@ Build-Depends:
  git-core,
  javahelper,
  libejml-java (>= 0.38),
- libflatlaf-java,
+ libflatlaf-java (>= 3.6),
  libglib2.0-dev,
  libjetbrains-annotations-java,
  libjiconfont-font-awesome-java,

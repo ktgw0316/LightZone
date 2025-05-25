@@ -3,7 +3,7 @@
 
 package com.lightcrafts.ui;
 
-import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatMaterialDarkerIJTheme;
+import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatMTMaterialDarkerIJTheme;
 
 import javax.media.jai.IHSColorSpace;
 import javax.swing.*;
@@ -83,6 +83,6 @@ public class LightZoneSkin {
     }
 
     public static LookAndFeel getLightZoneLookAndFeel() {
-        return new FlatMaterialDarkerIJTheme();
+        return new FlatMTMaterialDarkerIJTheme();
     }
 }
