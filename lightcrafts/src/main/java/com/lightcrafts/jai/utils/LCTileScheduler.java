@@ -1003,7 +1003,7 @@ public final class LCTileScheduler implements TileScheduler {
     }
 
     /**
-     * Prefetchs a list of tiles of an image.
+     * Prefetches a list of tiles of an image.
      *
      * @param owner  The image the tiles belong to.
      * @param tileIndices  An array of tile X and Y indices.

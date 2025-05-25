@@ -50,7 +50,7 @@ class DefaultDocuments {
 
     /**
      * Tell if the given ImageMetadata points to a File containing RAW
-     * image data.  Only RAW files cna have default Documents.
+     * image data.  Only RAW files can have default Documents.
      */
     private static boolean isRaw(ImageMetadata meta) {
         ImageType type = meta.getImageType();

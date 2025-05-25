@@ -104,7 +104,7 @@ struct ClassStateStruct {
 
  // Threshold
 const double   EPSILON        = 0.01;  // define threshold (approx. Value of Mh at a peak or plateau)
-const double   MU             = 0.05;	// define threshold required that window is near convergence
+const double   MU             = 0.05;  // define threshold required that window is near convergence
 const double   TC_DIST_FACTOR	= 0.5;   // cluster search windows near convergence that are a distance
                                        // h[i]*TC_DIST_FACTOR of one another (transitive closure)
 const double   SQ_TC_DFACTOR  = 0.0625; // (TC_DIST_FACTOR)^2
@@ -117,7 +117,7 @@ const double   GAUSS_INCREMENT = GAUSS_LIMIT*GAUSS_LIMIT/GAUSS_NUM_ELS;
                                        // GAUSS_INCREMENT = (c^2)/(# of samples)
 
  // Numerical Analysis
-const double   DELTA           = 0.00001;	// used for floating point to integer conversion
+const double   DELTA           = 0.00001; // used for floating point to integer conversion
 
 //MeanShift Prototype
 class MeanShift {
@@ -639,7 +639,7 @@ class MeanShift {
   //|   library class method or because of insufficient  |//
   //|   resources. ErrorStatus is set to EL_ERROR        |//
   //|   (ErrorStatus = 1) if an error has occurred. If   |//
-  //|   no error occured when calling a particular       |//
+  //|   no error occurred when calling a particular      |//
   //|   method ErrorStatus is set to EL_OKAY             |//
   //|   (ErrorStatus = 0).                               |//
   //|                                                    |//
@@ -703,8 +703,8 @@ class MeanShift {
 
    /////////////////////////////////////////////////////
    // <<*>> Usage: ErrorHandler(                <<*>> //
-   //       className, functName, errMessage)         //      
-   /////////////////////////////////////////////////////                           
+   //       className, functName, errMessage)         //
+   /////////////////////////////////////////////////////
 
    void ErrorHandler(const char*, const char*, const char*);		// flags an error and halts the system
 
@@ -717,21 +717,21 @@ class MeanShift {
    //#########   MEAN SHIFT SYSTEM   ##########
    //##########################################
 
-	msSystem    msSys;                     // used for function timing and system output
+   msSystem    msSys;                     // used for function timing and system output
 
    //##########################################
    //######### INPUT DATA PARAMETERS ##########
    //##########################################
 
-	int         L, N, kp, *P;              // length, dimension, subspace number, and subspace dimensions
+   int         L, N, kp, *P;              // length, dimension, subspace number, and subspace dimensions
 
 
    //##########################################
    //######### INPUT DATA STORAGE    ##########
    //##########################################
 
-	////////Linear Storage (used by lattice and bst)////////
-	float       *data;                     // memory allocated for data points stored by tree nodes
+   ////////Linear Storage (used by lattice and bst)////////
+   float       *data;                     // memory allocated for data points stored by tree nodes
                                           // when used by the lattice data structure data does not store
                                           // the lattice information; format of data:
                                           // data = <x11, x12, ..., x1N,...,xL1, xL2, ..., xLN>
@@ -741,23 +741,23 @@ class MeanShift {
    //######## LATTICE DATA STRUCTURE ##########
    //##########################################
 
-	////////Lattice Data Structure////////
-	int         height, width;             // Height and width of lattice
+   ////////Lattice Data Structure////////
+   int         height, width;             // Height and width of lattice
 
    //##########################################
    //######### KERNEL DATA STRUCTURE ##########
    //##########################################
 
-	float       *h;                        // bandwidth vector
+   float       *h;                        // bandwidth vector
 
-	float       *offset;                   // defines bandwidth offset caused by the use of a Gaussian kernel
+   float       *offset;                   // defines bandwidth offset caused by the use of a Gaussian kernel
                                           // (for example)
 
    //##########################################
    //#########  BASIN OF ATTRACTION  ##########
    //##########################################
 
-	unsigned char  *modeTable;             // Assigns a marking to each data point specifying whether
+   unsigned char  *modeTable;             // Assigns a marking to each data point specifying whether
                                           // or not it has been assigned a mode. These labels are:
                                           // modeTable[i] = 0 - data point i is not associated with a mode
                                           // modeTable[i] = 1 - data point i is associated with a mode
@@ -768,7 +768,7 @@ class MeanShift {
                                           // converge to the same mode as the mode that mean shift is
                                           // currently being applied to
 
-	int         pointCount;                // the number of points stored by the point list
+   int         pointCount;                // the number of points stored by the point list
 
 
    //##########################################
@@ -796,18 +796,18 @@ class MeanShift {
   // *** Private Methods ***
   //========================
 
-	 /*/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\*/
-	 /* Kernel Creation/Manipulation */
-	 /*\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/*/
+    /*/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\*/
+    /* Kernel Creation/Manipulation */
+    /*\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/*/
 
    void  generateLookupTable ( void );    // Generates Weight Function Lookup Table
 
    void  DestroyKernel       ( void );    // Destroys mean shift kernel, re-initializes kernel
 
 
-	 /*/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\*/
-	 /* Input Data Initialization/Destruction  */
-	 /*\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/*/
+    /*/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\*/
+    /* Input Data Initialization/Destruction  */
+    /*\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/*/
 
    void  CreateBST           ( void );    // Upload input into a kd-BST
 
@@ -892,7 +892,7 @@ class MeanShift {
    //######### INPUT DATA STORAGE    ##########
    //##########################################
 
-	////////Range Searching on General Input Data Set////////
+   ////////Range Searching on General Input Data Set////////
    tree        *root;                     // root of kdBST used to store input
 
    tree        *forest;                   // memory allocated for tree nodes
@@ -915,8 +915,8 @@ class MeanShift {
    //######### LATTICE DATA STRUCTURE #########
    //##########################################
 
-	////////Lattice Data Structure////////
-	int         LowerBoundX, UpperBoundX;  // Upper and lower bounds for lattice search window
+   ////////Lattice Data Structure////////
+   int         LowerBoundX, UpperBoundX;  // Upper and lower bounds for lattice search window
                                           // in the x dimension
 
    int         LowerBoundY, UpperBoundY;  // Upper and lower bounds for lattice search window
