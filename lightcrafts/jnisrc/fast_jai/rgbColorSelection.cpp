@@ -6,7 +6,8 @@ typedef unsigned short ushort;
 #include <stdlib.h>
 #include <math.h>
 #include <omp.h>
-#include "../include/mathlz.h"
+#include "mathlz.h"
+#include "include/omp_util.h"
 
 #include <jni.h>
 
@@ -39,11 +40,7 @@ void loop
     float luminosityUpper           = colorSelection[6];
     float luminosityUpperFeather    = colorSelection[7];
 
-#if _OPENMP < 201307
 #pragma omp parallel for schedule (guided)
-#else
-#pragma omp parallel for simd schedule (guided)
-#endif
     for (int row = 0; row < height; row++) {
         for (int col = 0; col < width; col++) {
             float L = srcData[3 * col + row * srcLineStride + srcROffset];

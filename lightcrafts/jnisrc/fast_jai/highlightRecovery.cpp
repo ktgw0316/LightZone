@@ -162,11 +162,7 @@ Java_com_lightcrafts_jai_opimage_HighlightRecoveryOpImage_floatNativeUshortLoop(
     }
 #endif
 
-#if _OPENMP < 201307
-#pragma omp parallel for schedule(guided)
-#else
-#pragma omp parallel for simd schedule(guided)
-#endif
+    #pragma omp parallel for schedule(guided)
     for (int row = 0; row < height; row++) {
         int col = 0;
 #ifdef USE_SIMD

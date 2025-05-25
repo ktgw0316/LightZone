@@ -10,8 +10,9 @@ inline void planar_YST_to_interleaved_RGB(unsigned short * const dstData, int ds
                                    int width, int height,
                                    float *yst_to_rgb)
 {
-    OMP_FOR_SIMD
+#pragma omp parallel for
     for (int y=wr; y < height-wr; y++) {
+        OMP_SIMD
         for (int x=wr; x < width-wr; x++) {
             const int dst_idx = 3*(x-wr) + (y-wr)*dstStep + r_offset;
             const int idx = x + y*width;
@@ -37,8 +38,9 @@ inline void interleaved_RGB_to_planar_YST(const unsigned short * const srcData, 
     const float norm = (float)0x10000;
     const float inv_norm = 1.0f/norm;
 
-    OMP_FOR_SIMD
+#pragma omp parallel for
     for (int y=0; y < height; y++) {
+        OMP_SIMD
         for (int x=0; x < width; x++) {
             const int src_idx = 3*x + y*srcStep;
             const int idx = x + y*width;

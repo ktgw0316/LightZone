@@ -18,7 +18,7 @@ inline void separable_bf_mono_row(
 {
     float *rbuf = new float[width];
 
-    OMP_FOR_SIMD
+#   pragma omp for
     for (int y=wr; y < height - wr; y++) {
 
         memcpy(rbuf, &ibuf[y * width], width * sizeof(float));
@@ -31,6 +31,7 @@ inline void separable_bf_mono_row(
             float num = 0;
             float denom = 0;
 
+            OMP_SIMD
             for (int k = 0; k <= 2*wr; k++) {
                 const float I_s = rbuf[k-wr + x];
                 const float D_sq = SQR(I_s - I_s0);
@@ -64,7 +65,7 @@ inline void separable_bf_chroma_row(
     float *rbuf_a = new float[width];
     float *rbuf_b = new float[width];
 
-    OMP_FOR_SIMD
+#   pragma omp for
     for (int y=wr; y < height - wr; y++) {
         memcpy(rbuf_a, &buf_a[y * width], width * sizeof(float));
         memcpy(rbuf_b, &buf_b[y * width], width * sizeof(float));
@@ -81,6 +82,7 @@ inline void separable_bf_chroma_row(
             float b_num = 0;
             float denom = 0;
 
+            OMP_SIMD
             for (int k = 0; k <= 2*wr; k++) {
                 const int idx = (k-wr) + x;
 

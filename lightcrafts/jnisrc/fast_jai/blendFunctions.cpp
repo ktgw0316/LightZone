@@ -145,7 +145,7 @@ class ColorBurnBlendMode : public BlendMode {
 
 class SoftDodgeBlendMode : public BlendMode {
     virtual ushort blendPixels(ushort front, ushort back) const {
-        const auto p = std::minmax(back, ushort(maxVal - front));
+        const std::pair<ushort, ushort> p = std::minmax(back, ushort(maxVal - front));
         if (p.second == 0)
             return maxVal;
         uint32_t c = uint32_t(p.first) * (maxVal / 2) / p.second;
@@ -155,7 +155,7 @@ class SoftDodgeBlendMode : public BlendMode {
 
 class SoftBurnBlendMode : public BlendMode {
     virtual ushort blendPixels(ushort front, ushort back) const {
-        const auto p = std::minmax(front, ushort(maxVal - back));
+        const std::pair<ushort, ushort> p = std::minmax(front, ushort(maxVal - back));
         if (p.second == 0)
             return maxVal;
         uint32_t c = uint32_t(p.first) * (maxVal / 2) / p.second;

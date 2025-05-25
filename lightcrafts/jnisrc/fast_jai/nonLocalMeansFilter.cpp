@@ -117,10 +117,11 @@ inline void nlm_mono_tile(
             const float f = kernel[-ny] * kernel[abs(nx)];
 
             // square distances
-            OMP_PARALLEL_FOR_SIMD
+            #pragma omp parallel for
             for (int y = -ny; y < height; ++y) {
                 const int x0 = y * width;
 
+                OMP_SIMD
                 for (int x = margin_left; x < width - margin_right; ++x) {
                     const int pos0 = x0 + x;
                     const int pos1 = pos0 + n_offset;
@@ -132,9 +133,11 @@ inline void nlm_mono_tile(
             box_sum(ui, v, width, height, pr, pr);
 
             // Update the output pixel values using the weight map
-            OMP_PARALLEL_FOR_SIMD // TODO: Is this safe?
+            #pragma omp parallel for
             for (int y = -ny; y < height; ++y) {
                 const int x0 = y * width;
+
+                OMP_SIMD
                 for (int x = margin_left; x < width - margin_right; ++x) {
                     const int pos0 = x0 + x;
                     const int pos1 = pos0 + n_offset;
@@ -225,10 +228,11 @@ inline void nlm_chroma_tile(
             const float f = kernel[-ny] * kernel[abs(nx)];
 
             // square distances
-            OMP_PARALLEL_FOR_SIMD
+            #pragma omp parallel for
             for (int y = -ny; y < height; ++y) {
                 const int x0 = y * width;
 
+                OMP_SIMD
                 for (int x = margin_left; x < width - margin_right; ++x) {
                     const int pos0 = x0 + x;
                     const int pos1 = pos0 + n_offset;
@@ -241,9 +245,11 @@ inline void nlm_chroma_tile(
             box_sum(ui, v, width, height, pr, pr);
 
             // Update the output pixel values using the weight map
-            OMP_PARALLEL_FOR_SIMD // TODO: Is this safe?
+            #pragma omp parallel for
             for (int y = -ny; y < height; ++y) {
                 const int x0 = y * width;
+
+                OMP_SIMD
                 for (int x = margin_left; x < width - margin_right; ++x) {
                     const int pos0 = x0 + x;
                     const int pos1 = pos0 + n_offset;
