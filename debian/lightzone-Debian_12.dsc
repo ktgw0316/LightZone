@@ -25,7 +25,7 @@ Build-Depends:
  libjiconfont-google-material-design-icons-java,
  libjiconfont-swing-java,
  libjpeg-dev,
- liblombok-java,
+ liblombok-java (>= 1.18.22),
  liblcms2-dev,
  liblensfun-dev (<< 0.3.95),
  libopenjson-java,
