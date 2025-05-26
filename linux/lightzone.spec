@@ -93,7 +93,6 @@ export NO_BRP_CHECK_BYTECODE_VERSION=true
 %endif
 
 install -dm 0755 "%buildroot/%{_libexecdir}/%{name}"
-cp -pH lightcrafts/products/dcraw_lz "%buildroot/%{_libexecdir}/%{name}"
 cp -pH linux/products/*.so "%buildroot/%{_libexecdir}/%{name}"
 
 install -dm 0755 "%buildroot/%{_javadir}/%{name}"
@@ -107,6 +106,7 @@ install -m 644 linux/products/io.github.ktgw0316.LightZone.metainfo.xml "%buildr
 cp -pHR linux/icons "%buildroot/%{_datadir}/"
 
 install -dm 755 %{buildroot}/%{_bindir}
+install -m 755 lightcrafts/products/dcraw_lz %{buildroot}/%{_bindir}
 install -m 755 linux/products/%{name} %{buildroot}/%{_bindir}
 
 %if 0%{?sles_version}

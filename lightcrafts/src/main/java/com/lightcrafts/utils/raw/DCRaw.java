@@ -25,6 +25,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.LocalDateTime;
@@ -174,19 +175,21 @@ public final class DCRaw extends RawDecoder {
     private static String DCRAW_PATH;
     static {
         final var appDir = Platform.getApplicationDirectory();
+        Optional<Path> dcrawPath;
+
         try (final var stream = Files.walk(appDir)) {
-            DCRAW_PATH = stream
+            dcrawPath = stream
                     .filter(Files::isExecutable)
                     .filter(path -> path.getFileName().toString().replaceAll("\\.exe$", "").equals(DCRAW_NAME))
-                    .findFirst()
-                    .orElseThrow()
-                    .toString();
+                    .findFirst();
         } catch (IOException e) {
             throw new RuntimeException(e);
-        } catch (NoSuchElementException e) {
-            System.err.println("dcraw_lz not found in appDir: " + appDir);
-            throw new RuntimeException(e);
         }
+
+        // If dcraw_lz is not in the appDir, use the one in the PATH
+        DCRAW_PATH = dcrawPath.map(Path::toString).orElse(DCRAW_NAME);
+
+        System.out.println("Using dcraw at: " + DCRAW_PATH);
     }
 
     private static String match(@NonNull String s, @NonNull String tag) {

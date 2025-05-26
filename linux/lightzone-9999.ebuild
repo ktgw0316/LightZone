@@ -58,7 +58,6 @@ src_install() {
 
 	_libdir=/usr/$(get_libdir)
 	install -dm 0755 "${D}/${_libdir}/${PN}"
-	cp -pH lightcrafts/products/dcraw_lz "${D}/${_libdir}/${PN}"
 	cp -pH linux/products/*.so "${D}/${_libdir}/${PN}"
 
 	_javadir=/usr/share
@@ -74,5 +73,6 @@ src_install() {
 
 	_bindir=/usr/bin
 	install -dm 0755 "${D}/${_bindir}"
+	install -m 755 lightcrafts/products/dcraw_lz "${D}/${_bindir}"
 	install -m 755 "linux/products/${PN}" "${D}/${_bindir}"
 }
