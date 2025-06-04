@@ -59,19 +59,7 @@ export JAVA_HOME=/usr/lib64/jvm/java
 To start the build:
 
 ```shell
-ant -f linux/build.xml
-```
-
-_Note:_ If the build failed with a message:
-
-```
-"/usr/share/ant/bin/antRun": java.io.IOException: error=2, No such file or directory
-```
-
-manually download Apache Ant, unpack it somewhere (e.g. to your home directory) and append it to the path:
-
-```shell
-export PATH=/home/yourusername/apache-ant-1.10.5/bin/:$PATH
+gradle build -x test
 ```
 
 ### Offline build
@@ -94,7 +82,7 @@ ant -f linux/build.xml -Dno-ivy=true -Dno-submodule=false
 To check if it works fine before installing:
 
 ```shell
-ant -f linux/build.xml run
+gradle linux:run
 ```
 
 ## Create a package and install
