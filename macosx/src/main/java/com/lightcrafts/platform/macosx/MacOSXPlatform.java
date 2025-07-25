@@ -7,6 +7,7 @@ import com.lightcrafts.platform.*;
 import com.lightcrafts.utils.Version;
 import com.lightcrafts.utils.file.FileUtil;
 
+import java.awt.Desktop;
 import java.awt.color.ICC_Profile;
 import java.io.File;
 import java.io.IOException;
@@ -115,7 +116,9 @@ public final class MacOSXPlatform extends Platform {
 
     @Override
     public void showHelpTopic(String topic) {
-        MacOSXHelp.showHelpTopic(topic);
+        if (Desktop.isDesktopSupported()) {
+            Desktop.getDesktop().openHelp();
+        }
     }
 
     ////////// private ////////////////////////////////////////////////////////

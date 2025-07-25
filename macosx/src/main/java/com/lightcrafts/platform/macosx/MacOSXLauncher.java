@@ -44,14 +44,7 @@ public final class MacOSXLauncher extends Launcher {
 
     ////////// protected //////////////////////////////////////////////////////
 
-    @Override
-    protected String showJavaVersion() {
-        String javaVersion = super.showJavaVersion();
-        checkJavaVersion(javaVersion);
-        return javaVersion;
-    }
-
-   /**
+    /**
      * Set the color back to the user's defaults
      */
     @Override
@@ -69,57 +62,6 @@ public final class MacOSXLauncher extends Launcher {
     }
 
     ////////// private ////////////////////////////////////////////////////////
-
-    //
-    // Values correspond to M.m.p_r, e.g. "1.5.0_13".
-    //
-    private static final int REQUIRED_MIN_MAJOR    = 1;
-    private static final int REQUIRED_MIN_MINOR    = 6;
-    private static final int REQUIRED_MIN_POINT    = 0;
-    private static final int REQUIRED_MIN_REVISION = 0; // accept any rev.
-
-    /**
-     * Check that the currently running JVM meets our minimum required version.
-     * If it doesn't, show an error dialog and quit.
-     */
-    private static void checkJavaVersion(String javaVersion) {
-        try {
-            final String[] parts1 = javaVersion.split( "\\." );
-
-            final int major = Integer.parseInt( parts1[0] );
-            if ( major < REQUIRED_MIN_MAJOR )
-                showUpgradeJavaDialogAndQuit();
-            if ( major > REQUIRED_MIN_MAJOR )
-                return;
-
-            final int minor = Integer.parseInt( parts1[1] );
-            if ( minor < REQUIRED_MIN_MINOR )
-                showUpgradeJavaDialogAndQuit();
-            if ( minor > REQUIRED_MIN_MINOR )
-                return;
-
-            if ( parts1.length < 3 )
-                showUpgradeJavaDialogAndQuit();
-
-            final String[] parts2 = parts1[2].split( "_" );
-
-            final int point = Integer.parseInt( parts2[0] );
-            if ( point < REQUIRED_MIN_POINT )
-                showUpgradeJavaDialogAndQuit();
-            if ( point > REQUIRED_MIN_POINT )
-                return;
-
-            if ( parts2.length < 2 )
-                showUpgradeJavaDialogAndQuit();
-
-            final int revision = Integer.parseInt( parts2[1] );
-            if ( revision < REQUIRED_MIN_REVISION )
-                showUpgradeJavaDialogAndQuit();
-        }
-        catch ( Exception e ) {
-            showUpgradeJavaDialogAndQuit();
-        }
-    }
 
     /**
      * Open a file passed via an AppleEvent.  This method is called only from
@@ -226,26 +168,10 @@ public final class MacOSXLauncher extends Launcher {
         );
     }
 
-    /**
-     * Show the user a dialog telling him/her to upgrade the installed Java
-     * version, then quit.
-     */
-    private static void showUpgradeJavaDialogAndQuit() {
-        final AlertDialog dialog = Platform.getPlatform().getAlertDialog();
-        dialog.showAlert(
-            null, LOCALE.get( "UpgradeJavaErrorMajor" ),
-            LOCALE.get( "UpgradeJavaErrorMinor" ),
-            AlertDialog.ERROR_ALERT, LOCALE.get( "QuitButton" )
-        );
-        System.exit( 0 );
-    }
-
     static {
         System.setProperty( "apple.laf.useScreenMenuBar", "true" );
-        System.setProperty( "apple.awt.showGrowBox"     , "true" );
-        // System.setProperty( "apple.awt.textantialiasing", "true" );
-        // System.setProperty( "apple.awt.antialiasing"    , "false" );
-        System.setProperty( "apple.awt.graphics.UseQuartz", "false" );
+        System.setProperty( "apple.awt.application.name", "LightZone" );
+        System.setProperty( "apple.awt.application.appearance", "system" );
 
         final Desktop app = Desktop.getDesktop(); 
         app.setAboutHandler(new AboutHandler() {

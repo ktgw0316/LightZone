@@ -58,10 +58,6 @@ runtime {
     launcher {
         jvmArgs = listOf(
             "--add-exports=java.desktop/sun.awt.image=ALL-UNNAMED",
-            "-Dapple.awt.graphics.UseQuartz=false",
-            "-Dapple.laf.useScreenMenuBar=true",
-            "-Dcom.apple.macos.use-file-dialog-packages=true",
-            "-Dcom.apple.macos.useScreenMenuBar=true",
             "-Djava.library.path=\$APPDIR",
             "-Dfile.encoding=utf-8",
             "-Xdock:name=LightZone",

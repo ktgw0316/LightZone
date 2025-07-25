@@ -23,7 +23,6 @@ import java.awt.event.MouseEvent;
  * <li>Repaint trickery to reorder thumbnail tasks so refreshes happen in order
  * in the viewport (hopefully).</li>
  * <li>Snap-to-grid behavior when scrollbar adjustment ends.
- * <li>The Quaqua visualMargin client property.</li>
  * </ul>
  */
 public class ImageBrowserScrollPane extends CenteringScrollPane {
