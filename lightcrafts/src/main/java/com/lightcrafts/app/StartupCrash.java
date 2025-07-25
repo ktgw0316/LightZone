@@ -49,7 +49,6 @@ class StartupCrash {
         Preferences prefs = Preferences.userRoot().node("/com/lightcrafts/app");
         boolean wasSuccessful = prefs.getBoolean(StartupKey, true);
         if (! wasSuccessful) {
-            SplashWindow.disposeSplash(); // because the splash can conceal other dialogs
             showResetDialog(true);
         }
     }

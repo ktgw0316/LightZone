@@ -18,8 +18,8 @@ import java.util.List;
 
 /**
  * This AbstractLayout holds the top-level layout of the "editor" perspective
- * in a ComboFrame: an Editor, its tool components, a TemplateControl and
- * an InfoPane components.
+ * in a ComboFrame: an Editor, its tool components, and a TemplateControl
+ * components.
  */
 class EditorLayout extends AbstractLayout {
 

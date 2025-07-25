@@ -33,15 +33,8 @@ public class Launcher {
 
             CheckForUpdate.start();
 
-            final String licenseText = "Open Source";
-            final SplashImage splash = new SplashImage(
-                SplashImage.getDefaultSplashText(licenseText)
-            );
-            SplashWindow.splash(splash);
             setColor();
-            Application.setStartupProgress(splash.getStartupProgress());
             Application.main(args);
-            SplashWindow.disposeSplash();
 
             CheckForUpdate.showAlertIfAvailable();
         }

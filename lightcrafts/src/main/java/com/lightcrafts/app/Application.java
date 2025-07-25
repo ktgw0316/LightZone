@@ -108,10 +108,6 @@ public class Application {
 
     private static Platform Env = Platform.getPlatform();
 
-    public static void setStartupProgress(StartupProgress startup) {
-        Startup = startup;
-    }
-
     public static void open(ComboFrame parent) {
         FileChooser chooser = Env.getFileChooser();
         File file = chooser.openFile(
@@ -1304,8 +1300,6 @@ public class Application {
         if (System.getProperty("dieOnError") != null) {
             System.exit(-1);
         }
-        // The splash can conceal other dialogs:
-        SplashWindow.disposeSplash();
 
         String detail = null;
         if (e != null) {

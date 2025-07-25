@@ -20,10 +20,6 @@ public final class SplashImage extends BufferedImage {
 
     ////////// public /////////////////////////////////////////////////////////
 
-    public SplashImage( String text ) {
-        this( new String[]{ text } );
-    }
-
     public SplashImage( String[] texts ) {
         super(
             backgroundImage().getWidth(), backgroundImage().getHeight(), TYPE_INT_ARGB

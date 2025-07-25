@@ -24,8 +24,8 @@ import java.util.prefs.Preferences;
 
 /**
  * This AbstractLayout holds the top-level layout of the "browser" perspective
- * in a ComboFrame: a TemplateControl, a FolderCtrl, a disabled Editor, an
- * AbstractImageBrowser, and an InfoPane, with no Editor toolbar or tool stack.
+ * in a ComboFrame: a TemplateControl, a FolderCtrl, a disabled Editor, and an
+ * AbstractImageBrowser, with no Editor toolbar or tool stack.
  */
 class BrowserLayout extends AbstractLayout {
 

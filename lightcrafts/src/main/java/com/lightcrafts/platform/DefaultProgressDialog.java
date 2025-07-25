@@ -197,24 +197,6 @@ public final class DefaultProgressDialog implements ProgressDialog {
             setResizable( false );
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void dispose() {
-            // apple.laf.AquaProgressBarUI leaks animation Timers,
-            // which hold references to the progress bar member:
-            if ( m_progressBar != null ) {
-                final Container barParent = m_progressBar.getParent();
-                if ( barParent != null ) {
-                    final Component progreesBarCopy = m_progressBar;
-                    EventQueue.invokeLater(() -> barParent.remove(progreesBarCopy));
-                }
-                m_progressBar = null;
-            }
-            super.dispose();
-        }
-
         ////////// private ////////////////////////////////////////////////////
 
         /**

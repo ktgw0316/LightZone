@@ -16,6 +16,15 @@ tasks {
     clean {
         dependsOn(":lightcrafts:clean")
     }
+    jar {
+        manifest {
+            attributes(
+                "Manifest-Version" to "1.0",
+                "Main-Class" to application.mainClass,
+                "SplashScreen-Image" to "com/lightcrafts/splash/resources/Splash.png"
+            )
+        }
+    }
     register<Exec> ("helpFiles") {
         commandLine("make", "-C", "help")
     }

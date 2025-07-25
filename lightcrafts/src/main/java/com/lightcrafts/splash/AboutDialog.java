@@ -59,4 +59,32 @@ public class AboutDialog extends JDialog {
         pack();
         setLocationRelativeTo(null);
     }
+
+    private static final Color m_textColor = new Color(204, 204, 204);
+    private static final Font m_textFont = new Font("SansSerif", Font.PLAIN, 12);
+    private static final Point m_textLoc = new Point(57, 107);
+
+    private void drawText(String dynamicText) {
+        final var splash = SplashScreen.getSplashScreen();
+        final var g = splash.createGraphics();
+
+        g.setColor(m_textColor);
+        g.setFont(m_textFont);
+        g.setRenderingHint(
+                RenderingHints.KEY_TEXT_ANTIALIASING,
+                RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+        );
+
+        int y = m_textLoc.y;
+        final var metrics = g.getFontMetrics(m_textFont);
+        final int dy = -metrics.getHeight() - 5;
+        String[] text = SplashImage.getDefaultSplashText(null);
+        for (String s : text) {
+            g.drawString(s, m_textLoc.x, y);
+            y += dy;
+        }
+        g.drawString(dynamicText, m_textLoc.x, y);
+
+        splash.update();
+    }
 }
