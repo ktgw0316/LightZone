@@ -281,22 +281,18 @@ public class ImageEditorDisplay extends JPanel {
     }
 
     private boolean firstTime;
-    private int repaintCount = 0;
 
     private final Timer paintTimer = new Timer(100, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
             firstTime = false;
             paintTimer.stop();
-            repaintCount++;
             repaint();
-//            System.out.println("repaintCount = " + repaintCount);
         }
     });
 
     void setFirstTime() {
         firstTime = true;
-        repaintCount = 0;
     }
 
     private long startGetTiles;
@@ -327,19 +323,10 @@ public class ImageEditorDisplay extends JPanel {
             return;
         }
 
-        final int MAX_REPAINT_COUNT = 2;
-        if (repaintCount > MAX_REPAINT_COUNT) {
-            System.err.println("asyncRepaint failed");
-            // Fetch tiles explicitly, blocks until the tiles are all available
-            source.getTiles(tileIndices);
-        }
-
         final var isCompleted = asyncRepaint(g2d, tileIndices);
         progressNotifier.setTiles(tileManager.pendingTiles(source, epoch));
 
-        if (isCompleted) {
-            repaintCount = 0;
-        } else if (!paintTimer.isRunning()) {
+        if (!isCompleted && !paintTimer.isRunning()) {
             paintTimer.start();
         }
     }
