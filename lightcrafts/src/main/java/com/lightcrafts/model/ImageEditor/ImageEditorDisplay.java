@@ -209,6 +209,7 @@ public class ImageEditorDisplay extends JPanel {
         } else {
             progressNotifier.setTiles(tileManager.pendingTiles(source, epoch));
         }
+        repaint();
     }
 
     private class ProgressNotifier {
