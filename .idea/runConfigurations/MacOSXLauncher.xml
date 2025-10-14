@@ -1,12 +1,9 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="MacOSXLauncher" type="Application" factoryName="Application" activateToolWindowBeforeRun="false">
-    <envs>
-      <env name="LD_LIBRARY_PATH" value="$ProjectFileDir$/products" />
-    </envs>
     <option name="MAIN_CLASS_NAME" value="com.lightcrafts.platform.macosx.MacOSXLauncher" />
-    <module name="LightZone.macosx.main" />
-    <option name="VM_PARAMETERS" value="-Djava.library.path=$ProjectFileDir$/products --add-exports=java.desktop/sun.awt.image=ALL-UNNAMED" />
-    <option name="WORKING_DIRECTORY" value="$ProjectFileDir$" />
+    <module name="lightzone.macosx.main" />
+    <option name="VM_PARAMETERS" value="--add-exports=java.desktop/sun.awt.image=ALL-UNNAMED" />
+    <option name="WORKING_DIRECTORY" value="macosx/products " />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
