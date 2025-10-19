@@ -247,25 +247,40 @@ public class ZoneFinder extends Preview implements PaintListener {
         return steps;
     }
 
+    // Cache the lookup table to avoid recreating it every time
+    private static byte[][][] cachedLUTs = new byte[steps + 1][][];
+    
     // requantize the segmented image to match the same lightness scale used in the zone mapper
     private static RenderedImage requantize(RenderedImage image, int focusZone) {
-        byte[][] lut = new byte[3][256];
-        int step = 0;
-        for (int i = 0; i < colors[steps]; i++) {
-            if (i > colors[step])
-                step++;
-            if (i < (colors[step] + colors[step + 1]) / 2) {
-                if (focusZone >= 0 && step ==  focusZone) {
-                    lut[0][i] = (byte) Color.yellow.getRed();
-                    lut[1][i] = (byte) Color.yellow.getGreen();
-                    lut[2][i] = (byte) Color.yellow.getBlue();
+        byte[][] lut;
+        
+        // Use cached LUT if available
+        if (focusZone >= 0 && focusZone < cachedLUTs.length && cachedLUTs[focusZone] != null) {
+            lut = cachedLUTs[focusZone];
+        } else {
+            lut = new byte[3][256];
+            int step = 0;
+            for (int i = 0; i < colors[steps]; i++) {
+                if (i > colors[step])
+                    step++;
+                if (i < (colors[step] + colors[step + 1]) / 2) {
+                    if (focusZone >= 0 && step ==  focusZone) {
+                        lut[0][i] = (byte) Color.yellow.getRed();
+                        lut[1][i] = (byte) Color.yellow.getGreen();
+                        lut[2][i] = (byte) Color.yellow.getBlue();
+                    } else
+                        lut[0][i] = lut[1][i] = lut[2][i] = (byte) (colors[step] & 0xFF);
                 } else
-                    lut[0][i] = lut[1][i] = lut[2][i] = (byte) (colors[step] & 0xFF);
-            } else
-                lut[0][i] = lut[1][i] = lut[2][i] = (byte) (colors[step + 1] & 0xFF);
-        }
-        for (int i = colors[steps]; i < 256; i++) {
-            lut[0][i] = lut[1][i] = lut[2][i] = (byte) colors[steps];
+                    lut[0][i] = lut[1][i] = lut[2][i] = (byte) (colors[step + 1] & 0xFF);
+            }
+            for (int i = colors[steps]; i < 256; i++) {
+                lut[0][i] = lut[1][i] = lut[2][i] = (byte) colors[steps];
+            }
+            
+            // Cache the LUT for future use
+            if (focusZone >= 0 && focusZone < cachedLUTs.length) {
+                cachedLUTs[focusZone] = lut;
+            }
         }
 
         ParameterBlock pb = new ParameterBlock();
