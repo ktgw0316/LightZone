@@ -38,7 +38,8 @@ import static com.lightcrafts.model.ImageEditor.Locale.LOCALE;
 public class ZoneFinder extends Preview implements PaintListener {
     private static final boolean ADJUST_GRAYSCALE = true;
     private static final int MAX_PREVIEW_DIMENSION = 512; // Maximum dimension for preview
-
+    private static final int DEBOUNCE_DELAY_MS = 150; // Delay before processing
+    
     private final boolean colorMode;
     final ImageEditorEngine engine;
 
@@ -46,7 +47,8 @@ public class ZoneFinder extends Preview implements PaintListener {
     private RenderedImage cachedSegmentedImage = null;
     private RenderedImage cachedInputImage = null;
     private long cachedImageHash = 0;
-    
+    private Timer debounceTimer = null;
+
     @Override
     public String getName() {
         return LOCALE.get( colorMode ? "ColorZones_Name" : "Zones_Name" );
@@ -74,6 +76,10 @@ public class ZoneFinder extends Preview implements PaintListener {
     public void removeNotify() {
         // This method gets called when this Preview is removed.
         stopSegmenter();
+        if (debounceTimer != null) {
+            debounceTimer.stop();
+            debounceTimer = null;
+        }
         super.removeNotify();
     }
 
@@ -484,23 +490,39 @@ public class ZoneFinder extends Preview implements PaintListener {
             Operation op = engine.getSelectedOperation();
             if (op != null && op instanceof ZoneOperation /* && op.isActive() */ ) {
                 PlanarImage processedImage = engine.getRendering(engine.getSelectedOperationIndex() + 1);
-                image = Functions.fromUShortToByte(Functions.toColorSpace(processedImage,
-                                                                          JAIContext.systemColorSpace,
-                                                                          engine.getProofProfile(),
-                                                                          null,
-                                                                          engine.getProofIntent(),
-                                                                          null),
-                                                   null);
+                
+                // Cache color space conversion to avoid redundant processing
+                if (cachedInputImage != processedImage) {
+                    image = Functions.fromUShortToByte(Functions.toColorSpace(processedImage,
+                                                                              JAIContext.systemColorSpace,
+                                                                              engine.getProofProfile(),
+                                                                              null,
+                                                                              engine.getProofIntent(),
+                                                                              null),
+                                                       null);
 
-                if (image.getSampleModel().getDataType() == DataBuffer.TYPE_USHORT)
-                    image = Functions.fromUShortToByte(image, null);
+                    if (image.getSampleModel().getDataType() == DataBuffer.TYPE_USHORT)
+                        image = Functions.fromUShortToByte(image, null);
+                }
             }
 
-            if (segmenter == null || !segmenter.isAlive()) {
-                segmenter = new Segmenter(visibleRect, image);
-                segmenter.start();
-            } else
-                segmenter.nextView(visibleRect, image);
+            final PlanarImage finalImage = image;
+            
+            // Debounce: delay processing to avoid overwhelming the system
+            if (debounceTimer != null) {
+                debounceTimer.stop();
+            }
+            
+            debounceTimer = new Timer(DEBOUNCE_DELAY_MS, e -> {
+                if (segmenter == null || !segmenter.isAlive()) {
+                    segmenter = new Segmenter(visibleRect, finalImage);
+                    segmenter.start();
+                } else {
+                    segmenter.nextView(visibleRect, finalImage);
+                }
+            });
+            debounceTimer.setRepeats(false);
+            debounceTimer.start();
         }
     }
 }
