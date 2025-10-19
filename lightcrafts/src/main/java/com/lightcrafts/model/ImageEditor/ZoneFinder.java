@@ -38,6 +38,11 @@ public class ZoneFinder extends Preview implements PaintListener {
     private final boolean colorMode;
     final ImageEditorEngine engine;
 
+    // Caching for performance
+    private RenderedImage cachedSegmentedImage = null;
+    private RenderedImage cachedInputImage = null;
+    private long cachedImageHash = 0;
+    
     @Override
     public String getName() {
         return LOCALE.get( colorMode ? "ColorZones_Name" : "Zones_Name" );
@@ -74,8 +79,12 @@ public class ZoneFinder extends Preview implements PaintListener {
 
     @Override
     public void setSelected(Boolean selected) {
-        if (!selected)
+        if (!selected) {
             zones = null;
+            cachedSegmentedImage = null;
+            cachedInputImage = null;
+            cachedImageHash = 0;
+        }
     }
 
     @Override
@@ -114,10 +123,19 @@ public class ZoneFinder extends Preview implements PaintListener {
     private BufferedImage lastPreview = null;
 
     void setFocusedZone(int index) {
+        if (currentFocusZone == index) {
+            return; // No change, avoid unnecessary work
+        }
+        
         currentFocusZone = index;
 
         if (!colorMode && ADJUST_GRAYSCALE && lastPreview != null) {
-            zones = requantize(lastPreview, currentFocusZone);
+            // Use cached segmented image if available
+            if (cachedSegmentedImage != null) {
+                zones = requantize(cachedSegmentedImage, currentFocusZone);
+            } else {
+                zones = requantize(lastPreview, currentFocusZone);
+            }
             repaint();
         }
     }
@@ -137,6 +155,10 @@ public class ZoneFinder extends Preview implements PaintListener {
                 @Override
                 public void componentResized(ComponentEvent event) {
                     if (isShowing()) {
+                        // Clear cache on resize
+                        cachedSegmentedImage = null;
+                        cachedInputImage = null;
+                        cachedImageHash = 0;
                         engine.update(null, false);
                     }
                 }
@@ -313,7 +335,23 @@ public class ZoneFinder extends Preview implements PaintListener {
         return result;
     }
 
+    // Compute a simple hash of the image for cache comparison
+    private long computeImageHash(RenderedImage image) {
+        long hash = image.getWidth();
+        hash = 31 * hash + image.getHeight();
+        hash = 31 * hash + image.getMinX();
+        hash = 31 * hash + image.getMinY();
+        hash = 31 * hash + System.identityHashCode(image);
+        return hash;
+    }
+
     private RenderedImage segment(RenderedImage image) {
+        // Check cache first
+        long imageHash = computeImageHash(image);
+        if (cachedSegmentedImage != null && cachedImageHash == imageHash && cachedInputImage == image) {
+            return cachedSegmentedImage;
+        }
+
         Rectangle bounds = new Rectangle(image.getMinX(), image.getMinY(), image.getWidth(), image.getHeight());
 
         byte[] pixels = ((DataBufferByte) image.getData(bounds).getDataBuffer()).getData();
@@ -342,6 +380,11 @@ public class ZoneFinder extends Preview implements PaintListener {
         }
 
         RenderedImage result = lastPreview = new BufferedImage(colorModel, raster, false, null);
+
+        // Cache the segmented image before requantization
+        cachedSegmentedImage = result;
+        cachedInputImage = image;
+        cachedImageHash = imageHash;
 
         // requantize the segmented image to match the same lightness scale used in the zone mapper
         if (!colorMode && ADJUST_GRAYSCALE)
