@@ -33,6 +33,8 @@ import static com.lightcrafts.model.ImageEditor.Locale.LOCALE;
 
 public class ZoneFinder extends Preview implements PaintListener {
     private static final boolean ADJUST_GRAYSCALE = true;
+    private static final int MAX_PREVIEW_DIMENSION = 512; // Maximum dimension for preview
+
     private final boolean colorMode;
     final ImageEditorEngine engine;
 
@@ -158,6 +160,16 @@ public class ZoneFinder extends Preview implements PaintListener {
         }
 
         Dimension previewSize = getSize();
+
+         // Limit maximum preview size for performance
+        int maxDim = Math.max(previewSize.width, previewSize.height);
+        if (maxDim > MAX_PREVIEW_DIMENSION) {
+            float scaleFactor = MAX_PREVIEW_DIMENSION / (float) maxDim;
+            previewSize = new Dimension(
+                (int) (previewSize.width * scaleFactor),
+                (int) (previewSize.height * scaleFactor)
+            );
+        }
 
         if (visibleRect.width > previewSize.width || visibleRect.height > previewSize.height) {
             final float scale = Math.min(previewSize.width / (float) visibleRect.width, previewSize.height / (float) visibleRect.height);
