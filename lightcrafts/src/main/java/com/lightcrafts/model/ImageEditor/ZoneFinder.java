@@ -18,6 +18,7 @@ import javax.media.jai.JAI;
 import javax.media.jai.LookupTableJAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedOp;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.color.ICC_ColorSpace;
@@ -28,6 +29,9 @@ import java.awt.event.ComponentEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.*;
 import java.awt.image.renderable.ParameterBlock;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.lightcrafts.model.ImageEditor.Locale.LOCALE;
 
@@ -69,6 +73,7 @@ public class ZoneFinder extends Preview implements PaintListener {
     @Override
     public void removeNotify() {
         // This method gets called when this Preview is removed.
+        stopSegmenter();
         super.removeNotify();
     }
 
@@ -393,44 +398,73 @@ public class ZoneFinder extends Preview implements PaintListener {
         return result;
     }
 
-    // TODO: this is ugly code, use a real queue
+    // Improved thread management with proper queue
     class Segmenter extends Thread {
-        RenderedImage image;
-        RenderedImage nextImage = null;
+        private final BlockingQueue<SegmentRequest> requestQueue = new LinkedBlockingQueue<>(1);
+        private final AtomicBoolean running = new AtomicBoolean(true);
 
         Segmenter(Rectangle visibleRect, PlanarImage image) {
-            super("ZoneFinder Histogrammer");
-            this.image = cropScaleGrayscale(visibleRect, image);
+            super("ZoneFinder Segmenter");
+            setDaemon(true);
+            requestQueue.offer(new SegmentRequest(visibleRect, image));
         }
 
-        synchronized void nextView(Rectangle visibleRect, PlanarImage image) {
-            nextImage = cropScaleGrayscale(visibleRect, image);
+        void nextView(Rectangle visibleRect, PlanarImage image) {
+            // Clear old requests and add new one
+            requestQueue.clear();
+            requestQueue.offer(new SegmentRequest(visibleRect, image));
         }
 
-        synchronized private boolean getNextView() {
-            if (nextImage != null) {
-                image = nextImage;
-                nextImage = null;
-                return true;
-            } else
-                return false;
+        void shutdown() {
+            running.set(false);
+            interrupt();
         }
 
         @Override
         public void run() {
-            do {
-                if (getSize().width > 0 && getSize().height > 0) {
-                    RenderedImage newZones = segment(image);
-                    if (newZones != null) {
-                        zones = newZones;
-                        repaint();
+            while (running.get()) {
+                try {
+                    SegmentRequest request = requestQueue.poll();
+                    if (request == null) {
+                        Thread.sleep(50); // Brief wait if no work
+                        continue;
                     }
+
+                    if (getSize().width > 0 && getSize().height > 0) {
+                        RenderedImage processedImage = cropScaleGrayscale(request.visibleRect, request.image);
+                        RenderedImage newZones = segment(processedImage);
+                        if (newZones != null) {
+                            zones = newZones;
+                            SwingUtilities.invokeLater(() -> repaint());
+                        }
+                    }
+                } catch (InterruptedException e) {
+                    break;
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } while (getNextView());
+            }
+        }
+    }
+
+    private static class SegmentRequest {
+        final Rectangle visibleRect;
+        final PlanarImage image;
+
+        SegmentRequest(Rectangle visibleRect, PlanarImage image) {
+            this.visibleRect = visibleRect;
+            this.image = image;
         }
     }
 
     private Segmenter segmenter = null;
+
+    private void stopSegmenter() {
+        if (segmenter != null) {
+            segmenter.shutdown();
+            segmenter = null;
+        }
+    }
 
     /*
         BIG NOTE: JAI has all sorts of deadlocks in its notification management,
