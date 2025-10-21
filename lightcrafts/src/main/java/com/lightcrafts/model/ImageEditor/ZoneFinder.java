@@ -12,6 +12,7 @@ import com.lightcrafts.model.Region;
 import com.lightcrafts.model.ZoneOperation;
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.utils.Segment;
+import org.jetbrains.annotations.NotNull;
 
 import javax.media.jai.BorderExtender;
 import javax.media.jai.JAI;
@@ -30,9 +31,10 @@ import java.awt.event.ComponentEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.*;
 import java.awt.image.renderable.ParameterBlock;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import static com.lightcrafts.model.ImageEditor.Locale.LOCALE;
 
@@ -48,7 +50,11 @@ public class ZoneFinder extends Preview implements PaintListener {
     private RenderedImage cachedSegmentedImage = null;
     private RenderedImage cachedInputImage = null;
     private long cachedImageHash = 0;
-    private Timer debounceTimer = null;
+
+    // Scheduled executor for debounced segmentation tasks
+    @NotNull
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledFuture<?> debounceFuture = null;
 
     @Override
     public String getName() {
@@ -77,15 +83,7 @@ public class ZoneFinder extends Preview implements PaintListener {
     public void removeNotify() {
         // This method gets called when this Preview is removed.
         stopSegmenter();
-        stopDebounceTimer();
         super.removeNotify();
-    }
-
-    private void stopDebounceTimer() {
-        if (debounceTimer != null) {
-            debounceTimer.stop();
-            debounceTimer = null;
-        }
     }
 
     @Override
@@ -409,63 +407,32 @@ public class ZoneFinder extends Preview implements PaintListener {
         return result;
     }
 
-    // Improved thread management with proper queue
-    class Segmenter extends Thread {
-        private final BlockingQueue<SegmentRequest> requestQueue = new LinkedBlockingQueue<>(1);
-        private final AtomicBoolean running = new AtomicBoolean(true);
+    private @NotNull Runnable segmenterTask(PlanarImage image, Rectangle visibleRect) {
+        final PlanarImage finalImage = image;
 
-        Segmenter(Rectangle visibleRect, PlanarImage image) {
-            super("ZoneFinder Segmenter");
-            setDaemon(true);
-            requestQueue.offer(new SegmentRequest(visibleRect, image));
-        }
-
-        void nextView(Rectangle visibleRect, PlanarImage image) {
-            // Clear old requests and add new one
-            requestQueue.clear();
-            requestQueue.offer(new SegmentRequest(visibleRect, image));
-        }
-
-        void shutdown() {
-            running.set(false);
-            interrupt();
-        }
-
-        @Override
-        public void run() {
-            while (running.get()) {
-                try {
-                    SegmentRequest request = requestQueue.poll();
-                    if (request == null) {
-                        Thread.sleep(50); // Brief wait if no work
-                        continue;
-                    }
-
-                    if (getSize().width > 0 && getSize().height > 0) {
-                        RenderedImage processedImage = cropScaleGrayscale(request.visibleRect, request.image);
-                        RenderedImage newZones = segment(processedImage);
-                        if (newZones != null) {
-                            zones = newZones;
-                            SwingUtilities.invokeLater(() -> repaint());
-                        }
-                    }
-                } catch (InterruptedException e) {
-                    break;
-                } catch (RuntimeException e) {
-                    e.printStackTrace();
+        return () -> {
+            if (getSize().width > 0 && getSize().height > 0) {
+                RenderedImage processedImage = cropScaleGrayscale(visibleRect, finalImage);
+                RenderedImage newZones = segment(processedImage);
+                if (newZones != null) {
+                    zones = newZones;
+                    SwingUtilities.invokeLater(this::repaint);
                 }
             }
-        }
+        };
     }
 
-    private record SegmentRequest(Rectangle visibleRect, PlanarImage image) { }
-
-    private Segmenter segmenter = null;
-
     private void stopSegmenter() {
-        if (segmenter != null) {
-            segmenter.shutdown();
-            segmenter = null;
+        if (debounceFuture != null) {
+            debounceFuture.cancel(false);
+            debounceFuture = null;
+        }
+
+        try {
+            scheduler.shutdownNow();
+            scheduler.awaitTermination(200, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -503,23 +470,15 @@ public class ZoneFinder extends Preview implements PaintListener {
                 }
             }
 
-            final PlanarImage finalImage = image;
-            
-            // Debounce: delay processing to avoid overwhelming the system
-            if (debounceTimer != null) {
-                debounceTimer.stop();
+            Runnable task = segmenterTask(image, visibleRect);
+
+            // cancel any pending scheduled task and reschedule
+            if (debounceFuture != null) {
+                debounceFuture.cancel(false);
             }
-            
-            debounceTimer = new Timer(DEBOUNCE_DELAY_MS, e -> {
-                if (segmenter == null || !segmenter.isAlive()) {
-                    segmenter = new Segmenter(visibleRect, finalImage);
-                    segmenter.start();
-                } else {
-                    segmenter.nextView(visibleRect, finalImage);
-                }
-            });
-            debounceTimer.setRepeats(false);
-            debounceTimer.start();
+
+            // Debounce via ScheduledExecutorService
+            debounceFuture = scheduler.schedule(task, DEBOUNCE_DELAY_MS, TimeUnit.MILLISECONDS);
         }
     }
 }
