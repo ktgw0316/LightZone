@@ -447,7 +447,7 @@ public class ZoneFinder extends Preview implements PaintListener {
                     }
                 } catch (InterruptedException e) {
                     break;
-                } catch (Exception e) {
+                } catch (RuntimeException e) {
                     e.printStackTrace();
                 }
             }
