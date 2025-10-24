@@ -77,11 +77,15 @@ public class ZoneFinder extends Preview implements PaintListener {
     public void removeNotify() {
         // This method gets called when this Preview is removed.
         stopSegmenter();
+        stopDebounceTimer();
+        super.removeNotify();
+    }
+
+    private void stopDebounceTimer() {
         if (debounceTimer != null) {
             debounceTimer.stop();
             debounceTimer = null;
         }
-        super.removeNotify();
     }
 
     @Override
