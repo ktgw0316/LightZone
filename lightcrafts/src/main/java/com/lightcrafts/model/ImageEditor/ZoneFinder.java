@@ -454,15 +454,7 @@ public class ZoneFinder extends Preview implements PaintListener {
         }
     }
 
-    private static class SegmentRequest {
-        final Rectangle visibleRect;
-        final PlanarImage image;
-
-        SegmentRequest(Rectangle visibleRect, PlanarImage image) {
-            this.visibleRect = visibleRect;
-            this.image = image;
-        }
-    }
+    private record SegmentRequest(Rectangle visibleRect, PlanarImage image) { }
 
     private Segmenter segmenter = null;
 
