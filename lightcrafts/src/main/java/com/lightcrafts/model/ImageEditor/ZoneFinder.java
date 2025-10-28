@@ -14,7 +14,6 @@ import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.utils.Segment;
 import org.jetbrains.annotations.NotNull;
 
-import javax.media.jai.BorderExtender;
 import javax.media.jai.JAI;
 import javax.media.jai.LookupTableJAI;
 import javax.media.jai.PlanarImage;
@@ -30,6 +29,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.*;
 import java.awt.image.renderable.ParameterBlock;
+import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -144,11 +144,8 @@ public class ZoneFinder extends Preview implements PaintListener {
 
         if (!colorMode && ADJUST_GRAYSCALE && lastPreview != null) {
             // Use cached segmented image if available
-            if (cachedSegmentedImage != null) {
-                zones = requantize(cachedSegmentedImage, currentFocusZone);
-            } else {
-                zones = requantize(lastPreview, currentFocusZone);
-            }
+            final var image = Objects.requireNonNullElse(cachedSegmentedImage, lastPreview);
+            zones = requantize(image, currentFocusZone);
             repaint();
         }
     }
@@ -217,12 +214,9 @@ public class ZoneFinder extends Preview implements PaintListener {
         }
 
         // avoid keeping references to the input image
-        if (image instanceof RenderedOp) {
-            RenderedOp ropImage = (RenderedOp) image;
-
-            SampleModel sm = ropImage.getSampleModel().createCompatibleSampleModel(image.getWidth(), image.getHeight());
-
-            WritableRaster wr = Raster.createWritableRaster(sm, new Point(ropImage.getMinX(), ropImage.getMinY()));
+        if (image instanceof RenderedOp ropImage) {
+            final var sm = ropImage.getSampleModel().createCompatibleSampleModel(image.getWidth(), image.getHeight());
+            final var wr = Raster.createWritableRaster(sm, new Point(ropImage.getMinX(), ropImage.getMinY()));
             ropImage.copyData(wr);
             image = new BufferedImage(ropImage.getColorModel(), wr.createWritableTranslatedChild(0, 0), false, null);
             ropImage.dispose();
@@ -273,17 +267,8 @@ public class ZoneFinder extends Preview implements PaintListener {
         colors[steps] = colors[steps - 1];
     }
 
-    private static int zoneFrom(int lightness) {
-        for (int i = 1; i <= steps; i++) {
-            if (lightness < colors[i]) {
-                return i - 1;
-            }
-        }
-        return steps;
-    }
-
     // Cache the lookup table to avoid recreating it every time
-    private static byte[][][] cachedLUTs = new byte[steps + 1][][];
+    private static final byte[][][] cachedLUTs = new byte[steps + 1][][];
     
     // requantize the segmented image to match the same lightness scale used in the zone mapper
     private static RenderedImage requantize(RenderedImage image, int focusZone) {
@@ -323,29 +308,6 @@ public class ZoneFinder extends Preview implements PaintListener {
         pb.add(new LookupTableJAI(lut));
 
         return JAI.create("lookup", pb, JAIContext.noCacheHint);
-    }
-
-    private RenderedImage segment_bah(RenderedImage image) {
-        image = Functions.fromByteToUShort(image, null);
-
-        RenderingHints hints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
-                                                  BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-        ParameterBlock pb = new ParameterBlock();
-        pb.addSource(image);
-        pb.add(4f);
-        pb.add(20f);
-        RenderedOp filtered = JAI.create("BilateralFilter", pb, hints);
-
-        filtered = Functions.fromUShortToByte(filtered, null);
-
-        RenderedImage result = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
-        filtered.copyData(((BufferedImage) result).getRaster());
-        lastPreview = (BufferedImage) result;
-
-        if (!colorMode && ADJUST_GRAYSCALE)
-            result = requantize(result, currentFocusZone);
-
-        return result;
     }
 
     // Compute a simple hash of the image for cache comparison
@@ -452,7 +414,7 @@ public class ZoneFinder extends Preview implements PaintListener {
 
         if (previewDimension.getHeight() > 1 && previewDimension.getWidth() > 1) {
             Operation op = engine.getSelectedOperation();
-            if (op != null && op instanceof ZoneOperation /* && op.isActive() */ ) {
+            if (op instanceof ZoneOperation /* && op.isActive() */ ) {
                 PlanarImage processedImage = engine.getRendering(engine.getSelectedOperationIndex() + 1);
                 
                 // Cache color space conversion to avoid redundant processing
