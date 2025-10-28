@@ -20,7 +20,6 @@ import javax.media.jai.LookupTableJAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedOp;
 import javax.swing.SwingUtilities;
-import javax.swing.Timer;
 import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.color.ICC_ColorSpace;
@@ -429,10 +428,11 @@ public class ZoneFinder extends Preview implements PaintListener {
         }
 
         try {
-            scheduler.shutdownNow();
-            scheduler.awaitTermination(200, TimeUnit.MILLISECONDS);
+            if (! scheduler.awaitTermination(200, TimeUnit.MILLISECONDS)) {
+                scheduler.shutdownNow();
+            }
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            scheduler.shutdownNow();
         }
     }
 
