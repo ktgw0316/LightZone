@@ -52,7 +52,7 @@ public class ZoneFinder extends Preview implements PaintListener {
 
     // Scheduled executor for debounced segmentation tasks
     @NotNull
-    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private ScheduledFuture<?> debounceFuture = null;
 
     @Override
@@ -475,6 +475,10 @@ public class ZoneFinder extends Preview implements PaintListener {
             // cancel any pending scheduled task and reschedule
             if (debounceFuture != null) {
                 debounceFuture.cancel(false);
+            }
+
+            if (scheduler.isShutdown()) {
+                scheduler = Executors.newSingleThreadScheduledExecutor();
             }
 
             // Debounce via ScheduledExecutorService
