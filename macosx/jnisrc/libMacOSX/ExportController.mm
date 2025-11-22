@@ -14,7 +14,7 @@ using namespace std;
     if ( [[self superclass] instancesRespondToSelector:@selector(awakeFromNib)] )
         [super awakeFromNib];
 
-    [imageTabView setDelegate:self];
+    [imageTabView setDelegate:(id<NSTabViewDelegate>)self];
 }
 
 /**
