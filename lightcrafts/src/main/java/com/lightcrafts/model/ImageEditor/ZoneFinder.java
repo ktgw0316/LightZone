@@ -12,14 +12,13 @@ import com.lightcrafts.model.Region;
 import com.lightcrafts.model.ZoneOperation;
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.utils.Segment;
+import org.jetbrains.annotations.NotNull;
 
-import javax.media.jai.BorderExtender;
 import javax.media.jai.JAI;
 import javax.media.jai.LookupTableJAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedOp;
 import javax.swing.SwingUtilities;
-import javax.swing.Timer;
 import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.color.ICC_ColorSpace;
@@ -30,9 +29,11 @@ import java.awt.event.ComponentEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.*;
 import java.awt.image.renderable.ParameterBlock;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import static com.lightcrafts.model.ImageEditor.Locale.LOCALE;
 
@@ -48,7 +49,11 @@ public class ZoneFinder extends Preview implements PaintListener {
     private RenderedImage cachedSegmentedImage = null;
     private RenderedImage cachedInputImage = null;
     private long cachedImageHash = 0;
-    private Timer debounceTimer = null;
+
+    // Scheduled executor for debounced segmentation tasks
+    @NotNull
+    private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledFuture<?> debounceFuture = null;
 
     @Override
     public String getName() {
@@ -77,15 +82,7 @@ public class ZoneFinder extends Preview implements PaintListener {
     public void removeNotify() {
         // This method gets called when this Preview is removed.
         stopSegmenter();
-        stopDebounceTimer();
         super.removeNotify();
-    }
-
-    private void stopDebounceTimer() {
-        if (debounceTimer != null) {
-            debounceTimer.stop();
-            debounceTimer = null;
-        }
     }
 
     @Override
@@ -147,11 +144,8 @@ public class ZoneFinder extends Preview implements PaintListener {
 
         if (!colorMode && ADJUST_GRAYSCALE && lastPreview != null) {
             // Use cached segmented image if available
-            if (cachedSegmentedImage != null) {
-                zones = requantize(cachedSegmentedImage, currentFocusZone);
-            } else {
-                zones = requantize(lastPreview, currentFocusZone);
-            }
+            final var image = Objects.requireNonNullElse(cachedSegmentedImage, lastPreview);
+            zones = requantize(image, currentFocusZone);
             repaint();
         }
     }
@@ -220,12 +214,9 @@ public class ZoneFinder extends Preview implements PaintListener {
         }
 
         // avoid keeping references to the input image
-        if (image instanceof RenderedOp) {
-            RenderedOp ropImage = (RenderedOp) image;
-
-            SampleModel sm = ropImage.getSampleModel().createCompatibleSampleModel(image.getWidth(), image.getHeight());
-
-            WritableRaster wr = Raster.createWritableRaster(sm, new Point(ropImage.getMinX(), ropImage.getMinY()));
+        if (image instanceof RenderedOp ropImage) {
+            final var sm = ropImage.getSampleModel().createCompatibleSampleModel(image.getWidth(), image.getHeight());
+            final var wr = Raster.createWritableRaster(sm, new Point(ropImage.getMinX(), ropImage.getMinY()));
             ropImage.copyData(wr);
             image = new BufferedImage(ropImage.getColorModel(), wr.createWritableTranslatedChild(0, 0), false, null);
             ropImage.dispose();
@@ -276,17 +267,8 @@ public class ZoneFinder extends Preview implements PaintListener {
         colors[steps] = colors[steps - 1];
     }
 
-    private static int zoneFrom(int lightness) {
-        for (int i = 1; i <= steps; i++) {
-            if (lightness < colors[i]) {
-                return i - 1;
-            }
-        }
-        return steps;
-    }
-
     // Cache the lookup table to avoid recreating it every time
-    private static byte[][][] cachedLUTs = new byte[steps + 1][][];
+    private static final byte[][][] cachedLUTs = new byte[steps + 1][][];
     
     // requantize the segmented image to match the same lightness scale used in the zone mapper
     private static RenderedImage requantize(RenderedImage image, int focusZone) {
@@ -326,29 +308,6 @@ public class ZoneFinder extends Preview implements PaintListener {
         pb.add(new LookupTableJAI(lut));
 
         return JAI.create("lookup", pb, JAIContext.noCacheHint);
-    }
-
-    private RenderedImage segment_bah(RenderedImage image) {
-        image = Functions.fromByteToUShort(image, null);
-
-        RenderingHints hints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
-                                                  BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-        ParameterBlock pb = new ParameterBlock();
-        pb.addSource(image);
-        pb.add(4f);
-        pb.add(20f);
-        RenderedOp filtered = JAI.create("BilateralFilter", pb, hints);
-
-        filtered = Functions.fromUShortToByte(filtered, null);
-
-        RenderedImage result = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
-        filtered.copyData(((BufferedImage) result).getRaster());
-        lastPreview = (BufferedImage) result;
-
-        if (!colorMode && ADJUST_GRAYSCALE)
-            result = requantize(result, currentFocusZone);
-
-        return result;
     }
 
     // Compute a simple hash of the image for cache comparison
@@ -409,63 +368,33 @@ public class ZoneFinder extends Preview implements PaintListener {
         return result;
     }
 
-    // Improved thread management with proper queue
-    class Segmenter extends Thread {
-        private final BlockingQueue<SegmentRequest> requestQueue = new LinkedBlockingQueue<>(1);
-        private final AtomicBoolean running = new AtomicBoolean(true);
+    private @NotNull Runnable segmenterTask(PlanarImage image, Rectangle visibleRect) {
+        final PlanarImage finalImage = image;
 
-        Segmenter(Rectangle visibleRect, PlanarImage image) {
-            super("ZoneFinder Segmenter");
-            setDaemon(true);
-            requestQueue.offer(new SegmentRequest(visibleRect, image));
-        }
-
-        void nextView(Rectangle visibleRect, PlanarImage image) {
-            // Clear old requests and add new one
-            requestQueue.clear();
-            requestQueue.offer(new SegmentRequest(visibleRect, image));
-        }
-
-        void shutdown() {
-            running.set(false);
-            interrupt();
-        }
-
-        @Override
-        public void run() {
-            while (running.get()) {
-                try {
-                    SegmentRequest request = requestQueue.poll();
-                    if (request == null) {
-                        Thread.sleep(50); // Brief wait if no work
-                        continue;
-                    }
-
-                    if (getSize().width > 0 && getSize().height > 0) {
-                        RenderedImage processedImage = cropScaleGrayscale(request.visibleRect, request.image);
-                        RenderedImage newZones = segment(processedImage);
-                        if (newZones != null) {
-                            zones = newZones;
-                            SwingUtilities.invokeLater(() -> repaint());
-                        }
-                    }
-                } catch (InterruptedException e) {
-                    break;
-                } catch (RuntimeException e) {
-                    e.printStackTrace();
+        return () -> {
+            if (getSize().width > 0 && getSize().height > 0) {
+                RenderedImage processedImage = cropScaleGrayscale(visibleRect, finalImage);
+                RenderedImage newZones = segment(processedImage);
+                if (newZones != null) {
+                    zones = newZones;
+                    SwingUtilities.invokeLater(this::repaint);
                 }
             }
-        }
+        };
     }
 
-    private record SegmentRequest(Rectangle visibleRect, PlanarImage image) { }
-
-    private Segmenter segmenter = null;
-
     private void stopSegmenter() {
-        if (segmenter != null) {
-            segmenter.shutdown();
-            segmenter = null;
+        if (debounceFuture != null) {
+            debounceFuture.cancel(false);
+            debounceFuture = null;
+        }
+
+        try {
+            if (! scheduler.awaitTermination(200, TimeUnit.MILLISECONDS)) {
+                scheduler.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            scheduler.shutdownNow();
         }
     }
 
@@ -485,7 +414,7 @@ public class ZoneFinder extends Preview implements PaintListener {
 
         if (previewDimension.getHeight() > 1 && previewDimension.getWidth() > 1) {
             Operation op = engine.getSelectedOperation();
-            if (op != null && op instanceof ZoneOperation /* && op.isActive() */ ) {
+            if (op instanceof ZoneOperation /* && op.isActive() */ ) {
                 PlanarImage processedImage = engine.getRendering(engine.getSelectedOperationIndex() + 1);
                 
                 // Cache color space conversion to avoid redundant processing
@@ -503,23 +432,19 @@ public class ZoneFinder extends Preview implements PaintListener {
                 }
             }
 
-            final PlanarImage finalImage = image;
-            
-            // Debounce: delay processing to avoid overwhelming the system
-            if (debounceTimer != null) {
-                debounceTimer.stop();
+            Runnable task = segmenterTask(image, visibleRect);
+
+            // cancel any pending scheduled task and reschedule
+            if (debounceFuture != null) {
+                debounceFuture.cancel(false);
             }
-            
-            debounceTimer = new Timer(DEBOUNCE_DELAY_MS, e -> {
-                if (segmenter == null || !segmenter.isAlive()) {
-                    segmenter = new Segmenter(visibleRect, finalImage);
-                    segmenter.start();
-                } else {
-                    segmenter.nextView(visibleRect, finalImage);
-                }
-            });
-            debounceTimer.setRepeats(false);
-            debounceTimer.start();
+
+            if (scheduler.isShutdown()) {
+                scheduler = Executors.newSingleThreadScheduledExecutor();
+            }
+
+            // Debounce via ScheduledExecutorService
+            debounceFuture = scheduler.schedule(task, DEBOUNCE_DELAY_MS, TimeUnit.MILLISECONDS);
         }
     }
 }
