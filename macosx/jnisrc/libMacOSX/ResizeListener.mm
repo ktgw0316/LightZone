@@ -13,6 +13,7 @@
     ResizeListener *const that = [ResizeListener alloc];
     that->m_field = field;
     that->m_aspectRatio = aspectRatio;
+    return that;
 }
 
 /**
