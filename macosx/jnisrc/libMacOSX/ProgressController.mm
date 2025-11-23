@@ -12,7 +12,7 @@
 {
     [message setStringValue:@"Canceling..."];
     [message displayIfNeeded];          // force redraw now
-    [NSApp endSheet:panel returnCode:NSCancelButton];
+    [NSApp endSheet:panel returnCode:NSModalResponseCancel];
 }
 
 @end
