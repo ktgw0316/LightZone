@@ -110,7 +110,12 @@ public final class MacOSXPlatform extends Platform {
 
     @Override
     public String resolveAliasFile(File file) {
-        return MacOSXFileUtil.resolveAlias(file.getAbsolutePath());
+        try {
+            final String resolved = file.getCanonicalPath();
+            return MacOSXFileUtil.resolveAlias(resolved);
+        } catch (IOException e) {
+            return null;
+        }
     }
 
     @Override

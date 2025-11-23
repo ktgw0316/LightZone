@@ -408,7 +408,11 @@ public class Platform {
      * refer to an alias) or <code>null</code> if there was an error.
      */
     public String resolveAliasFile( File file ) {
-        return file.getAbsolutePath();
+        try {
+            return file.getCanonicalPath();
+        } catch (IOException e) {
+            return null;
+        }
     }
 
     /**

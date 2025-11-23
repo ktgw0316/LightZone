@@ -139,15 +139,6 @@ public final class WindowsPlatform extends Platform {
     }
 
     @Override
-    public String resolveAliasFile( File file ) {
-        try {
-            return file.getCanonicalPath();
-        } catch (IOException e) {
-            return null;
-        }
-    }
-
-    @Override
     public void showHelpTopic( String topic ) {
         WindowsHelp.showHelpTopic( topic );
     }
