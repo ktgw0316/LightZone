@@ -39,10 +39,12 @@ public final class FileUtil {
             throws IOException {
         final Platform platform = Platform.getPlatform();
         final Path dirPath = platform.isSpecialFile(dir).toPath();
-        return Files.list(dirPath)
-                .map(Path::toFile)
-                .map(platform::isSpecialFile)
-                .anyMatch(filter::accept);
+        try (java.util.stream.Stream<Path> stream = Files.list(dirPath)) {
+            return stream
+                    .map(Path::toFile)
+                    .map(platform::isSpecialFile)
+                    .anyMatch(filter::accept);
+        }
     }
 
     /**
