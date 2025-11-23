@@ -29,33 +29,6 @@ using namespace LightCrafts;
         name4(Java_,com_lightcrafts_platform_macosx_MacOSXFileUtil,_,method)
 
 /**
- * Check whether a file is a Mac OS X alias file.
- */
-JNIEXPORT jboolean JNICALL MacOSXFileUtil_METHOD(isAlias)
-    ( JNIEnv *env, jclass, jstring jPath )
-{
-    auto_obj<NSAutoreleasePool> pool;
-    NSString *const nsPath = LC_jstringToNSString( env, jPath );
-    CFURLRef cfURLRef = CFURLCreateWithFileSystemPath(
-        NULL, (CFStringRef)nsPath, kCFURLPOSIXPathStyle, NO /* isDirectory */
-    );
-    if ( !cfURLRef )
-        return JNI_FALSE;
-
-    jboolean result = JNI_FALSE;
-
-    FSRef fsRef;
-    if ( CFURLGetFSRef( cfURLRef, &fsRef ) ) {
-        Boolean isAlias, isFolder;
-        if ( FSIsAliasFile( &fsRef, &isAlias, &isFolder ) == noErr && isAlias )
-            result = JNI_TRUE;
-    }
-
-    CFRelease( cfURLRef );
-    return result;
-}
-
-/**
  * Resolve a Mac OS X alias file.
  * Returns the resolved file (or the original file if it wasn't an alias), or
  * null if there was an error.
