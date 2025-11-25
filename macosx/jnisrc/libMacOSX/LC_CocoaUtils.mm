@@ -113,7 +113,7 @@ NSMutableArray* LC_jStringArrayToNSArray( JNIEnv *env, jobjectArray jArray ) {
  * Raise a Cocoa IllegalStateException.
  */
 void LC_raiseIllegalStateException( NSString *msg ) {
-    [NSException raise:@"IllegalStateException" format:msg];
+    [NSException raise:@"IllegalStateException" format:@"%@", msg];
 }
 
 /* vim:set et sw=4 ts=4: */

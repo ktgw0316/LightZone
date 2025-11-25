@@ -7,6 +7,7 @@
 
 // standard
 #include <CoreServices/CoreServices.h>
+#import <Foundation/Foundation.h>
 
 #ifdef DEBUG
 #include <iostream>
@@ -29,77 +30,53 @@ using namespace LightCrafts;
         name4(Java_,com_lightcrafts_platform_macosx_MacOSXFileUtil,_,method)
 
 /**
- * Check whether a file is a Mac OS X alias file.
- */
-JNIEXPORT jboolean JNICALL MacOSXFileUtil_METHOD(isAlias)
-    ( JNIEnv *env, jclass, jstring jPath )
-{
-    auto_obj<NSAutoreleasePool> pool;
-    NSString *const nsPath = LC_jstringToNSString( env, jPath );
-    CFURLRef cfURLRef = CFURLCreateWithFileSystemPath(
-        NULL, (CFStringRef)nsPath, kCFURLPOSIXPathStyle, NO /* isDirectory */
-    );
-    if ( !cfURLRef )
-        return JNI_FALSE;
-
-    jboolean result = JNI_FALSE;
-
-    FSRef fsRef;
-    if ( CFURLGetFSRef( cfURLRef, &fsRef ) ) {
-        Boolean isAlias, isFolder;
-        if ( FSIsAliasFile( &fsRef, &isAlias, &isFolder ) == noErr && isAlias )
-            result = JNI_TRUE;
-    }
-
-    CFRelease( cfURLRef );
-    return result;
-}
-
-/**
- * Resolve a Mac OS X alias file.
- * Returns the resolved file (or the original file if it wasn't an alias), or
- * null if there was an error.
- */
+  * Resolve a Mac OS X alias file.
+  * Returns the resolved file (or the original file if it wasn't an alias), or
+  * null if there was an error.
+  */
 JNIEXPORT jstring JNICALL MacOSXFileUtil_METHOD(resolveAlias)
     ( JNIEnv *env, jclass, jstring jPath )
 {
     auto_obj<NSAutoreleasePool> pool;
     NSString *const nsPath = LC_jstringToNSString( env, jPath );
-    CFURLRef cfURLRef = CFURLCreateWithFileSystemPath(
-        NULL, (CFStringRef)nsPath, kCFURLPOSIXPathStyle, NO /* isDirectory */
-    );
-    if ( !cfURLRef )
-        return NULL;
+    jstring result = NULL;
 
-    FSRef fsRef;
-    if ( !CFURLGetFSRef( cfURLRef, &fsRef ) )
-        goto error;
+    @autoreleasepool {
+        NSURL *url = [NSURL fileURLWithPath: nsPath];
+        NSNumber *isAlias = nil;
+        NSError *err = nil;
+        if ( ![url getResourceValue: &isAlias forKey: NSURLIsAliasFileKey error: &err] ) {
+            // Could not read resource value; return NULL to indicate error
+            return NULL;
+        }
 
-    Boolean isAlias, isFolder;
-    OSErr err;
-        err = FSResolveAliasFileWithMountFlags(
-        &fsRef, true /* resolveAliasChains */, &isFolder, &isAlias,
-        kResolveAliasFileNoUI
-    );
-    if ( err != noErr )
-        goto error;
-
-    if ( isAlias ) {
-        CFURLRef cfResolvedURL = CFURLCreateFromFSRef( NULL, &fsRef );
-        if ( !cfResolvedURL )
-            goto error;
-        CFStringRef cfResolvedPath =
-            CFURLCopyFileSystemPath( cfResolvedURL, kCFURLPOSIXPathStyle );
-        jPath = LC_NSStringTojstring( env, (NSString*)cfResolvedPath );
-        CFRelease( cfResolvedPath );
-        CFRelease( cfResolvedURL );
+        if ( isAlias != nil && [isAlias boolValue] ) {
+            // Try to read bookmark data from the alias file and resolve it.
+            NSError *bErr = nil;
+            NSData *bookmark = [NSURL bookmarkDataWithContentsOfURL: url error: &bErr];
+            if ( bookmark ) {
+                BOOL stale = NO;
+                NSError *resErr = nil;
+                NSURL *resolved = [NSURL URLByResolvingBookmarkData: bookmark
+                                                            options: NSURLBookmarkResolutionWithoutUI | NSURLBookmarkResolutionWithoutMounting
+                                                      relativeToURL: nil
+                                                bookmarkDataIsStale: &stale
+                                                              error: &resErr];
+                if ( resolved ) {
+                    result = LC_NSStringTojstring( env, [resolved path] );
+                } else {
+                    // If resolving bookmark failed, fall back to returning NULL
+                    result = NULL;
+                }
+            } else {
+                // If we couldn't get bookmark data, return NULL
+                result = NULL;
+            }
+        } else {
+            // Not an alias: return the original path
+            result = LC_NSStringTojstring( env, nsPath );
+        }
     }
-    goto done;
 
-error:
-    jPath = NULL;
-done:
-    CFRelease( cfURLRef );
-    return jPath;
+    return result;
 }
-/* vim:set et sw=4 ts=4: */
