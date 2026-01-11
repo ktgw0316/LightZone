@@ -184,7 +184,7 @@ public class UnSharpMaskOperation extends BlendedOperation {
             pb.addSource(Functions.gaussianBlur(back, rendering, op, radius * scale));
             pb.add(amount/100.0);
             pb.add((int) threshold);
-            return ImageN.create("LCUnSharpMask", pb, extenderHints);
+            return ImageN.create("LCUnsharpMask", pb, extenderHints);
         }
 
         @Override
@@ -204,7 +204,7 @@ public class UnSharpMaskOperation extends BlendedOperation {
             pb.addSource(blur);
             pb.add(amount/100.0);
             pb.add((int) threshold);
-            RenderedOp usm = ImageN.create("LCUnSharpMask", pb, extenderHints);
+            RenderedOp usm = ImageN.create("LCUnsharpMask", pb, extenderHints);
             usm.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
 
             pb = new ParameterBlock();
@@ -236,7 +236,7 @@ public class UnSharpMaskOperation extends BlendedOperation {
             pb.addSource(Functions.gaussianBlur(back, rendering, op, LuminanceUSMProcessorInstance, radius * scale));
             pb.add(amount/100.0);
             pb.add((int) threshold);
-            RenderedOp usm = ImageN.create("LCUnSharpMask", pb, extenderHints);
+            RenderedOp usm = ImageN.create("LCUnsharpMask", pb, extenderHints);
             usm.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
 
             pb = new ParameterBlock();
