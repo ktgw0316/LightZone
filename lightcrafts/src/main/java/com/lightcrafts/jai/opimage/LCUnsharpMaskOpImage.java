@@ -29,7 +29,7 @@ import java.util.Map;
 import org.eclipse.imagen.media.util.ImageUtil;
 import org.eclipse.imagen.media.util.JDKWorkarounds;
 
-final class UnSharpMaskOpImage extends PointOpImage {
+final class LCUnsharpMaskOpImage extends PointOpImage {
 
     /* Source 1 band increment */
     private int s1bd = 1;
@@ -41,9 +41,9 @@ final class UnSharpMaskOpImage extends PointOpImage {
     protected int threshold;
 
     /**
-     * Constructs an <code>AddOpImage</code>.
+     * Constructs an <code>LCUnsharpMaskOpImage</code>.
      *
-     * <p>The <code>layout</code> parameter may optionally contains the
+     * <p>The <code>layout</code> parameter may optionally contain the
      * tile grid layout, sample model, and/or color model. The image
      * dimension is determined by the intersection of the bounding boxes
      * of the two source images.
@@ -53,15 +53,17 @@ final class UnSharpMaskOpImage extends PointOpImage {
      * image. Any layout parameters not specified in the <code>layout</code>
      * argument are set to the same value as that of <code>source1</code>.
      *
-     * @param source1  The first source image.
-     * @param source2  The second source image.
-     * @param layout   The destination image layout.
+     * @param source1   The first source image.
+     * @param source2   The second source image.
+     * @param layout    The destination image layout.
+     * @param gain      The sharpening value.
+     * @param threshold The sharpening threshold.
      */
-    public UnSharpMaskOpImage(RenderedImage source1,
-                              RenderedImage source2,
-                              Map config,
-                              ImageLayout layout,
-                              double gain, int threshold) {
+    public LCUnsharpMaskOpImage(RenderedImage source1,
+                                RenderedImage source2,
+                                Map config,
+                                ImageLayout layout,
+                                double gain, int threshold) {
         super(source1, source2, layout, config, true);
 
         this.gain = gain;
@@ -116,15 +118,7 @@ final class UnSharpMaskOpImage extends PointOpImage {
         permitInPlaceOperation();
     }
 
-    /**
-     * Adds the pixel values of two source images within a specified
-     * rectangle.
-     *
-     * @param sources   Cobbled sources, guaranteed to provide all the
-     *                  source data necessary for computing the rectangle.
-     * @param dest      The tile containing the rectangle to be computed.
-     * @param destRect  The rectangle within the tile to be computed.
-     */
+    @Override
     protected void computeRect(Raster[] sources,
                                WritableRaster dest,
                                Rectangle destRect) {
@@ -242,10 +236,6 @@ final class UnSharpMaskOpImage extends PointOpImage {
             return 1;
         else
             return sigmoidTable[idx];
-    }
-
-    public static void main( String[] args ) {
-        System.out.println("Here: ");
     }
 
     private void computeRectUShort(RasterAccessor src1,

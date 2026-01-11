@@ -239,10 +239,10 @@ public class JAIContext {
         RIFRegistry.register(or, desc.getName(), "com.lightcrafts", crif);
         CRIFRegistry.register(or, desc.getName(), crif);
 
-        // register UnSharpMaskOp
-        desc = new UnSharpMaskDescriptor();
+        // register LCUnsharpMaskOp
+        desc = new LCUnsharpMaskDescriptor();
         or.registerDescriptor(desc);
-        crif = new UnSharpMaskCRIF();
+        crif = new LCUnsharpMaskCRIF();
         RIFRegistry.register(or, desc.getName(), "com.lightcrafts", crif);
         CRIFRegistry.register(or, desc.getName(), crif);
 
