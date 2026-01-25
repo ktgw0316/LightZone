@@ -1,9 +1,9 @@
 # Development guide
 
-Written and tested on MacOSX 13.5 with Java 17 64-bit.
+Written and tested on MacOS Sequoia 15.7 with Java 21 64-bit.
 
-LightZone can be built with Ant, and edited with any java IDE; these instructions use Eclipse for convenience,
-since it's a common IDE with Ant built in.
+LightZone can be built with Gradle, and edited with any java IDE; these instructions use Eclipse for convenience,
+since it's a common IDE with Gradle support.
 
 These instructions sometimes say to right-click on something; use Control+Click instead if necessary.
 
@@ -17,19 +17,18 @@ from LightZone/macosx/resources/Info.plist and launch the MainClass defined ther
 
 Building the LightZone source requires the following software:
 
-- __Java__ version 17 or later
+- __Java__ version 21 or later
 - __clang__
 - __git__
 - __homebrew__ from <http://brew.sh/>
 
 You need to install following packages using homebrew:
 
-- __ant__ version 1.9.8 or later to support nativeheaderdir parameter
 - __jpeg-turbo__
 - __lensfun__
 - __libomp__
 - __libraw__
-- __libtiff__ "brew edit libtiff", replace all "jpeg" occurrences with "jpeg-turbo", then "brew install libtiff --build-from-source"
+- __libtiff__
 - __little-cms2__
 - __pkg-config__
 
@@ -48,28 +47,36 @@ On the General tab, note the topmost Java version and type (64- or 32-bit).
 Because the project builds its libraries and JARs using varied commands,
 make sure you use this version consistently throughout the project settings.
 
-## Build instructions for LightZone with Ant (if you're not using Eclipse)
+## Build instructions for LightZone with Gradle (if you're not using Eclipse)
 
 If you're using Eclipse, skip this section.
 
-- Make sure command-line tools, clang-omp, git, and ant are installed.
+- Make sure command-line tools, clang-omp, git, and gradle are installed.
 - Make sure your default java version is set in the Java Preferences app.
-- Set the `JAVA_HOME` environment variable to /Library/Java/Home
-- cd to LightZone/macosx in the source folder.
-- To build LightZone, run these commands; each run's output should end with "`BUILD SUCCESSFUL`" when you run it.
+- Set the `JAVA_HOME` environment variable to:
+  - Arm: `/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home/`
+  - Intel: `/usr/local/opt/openjdk/libexec/openjdk.jdk/Contents/Home/`
+- cd to the root of the source folder (where `gradlew` is located).
+- To build LightZone, run these commands; each run's output should end with "BUILD SUCCESSFUL" when you run it.
 If you have errors, see the "Troubleshooting" section of this document.
 
-  ant clean
-  ant build
-  ant jar
+```sh
+  ./gradlew clean
+  ./gradlew build -x test
+  ./gradlew jar
+```
 
 - You should now be able to run LightZone with:
 
-  ant run
+```sh
+  ./gradlew run
+```
 
 - If everything is OK, you should be able to create an installer package with:
 
-  ant dmg
+```sh
+  ./gradlew jpackage
+```
 
 ## Setup instructions for LightZone as an Eclipse project
 
@@ -79,17 +86,15 @@ If you're already using Eclipse for other development, you may want to make a ne
 
 ## Eclipse initial setup
 
-- Eclipse prefs -> Java -> Installed JREs -> whatever you selected in Java Preferences (1.6 for me)
+- Eclipse prefs -> Java -> Installed JREs -> whatever you selected in Java Preferences (21 for me)
 
 If you can't find it in the list, click Add -> Mac OS X JVM and browse to
-/System/Library/Frameworks/JavaVM.framework/Versions/1.6/Home  (or 1.7/Home)
+/System/Library/Frameworks/JavaVM.framework/Versions/21/Home
 
-- Eclipse prefs -> java -> compiler -> compliance level: 1.6
+- Eclipse prefs -> java -> compiler -> compliance level: 21
 
-- Choose File -> New -> Project... -> Java Project from Existing Ant Buildfile.
-- Browse to lightcrafts/build.xml
-- Check [X] Link to the buildfile in the file system
-- Select the second "javac" task in target "javac"
+- Choose File -> New -> Project... -> Gradle -> Gradle Project.
+- Browse to the root directory of the project (where settings.gradle.kts is located)
 - Click "Finish"
 
 In the Project Explorer view, do the following:
@@ -109,16 +114,16 @@ If you get error messages while running these builds, see the "Troubleshooting" 
 ## First build config: clean
 
 - Click the down-arrow next to the External Tools icon, or choose Run -> External Tools -> External Tools Configurations
-- Select Ant Build, click the New icon
+- Select Gradle Build, click the New icon
 
 Set up this config for the build:
 
 - Main tab:
   - Name: clean
-  - Buildfile: Browse workspace: lightcrafts -> build.xml
-  - Base directory: Browse file system: lightcrafts (at top level of the source tree)
+  - Buildfile: Browse workspace: root -> build.gradle.kts (or settings.gradle.kts)
+  - Base directory: Browse file system: root (at top level of the source tree)
 - Build tab: un-check "Build before launch"
-- Targets tab: check clean  ; un-check the default "build"
+- Tasks tab: check clean
 - JRE tab: Separate JRE  ; in the dropdown, be sure to select the same one you're using throughout the project
 - Environment tab:
   - New: `JAVA_HOME = /Library/Java/Home`
@@ -127,21 +132,21 @@ Set up this config for the build:
 
  The console output should end with:
 
-  clean: BUILD SUCCESSFUL
+  BUILD SUCCESSFUL
 
 ## Main build config: build
 
 - Open the External Tools Configurations window.
 - Right-click our first one ("clean") and Duplicate
 - Name: build
-- Targets tab: un-check clean; check build
+- Tasks tab: un-check clean; check build
 - Click Apply, click Run
 
  Run will take a while. Some parts of LightZone are in c or c++, and gcc or gcc+ will compile them to JNI libraries.
 
  Eventually the console output should end with:
 
-  build: BUILD SUCCESSFUL
+  BUILD SUCCESSFUL
 
 ## Final build config: jar
 
@@ -151,13 +156,13 @@ This config will package LightZone as a JAR for execution.
 - Right-click our first one ("clean") and Duplicate
 - Name: jar
 - Build tab: [X] Build before launch; select "The project containing the selected resource"
-- Targets tab: un-check clean; check jar
+- Tasks tab: un-check clean; check jar
 - Click Apply, click Run
 
  Run will quickly verify the build steps, then create a jar file.
  The console output should end with:
 
-  jar: BUILD SUCCESSFUL
+  BUILD SUCCESSFUL
 
 Now, LightZone is built and can be set up to run inside Eclipse.
 
@@ -187,7 +192,7 @@ At this point, you can now run and develop LightZone.
 
 ## Testing your Build
 
-- Run LightZone, from the Eclipse run menu or from the command line with Ant.
+- Run LightZone, from the Eclipse run menu or from the command line with Gradle.
 - Navigate to a folder with some JPEGs, TIFFs or RAWs. Try all 3 if you have them; they are parsed with different libraries.
 - Make sure you can see the thumbnails at the bottom of the window.
 - Right-click an image thumbnail and choose Apply Style (any style) to test Batch Processing.
@@ -196,19 +201,13 @@ At this point, you can now run and develop LightZone.
 ## Troubleshooting
 
 If you get a popup error, or something doesn't work as expected, note the error and also check the console in Eclipse.
-If you get a build error, you can get more details by adding `-debug` to the build arguments (External Tool: main tab) in Eclipse.
+If you get a build error, you can get more details by adding `--debug` to the build arguments (External Tool: main tab) in Eclipse.
 
 Some specific errors:
 
-### Execute failed: java.io.IOException: Cannot run program "/Applications/eclipse-3.6/plugins/org.apache.ant_1.7.1.v20100518-1145/bin/antRun": error=13, Permission denied
+### class file has wrong version
 
-If this appears during build, you may need to go to the antRun directory under /Applications/eclipse-3.6/... and run:
-
-  sudo chmod +x *
-
-### class file has wrong version 51.0, should be 50.0
-
-If this appears, then some of the project was built with java 1.7, some with java 1.6.
+If this appears, then some of the project was built with a different Java version.
 
 - Find which one is the default JVM version for your machine, and set that (see "Eclipse initial setup" above).
 - Then, run the "clean" external tool and rebuild the project.
