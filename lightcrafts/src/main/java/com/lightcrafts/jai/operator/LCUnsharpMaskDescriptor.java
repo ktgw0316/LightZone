@@ -91,6 +91,11 @@ public class LCUnsharpMaskDescriptor extends OperationDescriptorImpl {
         super(resources, 2, paramClasses, paramNames, paramDefaults);
     }
 
+    /** Returns <code>true</code> since renderable operation is supported. */
+    public boolean isRenderableSupported() {
+        return true;
+    }
+
     /**
      * Performs UnsharpMask operation on the image.
      *
