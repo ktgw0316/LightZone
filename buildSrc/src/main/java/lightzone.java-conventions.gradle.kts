@@ -24,7 +24,6 @@ dependencies {
     annotationProcessor(lombok)
     compileOnly(jetbrainsAnnotation)
     compileOnly(lombok)
-    implementation("org.eclipse.imagen:imagen-all:0.9.1")
     testCompileOnly(jetbrainsAnnotation)
     testImplementation(kotlin("test"))
     testImplementation("io.kotest:kotest-runner-junit5-jvm:5.9.1")
