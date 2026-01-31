@@ -5,6 +5,7 @@ plugins {
 }
 dependencies {
     implementation(project(":lightcrafts"))
+    implementation("org.eclipse.imagen:imagen-all:0.9.1")
 }
 application {
     mainClass.set("com.lightcrafts.platform.windows.WindowsLauncher")
