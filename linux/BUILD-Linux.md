@@ -4,7 +4,6 @@
 
 Building the LightZone source requires (at least) following packages:
 
-- __ant__ version 1.9.8 or later to support nativeheaderdir parameter
 - __fakeroot__ for linux package creation
 - __g++__
 - __gcc__ version 4.4 or later
@@ -28,7 +27,7 @@ _See also [Packaging on Debian or Ubuntu](#.deb-package-(debian-or-ubuntu)) belo
 Install required packages:
 
 ```shell
-sudo apt-get install debhelper devscripts build-essential ant git-core default-jdk default-jre-headless libglib2.0-dev libjiconfont-google-material-design-icons-java liblcms2-dev liblensfun-dev libjpeg-dev libraw-dev libtiff-dev libx11-dev libxml2-utils pkg-config rsync
+sudo apt-get install debhelper devscripts build-essential git-core default-jdk default-jre-headless libglib2.0-dev libjiconfont-google-material-design-icons-java liblcms2-dev liblensfun-dev libjpeg-dev libraw-dev libtiff-dev libx11-dev libxml2-utils pkg-config rsync
 ```
 
 _Note:_ gcc, g++, libc6-dev and make shall be installed with the build-essential.
@@ -44,8 +43,8 @@ export JAVA_HOME=/usr/lib/jvm/default-java
 Install required packages:
 
 ```shell
-sudo zypper install ant gcc gcc-c++ make
-git liblcms2-devel lensfun-devel libjpeg8-devel libraw-devel libtiff-devel libxml2-utils rsync libX11-devel java-11-openjdk-devel pkg-config
+sudo zypper install gcc gcc-c++ make
+git liblcms2-devel lensfun-devel libjpeg8-devel libraw-devel libtiff-devel libxml2-utils rsync libX11-devel java-21-openjdk-devel pkg-config
 ```
 
 Set your `JAVA_HOME` variable to point to installed JDK, e.g.
@@ -59,19 +58,7 @@ export JAVA_HOME=/usr/lib64/jvm/java
 To start the build:
 
 ```shell
-ant -f linux/build.xml
-```
-
-_Note:_ If the build failed with a message:
-
-```
-"/usr/share/ant/bin/antRun": java.io.IOException: error=2, No such file or directory
-```
-
-manually download Apache Ant, unpack it somewhere (e.g. to your home directory) and append it to the path:
-
-```shell
-export PATH=/home/yourusername/apache-ant-1.10.5/bin/:$PATH
+./gradlew build
 ```
 
 ### Offline build
@@ -94,7 +81,7 @@ ant -f linux/build.xml -Dno-ivy=true -Dno-submodule=false
 To check if it works fine before installing:
 
 ```shell
-ant -f linux/build.xml run
+./gradlew run
 ```
 
 ## Create a package and install
@@ -187,13 +174,13 @@ There is a howto for the local overlay on Gentoo Wiki:
 In the local overlay use the portage groups:
 
 ```shell
-mkdir media-gfx/lightroom
+mkdir -p media-gfx/lightzone
 ```
 
 Put `linux/lightzone_9999.ebuild` in the local overlay.
 If you need to build specific version, replace the `9999` in the filename with the version number such as `4.2.4`.
 
-Move into the new directory `media-gfx/lightroom` and do:
+Move into the new directory `media-gfx/lightzone` and do:
 
 ```shell
 repoman manifest
@@ -210,19 +197,12 @@ In my case I had to keyword lightzone....
 
 ### SlackBuild (Slackware)
 
-There is a SlackBuild script with a patch to build a Slackware package
-on [Gist](https://gist.github.com/ktgw0316/1d178a800377b247a531a4b4e59bfac9).
+There is a SlackBuild script to build a Slackware package.
 You can use it like following:
 
 ```shell
-sbopkg -i zulu-openjdk17
-sbopkg -i apache-ant
-sbopkg -i apache-ivy
-wget https://github.com/ktgw0316/LightZone/archive/refs/tags/4.2.4.tar.gz
-wget https://gist.github.com/ktgw0316/1d178a800377b247a531a4b4e59bfac9/ivy.patch
-wget https://gist.github.com/ktgw0316/1d178a800377b247a531a4b4e59bfac9/lightzone.SlackBuild
-chmod +x ./lightzone.SlackBuild
-su -c ./lightzone.SlackBuild
+sbopkg -i zulu-openjdk21
+su -c linux/lightzone.SlackBuild
 su -c "installpkg /tmp/lightzone-4.2.4-1_SBo.tgz"
 ```
 

@@ -1,0 +1,106 @@
+#!/bin/bash
+
+# Slackware build script for lightzone
+
+# Copyright (c) 2022: Masahiro Kitagawa <arctica0316@gmail.com>
+# All rights reserved.
+#
+# Redistribution and use of this script, with or without modification, is
+# permitted provided that the following conditions are met:
+#
+# 1. Redistributions of this script must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY EXPRESS OR IMPLIED
+# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+# EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+# OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+# ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+cd $(dirname $0) ; CWD=$(pwd)
+
+PRGNAM=lightzone
+VERSION=${VERSION:-4.2.4}
+BUILD=${BUILD:-1}
+TAG=${TAG:-_SBo}
+PKGTYPE=${PKGTYPE:-tgz}
+
+VCSNAM='LightZone'
+SRCNAM=${VERSION}
+# source=("https://github.com/ktgw0316/${VCSNAM}.git")
+# pkgdesc="Open-source professional-level digital darkroom software"
+# license=('custom:BSD-3-Clause')
+
+if [ -z "$ARCH" ]; then
+  case "$(uname -m)" in
+    i?86) ARCH=i686;;
+    *)    ARCH=$(uname -m);;
+  esac
+fi
+
+# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
+# the name of the created package would be, and then exit. This information
+# could be useful to other scripts.
+if [ ! -z "${PRINT_PACKAGE_NAME}" ]; then
+  echo "$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.$PKGTYPE"
+  exit 0
+fi
+
+if [ "$ARCH" = "i686" ]; then
+  LIBDIRSUFFIX=""
+elif [ "$ARCH" = "x86_64" ]; then
+  LIBDIRSUFFIX="64"
+else
+  echo "Architecture ${ARCH} is not supported."
+  exit 1
+fi
+
+TMP=${TMP:-/tmp/SBo}
+PKG=${TMP}/package-${PRGNAM}
+OUTPUT=${OUTPUT:-/tmp}
+
+set -e
+
+rm -rf ${PKG}
+mkdir -p ${TMP} ${PKG} ${OUTPUT}
+
+rm -rf ${VCSNAM}-${VERSION} ${PRGNAM}
+tar xvf ${SRCNAM}.tar.gz
+mv ${VCSNAM}-${VERSION} ${PRGNAM}
+
+cd ${PRGNAM}
+./gradlew build -x test
+
+LIBDIR=${PKG}/usr/lib${LIBDIRSUFFIX}
+install -dm 0755 ${LIBDIR}/${PRGNAM}
+cp -pH linux/products/*.so ${LIBDIR}/${PRGNAM}
+
+JAVADIR=${PKG}/usr/share/java
+install -dm 0755 ${JAVADIR}/${PRGNAM}
+cp -pH lightcrafts/products/dcraw_lz ${JAVADIR}/${PRGNAM}
+cp -pH lightcrafts/products/LightZone-forkd ${JAVADIR}/${PRGNAM}
+cp -pH linux/products/*.jar ${JAVADIR}/${PRGNAM}
+
+DATADIR=${PKG}/usr/share
+install -dm 0755 ${DATADIR}/applications
+install -m 644 linux/products/${PRGNAM}.desktop ${DATADIR}/applications/
+cp -pHR linux/icons ${DATADIR}/
+
+BINDIR=${PKG}/usr/bin
+install -dm 0755 ${BINDIR}
+install -m 755 linux/products/${PRGNAM} ${BINDIR}
+
+mkdir -p ${PKG}/usr/doc/${PRGNAM}-${VERSION}
+cat ${CWD}/${PRGNAM}.SlackBuild > ${PKG}/usr/doc/${PRGNAM}-${VERSION}/${PRGNAM}.SlackBuild
+# cat $CWD/README > $PKG/usr/doc/${PRGNAM}-$VERSION/README.SBo
+
+# mkdir -p ${PKG}/install
+# cat ${CWD}/slack-desc > ${PKG}/install/slack-desc
+
+cd ${PKG}
+/sbin/makepkg -l y -c n ${OUTPUT}/${PRGNAM}-${VERSION}-${ARCH}-${BUILD}${TAG}.${PKGTYPE}

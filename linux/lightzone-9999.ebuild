@@ -20,7 +20,6 @@ SLOT="0"
 KEYWORDS="~x86 ~amd64"
 
 DEPEND="virtual/jdk
-	dev-java/ant-core
 	dev-util/pkgconfig
 	dev-vcs/git
 	media-libs/lensfun
@@ -32,7 +31,6 @@ DEPEND="virtual/jdk
 	x11-libs/libX11"
 
 RDEPEND="virtual/jre
-	dev-java/javahelp
 	dev-libs/libxml2
 	media-libs/lensfun
 	media-libs/lcms
@@ -46,11 +44,10 @@ pkg_setup() {
 	fi
 
 #	export JAVA_HOME=$(java-config --jdk-home)
-#	export ANT_HOME=/usr/share/ant
 }
 
 src_compile() {
-	ant -f "${S}"/linux/build.xml jar
+	"${S}"/gradlew build -x test
 }
 
 src_install() {

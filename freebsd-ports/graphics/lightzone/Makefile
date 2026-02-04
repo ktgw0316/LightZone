@@ -12,8 +12,7 @@ COMMENT=	Open-source professional-level digital darkroom software
 
 LICENSE=	BSD3CLAUSE
 
-BUILD_DEPENDS=	ant:${PORTSDIR}/devel/apache-ant \
-		git:${PORTSDIR}/devel/git \
+BUILD_DEPENDS=	git:${PORTSDIR}/devel/git \
 		rsync:${PORTSDIR}/net/rsync
 LIB_DEPENDS=	liblcms2.so:${PORTSDIR}/graphics/lcms2 \
 		liblensfun.so:${PORTSDIR}/graphics/lensfun \
@@ -25,13 +24,12 @@ GH_ACCOUNT=	ktgw0316
 GH_PROJECT=	LightZone
 
 USES=		desktop-file-utils gmake jpeg pkgconfig
-USE_ANT=	yes
 USE_JAVA=	yes
 USE_GCC=	yes
 USE_LDCONFIG=	yes
 USE_XORG=	x11
 JAVA_VENDOR=	openjdk
-JAVA_VERSION=	17+
+JAVA_VERSION=	21+
 JAVA_BUILD=	yes
 JAVA_RUN=	yes
 INSTALLS_ICONS=	yes
@@ -43,6 +41,9 @@ WRKSRC_SUBDIR=	linux
 post-patch:
 		@${REINPLACE_CMD} -e 's|gcc|${CC}|' -e 's|g++|${CXX}|' ${WRKSRC}/../lightcrafts/mk/platform.mk
 		@${REINPLACE_CMD} -e 's|%%LOCALBASE%%|${LOCALBASE}|' ${WRKSRC}/products/lightzone
+
+do-build:
+	${WRKSRC}/../gradlew build -x test
 
 do-install:
 	${INSTALL_SCRIPT} ${WRKSRC}/products/${PORTNAME} ${STAGEDIR}${PREFIX}/bin/

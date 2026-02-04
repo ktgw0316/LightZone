@@ -22,7 +22,6 @@ Source:		%{name}-%{version}.tar.xz
 %define pkg_config pkgconfig
 %define xmllint libxml2
 %define debug_package %{nil}
-BuildRequires: ant-openjdk21
 %endif
 
 %if 0%{?sles_version}
@@ -73,7 +72,7 @@ BuildRequires:	libgomp-devel
 Requires:	libgomp1
 %endif
 
-BuildRequires:	javapackages-tools, %{jdk}, %{libX11_devel}, ant, gcc, gcc-c++, make, git, %{lcms2_devel}, lensfun-devel, %{libjpeg_devel}, %{libraw}-devel, libtiff-devel, %{pkg_config}, rsync
+BuildRequires:	javapackages-tools, %{jdk}, %{libX11_devel}, gcc, gcc-c++, make, git, %{lcms2_devel}, lensfun-devel, %{libjpeg_devel}, %{libraw}-devel, libtiff-devel, %{pkg_config}, rsync
 Requires:	lcms2, lensfun, %{libraw}, %{xmllint}
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -85,7 +84,7 @@ LightZone is open-source professional-level digital darkroom software for Window
 %setup -q
 
 %build
-%ant -f linux/build.xml -Dno-ivy=true -Dno-submodule=false jar
+%./gradlew build -x test
 
 %install
 %if 0%{?sles_version}
