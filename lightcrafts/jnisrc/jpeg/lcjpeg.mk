@@ -8,7 +8,7 @@ TARGET_BASE:=		LCJPEG
 JNI_EXTRA_CFLAGS:=	-fexceptions -std=c++0x
 JNI_EXTRA_PKGCFG:=	libjpeg
 JNI_WINDOWS_LINK:=	-lLCJNI
-JNI_LINUX_LINK:=	-lLCJNI
+JNI_LINUX_LINK:=	-lLCJNI -Wl,-rpath,'$$ORIGIN'
 JNI_MACOSX_LINK:=	../jniutils/libLCJNI.a
 JNI_MACOSX_LDFLAGS:=	-L/usr/local/opt/jpeg-turbo/lib
 JNI_MACOSX_INCLUDES:=	-I/usr/local/opt/jpeg-turbo/include
