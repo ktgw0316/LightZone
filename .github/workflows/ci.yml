@@ -71,7 +71,7 @@ jobs:
           libraw-dev \
           libtiff-dev \
           tidy
-        ./gradlew build
+        ./gradlew jpackage
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
@@ -79,3 +79,4 @@ jobs:
         path: |
           windows/build/jpackage/LightZone-Installer*.exe
           macosx/build/jpackage/LightZone-Installer*.dmg
+          linux/build/jpackage/lightzone*.deb
