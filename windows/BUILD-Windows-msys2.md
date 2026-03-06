@@ -13,66 +13,53 @@ line endings. There's a .gitattributes file to specify that those files need to 
 
 Download and install (or unpack) following:
 
-- __Apache Ant__ version 1.9.8 or later to support nativeheaderdir parameter
 - __MSYS2__
   1. Install MSYS2 and update packages as described in <https://msys2.github.io/>
-  1. Install required packages.
-  - `pacman -S diffutils git make tar`
-  1. Install target-specific toolchain.
-  - For 32-bit: `pacman -S mingw-w64-i686-toolchain`
-  - For 64-bit: `pacman -S mingw-w64-x86_64-toolchain`
-  then select (at least) __binutils__, __gcc__, and __gcc-libs__.
-  1. Install __lcms2__. This will also install __libtiff__ and __libjpeg-turbo__.
-  - For 32-bit: `pacman -S mingw-w64-i686-lcms2`
-  - For 64-bit: `pacman -S mingw-w64-x86_64-lcms2`
-  1. Install __libraw__.
-  - For 32-bit: `pacman -S mingw-w64-i686-libraw`
-  - For 64-bit: `pacman -S mingw-w64-x86_64-libraw`
-  1. Install __lensfun__.
-  - For 32-bit: `pacman -S mingw-w64-i686-lensfun`
-  - For 64-bit: `pacman -S mingw-w64-x86_64-lensfun`
-  1. Install __pkgconf__.
-  - For 32-bit: `pacman -S mingw-w64-i686-pkgconf`
-  - For 64-bit: `pacman -S mingw-w64-x86_64-pkgconf`
-  1. Install __ntldd__.
-  - For 32-bit: `pacman -S mingw-w64-i686-ntldd-git`
-  - For 64-bit: `pacman -S mingw-w64-x86_64-ntldd-git`
-- __Java Development Kit__ (JDK) version 17 from [Bellsoft](https://bell-sw.com/pages/downloads/).
+  1. Install common packages:
+
+    ```shell
+    pacman -S diffutils git make tar pacboy
+    ```
+
+  1. Install target-specific packages:
+
+    ```shell
+    pacboy -S lcms2 libraw lensfun ntldd-git pkgconf toolchain
+    ```
+
+    For toolchain, select (at least) `binutils`, `gcc`, and `gcc-libs`.
+
+- __Java Development Kit__ (JDK) version 21 from [Bellsoft](https://bell-sw.com/pages/downloads/).
+
 - __Microsoft Windows SDK__
     Pick the right version based on your Windows version. Information and download links are
     available at
     <http://en.wikipedia.org/wiki/Microsoft_Windows_SDK#Versions>
-    Place at end of PATH environment variable.
+    Place at end of `PATH` environment variable.
+
 - __HTML Help Workshop__
-- __Install4J__ version 8 (free trial for 90 days, then we'll need to try to get open-source licenses)
-
-Optionally, install following:
-
-- Java IDE - Eclipse, Netbeans or IntelliJ IDEA Community Edition
 
 Few points for MSYS2 beginners
 
 - It is POSIX evnironment for Windows (emulates a lot of stuff that is in Linux)
 - It is case-sensitive
-- Computer drives under it are available under / (root) directory, e.g. /c/
-- Home directory is abbreviated with ~
+- Computer drives under it are available under `/` (root) directory, e.g. `/c/`
+- Home directory is abbreviated with `~`
 
 If you haven't changed anything, your default shell is Bash. Open `~/.bashrc` with an editor (nano
 or vim) and enter following environmental variables. (Modify the paths to match your environment.):
 
 ```shell
-export JAVA_HOME="/c/Program Files/AdoptOpenJDK/jdk-11.0.4.11-hotspot"
-export ANT_HOME="/c/Program Files/apache-ant-1.9.8"
-export MSSDK_HOME="/c/Program Files (x86)/Windows Kits/10/Lib/10.0.22000.0"
-export INSTALL4J_HOME="/c/Program Files/install4j5"
-export PATH=$PATH:${JAVA_HOME}/bin:${ANT_HOME}/bin:${INSTALL4J_HOME}/bin;
+export JAVA_HOME="/c/Program Files/BellSoft/LibericaJDK-21"
+export MSSDK_HOME="/c/Program Files (x86)/Windows Kits/10/Lib/10.0.22621.0"
+export PATH=$PATH:/msys64/usr/bin/:/msys32/usr/bin/:${JAVA_HOME}/bin/
 ```
 
 If you close and open your shell again it will automatically set these variables.
 
-Do NOT set C_INCLUDE_PATH=/usr/include for mingw compilers.
+Do NOT set `C_INCLUDE_PATH=/usr/include` for mingw compilers.
 
-Checkout your project with Git. If you have problems with line endings in build (the \r stuff), do
+Checkout your project with Git. If you have problems with line endings in build (the `\r` stuff), do
 following:
 
 ```shell
@@ -83,20 +70,11 @@ git reset --hard
 To start the build:
 
 ```shell
-cd windows
-ant build-installer
+./gradlew build
 ```
 
-If you want to build a 32-bit binary on 64-bit machine, specify TARGET_ARCH variable:
+To create the installer:
 
 ```shell
-TARGET_ARCH=i386 ant build-installer
+./gradlew jpackage
 ```
-
-### Known build issues
-
-- In LightZone there are now no version information. There was a problem with rc.exe from MSSDK
-failing, windres can be used to compile it. There is a bug in windres that makes it fail on
-compiling version info. A patch has been submitted to binutils already, so in next version (higher
-than 2.22.51-2) it should work again. Here also versioning with Git needs to be considered.
-- bundled JRE version in Install4J is updated manually now
