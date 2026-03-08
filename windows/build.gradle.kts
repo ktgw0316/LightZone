@@ -1,3 +1,6 @@
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 plugins {
     kotlin("jvm")
     id("lightzone.java-conventions")
@@ -38,6 +41,15 @@ tasks {
     }
 }
 runtime {
+    val fullVersion = project.version.toString()
+    val buildTimestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss"))
+    val osArch = System.getProperty("os.arch").lowercase()
+    val archName = when (osArch) {
+        "x86", "i386" -> "32bit"
+        "x64", "amd64", "x86_64" -> "64bit"
+        else -> osArch
+    }
+
     options.set(listOf("--strip-debug", "--no-header-files", "--no-man-pages"))
     modules.set(
         listOf(
@@ -46,7 +58,7 @@ runtime {
     )
     jpackage {
         imageName = "LightZone"
-        installerName = "LightZone-Installer"
+        installerName = "LightZone-$fullVersion-$buildTimestamp-windows-$archName"
         skipInstaller = false
         installerOptions = listOf(
             "--type", "msi",

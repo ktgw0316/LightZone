@@ -1,3 +1,6 @@
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 plugins {
     kotlin("jvm")
     id("lightzone.java-conventions")
@@ -40,6 +43,10 @@ tasks {
     }
 }
 runtime {
+    val fullVersion = project.version.toString()
+    val buildTimestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss"))
+    val osArch = System.getProperty("os.arch").lowercase()
+
     options.set(listOf("--strip-debug", "--no-header-files", "--no-man-pages"))
     modules.set(
         listOf(
@@ -47,9 +54,9 @@ runtime {
         )
     )
     jpackage {
-        version = version.toString().substringBefore("b") // Remove beta number
+        version = fullVersion.substringBefore("b") // Remove beta number
         imageName = "LightZone"
-        installerName = "LightZone-Installer"
+        installerName = "LightZone-$fullVersion-$buildTimestamp-$osArch"
         mainJar = "${project.name}-${project.version}.jar"
         skipInstaller = false
         installerOptions = listOf("--vendor", "LightZone Project")

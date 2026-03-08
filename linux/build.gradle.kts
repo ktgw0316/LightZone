@@ -1,3 +1,6 @@
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 plugins {
     kotlin("jvm")
     id("lightzone.java-conventions")
@@ -46,6 +49,9 @@ tasks {
     }
 }
 runtime {
+    val fullVersion = project.version.toString()
+    val buildTimestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
+
     options.set(listOf("--strip-debug", "--no-header-files", "--no-man-pages"))
     modules.set(
         listOf(
@@ -53,9 +59,8 @@ runtime {
         )
     )
     jpackage {
-        version = version.toString().substringBefore("b") // Remove beta number
+        version = fullVersion + "+" + buildTimestamp
         imageName = "lightzone"
-        installerName = "lightzone-installer"
         mainJar = "${project.name}-${project.version}.jar"
         skipInstaller = false
         installerType = "deb"
@@ -66,7 +71,6 @@ runtime {
             "--linux-menu-group", "Photography",
             "--linux-package-deps",
             "default-jre (>= 2:1.17) | openjdk-17-jre, libejml-java (>= 0.38), libflatlaf-java, libgomp1, libjiconfont-font-awesome-java, libjiconfont-google-material-design-icons-java, libjiconfont-swing-java, libjpeg62-turbo | libjpeg-turbo8, liblcms2-2, liblensfun0 | liblensfun1 (<< 0.3.95), libopenjson-java, libraw19 | libraw20 | libraw23, libtiff5 | libtiff6, libxml2-utils",
-            "--linux-app-release", "${project.version}",
             "--linux-app-category", "graphics",
             "--linux-rpm-license-type", "BSD-3-Clause",
         )
