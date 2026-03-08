@@ -55,7 +55,7 @@ jobs:
           ./gradlew jpackage
         fi
     - name: Build on Linux
-      if: matrix.os == 'ubuntu-latest'
+      if: startsWith(matrix.os, 'ubuntu')
       run: |
         sudo add-apt-repository -y ppa:lightzone-team/lightzone
         sudo apt update -y
@@ -72,11 +72,24 @@ jobs:
           libtiff-dev \
           tidy
         ./gradlew jpackage
-    - name: Upload Artifacts
-      uses: actions/upload-artifact@v4
+    - name: Upload Artifacts on Windows
+      if: startsWith(matrix.os, 'windows')
+      uses: actions/upload-artifact@v7
       with:
-        name: LightZone-${{ matrix.os }}
+        archive: false
         path: |
-          windows/build/jpackage/LightZone-Installer*.exe
-          macosx/build/jpackage/LightZone-Installer*.dmg
+          windows/build/jpackage/LightZone-*.msi
+    - name: Upload Artifacts on macOS
+      if: startsWith(matrix.os, 'macos')
+      uses: actions/upload-artifact@v7
+      with:
+        archive: false
+        path: |
+          macosx/build/jpackage/LightZone-*.dmg
+    - name: Upload Artifacts on Linux
+      if: startsWith(matrix.os, 'ubuntu')
+      uses: actions/upload-artifact@v7
+      with:
+        archive: false
+        path: |
           linux/build/jpackage/lightzone*.deb
