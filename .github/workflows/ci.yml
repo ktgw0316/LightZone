@@ -33,7 +33,7 @@ jobs:
       uses: msys2/setup-msys2@v2
       with:
         update: true
-        install: git make
+        install: git iconv make
         pacboy: lcms2 libraw lensfun ntldd-git pkgconf toolchain
     - name: Build on Windows
       if: startsWith(matrix.os, 'windows')
