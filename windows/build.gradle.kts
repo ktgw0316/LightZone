@@ -38,6 +38,19 @@ tasks {
                 into(layout.buildDirectory.dir("jpackage/LightZone/app"))
             }
         }
+        doLast {
+            val versionSuffix = "-${project.version}.msi"
+            val installerDir = layout.buildDirectory.dir("jpackage").get().asFile
+            installerDir.walkTopDown()
+                .filter { it.isFile && it.extension.equals("msi", ignoreCase = true) }
+                .filter { it.name.endsWith(versionSuffix) }
+                .forEach { installer ->
+                    val renamed = installer.resolveSibling(installer.name.removeSuffix(versionSuffix) + ".msi")
+                    if (!renamed.exists()) {
+                        installer.renameTo(renamed)
+                    }
+                }
+        }
     }
 }
 runtime {

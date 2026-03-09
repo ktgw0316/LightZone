@@ -40,6 +40,19 @@ tasks {
                 into(layout.buildDirectory.dir("jpackage/LightZone.app/Contents/Resources"))
             }
         }
+        doLast {
+            val versionSuffix = "-${project.version.toString().substringBefore("b")}.dmg"
+            val installerDir = layout.buildDirectory.dir("jpackage").get().asFile
+            installerDir.walkTopDown()
+                .filter { it.isFile && it.extension.equals("dmg", ignoreCase = true) }
+                .filter { it.name.endsWith(versionSuffix) }
+                .forEach { installer ->
+                    val renamed = installer.resolveSibling(installer.name.removeSuffix(versionSuffix) + ".dmg")
+                    if (!renamed.exists()) {
+                        installer.renameTo(renamed)
+                    }
+                }
+        }
     }
 }
 runtime {
