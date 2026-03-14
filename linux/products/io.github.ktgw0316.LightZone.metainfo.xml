@@ -3,7 +3,9 @@
   <id>io.github.ktgw0316.LightZone</id>
   <name>LightZone</name>
   <summary>Camera RAW image processor</summary>
-  <developer_name>Lightzone Contributors</developer_name>
+  <developer id="io.github.ktgw0316">
+    <name>LightZone Contributors</name>
+  </developer>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>BSD-3-Clause</project_license>
   <description>
@@ -22,14 +24,19 @@
     </p>
   </description>
   <screenshots>
-    <screenshot>https://github.com/hfiguiere/flathub/raw/7bf2b4da741e3e35e44eb5f4a5f16fd82b136812/screenshots/ligthzone-main.jpg</screenshot>
+    <screenshot type="default">
+      <image>https://github.com/hfiguiere/flathub/raw/7bf2b4da741e3e35e44eb5f4a5f16fd82b136812/screenshots/ligthzone-main.jpg</image>
+      <caption>Main Window</caption>
+    </screenshot>
   </screenshots>
+  <launchable type="desktop-id">io.github.ktgw0316.LightZone.desktop</launchable>
   <releases>
     <release version="4.2.5" date="2023-01-05" type="stable">
       <url>https://github.com/ktgw0316/LightZone/releases/tag/4.2.5</url>
     </release>
   </releases>
   <url type="homepage">https://github.com/ktgw0316/LightZone/</url>
+  <url type="vcs-browser">https://github.com/ktgw0316/LightZone/</url>
   <url type="bugtracker">https://github.com/ktgw0316/LightZone/issues</url>
   <content_rating type="oars-1.1"/>
 </component>
