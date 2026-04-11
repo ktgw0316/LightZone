@@ -33,11 +33,6 @@ public class FolderCtrl extends JPanel implements HorizontalMouseWheelSupport {
         return tree.goToFolder(folder);
     }
 
-    @Deprecated
-    public boolean goToPicturesFolder() {
-        return tree.goToPicturesFolder();
-    }
-
     public void addSelectionListener(FolderTreeListener listener) {
         tree.addSelectionListener(listener);
     }

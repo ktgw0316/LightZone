@@ -76,33 +76,6 @@ public final class WindowsPlatform extends Platform {
     }
 
     @Override
-    public String[] getPathComponentsToPicturesFolder() {
-        final File picturesDir =
-            Platform.getPlatform().getDefaultImageDirectory();
-        if ( picturesDir == null )
-            return null;
-        final String[] picturesComponents =
-            picturesDir.toString().split( "\\\\" );
-        if ( picturesComponents.length != 5 ) {
-            //
-            // We expect the components to be:
-            //
-            //      C:
-            //      Documents and Settings
-            //      {user}
-            //      My Documents
-            //      My Pictures
-            //
-            // If it isn't, forget it.
-            //
-            return null;
-        }
-        final String[] wantedComponents = new String[2];
-        System.arraycopy( picturesComponents, 3, wantedComponents, 0, 2 );
-        return wantedComponents;
-    }
-
-    @Override
     public Collection<ColorProfileInfo> getPrinterProfiles() {
         return getColorProfiles();
     }

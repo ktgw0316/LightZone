@@ -77,11 +77,6 @@ public final class MacOSXPlatform extends Platform {
     }
 
     @Override
-    public String[] getPathComponentsToPicturesFolder() {
-        return new String[] { System.getProperty("user.name"), "Pictures" };
-    }
-
-    @Override
     public Collection<ColorProfileInfo> getPrinterProfiles() {
         return getExportProfiles();
         /*

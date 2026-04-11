@@ -245,18 +245,6 @@ public class Platform {
         return (int) (totalPhysicalMemory / 1048576);
     }
 
-    /**
-     * Gets the path components to the platform's &quot;Pictures&quot; folder.
-     *
-     * @return Returns an array of the names of the path components starting
-     * from the root folder shown in the folder tree (not the root of the
-     * filesystem).
-     */
-    @Deprecated
-    public String[] getPathComponentsToPicturesFolder() {
-        return getPathComponentsTo(getDefaultImageDirectory());
-    }
-
     public String[] getPathComponentsTo(File file) {
         if (file == null || !file.exists()) {
             return null;

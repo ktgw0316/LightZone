@@ -199,7 +199,8 @@ public class ComboFrame
 
         File folder = folders.getSelection();
         if ((folder == null) || ! folder.exists()) {
-            if (folders.goToPicturesFolder()) {
+            final File pictureFolder = Platform.getPlatform().getDefaultImageDirectory();
+            if (folders.goToFolder(pictureFolder)) {
                 folder = folders.getSelection();
             }
         }

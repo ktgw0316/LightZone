@@ -72,11 +72,6 @@ public class FolderBrowserPane
         return tree.goToFolder(folder);
     }
 
-    @Deprecated
-    public boolean goToPicturesFolder() {
-        return tree.goToPicturesFolder();
-    }
-
     /**
      * Dispose of this <code>FolderBrowserPane</code>.
      */
@@ -197,7 +192,8 @@ public class FolderBrowserPane
 
     public static void main(String[] args) {
         FolderBrowserPane browser = new FolderBrowserPane();
-        browser.goToPicturesFolder();
+        final File pictureFolder = Platform.getPlatform().getDefaultImageDirectory();
+        browser.goToFolder(pictureFolder);
         
         NavigationPane buttons = new NavigationPane(browser); // new NavigationButtons(browser);
 
