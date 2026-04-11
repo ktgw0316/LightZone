@@ -10,9 +10,9 @@ package com.lightcrafts.utils;
  * To change this template use File | Settings | File Templates.
  */
 
-public class splines {
+public class Spline {
 
-    private splines() { }
+    private Spline() { }
 
 /*  Subroutine to generate B-spline basis functions for open knot vectors
 

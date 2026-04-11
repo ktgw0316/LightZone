@@ -10,7 +10,7 @@ import com.lightcrafts.model.ColorDropperOperation;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
 import com.lightcrafts.utils.LCMatrix;
-import com.lightcrafts.utils.splines;
+import com.lightcrafts.utils.Spline;
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
@@ -270,19 +270,19 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
 
             polygon[1][1] = tred;
             double[][] redCurve = new double[256][2];
-            splines.bspline(2, polygon, redCurve);
+            Spline.bspline(2, polygon, redCurve);
 
             polygon[1][1] = tgreen;
             double[][] greenCurve = new double[256][2];
-            splines.bspline(2, polygon, greenCurve);
+            Spline.bspline(2, polygon, greenCurve);
 
             polygon[1][1] = tblue;
             double[][] blueCurve = new double[256][2];
-            splines.bspline(2, polygon, blueCurve);
+            Spline.bspline(2, polygon, blueCurve);
 
             short[][] table = new short[3][0x10000];
 
-            splines.Interpolator interpolator = new splines.Interpolator();
+            Spline.Interpolator interpolator = new Spline.Interpolator();
 
             for (int i = 0; i < 0x10000; i++)
                 table[0][i] = (short) (0xffff & (int) Math.min(Math.max(i + 0xff * interpolator.interpolate(i / (double) 0xffff, redCurve), 0), 0xffff));

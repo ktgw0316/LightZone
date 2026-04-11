@@ -6,7 +6,7 @@ import com.lightcrafts.jai.LightnessLookupTable;
 import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.ZoneOperation;
-import com.lightcrafts.utils.splines;
+import com.lightcrafts.utils.Spline;
 
 import org.eclipse.imagen.ImageLayout;
 import org.eclipse.imagen.ImageN;
@@ -169,7 +169,7 @@ class ZoneOperationImpl extends BlendedOperation implements ZoneOperation {
 	weights[0] = weights[controlPoints.length - 1] = 1.0;
 	for (int i = 1; i < controlPoints.length - 1; i++)
 	    weights[i] = weight;
-	splines.rbspline(order, controlPoints, weights, curve);
+	Spline.rbspline(order, controlPoints, weights, curve);
     }
 
     private LookupTable computeTable(PlanarImage source) {
@@ -179,7 +179,7 @@ class ZoneOperationImpl extends BlendedOperation implements ZoneOperation {
         updateCurve();
 
         if (controlPoints.length > 2) {
-            splines.interpolate(0, 1, 1.0/(tableData.length-1), curve, tableData);
+            Spline.interpolate(0, 1, 1.0/(tableData.length-1), curve, tableData);
         } else {
             for (int i = 0; i < tableData.length; i++) {
                 double x = i / (double) (tableData.length - 1);
