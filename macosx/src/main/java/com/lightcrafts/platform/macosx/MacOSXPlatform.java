@@ -19,8 +19,6 @@ import java.util.HashSet;
  */
 public final class MacOSXPlatform extends Platform {
 
-    private final static String home = System.getProperty("user.home");
-
     private final static File[] SystemProfileDirs = new File[] { new File("/Library/ColorSync/Profiles"),
             new File("/System/Library/ColorSync/Profiles") };
 

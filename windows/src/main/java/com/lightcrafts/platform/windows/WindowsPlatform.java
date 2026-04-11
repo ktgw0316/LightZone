@@ -28,7 +28,7 @@ public final class WindowsPlatform extends Platform {
 
     @Override
     public File getDefaultImageDirectory() {
-        return new File(System.getProperty("user.home"), "Pictures");
+        return new File(home, "Pictures");
     }
 
     @Override
@@ -166,7 +166,7 @@ public final class WindowsPlatform extends Platform {
         if ( parentDir == null )
             return file;
         if ( parentDir.getName().equals( "Desktop" ) )
-            return new File( System.getProperty( "user.home" ) );
+            return new File(home);
         return file;
     }
 

@@ -52,6 +52,8 @@ public class Platform {
 
     private static final Logger logger = LoggerFactory.getLogger(Platform.class);
 
+    protected static final String home = System.getProperty("user.home");
+
     /**
      * A <code>Type</code> encodes the platform type.
      */
@@ -149,7 +151,6 @@ public class Platform {
      * @return Returns said directory.
      */
     public File getDefaultImageDirectory() {
-        final String home = System.getProperty( "user.home" );
         return new File( home, Version.getApplicationName() );
     }
 
@@ -178,7 +179,6 @@ public class Platform {
      * @return Returns said directory.
      */
     public File getLightZoneDocumentsDirectory() {
-        final String home = System.getProperty( "user.home" );
         return new File( home, Version.getApplicationName() );
     }
 

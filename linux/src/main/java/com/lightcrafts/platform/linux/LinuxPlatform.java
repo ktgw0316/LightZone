@@ -33,8 +33,6 @@ public class LinuxPlatform extends Platform {
 
     private static final Logger logger = LoggerFactory.getLogger(LinuxPlatform.class);
 
-    private final static String home = System.getProperty( "user.home" );
-
     // My understanding of the state of standard linux color profile
     // locations comes from:
     //
