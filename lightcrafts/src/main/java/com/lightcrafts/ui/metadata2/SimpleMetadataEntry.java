@@ -6,8 +6,12 @@ import com.lightcrafts.image.metadata.ImageMetadataDirectory;
 import com.lightcrafts.image.metadata.ImageMetadata;
 import com.lightcrafts.image.metadata.values.ImageMetaValue;
 import com.lightcrafts.image.ImageInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class SimpleMetadataEntry extends MetadataEntry {
+
+    private static final Logger logger = LoggerFactory.getLogger(SimpleMetadataEntry.class);
 
     Class<? extends ImageMetadataDirectory> clazz;
     int tagID;
@@ -41,7 +45,7 @@ class SimpleMetadataEntry extends MetadataEntry {
             return clazz.newInstance().getTagLabelFor(tagID);
         }
         catch (Throwable t) {
-            t.printStackTrace();
+            logger.warn("Failed to resolve metadata label for {}:{}", clazz.getName(), tagID, t);
         }
         return "(undefined)";
     }

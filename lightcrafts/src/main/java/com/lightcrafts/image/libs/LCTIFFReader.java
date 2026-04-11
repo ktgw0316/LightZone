@@ -36,6 +36,8 @@ import org.eclipse.imagen.TileCache;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.lightcrafts.image.metadata.TIFFTags.TIFF_BITS_PER_SAMPLE;
 import static com.lightcrafts.image.metadata.TIFFTags.TIFF_EXTRA_SAMPLES;
@@ -70,6 +72,8 @@ import static com.lightcrafts.jai.JAIContext.sRGBColorSpace;
  * @see <a href="http://www.remotesensing.org/libtiff/">LibTIFF</a>
  */
 public final class LCTIFFReader extends LCTIFFCommon implements LCImageReader {
+
+    private static final Logger logger = LoggerFactory.getLogger(LCTIFFReader.class);
 
     private final Cleaner.Cleanable cleanable;
 
@@ -438,7 +442,7 @@ public final class LCTIFFReader extends LCTIFFCommon implements LCImageReader {
                     readPlane(tile, tileY, tileN, plane);
                 }
             } catch (LCImageLibException | RuntimeException e) {
-                e.printStackTrace();
+                logger.warn("Failed to read TIFF tile {},{}", tileX, tileY, e);
             }
 
             // Cache the result tile.
@@ -694,7 +698,7 @@ public final class LCTIFFReader extends LCTIFFCommon implements LCImageReader {
             frame.setSize(800, 600);
             frame.setVisible(true);
         } catch (LCImageLibException | UnsupportedEncodingException | HeadlessException e) {
-            e.printStackTrace();
+            logger.error("Failed to run LCTIFFReader test", e);
         }
     }
 }

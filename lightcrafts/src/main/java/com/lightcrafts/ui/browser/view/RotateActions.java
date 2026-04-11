@@ -2,13 +2,18 @@
 
 package com.lightcrafts.ui.browser.view;
 
+import com.lightcrafts.image.BadImageFileException;
+import com.lightcrafts.image.UnknownImageTypeException;
 import com.lightcrafts.ui.browser.model.ImageDatum;
 import com.lightcrafts.ui.browser.model.ImageDatumType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import static com.lightcrafts.ui.browser.view.Locale.LOCALE;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,10 +22,12 @@ import java.util.List;
  */
 class RotateActions {
 
+    private static final Logger logger = LoggerFactory.getLogger(RotateActions.class);
+
     static List<SelectionAction> createAllActions(
         AbstractImageBrowser browser, boolean dynamic
     ) {
-        ArrayList<SelectionAction> actions = new ArrayList<SelectionAction>();
+        ArrayList<SelectionAction> actions = new ArrayList<>();
         actions.addAll(createRotateActions(browser, dynamic));
         actions.addAll(createRotateAdvanceActions(browser, dynamic));
         return actions;
@@ -29,7 +36,7 @@ class RotateActions {
     static List<SelectionAction> createRotateAdvanceActions(
         AbstractImageBrowser browser, boolean dynamic
     ) {
-        List<SelectionAction> actions = new ArrayList<SelectionAction>();
+        List<SelectionAction> actions = new ArrayList<>();
         actions.add(createRotateLeftAdvanceAction(browser, dynamic));
         actions.add(createRotateRightAdvanceAction(browser, dynamic));
         return actions;
@@ -38,7 +45,7 @@ class RotateActions {
     static List<SelectionAction> createRotateActions(
         AbstractImageBrowser browser, boolean dynamic
     ) {
-        List<SelectionAction> actions = new ArrayList<SelectionAction>();
+        List<SelectionAction> actions = new ArrayList<>();
         actions.add(createRotateLeftAction(browser, dynamic));
         actions.add(createRotateRightAction(browser, dynamic));
         return actions;
@@ -47,77 +54,105 @@ class RotateActions {
     static SelectionAction createRotateLeftAdvanceAction(
         final AbstractImageBrowser browser, boolean dynamic
     ) {
-        SelectionAction action = new SelectionAction(
+        return new SelectionAction(
             LOCALE.get("LeftAdvanceMenuItem"),
             browser,
             KeyStroke.getKeyStroke('[', KeyEvent.SHIFT_DOWN_MASK),
             dynamic, true
         ) {
+            @Override
+            protected SelectionAction clone() throws CloneNotSupportedException {
+                throw new CloneNotSupportedException();
+            }
+
+            @Override
             public void actionPerformed(ActionEvent e) {
                 rotateLeftAndAdvance(browser);
             }
+
+            @Override
             void update() {
                 setEnabled(hasNonLznSelection(this));
             }
         };
-        return action;
     }
 
     static SelectionAction createRotateRightAdvanceAction(
         final AbstractImageBrowser browser, boolean dynamic
     ) {
-        SelectionAction action = new SelectionAction(
+        return new SelectionAction(
             LOCALE.get("RightAdvanceMenuItem"),
             browser,
             KeyStroke.getKeyStroke(']', KeyEvent.SHIFT_DOWN_MASK),
             dynamic, true
         ) {
+            @Override
+            protected SelectionAction clone() throws CloneNotSupportedException {
+                throw new CloneNotSupportedException();
+            }
+
+            @Override
             public void actionPerformed(ActionEvent e) {
                 rotateRightAndAdvance(browser);
             }
+
+            @Override
             void update() {
                 setEnabled(hasNonLznSelection(this));
             }
         };
-        return action;
     }
 
     static SelectionAction createRotateLeftAction(
         final AbstractImageBrowser browser, boolean dynamic
     ) {
-        SelectionAction action = new SelectionAction(
+        return new SelectionAction(
             LOCALE.get("LeftMenuItem"),
             browser,
             KeyStroke.getKeyStroke('[', 0),
             dynamic, true
         ) {
+            @Override
+            protected SelectionAction clone() throws CloneNotSupportedException {
+                throw new CloneNotSupportedException();
+            }
+
+            @Override
             public void actionPerformed(ActionEvent e) {
                 rotateLeft(browser);
             }
+
+            @Override
             void update() {
                 setEnabled(hasNonLznSelection(this));
             }
         };
-        return action;
     }
 
     static SelectionAction createRotateRightAction(
         final AbstractImageBrowser browser, boolean dynamic
     ) {
-        SelectionAction action = new SelectionAction(
+        return new SelectionAction(
             LOCALE.get("RightMenuItem"),
             browser,
             KeyStroke.getKeyStroke(']', 0),
             dynamic, true
         ) {
+            @Override
+            protected SelectionAction clone() throws CloneNotSupportedException {
+                throw new CloneNotSupportedException();
+            }
+
+            @Override
             public void actionPerformed(ActionEvent e) {
                 rotateRight(browser);
             }
+
+            @Override
             void update() {
                 setEnabled(hasNonLznSelection(this));
             }
         };
-        return action;
     }
 
     static void rotateLeftAndAdvance(AbstractImageBrowser browser) {
@@ -148,10 +183,9 @@ class RotateActions {
         try {
             datum.rotateLeft();
         }
-        catch (Throwable t) {
-            browser.notifyError(t.getMessage());
-            System.err.println("Rotate left failed");
-            t.printStackTrace();
+        catch (IOException | BadImageFileException | UnknownImageTypeException e) {
+            browser.notifyError(e.getMessage());
+            logger.warn("Rotate left failed for {}", datum.getFile(), e);
         }
     }
 
@@ -159,10 +193,9 @@ class RotateActions {
         try {
             datum.rotateRight();
         }
-        catch (Throwable t) {
-            browser.notifyError(t.getMessage());
-            System.err.println("Rotate right failed");
-            t.printStackTrace();
+        catch (IOException | BadImageFileException | UnknownImageTypeException e) {
+            browser.notifyError(e.getMessage());
+            logger.warn("Rotate right failed for {}", datum.getFile(), e);
         }
     }
 

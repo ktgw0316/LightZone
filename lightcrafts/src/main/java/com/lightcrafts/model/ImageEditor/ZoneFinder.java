@@ -17,6 +17,8 @@ import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
 import org.eclipse.imagen.media.lookup.LookupTableFactory;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -38,6 +40,8 @@ import java.util.concurrent.TimeUnit;
 import static com.lightcrafts.model.ImageEditor.Locale.LOCALE;
 
 public class ZoneFinder extends Preview implements PaintListener {
+    private static final Logger logger = LoggerFactory.getLogger(ZoneFinder.class);
+
     private static final boolean ADJUST_GRAYSCALE = true;
     private static final int MAX_PREVIEW_DIMENSION = 512; // Maximum dimension for preview
     private static final int DEBOUNCE_DELAY_MS = 150; // Delay before processing
@@ -126,7 +130,7 @@ public class ZoneFinder extends Preview implements PaintListener {
             try {
                 g.drawRenderedImage(zones, transform);
             } catch (RuntimeException e) {
-                e.printStackTrace();
+                logger.warn("Failed to render zone preview", e);
             }
         }
     }

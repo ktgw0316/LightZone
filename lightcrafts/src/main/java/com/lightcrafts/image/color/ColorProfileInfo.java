@@ -4,6 +4,8 @@ package com.lightcrafts.image.color;
 
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.utils.bytebuffer.ByteBufferUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.color.ICC_Profile;
 import java.io.File;
@@ -19,6 +21,8 @@ import java.util.*;
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */
 public final class ColorProfileInfo implements Comparable {
+
+    private static final Logger logger = LoggerFactory.getLogger(ColorProfileInfo.class);
 
     ////////// public ////////////////////////////////////////////////////////
 
@@ -172,7 +176,7 @@ public final class ColorProfileInfo implements Comparable {
                 m_iccProfile = ICC_Profile.getInstance( in );
             }
             catch ( IOException e ) {
-                System.err.println( "Bad color profile path: " + m_path );
+                logger.warn("Bad color profile path: {}", m_path, e);
             }
             finally {
                 try {

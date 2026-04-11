@@ -9,6 +9,8 @@ import com.lightcrafts.utils.directory.DirectoryMonitor;
 import com.lightcrafts.utils.directory.UnixDirectoryMonitor;
 import com.lightcrafts.utils.file.ICC_ProfileFileFilter;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
@@ -47,6 +49,8 @@ import java.util.regex.Pattern;
  */
 @SuppressWarnings({"InnerClassFieldHidesOuterClassField"})
 public class Platform {
+
+    private static final Logger logger = LoggerFactory.getLogger(Platform.class);
 
     /**
      * A <code>Type</code> encodes the platform type.
@@ -236,7 +240,7 @@ public class Platform {
             totalPhysicalMemory = Long.parseLong(attribute.toString());
         } catch (AttributeNotFoundException | MBeanException | InstanceNotFoundException
                 | ReflectionException | MalformedObjectNameException e) {
-            e.printStackTrace();
+            logger.warn("Failed to query physical memory", e);
         }
         return (int) (totalPhysicalMemory / 1048576);
     }
@@ -439,7 +443,7 @@ public class Platform {
             desktop.open(p.toFile());
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.warn("Failed to show file in folder: {}", path, e);
         }
         return false;
     }
@@ -490,17 +494,11 @@ public class Platform {
                 }
                 catch (IOException e) {
                     // Trouble reading the file
-                    System.err.println(
-                            "Can't read a color profile from " + path + ": "
-                                    + e.getMessage()
-                    );
+                    logger.warn("Can't read a color profile from {}: {}", path, e.getMessage(), e);
                 }
                 catch (Throwable e) {
                     // Invalid color profile data
-                    System.err.println(
-                            "Not a valid color profile at " + path + ": "
-                                    + e.getMessage()
-                    );
+                    logger.warn("Not a valid color profile at {}: {}", path, e.getMessage(), e);
                 }
             }
         }
@@ -527,9 +525,7 @@ public class Platform {
         }
         catch ( Exception e ) {
             m_platform = new Platform();
-            System.err.println(
-                e.getClass().getName() + ": " + e.getMessage()
-            );
+            logger.error("{}: {}", e.getClass().getName(), e.getMessage(), e);
         }
     }
 }

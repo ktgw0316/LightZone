@@ -14,6 +14,8 @@ import com.lightcrafts.utils.LightCraftsException;
 import com.lightcrafts.utils.Version;
 import com.lightcrafts.utils.xml.XMLUtil;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -45,6 +47,8 @@ public class ImageMetadata implements
     OrientationProvider, OriginalWidthHeightProvider, RatingProvider, UrgencyProvider,
     ResolutionProvider, ShutterSpeedProvider, TitleProvider,
     WidthHeightProvider {
+
+    private static final Logger logger = LoggerFactory.getLogger(ImageMetadata.class);
 
     ////////// public /////////////////////////////////////////////////////////
 
@@ -1614,7 +1618,7 @@ public class ImageMetadata implements
             metadata = new ImageMetadata();
             metadata.readExternal(ois);
         }
-        System.out.println( metadata.toString() );
+        logger.info("{}", metadata);
     }
 }
 /* vim:set et sw=4 ts=4: */

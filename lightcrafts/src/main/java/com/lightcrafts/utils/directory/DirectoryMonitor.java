@@ -5,6 +5,8 @@ package com.lightcrafts.utils.directory;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.lang.ref.Cleaner;
@@ -24,9 +26,9 @@ import java.util.Collection;
  */
 public abstract class DirectoryMonitor {
 
-    WatchService watcher;
+    private static final Logger logger = LoggerFactory.getLogger(DirectoryMonitor.class);
 
-    static final boolean DEBUG = false;
+    WatchService watcher;
 
     private static final Cleaner cleaner = Cleaner.create();
     private final Cleaner.Cleanable cleanable = cleaner.register(this, cleanupRunnable(this));
@@ -75,11 +77,7 @@ public abstract class DirectoryMonitor {
     public final synchronized void resume(boolean force) {
         if (force || --m_suspendCount < 0)
             m_suspendCount = 0;
-        if (DEBUG) {
-            System.out.println(
-                    "DirectoryMonitor: resuming (" + m_suspendCount + ')'
-            );
-        }
+        logger.debug("DirectoryMonitor: resuming ({})", m_suspendCount);
     }
 
     /**
@@ -113,11 +111,7 @@ public abstract class DirectoryMonitor {
      */
     public final synchronized void suspend() {
         ++m_suspendCount;
-        if (DEBUG) {
-            System.out.println(
-                    "DirectoryMonitor: suspending (" + m_suspendCount + ')'
-            );
-        }
+        logger.debug("DirectoryMonitor: suspending ({})", m_suspendCount);
     }
 
     /**
@@ -147,7 +141,7 @@ public abstract class DirectoryMonitor {
                 try {
                     watchKey = watcher.take();
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    logger.warn("Directory monitor interrupted", e);
                     return;
                 }
 
@@ -160,7 +154,7 @@ public abstract class DirectoryMonitor {
                     notifyListenersAbout(dir, file, kind);
                 }
                 if (! watchKey.reset()) {
-                    System.out.println("Disappeared: " + path);
+                    logger.debug("Disappeared: {}", path);
                 }
             }
         }

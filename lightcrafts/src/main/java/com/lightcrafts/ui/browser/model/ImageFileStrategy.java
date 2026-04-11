@@ -5,6 +5,8 @@ package com.lightcrafts.ui.browser.model;
 import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.image.types.ImageType;
 import com.lightcrafts.image.types.JPEGImageType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.image.RenderedImage;
 import java.io.File;
@@ -15,17 +17,18 @@ import java.io.File;
  */
 abstract class ImageFileStrategy {
 
+    private static final Logger logger = LoggerFactory.getLogger(ImageFileStrategy.class);
+
     static ImageFileStrategy JPEGStrategy =
         new ImageFileStrategy() {
             RenderedImage maybeGetImage(ImageInfo info, int maxImageSize)
                 throws Exception
             {
                 ImageType imageType = info.getImageType();
-                if (imageType instanceof JPEGImageType) {
+                if (imageType instanceof JPEGImageType jpeg) {
                     File file = info.getFile();
                     long length = file.length();
                     if (length < 50 * 1024 * 1024) {
-                        JPEGImageType jpeg = (JPEGImageType) imageType;
                         return jpeg.getImage(
                             info, null,
                             maxImageSize, maxImageSize
@@ -83,9 +86,8 @@ abstract class ImageFileStrategy {
     RenderedImage getImage(ImageInfo info, int maxImageSize) {
         try {
             return maybeGetImage(info, maxImageSize);
-        }
-        catch (Throwable t) {
-            logNonFatal(t, info);
+        } catch (Exception e) {
+            logNonFatal(e, info);
             return null;
         }
     }
@@ -96,14 +98,9 @@ abstract class ImageFileStrategy {
     abstract RenderedImage maybeGetImage(ImageInfo info, int maxImageSize)
         throws Exception;
 
-    private void logNonFatal(Throwable t, ImageInfo info) {
-        File file = info.getFile();
-        StringBuffer buffer = new StringBuffer();
-        buffer.append(t.getClass().getName());
-        buffer.append(" while fetching preview for ");
-        buffer.append(file.getAbsolutePath());
-        buffer.append(": ");
-        buffer.append(t.getMessage());
-        System.err.println(buffer);
+    private void logNonFatal(Exception e, ImageInfo info) {
+        final String path = info.getFile().getAbsolutePath();
+        logger.debug("{} while fetching preview for {}: {}",
+                e.getClass().getName(), path, e.getMessage(), e);
     }
 }

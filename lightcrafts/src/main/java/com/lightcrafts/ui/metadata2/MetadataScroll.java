@@ -5,6 +5,8 @@ package com.lightcrafts.ui.metadata2;
 import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.ui.LightZoneSkin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.io.File;
@@ -14,6 +16,8 @@ import java.io.File;
  * a stack of MetadataSections.
  */
 public class MetadataScroll extends JScrollPane {
+
+    private static final Logger logger = LoggerFactory.getLogger(MetadataScroll.class);
 
     private MetadataStack stack;
     private ImageInfo info;
@@ -82,7 +86,7 @@ public class MetadataScroll extends JScrollPane {
 
     public static void main(String[] args) throws Exception {
         if (args.length != 1) {
-            System.err.println("usage: MetadataScroll (file)");
+            logger.warn("usage: MetadataScroll (file)");
             System.exit(1);
         }
 

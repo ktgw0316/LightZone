@@ -9,6 +9,8 @@ import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.model.CropBounds;
 import com.lightcrafts.model.Operation;
 import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.eclipse.imagen.BorderExtender;
 import org.eclipse.imagen.ImageLayout;
@@ -25,6 +27,8 @@ import java.awt.image.renderable.ParameterBlock;
 import java.util.LinkedList;
 
 public class Rendering implements Cloneable {
+    private static final Logger logger = LoggerFactory.getLogger(Rendering.class);
+
     @Getter
     private float scaleFactor = 1;
 
@@ -60,7 +64,7 @@ public class Rendering implements Cloneable {
             }
             return object;
         } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
+            logger.error("Failed to clone Rendering", e);
             return null;
         }
     }
@@ -154,7 +158,7 @@ public class Rendering implements Cloneable {
         PlanarImage processedImage = getXformedSourceImage();
 
         if (pipeline == null) {
-            System.out.println("Rendering.renderPipeline: null pipeline?");
+            logger.warn("Rendering.renderPipeline: null pipeline?");
             return processedImage;
         }
 
@@ -174,7 +178,7 @@ public class Rendering implements Cloneable {
 
     public void prefetch(Rectangle area) {
         if (pipeline == null) {
-            System.out.println("Rendering.renderPipeline: null pipeline?");
+            logger.warn("Rendering.renderPipeline: null pipeline?");
             return;
         }
 

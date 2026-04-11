@@ -3,6 +3,8 @@
 package com.lightcrafts.ui.toolkit.journal;
 
 import com.lightcrafts.ui.toolkit.TextAreaFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
@@ -20,6 +22,8 @@ import java.io.*;
  * Replay always will apply to the JFrame specified in showJournalDialog().
  */
 public class JournalDialog extends JDialog implements JournalListener {
+
+    private static final Logger logger = LoggerFactory.getLogger(JournalDialog.class);
 
     private static InputEventJournal Journal = InputEventJournal.Instance;
 
@@ -93,9 +97,7 @@ public class JournalDialog extends JDialog implements JournalListener {
             file.deleteOnExit();
         }
         catch (IOException e) {
-            System.err.println(
-                "Couldn't create journal temp file: " + e.getMessage()
-            );
+            logger.warn("Couldn't create journal temp file", e);
         }
         setStatus("Stopped");
         setCounter(0);
@@ -151,7 +153,7 @@ public class JournalDialog extends JDialog implements JournalListener {
             Journal.write(out);
         }
         catch (IOException e) {
-            System.err.println("Error writing journal: " + e.getMessage());
+            logger.warn("Error writing journal", e);
         }
     }
 
@@ -194,7 +196,7 @@ public class JournalDialog extends JDialog implements JournalListener {
                     Journal.write(out);
                 }
                 catch (IOException e) {
-                    System.err.println(e.getMessage());
+                    logger.warn("Error saving journal", e);
                 }
             }
         });
@@ -213,7 +215,7 @@ public class JournalDialog extends JDialog implements JournalListener {
                     Journal.read(in);
                 }
                 catch (IOException e) {
-                    System.err.println(e.getMessage());
+                    logger.warn("Error loading journal", e);
                 }
             }
         });
@@ -236,7 +238,7 @@ public class JournalDialog extends JDialog implements JournalListener {
                 Journal.write(System.out);
             }
             catch (IOException e) {
-                System.out.println(e.getMessage());
+                logger.warn("Error printing journal", e);
             }
         });
         return print;

@@ -10,6 +10,8 @@ import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.ui.browser.model.ImageTask;
 import com.lightcrafts.utils.filecache.FileCacheFactory;
 import com.lightcrafts.utils.filecache.FileCache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,6 +23,8 @@ import java.io.File;
 import java.io.FileInputStream;
 
 class BatchImageComponent extends JComponent {
+
+    private static final Logger logger = LoggerFactory.getLogger(BatchImageComponent.class);
 
     final static Dimension ImageSize = new Dimension(150, 150);
 
@@ -76,7 +80,7 @@ class BatchImageComponent extends JComponent {
                 // ColorProfileException
                 // IOException
                 // UnknownImageTypeException
-                t.printStackTrace();
+                logger.warn("Failed to load cached preview image for {}", file, t);
                 image = null;
             }
         }
@@ -95,7 +99,7 @@ class BatchImageComponent extends JComponent {
                 // ColorProfileException
                 // IOException
                 // UnknownImageTypeException
-                t.printStackTrace();
+                logger.warn("Failed to load preview image for {}", file, t);
                 image = null;
             }
         }

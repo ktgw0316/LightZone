@@ -6,6 +6,8 @@ import com.lightcrafts.splash.SplashWindow;
 import com.lightcrafts.ui.toolkit.TextAreaFactory;
 import com.lightcrafts.utils.filecache.FileCacheFactory;
 import com.lightcrafts.utils.filecache.FileCache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.lightcrafts.app.Locale.LOCALE;
 
@@ -25,6 +27,8 @@ import java.io.IOException;
  */
 class StartupCrash {
 
+    private static final Logger logger = LoggerFactory.getLogger(StartupCrash.class);
+
     private final static String StartupKey = "StartupSuccessful";
 
     static void startupStarted() {
@@ -34,8 +38,7 @@ class StartupCrash {
             prefs.sync();
         }
         catch (BackingStoreException e) {
-            System.err.println("Couldn't access Preferences in StartupCrash");
-            e.printStackTrace();
+            logger.error("Couldn't access Preferences in StartupCrash", e);
         }
         // Just let startup continue; maybe we'll get lucky.
     }
@@ -126,9 +129,7 @@ class StartupCrash {
                 node.removeNode();
             }
             catch (BackingStoreException e) {
-                System.err.println(
-                        "StartupCrash failed to reset Preferences"
-                );
+                logger.error("StartupCrash failed to reset Preferences", e);
                 showErrorDialog(e);
                 success = false;
             }
@@ -139,9 +140,7 @@ class StartupCrash {
                 }
             }
             catch (IOException e) {
-                System.err.println(
-                        "StartupCrach failed to clear FileCache"
-                );
+                logger.error("StartupCrash failed to clear FileCache", e);
                 showErrorDialog(e);
                 success = false;
             }

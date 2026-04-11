@@ -37,6 +37,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Map;
 import org.eclipse.imagen.PlanarImage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import static com.lightcrafts.image.metadata.EXIFConstants.EXIF_FIELD_SIZE;
@@ -90,6 +92,8 @@ import static com.lightcrafts.image.types.TIFFConstants.TIFF_SHORT_SIZE;
  * @see <a href="http://www.remotesensing.org/libtiff/">LibTIFF</a>
  */
 public final class LCTIFFWriter extends LCTIFFCommon {
+
+    private static final Logger logger = LoggerFactory.getLogger(LCTIFFWriter.class);
 
     /**
      * Construct an <code>LCTIFFWriter</code> and open a TIFF file.
@@ -766,7 +770,7 @@ public final class LCTIFFWriter extends LCTIFFCommon {
                 writer.putImageStriped(image, null);
             }
         } catch (IOException | LCImageLibException | UserCanceledException e) {
-            e.printStackTrace();
+            logger.error("Failed to run LCTIFFWriter test", e);
         }
     }
 }

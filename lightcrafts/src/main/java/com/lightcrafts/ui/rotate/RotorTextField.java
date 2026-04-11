@@ -16,6 +16,8 @@ import java.awt.event.MouseWheelListener;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.lightcrafts.ui.rotate.Locale.LOCALE;
 
@@ -24,6 +26,8 @@ import static com.lightcrafts.ui.rotate.Locale.LOCALE;
 class RotorTextField
     extends JTextField implements DocumentListener, MouseWheelListener
  {
+    private static final Logger logger = LoggerFactory.getLogger(RotorTextField.class);
+
     private final static NumberFormat Format = new DecimalFormat("+0.00;-0.00");
     private final static String TooltipText = LOCALE.get("RotorTextToolTip");
 
@@ -98,7 +102,7 @@ class RotorTextField
                 control.setDegrees(value);
             }
             catch (ParseException e) {
-                System.err.println("Unparsable verified text: " + text);
+                logger.warn("Unparsable verified text: {}", text, e);
                 setForeground(Color.red);
             }
         }
@@ -120,7 +124,7 @@ class RotorTextField
                 selectAll();
             }
             catch (ParseException e1) {
-                System.err.println("Unparsable verified text: " + text);
+                logger.warn("Unparsable verified text: {}", text, e1);
                 // do nothing, let the wheel have no effect
             }
         }

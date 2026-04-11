@@ -10,6 +10,8 @@ import com.lightcrafts.ui.editor.EditorControls;
 import com.lightcrafts.ui.operation.OpControl;
 import com.lightcrafts.utils.awt.geom.HiDpi;
 import com.lightcrafts.utils.xml.XmlNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,6 +26,8 @@ import java.util.List;
  * the given one with a style subsequently applied to it.
  */
 class TemplatePreview extends JPanel {
+
+    private static final Logger logger = LoggerFactory.getLogger(TemplatePreview.class);
 
     private final static Dimension PreferredSize = new Dimension(240, 180);
 
@@ -87,10 +91,7 @@ class TemplatePreview extends JPanel {
             }
             catch (Throwable t) {
                 // Just leave the old tools removed.
-                System.err.println(
-                    "Could not preview a template"
-                );
-                t.printStackTrace();
+                logger.warn("Could not preview a template", t);
             }
             recentTemplate = node;
         }

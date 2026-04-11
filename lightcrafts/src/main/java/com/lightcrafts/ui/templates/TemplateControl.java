@@ -10,6 +10,8 @@ import com.lightcrafts.ui.HorizontalMouseWheelSupport;
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.ui.editor.Editor;
 import com.lightcrafts.ui.toolkit.PaneTitle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputListener;
@@ -24,6 +26,8 @@ import static com.lightcrafts.ui.templates.Locale.LOCALE;
 public class TemplateControl
     extends JPanel implements TemplateDatabaseListener, HorizontalMouseWheelSupport
 {
+    private static final Logger logger = LoggerFactory.getLogger(TemplateControl.class);
+
     private final static String ControlTitle =
         LOCALE.get("TemplateControlTitle");
 
@@ -121,7 +125,7 @@ public class TemplateControl
             }
         }
         catch (TemplateDatabase.TemplateException e) {
-            e.printStackTrace();
+            logger.warn("Failed to initialize template tree", e);
         }
         if (tree != null) {
             scroll = new JScrollPane(tree);
@@ -187,7 +191,7 @@ public class TemplateControl
             null,
             new TemplateControlListener() {
                 public void addTemplate() {
-                    System.out.println("add template");
+                    logger.info("add template");
                 }
             }
         );

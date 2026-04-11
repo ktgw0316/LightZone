@@ -5,6 +5,8 @@ import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.utils.bytebuffer.LCByteBuffer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.ByteOrder;
@@ -16,7 +18,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class CR3MetadataReader extends ImageMetadataReader {
 
-    private final boolean DEBUG = false;
+    private static final Logger logger = LoggerFactory.getLogger(CR3MetadataReader.class);
 
     public record ImageParam(int offset, int length) {
     }
@@ -103,8 +105,7 @@ public class CR3MetadataReader extends ImageMetadataReader {
         long moovBoxEnd = -1;
         while (boxPos < buf.limit()) {
             final var boxType = buf.getBytes((int) (boxPos + boxLengthSize), boxNameSize);
-            if (DEBUG)
-                System.out.println("boxType: " + new String(boxType, UTF_8) + ", pos: " + boxPos);
+            logger.debug("boxType: {}, pos: {}", new String(boxType, UTF_8), boxPos);
             if (Arrays.equals(boxType, moovTag)) {
                 moovBoxEnd = boxPos + (int) getBoxSize(buf, boxPos);
                 final var moovUuidTagPos = boxPos + headerSize;
@@ -120,8 +121,7 @@ public class CR3MetadataReader extends ImageMetadataReader {
         long prvwBoxPos = -1;
         while (boxPos < moovBoxEnd) {
             final var boxType = buf.getBytes((int) (boxPos + boxLengthSize), boxNameSize);
-            if (DEBUG)
-                System.out.println("boxType: " + new String(boxType, UTF_8) + ", pos: " + boxPos);
+            logger.debug("boxType: {}, pos: {}", new String(boxType, UTF_8), boxPos);
             if (Arrays.equals(boxType, ctboTag)) {
                 // cf. https://github.com/lclevy/canon_cr3#ctbo
                 final int recodeSize = 20;

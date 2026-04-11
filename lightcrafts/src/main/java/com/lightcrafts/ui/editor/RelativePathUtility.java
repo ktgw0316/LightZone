@@ -2,6 +2,9 @@
 
 package com.lightcrafts.ui.editor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.util.List;
 import java.util.LinkedList;
@@ -14,6 +17,8 @@ import java.util.Iterator;
  */
 
 class RelativePathUtility {
+
+    private static final Logger logger = LoggerFactory.getLogger(RelativePathUtility.class);
 
     /**
      * Get a relative path pointing from one File to another.
@@ -167,9 +172,9 @@ class RelativePathUtility {
         File f2 = new File(s2);
 
         String path = getRelativePath(f1, f2);
-        System.out.println(path);    // "../d/e"
+        logger.info(path);    // "../d/e"
 
         File file = getRelativeFile(f1, path);
-        System.out.println(file.getPath());
+        logger.info(file.getPath());
     }
 }

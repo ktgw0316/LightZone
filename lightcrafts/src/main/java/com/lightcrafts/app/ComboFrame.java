@@ -35,6 +35,8 @@ import com.lightcrafts.ui.toolkit.UICompliance;
 import com.lightcrafts.utils.Version;
 import com.lightcrafts.utils.filecache.FileCacheFactory;
 import com.lightcrafts.utils.thread.ProgressThread;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -67,6 +69,8 @@ public class ComboFrame
                WindowFocusListener,
                TemplateControlListener,
                MouseWheelListener {
+    private static final Logger logger = LoggerFactory.getLogger(ComboFrame.class);
+
     // This is the frame icon, for frame decorations and the windows task bar:
     public final static Image IconImage;
     static {
@@ -1337,7 +1341,7 @@ public class ComboFrame
             }
             catch (TemplateDatabase.TemplateException e) {
                 // Templates are broken, abort.
-                e.printStackTrace();
+                logger.warn("Failed to load template keys", e);
                 return new ArrayList();
             }
         }

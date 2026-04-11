@@ -11,6 +11,8 @@ import com.lightcrafts.ui.editor.Editor;
 import com.lightcrafts.templates.TemplateDatabase;
 import com.lightcrafts.templates.TemplateKey;
 import com.lightcrafts.platform.Platform;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -21,6 +23,8 @@ import java.io.File;
 import java.util.List;
 
 class BrowserMenu extends UpdatableDisposableMenu {
+
+    private static final Logger logger = LoggerFactory.getLogger(BrowserMenu.class);
 
     private WeakReference<AbstractImageBrowser> browserRef =
         new WeakReference<AbstractImageBrowser>(null);
@@ -154,8 +158,7 @@ class BrowserMenu extends UpdatableDisposableMenu {
             }
         }
         catch (TemplateDatabase.TemplateException e) {
-            System.out.println("Couldn't initialize browser templates menu");
-            e.printStackTrace();
+            logger.warn("Couldn't initialize browser templates menu", e);
             templateItem.setEnabled(false);
             wasTemplatesInitialized = false;
         }

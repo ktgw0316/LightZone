@@ -5,6 +5,8 @@ package com.lightcrafts.ui.browser.model;
 import com.lightcrafts.image.libs.*;
 import com.lightcrafts.image.metadata.ImageMetadata;
 import com.lightcrafts.utils.filecache.FileCache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.image.RenderedImage;
 import java.io.File;
@@ -22,6 +24,8 @@ import java.io.OutputStream;
  * rotation results are never cached and are recomputed every time.
  */
 public class ImageTask implements Runnable {
+
+    private static final Logger logger = LoggerFactory.getLogger(ImageTask.class);
 
     // The fixed size for cached intermediate preview images
     public final static int CacheImageSize = 320;
@@ -107,7 +111,7 @@ public class ImageTask implements Runnable {
             buffer.append(": ");
             buffer.append(t.getMessage());
         }
-        System.err.println(buffer);
+        logger.debug("{}", buffer, t);
     }
 
     private RenderedImage readImageCache() {

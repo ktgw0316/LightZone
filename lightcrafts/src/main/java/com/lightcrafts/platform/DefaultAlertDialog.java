@@ -5,6 +5,8 @@ package com.lightcrafts.platform;
 import com.lightcrafts.ui.toolkit.TextAreaFactory;
 import com.lightcrafts.ui.toolkit.UICompliance;
 import com.lightcrafts.ui.LightZoneSkin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,6 +18,8 @@ import java.awt.*;
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */
 public final class DefaultAlertDialog implements AlertDialog {
+
+    private static final Logger logger = LoggerFactory.getLogger(DefaultAlertDialog.class);
 
     ////////// public /////////////////////////////////////////////////////////
 
@@ -130,7 +134,7 @@ public final class DefaultAlertDialog implements AlertDialog {
         try {
             UIManager.setLookAndFeel(Platform.getPlatform().getLookAndFeel());
         } catch (UnsupportedLookAndFeelException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            logger.warn("Failed to set look and feel", e);
         }
 
         int result = INSTANCE.showAlert(
@@ -141,7 +145,7 @@ public final class DefaultAlertDialog implements AlertDialog {
             AlertDialog.ERROR_ALERT,
             "Use This", "Search", "Cancel"
         );
-        System.out.println("result=" + result);
+        logger.info("result={}", result);
         System.exit(0);
     }
 }

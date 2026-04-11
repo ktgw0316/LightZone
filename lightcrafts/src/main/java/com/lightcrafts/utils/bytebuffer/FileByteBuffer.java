@@ -15,6 +15,8 @@ import com.lightcrafts.utils.CloseableManager;
 import com.lightcrafts.utils.cache.CacheIOException;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A <code>FileByteBuffer</code> is-an {@link LCByteBuffer} that uses a
@@ -23,6 +25,8 @@ import org.jetbrains.annotations.NotNull;
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */
 public class FileByteBuffer extends LCByteBuffer implements Closeable {
+
+    private static final Logger logger = LoggerFactory.getLogger(FileByteBuffer.class);
 
     ////////// public /////////////////////////////////////////////////////////
 
@@ -338,7 +342,7 @@ public class FileByteBuffer extends LCByteBuffer implements Closeable {
                 buffer.dispose();
             }
             catch ( IOException e ) {
-                e.printStackTrace();
+                logger.warn("Failed to dispose FileByteBuffer", e);
             }
         };
     }

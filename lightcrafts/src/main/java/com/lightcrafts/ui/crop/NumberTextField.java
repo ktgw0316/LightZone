@@ -3,6 +3,8 @@
 package com.lightcrafts.ui.crop;
 
 import com.lightcrafts.ui.LightZoneSkin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -22,6 +24,8 @@ import java.text.ParsePosition;
  */
 
 public class NumberTextField extends JTextField implements DocumentListener {
+
+    private static final Logger logger = LoggerFactory.getLogger(NumberTextField.class);
 
     /**
       * A single listener can be notified when the validated number changes.
@@ -109,7 +113,7 @@ public class NumberTextField extends JTextField implements DocumentListener {
         }
         catch (ParseException e) {
             // Can't happen (we just ran the verifier).
-            System.err.println(e.getMessage());
+            logger.warn("Unexpected parse failure for verified number text: {}", text, e);
         }
         return n;
     }
@@ -215,7 +219,7 @@ public class NumberTextField extends JTextField implements DocumentListener {
         NumberTextField text = new NumberTextField(
             new Listener() {
                 public void numberChanged(int number) {
-                    System.out.println(number);
+                    logger.info("{}", number);
                 }
             }
         );

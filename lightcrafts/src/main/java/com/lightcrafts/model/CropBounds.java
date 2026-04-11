@@ -13,6 +13,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A CropBounds is an immutable rectangular shape which may be at an
@@ -26,6 +28,8 @@ import lombok.experimental.Accessors;
 
 @EqualsAndHashCode
 public class CropBounds implements Cloneable {
+
+    private static final Logger logger = LoggerFactory.getLogger(CropBounds.class);
 
     // The counter-clockwise angle to rotate the image:
     @Accessors(chain=true) @Getter @Setter
@@ -53,7 +57,7 @@ public class CropBounds implements Cloneable {
             clone = (CropBounds) super.clone();
             clone.center = (center != null) ? (Point2D) center.clone() : null;
         } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
+            logger.error("Failed to clone CropBounds", e);
         }
         return clone;
     }

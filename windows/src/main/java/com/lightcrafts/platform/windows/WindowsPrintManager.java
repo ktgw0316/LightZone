@@ -12,6 +12,8 @@ import org.eclipse.imagen.PlanarImage;
 import com.lightcrafts.platform.AlertDialog;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.utils.thread.ProgressThread;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Do native printing on Windows.
@@ -19,6 +21,8 @@ import com.lightcrafts.utils.thread.ProgressThread;
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */
 public final class WindowsPrintManager {
+
+    private static final Logger logger = LoggerFactory.getLogger(WindowsPrintManager.class);
 
     ////////// public /////////////////////////////////////////////////////////
 
@@ -274,18 +278,19 @@ public final class WindowsPrintManager {
     }
 
     public static void dumpPage(PageFormat pageFormat) {
-        System.out.println(
-            "page area: w=" + pageFormat.getWidth()
-            + ", h=" + pageFormat.getHeight()
-            + ", orientation="
-            + (pageFormat.getOrientation() == PageFormat.LANDSCAPE ? "landscape" : "portrait")
+        logger.debug(
+            "page area: w={}, h={}, orientation={}",
+            pageFormat.getWidth(),
+            pageFormat.getHeight(),
+            pageFormat.getOrientation() == PageFormat.LANDSCAPE ? "landscape" : "portrait"
         );
 
-        System.out.println(
-            "imageable area: x=" + pageFormat.getImageableX()
-            + ", y=" + pageFormat.getImageableY()
-            + ", w=" + pageFormat.getImageableWidth()
-            + ", h=" + pageFormat.getImageableHeight()
+        logger.debug(
+            "imageable area: x={}, y={}, w={}, h={}",
+            pageFormat.getImageableX(),
+            pageFormat.getImageableY(),
+            pageFormat.getImageableWidth(),
+            pageFormat.getImageableHeight()
         );
     }
 

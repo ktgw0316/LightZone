@@ -9,6 +9,8 @@ import com.lightcrafts.utils.Version;
 import com.lightcrafts.utils.thread.CancelableThread;
 import com.lightcrafts.utils.thread.CancelableThreadMonitor;
 import com.lightcrafts.utils.thread.ProgressThread;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,6 +23,8 @@ import java.lang.reflect.InvocationTargetException;
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */
 public final class DefaultProgressDialog implements ProgressDialog {
+
+    private static final Logger logger = LoggerFactory.getLogger(DefaultProgressDialog.class);
 
     ////////// public /////////////////////////////////////////////////////////
 
@@ -372,7 +376,7 @@ public final class DefaultProgressDialog implements ProgressDialog {
             for ( int i = 0; i < 20; ++i ) {
                 if ( isCanceled() )
                     break;
-                System.out.println( i );
+                logger.debug("{}", i);
                 getProgressIndicator().incrementBy( 1 );
                 try {
                     Thread.sleep( 250 );

@@ -2,6 +2,9 @@
 
 package com.lightcrafts.utils.filecache;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.File;
 import java.util.HashMap;
@@ -18,6 +21,8 @@ import java.util.prefs.Preferences;
  * </ol>
  */
 public class FileCacheFactory {
+
+    private static final Logger logger = LoggerFactory.getLogger(FileCacheFactory.class);
 
     /**
      * The global limit on cache size, in bytes.
@@ -56,8 +61,7 @@ public class FileCacheFactory {
                 GlobalInstance = new FileCache(MaxSize, mapper);
             }
             catch (IOException e) {
-                System.err.print("Couldn't create FileCache: ");
-                System.err.println(e.getMessage());
+                logger.error("Couldn't create FileCache: {}", e.getMessage(), e);
             }
         }
         return GlobalInstance;
@@ -88,13 +92,12 @@ public class FileCacheFactory {
                 return cache;
             }
             else {
-                System.err.print("Couldn't create LocalFileCacheKeyMapper");
+                logger.error("Couldn't create LocalFileCacheKeyMapper");
                 return null;
             }
         }
         catch (IOException e) {
-            System.err.print("Couldn't create FileCache: ");
-            System.err.println(e.getMessage());
+            logger.error("Couldn't create FileCache: {}", e.getMessage(), e);
             return null;
         }
     }

@@ -6,13 +6,13 @@ import com.lightcrafts.platform.Platform;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.io.IOException;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -22,6 +22,8 @@ import java.util.NoSuchElementException;
  */
 @RequiredArgsConstructor (access = AccessLevel.PRIVATE)
 public class Lensfun {
+    private static final Logger logger = LoggerFactory.getLogger(Lensfun.class);
+
     private static Lensfun instance; // singleton
 
     private final String cameraMaker;
@@ -48,10 +50,9 @@ public class Lensfun {
                         .orElseThrow()
                         .toString();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("Failed to scan lensfun directory under {}", appDir, e);
             } catch (NoSuchElementException e) {
-                System.err.println("Directory lensfun/version_* not found in appDir: " + appDir);
-                e.printStackTrace();
+                logger.error("Directory lensfun/version_* not found in appDir: {}", appDir, e);
             }
         }
     }

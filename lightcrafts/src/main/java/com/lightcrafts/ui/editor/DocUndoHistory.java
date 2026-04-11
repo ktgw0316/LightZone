@@ -6,6 +6,8 @@ import com.lightcrafts.app.ComboFrame;
 import com.lightcrafts.ui.HorizontalMouseWheelSupport;
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.ui.toolkit.PaneTitle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -25,6 +27,8 @@ import static com.lightcrafts.ui.editor.Locale.LOCALE;
  */
 public final class DocUndoHistory
     extends JPanel implements UndoableEditListener, HorizontalMouseWheelSupport {
+
+    private static final Logger logger = LoggerFactory.getLogger(DocUndoHistory.class);
 
     private DocUndoManager undo;
     private DefaultListModel model;
@@ -108,7 +112,7 @@ public final class DocUndoHistory
                             isEditing = true;
                             int selected = selection.getLeadSelectionIndex();
                             int index = model.size() - selected - 2;
-                            System.out.println("selected index = " + index);
+                            logger.debug("selected index = {}", index);
                             undo.setEditIndex(index);
                             isEditing = false;
                         }

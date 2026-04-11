@@ -3,6 +3,8 @@
 package com.lightcrafts.splash;
 
 import com.lightcrafts.utils.Version;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -17,6 +19,8 @@ import java.net.URL;
  * release tags.
  */
 public final class SplashImage extends BufferedImage {
+
+    private static final Logger logger = LoggerFactory.getLogger(SplashImage.class);
 
     ////////// public /////////////////////////////////////////////////////////
 
@@ -74,7 +78,7 @@ public final class SplashImage extends BufferedImage {
                 m_splashImage = ImageIO.read(url);
             }
             catch (IOException e) {
-                e.printStackTrace();
+                logger.error("Failed to load splash image from {}", url, e);
             }
         }
         return m_splashImage;

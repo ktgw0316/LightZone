@@ -23,6 +23,8 @@ import com.lightcrafts.image.types.RawImageType;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.utils.filecache.FileCache;
 import com.lightcrafts.utils.filecache.FileCacheFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.lightcrafts.image.libs.LCJPEGConstants.CS_RGB;
 
@@ -34,6 +36,8 @@ import static com.lightcrafts.image.libs.LCJPEGConstants.CS_RGB;
  * Be sure to call dispose().
  */
 public class PreviewUpdater extends Thread {
+
+    private static final Logger logger = LoggerFactory.getLogger(PreviewUpdater.class);
 
     /**
      * PreviewUpdater may optionally be initialized with an externally
@@ -189,12 +193,7 @@ public class PreviewUpdater extends Thread {
         FileCache cache, RenderedImage image, ImageMetadata meta
     ) {
         DebugPreviewCount++;
-        if (Debug) {
-            System.out.println(
-                meta.getFile().getName() +
-                " PreviewUpdater " + DebugPreviewCount + " instantiated"
-            );
-        }
+        logger.debug("{} PreviewUpdater {} instantiated", meta.getFile().getName(), DebugPreviewCount);
         this.cache = cache;
         this.image = image;
         this.meta = meta;
@@ -288,11 +287,7 @@ public class PreviewUpdater extends Thread {
             RenderedImage preview;
             synchronized(Monitor) {
                 if (stillInterested) {
-                    if (Debug) {
-                        System.out.println(
-                            meta.getFile().getName() + " PreviewUpdater running"
-                        );
-                    }
+                    logger.debug("{} PreviewUpdater running", meta.getFile().getName());
                     preview = readCache();
                     if (preview == null) {
                         if (provider != null) {
@@ -321,9 +316,7 @@ public class PreviewUpdater extends Thread {
                         }
                         if (preview == null) {
                             // Some image files just can't be previewed.
-                            System.out.println(
-                                "All preview methods fail for " + file
-                            );
+                            logger.debug("All preview methods fail for {}", file);
                             notifyEnd();
                             done = true;
                             return;
@@ -345,12 +338,7 @@ public class PreviewUpdater extends Thread {
     }
 
     void dispose() {
-        if (Debug) {
-            System.out.println(
-                meta.getFile().getName() +
-                " PreviewUpdater " + DebugPreviewCount + " disposed"
-            );
-        }
+        logger.debug("{} PreviewUpdater {} disposed", meta.getFile().getName(), DebugPreviewCount);
         DebugPreviewCount--;
         if (prevUpdater != null) {
             prevUpdater.dispose();
@@ -454,7 +442,7 @@ public class PreviewUpdater extends Thread {
             sb.append(": ");
             sb.append(t.getMessage());
         }
-        System.err.println(sb );
+        logger.debug("{}", sb, t);
     }
 
     private void removeCacheSilent() {

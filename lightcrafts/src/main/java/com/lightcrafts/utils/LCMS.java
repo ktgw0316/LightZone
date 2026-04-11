@@ -8,6 +8,8 @@ import org.jetbrains.annotations.NotNull;
 import org.eclipse.imagen.media.util.ImageUtil;
 import org.eclipse.imagen.RasterAccessor;
 import org.eclipse.imagen.RasterFormatTag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.color.ICC_Profile;
@@ -26,6 +28,8 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 public class LCMS {
+
+    private static final Logger logger = LoggerFactory.getLogger(LCMS.class);
 
 // Format of pixel is defined by one DWORD, using bit fields as follows
 //
@@ -575,7 +579,7 @@ public class LCMS {
                         new Point(ri.getX(), ri.getY())
                 );
                 ro = new RasterAccessor(output, output.getBounds(), dstRft, dstCm);
-                System.out.println("*** A");
+                logger.debug("*** A");
             }
             else {
                 ro = normalizeRaster(dst, dstRft, dstCm);

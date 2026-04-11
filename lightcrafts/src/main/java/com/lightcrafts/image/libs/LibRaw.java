@@ -5,15 +5,20 @@ import com.lightcrafts.image.UnknownImageTypeException;
 import com.lightcrafts.image.types.JPEGImageType;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.utils.raw.RawDecoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.*;
 import java.io.File;
+import java.io.IOException;
 import java.time.*;
 import java.util.Arrays;
 
 public class LibRaw extends RawDecoder {
+    private static final Logger logger = LoggerFactory.getLogger(LibRaw.class);
+
     final String filePath;
 
     int         progress_flags;
@@ -300,7 +305,7 @@ public class LibRaw extends RawDecoder {
     }
     
     public int progress(int stage, int iteration, int expected) {
-        System.out.println("progress - stage: " + strProgress(stage) + ", iteration: " + iteration + ", expected: " + expected);
+        logger.debug("progress - stage: {}, iteration: {}, expected: {}", strProgress(stage), iteration, expected);
         return 0;
     }
 
@@ -314,13 +319,13 @@ public class LibRaw extends RawDecoder {
         openFile(filePath);
         byte[] thumbnail = unpackThumb();
         time = System.currentTimeMillis() - time;
-        System.out.println("LibRaw Exception (p:" + progress_flags + ", w:" + process_warnings + ")");
+        logger.debug("LibRaw status (p:{}, w:{})", progress_flags, process_warnings);
         disposeLibRawObject();
 
         if (thumbnail == null)
             throw new BadImageFileException(new File(filePath), "LibRaw Exception (p:" + progress_flags + ", w:" + process_warnings + ")");
         else
-            System.out.println("Read " + (2 * thumbnail.length) + " bytes in " + time + "ms");
+            logger.debug("Read {} bytes in {}ms", (2 * thumbnail.length), time);
 
         if (tformat == 1) {
             // TODO: what to do with the color space? How do we detect AdobeRGB?
@@ -388,7 +393,7 @@ public class LibRaw extends RawDecoder {
         if (image_data == null)
             throw new BadImageFileException(new File(filePath), "LibRaw Exception (p:" + progress_flags + ", w:" + process_warnings + ")");
         else
-            System.out.println("Read " + (2 * image_data.length) + " bytes in " + time + "ms");
+            logger.debug("Read {} bytes in {}ms", (2 * image_data.length), time);
 
         final int width, height;
         if (halfSize) {
@@ -455,42 +460,39 @@ public class LibRaw extends RawDecoder {
     }
 
     public static void main(String[] args) {
-        System.out.println("Testing LibRaw");
+        logger.info("Testing LibRaw");
 
         LibRaw libRaw = new LibRaw("/Stuff/Pictures/New Raw Support/Canon 450D/IMG_1598.CR2");
 
-        System.out.println(
-                "LibRaw (p:" + libRaw.progress_flags
-                + ", w:" + libRaw.process_warnings
-                + ") - make: " + libRaw.make
-                + ", model: " + libRaw.model
-                + ", timestamp: " + libRaw.timestamp + " (" + libRaw.getCaptureDateTime() + ")"
+        logger.info("LibRaw (p:{}, w:{}) - make: {}, model: {}, timestamp: {} ({})",
+                libRaw.progress_flags, libRaw.process_warnings, libRaw.make, libRaw.model,
+                libRaw.timestamp, libRaw.getCaptureDateTime()
         );
-        System.out.println("Filter pattern: " + libRaw.filter_pattern);
+        logger.info("Filter pattern: {}", libRaw.filter_pattern);
 
+        final var row = new StringBuilder();
         for (int i = 0; i < 4; i++)
             for (int j = 0; j < 3; j++)
-                System.out.print(libRaw.cam_xyz[i][j] + " ");
-        System.out.println();
+                row.append(libRaw.cam_xyz[i][j]).append(' ');
+        logger.info("{}", row);
 
         try {
             RenderedImage image = libRaw.getImage();
-            System.out.println("Image (p:" + libRaw.progress_flags + ", w:" + libRaw.process_warnings + "): " + image);
             ImageIO.write(image, "PNG", new File("/tmp/out.png"));
+            logger.info("Image (p:{}, w:{}): {}", libRaw.progress_flags, libRaw.process_warnings, image);
 
             RenderedImage preview = libRaw.getPreview();
-            System.out.println("Image (p:" + libRaw.progress_flags + ", w:" + libRaw.process_warnings + "): " + preview);
             ImageIO.write(preview, "PNG", new File("/tmp/out-preview.png"));
+            logger.info("Image (p:{}, w:{}): {}", libRaw.progress_flags, libRaw.process_warnings, preview);
 
             RenderedImage thumbnail = libRaw.getThumbnail(0, 0);
-            System.out.println("Thumbnail (p:" + libRaw.progress_flags + ", w:" + libRaw.process_warnings + "): " + thumbnail);
             ImageIO.write(thumbnail, "PNG", new File("/tmp/out-thumb.png"));
-        } catch (Exception e) {
-            System.out.println("LibRaw Exception (p:" + libRaw.progress_flags + ", w:" + libRaw.process_warnings + ")");
-            e.printStackTrace();
+            logger.info("Thumbnail (p:{}, w:{}): {}", libRaw.progress_flags, libRaw.process_warnings, thumbnail);
+        } catch (BadImageFileException | UnknownImageTypeException | IOException e) {
+            logger.error("LibRaw Exception (p:{}, w:{})", libRaw.progress_flags, libRaw.process_warnings, e);
         }
 
-        System.out.println("Done testing LibRaw!");
+        logger.info("Done testing LibRaw!");
     }
 
     static {

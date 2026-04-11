@@ -16,6 +16,8 @@ import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
 import org.eclipse.imagen.media.lookup.LookupTableFactory;
 import org.ejml.simple.SimpleMatrix;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.geom.Point2D;
 import java.awt.image.RenderedImage;
@@ -32,6 +34,8 @@ import java.util.TreeMap;
  * To change this template use File | Settings | File Templates.
  */
 public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOperation {
+    private static final Logger logger = LoggerFactory.getLogger(WhiteBalanceV2.class);
+
     private static final String SOURCE = "Temperature";
     private final String TINT = "Tint";
     private float tint = 0;
@@ -58,8 +62,8 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
             float[] daylightMultipliers = dcRaw.getDaylightMultipliers();
             float[] cameraMultipliers = dcRaw.getCameraMultipliers();
 
-            System.out.println("daylightMultipliers: " + daylightMultipliers[0] + ", " + daylightMultipliers[1] + ", " + daylightMultipliers[2]);
-            System.out.println("cameraMultipliers: " + cameraMultipliers[0] + ", " + cameraMultipliers[1] + ", " + cameraMultipliers[2]);
+            logger.debug("daylightMultipliers: {}, {}, {}", daylightMultipliers[0], daylightMultipliers[1], daylightMultipliers[2]);
+            logger.debug("cameraMultipliers: {}, {}, {}", cameraMultipliers[0], cameraMultipliers[1], cameraMultipliers[2]);
 
             float[][] RGBToXYZMat = ColorScience.RGBToXYZMat;
 
@@ -75,7 +79,7 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
 
                 REF_T = ColorScience.findTemperature(daylightMultipliers, 5000, caMethod);
 
-                System.out.println("Daylight Temperature a (" + x + ") : " + ColorScience.CCTX(x) + ", " + REF_T);
+                logger.debug("Daylight Temperature a ({}) : {}, {}", x, ColorScience.CCTX(x), REF_T);
 
                 float[] rgb = new float[3];
 
@@ -85,7 +89,7 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
                 float[] wb = ColorScience.neutralTemperature(rgb, 5000, caMethod);
                 REF_T = wb[0];
 
-                System.out.println("Daylight Temperature b (" + x + ") : " + ColorScience.CCTX(x) + ", " + REF_T + ", tint: " + wb[1]);
+                logger.debug("Daylight Temperature b ({}) : {}, {}, tint: {}", x, ColorScience.CCTX(x), REF_T, wb[1]);
 
                 float[] inverseMultipliers = new float[] {1/daylightMultipliers[0], 1/daylightMultipliers[1], 1/daylightMultipliers[2]};
                 float invMax = Math.max(inverseMultipliers[0], Math.max(inverseMultipliers[1], inverseMultipliers[2]));
@@ -98,7 +102,7 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
                 source = wb[0];
                 tint = 0; // wb[1];
 
-                System.out.println("Daylight Temperature c (" + x + ") : " + ColorScience.CCTX(x) + ", " + source + ", tint: " + wb[1]);
+                logger.debug("Daylight Temperature c ({}) : {}, {}, tint: {}", x, ColorScience.CCTX(x), source, wb[1]);
 
             }
 
@@ -121,7 +125,7 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
                 source = wb[0];
                 tint = 0.18f * 256 * wb[1];
 
-                System.out.println("Camera Temperature a (" + x + ") : " + ColorScience.CCTX(x) + ", " + source + ", tint: " + tint);
+                logger.debug("Camera Temperature a ({}) : {}, {}, tint: {}", x, ColorScience.CCTX(x), source, tint);
 
                 float[] inverseMultipliers = new float[] {1/cameraMultipliers[0], 1/cameraMultipliers[1], 1/cameraMultipliers[2]};
                 float invMax = Math.max(inverseMultipliers[0], Math.max(inverseMultipliers[1], inverseMultipliers[2]));
@@ -134,32 +138,13 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
                 source = wb[0];
                 tint = 0; // wb[1];
 
-                System.out.println("Camera Temperature b (" + x + ") : " + ColorScience.CCTX(x) + ", " + source + ", tint: " + wb[1]);
+                logger.debug("Camera Temperature b ({}) : {}, {}, tint: {}", x, ColorScience.CCTX(x), source, wb[1]);
             }
 
             double dmax = Math.max(daylightMultipliers[0], Math.max(daylightMultipliers[1], daylightMultipliers[2]));
 
             for (int c=0; c < 3; c++)
                 daylightMultipliers[c] /= dmax;
-
-            /* float[] wb = new float[] {(cameraMultipliers[0] / (cameraMultipliers[1] * daylightMultipliers[0])),
-                                      (cameraMultipliers[1] / (cameraMultipliers[1] * daylightMultipliers[1])),
-                                      (cameraMultipliers[2] / (cameraMultipliers[1] * daylightMultipliers[2]))};
-
-            System.out.println("wb: " + wb[0] + ", " + wb[1] + ", " + wb[2]);
-
-            for (int i = 0; i < 3; i++)
-                wb[i] = 1/wb[i];
-
-            System.out.println("inverse wb: " + wb[0] + ", " + wb[1] + ", " + wb[2]);
-
-            float n[] = neutralize(new int[] {(int) (128 * 256 * wb[0]),
-                                              (int) (128 * 256 * wb[1]),
-                                              (int) (128 * 256 * wb[2])}, caMethod, source, REF_T);
-            if (n != null) {
-                source = n[0];
-                // tint = Math.min(Math.max(n[1], -20), 20);
-            } */
         }
 
         addSliderKey(SOURCE);
@@ -240,7 +225,7 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
         }
 
         if (wbr != 0 || wbg != 0 || wbb != 0) {
-            System.out.println("wb: " + wbr + ", " + wbg + ", " + wbb + ", sat: " + sat);
+            logger.debug("wb: {}, {}, {}, sat: {}", wbr, wbg, wbb, sat);
             return new float[] {minT, (float) (- (wbg - (wbr + wbb) / 2))};
         } else
             return new float[] {REF_T, 0};

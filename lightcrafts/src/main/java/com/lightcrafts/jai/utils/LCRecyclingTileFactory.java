@@ -16,6 +16,8 @@ package com.lightcrafts.jai.utils;
 
 import org.eclipse.imagen.TileFactory;
 import org.eclipse.imagen.TileRecycler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.image.*;
@@ -74,37 +76,7 @@ import java.util.Observable;
 public class LCRecyclingTileFactory extends Observable
     implements TileFactory, TileRecycler {
 
-    private static final boolean DEBUG = false;
-
-    /* XXX
-    public static void main(String[] args) throws Throwable {
-        RecyclingTileFactory rtf = new RecyclingTileFactory();
-
-        WritableRaster original =
-            Raster.createInterleavedRaster(DataBuffer.TYPE_BYTE,
-                                           1024, 768, 1, null);
-
-        rtf.recycleTile(Raster.createInterleavedRaster(DataBuffer.TYPE_BYTE,
-                                                       1024, 768, 1, null));
-        rtf.recycleTile(Raster.createInterleavedRaster(DataBuffer.TYPE_BYTE,
-                                                       1024, 768, 1, null));
-
-        rtf.createTile(original.getSampleModel(),
-                       new Point(original.getMinX(),
-                                 original.getMinY()));
-        rtf.createTile(original.getSampleModel(),
-                       new Point(original.getMinX(),
-                                 original.getMinY()));
-        rtf.createTile(original.getSampleModel(),
-                       new Point(original.getMinX(),
-                                 original.getMinY()));
-
-        //System.out.println(original.hashCode()+" "+original);
-        //System.out.println(recycled.hashCode()+" "+recycled);
-
-        System.exit(0);
-    }
-    */
+    private static final Logger logger = LoggerFactory.getLogger(LCRecyclingTileFactory.class);
 
     /**
      * Cache of recycled arrays.  The key in this mapping is a
@@ -358,33 +330,22 @@ public class LCRecyclingTileFactory extends Observable
                     throw new IllegalArgumentException("Unsupported Data Type");
                 }
 
-                if(DEBUG) {
-                    System.out.println(getClass().getName()+
-                                       " Using a recycled array of type: " + type + " array["+numBanks+"]["+size+"]");// XXX
-                    //(new Throwable()).printStackTrace(); // XXX
-                }
-            } else if(DEBUG) {
-                System.out.println(getClass().getName()+
-                                   " No type "+type+
-                                   " array["+numBanks+"]["+size+"] available");
+                logger.debug("{} Using a recycled array of type: {} array[{}][{}]",
+                        getClass().getName(), type, numBanks, size);
+            } else {
+                logger.debug("{} No type {} array[{}][{}] available",
+                        getClass().getName(), type, numBanks, size);
             }
-        } else if(DEBUG) {
-            System.out.println(getClass().getName()+
-                               " Size is zero");
+        } else {
+            logger.debug("{} Size is zero", getClass().getName());
         }
 
         if(db == null) {
-            if(DEBUG) {
-                System.out.println(getClass().getName()+
-                                   " Creating new DataBuffer");// XXX
-            }
-            //(new Throwable()).printStackTrace(); // XXX
+            logger.debug("{} Creating new DataBuffer", getClass().getName());
             db = sampleModel.createDataBuffer();
         }
 
-        return Raster.createWritableRaster(sampleModel,
-                                           db,
-                                           location);
+        return Raster.createWritableRaster(sampleModel, db, location);
     }
 
     /**
@@ -397,13 +358,8 @@ public class LCRecyclingTileFactory extends Observable
                 | (long)db.getNumBanks() << 32
                 | (long)db.getSize();
 
-        if(DEBUG) {
-            System.out.println("Recycling array for: "+
-                               db.getDataType()+" "+
-                               db.getNumBanks()+" "+
-                               db.getSize());
-            //System.out.println("recycleTile(); key = "+key);
-        }
+        logger.debug("Recycling array for: {} {} {}",
+                db.getDataType(), db.getNumBanks(), db.getSize());
 
         synchronized(recycledArrays) {
             Object value = recycledArrays.get(key);
@@ -434,11 +390,7 @@ public class LCRecyclingTileFactory extends Observable
                                     long arrayLength) {
         final Long key = (long)arrayType << 56 | numBanks << 32 | arrayLength;
 
-        if(DEBUG) {
-            System.out.println("Attempting to get array for: "+
-                               arrayType+" "+numBanks+" "+arrayLength);
-            //System.out.println("Attempting to get array for key "+key);
-        }
+        logger.debug("Attempting to get array for: {} {} {}", arrayType, numBanks, arrayLength);
 
         synchronized(recycledArrays) {
             Object value = recycledArrays.get(key);
@@ -459,7 +411,7 @@ public class LCRecyclingTileFactory extends Observable
                         return array;
                     }
 
-                    if(DEBUG) System.out.println("null reference");
+                    logger.debug("null reference");
                 }
             }
         }
@@ -486,7 +438,5 @@ public class LCRecyclingTileFactory extends Observable
             //throw new IllegalArgumentException("Unsupported Data Type");
             return null;
         }
-
-        //if(DEBUG) System.out.println("getRecycledArray() returning "+array);
     }
 }

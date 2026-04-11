@@ -12,6 +12,8 @@ import com.lightcrafts.utils.Version;
 import com.lightcrafts.utils.WebBrowser;
 import com.lightcrafts.utils.thread.ProgressThread;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
@@ -43,6 +45,8 @@ import static com.lightcrafts.app.Locale.LOCALE;
  * @author Masahiro Kitagawa [arctica0316@gmail.com]
  */
 public final class CheckForUpdate {
+
+    private static final Logger logger = LoggerFactory.getLogger(CheckForUpdate.class);
 
     ////////// public /////////////////////////////////////////////////////////
 
@@ -276,7 +280,7 @@ public final class CheckForUpdate {
             final var jsonObject = new JSONObject(response.body());
             return jsonObject.getString("tag_name");
         } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+            logger.warn("Failed to check latest release", e);
             return "";
         }
     }
@@ -478,7 +482,7 @@ public final class CheckForUpdate {
             m_prefs.sync();
         }
         catch ( BackingStoreException e ) {
-            e.printStackTrace();
+            logger.warn("Failed to sync update preferences", e);
         }
     }
 
@@ -577,7 +581,7 @@ public final class CheckForUpdate {
             CHECK_URI = new URI(CHECK_URI_STRING);
         }
         catch (URISyntaxException e) {
-            e.printStackTrace();
+            logger.error("Invalid update check URI: {}", CHECK_URI_STRING, e);
         }
         m_prefs = Preferences.userRoot().node( "com/lightcrafts/app" );
     }

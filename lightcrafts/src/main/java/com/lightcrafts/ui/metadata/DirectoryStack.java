@@ -7,6 +7,8 @@ import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.image.UnknownImageTypeException;
 import com.lightcrafts.image.metadata.*;
 import com.lightcrafts.image.metadata.makernotes.MakerNotesDirectory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,6 +17,8 @@ import java.io.IOException;
 import java.util.*;
 
 public class DirectoryStack extends JPanel implements Scrollable {
+
+    private static final Logger logger = LoggerFactory.getLogger(DirectoryStack.class);
 
     private static ResourceBundle Resources = ResourceBundle.getBundle(
         "com/lightcrafts/ui/metadata/resources/Directories"
@@ -242,7 +246,7 @@ public class DirectoryStack extends JPanel implements Scrollable {
         throws IOException, BadImageFileException, UnknownImageTypeException
     {
         if (args.length != 1) {
-            System.err.println("usage: DirectoryStack (file)");
+            logger.error("usage: DirectoryStack (file)");
             System.exit(1);
         }
         File file = new File(args[0]);

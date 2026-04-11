@@ -4,6 +4,8 @@ package com.lightcrafts.utils.cache;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.ref.Cleaner;
@@ -21,6 +23,8 @@ import java.util.Map;
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */
 public final class Cache {
+
+    private static final Logger logger = LoggerFactory.getLogger(Cache.class);
 
     ////////// public /////////////////////////////////////////////////////////
 
@@ -265,7 +269,7 @@ public final class Cache {
             try {
                 cache.dispose();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.warn("Failed to dispose cache resources", e);
             }
         };
     }

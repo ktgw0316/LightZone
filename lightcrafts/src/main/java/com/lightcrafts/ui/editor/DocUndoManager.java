@@ -52,6 +52,7 @@ class DocUndoManager extends UndoManager {
         return redoAction;
     }
 
+    @Override
     public boolean addEdit(UndoableEdit edit) {
         boolean inProgress = super.addEdit(edit);
         if (edit.isSignificant()) {
@@ -68,6 +69,7 @@ class DocUndoManager extends UndoManager {
         return inProgress;
     }
 
+    @Override
     public void undo() {
         final Editor editor = doc.getEditor();
         final EditorMode mode = editor.getMode();
@@ -84,6 +86,7 @@ class DocUndoManager extends UndoManager {
         // debugDump();
     }
 
+    @Override
     public void redo() {
         super.redo();
         currentEdit.next();
@@ -91,6 +94,7 @@ class DocUndoManager extends UndoManager {
         // debugDump();
     }
 
+    @Override
     public void discardAllEdits() {
         super.discardAllEdits();
         edits.clear();
@@ -121,6 +125,7 @@ class DocUndoManager extends UndoManager {
         }
     }
 
+    @Override
     public void undoableEditHappened(UndoableEditEvent event) {
         super.undoableEditHappened(event);
         notifyListeners(event);
@@ -130,35 +135,11 @@ class DocUndoManager extends UndoManager {
         listeners.add(listener);
     }
 
-    void removeUndoableEditListener(UndoableEditListener listener) {
-        listeners.remove(listener);
-    }
-
     private void notifyListeners(UndoableEditEvent event) {
         for (UndoableEditListener listener : listeners) {
             listener.undoableEditHappened(event);
         }
     }
-
-    // For development only
-/*
-    private void debugDump() {
-        List<UndoableEdit> list = getEdits();
-        int index = getEditIndex();
-        System.out.println("--- Start ---");
-        for (int n=0; n<list.size(); n++) {
-            if (n == index) {
-                System.out.print("--> ");
-            }
-            else {
-                System.out.print("    ");
-            }
-            UndoableEdit edit = list.get(n);
-            System.out.println(edit.getPresentationName());
-        }
-        System.out.println("--- End ---");
-    }
-*/
 
     private final class UndoAction extends AbstractAction {
         UndoAction() {
@@ -166,6 +147,7 @@ class DocUndoManager extends UndoManager {
             setEnabled(false);
         }
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             try {
                 undo();
@@ -190,6 +172,11 @@ class DocUndoManager extends UndoManager {
                 putValue(Action.NAME, LOCALE.get("UndoActionName"));
             }
         }
+
+        @Override
+        protected UndoAction clone() throws CloneNotSupportedException {
+            throw new CloneNotSupportedException();
+        }
     }
 
     private final class RedoAction extends AbstractAction {
@@ -198,6 +185,7 @@ class DocUndoManager extends UndoManager {
             setEnabled(false);
         }
 
+        @Override
         public void actionPerformed(ActionEvent event) {
             try {
                 redo();
@@ -221,6 +209,11 @@ class DocUndoManager extends UndoManager {
                 setEnabled(false);
                 putValue(Action.NAME, LOCALE.get("RedoActionName"));
             }
+        }
+
+        @Override
+        protected RedoAction clone() throws CloneNotSupportedException {
+            throw new CloneNotSupportedException();
         }
     }
 }

@@ -6,6 +6,9 @@ package com.lightcrafts.model.ImageEditor;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.TileComputationListener;
 import org.eclipse.imagen.TileRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.*;
 import java.awt.image.Raster;
 import java.util.HashSet;
@@ -102,6 +105,8 @@ class PaintRequest implements PaintContext {
 }
 
 public class TileManager implements TileComputationListener {
+    private static final Logger logger = LoggerFactory.getLogger(TileManager.class);
+
     private final List<PaintRequest> requests = new LinkedList<>();
     private PaintRequest prefetchRequest = null;
 
@@ -207,8 +212,7 @@ public class TileManager implements TileComputationListener {
                                        TileRequest[] tileRequests,
                                        PlanarImage image, int tileX, int tileY,
                                        final Throwable situation) {
-        System.err.println("failed tile " + tileX + ":" + tileY);
-        situation.printStackTrace();
+        logger.warn("failed tile {}:{}", tileX, tileY, situation);
         // TODO: eventually this should go away...
         /*
         EventQueue.invokeLater(

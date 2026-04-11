@@ -25,6 +25,8 @@ import com.lightcrafts.ui.export.SaveOptions;
 import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlDocument;
 import com.lightcrafts.utils.xml.XmlNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -43,6 +45,8 @@ import static com.lightcrafts.app.batch.Locale.LOCALE;
  * the send action.
  */
 public class BatchProcessor {
+
+    private static final Logger logger = LoggerFactory.getLogger(BatchProcessor.class);
 
     private static JDialog Dialog;  // Blocks UI during batch processing
     private static BatchText Text;  // Where log messages stream to
@@ -73,10 +77,7 @@ public class BatchProcessor {
                         processTemplate(files, template, conf);
                     }
                     catch (RuntimeException e) {
-                        System.err.println(
-                            "Unchecked batch processing exception:"
-                        );
-                        e.printStackTrace();
+                        logger.error("Unchecked batch processing exception", e);
                         Error = e;
                         Dialog.dispose();
                     }
@@ -299,7 +300,7 @@ public class BatchProcessor {
             }
             catch (Throwable e) {
                 logError(LOCALE.get("BatchLogUnknownError"), e);
-                e.printStackTrace();
+                logger.error("Unhandled batch processing error", e);
             }
             updateLabel(++n, files.length);
         }

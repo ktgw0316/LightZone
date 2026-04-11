@@ -28,6 +28,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.eclipse.imagen.BorderExtender;
 import org.eclipse.imagen.ImageLayout;
@@ -54,6 +56,8 @@ import java.util.List;
 import java.util.*;
 
 public class ImageEditorEngine implements Engine {
+    private static final Logger logger = LoggerFactory.getLogger(ImageEditorEngine.class);
+
     private ImageInfo m_imageInfo;
     private ImageInfo m_exportInfo;
 
@@ -175,7 +179,7 @@ public class ImageEditorEngine implements Engine {
         final var imagePath = imageMetadata.getPath();
         final var imageFile = new File(imagePath).getCanonicalFile();
         m_imageInfo = ImageInfo.getInstanceFor(imageFile);
-        System.out.println("Opening " + imageFile);
+        logger.info("Opening {}", imageFile);
 
         m_exportInfo = exportInfo;
         metadata = imageMetadata; // imageInfo.getMetadata();
@@ -256,7 +260,7 @@ public class ImageEditorEngine implements Engine {
             return;
         disposed = true;
 
-        System.out.println("Disposing Engine");
+        logger.debug("Disposing Engine");
 
         if (swingTimer != null) {
             swingTimer.stop();
@@ -370,7 +374,7 @@ public class ImageEditorEngine implements Engine {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to instantiate operation for type {}", type, e);
             // TODO: what to do here?
         }
 
@@ -621,9 +625,8 @@ public class ImageEditorEngine implements Engine {
                     tilesRead = tc.tilesRead();
                     tilesWritten = tc.tilesWritten();
                     tilesOnDisk = tc.tilesOnDisk();
-                    System.out.println("Tile Cache Statistics r: " + tilesRead
-                            + ", w: " + tilesWritten
-                            + ", on disk: " + tilesOnDisk);
+                    logger.debug("Tile Cache Statistics r: {}, w: {}, on disk: {}",
+                            tilesRead, tilesWritten, tilesOnDisk);
                 }
             }
 

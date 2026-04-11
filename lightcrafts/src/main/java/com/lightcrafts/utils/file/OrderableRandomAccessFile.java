@@ -4,6 +4,8 @@ package com.lightcrafts.utils.file;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.lang.ref.Cleaner;
@@ -23,6 +25,8 @@ import java.nio.channels.FileChannel;
  */
 public final class OrderableRandomAccessFile
     implements Closeable, DataInput, DataOutput {
+
+    private static final Logger logger = LoggerFactory.getLogger(OrderableRandomAccessFile.class);
 
     ////////// public /////////////////////////////////////////////////////////
 
@@ -273,7 +277,7 @@ public final class OrderableRandomAccessFile
                 f.close();
             }
             catch (IOException e) {
-                e.printStackTrace();
+                logger.warn("Failed to close random access file", e);
             }
         };
     }

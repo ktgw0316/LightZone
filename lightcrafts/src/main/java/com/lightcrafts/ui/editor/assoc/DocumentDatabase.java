@@ -7,6 +7,8 @@ import com.lightcrafts.ui.editor.LightweightDocument;
 import com.lightcrafts.utils.file.FileUtil;
 import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlDocument;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,6 +24,8 @@ import java.util.*;
  */
 
 public class DocumentDatabase {
+
+    private static final Logger logger = LoggerFactory.getLogger(DocumentDatabase.class);
 
     // An in-memory copy of the Document directory paths:
     private static Set<File> Directories = new LinkedHashSet<File>();
@@ -230,10 +234,7 @@ public class DocumentDatabase {
             // Encountered a file that is not an editor file--so what?
         }
         catch (IOException e) {
-            System.err.println(
-                "DocDB: can't read " + file.getName() + ": " +
-                e.getMessage()
-            );
+            logger.warn("DocDB: can't read {}: {}", file.getName(), e.getMessage(), e);
         }
     }
 
@@ -312,10 +313,7 @@ public class DocumentDatabase {
         }
         catch (IOException e) {
             if (DefaultDocuments.Debug) {
-                System.err.print(
-                    "Error reading default document at " + url + ": "
-                );
-                System.err.println(e.getMessage());
+                logger.warn("Error reading default document at {}: {}", url, e.getMessage(), e);
             }
             return null;
         }

@@ -6,6 +6,8 @@ import com.lightcrafts.utils.filecache.FileCacheFactory;
 import com.lightcrafts.utils.filecache.FileCache;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.platform.AlertDialog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.lightcrafts.prefs.Locale.LOCALE;
 
@@ -18,6 +20,8 @@ import java.util.prefs.Preferences;
 import java.io.IOException;
 
 class BrowserCacheItem extends PreferencesItem {
+
+    private static final Logger logger = LoggerFactory.getLogger(BrowserCacheItem.class);
 
     private final static String Package = "/com/lightcrafts/utils/filecache";
     private final static String Key = "CacheScope";
@@ -122,8 +126,7 @@ class BrowserCacheItem extends PreferencesItem {
                     AlertDialog.ERROR_ALERT,
                     new String[] { LOCALE.get("BrowserCacheItemErrorButton") }
                 );
-                System.out.println("Error clearing the global browser cache:");
-                e.printStackTrace();
+                logger.error("Error clearing the global browser cache", e);
             }
         }
     }

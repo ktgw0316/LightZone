@@ -2,24 +2,29 @@
 
 package com.lightcrafts.ui.browser.model;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.LinkedList;
 import java.awt.*;
 
 public class ImageTaskQueue implements Runnable {
 
-    private LinkedList<ImageTask> queue;
+    private static final Logger logger = LoggerFactory.getLogger(ImageTaskQueue.class);
 
-    private Thread thread;
+    private final LinkedList<ImageTask> queue;
+
+    private final Thread thread;
     private boolean pause;
     private boolean stop;
 
-    private LinkedList<ImageTaskQueueListener> listeners;
+    private final LinkedList<ImageTaskQueueListener> listeners;
 
     public ImageTaskQueue() {
         thread = new Thread(this, "Image Task Queue");
         thread.setPriority(Thread.MIN_PRIORITY);
-        queue = new LinkedList<ImageTask>();
-        listeners = new LinkedList<ImageTaskQueueListener>();
+        queue = new LinkedList<>();
+        listeners = new LinkedList<>();
     }
 
     void addTask(ImageTask task) {
@@ -84,15 +89,6 @@ public class ImageTaskQueue implements Runnable {
         }
     }
 
-    public void lowerTask(ImageTask task) {
-        synchronized(queue) {
-            if (queue.contains(task)) {
-                queue.remove(task);
-                queue.addLast(task);
-            }
-        }
-    }
-
     public void run() {
         while (! stop) {
             Runnable task;
@@ -145,15 +141,7 @@ public class ImageTaskQueue implements Runnable {
 
     private void logQueueSize() {
         final int depth = queue.size();
-        EventQueue.invokeLater(
-            new Runnable() {
-                public void run() {
-                    for (ImageTaskQueueListener listener : listeners) {
-                        listener.queueDepthChanged(depth);
-                    }
-                }
-            }
-        );
+        EventQueue.invokeLater(() -> listeners.forEach(l -> l.queueDepthChanged(depth)));
     }
 
     private void logTaskError(Throwable t) {
@@ -164,7 +152,6 @@ public class ImageTaskQueue implements Runnable {
             buffer.append(": ");
             buffer.append(t.getMessage());
         }
-        System.err.println(buffer);
-        t.printStackTrace();
+        logger.error("{}", buffer, t);
     }
 }

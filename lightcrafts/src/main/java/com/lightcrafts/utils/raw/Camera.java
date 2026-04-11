@@ -1,6 +1,8 @@
 package com.lightcrafts.utils.raw;
 
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -12,6 +14,7 @@ import java.util.Properties;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class Camera {
+    private static final Logger logger = LoggerFactory.getLogger(Camera.class);
     static final boolean Debug = System.getProperty("lightcrafts.debug") != null;
 
     public static String getCompatibleCameraName(@NotNull String name) {
@@ -35,7 +38,7 @@ public class Camera {
         name = Camera.getCompatibleCameraName(name);
         final URL url = Camera.class.getResource("resources/" + name + ".lzt");
         if ((url == null) && Debug) {
-            System.err.println("No default Document for \"" + name + "\"");
+            logger.debug("No default Document for \"{}\"", name);
         }
         return url;
     }

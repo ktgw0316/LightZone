@@ -8,6 +8,8 @@ import org.eclipse.imagen.RenderedOp;
 import org.eclipse.imagen.media.algebra.AlgebraDescriptor;
 import org.eclipse.imagen.media.bandmerge.BandMergeDescriptor;
 import org.eclipse.imagen.media.bandselect.BandSelectDescriptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -27,6 +29,8 @@ import static org.eclipse.imagen.media.algebra.AlgebraDescriptor.Operator.INVERT
  * enforced and errors can be handled.
  */
 public class IconFactory {
+
+    private static final Logger logger = LoggerFactory.getLogger(IconFactory.class);
 
     public static int StandardSize = 18;
 
@@ -48,7 +52,7 @@ public class IconFactory {
             return new ImageIcon(image);
         }
         catch (Throwable t) {   // IOException, null URL
-            t.printStackTrace();
+            logger.error("Couldn't read icon resource \"{}\" for class {}", name, clazz.getName(), t);
             throw new RuntimeException(
                 "Couldn't read icon resource \"" + name + "\" " +
                 "for class " + clazz.getName()

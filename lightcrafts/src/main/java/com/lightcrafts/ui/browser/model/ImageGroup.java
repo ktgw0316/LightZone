@@ -2,6 +2,9 @@
 
 package com.lightcrafts.ui.browser.model;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.*;
 
 /**
@@ -10,6 +13,8 @@ import java.util.*;
  * ImageDatum.setGroup(), and ImageDatumComparator.
  */
 public class ImageGroup {
+
+    private static final Logger logger = LoggerFactory.getLogger(ImageGroup.class);
 
     private final List<ImageDatum> datums;
 
@@ -67,11 +72,11 @@ public class ImageGroup {
             List<ImageDatum> members = group.getImageDatums();
             for (ImageDatum member : members) {
                 if (seen.contains(member)) {
-                    System.err.println("ImageDatum in multiple ImageGroups");
+                    logger.warn("ImageDatum in multiple ImageGroups");
                     return false;
                 }
                 if (! datums.contains(member)) {
-                    System.err.println("Unexpected ImageDatum in ImageGroup");
+                    logger.warn("Unexpected ImageDatum in ImageGroup");
                     return false;
                 }
                 seen.add(member);

@@ -10,6 +10,8 @@ import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlDocument;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -31,6 +33,8 @@ import java.util.prefs.Preferences;
  */
 
 class OpTitle extends SelectableTitle {
+
+    private static final Logger logger = LoggerFactory.getLogger(OpTitle.class);
 
     // Preferences are used to remember OpControl presets:
     private final static Preferences Prefs = Preferences.userNodeForPackage(OpTitle.class);
@@ -145,7 +149,7 @@ class OpTitle extends SelectableTitle {
                 catch (XMLException e) {
                     // No way to back out of this, so leave things as
                     // they are and hope the user can recover.
-                    System.err.println("Error in preset restore: " + e.getMessage());
+                    logger.warn("Error in preset restore: {}", e.getMessage(), e);
                 }
             });
         }

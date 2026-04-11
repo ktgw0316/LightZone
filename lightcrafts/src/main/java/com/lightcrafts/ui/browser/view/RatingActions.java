@@ -2,12 +2,17 @@
 
 package com.lightcrafts.ui.browser.view;
 
+import com.lightcrafts.image.BadImageFileException;
+import com.lightcrafts.image.UnknownImageTypeException;
 import com.lightcrafts.ui.browser.model.ImageDatum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import static com.lightcrafts.ui.browser.view.Locale.LOCALE;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,67 +23,44 @@ import java.util.List;
  */
 class RatingActions {
 
+    private static final Logger logger = LoggerFactory.getLogger(RatingActions.class);
+
     static List<SelectionAction> createAllActions(
         AbstractImageBrowser browser, boolean dynamic
     ) {
-        ArrayList<SelectionAction> actions = new ArrayList<SelectionAction>();
-        actions.addAll(createRatingActions(browser, dynamic));
+        ArrayList<SelectionAction> actions = new ArrayList<>(createRatingActions(browser, dynamic));
         // actions.addAll(createRatingAdvanceActions(browser, dynamic));
         actions.add(createClearRatingAction(browser, dynamic));
         // actions.add(createClearRatingAdvanceAction(browser, dynamic));
         return actions;
     }
 
-//    static SelectionAction createClearRatingAdvanceAction(
-//        final AbstractImageBrowser browser, boolean dynamic
-//    ) {
-//        SelectionAction action = new SelectionAction(
-//            LOCALE.get("ClearRatingAdvanceAction"),
-//            browser,
-//            KeyStroke.getKeyStroke('0', KeyEvent.SHIFT_DOWN_MASK),
-//            dynamic
-//        ) {
-//            public void actionPerformed(ActionEvent e) {
-//                clearRating(browser);
-//                browser.moveSelectionNext();
-//            }
-//        };
-//        return action;
-//    }
-
     static SelectionAction createClearRatingAction(
         final AbstractImageBrowser browser, boolean dynamic
     ) {
-        SelectionAction action = new SelectionAction(
+        return new SelectionAction(
             LOCALE.get("ClearRatingAction"),
             browser,
             KeyStroke.getKeyStroke('0', 0),
             dynamic,
             true
         ) {
+            @Override
+            protected SelectionAction clone() throws CloneNotSupportedException {
+                throw new CloneNotSupportedException();
+            }
+
+            @Override
             public void actionPerformed(ActionEvent e) {
                 clearRating(browser);
             }
         };
-        return action;
     }
-
-//    static List<SelectionAction> createRatingAdvanceActions(
-//        AbstractImageBrowser browser, boolean dynamic
-//    ) {
-//        List<SelectionAction> actions = new ArrayList<SelectionAction>();
-//        for (int rating=1; rating<=5; rating++) {
-//            SelectionAction action =
-//                createRatingAdvanceAction(browser, rating, dynamic);
-//            actions.add(action);
-//        }
-//        return actions;
-//    }
 
     static List<SelectionAction> createRatingActions(
         AbstractImageBrowser browser, boolean dynamic
     ) {
-        List<SelectionAction> actions = new ArrayList<SelectionAction>();
+        List<SelectionAction> actions = new ArrayList<>();
         for (int rating=1; rating<=5; rating++) {
             SelectionAction action =
                 createRatingAction(browser, rating, dynamic);
@@ -87,48 +69,31 @@ class RatingActions {
         return actions;
     }
 
-//    static SelectionAction createRatingAdvanceAction(
-//        final AbstractImageBrowser browser, final int rating, boolean dynamic
-//    ) {
-//        String stars = createStars(rating);
-//        SelectionAction action = new SelectionAction(
-//            LOCALE.get("RateAndAdvanceAction", stars),
-//            browser,
-//            KeyStroke.getKeyStroke('0' + rating, KeyEvent.SHIFT_DOWN_MASK),
-//            dynamic
-//        ) {
-//            public void actionPerformed(ActionEvent e) {
-//                setRating(browser, rating);
-//                browser.moveSelectionNext();
-//            }
-//        };
-//        return action;
-//    }
-
     private static String createStars(int rating) {
-        StringBuffer buffer = new StringBuffer();
-        for (int n=0; n<rating; n++) {
-            buffer.append('\u2605');    // a unicode star character
-        }
-        return buffer.toString();
+        return "★".repeat(Math.max(0, rating));
     }
 
     static SelectionAction createRatingAction(
         final AbstractImageBrowser browser, final int rating, boolean dynamic
     ) {
         String stars = createStars(rating);
-        SelectionAction action = new SelectionAction(
+        return new SelectionAction(
             stars, // LOCALE.get("RateAction", stars),
             browser,
             KeyStroke.getKeyStroke('0' + rating, 0),
             dynamic,
             true
         ) {
+            @Override
+            protected SelectionAction clone() throws CloneNotSupportedException {
+                throw new CloneNotSupportedException();
+            }
+
+            @Override
             public void actionPerformed(ActionEvent e) {
                 setRating(browser, rating);
             }
         };
-        return action;
     }
 
     // Get the action that queries the browser selection model for its
@@ -141,14 +106,10 @@ class RatingActions {
         for (ImageDatum datum : datums) {
             try {
                 datum.setRating(rating);
-            }
-            catch (Throwable t) {
-                browser.notifyError(t.getMessage());
+            } catch (BadImageFileException | UnknownImageTypeException | IOException e) {
+                browser.notifyError(e.getMessage());
                 File file = datum.getFile();
-                System.err.println(
-                    "Couldn't set rating on " + file.getAbsolutePath() + ": "
-                );
-                t.printStackTrace();
+                logger.warn("Couldn't set rating on {}", file.getAbsolutePath(), e);
             }
         }
     }
@@ -160,13 +121,10 @@ class RatingActions {
             datum.setRating(rating);
             return true;
         }
-        catch (Throwable t) {
-            browser.notifyError(t.getMessage());
+        catch (BadImageFileException | UnknownImageTypeException | IOException e) {
+            browser.notifyError(e.getMessage());
             File file = datum.getFile();
-            System.err.println(
-                "Couldn't set rating on " + file.getAbsolutePath() + ": "
-            );
-            t.printStackTrace();
+            logger.warn("Couldn't set rating on {}", file.getAbsolutePath(), e);
             return false;
         }
     }
@@ -176,13 +134,10 @@ class RatingActions {
             datum.clearRating();
             return true;
         }
-        catch (Throwable t) {
-            browser.notifyError(t.getMessage());
+        catch (BadImageFileException | UnknownImageTypeException | IOException e) {
+            browser.notifyError(e.getMessage());
             File file = datum.getFile();
-            System.err.println(
-                "Couldn't clear rating on " + file.getAbsolutePath() + ": "
-            );
-            t.printStackTrace();
+            logger.warn("Couldn't clear rating on {}", file.getAbsolutePath(), e);
             return false;
         }
     }
@@ -194,12 +149,9 @@ class RatingActions {
             try {
                 datum.clearRating();
             }
-            catch (Throwable t) {
-                browser.notifyError(t.getMessage());
-                System.err.println(
-                    "Couldn't clear rating on " + file.getAbsolutePath() + ": "
-                );
-                t.printStackTrace();
+            catch (BadImageFileException | UnknownImageTypeException | IOException e) {
+                browser.notifyError(e.getMessage());
+                logger.warn("Couldn't clear rating on {}", file.getAbsolutePath(), e);
             }
         }
     }

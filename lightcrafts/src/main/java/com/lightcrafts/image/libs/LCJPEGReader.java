@@ -10,6 +10,8 @@ import com.lightcrafts.jai.opimage.CachedImage;
 import com.lightcrafts.utils.ProgressIndicator;
 import com.lightcrafts.utils.UserCanceledException;
 import com.lightcrafts.utils.thread.ProgressThread;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.awt.Point;
 import java.awt.Transparency;
 import java.awt.color.ColorSpace;
@@ -41,6 +43,8 @@ import static com.lightcrafts.jai.JAIContext.sRGBColorSpace;
  * @see <a href="http://www.ijg.org/">LibJPEG</a>
  */
 public final class LCJPEGReader implements AutoCloseable, LCImageReader {
+
+    private static final Logger logger = LoggerFactory.getLogger(LCJPEGReader.class);
 
     /**
      * The default buffer size for use with {@link #LCJPEGReader(LCImageDataProvider).
@@ -378,7 +382,7 @@ public final class LCJPEGReader implements AutoCloseable, LCImageReader {
 
             final int linesRead = readScanLines(((DataBufferByte) db).getData(), 0, tileHeight);
             if (linesRead <= 0) {
-                System.out.println("Problem with readScanLines, returned: " + linesRead);
+                logger.warn("Problem with readScanLines, returned: {}", linesRead);
                 break;
             }
 

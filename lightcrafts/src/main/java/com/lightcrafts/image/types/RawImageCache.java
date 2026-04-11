@@ -16,6 +16,8 @@ import com.lightcrafts.utils.UserCanceledException;
 import com.lightcrafts.utils.filecache.FileCache;
 import com.lightcrafts.utils.filecache.FileCacheFactory;
 import com.lightcrafts.utils.thread.ProgressThread;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.eclipse.imagen.PlanarImage;
 import java.awt.image.RenderedImage;
@@ -29,6 +31,8 @@ import java.time.ZoneOffset;
  * @author Fabio Riccardi [fabio@lightcrafts.com]
  */
 class RawImageCache extends Thread {
+    private static final Logger logger = LoggerFactory.getLogger(RawImageCache.class);
+
     private static final String version = "V5";
 
     private record ImageToCache(String cacheKey, RenderedImage image) {
@@ -109,7 +113,7 @@ class RawImageCache extends Thread {
             }
             catch ( LCImageLibException e ) {
                 // never mind, don't use the cache
-                e.printStackTrace();
+                logger.warn("Failed to read cached raw image {}", fileName, e);
             }
         }
         return null;
@@ -126,7 +130,7 @@ class RawImageCache extends Thread {
                 }
             }
 
-            System.out.println("Caching image: " + currentJob.cacheKey);
+            logger.debug("Caching image: {}", currentJob.cacheKey);
 
             long t1 = System.currentTimeMillis();
 
@@ -146,14 +150,14 @@ class RawImageCache extends Thread {
                     }
                 } catch (IOException | LCImageLibException e) {
                     // nevermind, do without cache...
-                    e.printStackTrace();
+                    logger.warn("Failed to cache image {}", currentJob.cacheKey, e);
                 }
             }
 
             currentJob = null;
 
             long t2 = System.currentTimeMillis();
-            System.out.println("Image cached in " + (t2 - t1) + "ms");
+            logger.debug("Image cached in {}ms", t2 - t1);
         }
     }
 }

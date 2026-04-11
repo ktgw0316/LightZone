@@ -10,8 +10,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class FolderTreeTransferHandler extends TransferHandler {
+
+    private static final Logger logger = LoggerFactory.getLogger(FolderTreeTransferHandler.class);
 
     private FolderTree tree;
 
@@ -32,18 +36,16 @@ class FolderTreeTransferHandler extends TransferHandler {
             );
             files.stream()
                     .map(File::getAbsolutePath)
-                    .forEach(System.out::println);
+                    .forEach(path -> logger.debug("{}", path));
             FolderTreeSelectionModel selection =
                 (FolderTreeSelectionModel) tree.getSelectionModel();
             File folder = selection.getDropFolder();
-            System.out.println(
-                folder != null ? folder.getAbsolutePath() : null
-            );
+            logger.debug("{}", folder != null ? folder.getAbsolutePath() : null);
             tree.notifyDropAccepted(files, folder);
             return true;
         }
         catch (UnsupportedFlavorException | IOException e) {
-            e.printStackTrace();
+            logger.warn("Failed to import dropped folder data", e);
         }
         return false;
     }

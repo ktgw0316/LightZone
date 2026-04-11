@@ -6,6 +6,8 @@ package com.lightcrafts.image.libs;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,6 +23,8 @@ import java.nio.channels.ReadableByteChannel;
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */
 public final class InputStreamImageDataProvider implements AutoCloseable, LCImageDataProvider {
+
+    private static final Logger logger = LoggerFactory.getLogger(InputStreamImageDataProvider.class);
 
     private final ReadableByteChannel m_channel;
 
@@ -61,7 +65,7 @@ public final class InputStreamImageDataProvider implements AutoCloseable, LCImag
             try {
                 channel.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.warn("Failed to close input image data channel", e);
             }
         };
     }

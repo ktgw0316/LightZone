@@ -4,6 +4,8 @@
 package com.lightcrafts.platform.windows;
 
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Set;
@@ -15,6 +17,8 @@ import java.util.Locale;
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */
 public final class WindowsHelp {
+
+    private static final Logger logger = LoggerFactory.getLogger(WindowsHelp.class);
 
     ////////// public /////////////////////////////////////////////////////////
 
@@ -50,7 +54,7 @@ public final class WindowsHelp {
         try {
             new ProcessBuilder(cmd).start();
         } catch (IOException e) {
-            System.err.println("Unable to launch help viewer for " + param + ": " + e);
+            logger.warn("Unable to launch help viewer for {}", param, e);
         }
     }
 

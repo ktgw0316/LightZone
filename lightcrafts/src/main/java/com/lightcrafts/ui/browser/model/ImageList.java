@@ -7,6 +7,8 @@ import com.lightcrafts.image.ImageFileFilter;
 import com.lightcrafts.utils.file.FileUtil;
 import com.lightcrafts.utils.ProgressIndicator;
 import com.lightcrafts.utils.filecache.FileCache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.io.File;
@@ -36,6 +38,8 @@ import lombok.Getter;
  * also run on that thread.
  */
 public class ImageList {
+
+    private static final Logger logger = LoggerFactory.getLogger(ImageList.class);
 
     // The List of ImageDatums.
     private final List<ImageDatum> list;
@@ -373,9 +377,7 @@ public class ImageList {
     }
 
     private void showContext(String msg) {
-        System.out.println(msg + " " + pauseDepth);
-        System.out.println('\t' + Thread.currentThread().getName());
-        System.out.println('\t' + this.toString());
+        logger.debug("{} {}\t{}\t{}", msg, pauseDepth, Thread.currentThread().getName(), this);
         final var t = new Throwable();
         final var stack = t.getStackTrace();
         Arrays.stream(stack)
@@ -384,6 +386,6 @@ public class ImageList {
                     final var name = frame.getClassName();
                     return (!name.contains("java.awt.") && !name.contains("javax.swing."));
                 })
-                .forEach(frame -> System.out.println("\tat " + frame));
+                .forEach(frame -> logger.debug("\tat {}", frame));
     }
 }

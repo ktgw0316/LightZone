@@ -8,6 +8,8 @@ import com.lightcrafts.image.types.JPEGImageType;
 import com.lightcrafts.image.types.TIFFImageType;
 import com.lightcrafts.utils.xml.XmlDocument;
 import com.lightcrafts.platform.Platform;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.lightcrafts.ui.export.Locale.LOCALE;
 
@@ -25,6 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ExportDialog extends JFileChooser {
+
+    private static final Logger logger = LoggerFactory.getLogger(ExportDialog.class);
 
     static class ExportFilter extends FileFilter {
 
@@ -308,7 +312,7 @@ public class ExportDialog extends JFileChooser {
                         o.write(doc.getRoot());
                     }
                     else {
-                        System.out.println("cancelled");
+                        logger.info("cancelled");
                         System.exit(0);
                     }
                 }

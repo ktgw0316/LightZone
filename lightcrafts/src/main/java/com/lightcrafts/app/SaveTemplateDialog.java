@@ -11,6 +11,8 @@ import com.lightcrafts.templates.TemplateKey;
 import com.lightcrafts.templates.TemplateDatabase;
 import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlDocument;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,6 +30,8 @@ import java.util.Set;
  * button.
  */
 class SaveTemplateDialog extends JDialog {
+
+    private static final Logger logger = LoggerFactory.getLogger(SaveTemplateDialog.class);
 
     private XmlDocument originalTemplate;
     private JComboBox namespaceField;
@@ -74,8 +78,7 @@ class SaveTemplateDialog extends JDialog {
         }
         catch (XMLException e) {
             // Don't include the selector to the layout below.
-            System.err.println("Couldn't initialize TemplateToolSelector");
-            e.printStackTrace();
+            logger.warn("Couldn't initialize TemplateToolSelector", e);
         }
         // Please excuse the GridBag.  I'm just lining up text fields and
         // labels into columns.
@@ -286,7 +289,7 @@ class SaveTemplateDialog extends JDialog {
         }
         catch (TemplateDatabase.TemplateException e) {
             // Just leave the name field blank.
-            e.printStackTrace();
+            logger.warn("Failed to update template name field", e);
         }
     }
 
@@ -306,8 +309,8 @@ class SaveTemplateDialog extends JDialog {
         SaveTemplateDialog dialog = new SaveTemplateDialog();
         dialog.showDialog(meta, doc, null, null);
 
-        System.out.println("name=" + dialog.getNameText());
-        System.out.println("namespace=" + dialog.getNamespaceText());
+        logger.info("name={}", dialog.getNameText());
+        logger.info("namespace={}", dialog.getNamespaceText());
 
         System.exit(0);
     }

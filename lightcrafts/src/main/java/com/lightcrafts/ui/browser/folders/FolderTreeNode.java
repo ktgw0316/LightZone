@@ -8,6 +8,8 @@ import com.lightcrafts.utils.directory.DirectoryMonitor;
 import com.lightcrafts.utils.file.FileUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
@@ -21,6 +23,8 @@ import java.util.*;
  * A TreeNode representing a folder.
  */
 class FolderTreeNode implements TreeNode {
+
+    private static final Logger logger = LoggerFactory.getLogger(FolderTreeNode.class);
 
     private final static FileSystemView FileSystemView =
         Platform.getPlatform().getFileSystemView();
@@ -74,7 +78,7 @@ class FolderTreeNode implements TreeNode {
         }
         catch (IOException e) {
             // Accept the non-canonical instance
-            e.printStackTrace();
+            logger.debug("Failed to canonicalize folder path {}", resolvedFile, e);
         }
         index.add(this);
         directoryMonitor.addDirectory(resolvedFile);

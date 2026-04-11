@@ -3,6 +3,8 @@
 package com.lightcrafts.ui.browser.view;
 
 import com.lightcrafts.ui.browser.model.ImageDatum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -13,6 +15,8 @@ import static com.lightcrafts.ui.browser.view.Locale.LOCALE;
  * Actions for changing the orientations of images through the browser.
  */
 class FlipActions {
+
+    private static final Logger logger = LoggerFactory.getLogger(FlipActions.class);
 
     static SelectionAction createFlipHorizontalAction(
         final AbstractImageBrowser browser, boolean dynamic
@@ -74,8 +78,7 @@ class FlipActions {
         }
         catch (Throwable t) {
             browser.notifyError(t.getMessage());
-            System.err.println("Flip horizontal failed");
-            t.printStackTrace();
+            logger.warn("Flip horizontal failed for {}", datum.getFile(), t);
         }
     }
 
@@ -85,8 +88,7 @@ class FlipActions {
         }
         catch (Throwable t) {
             browser.notifyError(t.getMessage());
-            System.err.println("Flip vertical failed");
-            t.printStackTrace();
+            logger.warn("Flip vertical failed for {}", datum.getFile(), t);
         }
     }
 

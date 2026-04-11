@@ -13,6 +13,8 @@ import com.lightcrafts.utils.file.FileIterator;
 import com.lightcrafts.utils.file.FileUtil;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A <code>FileCacheMonitor</code> is used to monitor the size of a
@@ -21,6 +23,8 @@ import org.jetbrains.annotations.NotNull;
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */
 final class FileCacheMonitor extends Thread {
+
+    private static final Logger logger = LoggerFactory.getLogger(FileCacheMonitor.class);
 
     ////////// public /////////////////////////////////////////////////////////
 
@@ -35,25 +39,14 @@ final class FileCacheMonitor extends Thread {
             while ( m_owningCache.getSize() > m_owningCache.getCapacity() ) {
                 if ( m_stop )
                     return;
-                if ( FileCache.DEBUG )
-                    System.err.println(
-                        "run(): cache size = "
-                         + (m_owningCache.getSize() / (1024*1024)) + " MB"
-                    );
+                logger.debug("run(): cache size = {} MB", (m_owningCache.getSize() / (1024 * 1024)));
                 final CacheFile fileToRemove = getNextFileToRemove();
                 final long size = fileToRemove.length();
                 fileToRemove.delete();
-                if ( FileCache.DEBUG )
-                    System.err.println(
-                        "run(): purging " + fileToRemove.getAbsolutePath()
-                        + ", size = " + (size / (1024 * 1024)) + " MB"
-                    );
+                logger.debug("run(): purging {}, size = {} MB",
+                        fileToRemove.getAbsolutePath(), (size / (1024 * 1024)));
                 m_owningCache.addToCacheSize( -size );
-                if ( FileCache.DEBUG )
-                    System.err.println(
-                        "run(): cache size = "
-                        + (m_owningCache.getSize() / (1024 * 1024)) + " MB"
-                    );
+                logger.debug("run(): cache size = {} MB", (m_owningCache.getSize() / (1024 * 1024)));
             }
             synchronized ( this ) {
                 try {

@@ -5,6 +5,8 @@ package com.lightcrafts.jai;
 import com.lightcrafts.model.Region;
 import com.lightcrafts.model.Contour;
 import com.lightcrafts.jai.opimage.ShapedMask;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.eclipse.imagen.ROIShape;
 import java.util.LinkedList;
@@ -23,6 +25,8 @@ import java.awt.geom.NoninvertibleTransformException;
  * To change this template use File | Settings | File Templates.
  */
 public class LCROIShape extends ROIShape {
+    private static final Logger logger = LoggerFactory.getLogger(LCROIShape.class);
+
     public LCROIShape(Region r, AffineTransform transform) {
         super(r.getOuterShape());
         this.transform = transform;
@@ -59,7 +63,7 @@ public class LCROIShape extends ROIShape {
                     AffineTransform inverse = combined.createInverse();
                     translatedRect = inverse.createTransformedShape(rect).getBounds2D();
                 } catch (NoninvertibleTransformException e) {
-                    e.printStackTrace();
+                    logger.warn("Failed to invert contour transform", e);
                 }
             }
 

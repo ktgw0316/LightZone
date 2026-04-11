@@ -2,19 +2,19 @@
 
 package com.lightcrafts.app;
 
-import com.lightcrafts.ui.toolkit.TextAreaFactory;
-import com.lightcrafts.utils.ErrorLogger;
-
 import static com.lightcrafts.app.Locale.LOCALE;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.PrintWriter;
 import java.io.StringWriter;
 
 public class ExceptionDialog extends JOptionPane {
+
+    private static final Logger logger = LoggerFactory.getLogger(ExceptionDialog.class);
 
     private final static String RegularMessage = LOCALE.get("CrashRegularMessage");
     private final static String MemoryMessage = LOCALE.get("CrashMemoryMessage");
@@ -95,7 +95,7 @@ public class ExceptionDialog extends JOptionPane {
     }
 
     public void handle(Throwable t) {
-        t.printStackTrace();
+        logger.error("Unhandled exception", t);
         // Fabio and Paul have clammored for this (for developers only):
         if (System.getProperty("dieOnError") != null) {
             System.exit(-1);
@@ -111,10 +111,26 @@ public class ExceptionDialog extends JOptionPane {
             message.setText(RegularMessage);
         }
         StringWriter buffer = new StringWriter();
-        PrintWriter writer = new PrintWriter(buffer);
-        t.printStackTrace(writer);
+        buffer.append(buildStackTraceText(t));
+        logger.error("Exception dialog detail", t);
         trace.setText(buffer.toString());
         trace.revalidate();
+    }
+
+    private static String buildStackTraceText(Throwable t) {
+        final StringBuilder sb = new StringBuilder();
+        Throwable current = t;
+        while (current != null) {
+            sb.append(current).append('\n');
+            for (StackTraceElement element : current.getStackTrace()) {
+                sb.append("\tat ").append(element).append('\n');
+            }
+            current = current.getCause();
+            if (current != null) {
+                sb.append("Caused by: ");
+            }
+        }
+        return sb.toString();
     }
 
     static void installHandler() {

@@ -4,6 +4,8 @@ package com.lightcrafts.ui.browser.model;
 
 import com.lightcrafts.image.ImageFileFilter;
 import com.lightcrafts.utils.file.FileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.HashSet;
@@ -16,6 +18,8 @@ import java.util.Set;
  * modification times and triggers appropriate refreshes on ImageDatums.
  */
 class ImageListPoller implements Runnable {
+
+    private static final Logger logger = LoggerFactory.getLogger(ImageListPoller.class);
 
     // The wait between scans for modifications, in milliseconds
     private final static long Interval = 3000;
@@ -52,8 +56,7 @@ class ImageListPoller implements Runnable {
                         // Probably a call to stop()
                         continue;
                     }
-                    System.err.println("Error in ImageListPoller:");
-                    e.printStackTrace();
+                    logger.warn("Error in ImageListPoller", e);
                     // Keep going anyway
                 }
             }
@@ -140,6 +143,6 @@ class ImageListPoller implements Runnable {
     }
 
     private static void log(String message, File file) {
-        System.out.println(message + " at " + file);
+        logger.debug("{} at {}", message, file);
     }
 }

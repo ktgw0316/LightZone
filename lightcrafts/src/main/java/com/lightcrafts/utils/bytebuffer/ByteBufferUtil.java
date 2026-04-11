@@ -3,6 +3,9 @@
 
 package com.lightcrafts.utils.bytebuffer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -19,6 +22,8 @@ import java.nio.channels.FileChannel;
  */
 public final class ByteBufferUtil {
 
+    private static final Logger logger = LoggerFactory.getLogger(ByteBufferUtil.class);
+
     ////////// public /////////////////////////////////////////////////////////
 
     /**
@@ -32,7 +37,7 @@ public final class ByteBufferUtil {
             fos.write(buf.array());
         }
         catch ( IOException e ) {
-            e.printStackTrace();
+            logger.error("Failed to dump ByteBuffer to file {}", fileName, e);
             System.exit( -1 );
         }
     }
@@ -500,10 +505,10 @@ public final class ByteBufferUtil {
                     cleanMethod.setAccessible(wasCleanMethodAccessible);
                 }
                 catch (IllegalAccessException e) {
-                    e.printStackTrace();
+                    logger.warn("Failed to access direct ByteBuffer cleaner", e);
                 }
                 catch (InvocationTargetException e) {
-                    e.printStackTrace();
+                    logger.warn("Failed to invoke direct ByteBuffer cleaner", e);
                 }
             }
         }

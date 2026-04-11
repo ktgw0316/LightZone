@@ -17,11 +17,15 @@ import org.eclipse.imagen.BorderExtender;
 import org.eclipse.imagen.Interpolation;
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.RenderedOp;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // Show a scaled image inside a rectangle representing paper bounds for
 // printing.
 
 class PreviewComponent extends JComponent {
+
+    private static final Logger logger = LoggerFactory.getLogger(PreviewComponent.class);
 
     private static final Dimension PreferredSize = new Dimension(400, 200);
 
@@ -222,7 +226,7 @@ class PreviewComponent extends JComponent {
         try {
             image = ImageIO.read(new File(args[0]));
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Failed to load preview image {}", args[0], e);
             System.exit(-1);
         }
         PageFormat format = new PageFormat();

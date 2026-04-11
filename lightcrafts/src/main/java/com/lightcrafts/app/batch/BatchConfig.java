@@ -7,6 +7,8 @@ import com.lightcrafts.image.export.ImageFileExportOptions;
 import com.lightcrafts.image.types.JPEGImageType;
 import com.lightcrafts.utils.xml.XmlDocument;
 import com.lightcrafts.utils.xml.XmlNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.prefs.Preferences;
@@ -21,6 +23,8 @@ import java.util.prefs.Preferences;
  *      if files will be created, a name pattern for the new files.
  */
 public class BatchConfig {
+
+    private static final Logger logger = LoggerFactory.getLogger(BatchConfig.class);
 
     // Batch processor configurations are sticky:
     private final static Preferences Prefs =
@@ -49,7 +53,8 @@ public class BatchConfig {
             doc.write(out);
         }
         catch (IOException e) {
-            e.printStackTrace(printer);
+            printer.println("Error writing debug XML: " + e.getMessage());
+            logger.warn("Error writing batch debug output", e);
         }
     }
 
@@ -71,11 +76,8 @@ public class BatchConfig {
             Prefs.put(ExportKey + context, text);
         }
         catch (IOException e) {
-            System.err.print(
-                "Error saving BatchConfig preferences: "
-            );
-            System.err.print(e.getClass().getName() + " ");
-            System.err.println(e.getMessage());
+            logger.error("Error saving BatchConfig preferences: {} {}",
+                    e.getClass().getName(), e.getMessage(), e);
         }
     }
 
@@ -100,11 +102,8 @@ public class BatchConfig {
                 export = (ImageFileExportOptions) ImageExportOptions.read(root);
             }
             catch (IOException e) {
-                System.err.print(
-                    "Error reading BatchConfig preferences: "
-                );
-                System.err.print(e.getClass().getName() + " ");
-                System.err.println(e.getMessage());
+                logger.error("Error reading BatchConfig preferences: {} {}",
+                        e.getClass().getName(), e.getMessage(), e);
                 Prefs.remove(ExportKey + context);
             }
         }

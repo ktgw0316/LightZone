@@ -10,6 +10,8 @@ import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.utils.Version;
 import com.lightcrafts.utils.WebBrowser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 
@@ -28,6 +30,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class LinuxPlatform extends Platform {
+
+    private static final Logger logger = LoggerFactory.getLogger(LinuxPlatform.class);
 
     private final static String home = System.getProperty( "user.home" );
 
@@ -95,7 +99,7 @@ public class LinuxPlatform extends Platform {
                 return ICC_Profile.getInstance(path);
             }
             catch (Throwable e) {
-                System.err.println("Malformed display profile at " + path);
+                logger.warn("Malformed display profile at {}", path, e);
                 // return null;
             }
         }
@@ -139,7 +143,7 @@ public class LinuxPlatform extends Platform {
     {
         Platform platform = Platform.getPlatform();
         platform.loadLibraries();
-        System.out.println(platform.getPhysicalMemoryInMB());
+        logger.info("{}", platform.getPhysicalMemoryInMB());
 
         UIManager.setLookAndFeel(platform.getLookAndFeel());
         platform.showHelpTopic("New_Features");

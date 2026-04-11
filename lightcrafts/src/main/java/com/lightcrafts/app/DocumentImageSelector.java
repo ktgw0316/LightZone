@@ -6,6 +6,8 @@ import com.lightcrafts.platform.AlertDialog;
 import com.lightcrafts.platform.FileChooser;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.ui.toolkit.TextAreaFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.lightcrafts.app.Locale.LOCALE;
 import com.lightcrafts.image.ImageFilenameFilter;
@@ -22,6 +24,8 @@ import java.io.File;
 // Document, in case the Document's file pointers aren't valid.
 
 class DocumentImageSelector {
+
+    private static final Logger logger = LoggerFactory.getLogger(DocumentImageSelector.class);
 
     // For file choosers:
     private static Platform Env = Platform.getPlatform();
@@ -234,7 +238,7 @@ class DocumentImageSelector {
         File newImageFile = DocumentImageSelector.chooseImageFile(
             docFile, oldImageFile, files, null, null
         );
-        System.out.println(newImageFile);
+        logger.info(newImageFile.getAbsolutePath());
 
         System.exit(0);
     }

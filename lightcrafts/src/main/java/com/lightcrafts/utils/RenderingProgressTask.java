@@ -5,6 +5,9 @@ package com.lightcrafts.utils;
 import org.eclipse.imagen.TileComputationListener;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.TileRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.*;
 import java.awt.image.Raster;
 
@@ -16,6 +19,7 @@ import java.awt.image.Raster;
  * To change this template use File | Settings | File Templates.
  */
 public class RenderingProgressTask implements TileComputationListener {
+    private static final Logger logger = LoggerFactory.getLogger(RenderingProgressTask.class);
     int numTiles = 0;
     int computedTiles = 0;
     PlanarImage theImage = null;
@@ -67,7 +71,7 @@ public class RenderingProgressTask implements TileComputationListener {
     public synchronized void tileCancelled(Object eventSource,
                               TileRequest[] tileRequests,
                               PlanarImage image, int tileX, int tileY) {
-        System.err.println("RP: cancelled tile " + tileX + ":" + tileY);
+        logger.warn("RP: cancelled tile {}:{}", tileX, tileY);
         this.notify();
     }
 
@@ -75,7 +79,7 @@ public class RenderingProgressTask implements TileComputationListener {
                                        TileRequest[] tileRequests,
                                        PlanarImage image, int tileX, int tileY,
                                        final Throwable situation) {
-        System.err.println("RP: failed tile " + tileX + ":" + tileY);
+        logger.warn("RP: failed tile {}:{}", tileX, tileY);
         this.notify();
     }
 

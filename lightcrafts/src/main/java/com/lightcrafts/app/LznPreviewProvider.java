@@ -10,6 +10,8 @@ import com.lightcrafts.model.Engine;
 import com.lightcrafts.ui.browser.model.PreviewUpdater;
 import com.lightcrafts.ui.editor.Document;
 import org.eclipse.imagen.PlanarImage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.image.RenderedImage;
@@ -18,6 +20,8 @@ import java.io.File;
 import static com.lightcrafts.app.Locale.LOCALE;
 
 class LznPreviewProvider implements PreviewUpdater.Provider {
+
+    private static final Logger logger = LoggerFactory.getLogger(LznPreviewProvider.class);
 
     // Where the "Previewing..." message goes
     private ComboFrame frame;
@@ -50,10 +54,7 @@ class LznPreviewProvider implements PreviewUpdater.Provider {
             // ColorProfileException
             // Document.MissingImageFileException
             // (etc.)
-            System.err.println(
-                "Error generating preview for " + file.getName() + ":"
-            );
-            t.printStackTrace();
+            logger.warn("Error generating preview for {}", file.getName(), t);
             return null;
         }
     }

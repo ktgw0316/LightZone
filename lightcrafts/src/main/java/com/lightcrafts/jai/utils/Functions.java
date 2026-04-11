@@ -14,6 +14,8 @@ import org.eclipse.imagen.media.lookup.LookupTableFactory;
 import org.eclipse.imagen.media.util.ImageUtil;
 import org.eclipse.imagen.operator.TransposeDescriptor;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.color.ColorSpace;
@@ -24,6 +26,7 @@ import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Created by IntelliJ IDEA.
@@ -32,7 +35,7 @@ import java.util.Arrays;
  * Time: 8:00:25 AM
  */
 public class Functions {
-    public static boolean DEBUG = false;
+    private static final Logger logger = LoggerFactory.getLogger(Functions.class);
 
     public static LookupTable computeGammaTable(int dataType, double gamma) {
         if (dataType == DataBuffer.TYPE_BYTE) {
@@ -147,17 +150,6 @@ public class Functions {
                               image.getColorModel().getColorSpace());
     }
 
-    public static ImageLayout getImageLayout(RenderedImage image, int tileWidth, int tileHeight) {
-        return getImageLayout(image.getSampleModel().getDataType(),
-                              image.getColorModel().getColorSpace(),
-                              tileWidth, tileHeight);
-    }
-
-    public static ImageLayout getImageLayout(RenderedImage image, int dataType) {
-        return getImageLayout(dataType,
-                              image.getColorModel().getColorSpace());
-    }
-
     public static ImageLayout getImageLayout(int dataType, ColorSpace cs) {
         return getImageLayout(dataType, cs, JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT);
     }
@@ -173,27 +165,12 @@ public class Functions {
         }
     }
 
-    public static int[] fromLinearToCS(ColorSpace target, int[] color) {
-        float[] converted;
-        synchronized (ColorSpace.class) {
-            converted = target.fromCIEXYZ(JAIContext.linearColorSpace.toCIEXYZ(
-                    new float[]{color[0] / 255.0f, color[1] / 255.0f, color[2] / 255.0f})
-            );
-        }
-        return new int[] {(int) (255 * converted[0]), (int) (255 * converted[1]), (int) (255 * converted[2])};
-    }
-
     public static double gauss(double x, double s) {
         return Math.exp(-x * x / (2 * s * s));
     }
 
     public static double LoG(double x, double y, double s) {
         double exp = (x * x + y * y) / (2 * s * s);
-        return - Math.exp(-exp) * (1 - exp) /*/ (Math.PI * Math.pow(s, 4))*/;
-    }
-
-    public static double LoG(double x, double s) {
-        double exp = (x * x) / (2 * s * s);
         return - Math.exp(-exp) * (1 - exp) /*/ (Math.PI * Math.pow(s, 4))*/;
     }
 
@@ -218,11 +195,6 @@ public class Functions {
         return logKernel;
     }
 
-    static public double logScale(double value, double max) {
-        assert value >= 0 && value <= 1.0;
-        return Math.pow(max + 1, value) - 1;
-    }
-
     static NumberFormat fmt = DecimalFormat.getInstance();
 
     static public KernelImageN LoGSharpenKernel(double radius, double gain) {
@@ -233,115 +205,17 @@ public class Functions {
 
         float[] data = generateLoGKernel(radius, size);
 
-        if (DEBUG) System.out.println("kernel data: (" + radius + ") ");
+        logger.debug("kernel data: ({})", radius);
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 data[i + size * j] *= (float)gain;
                 if (i == size / 2 && j == size / 2)
                     data[i + size * j] += (float)(1 - gain);
-                if (DEBUG) System.out.print(fmt.format(data[i + size * j]) + " ");
+                logger.debug(fmt.format(data[i + size * j]));
             }
-            if (DEBUG) System.out.println();
         }
 
         return new KernelImageN(size, size, data);
-    }
-
-    static public KernelImageN LoGSharpenKernel2(double radius, double gain) {
-        if (radius < 0.00001)
-            radius = 0.00001;
-
-        int size = 5;
-
-        float[] data = generateLoGKernel(radius, size);
-
-        if (DEBUG) System.out.println("kernel data: (" + radius + ") ");
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                if (i == size / 2 && j == size / 2)
-                    data[i + size * j] = (float) (1 + gain * (1 - data[i + size * j]));
-                else
-                    data[i + size * j] *= (float)(-gain);
-                if (DEBUG) System.out.print(fmt.format(data[i + size * j]) + " ");
-            }
-            if (DEBUG) System.out.println();
-        }
-
-        return new KernelImageN(size, size, data).getRotatedKernel();
-    }
-
-    static public KernelImageN getLoGKernel(double radius) {
-        // boolean DEBUG = true;
-
-        if (radius < 0.00001)
-            radius = 0.00001;
-
-        int size = (int) (6 * radius + 0.5);
-        size += 1 - size & 1;
-
-        if (size < 3)
-            size = 3;
-        float[] data = new float[size];
-        if (DEBUG) System.out.print("Radius: " + radius + ", kernel size: " + size + ", kernel data: ");
-        float positive = 0;
-        float negative = 0;
-        // float scale = 0;
-        for (int x = -size/2, j = 0; x <= size/2; x++, j++) {
-            data[j] = (float) LoG(x, radius);
-            if (data[j] > 0)
-                positive += data[j];
-            else
-                negative += data[j];
-            // scale += data[j];
-            if (DEBUG) System.out.print(", " + data[j]);
-        }
-        if (DEBUG) System.out.println();
-        for (int i = 0; i < data.length; i++) {
-            if (data[i] > 0)
-                data[i] *= (-negative/positive);
-        }
-        return new KernelImageN(size, size, size/2, size/2, data, data);
-    }
-
-    static public KernelImageN getLoGKernel(double radius, double gain) {
-        // boolean DEBUG = true;
-
-        if (radius < 0.00001)
-            radius = 0.00001;
-
-        int size = (int) (8 * radius + 0.5);
-        size += 1 - size & 1;
-
-        if (size < 3)
-            size = 3;
-        float[] data = new float[size];
-        if (DEBUG) System.out.print("Radius: " + radius + ", kernel size: " + size + ", kernel data: ");
-        float positive = 0;
-        float negative = 0;
-        float scale = 0;
-        for (int x = -size/2, j = 0; x <= size/2; x++, j++) {
-            data[j] = (float) LoG(x, radius);
-            if (data[j] > 0)
-                positive += data[j];
-            else
-                negative += data[j];
-            scale += data[j];
-            if (DEBUG) System.out.print(", " + data[j]);
-        }
-        if (DEBUG) System.out.println();
-        if (false) {
-        for (int i = 0; i < data.length; i++) {
-            if (data[i] > 0)
-                data[i] *= -negative/positive;
-            data[i] *= (float)(-gain);
-            if (i == size / 2)
-                data[i] += (1 + (float)gain);
-        }
-        } else {
-        for (int i = 0; i < data.length; i++)
-            data[i] /= scale;
-        }
-        return new KernelImageN(size, size, size/2, size/2, data, data);
     }
 
     static public KernelImageN getGaussKernel(double sigma) {
@@ -365,46 +239,11 @@ public class Functions {
         return new KernelImageN(size, size, size/2, size/2, data, data);
     }
 
-    static public KernelImageN getSincKernel(double sigma) {
-        // boolean DEBUG = true;
-
-        if (sigma < 0.00001)
-            sigma = 0.00001;
-
-        int size = 4 * (int) Math.round(sigma) + 1;
-
-        if (size < 3)
-            size = 3;
-        float[] data = new float[size];
-        if (DEBUG) System.out.print("Radius: " + sigma + ", kernel size: " + size + ", kernel data: ");
-        int j = 0;
-        float scale = 0;
-        for (int x = -size/2; x <= size/2; x++) {
-            data[j++] = x == 0 ? 1 : (float) Math.sin(x * sigma) / x;
-            scale += data[j - 1];
-            if (DEBUG) System.out.print(", " + data[j - 1]);
-        }
-        if (DEBUG) System.out.println();
-
-        for (int i = 0; i < data.length; i++)
-            data[i] /= scale;
-        return new KernelImageN(size, size, size/2, size/2, data, data);
-    }
-
     static public double lanczos2(double x) {
         if (x == 0)
             return 1;
         else if (x > -2 && x < 2)
             return Math.sin(Math.PI * x) * Math.sin(Math.PI * x / 2) / (Math.PI * Math.PI * x * x / 2);
-        else
-            return 0;
-    }
-
-    static public double lanczos3(double x) {
-        if (x == 0)
-            return 1;
-        else if (x > -3 && x < 3)
-            return Math.sin(Math.PI * x) * Math.sin(Math.PI * x / 3) / (Math.PI * Math.PI * x * x / 3);
         else
             return 0;
     }
@@ -427,50 +266,6 @@ public class Functions {
         for (int i = 0; i < samples; i++)
             data[i] /= sum;
         return new KernelImageN(samples, samples, samples/2, samples/2, data, data);
-    }
-
-    static public KernelImageN getHighPassKernel(double ratio) {
-        /*
-         * To decimate a signal we have to sample with a frequency
-         * of 1/ratio inside the support of the filter function.
-         *
-         * The lanczos2 has a support [-2, 2] so we need 4 * ratio + 1
-         * points for a zero phase filter.
-         *
-         */
-
-        int samples = 4 * (int) (ratio+0.5) + 1;
-        float[] data = new float[samples];
-        float sum = 0;
-        for (int i = 0; i < samples; i++)
-            sum += data[i] = - (float) lanczos2(i / ratio - 2.);
-        for (int i = 0; i < samples; i++)
-            data[i] /= sum;
-        data[samples/2] += 1;
-        return new KernelImageN(samples, samples, samples/2, samples/2, data, data);
-    }
-
-    /*
-        Build an ImageLayout that works well with the underlying OS X Core Graphics engine based on RGB buffers.
-        For some reason Java uses BGR buffers by default that require expensive translations at draw time on the Mac.
-    */
-
-    public static ImageLayout getDirectImageLayout(int width, int height, ColorSpace cs) {
-        ImageLayout layout = new ImageLayout();
-        ColorModel cm = new DirectColorModel(cs,
-                                    32,
-                                    0x00ff0000, // Red
-                                    0x0000ff00, // Green
-                                    0x000000ff, // Blue
-                                    0x00000000, // Alpha
-                                    false,
-                                    DataBuffer.TYPE_INT);
-
-        layout.setColorModel(cm);
-        layout.setSampleModel(cm.createCompatibleSampleModel(width, height));
-        layout.setTileWidth(JAIContext.TILE_WIDTH);
-        layout.setTileHeight(JAIContext.TILE_HEIGHT);
-        return layout;
     }
 
     public static RenderedImage systemColorSpaceImage(RenderedImage image) {
@@ -499,27 +294,6 @@ public class Functions {
                                                             : JAIContext.gray22ColorSpace,
                                                           false, false,
                                                           Transparency.OPAQUE, DataBuffer.TYPE_BYTE)), null, null);
-            this.source = source;
-        }
-
-        public Raster getTile(int tileX, int tileY) {
-            return source.getTile(tileX, tileY);
-        }
-    }
-
-    public static class CSWrapper extends PlanarImage {
-        final RenderedImage source;
-
-        static ImageLayout patchColorModel(ImageLayout layout, ColorModel cm) {
-            layout.setColorModel(cm);
-            return layout;
-        }
-
-        public CSWrapper(RenderedImage source, ColorSpace cs) {
-            super(patchColorModel(new ImageLayout(source),
-                                  new ComponentColorModel(cs, false, false,
-                                                          Transparency.OPAQUE,
-                                                          source.getColorModel().getTransferType())), null, null);
             this.source = source;
         }
 
@@ -585,31 +359,6 @@ public class Functions {
         return ImageN.create("Rescale", pb, formatHints);
     }
 
-    public static RenderedOp fromShortToUShort(RenderedImage source, RenderingHints hints) {
-        // NOTE: Specifying the ImageLayout forces rescale to also perform the Format operation
-
-        ComponentColorModel cm = new ComponentColorModel(source.getColorModel().getColorSpace(), false, false,
-                                                         Transparency.OPAQUE, DataBuffer.TYPE_USHORT);
-
-        RenderingHints formatHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT,
-                                                        new ImageLayout(0, 0, JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT,
-                                                                        cm.createCompatibleSampleModel(source.getWidth(),
-                                                                                                       source.getHeight()),
-                                                                        cm));
-
-        if (hints != null)
-            formatHints.add(hints);
-
-        final double C0 = 0;
-        final double C1 = 1;
-
-        ParameterBlock pb = new ParameterBlock();
-        pb.addSource(source);
-        pb.add(new double[]{C1});
-        pb.add(new double[]{C0});
-        return ImageN.create("Rescale", pb, formatHints);
-    }
-
     public static RenderedOp fromUShortToByte(RenderedImage source, RenderingHints hints) {
         // NOTE: Specifying the ImageLayout forces rescale to also perform the Format operation
 
@@ -660,10 +409,7 @@ public class Functions {
         ParameterBlock pb = new ParameterBlock();
         pb.addSource(source);
         pb.add(cm);
-        if (intent != null)
-            pb.add(intent);
-        else
-            pb.add(LCMSColorConvertDescriptor.PERCEPTUAL);
+        pb.add(Objects.requireNonNullElse(intent, LCMSColorConvertDescriptor.PERCEPTUAL));
         if (proof != null) {
             pb.add(proof);
             if (proofIntent != null)
@@ -738,9 +484,8 @@ public class Functions {
         RasterAccessor d = new RasterAccessor(raster, subRegion,
                                               dstTag, null);
 
-        if (source.getSampleModel() instanceof ComponentSampleModel &&
+        if (source.getSampleModel() instanceof ComponentSampleModel ssm &&
             raster.getSampleModel() instanceof ComponentSampleModel) {
-            ComponentSampleModel ssm = (ComponentSampleModel) source.getSampleModel();
 
             if (ssm.getPixelStride() == ssm.getNumBands() &&
                 source.getSampleModel().getNumBands() == raster.getSampleModel().getNumBands())

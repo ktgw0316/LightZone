@@ -15,6 +15,8 @@ import java.awt.event.*;
 import java.text.NumberFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** This is a JTextField that listens on a ConfiguredBoundedRangeModel,
   * updating its text when the model changes and pushing validated numeric
@@ -25,6 +27,8 @@ class ConfiguredTextField
     extends JTextField
     implements MouseWheelListener, ChangeListener, DocumentListener
 {
+    private static final Logger logger = LoggerFactory.getLogger(ConfiguredTextField.class);
+
     // Select-all and handle mouse wheel events when text fields gain focus:
     private static final FocusListener FocusSelector = new FocusAdapter() {
         public void focusGained(FocusEvent event) {
@@ -146,7 +150,7 @@ class ConfiguredTextField
             }
             catch (ParseException e) {
                 // Should never happen, because of the verifier.
-                System.err.println("Unparsable verified text: " + text);
+                logger.warn("Unparsable verified text: {}", text, e);
                 setForeground(Color.red);
             }
         }

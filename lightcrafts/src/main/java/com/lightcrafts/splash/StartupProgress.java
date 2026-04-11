@@ -2,6 +2,9 @@
 
 package com.lightcrafts.splash;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * To get startup progress feedback from Application, override this class and
  * call Application.setStartupProgress().
@@ -9,7 +12,9 @@ package com.lightcrafts.splash;
 
 public class StartupProgress {
 
+    private static final Logger logger = LoggerFactory.getLogger(StartupProgress.class);
+
     public void startupMessage(String text) {
-        System.out.println(text);
+        logger.info(text);
     }
 }

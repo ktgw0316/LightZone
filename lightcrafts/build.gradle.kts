@@ -15,6 +15,8 @@ dependencies {
     implementation("com.github.openjson:openjson:1.0.13")
     implementation("org.eclipse.imagen:imagen-all:0.9.1")
     implementation("org.ejml:ejml-simple:0.44.0")
+    implementation("org.slf4j:slf4j-api:2.0.17")
+    runtimeOnly("ch.qos.logback:logback-classic:1.5.18")
 }
 application {
     mainClass.set("com.lightcrafts.app.Application")

@@ -3,6 +3,8 @@
 package com.lightcrafts.utils.xml;
 
 import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -37,6 +39,8 @@ import java.util.Arrays;
  */
 
 public class XmlDocument {
+
+    private static final Logger logger = LoggerFactory.getLogger(XmlDocument.class);
 
     private static DocumentBuilder Builder;
     private static TransformerFactory Transformers;
@@ -155,7 +159,7 @@ public class XmlDocument {
             xform = Transformers.newTransformer();
         }
         catch (TransformerConfigurationException e) {
-            e.printStackTrace();
+            logger.error("Couldn't create XML transformer", e);
         }
         if (xform != null) {
             xform.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -193,10 +197,10 @@ public class XmlDocument {
         byte[] outBytes = child.getData();
 
         if (Arrays.equals(inBytes, outBytes)) {
-            System.out.println("CDATA match");
+            logger.debug("CDATA match");
         }
         else {
-            System.out.println("CDATA differ");
+            logger.debug("CDATA differ");
         }
     }
 }

@@ -16,6 +16,8 @@ import com.lightcrafts.model.RawAdjustmentOperation;
 import com.lightcrafts.model.SliderConfig;
 import com.lightcrafts.utils.LCMatrix;
 import org.ejml.simple.SimpleMatrix;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.eclipse.imagen.BorderExtender;
 import org.eclipse.imagen.PlanarImage;
@@ -29,6 +31,8 @@ import java.util.TreeMap;
 import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_RAW_ADJUSTMENTS;
 
 public class RawAdjustmentsOperation extends BlendedOperation implements ColorDropperOperation, RawAdjustmentOperation {
+    private static final Logger logger = LoggerFactory.getLogger(RawAdjustmentsOperation.class);
+
     private static final String SOURCE = "Temperature";
     private static final String TINT = "Tint";
     private static final String EXPOSURE = "Exposure";
@@ -98,24 +102,20 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
             if (daylightMultipliers[0] != 0) {
                 daylightTemperature = neutralTemperature(daylightMultipliers, referenceTemperature);
 
-                System.out.println("daylightMultipliers: "
-                        + daylightMultipliers[0] + ", "
-                        + daylightMultipliers[1] + ", "
-                        + daylightMultipliers[2]);
+                logger.debug("daylightMultipliers: {}, {}, {}",
+                        daylightMultipliers[0], daylightMultipliers[1], daylightMultipliers[2]);
 
-                System.out.println("Daylight Temperature : " + daylightTemperature);
+                logger.debug("Daylight Temperature : {}", daylightTemperature);
             } else
                 daylightTemperature = referenceTemperature;
 
             if (cameraMultipliers[0] != 0) {
                 originalTemperature = temperature = neutralTemperature(cameraMultipliers, referenceTemperature);
 
-                System.out.println("cameraMultipliers: "
-                        + cameraMultipliers[0] + ", "
-                        + cameraMultipliers[1] + ", "
-                        + cameraMultipliers[2]);
+                logger.debug("cameraMultipliers: {}, {}, {}",
+                        cameraMultipliers[0], cameraMultipliers[1], cameraMultipliers[2]);
 
-                System.out.println("Camera Temperature: " + originalTemperature);
+                logger.debug("Camera Temperature: {}", originalTemperature);
             } else
                 originalTemperature = temperature = daylightTemperature;
 
@@ -132,8 +132,8 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
                         (cameraMultipliers[1] / (cameraMultipliers[1] * daylightMultipliers[1])),
                         (cameraMultipliers[2] / (cameraMultipliers[1] * daylightMultipliers[2]))};
 
-                System.out.println("Scaling with: " + wb[0] + ", " + wb[1] + ", " + wb[2]);
-                System.out.println("Correlated Temperature: " + neutralTemperature(wb, referenceTemperature));
+                logger.debug("Scaling with: {}, {}, {}", wb[0], wb[1], wb[2]);
+                logger.debug("Correlated Temperature: {}", neutralTemperature(wb, referenceTemperature));
 
                 cameraRGBWB = dcRaw.getCameraRGB();
 
@@ -338,12 +338,12 @@ public class RawAdjustmentsOperation extends BlendedOperation implements ColorDr
 
             if (autoWB) {
                 float[] wb = autoWhiteBalance(back);
-                System.out.println("Auto WB: " + wb[0] + ", " + wb[1] + ", " + wb[2]);
+                logger.debug("Auto WB: {}, {}, {}", wb[0], wb[1], wb[2]);
 
                 temperature = neutralTemperature(wb, daylightTemperature);
                 tint = 0;
 
-                System.out.println("Correlated Temperature: " + temperature);
+                logger.debug("Correlated Temperature: {}", temperature);
             } else if (p != null) {
                 int[] pixel = pointToPixel(p);
 

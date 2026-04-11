@@ -26,6 +26,8 @@ import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XMLUtil;
 import com.lightcrafts.utils.xml.XmlNode;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import org.eclipse.imagen.PlanarImage;
@@ -53,6 +55,8 @@ import static com.lightcrafts.image.types.JPEGConstants.*;
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */
 public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
+
+    private static final Logger logger = LoggerFactory.getLogger(JPEGImageType.class);
 
     ////////// public /////////////////////////////////////////////////////////
 
@@ -123,7 +127,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
             }
             catch (XMLException e) {
                 // Files saved with v4.1.6 cause this, just ignore it.
-                System.err.println("Failed to restore JPEG quality");
+                logger.warn("Failed to restore JPEG quality", e);
             }
         }
     }

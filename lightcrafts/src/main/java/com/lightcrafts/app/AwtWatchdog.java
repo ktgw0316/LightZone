@@ -2,6 +2,9 @@
 
 package com.lightcrafts.app;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.*;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -12,6 +15,8 @@ import java.util.Map;
 // notification to developers.
 
 class AwtWatchdog extends Thread {
+
+    private static final Logger logger = LoggerFactory.getLogger(AwtWatchdog.class);
 
     private static long DequeueLimit = 2000;
     private static long ThreadDumpLimit = 15000;
@@ -43,10 +48,10 @@ class AwtWatchdog extends Thread {
     static void dumpThreads() {
         Map<Thread, StackTraceElement[]> stacks = Thread.getAllStackTraces();
         for (Thread thread : stacks.keySet()) {
-            System.out.println(thread.getName() + ": " + thread.getState());
+            logger.info("{}: {}", thread.getName(), thread.getState());
             StackTraceElement[] stack = stacks.get(thread);
             for (StackTraceElement frame : stack) {
-                System.out.println("\tat " + frame);
+                logger.info("\tat {}", frame);
             }
         }
     }
@@ -72,7 +77,7 @@ class AwtWatchdog extends Thread {
                     String s = TimeFormat.format((time - start) / 1000D);
                     String message =
                         "EventThread blocked for " + s + " seconds";
-                    System.err.println(message);
+                    logger.warn(message);
                     if ((time - start) > ThreadDumpLimit) {
                         if (System.getProperty("lightcrafts.debug") == null) {
                             dumpThreads();

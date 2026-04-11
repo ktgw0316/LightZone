@@ -9,6 +9,8 @@ import com.lightcrafts.templates.TemplateKey;
 import com.lightcrafts.ui.browser.view.AbstractImageBrowser;
 import com.lightcrafts.ui.toolkit.IconFontFactory;
 import com.lightcrafts.ui.editor.EditorMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,6 +28,8 @@ import java.util.List;
  * browser selection.
  */
 class StylesButton extends BrowserButton {
+
+    private static final Logger logger = LoggerFactory.getLogger(StylesButton.class);
 
     private final static Icon Icon= IconFontFactory.buildIcon("styles");
 
@@ -78,7 +82,7 @@ class StylesButton extends BrowserButton {
             }
         }
         catch (TemplateDatabase.TemplateException e) {
-            e.printStackTrace();
+            logger.warn("Failed to build styles popup", e);
             // Just don't show the popup
             return;
         }

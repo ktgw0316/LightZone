@@ -12,6 +12,8 @@ import com.lightcrafts.utils.tuple.Pair;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.image.RenderedImage;
@@ -33,6 +35,8 @@ import static com.lightcrafts.ui.browser.model.Locale.LOCALE;
  * such as metadata, thumbnails, and a cache for ImageTasks.
  */
 public class ImageDatum {
+
+    private static final Logger logger = LoggerFactory.getLogger(ImageDatum.class);
 
     /**
      * The image File backing the data in this ImageDatum.  This File is
@@ -551,40 +555,25 @@ public class ImageDatum {
             File xmpFile = new File(info.getXMPFilename());
             if (! xmpFile.isFile()) {
                 writeToXmp(info);
-                System.out.println(
-                    "Migrated rotate cache to XMP for " +
-                    file.getAbsolutePath()
-                );
+                logger.info("Migrated rotate cache to XMP for {}", file.getAbsolutePath());
             }
             else {
-                System.out.println(
-                    "Rotate cache migration aborted for " +
-                    file.getAbsolutePath() +
-                    " (" + xmpFile.getAbsolutePath() + " already exists)"
-                );
+                logger.info("Rotate cache migration aborted for {} ({} already exists)",
+                        file.getAbsolutePath(), xmpFile.getAbsolutePath());
             }
         }
         catch (Throwable t) {
             // BadImageFileException, IOException, UnknownImageTypeException
-            System.err.println(
-                "Failed to migrate rotate cache to XMP for " +
-                file.getAbsolutePath()
-            );
-            t.printStackTrace();
+            logger.warn("Failed to migrate rotate cache to XMP for {}", file.getAbsolutePath(), t);
         }
         String key = getRotateKey();
         try {
             cache.remove(key);
-            System.out.println(
-                "Cleared rotate cache to XMP for " + file.getAbsolutePath()
-            );
+            logger.info("Cleared rotate cache to XMP for {}", file.getAbsolutePath());
         }
         catch (IOException e) {
             // Try again next time.
-            System.err.println(
-                "Failed to clear rotate cache for " + file.getAbsolutePath()
-            );
-            e.printStackTrace();
+            logger.warn("Failed to clear rotate cache for {}", file.getAbsolutePath(), e);
         }
     }
 
@@ -608,7 +597,7 @@ public class ImageDatum {
         try (final var out = new ObjectOutputStream(cache.putToStream(key))) {
             out.writeObject(obj);
         } catch (IOException e) {
-            System.err.println(errorMessage + e.getMessage());
+            logger.warn("{}{}", errorMessage, e.getMessage(), e);
         }
     }
 
@@ -667,7 +656,7 @@ public class ImageDatum {
                     try {
                         cache.remove(key);
                     } catch (IOException e) {
-                        System.err.println("metadata cache clear error: " + e.getMessage());
+                        logger.warn("metadata cache clear error: {}", e.getMessage(), e);
                     }
                 });
     }
@@ -719,7 +708,7 @@ public class ImageDatum {
             buffer.append(": ");
             buffer.append(t.getMessage());
         }
-        System.err.println(buffer);
+        logger.warn("{}", buffer, t);
     }
 
     private void writeToXmp(ImageInfo info)

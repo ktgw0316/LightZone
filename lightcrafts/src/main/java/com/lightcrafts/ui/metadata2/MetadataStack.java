@@ -8,6 +8,8 @@ import com.lightcrafts.image.metadata.ImageMetadataDirectory;
 import com.lightcrafts.ui.LightZoneSkin;
 import static com.lightcrafts.ui.metadata2.Locale.LOCALE;
 import com.lightcrafts.ui.toolkit.PaneTitle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
@@ -22,6 +24,8 @@ import java.util.List;
  * components if there is trouble with metadata.
  */
 public class MetadataStack extends JPanel implements Scrollable {
+
+    private static final Logger logger = LoggerFactory.getLogger(MetadataStack.class);
 
     private List<MetadataTable> tables;
 
@@ -50,7 +54,7 @@ public class MetadataStack extends JPanel implements Scrollable {
         }
         catch (Throwable t) {
             // BadImageFileException, IOException, UnknownImageTypeException
-            t.printStackTrace();
+            logger.warn("Failed to read metadata for {}", info.getFile(), t);
         }
         if (meta == null) {
             String no = LOCALE.get("NoLabel");

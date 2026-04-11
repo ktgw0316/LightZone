@@ -7,6 +7,8 @@ import com.lightcrafts.templates.TemplateKey;
 import com.lightcrafts.templates.TemplateDatabase;
 import static com.lightcrafts.ui.templates.Locale.LOCALE;
 import com.lightcrafts.utils.file.FileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -15,6 +17,8 @@ import java.awt.*;
 import java.io.File;
 
 class TemplateTreePopup extends JPopupMenu {
+
+    private static final Logger logger = LoggerFactory.getLogger(TemplateTreePopup.class);
 
     private TemplateTree tree;
 
@@ -53,10 +57,7 @@ class TemplateTreePopup extends JPopupMenu {
                         }
                         catch (TemplateDatabase.TemplateException e) {
                             // The TemplateList gives its own feedback.
-                            System.out.println(
-                                "Couldn't delete Template " + key
-                            );
-                            e.printStackTrace();
+                            logger.warn("Couldn't delete Template {}", key, e);
                         }
                     }
                 }

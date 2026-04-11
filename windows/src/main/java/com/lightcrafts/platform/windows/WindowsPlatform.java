@@ -7,6 +7,8 @@ import com.lightcrafts.platform.Platform;
 import com.lightcrafts.platform.PrinterLayer;
 import com.lightcrafts.utils.Version;
 import com.lightcrafts.utils.file.FileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.filechooser.FileSystemView;
 import java.awt.color.ICC_Profile;
@@ -19,6 +21,8 @@ import java.nio.file.Path;
 import java.util.Collection;
 
 public final class WindowsPlatform extends Platform {
+
+    private static final Logger logger = LoggerFactory.getLogger(WindowsPlatform.class);
 
     ////////// public /////////////////////////////////////////////////////////
 
@@ -36,9 +40,7 @@ public final class WindowsPlatform extends Platform {
         try {
             final InputStream in = new File( path ).toURL().openStream();
             final ICC_Profile profile = ICC_Profile.getInstance( in );
-            System.out.println(
-                "Display profile " + ColorProfileInfo.getNameOf( profile )
-            );
+            logger.debug("Display profile {}", ColorProfileInfo.getNameOf(profile));
             return profile;
         }
         catch ( IOException e ) {

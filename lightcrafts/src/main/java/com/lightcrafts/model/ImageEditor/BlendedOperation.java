@@ -13,6 +13,8 @@ import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.*;
 import com.lightcrafts.utils.LCMS;
 import com.lightcrafts.utils.LCMS_ColorSpace;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.eclipse.imagen.ImageLayout;
 import org.eclipse.imagen.ImageN;
@@ -30,6 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class BlendedOperation extends GenericOperationImpl implements Cloneable {
+    private static final Logger logger = LoggerFactory.getLogger(BlendedOperation.class);
+
     private double opacity = 1.0;
     private String blendingMode = "Normal";
 
@@ -51,7 +55,7 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
             object.lastTransform = null;
             return object;
         } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
+            logger.error("Failed to clone {}", getClass().getSimpleName(), e);
             return null;
         }
     }
@@ -310,7 +314,7 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
                     PlanarImage rendering = softRendering.get();
 
                     if (rendering == null) {
-                        System.out.println("rendering null..." + BlendedOperation.this.getClass());
+                        logger.debug("rendering null...{}", BlendedOperation.this.getClass());
                         rendering = update();
                         softRendering = new SoftReference<PlanarImage>(rendering);
                     }

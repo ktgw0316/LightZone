@@ -11,6 +11,8 @@ import com.lightcrafts.image.types.LZNImageType;
 import com.lightcrafts.utils.LightCraftsException;
 import com.lightcrafts.utils.xml.XmlDocument;
 import com.lightcrafts.utils.xml.XmlNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import java.io.File;
@@ -23,6 +25,8 @@ import java.io.InputStream;
  * file pointer, if any are defined, from a file.
  */
 public class DocumentReader {
+
+    private static final Logger logger = LoggerFactory.getLogger(DocumentReader.class);
 
     /**
      * The output from reading a file is a triplet: and XML document holding
@@ -125,10 +129,7 @@ public class DocumentReader {
                 return null;
             }
             catch (Throwable t) {
-                System.out.println("Unexpected error in DocumentReader.read()");
-                System.out.println(
-                    t.getClass().getName() + ": " + t.getMessage()
-                );
+                logger.error("Unexpected error in DocumentReader.read()", t);
                 return null;
             }
         }

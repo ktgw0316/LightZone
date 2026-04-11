@@ -4,6 +4,8 @@ package com.lightcrafts.ui.crop;
 
 import com.lightcrafts.model.CropBounds;
 import com.lightcrafts.ui.mode.AbstractMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.lightcrafts.ui.crop.CropOverlay;
 
 import javax.swing.*;
@@ -18,6 +20,8 @@ import java.awt.geom.Dimension2D;
 import java.util.LinkedList;
 
 public class CropMode extends AbstractMode {
+
+    private static final Logger logger = LoggerFactory.getLogger(CropMode.class);
 
     private CropOverlay overlay;
     private AffineTransform xform;
@@ -143,7 +147,7 @@ public class CropMode extends AbstractMode {
             catch (NoninvertibleTransformException e) {
                 // An uninvertible transform would create bigger problems
                 // than this.
-                e.printStackTrace();
+                logger.warn("Failed to invert crop transform", e);
                 return null;
             }
         }

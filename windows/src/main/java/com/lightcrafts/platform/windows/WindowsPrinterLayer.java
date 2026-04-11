@@ -11,6 +11,8 @@ import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.BorderExtender;
 import org.eclipse.imagen.Interpolation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
@@ -28,6 +30,8 @@ import java.awt.geom.AffineTransform;
  */
 public class WindowsPrinterLayer implements PrinterLayer {
 
+    private static final Logger logger = LoggerFactory.getLogger(WindowsPrinterLayer.class);
+
     public void initialize() {
         WindowsPrintManager.initDefaultPrinter();
     }
@@ -38,14 +42,14 @@ public class WindowsPrinterLayer implements PrinterLayer {
 
     public void setPageFormat(PageFormat pageFormat) {
         WindowsPrintManager.setPageFormat(pageFormat);
-        System.out.println("Setting PageFormat");
+        logger.debug("Setting PageFormat");
         dumpPage(pageFormat);
     }
 
     public PageFormat getPageFormat() {
         PageFormat pf = WindowsPrintManager.getPageFormat();
         if (pf != null) {
-            System.out.println("Printer PageFormat");
+            logger.debug("Printer PageFormat");
             dumpPage(pf);
         }
         return pf;
@@ -70,14 +74,15 @@ public class WindowsPrinterLayer implements PrinterLayer {
         WindowsPrintManager.setPageFormat(format);
         Dimension resolution = WindowsPrintManager.getPrinterResolution();
 
-        System.out.println("Our PageFormat");
+        logger.debug("Our PageFormat");
         dumpPage(format);
 
         Dimension naturalSize = engine.getNaturalSize();
 
-        System.out.println("settings x: " + settings.getX() + ", y: " + settings.getY() + ", width: " + settings.getWidth() + ", height: " + settings.getHeight());
+        logger.debug("settings x: {}, y: {}, width: {}, height: {}",
+                     settings.getX(), settings.getY(), settings.getWidth(), settings.getHeight());
 
-        System.out.println("resolution: " + resolution);
+        logger.debug("resolution: {}", resolution);
 
         Dimension targetSize = new Dimension((int) (settings.getWidth() * resolution.getWidth() / 72.0),
                                              (int) (settings.getHeight() * resolution.getHeight() / 72.0));
@@ -94,7 +99,7 @@ public class WindowsPrinterLayer implements PrinterLayer {
                                              true);
 
         if (xMagnification > 1 || yMagnification > 1) {
-            System.out.println("Uprezzing by " + xMagnification * 100 + '%');
+            logger.debug("Uprezzing by {}%", xMagnification * 100);
 
             AffineTransform xform = AffineTransform.getScaleInstance(xMagnification, yMagnification);
 
@@ -113,9 +118,9 @@ public class WindowsPrinterLayer implements PrinterLayer {
 
         WindowsPrintManager.print(printImage, location, jobName != null ? jobName : "Unittled", thread );
 
-        System.out.println("printImage: " + printImage);
+        logger.debug("printImage: {}", printImage);
 
-        System.out.println("location: " + location);
+        logger.debug("location: {}", location);
     }
 
     public void cancelPrint() {
@@ -123,17 +128,18 @@ public class WindowsPrinterLayer implements PrinterLayer {
     }
 
     public static void dumpPage(PageFormat pageFormat) {
-        System.out.println("page area w:" + pageFormat.getWidth() + ", h: " + pageFormat.getHeight() + ", o: " + pageFormat.getOrientation());
+        logger.debug("page area w:{}, h: {}, o: {}",
+                     pageFormat.getWidth(), pageFormat.getHeight(), pageFormat.getOrientation());
 
-        System.out.println("imageable area x: " +
-                           pageFormat.getImageableX() + ", y: " + pageFormat.getImageableY() + ", w: " +
-                           pageFormat.getImageableWidth() + ", h: " + pageFormat.getImageableHeight());
+        logger.debug("imageable area x: {}, y: {}, w: {}, h: {}",
+                     pageFormat.getImageableX(), pageFormat.getImageableY(),
+                     pageFormat.getImageableWidth(), pageFormat.getImageableHeight());
 
         Paper paper = pageFormat.getPaper();
 
-        System.out.println("paper area w:" + paper.getWidth() + ", h: " + paper.getHeight());
-        System.out.println("imageable area x: " +
-                           paper.getImageableX() + ", y: " + paper.getImageableY() + ", w: " +
-                           paper.getImageableWidth() + ", h: " + paper.getImageableHeight());
+        logger.debug("paper area w:{}, h: {}", paper.getWidth(), paper.getHeight());
+        logger.debug("imageable area x: {}, y: {}, w: {}, h: {}",
+                     paper.getImageableX(), paper.getImageableY(),
+                     paper.getImageableWidth(), paper.getImageableHeight());
     }
 }

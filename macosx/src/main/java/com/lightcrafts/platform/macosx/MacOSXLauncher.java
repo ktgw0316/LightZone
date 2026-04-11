@@ -9,6 +9,8 @@ import com.lightcrafts.app.other.OtherApplication;
 import com.lightcrafts.platform.AlertDialog;
 import com.lightcrafts.platform.Launcher;
 import com.lightcrafts.platform.Platform;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.EventQueue;
 import java.io.File;
@@ -34,6 +36,8 @@ import static com.lightcrafts.platform.macosx.Locale.LOCALE;
  * Launch LightZone for Mac OS X.
  */
 public final class MacOSXLauncher extends Launcher {
+
+    private static final Logger logger = LoggerFactory.getLogger(MacOSXLauncher.class);
 
     ////////// public /////////////////////////////////////////////////////////
 
@@ -64,7 +68,7 @@ public final class MacOSXLauncher extends Launcher {
             final Process p = pb.start();
             p.waitFor();
         } catch (InterruptedException | IOException e) {
-            e.printStackTrace();
+            logger.warn("Failed to reset AppleAquaColorVariant setting", e);
         }
     }
 

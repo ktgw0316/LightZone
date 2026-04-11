@@ -23,6 +23,8 @@ import com.lightcrafts.ui.toolkit.BoxedButton;
 import com.lightcrafts.utils.awt.geom.HiDpi;
 import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -51,6 +53,8 @@ import static com.lightcrafts.ui.editor.Locale.LOCALE;
  */
 
 public class Editor implements HorizontalMouseWheelSupport {
+
+    private static final Logger logger = LoggerFactory.getLogger(Editor.class);
 
     private Engine engine;
     private ScaleModel scale;
@@ -286,9 +290,7 @@ public class Editor implements HorizontalMouseWheelSupport {
                     catch (NoninvertibleTransformException f) {
                         // Can't happen, because Engine transforms are never
                         // singular.
-                        System.err.println(
-                            "DocPanel Preview dropper update: " + f.getMessage()
-                        );
+                        logger.warn("DocPanel Preview dropper update: {}", f.getMessage(), f);
                     }
                 }
             }

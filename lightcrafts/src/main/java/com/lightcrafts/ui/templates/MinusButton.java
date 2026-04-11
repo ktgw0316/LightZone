@@ -7,12 +7,16 @@ import com.lightcrafts.templates.TemplateKey;
 import static com.lightcrafts.ui.templates.Locale.LOCALE;
 import com.lightcrafts.ui.toolkit.CoolButton;
 import com.lightcrafts.ui.toolkit.IconFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 class MinusButton extends CoolButton {
+
+    private static final Logger logger = LoggerFactory.getLogger(MinusButton.class);
 
     private static Icon Icon =
         IconFactory.createInvertedIcon(MinusButton.class, "minus.png");
@@ -54,7 +58,7 @@ class MinusButton extends CoolButton {
                         }
                         catch (TemplateDatabase.TemplateException e) {
                             // The user will see nothing happened.
-                            e.printStackTrace();
+                            logger.warn("Failed to remove template {}", key, e);
                         }
                     }
                 }

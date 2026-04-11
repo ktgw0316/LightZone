@@ -12,7 +12,6 @@ import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.jai.utils.LCTileScheduler;
 import com.lightcrafts.platform.Platform;
 import org.eclipse.imagen.media.util.SunTileCache;
-
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.OperationDescriptor;
 import org.eclipse.imagen.OperationRegistry;
@@ -21,6 +20,9 @@ import org.eclipse.imagen.TileCache;
 import org.eclipse.imagen.TileFactory;
 import org.eclipse.imagen.registry.CRIFRegistry;
 import org.eclipse.imagen.registry.RIFRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.color.ICC_ColorSpace;
@@ -33,6 +35,8 @@ import java.util.Collection;
 import java.util.ArrayList;
 
 public class JAIContext {
+    private static final Logger logger = LoggerFactory.getLogger(JAIContext.class);
+
     public static final Collection<ColorProfileInfo> systemProfiles;
 
     public static final ICC_Profile linearProfile;
@@ -82,16 +86,17 @@ public class JAIContext {
     {
         byte[] data = profile.getData(tag);
         if (data != null) {
-            System.out.print(name + " (" + data.length + ") :");
+            final StringBuilder bytes = new StringBuilder(name).append(" (").append(data.length).append(") :");
             for (byte aData : data)
-                System.out.print(" " + (aData & 0xFF));
-            System.out.println();
+                bytes.append(' ').append(aData & 0xFF);
+            logger.debug("{}", bytes);
 
+            final StringBuilder chars = new StringBuilder();
             for (byte aData : data)
-                System.out.print((char) (aData & 0xFF));
-            System.out.println();
+                chars.append((char) (aData & 0xFF));
+            logger.debug("{}", chars);
         } else {
-            System.out.println("no " + name + " info");
+            logger.debug("no {} info", name);
         }
     }
 
@@ -159,9 +164,9 @@ public class JAIContext {
         synchronized (ColorSpace.class) {
             zero = cs.fromCIEXYZ(new float[] {0, 0, 0});
         }
-        System.out.println("zero: "  + zero[0] + " : " + zero[1] + " : " + zero[2]);
+        logger.debug("zero: {} : {} : {}", zero[0], zero[1], zero[2]);
         double zlum = ColorScience.Wr * zero[0] + ColorScience.Wg * zero[1] + ColorScience.Wb * zero[2];
-        System.out.println("zero lum: " + zlum);
+        logger.debug("zero lum: {}", zlum);
     }
 
     static {
@@ -169,13 +174,13 @@ public class JAIContext {
 
         final long maxMemory = Runtime.getRuntime().maxMemory(); // -Xmx
         final long totalMemory = Runtime.getRuntime().totalMemory(); // -Xms
-        System.out.printf("Max Memory:   %6d MB%n", maxMemory / MB);
-        System.out.printf("Total Memory: %6d MB%n", totalMemory / MB);
+        logger.info("Max Memory:   {} MB", maxMemory / MB);
+        logger.info("Total Memory: {} MB", totalMemory / MB);
 
         ImageN jaiInstance = ImageN.getDefaultInstance();
 
         final int processors = Runtime.getRuntime().availableProcessors();
-        System.out.println("Running on " + processors + " processors");
+        logger.info("Running on {} processors", processors);
 
         // Use multiple processors only if we have enough heap
         final int parallelism = (maxMemory >= 400 * MB) ? processors - 1 : 1;
@@ -188,7 +193,7 @@ public class JAIContext {
         final long tileCacheMemory = (maxMemory <= 2048L * MB)
                 ? maxMemory / 2
                 : maxMemory - 1024 * MB;
-        System.out.printf("Tile Cache:   %6d MB%n", tileCacheMemory / MB);
+        logger.info("Tile Cache:   {} MB", tileCacheMemory / MB);
         fileCache = new LCTileCache(tileCacheMemory, true);
         // fileCache.setMemoryThreshold(0.5f);
         jaiInstance.setTileCache(fileCache);
@@ -288,11 +293,11 @@ public class JAIContext {
             if ((cpiName.equals("sRGB Profile") || cpiName.equals("sRGB IEC61966-2.1"))) {
                 try {
                     _sRGBColorProfile = ICC_Profile.getInstance(cpi.getPath());
-                    System.out.println("found " + cpiName);
+                    logger.info("found {}", cpiName);
                     if (_sRGBColorProfile != null)
                         break;
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.warn("Failed to load profile {}", cpiName, e);
                 }
             }
         }
@@ -302,7 +307,7 @@ public class JAIContext {
             try {
                 _sRGBColorProfile = ICC_Profile.getInstance(in);
             } catch (IOException e) {
-                System.err.println("Can't load resource sRGB profile, defaulting on Java's");
+                logger.warn("Can't load resource sRGB profile, defaulting on Java's", e);
                 _sRGBColorProfile = ICC_Profile.getInstance(ColorSpace.CS_sRGB);
             }
         }
@@ -403,13 +408,13 @@ public class JAIContext {
                                                                                 Transparency.OPAQUE);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.warn("Failed to load display profile", e);
             }
 
             _noCacheHint = new RenderingHints(ImageN.KEY_TILE_CACHE, noTileCache);
             // _noCacheHint = new RenderingHints(ImageN.KEY_TILE_CACHE, defaultTileCache);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Couldn't access color space resource", e);
             // Rethrow so the Application will notice the problem:
             throw new RuntimeException(
                 "Couldn't access color space resource",

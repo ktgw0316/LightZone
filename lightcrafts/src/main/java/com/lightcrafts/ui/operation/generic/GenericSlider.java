@@ -11,6 +11,8 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.text.DecimalFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** This class takes a SliderConfig and combines a ConfiguredSlider and a
   * ConfiguredTextField based on a common ConfiguredBoundedRangeModel into an
@@ -31,6 +33,8 @@ import java.text.DecimalFormat;
   */
 
 public class GenericSlider extends JPanel {
+
+    private static final Logger logger = LoggerFactory.getLogger(GenericSlider.class);
 
     private ConfiguredBoundedRangeModel model;
     private JLabel label;
@@ -169,7 +173,7 @@ public class GenericSlider extends JPanel {
             new ChangeListener() {
                 public void stateChanged(ChangeEvent event) {
                     double value = slider.getConfiguredValue();
-                    System.out.println(value);
+                    logger.info("{}", value);
                 }
             }
         );

@@ -7,6 +7,8 @@ import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.model.Preview;
 import com.lightcrafts.model.Region;
 import com.lightcrafts.ui.LightZoneSkin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
@@ -23,6 +25,8 @@ import java.lang.ref.SoftReference;
 public class PassThroughPreview
     extends Preview implements PaintListener
 {
+    private static final Logger logger = LoggerFactory.getLogger(PassThroughPreview.class);
+
     private ImageEditorEngine engine;
 
     PassThroughPreview(ImageEditorEngine engine) {
@@ -110,7 +114,7 @@ public class PassThroughPreview
                 g.drawRenderedImage(preview, transform);
             }
             catch (Exception e) {
-                e.printStackTrace();
+                logger.warn("Failed to render pass-through preview", e);
             }
         }
     }

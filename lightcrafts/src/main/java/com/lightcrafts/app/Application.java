@@ -36,7 +36,6 @@ import com.lightcrafts.ui.help.HelpConstants;
 import com.lightcrafts.ui.print.PrintLayoutDialog;
 import com.lightcrafts.ui.print.PrintLayoutModel;
 import com.lightcrafts.ui.templates.TemplateList;
-import com.lightcrafts.utils.TerseLoggingHandler;
 import com.lightcrafts.utils.UserCanceledException;
 import com.lightcrafts.utils.file.FileUtil;
 import com.lightcrafts.utils.thread.ProgressThread;
@@ -44,6 +43,8 @@ import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlDocument;
 import com.lightcrafts.utils.xml.XmlNode;
 import org.eclipse.imagen.PlanarImage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -61,8 +62,6 @@ import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.util.*;
 import java.util.List;
-import java.util.logging.Handler;
-import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -75,6 +74,8 @@ import static com.lightcrafts.app.Locale.LOCALE;
   */
 
 public class Application {
+
+    private static final Logger logger = LoggerFactory.getLogger(Application.class);
 
     public static final String LznNamespace =
         "http://www.lightcrafts.com/lightzone/LightZoneTransform";
@@ -235,7 +236,7 @@ public class Application {
                     }
                 }
                 public void documentCancelled() {
-                    System.err.println("Document cancelled");
+                    logger.warn("Document cancelled");
                 }
                 public void documentFailed(Throwable t) {
                     handleDocInitError(t, frame);
@@ -1299,7 +1300,7 @@ public class Application {
 
     public static void showError(String message, Throwable e, Frame frame) {
         if (e != null) {
-            e.printStackTrace();
+            logger.error(message, e);
         }
         if (System.getProperty("dieOnError") != null) {
             System.exit(-1);
@@ -1744,14 +1745,6 @@ public class Application {
         Env.getPrinterProfiles();
     }
 
-    private static void initLogging() {
-        // Abbreviate metadata error messages, which can be scroll blinding.
-        Logger logger = Logger.getLogger("com.lightcrafts.image.metadata");
-        Handler handler = new TerseLoggingHandler(System.out);
-        logger.addHandler(handler);
-        logger.setUseParentHandlers(false);
-    }
-
     private static void initDocumentDatabase() {
         // This associates images with LZNs, but can be very expensive:
 //        DocumentDatabase.init(Startup);
@@ -1973,9 +1966,7 @@ public class Application {
             return true;
         }
         catch (IOException e) {
-            System.err.print("Error saving preferences: ");
-            System.err.print(e.getClass().getName() + " ");
-            System.err.println(e.getMessage());
+            logger.error("Error saving preferences", e);
             return false;
         }
     }
@@ -2063,9 +2054,7 @@ public class Application {
                     LastSaveOptions = SaveOptions.restore(doc.getRoot());
                 }
                 catch (XMLException e) {
-                    System.err.println(
-                        "Malformed save preferences: " + e.getMessage()
-                    );
+                    logger.error("Malformed save preferences", e);
                     LastSaveOptions = null;
                 }
             }
@@ -2077,9 +2066,7 @@ public class Application {
                     LastPrintLayout.restore(doc.getRoot());
                 }
                 catch (XMLException e) {
-                    System.err.println(
-                        "Malformed print preferences: " + e.getMessage()
-                    );
+                    logger.error("Malformed print preferences", e);
                     LastPrintLayout = null;
                 }
             }
@@ -2090,9 +2077,7 @@ public class Application {
                     LastExportOptions = ImageExportOptions.read(doc.getRoot());
                 }
                 catch (XMLException e) {
-                    System.err.println(
-                        "Malformed export preferences: " + e.getMessage()
-                    );
+                    logger.error("Malformed export preferences", e);
                     LastExportOptions = null;
                 }
             }
@@ -2114,9 +2099,7 @@ public class Application {
                 return doc;
             }
             catch (Exception e) {   // IOException, XMLException
-                System.err.print("Error reading preferences: ");
-                System.err.print(e.getClass().getName() + " ");
-                System.err.println(e.getMessage());
+                logger.error("Error reading preferences", e);
                 prefs.remove(tag);
             }
         }
@@ -2127,22 +2110,16 @@ public class Application {
     private static void initFocusDebug() {
         KeyboardFocusManager focus =
             KeyboardFocusManager.getCurrentKeyboardFocusManager();
-        focus.addPropertyChangeListener(
-            new PropertyChangeListener() {
-                public void propertyChange(PropertyChangeEvent evt) {
-                    String propName = evt.getPropertyName();
-                    Object oldValue = evt.getOldValue();
-                    String oldName = (oldValue != null) ?
-                        oldValue.getClass().getName() : "null";
-                    Object newValue = evt.getNewValue();
-                    String newName = (newValue != null) ?
-                        newValue.getClass().getName() : "null";
-                    System.out.println(
-                        propName + ": " + oldName + " -> " + newName
-                    );
-                }
-            }
-        );
+        focus.addPropertyChangeListener(evt -> {
+            String propName = evt.getPropertyName();
+            Object oldValue = evt.getOldValue();
+            String oldName = (oldValue != null) ?
+                    oldValue.getClass().getName() : "null";
+            Object newValue = evt.getNewValue();
+            String newName = (newValue != null) ?
+                    newValue.getClass().getName() : "null";
+            logger.info("{}: {} -> {}", propName, oldName, newName);
+        });
     }
 
     private static void addShutdownHook() {
@@ -2182,76 +2159,62 @@ public class Application {
             scanProfiles();
             Startup.startupMessage(LOCALE.get("StartupPrefsMessage"));
             restorePrefs();
-            Startup.startupMessage(LOCALE.get("StartupLogsMessage"));
-            initLogging();
             Startup.startupMessage(LOCALE.get("StartupScanMessage"));
             initDocumentDatabase();
             Startup.startupMessage(LOCALE.get("StartupOpeningMessage"));
 
-            EventQueue.invokeLater(
-                new Runnable() {
-                    public void run() {
-                        if (Platform.isMac()) {
-                            // Get a Mac menu bar before setting LaF, then restore.
-                            Object menuBarUI = UIManager.get("MenuBarUI");
-                            setLookAndFeel(LightZoneSkin.getLightZoneLookAndFeel());
-                            UIManager.put("MenuBarUI", menuBarUI);
+            EventQueue.invokeLater(() -> {
+                if (Platform.isMac()) {
+                    // Get a Mac menu bar before setting LaF, then restore.
+                    Object menuBarUI = UIManager.get("MenuBarUI");
+                    setLookAndFeel(LightZoneSkin.getLightZoneLookAndFeel());
+                    UIManager.put("MenuBarUI", menuBarUI);
 
-                            openMacPlaceholderFrame();
-                        }
-                        else {
-                            setLookAndFeel(LightZoneSkin.getLightZoneLookAndFeel());
-                        }
+                    openMacPlaceholderFrame();
+                }
+                else {
+                    setLookAndFeel(LightZoneSkin.getLightZoneLookAndFeel());
+                }
 
-                        for (final String arg : args) {
-                            final File file = new File(arg);
-                            if (file.isDirectory()) {
-                                openFolder(openEmpty(), file);
-                            }
-                            else /* if (file.isFile()) */ {
-                                final File parent = file.getParentFile();
-                                if (parent != null) {
-                                    notifyRecentFolder(parent);
-                                    open(file, openEmpty(), null);
-                                }
-                            }
+                for (final String arg : args) {
+                    final File file = new File(arg);
+                    if (file.isDirectory()) {
+                        openFolder(openEmpty(), file);
+                    }
+                    else /* if (file.isFile()) */ {
+                        final File parent = file.getParentFile();
+                        if (parent != null) {
+                            notifyRecentFolder(parent);
+                            open(file, openEmpty(), null);
                         }
-                        if (Current.isEmpty()) {
-                            openEmpty();
-                        }
-                        Platform.getPlatform().readyToOpenFiles();
-
-                        // Make sure this happens good and late, after a
-                        // frame is visible.
-                        EventQueue.invokeLater(
-                            new Runnable() {
-                                public void run() {
-                                    showFirstTimeHelp();
-                                }
-                            }
-                        );
-                        // Wait twenty seconds after all initialization has
-                        // completed before declaring a successful startup,
-                        // since crashes that would be fixed by cleared
-                        // settings sometimes happen much later, during
-                        // queued browser thumbnail tasks.
-                        new Thread(
-                            new Runnable() {
-                                public void run() {
-                                    try {
-                                        Thread.sleep(20000);
-                                    }
-                                    catch (InterruptedException e) {
-                                        e.printStackTrace();
-                                    }
-                                    StartupCrash.startupEnded();
-                                }
-                            },
-                            "StartupSuccessWait"
-                        ).start();
                     }
                 }
-            );
+                if (Current.isEmpty()) {
+                    openEmpty();
+                }
+                Platform.getPlatform().readyToOpenFiles();
+
+                // Make sure this happens good and late, after a
+                // frame is visible.
+                EventQueue.invokeLater(Application::showFirstTimeHelp);
+
+                // Wait twenty seconds after all initialization has
+                // completed before declaring a successful startup,
+                // since crashes that would be fixed by cleared
+                // settings sometimes happen much later, during
+                // queued browser thumbnail tasks.
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(20000);
+                    }
+                    catch (InterruptedException e) {
+                        logger.trace("Startup wait interrupted", e);
+                    }
+                    StartupCrash.startupEnded();
+                },
+                        "StartupSuccessWait"
+                ).start();
+            });
             AwtWatchdog.spawn();
         }
         catch (Throwable e) {

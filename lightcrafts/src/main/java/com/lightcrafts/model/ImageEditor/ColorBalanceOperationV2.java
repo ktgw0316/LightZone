@@ -12,6 +12,8 @@ import com.lightcrafts.utils.splines;
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.media.lookup.LookupTableFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
@@ -23,6 +25,8 @@ import java.util.Map;
 import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_COLOR_BALANCE;
 
 public class ColorBalanceOperationV2 extends BlendedOperation implements com.lightcrafts.model.ColorPickerDropperOperation {
+    private static final Logger logger = LoggerFactory.getLogger(ColorBalanceOperationV2.class);
+
     static final OperationType typeV2 = new OperationTypeImpl("Color Balance V2");
     static final OperationType typeV3 = new OperationTypeImpl("Color Balance V3");
 
@@ -129,7 +133,7 @@ public class ColorBalanceOperationV2 extends BlendedOperation implements com.lig
                         midpoint = (ColorScience.Wr * pixel[0] + ColorScience.Wg * pixel[1] + ColorScience.Wb * pixel[2]) / (double) 0xffff;
                         p = null;
                     } else {
-                        System.out.println("Something funny here...");
+                        logger.debug("Something funny here...");
                         return back;
                     }
                 } else {

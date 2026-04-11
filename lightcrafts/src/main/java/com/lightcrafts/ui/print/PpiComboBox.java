@@ -14,6 +14,8 @@ import java.awt.event.*;
 import java.util.prefs.Preferences;
 import java.util.prefs.BackingStoreException;
 import java.util.Arrays;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is an editable combo box that remembers its most values, verifies its
@@ -22,6 +24,8 @@ import java.util.Arrays;
 class PpiComboBox
     extends JComboBox implements ActionListener, DocumentListener
 {
+    private static final Logger logger = LoggerFactory.getLogger(PpiComboBox.class);
+
     // Keep track of recently entered PPI numbers
     private final static Preferences Prefs =
         Preferences.userNodeForPackage(PpiComboBox.class);
@@ -192,9 +196,7 @@ class PpiComboBox
             }
         }
         catch (BackingStoreException e) {
-            System.err.println(
-                "Error restoring PpiComboBox values: " + e.getMessage()
-            );
+            logger.warn("Error restoring PpiComboBox values", e);
             // Just leave things uninitialized
         }
         isRestoring = false;

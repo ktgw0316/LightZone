@@ -8,6 +8,8 @@ import com.lightcrafts.utils.thread.ProgressThread;
 import com.lightcrafts.utils.ProgressIndicator;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.JAIContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.eclipse.imagen.BorderExtender;
 import org.eclipse.imagen.Interpolation;
@@ -25,6 +27,8 @@ import java.awt.geom.Point2D;
 import java.awt.geom.AffineTransform;
 
 public class DefaultPrinterLayer implements PrinterLayer {
+    private static final Logger logger = LoggerFactory.getLogger(DefaultPrinterLayer.class);
+
     private PageFormat lastPageFormat;
     private final PrinterJob printJob;
 
@@ -187,7 +191,7 @@ public class DefaultPrinterLayer implements PrinterLayer {
 
             printOrigin.setLocation(printX, printY);
 
-            System.out.println("print scale: " + pr.scale + ", print resolution: " + 72 * printResolution + " dpi");
+            logger.info("print scale: {}, print resolution: {} dpi", pr.scale, 72 * printResolution);
 
             printImage = engine.getRendering(new Dimension((int) (pr.scale * dimension.width),
                                                            (int) (pr.scale * dimension.height)),
@@ -212,7 +216,7 @@ public class DefaultPrinterLayer implements PrinterLayer {
             if (printResolution != PRINTER_RESOLUTION) {
                 double scale = PRINTER_RESOLUTION / printResolution;
 
-                System.out.println("Uprezzing by " + scale * 100 + '%');
+                logger.info("Uprezzing by {}%", scale * 100);
 
                 AffineTransform xform = AffineTransform.getScaleInstance(scale, scale);
 
@@ -230,10 +234,10 @@ public class DefaultPrinterLayer implements PrinterLayer {
             }
 
             if (!printCancelled) {
-                System.out.println("print image bounds: " + printImage.getBounds());
+                logger.debug("print image bounds: {}", printImage.getBounds());
                 // JAIContext.defaultTileCache.flush();
             } else
-                System.out.println("cancelled printing");
+                logger.info("cancelled printing");
         }
 
         private boolean firstTime = true;
@@ -247,7 +251,7 @@ public class DefaultPrinterLayer implements PrinterLayer {
                 return NO_SUCH_PAGE;
             }
 
-            System.out.println("print image bounds: " + printImage.getBounds());
+            logger.debug("print image bounds: {}", printImage.getBounds());
 
             Graphics2D g2d = (Graphics2D) g;
 
@@ -257,7 +261,7 @@ public class DefaultPrinterLayer implements PrinterLayer {
 
             g2d.setClip(printImage.getBounds());
 
-            System.out.println("printing...");
+            logger.debug("printing...");
 
             if (!firstTime)
                 listener.setMaximum(printImage.getMaxTileX() * printImage.getMaxTileY());
@@ -284,7 +288,7 @@ public class DefaultPrinterLayer implements PrinterLayer {
                 } else
                     g2d.drawRenderedImage(printImage, identity);
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.warn("Error while printing tiles", e);
             }
 
             if (!firstTime)
@@ -292,7 +296,7 @@ public class DefaultPrinterLayer implements PrinterLayer {
 
             g2d.setTransform(at);
 
-            System.out.println("...printed!");
+            logger.debug("...printed!");
 
             firstTime = false;
 

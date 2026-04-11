@@ -6,6 +6,8 @@ package com.lightcrafts.ui.region.curves;
 import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlNode;
 import com.lightcrafts.ui.region.Curve;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.geom.*;
@@ -19,6 +21,8 @@ import java.util.LinkedList;
   */
 
 abstract class AbstractCurve implements Curve {
+
+    private static final Logger logger = LoggerFactory.getLogger(AbstractCurve.class);
 
     // Derived classes must implement updateShape(), and in there they should
     // update these member variables to match the current values for control
@@ -379,7 +383,7 @@ abstract class AbstractCurve implements Curve {
             }
         } catch (CloneNotSupportedException e) {
             // Can't happen: all members are Cloneable
-            System.err.println("Broken Curve.clone(): " + e.getMessage());
+            logger.warn("Broken Curve.clone()", e);
         }
         clone.segments = new LinkedList<Shape>();
         for (Iterator<Shape> i=segments.iterator(); i.hasNext(); ) {
@@ -394,7 +398,7 @@ abstract class AbstractCurve implements Curve {
                 segment = (CubicCurve2D) ((CubicCurve2D) segment).clone();
             }
             else {
-                System.err.println("Curve.clone(): non-Cloneable segment");
+                logger.warn("Curve.clone(): non-Cloneable segment");
             }
             clone.segments.add(segment);
         }

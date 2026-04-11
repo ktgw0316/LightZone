@@ -6,6 +6,8 @@ package com.lightcrafts.platform.linux;
 import static com.lightcrafts.platform.linux.Locale.LOCALE;
 import com.lightcrafts.ui.toolkit.TextAreaFactory;
 import com.lightcrafts.utils.WebBrowser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -19,6 +21,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 class TestSSE2 {
+
+    private static final Logger logger = LoggerFactory.getLogger(TestSSE2.class);
 
     private static String simdRegex;
     private static String modelRegex;
@@ -70,7 +74,7 @@ class TestSSE2 {
             }
         }
         catch (IOException e) {
-            e.printStackTrace();
+            logger.warn("Failed to read CPU info", e);
         }
         return line;
     }

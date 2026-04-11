@@ -2,6 +2,9 @@
 
 package com.lightcrafts.templates;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.util.*;
 
@@ -10,6 +13,8 @@ import java.util.*;
  * the folder where TemplateDatabase will find them.
  */
 class TemplateDeployer {
+
+    private static final Logger logger = LoggerFactory.getLogger(TemplateDeployer.class);
 
     // Don't perform the Template copy operation more than once per VM instance,
     // no matter what.
@@ -25,8 +30,7 @@ class TemplateDeployer {
                 migrateTemplate(template);
             }
             catch (IOException e) {
-                System.out.println("Failed to migrate template " + template);
-                e.printStackTrace();
+                logger.error("Failed to migrate template {}", template, e);
             }
         }
         hasDeployed = true;
@@ -57,7 +61,7 @@ class TemplateDeployer {
                 }
             } while (count >= 0);
         } catch (IOException e) {
-            System.out.println("Failed to close template " + template);
+            logger.warn("Failed to close template {}", template, e);
         }
     }
 
@@ -89,7 +93,7 @@ class TemplateDeployer {
             "resources/TemplateList"
         );
         if (in == null) {
-            System.out.println("Couldn't access TemplateList");
+            logger.warn("Couldn't access TemplateList");
             return Collections.emptySet();
         }
         InputStreamReader reader = new InputStreamReader(in);
@@ -102,8 +106,7 @@ class TemplateDeployer {
             }
             catch (IOException e) {
                 // Use whatever lines we've read so far.
-                System.out.println("Error reading TemplateList");
-                e.printStackTrace();
+                logger.warn("Error reading TemplateList", e);
                 break;
             }
             if (template != null) {
@@ -115,6 +118,6 @@ class TemplateDeployer {
 
     public static void main(String[] args) throws Exception {
         TemplateDatabase.getTemplateKeys();
-        System.out.println("hasDeployed = " + hasDeployed());
+        logger.info("hasDeployed = {}", hasDeployed());
     }
 }

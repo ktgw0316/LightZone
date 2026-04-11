@@ -13,8 +13,12 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
 import java.io.File;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PrintLayoutDialog extends JDialog {
+
+    private static final Logger logger = LoggerFactory.getLogger(PrintLayoutDialog.class);
 
     private PrintLayoutModel model;
 
@@ -74,7 +78,7 @@ public class PrintLayoutDialog extends JDialog {
         dialog.addPrintAction(
             new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    System.out.println("print");
+                    logger.info("print");
                 }
             }
         );
@@ -92,7 +96,7 @@ public class PrintLayoutDialog extends JDialog {
         dialog.addCancelAction(
             new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    System.out.println("cancel");
+                    logger.info("cancel");
                     dialog.dispose();
                 }
             }
@@ -100,7 +104,7 @@ public class PrintLayoutDialog extends JDialog {
         dialog.addDoneAction(
             new ActionListener() {
                 public void actionPerformed(ActionEvent event) {
-                    System.out.println("done");
+                    logger.info("done");
                     dialog.dispose();
                 }
             }

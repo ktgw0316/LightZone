@@ -11,6 +11,8 @@ import com.lightcrafts.utils.splines;
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.media.lookup.LookupTableFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
@@ -20,6 +22,8 @@ import java.awt.image.renderable.ParameterBlock;
 import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_WHITE_BALANCE;
 
 class WhitePointOperationImpl extends BlendedOperation implements WhitePointOperation  {
+    private static final Logger logger = LoggerFactory.getLogger(WhitePointOperationImpl.class);
+
     private static final OperationType type = new OperationTypeImpl("White Dropper");
     private Color color = Color.gray;
     private Point2D p = null;
@@ -110,7 +114,7 @@ class WhitePointOperationImpl extends BlendedOperation implements WhitePointOper
                         color = new Color(pixel[0] / 256, pixel[1] / 256, pixel[2] / 256);
                         p = null; // Set the point to null, from now on we just remember the color...
                     } else {
-                        System.out.println("Something funny here...");
+                        logger.debug("Something funny here...");
                         return back;
                     }
                 } else {

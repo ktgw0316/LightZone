@@ -10,6 +10,8 @@ import com.lightcrafts.image.types.TIFFImageType;
 import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlDocument;
 import com.lightcrafts.utils.xml.XmlNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.prefs.Preferences;
@@ -21,6 +23,8 @@ import java.awt.*;
  * format was selected (LZN, Sidecar TIFF, Sidecar JPEG, or Multilayer TIFF).
  */
 public class SaveOptions {
+
+    private static final Logger logger = LoggerFactory.getLogger(SaveOptions.class);
 
     // A private, abstract base class to simplify access to all the
     // format special cases.
@@ -295,7 +299,7 @@ public class SaveOptions {
                     return options;
                 }
                 catch (Exception e) {   // IOException, XMLException
-                    e.printStackTrace();
+                    logger.warn("Failed to restore default save options", e);
                     Prefs.remove(SaveOptionsKey);
                     // Fall back to the default default options.
                 }
@@ -323,7 +327,7 @@ public class SaveOptions {
             Prefs.put(SaveOptionsKey, text);
         }
         catch (IOException e) {
-            e.printStackTrace();
+            logger.warn("Failed to persist default save options", e);
             Prefs.remove(SaveOptionsKey);
         }
     }

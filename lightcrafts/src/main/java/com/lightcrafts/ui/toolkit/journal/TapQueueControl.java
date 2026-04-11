@@ -2,11 +2,16 @@
 
 package com.lightcrafts.ui.toolkit.journal;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.event.AWTEventListener;
 import java.awt.event.KeyEvent;
 import java.awt.*;
 
 class TapQueueControl implements AWTEventListener {
+
+    private static final Logger logger = LoggerFactory.getLogger(TapQueueControl.class);
 
     // Signal events for the AWTEventListener, to tell about changes
     // in the state of the tap:
@@ -54,11 +59,7 @@ class TapQueueControl implements AWTEventListener {
                     else {
                         listener.eventDispatched(TapEndEvent);
                     }
-                    System.out.println(
-                        "*** " +
-                        "TapQueueControl " + (isControlOn ? "ON" : "OFF") +
-                        " ***"
-                    );
+                    logger.debug("*** TapQueueControl {} ***", isControlOn ? "ON" : "OFF");
                 }
             }
         }

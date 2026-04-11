@@ -8,6 +8,8 @@ import com.lightcrafts.model.Operation;
 import com.lightcrafts.model.Preview;
 import com.lightcrafts.model.Region;
 import com.lightcrafts.ui.LightZoneSkin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
@@ -24,6 +26,8 @@ import java.lang.ref.SoftReference;
 import static com.lightcrafts.model.ImageEditor.Locale.LOCALE;
 
 public class ColorSelectionPreview extends Preview implements PaintListener {
+    private static final Logger logger = LoggerFactory.getLogger(ColorSelectionPreview.class);
+
     static final boolean ADJUST_GRAYSCALE = true;
     final ImageEditorEngine engine;
 
@@ -97,7 +101,7 @@ public class ColorSelectionPreview extends Preview implements PaintListener {
         try {
             g.drawRenderedImage(preview, transform);
         } catch (RuntimeException e) {
-            e.printStackTrace();
+            logger.warn("Failed to render color selection preview", e);
         }
     }
 

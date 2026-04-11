@@ -22,6 +22,8 @@ import org.eclipse.imagen.media.util.CacheDiagnostics;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.eclipse.imagen.EnumeratedParameter;
 import org.eclipse.imagen.TileCache;
@@ -59,6 +61,8 @@ import java.util.prefs.Preferences;
 public final class LCTileCache extends Observable
                                 implements TileCache,
         CacheDiagnostics {
+
+    private static final Logger logger = LoggerFactory.getLogger(LCTileCache.class);
 
     /** The default memory capacity of the cache (16 MB). */
     private static final long DEFAULT_MEMORY_CAPACITY = 16L * 1024L * 1024L;
@@ -527,7 +531,7 @@ public final class LCTileCache extends Observable
         }
         // NOTE: we don't do flushing for disk caches, it wipes the persistent cache, rather spill half of the cache out
         if (m_objectCache != null) {
-            System.err.println("flushing the cache");
+            logger.warn("Flushing the in-memory tile cache while preserving disk cache");
             float mt = memoryThreshold;
             memoryThreshold = 0.1f;
             memoryControl();
@@ -812,7 +816,7 @@ public final class LCTileCache extends Observable
                 }
 
             final long extraCacheSize = getExtraCacheSize();
-            System.out.println("Allocating " + extraCacheSize / MB + " MB for the image cache.");
+            logger.debug("Allocating {} MB for the image cache.", extraCacheSize / MB);
 
             return new Cache(
                 new TileCacheCacheObjectBroker(),
@@ -826,7 +830,7 @@ public final class LCTileCache extends Observable
             );
         }
         catch ( IOException e ) {
-            e.printStackTrace();
+            logger.error("Failed to create disk cache for tiles", e);
             return null;
         }
     }
@@ -896,7 +900,7 @@ public final class LCTileCache extends Observable
                     tilesOnDisk--;
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.warn("Failed to read tile from disk cache", e);
             }
 
             WritableRaster raster;
@@ -937,7 +941,7 @@ public final class LCTileCache extends Observable
                 tilesOnDisk++;
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.warn("Failed to write tile to disk cache", e);
         }
 
         synchronized (this) {

@@ -4,6 +4,8 @@ package com.lightcrafts.prefs;
 
 import static com.lightcrafts.prefs.Locale.LOCALE;
 import com.lightcrafts.ui.toolkit.TextAreaFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -13,6 +15,8 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 class ClearPrefsItem extends PreferencesItem {
+
+    private static final Logger logger = LoggerFactory.getLogger(ClearPrefsItem.class);
 
     private JButton clearButton;
 
@@ -96,9 +100,7 @@ class ClearPrefsItem extends PreferencesItem {
                 node.flush();
             }
             catch (BackingStoreException e) {
-                System.err.println(
-                    "ClearPrefs failed to reset Preferences"
-                );
+                logger.error("ClearPrefs failed to reset Preferences", e);
                 showErrorDialog(e);
                 success = false;
             }

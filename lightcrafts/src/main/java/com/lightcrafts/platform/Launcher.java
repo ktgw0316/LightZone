@@ -9,6 +9,8 @@ import com.lightcrafts.prefs.LocaleModel;
 import com.lightcrafts.splash.SplashImage;
 import com.lightcrafts.splash.SplashWindow;
 import com.lightcrafts.utils.Version;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 
@@ -16,6 +18,8 @@ import javax.swing.*;
  * Launch LightZone.
  */
 public class Launcher {
+
+    private static final Logger logger = LoggerFactory.getLogger(Launcher.class);
 
     /**
      * @param args The command line arguments.
@@ -59,7 +63,7 @@ public class Launcher {
         final String rev = Version.getRevisionNumber();
         final String msg = "This is " + Version.getApplicationName() + ' '
                 + Version.getVersionName();
-        System.out.println(
+        logger.info(
                 rev.isEmpty() ? msg : msg + ' ' + '(' + rev + ')'
         );
     }
@@ -67,7 +71,7 @@ public class Launcher {
     protected String showJavaVersion() {
         final String javaVersion = System.getProperty( "java.version" );
         final String javaArch = System.getProperty( "os.arch" );
-        System.out.println( "Running Java version " + javaVersion + ' '
+        logger.info( "Running Java version " + javaVersion + ' '
                 + '(' + javaArch + ')' );
         return javaVersion;
     }

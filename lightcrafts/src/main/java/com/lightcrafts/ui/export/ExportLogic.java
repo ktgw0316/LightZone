@@ -10,6 +10,8 @@ import com.lightcrafts.image.types.ImageType;
 import com.lightcrafts.image.types.RawImageType;
 import com.lightcrafts.image.types.TIFFImageType;
 import com.lightcrafts.image.color.ColorProfileInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.color.ICC_Profile;
@@ -31,6 +33,8 @@ import java.io.File;
  * </ul>
  */
 public class ExportLogic {
+
+    private static final Logger logger = LoggerFactory.getLogger(ExportLogic.class);
 
     /**
      * Figure out new export options when there is no export history
@@ -190,9 +194,7 @@ public class ExportLogic {
                 //   ColorProfileException
                 //   IOException
                 //   UnknownImageTypeException
-                System.err.println(
-                    "Error cloning color profile: " + t.getClass().getName()
-                );
+                logger.warn("Error cloning color profile", t);
             }
         }
     }

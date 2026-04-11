@@ -4,6 +4,8 @@ package com.lightcrafts.model.ImageEditor;
 
 import com.lightcrafts.model.Engine;
 import static com.lightcrafts.model.ImageEditor.Locale.LOCALE;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
@@ -11,6 +13,8 @@ import javax.swing.event.ChangeEvent;
 import java.awt.*;
 
 class RawSettings extends JPanel {
+
+    private static final Logger logger = LoggerFactory.getLogger(RawSettings.class);
 
     abstract class FloatSlider extends JSlider {
         FloatSlider(final double min, final double max) {
@@ -44,7 +48,7 @@ class RawSettings extends JPanel {
                 @Override
                 void sliderMoved(double value) {
 //                    engine.setTemperature(value);
-                    System.out.println("set RAW temperature to " + value);
+                    logger.debug("set RAW temperature to {}", value);
                 }
             }
         );
@@ -58,7 +62,7 @@ class RawSettings extends JPanel {
                 @Override
                 void sliderMoved(double value) {
 //                    engine.setNoiseReduction(value);
-                    System.out.println("set RAW noise reduction to " + value);
+                    logger.debug("set RAW noise reduction to {}", value);
                 }
             }
         );
@@ -71,7 +75,7 @@ class RawSettings extends JPanel {
                 @Override
                 void sliderMoved(double value) {
 //                    engine.setExposure(value);
-                    System.out.println("set RAW exposure to " + value);
+                    logger.debug("set RAW exposure to {}", value);
                 }
             }
         );

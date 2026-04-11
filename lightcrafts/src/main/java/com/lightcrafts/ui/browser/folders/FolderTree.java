@@ -6,6 +6,8 @@ import com.lightcrafts.platform.Platform;
 import com.lightcrafts.ui.LightZoneSkin;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.tree.TreeCellRenderer;
@@ -22,6 +24,8 @@ import java.util.*;
  * model is updated dynamically when file system modifications are detected.
  */
 class FolderTree extends JTree {
+
+    private static final Logger logger = LoggerFactory.getLogger(FolderTree.class);
 
     private LinkedList<FolderTreeListener> listeners;
 
@@ -47,7 +51,7 @@ class FolderTree extends JTree {
         }
         catch (TooManyListenersException e) {
             // Doesn't seem to happen
-            e.printStackTrace();
+            logger.warn("Unexpected duplicate drop target listener", e);
         }
         addTreeSelectionListener(e -> notifyFolderSelected());
         listeners = new LinkedList<>();

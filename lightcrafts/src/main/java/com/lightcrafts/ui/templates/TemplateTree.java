@@ -20,12 +20,16 @@ import java.awt.event.MouseEvent;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.prefs.Preferences;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Maintain a selectable list of Templates and associated controls.  Update
  * controls in an Editor as the selection changes.
  */
 public class TemplateTree extends JTree {
+
+    private static final Logger logger = LoggerFactory.getLogger(TemplateTree.class);
 
     // Namespace node collapsed/expanded states are sticky.
     private static Preferences Prefs = Preferences.userRoot().node(
@@ -156,10 +160,7 @@ public class TemplateTree extends JTree {
             }
             catch (Throwable t) {
                 // Let the control just do nothing.
-                System.err.println(
-                    "Could not apply template \"" + template.key + "\""
-                );
-                t.printStackTrace();
+                logger.warn("Could not apply template \"{}\"", template.key, t);
             }
         }
         else {

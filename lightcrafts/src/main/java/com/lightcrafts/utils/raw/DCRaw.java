@@ -16,6 +16,8 @@ import com.lightcrafts.utils.bytebuffer.ByteBufferUtil;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.color.ColorSpace;
@@ -44,6 +46,8 @@ import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME;
  */
 public final class DCRaw extends RawDecoder {
 
+    private static final Logger logger = LoggerFactory.getLogger(DCRaw.class);
+
     //////////  public ////////////////////////////////////////////////////////
 
     static private final Map<String,DCRaw> dcrawCache =
@@ -68,7 +72,7 @@ public final class DCRaw extends RawDecoder {
         try {
             runDCRawInfo(false);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Failed to run dcraw info for {}", fileName, e);
         }
     }
 
@@ -192,7 +196,7 @@ public final class DCRaw extends RawDecoder {
         // If dcraw_lz is not in the appDir, use the one in the PATH
         DCRAW_PATH = dcrawPath.map(Path::toString).orElse(DCRAW_NAME);
 
-        System.out.println("Using dcraw at: " + DCRAW_PATH);
+        logger.info("Using dcraw at: {}", DCRAW_PATH);
     }
 
     private static String match(@NonNull String s, @NonNull String tag) {
@@ -233,7 +237,8 @@ public final class DCRaw extends RawDecoder {
 
                 p.waitFor();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.warn("Interrupted while waiting for dcraw info process", e);
+                Thread.currentThread().interrupt();
             } finally {
                 error = p.exitValue();
                 p.destroy();
@@ -452,7 +457,7 @@ public final class DCRaw extends RawDecoder {
             }
             return imageData;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to read PPM file: {}", file, e);
             throw new BadImageFileException(file, e);
         }
     }
@@ -497,7 +502,7 @@ public final class DCRaw extends RawDecoder {
                     final var reader = readerFactory.create(of);
                     result = reader.getImage();
                 } catch (LCImageLibException | UserCanceledException e) {
-                    e.printStackTrace();
+                    logger.error("Failed to read image file: {}", of, e);
                 }
                 if (result == null) {
                     throw new BadImageFileException(of);
@@ -525,10 +530,10 @@ public final class DCRaw extends RawDecoder {
 
                 result = new BufferedImage(cm, raster, false, null);
             }
-            System.out.println("Read " + totalData + " bytes in " + (t2 - t1) + "ms");
+            logger.debug("Read {} bytes in {}ms", totalData, (t2 - t1));
         } finally {
             if (of != null && !of.delete()) {
-                System.out.println("Could not delete temporary file: " + of);
+                logger.warn("Could not delete temporary file: {}", of);
             }
         }
         return result;
@@ -569,7 +574,7 @@ public final class DCRaw extends RawDecoder {
                 String line;
                 // output expected on stderr
                 while ((line = readln(dcrawStdErr)) != null) {
-                    System.out.println(line);
+                    logger.debug(line);
 
                     final var args = match(line, DCRAW_OUTPUT);
                     if (args != null)
@@ -582,24 +587,25 @@ public final class DCRaw extends RawDecoder {
 
                 p.waitFor();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.warn("Interrupted while waiting for dcraw output process", e);
+                Thread.currentThread().interrupt();
             } finally {
                 error = p.exitValue();
                 p.destroy();
             }
         }
 
-        System.out.println("dcraw value: " + error);
+        logger.debug("dcraw value: {}", error);
 
         if (error > 0) {
             throw new BadImageFileException(of);
         }
 
         if (ofName == null) {
-            System.out.println("Cannot get output filename. Falling back to: " + of.getPath());
+            logger.warn("Cannot get output filename. Falling back to: {}", of.getPath());
         } else if (!ofName.equals(of.getPath())) {
             if (!of.delete()) {
-                System.out.println("Could not delete temporary file: " + of);
+                logger.warn("Could not delete temporary file: {}", of);
             }
             of = new File(ofName);
         }

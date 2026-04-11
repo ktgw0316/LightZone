@@ -8,6 +8,8 @@ import com.lightcrafts.utils.file.FileUtil;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.lang.ref.Cleaner;
@@ -21,12 +23,12 @@ import java.nio.channels.FileChannel;
  */
 public final class FileCache {
 
+    private static final Logger logger = LoggerFactory.getLogger(FileCache.class);
+
     /**
      * The version of the cache data.
      */
     private static final int CACHE_VERSION = 11;
-
-    static final boolean DEBUG = false;
 
     ////////// public /////////////////////////////////////////////////////////
 
@@ -133,18 +135,12 @@ public final class FileCache {
     @SuppressWarnings({"ConstantConditions"})
     public File getFileFor( String key ) {
         final File file = m_mapper.mapKeyToFile( key, true );
-        if ( DEBUG )
-            System.err.println(
-                "FileCache.getFileFor(\"" + key + "\"); file = \""
-                + file + '"'
-            );
+        logger.debug("FileCache.getFileFor(\"{}\"); file = \"{}\"", key, file);
         if ( file.exists() ) {
-            if ( DEBUG )
-                System.err.println( "  --> cache hit" );
+            logger.debug("  --> cache hit");
             return file;
         }
-        if ( DEBUG )
-             System.err.println( "  --> cache miss" );
+        logger.debug("  --> cache miss");
         return null;
     }
 
@@ -171,20 +167,14 @@ public final class FileCache {
     @SuppressWarnings({"ConstantConditions"})
     public FileInputStream getStreamFor( String key ) {
         final File file = m_mapper.mapKeyToFile( key, true );
-        if ( DEBUG )
-            System.err.println(
-                "FileCache.getStreamFor(\"" + key + "\"); file = \""
-                + file + '"'
-            );
+        logger.debug("FileCache.getStreamFor(\"{}\"); file = \"{}\"", key, file);
         try {
             final FileInputStream fis = new FileInputStream( file );
-            if ( DEBUG )
-                System.err.println( "  --> cache hit" );
+            logger.debug("  --> cache hit");
             return fis;
         }
         catch ( FileNotFoundException e ) {
-            if ( DEBUG )
-                System.err.println( "  --> cache miss" );
+            logger.debug("  --> cache miss");
             return null;
         }
     }
@@ -278,11 +268,8 @@ public final class FileCache {
     @SuppressWarnings({"ConstantConditions"})
     synchronized void addToCacheSize( long size ) {
         m_size += size;
-        if ( DEBUG )
-            System.err.println(
-                "FileCache.addToCacheSize(" + (size / (1024*1024))
-                + "); cache size now = " + (m_size / (1024*1024)) + " MB"
-            );
+        logger.debug("FileCache.addToCacheSize({}); cache size now = {} MB",
+                (size / (1024 * 1024)), (m_size / (1024 * 1024)));
     }
 
     ////////// private ////////////////////////////////////////////////////////
@@ -413,7 +400,7 @@ public final class FileCache {
             if (file == null) {
                 return;
             }
-            System.err.println( "main(): putting " + file.getAbsolutePath() + ", size = " + (file.length() / (1024*1024)) + " MB" );
+            logger.info("main(): putting {}, size = {} MB", file.getAbsolutePath(), (file.length() / (1024 * 1024)));
             try (FileInputStream fis = new FileInputStream(file);
                  FileOutputStream fos = cache.putToStream(file.getAbsolutePath())) {
                 final FileChannel fic = fis.getChannel();

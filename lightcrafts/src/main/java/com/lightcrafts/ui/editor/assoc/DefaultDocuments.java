@@ -11,6 +11,8 @@ import com.lightcrafts.image.types.ImageType;
 import com.lightcrafts.image.types.RawImageType;
 import com.lightcrafts.utils.raw.Camera;
 import com.lightcrafts.utils.xml.XmlDocument;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.URL;
@@ -21,6 +23,8 @@ import java.net.URL;
  */
 
 class DefaultDocuments {
+
+    private static final Logger logger = LoggerFactory.getLogger(DefaultDocuments.class);
 
     static final boolean Debug =
         System.getProperty("lightcrafts.debug") != null;
@@ -38,11 +42,7 @@ class DefaultDocuments {
             if (make != null) {
                 return Camera.getLztUrl(make);
             } else if (Debug) {
-                System.err.println(
-                    "No camera make found for RAW file \"" +
-                    meta.getFile().getName() +
-                    "\""
-                );
+                logger.warn("No camera make found for RAW file \"{}\"", meta.getFile().getName());
             }
         }
         return null;
@@ -70,6 +70,6 @@ class DefaultDocuments {
                 doc.write(System.out);
             }
         }
-        System.out.println(url);
+        logger.info("{}", url);
     }
 }

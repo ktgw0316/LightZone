@@ -6,6 +6,8 @@ package com.lightcrafts.ui.browser.view;
 import com.lightcrafts.ui.browser.model.ImageDatum;
 import com.lightcrafts.ui.browser.model.ImageGroup;
 import com.lightcrafts.ui.browser.model.ImageList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.event.ComponentEvent;
@@ -24,25 +26,26 @@ import java.util.List;
  */
 public class ExpandedImageBrowser extends AbstractImageBrowser {
 
+    private static final Logger logger = LoggerFactory.getLogger(ExpandedImageBrowser.class);
+
     public ExpandedImageBrowser(ImageList list) {
         super(list);
         addComponentListener(
                 new ComponentListener() {
                     @Override
-                    public void componentResized(ComponentEvent e) {
+                    public void componentResized(ComponentEvent e) { }
 
-                    }
                     @Override
-                    public void componentMoved(ComponentEvent e) {
+                    public void componentMoved(ComponentEvent e) { }
 
-                    }
                     @Override
                     public void componentShown(ComponentEvent e) {
-                        System.out.println("Browser Shown");
+                        logger.debug("Browser Shown");
                     }
+
                     @Override
                     public void componentHidden(ComponentEvent e) {
-                        System.out.println("Browser Hidden");
+                        logger.debug("Browser Hidden");
                         justShown = true;
                     }
                 }

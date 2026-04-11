@@ -3,6 +3,9 @@
 
 package com.lightcrafts.utils.directory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -21,6 +24,8 @@ import static java.nio.file.StandardWatchEventKinds.*;
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */
 public final class UnixDirectoryMonitor extends DirectoryMonitor {
+
+    private static final Logger logger = LoggerFactory.getLogger(UnixDirectoryMonitor.class);
 
     public UnixDirectoryMonitor() {
         try {
@@ -42,9 +47,7 @@ public final class UnixDirectoryMonitor extends DirectoryMonitor {
             final Path dir = directory.toPath();
             WatchKey watchKey = dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
             watchKeyMap.put(watchKey, dir);
-            if (DEBUG) {
-                System.out.println("UnixDirectoryMonitor: added " + dir);
-            }
+            logger.debug("UnixDirectoryMonitor: added {}", dir);
         } catch (InvalidPathException | IOException ignored) {
         }
     }
@@ -64,8 +67,8 @@ public final class UnixDirectoryMonitor extends DirectoryMonitor {
                     .filter(key -> getPathFor(key).equals(directory.toPath()))
                     .anyMatch(key -> watchKeyMap.remove(key) != null);
         }
-        if (DEBUG && removed) {
-            System.out.println("UnixDirectoryMonitor: removed " + directory);
+        if (removed) {
+            logger.debug("UnixDirectoryMonitor: removed {}", directory);
         }
         return removed;
     }
@@ -76,43 +79,5 @@ public final class UnixDirectoryMonitor extends DirectoryMonitor {
     }
 
     private final Map<WatchKey, Path> watchKeyMap = new HashMap<>();
-
-    ////////// main() /////////////////////////////////////////////////////////
-
-    /*
-    private static final class TestListener implements DirectoryListener {
-        @Override
-        public void directoryChanged( File dir ) {
-            System.out.println( dir.getAbsolutePath() );
-        }
-    }
-
-    public static void main( String[] args ) throws IOException {
-        final DirectoryMonitor monitor = new UnixDirectoryMonitor();
-        final DirectoryListener listener = new TestListener();
-        monitor.addListener( listener );
-
-        final BufferedReader commandLine =
-            new BufferedReader( new InputStreamReader( System.in ) );
-
-        while ( true ) {
-            System.out.print( "> " );
-            final String cmd = commandLine.readLine();
-            if ( cmd.length() == 0 )
-                continue;
-            if ( cmd.startsWith( "+ " ) ) {
-                final String dir = cmd.substring( 2 );
-                monitor.addDirectory( new File( dir ) );
-                continue;
-            }
-            if ( cmd.startsWith( "- " ) ) {
-                final String dir = cmd.substring( 2 );
-                monitor.removeDirectory( new File( dir ) );
-                continue;
-            }
-            System.err.println( "Unknown command" );
-        }
-    }
-    */
 }
 /* vim:set et sw=4 ts=4: */

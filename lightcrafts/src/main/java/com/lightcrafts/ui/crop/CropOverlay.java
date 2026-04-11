@@ -10,6 +10,8 @@ import com.lightcrafts.utils.awt.geom.HiDpi;
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.Interpolation;
 import org.eclipse.imagen.RenderedOp;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -35,6 +37,8 @@ import java.util.ResourceBundle;
 // It works in screen coordinates (no AffineTransform).
 
 class CropOverlay extends JComponent implements MouseInputListener, MouseWheelListener {
+
+    private static final Logger logger = LoggerFactory.getLogger(CropOverlay.class);
 
     private final static Stroke RectStroke = new BasicStroke(20f);
     private final static Color RectColor = new Color(0, 0, 0, 128);
@@ -1384,7 +1388,7 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
             return toolkit.createCustomCursor(image, hot, name);
         }
         catch (IOException e) {
-            e.printStackTrace();
+            logger.warn("Failed to load crop cursor {}", name, e);
             return null;
         }
     }
@@ -1437,7 +1441,7 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
             resourceImage = ImageIO.read(url);
         }
         catch (IOException e) {
-            e.printStackTrace();
+            logger.warn("Failed to create resize cursor", e);
             return null;
         }
 

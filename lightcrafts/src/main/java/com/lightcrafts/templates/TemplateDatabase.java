@@ -10,6 +10,8 @@ import com.lightcrafts.platform.Platform;
 import com.lightcrafts.utils.file.FileUtil;
 import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlDocument;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -24,6 +26,8 @@ import java.util.prefs.Preferences;
  * String keys.  Also, inspect the current set of key Strings.
  */
 public class TemplateDatabase {
+
+    private static final Logger logger = LoggerFactory.getLogger(TemplateDatabase.class);
 
     /**
      * Any failure in the backing store mechanism for templates causes this
@@ -236,9 +240,7 @@ public class TemplateDatabase {
         }
         catch (TemplateException e) {
             // Counts as a missing template.
-            System.err.println(
-                "Default template not found: " + e.getMessage()
-            );
+            logger.warn("Default template not found: {}", e.getMessage(), e);
         }
         if (xml == null) {
             // The template's gone, so remove the camera key also:
@@ -299,21 +301,15 @@ public class TemplateDatabase {
                     TemplateKey newKey = new TemplateKey("", name);
                     addTemplateDocument(doc, newKey, false);
                     removePrefsTemplateDocument(name);
-                    System.out.println(
-                        "Migrated old-style template " + name
-                    );
+                    logger.info("Migrated old-style template {}", name);
                 }
                 catch (TemplateException e) {
-                    System.err.println(
-                        "Failed to migrate old-style template " + name
-                    );
+                    logger.warn("Failed to migrate old-style template {}", name, e);
                 }
             }
         }
         catch (TemplateException e) {
-            System.err.println(
-                "Couldn't access old-style templates"
-            );
+            logger.warn("Couldn't access old-style templates", e);
         }
     }
 
@@ -351,21 +347,15 @@ public class TemplateDatabase {
             final var newFile = new File(TemplateDir, oldFile.getName());
             try {
                 FileUtil.copyFile(oldFile, newFile);
-                System.out.println(
-                    "Copied a template from " +
-                    oldFile + " to " + newFile
-                );
+                logger.info("Copied a template from {} to {}", oldFile, newFile);
                 final var msg = oldTemplateDir.delete()
                         ? "Deleted an old template at "
                         : "Failed to delete an old template at ";
-                System.out.println(msg + oldFile);
+                logger.info("{}{}", msg, oldFile);
             }
             catch (IOException e) {
-                System.out.println(
-                    "Failed to migrate a template from " +
-                    oldFile + " to " + newFile + ": " +
-                    e.getClass().getName() + " " + e.getMessage()
-                );
+                logger.warn("Failed to migrate a template from {} to {}: {} {}",
+                        oldFile, newFile, e.getClass().getName(), e.getMessage(), e);
                 return;
             }
         }
@@ -373,7 +363,7 @@ public class TemplateDatabase {
         final var msg = oldTemplateDir.delete()
                 ? "Deleted old template folder "
                 : "Failed to delete old template folder ";
-        System.out.println(msg + oldTemplateDir.getAbsolutePath());
+        logger.info("{}{}", msg, oldTemplateDir.getAbsolutePath());
     }
 
     // Older templates have no namespace.  Find templates whose namespace is
@@ -393,17 +383,14 @@ public class TemplateDatabase {
                     }
                     catch (TemplateException e) {
                         // Skip this one and continue.
-                        System.out.println(
-                            "Template migration failed for " + key
-                        );
-                        e.printStackTrace();
+                        logger.warn("Template migration failed for {}", key, e);
                     }
                 }
             }
         }
         catch (TemplateException e) {
             // OK, just allow some templates with the empty namespace
-            System.out.println("Failed to migrate template namespaces");
+            logger.warn("Failed to migrate template namespaces", e);
         }
     }
 

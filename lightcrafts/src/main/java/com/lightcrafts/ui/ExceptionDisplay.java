@@ -2,15 +2,19 @@
 
 package com.lightcrafts.ui;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.swing.*;
 import java.awt.*;
-import java.io.PrintWriter;
 import java.io.StringWriter;
 
 /** Display a Throwable as a text area.
   */
 
 public class ExceptionDisplay extends Box implements Scrollable {
+
+    private static final Logger logger = LoggerFactory.getLogger(ExceptionDisplay.class);
 
     private JTextArea trace;
 
@@ -27,12 +31,11 @@ public class ExceptionDisplay extends Box implements Scrollable {
         trace.setFont(font);
 
         StringWriter buffer = new StringWriter();
-        PrintWriter writer = new PrintWriter(buffer);
-        t.printStackTrace(writer);
+        buffer.append(buildStackTraceText(t));
         trace.setText(buffer.toString());
         add(trace);
 
-        t.printStackTrace();
+        logger.error("Exception display", t);
 
         add(Box.createVerticalGlue());
     }
@@ -65,5 +68,21 @@ public class ExceptionDisplay extends Box implements Scrollable {
         return trace.getScrollableUnitIncrement(
             visibleRect, orientation, direction
         );
+    }
+
+    private static String buildStackTraceText(Throwable t) {
+        final StringBuilder sb = new StringBuilder();
+        Throwable current = t;
+        while (current != null) {
+            sb.append(current).append('\n');
+            for (StackTraceElement element : current.getStackTrace()) {
+                sb.append("\tat ").append(element).append('\n');
+            }
+            current = current.getCause();
+            if (current != null) {
+                sb.append("Caused by: ");
+            }
+        }
+        return sb.toString();
     }
 }

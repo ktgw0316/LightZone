@@ -20,6 +20,8 @@ import com.lightcrafts.utils.thread.ProgressThread;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.eclipse.imagen.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -37,6 +39,8 @@ import java.io.IOException;
  */
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class RawImageType extends ImageType {
+
+    private static final Logger logger = LoggerFactory.getLogger(RawImageType.class);
 
     private static final boolean CACHE_CONVERSION = true;
 
@@ -78,7 +82,7 @@ public abstract class RawImageType extends ImageType {
         final var fileCache = RawImageCache.getCacheFor( imageInfo );
 
         if ( CACHE_CONVERSION && fileCache != null ) {
-            System.out.println("Checking cache for: " + imageInfo);
+            logger.debug("Checking cache for: {}", imageInfo);
             final var t1 = System.currentTimeMillis();
             cacheKey = RawImageCache.getCacheKeyFor( imageInfo );
             if ( cacheKey != null )
@@ -90,14 +94,14 @@ public abstract class RawImageType extends ImageType {
                     final var image = reader.getImage( thread ); */
                     final var image = new LCTIFFReader.TIFFImage(fileName);
                     final var t2 = System.currentTimeMillis();
-                    System.out.println("Retrieved Cached image in " + (t2 - t1) + "ms");
+                    logger.debug("Retrieved cached image in {}ms", t2 - t1);
                     return image;
                 } catch (LCImageLibException e) {
                     // never mind, don't use the cache
-                    e.printStackTrace();
+                    logger.warn("Failed to read cached raw conversion for {}", imageInfo, e);
                 }
             } else
-                System.out.println("File not in cache.");
+                logger.debug("File not in cache.");
         }
 
         ProgressIndicator indicator = null;
@@ -121,11 +125,11 @@ public abstract class RawImageType extends ImageType {
         final var metadata = imageInfo.getMetadata();
         final var imageWidth = metadata.getImageWidth();
         final var imageHeight = metadata.getImageHeight();
-        System.out.println("metadata width: " + imageWidth + ", height: " + imageHeight);
+        logger.debug("metadata width: {}, height: {}", imageWidth, imageHeight);
 
         final var rawWidth  = rawImage.getWidth();
         final var rawHeight = rawImage.getHeight();
-        System.out.println("raw      width: " + rawWidth + ", height: " + rawHeight);
+        logger.debug("raw width: {}, height: {}", rawWidth, rawHeight);
 
         if ( thread != null && thread.isCanceled() )
             return null;
@@ -198,8 +202,11 @@ public abstract class RawImageType extends ImageType {
         if (indicator != null)
             indicator.incrementBy(1);
 
-        System.out.println("decode: " + (rawDecodeTime - startTime)
-                + "ms, demosaic: " + (demosaicTime - rawDecodeTime) + "ms");
+        logger.debug(
+                "decode: {}ms, demosaic: {}ms",
+                rawDecodeTime - startTime,
+                demosaicTime - rawDecodeTime
+        );
 
         if (CACHE_CONVERSION && fileCache != null && imageFile == null && cacheKey != null) {
             RawImageCache.add(cacheKey, rgbImage);
@@ -307,14 +314,15 @@ public abstract class RawImageType extends ImageType {
                 try {
                     t.join();
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    logger.warn("RAW processing thread interrupted", e);
+                    Thread.currentThread().interrupt();
                 }
             }
         } else {
             setTileData(tileIndices, image, cache);
         }
 
-        System.out.println("retiling: " + (System.currentTimeMillis() - tilingTime) + "ms");
+        logger.debug("retiling: {}ms", System.currentTimeMillis() - tilingTime);
     }
 
     private void setTileData(Point[] tileIndices, PlanarImage image, CachedImage cache) {

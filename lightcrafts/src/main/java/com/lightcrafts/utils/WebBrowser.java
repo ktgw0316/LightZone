@@ -3,6 +3,9 @@
 
 package com.lightcrafts.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
@@ -12,6 +15,8 @@ import java.net.URISyntaxException;
  * Browser launcher, just a wrapper to java.awt.Desktop.browse().
  */
 public final class WebBrowser {
+
+    private static final Logger logger = LoggerFactory.getLogger(WebBrowser.class);
 
     /**
      * Direct the user's default web browser to browse the given URL.
@@ -24,7 +29,7 @@ public final class WebBrowser {
         try {
             return browse(new URI(url));
         } catch (URISyntaxException e) {
-            e.printStackTrace();
+            logger.warn("Invalid browser URL: {}", url, e);
         }
         return false;
     }
@@ -49,7 +54,7 @@ public final class WebBrowser {
             desktop.browse(uri);
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.warn("Failed to open browser for URI {}", uri, e);
         }
         return false;
     }

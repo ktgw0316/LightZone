@@ -6,6 +6,8 @@ import static com.lightcrafts.app.batch.Locale.LOCALE;
 import com.lightcrafts.image.types.JPEGImageType;
 import com.lightcrafts.platform.FileChooser;
 import com.lightcrafts.platform.Platform;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,6 +27,8 @@ import java.util.LinkedHashMap;
  * size selected from a narrow range of values.
  */
 public class SendDialog extends JDialog {
+
+    private static final Logger logger = LoggerFactory.getLogger(SendDialog.class);
 
     private final static String PrefsKey = "Send";
 
@@ -257,7 +261,7 @@ public class SendDialog extends JDialog {
             conf.writeDebug(System.out);
         }
         else {
-            System.out.println("cancelled");
+            logger.info("cancelled");
         }
         System.exit(0);
     }

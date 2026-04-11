@@ -8,6 +8,8 @@ import com.lightcrafts.image.UnknownImageTypeException;
 import com.lightcrafts.platform.AlertDialog;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.ui.export.ExportNameUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,6 +25,8 @@ import static com.lightcrafts.ui.browser.view.Locale.LOCALE;
  * dialogs to ask about overwrite and to report errors.
  */
 class FileActions {
+
+    private static final Logger logger = LoggerFactory.getLogger(FileActions.class);
 
     static void deleteFiles(File[] files, Component parent) {
         AlertDialog alert = Platform.getPlatform().getAlertDialog();
@@ -128,8 +132,7 @@ class FileActions {
                 }
             }
             catch (Throwable t) {
-                System.out.println("File rename failed");
-                t.printStackTrace();
+                logger.warn("File rename failed: {} -> {}", file, newFile, t);
             }
             if (! fileRenamed) {
                 String error = LOCALE.get(
@@ -146,7 +149,7 @@ class FileActions {
                 if (fileRenamed) {
                     boolean fileUnRenamed = newFile.renameTo(file);
                     if (! fileUnRenamed) {
-                        System.out.println("Failed to undo file rename");
+                        logger.warn("Failed to undo file rename: {} -> {}", newFile, file);
                     }
                 }
                 String error = LOCALE.get("XmpRenameError", file.getName());

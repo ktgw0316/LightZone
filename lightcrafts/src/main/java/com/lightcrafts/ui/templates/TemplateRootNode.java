@@ -4,6 +4,8 @@ package com.lightcrafts.ui.templates;
 
 import com.lightcrafts.templates.TemplateDatabase;
 import com.lightcrafts.templates.TemplateKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.tree.TreeNode;
 import java.util.*;
@@ -12,6 +14,8 @@ import java.util.*;
  * An invisible, universal root node to hold template namespace nodes.
  */
 class TemplateRootNode implements TreeNode {
+
+    private static final Logger logger = LoggerFactory.getLogger(TemplateRootNode.class);
 
     private ArrayList<TemplateNamespaceTreeNode> children;
 
@@ -32,7 +36,7 @@ class TemplateRootNode implements TreeNode {
             }
             catch (Throwable t) {
                 // TemplateDatabase.TemplateException, XMLException
-                t.printStackTrace();
+                logger.warn("Skipping malformed template in namespace {}", namespace, t);
                 // Continue, just a malformed template
             }
         }

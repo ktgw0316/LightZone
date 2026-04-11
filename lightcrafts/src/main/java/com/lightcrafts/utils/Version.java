@@ -5,6 +5,8 @@ package com.lightcrafts.utils;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -26,6 +28,8 @@ import java.util.ResourceBundle;
   * resources/main/com/lightcrafts/utils/resources/.
   */
 public final class Version {
+
+    private static final Logger logger = LoggerFactory.getLogger(Version.class);
 
     /**
      * Gets the application's name.
@@ -95,7 +99,7 @@ public final class Version {
             }
         }
         catch ( Throwable t ) {
-            System.err.println( "Failed to read " + name + " resource" );
+            logger.error("Failed to read {} resource", name);
         }
         return null;
     }

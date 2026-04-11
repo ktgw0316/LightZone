@@ -5,6 +5,8 @@ package com.lightcrafts.ui.metadata2;
 import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.image.metadata.ImageMetadata;
 import com.lightcrafts.image.types.ImageType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.table.AbstractTableModel;
 import java.net.URI;
@@ -15,6 +17,8 @@ import java.net.URI;
  */
 
 class MetadataTableModel extends AbstractTableModel {
+
+    private static final Logger logger = LoggerFactory.getLogger(MetadataTableModel.class);
 
     private final static String[] ColumnNames = {"Key", "Value"};
 
@@ -89,7 +93,7 @@ class MetadataTableModel extends AbstractTableModel {
         }
         catch (Throwable t) {
             // BadImageFileException, IOException, UnknownImageTypeException
-            t.printStackTrace();
+            logger.warn("Failed to write metadata for {}", info.getFile(), t);
             // do nothing, hope the user figures it out
         }
     }

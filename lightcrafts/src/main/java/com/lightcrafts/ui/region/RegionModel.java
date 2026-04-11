@@ -7,6 +7,9 @@ import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlDocument;
 import com.lightcrafts.utils.xml.XmlNode;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.swing.event.UndoableEditListener;
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
@@ -60,10 +63,7 @@ class RegionModel {
         void modeChanged(RegionMode oldMode, RegionMode newMode);
     }
 
-    // Switch on some printlines that show about edit batching and
-    // change notification:
-    private static final boolean Debug =
-        System.getProperty("lightcrafts.debug.regions") != null;
+    private static final Logger logger = LoggerFactory.getLogger(RegionModel.class);
 
     private LinkedList<Listener> listeners;
 
@@ -216,41 +216,18 @@ class RegionModel {
         // Don't call postEdit().
     }
 
-    // Useful debug dump, to track timing and balancing of edit batches:
+    /// Useful debug dump, to track timing and balancing of edit batches:
     private void dumpEdit(String s) {
-        if (! Debug) {
-            return;
-        }
-        System.out.print("|");
-        for (int n=0; n<batchEdit;n++) {
-            System.out.print("  ");
-        }
-        System.out.print(batchEdit);
-        System.out.print(" ");
-        System.out.println(s);
+        logger.debug("|{}{} {}", "  ".repeat(batchEdit), batchEdit, s);
     }
 
-    // Useful debug dump, to track timing and balancing of change notifications:
+    /// Useful debug dump, to track timing and balancing of change notifications:
     private void dumpNotify(String s) {
-        if (! Debug) {
-            return;
-        }
-        System.out.print("|");
-        for (int n=0; n<batchNotify;n++) {
-            System.out.print("  ");
-        }
-        System.out.print(batchNotify);
-        System.out.print(" ");
-        System.out.println(s);
+        logger.debug("|{}{} {}", "  ".repeat(batchNotify), batchNotify, s);
     }
 
     private void dumpModeChange(RegionMode oldMode, RegionMode newMode) {
-        if (Debug) {
-            System.out.println(
-                "mode change: " +
-                getNameOfMode(oldMode) + " -> " + getNameOfMode(newMode)
-            );
-        }
+        logger.debug("mode change: {} -> {}", getNameOfMode(oldMode), getNameOfMode(newMode));
     }
 
     private static String getNameOfMode(RegionMode mode) {
@@ -462,9 +439,7 @@ class RegionModel {
         if (isRestoring || isUndoing) {
             return;
         }
-        if (Debug) {
-            System.out.println("post edit");
-        }
+        logger.debug("post edit");
         currentEdit.end();
         undoSupport.postEdit(currentEdit);
         currentEdit = new RegionEdit();

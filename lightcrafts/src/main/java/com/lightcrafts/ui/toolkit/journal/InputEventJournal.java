@@ -5,6 +5,8 @@ package com.lightcrafts.ui.toolkit.journal;
 import com.lightcrafts.utils.xml.XmlDocument;
 import com.lightcrafts.utils.xml.XMLException;
 import com.lightcrafts.utils.xml.XmlNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -34,6 +36,8 @@ import java.util.Iterator;
  * call write().  To reload a saved history, call read().
  */
 public class InputEventJournal implements AWTEventListener {
+
+    private static final Logger logger = LoggerFactory.getLogger(InputEventJournal.class);
 
     /**
      * Since the AWT event queue is a singleton, so is this class.
@@ -136,12 +140,11 @@ public class InputEventJournal implements AWTEventListener {
                     } while (nodes.length > index);
                 }
                 catch (XMLException e) {
-                    System.err.println(
-                        "Error decoding event history: " + e.getMessage()
-                    );
+                    logger.warn("Error decoding event history", e);
                 }
                 catch (InterruptedException e) {
-                    System.err.println("History replay interrupted");
+                    logger.warn("History replay interrupted", e);
+                    Thread.currentThread().interrupt();
                 }
                 notifyJournalEnded(true);
             }
