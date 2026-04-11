@@ -9,10 +9,10 @@ import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
 
-import javax.media.jai.BorderExtender;
-import javax.media.jai.JAI;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.RenderedOp;
+import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.RenderedOp;
 import java.awt.*;
 import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
@@ -112,9 +112,9 @@ public class AdvancedNoiseReductionOperation extends BlendedOperation {
             ParameterBlock pb = new ParameterBlock();
             pb.addSource( back );
             pb.add( rgb2yst );
-            RenderedOp ystImage = JAI.create("BandCombine", pb, null);
+            RenderedOp ystImage = ImageN.create("BandCombine", pb, null);
 
-            RenderingHints mfHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
+            RenderingHints mfHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
 
             if (chroma_domain != 0 && chroma_range != 0) {
                 pb = new ParameterBlock();
@@ -122,7 +122,7 @@ public class AdvancedNoiseReductionOperation extends BlendedOperation {
                 pb.add(chroma_domain * scale);
                 pb.add(0.02f + 0.001f * chroma_domain);
                 // pb.add(0.1f);
-                ystImage = JAI.create("BilateralFilter", pb, mfHints);
+                ystImage = ImageN.create("BilateralFilter", pb, mfHints);
                 ystImage.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
             }
 
@@ -130,31 +130,31 @@ public class AdvancedNoiseReductionOperation extends BlendedOperation {
                 pb = new ParameterBlock();
                 pb.addSource(ystImage);
                 pb.add(new int[]{0});
-                RenderedOp y = JAI.create("bandselect", pb, null);
+                RenderedOp y = ImageN.create("bandselect", pb, null);
 
                 pb = new ParameterBlock();
                 pb.addSource(ystImage);
                 pb.add(new int[]{1, 2});
-                RenderedOp cc = JAI.create("bandselect", pb, JAIContext.noCacheHint);
+                RenderedOp cc = ImageN.create("bandselect", pb, JAIContext.noCacheHint);
 
                 pb = new ParameterBlock();
                 pb.addSource( y );
                 pb.add((2 + luma_domain / 10f)* scale);
                 pb.add(0.005f * luma_domain);
-                y = JAI.create("BilateralFilter", pb, mfHints);
+                y = ImageN.create("BilateralFilter", pb, mfHints);
 
-                RenderingHints layoutHints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, Functions.getImageLayout(ystImage));
+                RenderingHints layoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, Functions.getImageLayout(ystImage));
                 pb = new ParameterBlock();
                 pb.addSource(y);
                 pb.addSource(cc);
                 layoutHints.add(JAIContext.noCacheHint);
-                ystImage = JAI.create("BandMerge", pb, layoutHints);
+                ystImage = ImageN.create("BandMerge", pb, layoutHints);
             }
 
             pb = new ParameterBlock();
             pb.addSource( ystImage );
             pb.add( yst2rgb );
-            PlanarImage front = JAI.create("BandCombine", pb, null);
+            PlanarImage front = ImageN.create("BandCombine", pb, null);
             front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
 
             return front;

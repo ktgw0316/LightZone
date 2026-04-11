@@ -3,12 +3,12 @@
 package com.lightcrafts.jai.opimage;
 
 import com.lightcrafts.image.color.ColorScience;
-import com.sun.media.jai.util.ImageUtil;
+import org.eclipse.imagen.media.util.ImageUtil;
 
-import javax.media.jai.ImageLayout;
-import javax.media.jai.PointOpImage;
-import javax.media.jai.RasterAccessor;
-import javax.media.jai.RasterFormatTag;
+import org.eclipse.imagen.ImageLayout;
+import org.eclipse.imagen.PointOpImage;
+import org.eclipse.imagen.RasterAccessor;
+import org.eclipse.imagen.RasterFormatTag;
 import java.awt.*;
 import java.awt.image.*;
 import java.util.Map;

@@ -15,11 +15,11 @@ package com.lightcrafts.jai.operator;
 
 import java.awt.RenderingHints;
 import java.awt.image.RenderedImage;
-import javax.media.jai.JAI;
-import javax.media.jai.OperationDescriptorImpl;
-import javax.media.jai.ParameterBlockJAI;
-import javax.media.jai.RenderedOp;
-import javax.media.jai.registry.RenderedRegistryMode;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.OperationDescriptorImpl;
+import org.eclipse.imagen.ParameterBlockImageN;
+import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.registry.RenderedRegistryMode;
 
 public class RawAdjustmentsDescriptor extends OperationDescriptorImpl {
 
@@ -60,12 +60,12 @@ public class RawAdjustmentsDescriptor extends OperationDescriptorImpl {
     /**
      * Performs RAW adjustment operation on the image.
      *
-     * <p>Creates a <code>ParameterBlockJAI</code> from all
+     * <p>Creates a <code>ParameterBlockImageN</code> from all
      * supplied arguments except <code>hints</code> and invokes
-     * {@link JAI#create(String,java.awt.image.renderable.ParameterBlock,RenderingHints)}.
+     * {@link ImageN#create(String,java.awt.image.renderable.ParameterBlock,RenderingHints)}.
      *
-     * @see JAI
-     * @see ParameterBlockJAI
+     * @see ImageN
+     * @see ParameterBlockImageN
      * @see RenderedOp
      *
      * @param source0 <code>RenderedImage</code> source 0.
@@ -83,14 +83,14 @@ public class RawAdjustmentsDescriptor extends OperationDescriptorImpl {
                                     float colorTemperature,
                                     float[][] cameraRGB,
                                     RenderingHints hints)  {
-        ParameterBlockJAI pb =
-            new ParameterBlockJAI("RawAdjustments", RenderedRegistryMode.MODE_NAME);
+        ParameterBlockImageN pb =
+            new ParameterBlockImageN("RawAdjustments", RenderedRegistryMode.MODE_NAME);
 
         pb.setSource("source0", source0);
         pb.setParameter("exposure", exposure);
         pb.setParameter("colorTemperature", colorTemperature);
         pb.setParameter("cameraRGB", cameraRGB);
 
-        return JAI.create("LCErode", pb, hints);
+        return ImageN.create("LCErode", pb, hints);
     }
 }

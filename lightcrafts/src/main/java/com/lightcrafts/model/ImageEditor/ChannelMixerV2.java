@@ -9,8 +9,8 @@ import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
 
-import javax.media.jai.JAI;
-import javax.media.jai.PlanarImage;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.PlanarImage;
 import java.awt.*;
 import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
@@ -127,7 +127,7 @@ public class ChannelMixerV2 extends BlendedOperation implements com.lightcrafts.
             ParameterBlock pb = new ParameterBlock();
             pb.addSource(back);
             pb.add(transform);
-            return JAI.create("BandCombine", pb, null);
+            return ImageN.create("BandCombine", pb, null);
         }
 
         PlanarImage setFrontV3() {
@@ -161,7 +161,7 @@ public class ChannelMixerV2 extends BlendedOperation implements com.lightcrafts.
             ParameterBlock pb = new ParameterBlock();
             pb.addSource(Functions.toColorSpace(back, JAIContext.oldLinearColorSpace, null));
             pb.add(transform);
-            return JAI.create("BandCombine", pb, null);
+            return ImageN.create("BandCombine", pb, null);
         }
     }
 

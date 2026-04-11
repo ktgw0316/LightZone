@@ -7,10 +7,10 @@ import com.lightcrafts.model.ImageEditor.ImageEditorEngine;
 import com.lightcrafts.model.PrintSettings;
 import com.lightcrafts.utils.thread.ProgressThread;
 import com.lightcrafts.jai.JAIContext;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.JAI;
-import javax.media.jai.BorderExtender;
-import javax.media.jai.Interpolation;
+import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.Interpolation;
 
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
@@ -98,14 +98,14 @@ public class WindowsPrinterLayer implements PrinterLayer {
 
             AffineTransform xform = AffineTransform.getScaleInstance(xMagnification, yMagnification);
 
-            RenderingHints formatHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
+            RenderingHints formatHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
 
             Interpolation interp = Interpolation.getInstance(Interpolation.INTERP_BICUBIC_2);
             ParameterBlock params = new ParameterBlock();
             params.addSource(printImage);
             params.add(xform);
             params.add(interp);
-            printImage = JAI.create("Affine", params, formatHints);
+            printImage = ImageN.create("Affine", params, formatHints);
         }
 
         Point location = new Point((int) (settings.getX() * resolution.getWidth() / 72.0),

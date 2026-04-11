@@ -18,14 +18,14 @@ import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
-import javax.media.jai.AreaOpImage;
-import javax.media.jai.BorderExtender;
-import javax.media.jai.ImageLayout;
-import javax.media.jai.KernelJAI;
-import javax.media.jai.RasterAccessor;
-import javax.media.jai.RasterFormatTag;
+import org.eclipse.imagen.AreaOpImage;
+import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.ImageLayout;
+import org.eclipse.imagen.KernelImageN;
+import org.eclipse.imagen.RasterAccessor;
+import org.eclipse.imagen.RasterFormatTag;
 import java.util.Map;
-// import com.sun.media.jai.test.OpImageTester;
+// import org.eclipse.imagen.media.test.OpImageTester;
 
 /**
  *
@@ -123,14 +123,14 @@ import java.util.Map;
  * Spie Optical Engineering Press, 1994.
  *
  *
- * @see KernelJAI
+ * @see KernelImageN
  */
 final class LCErodeOpImage extends AreaOpImage {
 
     /**
      * The kernel with which to do the erode operation.
      */
-    protected KernelJAI kernel;
+    protected KernelImageN kernel;
 
     /** Kernel variables. */
     private int kw, kh, kx, ky;
@@ -149,13 +149,13 @@ final class LCErodeOpImage extends AreaOpImage {
      * @param extender a BorderExtender, or null.
      * @param layout an ImageLayout optionally containing the tile grid layout,
      *        SampleModel, and ColorModel, or null.
-     * @param kernel the pre-rotated erosion KernelJAI.
+     * @param kernel the pre-rotated erosion KernelImageN.
      */
     public LCErodeOpImage(RenderedImage source,
                            BorderExtender extender,
                            Map config,
                            ImageLayout layout,
-                           KernelJAI kernel) {
+                           KernelImageN kernel) {
 	super(source,
               layout,
               config,

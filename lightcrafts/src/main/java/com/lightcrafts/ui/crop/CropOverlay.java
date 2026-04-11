@@ -7,11 +7,11 @@ package com.lightcrafts.ui.crop;
 import com.lightcrafts.model.CropBounds;
 import com.lightcrafts.platform.Platform;
 import com.lightcrafts.utils.awt.geom.HiDpi;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.Interpolation;
+import org.eclipse.imagen.RenderedOp;
 
 import javax.imageio.ImageIO;
-import javax.media.jai.Interpolation;
-import javax.media.jai.RenderedOp;
-import javax.media.jai.operator.RotateDescriptor;
 import javax.swing.*;
 import javax.swing.event.MouseInputListener;
 import java.awt.*;
@@ -22,6 +22,7 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
+import java.awt.image.renderable.ParameterBlock;
 import java.io.IOException;
 import java.net.URL;
 import java.util.LinkedList;
@@ -1425,32 +1426,40 @@ class CropOverlay extends JComponent implements MouseInputListener, MouseWheelLi
         if ((diff < 0.001) && (RecentCursor != null)) {
             return RecentCursor;
         }
+
+        String path = "resources/resize.png";
+        URL url = CropOverlay.class.getResource(path);
+        if (url == null) {
+            return null;
+        }
+        final RenderedImage resourceImage;
         try {
-            String path = "resources/resize.png";
-            URL url = CropOverlay.class.getResource(path);
-            RenderedImage resourceImage = ImageIO.read(url);
-            int cx = resourceImage.getWidth() / 2;
-            int cy = resourceImage.getHeight() / 2;
-            RenderedOp rotatedImage = RotateDescriptor.create(
-                resourceImage,
-                (float) cx, (float) cy, (float) angle,
-                Interpolation.getInstance(Interpolation.INTERP_BICUBIC),
-                null, null
-            );
-            Point hot = new Point(cx, cy);
-            Toolkit toolkit = Toolkit.getDefaultToolkit();
-            BufferedImage buffer = rotatedImage.getAsBufferedImage();
-            Cursor cursor = toolkit.createCustomCursor(buffer, hot, "resize");
-
-            RecentCursorAngle = angle;
-            RecentCursor = cursor;
-
-            return cursor;
+            resourceImage = ImageIO.read(url);
         }
         catch (IOException e) {
             e.printStackTrace();
             return null;
         }
+
+        int cx = resourceImage.getWidth() / 2;
+        int cy = resourceImage.getHeight() / 2;
+        var interp = Interpolation.getInstance(Interpolation.INTERP_BICUBIC);
+        var pb = new ParameterBlock()
+                .addSource(resourceImage)
+                .add(cx)
+                .add(cy)
+                .add(angle)
+                .add(interp);
+        RenderedOp rotatedImage = ImageN.create("rotate", pb, null);
+        Point hot = new Point(cx, cy);
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        BufferedImage buffer = rotatedImage.getAsBufferedImage();
+        Cursor cursor = toolkit.createCustomCursor(buffer, hot, "resize");
+
+        RecentCursorAngle = angle;
+        RecentCursor = cursor;
+
+        return cursor;
     }
 
     private static boolean hasRotateModifier(MouseEvent event) {

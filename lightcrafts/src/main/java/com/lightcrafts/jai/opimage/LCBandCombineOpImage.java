@@ -19,13 +19,13 @@ import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.util.Map;
-import javax.media.jai.ImageLayout;
-import javax.media.jai.PointOpImage;
-import javax.media.jai.RasterAccessor;
-import javax.media.jai.RasterFormatTag;
-import javax.media.jai.RasterFactory;
-import com.sun.media.jai.util.ImageUtil;
-import com.sun.media.jai.util.JDKWorkarounds;
+import org.eclipse.imagen.ImageLayout;
+import org.eclipse.imagen.PointOpImage;
+import org.eclipse.imagen.RasterAccessor;
+import org.eclipse.imagen.RasterFormatTag;
+import org.eclipse.imagen.RasterFactory;
+import org.eclipse.imagen.media.util.ImageUtil;
+import org.eclipse.imagen.media.util.JDKWorkarounds;
 
 /**
  * An <code>OpImage</code> implementing the "BandCombine" operation.
@@ -43,7 +43,7 @@ import com.sun.media.jai.util.JDKWorkarounds;
  * the specified matrix.  The extra column of values is a constant
  * that is added after the matrix-multiply operation takes place.
  *
- * @see javax.media.jai.operator.BandCombineDescriptor
+ * @see org.eclipse.imagen.operator.BandCombineDescriptor
  * @see LCBandCombineCRIF
  *
  *

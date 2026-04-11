@@ -2,14 +2,14 @@
 
 package com.lightcrafts.jai.operator;
 
-import com.sun.media.jai.util.AreaOpPropertyGenerator;
+import org.eclipse.imagen.media.util.AreaOpPropertyGenerator;
 
-import javax.media.jai.JAI;
-import javax.media.jai.OperationDescriptorImpl;
-import javax.media.jai.ParameterBlockJAI;
-import javax.media.jai.PropertyGenerator;
-import javax.media.jai.RenderedOp;
-import javax.media.jai.registry.RenderedRegistryMode;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.OperationDescriptorImpl;
+import org.eclipse.imagen.ParameterBlockImageN;
+import org.eclipse.imagen.PropertyGenerator;
+import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.registry.RenderedRegistryMode;
 import java.awt.image.RenderedImage;
 import java.awt.*;
 
@@ -53,8 +53,8 @@ public class BilateralFilterDescriptor extends OperationDescriptorImpl {
     public static RenderedOp create(RenderedImage source,
                                     float sigma_d, float sigma_r, boolean luminosity,
                                     RenderingHints hints)  {
-        ParameterBlockJAI pb =
-            new ParameterBlockJAI("BilateralFilter", RenderedRegistryMode.MODE_NAME);
+        ParameterBlockImageN pb =
+            new ParameterBlockImageN("BilateralFilter", RenderedRegistryMode.MODE_NAME);
 
         pb.setSource("source0", source);
 
@@ -62,6 +62,6 @@ public class BilateralFilterDescriptor extends OperationDescriptorImpl {
         pb.setParameter("sigma_r", sigma_r);
         pb.setParameter("luminosity", luminosity);
 
-        return JAI.create("BilateralFilter", pb, hints);
+        return ImageN.create("BilateralFilter", pb, hints);
     }
 }

@@ -29,13 +29,13 @@ import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import javax.media.jai.BorderExtender;
-import javax.media.jai.ImageLayout;
-import javax.media.jai.Interpolation;
-import javax.media.jai.JAI;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.RenderedImageAdapter;
-import javax.media.jai.RenderedOp;
+import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.ImageLayout;
+import org.eclipse.imagen.Interpolation;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.RenderedImageAdapter;
+import org.eclipse.imagen.RenderedOp;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.color.ICC_ColorSpace;
@@ -192,7 +192,7 @@ public class ImageEditorEngine implements Engine {
                 final var pb = new ParameterBlock();
                 pb.addSource(sourceImage);
                 pb.add(transposeAngle);
-                final var transposed = JAI.create("Transpose", pb, null);
+                final var transposed = ImageN.create("Transpose", pb, null);
                 transposed.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
                 sourceImage = copyImageDataFrom(transposed);
                 transposed.dispose();
@@ -499,7 +499,7 @@ public class ImageEditorEngine implements Engine {
 
         final var xform = AffineTransform.getScaleInstance(scaleX, scaleY);
 
-        final var formatHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
+        final var formatHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
                 BorderExtender.createInstance(BorderExtender.BORDER_COPY));
 
         final var interp = Interpolation.getInstance(Interpolation.INTERP_NEAREST);
@@ -508,7 +508,7 @@ public class ImageEditorEngine implements Engine {
         params.add(xform);
         params.add(interp);
         // NOTE: we cache this for the screen
-        return JAI.create("Affine", params, formatHints);
+        return ImageN.create("Affine", params, formatHints);
     }
 
     /*
@@ -612,7 +612,7 @@ public class ImageEditorEngine implements Engine {
                 // System.out.println("slow repaint done");
             // }
 
-            final var tileCache = JAI.getDefaultInstance().getTileCache();
+            final var tileCache = ImageN.getDefaultInstance().getTileCache();
             if (tileCache instanceof LCTileCache) {
                 final var tc = (LCTileCache) tileCache;
                 if (tilesRead != tc.tilesRead()
@@ -649,7 +649,7 @@ public class ImageEditorEngine implements Engine {
     }
 
     /*
-        BIG NOTE: JAI has all sorts of deadlocks in its notification management,
+        BIG NOTE: ImageN has all sorts of deadlocks in its notification management,
         we just avoid doing any pipeline setup off the main event thread.
         For this reason we use javax.swing.Timer instead of java.util.Timer
         to make sure that everything happens on the AWT thread.
@@ -832,7 +832,7 @@ public class ImageEditorEngine implements Engine {
 
         if (scale > 1) {
             final var xform = AffineTransform.getScaleInstance(scale, scale);
-            final var formatHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
+            final var formatHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
                     BorderExtender.createInstance(BorderExtender.BORDER_COPY));
 
             Interpolation interp = Interpolation.getInstance(Interpolation.INTERP_BICUBIC);
@@ -840,7 +840,7 @@ public class ImageEditorEngine implements Engine {
             params.addSource(exportImage);
             params.add(xform);
             params.add(interp);
-            exportImage = JAI.create("Affine", params, formatHints);
+            exportImage = ImageN.create("Affine", params, formatHints);
         }
 
         // Make sure that if uprezzing was requested and denied, the metadata

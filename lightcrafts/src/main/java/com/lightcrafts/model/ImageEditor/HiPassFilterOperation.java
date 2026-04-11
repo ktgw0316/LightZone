@@ -8,10 +8,10 @@ import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.JAIContext;
 
-import javax.media.jai.KernelJAI;
-import javax.media.jai.JAI;
-import javax.media.jai.BorderExtender;
-import javax.media.jai.PlanarImage;
+import org.eclipse.imagen.KernelImageN;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.PlanarImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.*;
 import java.text.DecimalFormat;
@@ -45,7 +45,7 @@ public class HiPassFilterOperation extends BlendedOperation {
     private double gain = 0.02;
     private double radius = 0.8;
 
-    private KernelJAI kernel = null;
+    private KernelImageN kernel = null;
 
     @Override
     public void setSliderValue(String key, double value) {
@@ -74,10 +74,10 @@ public class HiPassFilterOperation extends BlendedOperation {
             ParameterBlock pb = new ParameterBlock();
             pb.addSource(back);
             pb.add(kernel);
-            RenderingHints hints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
+            RenderingHints hints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
                     BorderExtender.createInstance(BorderExtender.BORDER_COPY));
             hints.add(JAIContext.noCacheHint);
-            return JAI.create("convolve", pb, hints);
+            return ImageN.create("convolve", pb, hints);
         }
     }
 

@@ -5,7 +5,7 @@ package com.lightcrafts.ui;
 
 import com.formdev.flatlaf.intellijthemes.materialthemeuilite.FlatMTMaterialDarkerIJTheme;
 
-import javax.media.jai.IHSColorSpace;
+import org.eclipse.imagen.IHSColorSpace;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;

@@ -13,16 +13,16 @@
  */
 package com.lightcrafts.jai.opimage;
 
-import com.sun.media.jai.opimage.RIFUtil;
+import org.eclipse.imagen.media.opimage.RIFUtil;
 
 import java.awt.RenderingHints;
 import java.awt.image.DataBuffer;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.image.renderable.RenderedImageFactory;
-import javax.media.jai.BorderExtender;
-import javax.media.jai.ImageLayout;
-import javax.media.jai.KernelJAI;
+import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.ImageLayout;
+import org.eclipse.imagen.KernelImageN;
 
 /**
  * @see ConvolveOpImage
@@ -47,9 +47,9 @@ public class LCSeparableConvolveRIF implements RenderedImageFactory {
         // Get BorderExtender from renderHints if any.
         BorderExtender extender = RIFUtil.getBorderExtenderHint(renderHints);
 
-        KernelJAI unRotatedKernel =
-            (KernelJAI)paramBlock.getObjectParameter(0);
-        KernelJAI kJAI = unRotatedKernel.getRotatedKernel();
+        KernelImageN unRotatedKernel =
+            (KernelImageN)paramBlock.getObjectParameter(0);
+        KernelImageN kImageN = unRotatedKernel.getRotatedKernel();
 
         int dataType =
            paramBlock.getRenderedSource(0).getSampleModel().getDataType();
@@ -57,12 +57,12 @@ public class LCSeparableConvolveRIF implements RenderedImageFactory {
                               dataType == DataBuffer.TYPE_SHORT ||
                               dataType == DataBuffer.TYPE_INT);
 
-        if (kJAI.isSeparable()) {
+        if (kImageN.isSeparable()) {
            return new LCSeparableConvolveOpImage(paramBlock.getRenderedSource(0),
                                                extender,
                                                renderHints,
                                                layout,
-                                               kJAI);
+                                               kImageN);
 
         } else {
             return null;

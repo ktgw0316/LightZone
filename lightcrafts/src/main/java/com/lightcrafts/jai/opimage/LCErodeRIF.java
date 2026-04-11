@@ -13,15 +13,15 @@
  */
 package com.lightcrafts.jai.opimage;
 
-import com.sun.media.jai.opimage.RIFUtil;
+import org.eclipse.imagen.media.opimage.RIFUtil;
 
 import java.awt.RenderingHints;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.image.renderable.RenderedImageFactory;
-import javax.media.jai.BorderExtender;
-import javax.media.jai.ImageLayout;
-import javax.media.jai.KernelJAI;
+import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.ImageLayout;
+import org.eclipse.imagen.KernelImageN;
 
 /**
  * @see LCErodeOpImage
@@ -46,9 +46,9 @@ public class LCErodeRIF implements RenderedImageFactory {
         // Get BorderExtender from renderHints if any.
         BorderExtender extender = RIFUtil.getBorderExtenderHint(renderHints);
 
-        KernelJAI unRotatedKernel =
-            (KernelJAI)paramBlock.getObjectParameter(0);
-        KernelJAI kJAI = unRotatedKernel.getRotatedKernel();
+        KernelImageN unRotatedKernel =
+            (KernelImageN)paramBlock.getObjectParameter(0);
+        KernelImageN kImageN = unRotatedKernel.getRotatedKernel();
 
 	RenderedImage source = paramBlock.getRenderedSource(0);
 
@@ -56,6 +56,6 @@ public class LCErodeRIF implements RenderedImageFactory {
                                   extender,
                                   renderHints,
                                   layout,
-                                  kJAI);
+                                  kImageN);
     }
 }

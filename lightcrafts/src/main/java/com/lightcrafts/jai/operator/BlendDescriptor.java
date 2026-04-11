@@ -2,15 +2,15 @@
 
 package com.lightcrafts.jai.operator;
 
-import javax.media.jai.JAI;
-import javax.media.jai.OperationDescriptorImpl;
-import javax.media.jai.ParameterBlockJAI;
-import javax.media.jai.ROI;
-import javax.media.jai.ROIShape;
-import javax.media.jai.RenderableOp;
-import javax.media.jai.RenderedOp;
-import javax.media.jai.registry.RenderedRegistryMode;
-import javax.media.jai.registry.RenderableRegistryMode;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.OperationDescriptorImpl;
+import org.eclipse.imagen.ParameterBlockImageN;
+import org.eclipse.imagen.ROI;
+import org.eclipse.imagen.ROIShape;
+import org.eclipse.imagen.RenderableOp;
+import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.registry.RenderedRegistryMode;
+import org.eclipse.imagen.registry.RenderableRegistryMode;
 
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.RenderableImage;
@@ -56,13 +56,13 @@ public class BlendDescriptor extends OperationDescriptorImpl {
     /**
      * Adds two images.
      *
-     * <p>Creates a <code>ParameterBlockJAI</code> from all
+     * <p>Creates a <code>ParameterBlockImageN</code> from all
      * supplied arguments except <code>hints</code> and invokes
-     * {@link javax.media.jai.JAI#create(String,java.awt.image.renderable.ParameterBlock,java.awt.RenderingHints)}.
+     * {@link org.eclipse.imagen.ImageN#create(String,java.awt.image.renderable.ParameterBlock,java.awt.RenderingHints)}.
      *
-     * @see javax.media.jai.JAI
-     * @see javax.media.jai.ParameterBlockJAI
-     * @see javax.media.jai.RenderedOp
+     * @see org.eclipse.imagen.ImageN
+     * @see org.eclipse.imagen.ParameterBlockImageN
+     * @see org.eclipse.imagen.RenderedOp
      *
      * @param source0 <code>RenderedImage</code> source 0.
      * @param source1 <code>RenderedImage</code> source 1.
@@ -76,8 +76,8 @@ public class BlendDescriptor extends OperationDescriptorImpl {
                                     RenderedImage source1,
                                     RenderedImage colorSelection,
                                     RenderingHints hints)  {
-        ParameterBlockJAI pb =
-            new ParameterBlockJAI("Blend",
+        ParameterBlockImageN pb =
+            new ParameterBlockImageN("Blend",
                                   RenderedRegistryMode.MODE_NAME);
 
         pb.setSource("source0", source0);
@@ -86,7 +86,7 @@ public class BlendDescriptor extends OperationDescriptorImpl {
         pb.setParameter("opacity", paramDefaults[1]);
         pb.setParameter("mask", paramDefaults[2]);
         pb.setParameter("colorSelection", colorSelection);
-        return JAI.create("Blend", pb, hints);
+        return ImageN.create("Blend", pb, hints);
     }
 
     public static RenderedOp create(RenderedImage source0,
@@ -96,8 +96,8 @@ public class BlendDescriptor extends OperationDescriptorImpl {
                                     Double opacity,
                                     ROI mask,
                                     RenderingHints hints)  {
-        ParameterBlockJAI pb =
-            new ParameterBlockJAI("Blend",
+        ParameterBlockImageN pb =
+            new ParameterBlockImageN("Blend",
                                   RenderedRegistryMode.MODE_NAME);
 
         pb.setSource("source0", source0);
@@ -106,19 +106,19 @@ public class BlendDescriptor extends OperationDescriptorImpl {
         pb.setParameter("blendingMode", blendingMode);
         pb.setParameter("opacity", opacity);
         pb.setParameter("mask", mask);
-        return JAI.create("Blend", pb, hints);
+        return ImageN.create("Blend", pb, hints);
     }
 
     /**
      * Adds two images.
      *
-     * <p>Creates a <code>ParameterBlockJAI</code> from all
+     * <p>Creates a <code>ParameterBlockImageN</code> from all
      * supplied arguments except <code>hints</code> and invokes
-     * {@link JAI#createRenderable(String,java.awt.image.renderable.ParameterBlock,RenderingHints)}.
+     * {@link ImageN#createRenderable(String,java.awt.image.renderable.ParameterBlock,RenderingHints)}.
      *
-     * @see JAI
-     * @see ParameterBlockJAI
-     * @see javax.media.jai.RenderableOp
+     * @see ImageN
+     * @see ParameterBlockImageN
+     * @see org.eclipse.imagen.RenderableOp
      *
      * @param source0 <code>RenderableImage</code> source 0.
      * @param source1 <code>RenderableImage</code> source 1.
@@ -131,8 +131,8 @@ public class BlendDescriptor extends OperationDescriptorImpl {
     public static RenderableOp createRenderable(RenderableImage source0,
                                                 RenderableImage source1,
                                                 RenderingHints hints)  {
-        ParameterBlockJAI pb =
-            new ParameterBlockJAI("Blend",
+        ParameterBlockImageN pb =
+            new ParameterBlockImageN("Blend",
                                   RenderableRegistryMode.MODE_NAME);
 
         pb.setSource("source0", source0);
@@ -140,6 +140,6 @@ public class BlendDescriptor extends OperationDescriptorImpl {
         pb.setParameter("blendingMode", paramDefaults[0]);
         pb.setParameter("opacity", paramDefaults[1]);
         pb.setParameter("mask", paramDefaults[2]);
-        return JAI.createRenderable("Blend", pb, hints);
+        return ImageN.createRenderable("Blend", pb, hints);
     }
 }

@@ -5,7 +5,7 @@ package com.lightcrafts.model.ImageEditor;
 import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.*;
 
-import javax.media.jai.PlanarImage;
+import org.eclipse.imagen.PlanarImage;
 import com.lightcrafts.ui.editor.EditorMode;
 
 import java.util.prefs.Preferences;

@@ -14,11 +14,11 @@ import com.lightcrafts.model.*;
 import com.lightcrafts.utils.LCMS;
 import com.lightcrafts.utils.LCMS_ColorSpace;
 
-import javax.media.jai.ImageLayout;
-import javax.media.jai.JAI;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.RenderedOp;
-import javax.media.jai.TileCache;
+import org.eclipse.imagen.ImageLayout;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.TileCache;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -244,8 +244,8 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
             pb.add(colorSelectionMask);
 
             // we don't know what front might generate, specify the output format to be the same as the input
-            RenderingHints formatHints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, Functions.getImageLayout(back));
-            RenderedOp blender = JAI.create("Blend", pb, formatHints);
+            RenderingHints formatHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, Functions.getImageLayout(back));
+            RenderedOp blender = ImageN.create("Blend", pb, formatHints);
             // blender.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
             return blender;
         }
@@ -324,7 +324,7 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
         }
 
         /*
-            Note: ever change sources or parameters in JAI pipelines, it is the slowest thing of all,
+            Note: ever change sources or parameters in ImageN pipelines, it is the slowest thing of all,
             just rebuild everything from scratch
         */
 
@@ -390,19 +390,19 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
                 ParameterBlock pb = new ParameterBlock();
                 pb.addSource(labImage);
                 pb.add(new int[]{1, 2});
-                RenderedOp abImage = JAI.create("bandselect", pb, null);
+                RenderedOp abImage = ImageN.create("bandselect", pb, null);
 
                 pb = new ParameterBlock();
                 pb.addSource(back);
                 pb.add(new double[][]{{ColorScience.Wr, ColorScience.Wg, ColorScience.Wb, 0}});
-                PlanarImage monochrome = JAI.create("BandCombine", pb, null);
+                PlanarImage monochrome = ImageN.create("BandCombine", pb, null);
 
-                RenderingHints layoutHints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, Functions.getImageLayout(labImage));
+                RenderingHints layoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, Functions.getImageLayout(labImage));
                 // layoutHints.add(JAIContext.noCacheHint);
                 pb = new ParameterBlock();
                 pb.addSource(monochrome);
                 pb.addSource(abImage);
-                PlanarImage maskImage = JAI.create("BandMerge", pb, layoutHints);
+                PlanarImage maskImage = ImageN.create("BandMerge", pb, layoutHints);
 
                 colorSelectionMask = Functions.fastGaussianBlur(
                         new RGBColorSelectionMaskOpImage(maskImage, getColorSelection(), null), 0.5 * scale);
@@ -448,6 +448,6 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
         ParameterBlock pb = new ParameterBlock()
                 .addSource(source)
                 .add(yChannel);
-        return JAI.create("BandCombine", pb, null);
+        return ImageN.create("BandCombine", pb, null);
     }
 }

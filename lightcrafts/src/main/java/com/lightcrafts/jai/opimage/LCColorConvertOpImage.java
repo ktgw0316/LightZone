@@ -25,20 +25,20 @@ import java.awt.image.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import javax.media.jai.ColorSpaceJAI;
-import javax.media.jai.ImageLayout;
-import javax.media.jai.PointOpImage;
-import javax.media.jai.RasterFactory;
+import org.eclipse.imagen.ColorSpaceImageN;
+import org.eclipse.imagen.ImageLayout;
+import org.eclipse.imagen.PointOpImage;
+import org.eclipse.imagen.RasterFactory;
 import java.lang.ref.SoftReference;
 
 /**
  * An <code>OpImage</code> implementing the "LCColorConvert" operation as
- * described in <code>javax.media.jai.operator.ColorConvertDescriptor</code>.
+ * described in <code>org.eclipse.imagen.operator.ColorConvertDescriptor</code>.
  *
  * @since EA4
  *
- * @see javax.media.jai.PointOpImage
- * @see javax.media.jai.operator.ColorConvertDescriptor
+ * @see org.eclipse.imagen.PointOpImage
+ * @see org.eclipse.imagen.operator.ColorConvertDescriptor
  *
  */
 final class LCColorConvertOpImage extends PointOpImage {
@@ -244,15 +244,15 @@ final class LCColorConvertOpImage extends PointOpImage {
 
         // for each case, define the case number; create tempParam
         // and/or ColorConvertOp if necessary
-        if (srcColorSpace instanceof ColorSpaceJAI &&
-                dstColorSpace instanceof ColorSpaceJAI) {
+        if (srcColorSpace instanceof ColorSpaceImageN &&
+                dstColorSpace instanceof ColorSpaceImageN) {
 
-            // when both are ColorSpaceJAI, convert via RGB
+            // when both are ColorSpaceImageN, convert via RGB
             caseNumber = 1;
             tempParam = createTempParam();
-        } else if (srcColorSpace instanceof ColorSpaceJAI) {
+        } else if (srcColorSpace instanceof ColorSpaceImageN) {
 
-            // when source is ColorSpaceJAI, 1. convert via RGB if
+            // when source is ColorSpaceImageN, 1. convert via RGB if
             // the dest isn't RGB; 2. convert to RGB
             if (dstColorSpace != rgbColorSpace) {
                 caseNumber = 2;
@@ -261,9 +261,9 @@ final class LCColorConvertOpImage extends PointOpImage {
             } else {
                 caseNumber = 3;
             }
-        } else if (dstColorSpace instanceof ColorSpaceJAI) {
+        } else if (dstColorSpace instanceof ColorSpaceImageN) {
 
-            // when destination is ColorSpaceJAI, 1. convert via RGB if
+            // when destination is ColorSpaceImageN, 1. convert via RGB if
             // source isn't RGB; 2. convert from RGB
             if (srcColorSpace != rgbColorSpace) {
                 caseNumber = 4;
@@ -273,7 +273,7 @@ final class LCColorConvertOpImage extends PointOpImage {
                 caseNumber = 5;
             }
         } else {
-            // if all the color space are not ColorSpaceJAI
+            // if all the color space are not ColorSpaceImageN
             caseNumber = 6;
             colorConvertOp = getColorConvertOp(srcColorSpace, dstColorSpace, renderingIntent);
         }
@@ -296,93 +296,93 @@ final class LCColorConvertOpImage extends PointOpImage {
         WritableRaster tempRas;
 
         switch (caseNumber) {
-            // 1. When source and destination color spaces are all ColorSpaceJAI,
+            // 1. When source and destination color spaces are all ColorSpaceImageN,
             // convert via RGB color space
             case 1:
-                tempRas = computeRectColorSpaceJAIToRGB(sources[0], srcParam,
+                tempRas = computeRectColorSpaceImageNToRGB(sources[0], srcParam,
                         null, tempParam);
-                computeRectColorSpaceJAIFromRGB(tempRas, tempParam,
+                computeRectColorSpaceImageNFromRGB(tempRas, tempParam,
                         dest, dstParam);
                 break;
-            // when only the source color space is ColorSpaceJAI,
+            // when only the source color space is ColorSpaceImageN,
             // 2. if the destination is not RGB, convert to RGB using
-            //    ColorSpaceJAI; then convert RGB to the destination
-            // 3. if the destination is RGB, convert using ColorSpaceJAI
+            //    ColorSpaceImageN; then convert RGB to the destination
+            // 3. if the destination is RGB, convert using ColorSpaceImageN
             case 2:
-                tempRas = computeRectColorSpaceJAIToRGB(sources[0], srcParam,
+                tempRas = computeRectColorSpaceImageNToRGB(sources[0], srcParam,
                         null, tempParam);
-                computeRectNonColorSpaceJAI(tempRas, tempParam,
+                computeRectNonColorSpaceImageN(tempRas, tempParam,
                         dest, dstParam, destRect);
                 break;
             case 3:
-                computeRectColorSpaceJAIToRGB(sources[0], srcParam,
+                computeRectColorSpaceImageNToRGB(sources[0], srcParam,
                         dest, dstParam);
                 break;
-            // 4, 5. When only the destination color space is ColorSpaceJAI,
+            // 4, 5. When only the destination color space is ColorSpaceImageN,
             // similar to the case above.
             case 4:
                 tempRas =createTempWritableRaster(sources[0]);
-                computeRectNonColorSpaceJAI(sources[0], srcParam,
+                computeRectNonColorSpaceImageN(sources[0], srcParam,
                         tempRas, tempParam, destRect);
-                computeRectColorSpaceJAIFromRGB(tempRas, tempParam,
+                computeRectColorSpaceImageNFromRGB(tempRas, tempParam,
                         dest, dstParam);
                 break;
             case 5:
-                computeRectColorSpaceJAIFromRGB(sources[0], srcParam,
+                computeRectColorSpaceImageNFromRGB(sources[0], srcParam,
                         dest, dstParam);
                 break;
-            // 6. If all the color space are not ColorSpaceJAI
+            // 6. If all the color space are not ColorSpaceImageN
             case 6:
-                computeRectNonColorSpaceJAI(sources[0], srcParam,
+                computeRectNonColorSpaceImageN(sources[0], srcParam,
                         dest, dstParam, destRect);
             default :
                 break;
         }
     }
 
-    // when the source color space is ColorSpaceJAI, convert it to RGB.
+    // when the source color space is ColorSpaceImageN, convert it to RGB.
     // 1. If the source data type is short/int, shift the data to [0,
     //    MAX-MIN]
     // 2. Convert to RGB.
     // 3. Shift back to [MIN, MAX]
-    private WritableRaster computeRectColorSpaceJAIToRGB(Raster src,
+    private WritableRaster computeRectColorSpaceImageNToRGB(Raster src,
 							 ImageParameters srcParam,
 							 WritableRaster dest,
 							 ImageParameters dstParam) {
 	src = convertRasterToUnsigned(src);
 
-	ColorSpaceJAI colorSpaceJAI
-	    = (ColorSpaceJAI) srcParam.getColorModel().getColorSpace();
-	dest = colorSpaceJAI.toRGB(src, srcParam.getComponentSize(), dest,
+	ColorSpaceImageN colorSpaceImageN
+	    = (ColorSpaceImageN) srcParam.getColorModel().getColorSpace();
+	dest = colorSpaceImageN.toRGB(src, srcParam.getComponentSize(), dest,
 			           dstParam.getComponentSize());
 
         dest = convertRasterToSigned(dest);
 	return dest;
     }
 
-    // when the source color space is ColorSpaceJAI, convert it from RGB.
+    // when the source color space is ColorSpaceImageN, convert it from RGB.
     // 1. If the source data type is short/int, shift the data to [0,
     //    MAX-MIN]
     // 2. Convert from RGB.
     // 3. Shift back to [MIN, MAX]
-    private WritableRaster computeRectColorSpaceJAIFromRGB(Raster src,
+    private WritableRaster computeRectColorSpaceImageNFromRGB(Raster src,
 							   ImageParameters srcParam,
 							   WritableRaster dest,
 							   ImageParameters dstParam){
 	src = convertRasterToUnsigned(src);
-	ColorSpaceJAI colorSpaceJAI
-	    = (ColorSpaceJAI) dstParam.getColorModel().getColorSpace();
-        dest = colorSpaceJAI.fromRGB(src, srcParam.getComponentSize(), dest,
+	ColorSpaceImageN colorSpaceImageN
+	    = (ColorSpaceImageN) dstParam.getColorModel().getColorSpace();
+        dest = colorSpaceImageN.fromRGB(src, srcParam.getComponentSize(), dest,
 				     dstParam.getComponentSize());
 
 	dest = convertRasterToSigned(dest);
 	return dest;
     }
 
-    // When the source and destination color spaces are not ColorSpaceJAI,
+    // When the source and destination color spaces are not ColorSpaceImageN,
     // convert using ColorConvertOp of Java 2D for integer type. For the
     // floating point, use the following method.
-    private void computeRectNonColorSpaceJAI(Raster src,
+    private void computeRectNonColorSpaceImageN(Raster src,
 					     ImageParameters srcParam,
 					     WritableRaster dest,
 					     ImageParameters dstParam,
@@ -611,4 +611,3 @@ final class LCColorConvertOpImage extends PointOpImage {
         }
     }
 }
-

@@ -11,9 +11,9 @@ import com.lightcrafts.model.SliderConfig;
 import com.lightcrafts.utils.Lensfun;
 import org.jetbrains.annotations.NotNull;
 
-import javax.media.jai.BorderExtender;
-import javax.media.jai.JAI;
-import javax.media.jai.PlanarImage;
+import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.PlanarImage;
 import java.awt.geom.AffineTransform;
 import java.text.DecimalFormat;
 import java.util.List;
@@ -274,11 +274,11 @@ public class LensCorrectionsOperation extends BlendedOperation {
                 }
                 final var shiftX = back.getMinX();
                 final var shiftY = back.getMinY();
-                final var shifted = JAI.create("affine", back,
+                final var shifted = ImageN.create("affine", back,
                         AffineTransform.getTranslateInstance(-shiftX, -shiftY));
                 final var borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
                 final var corrected = new DistortionOpImage(shifted, JAIContext.fileCacheHint, borderExtender, lf);
-                front = JAI.create("affine", corrected,
+                front = ImageN.create("affine", corrected,
                         AffineTransform.getTranslateInstance(shiftX, shiftY));
             }
             front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);

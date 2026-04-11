@@ -8,20 +8,13 @@ import com.lightcrafts.jai.operator.LCMSColorConvertDescriptor;
 import com.lightcrafts.model.ImageEditor.ImageProcessor;
 import com.lightcrafts.model.ImageEditor.Rendering;
 import com.lightcrafts.model.Operation;
-import com.sun.media.jai.util.ImageUtil;
+import org.eclipse.imagen.*;
+import org.eclipse.imagen.media.lookup.LookupTable;
+import org.eclipse.imagen.media.lookup.LookupTableFactory;
+import org.eclipse.imagen.media.util.ImageUtil;
+import org.eclipse.imagen.operator.TransposeDescriptor;
 import org.jetbrains.annotations.NotNull;
 
-import javax.media.jai.BorderExtender;
-import javax.media.jai.ImageLayout;
-import javax.media.jai.Interpolation;
-import javax.media.jai.JAI;
-import javax.media.jai.KernelJAI;
-import javax.media.jai.LookupTableJAI;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.RasterAccessor;
-import javax.media.jai.RasterFormatTag;
-import javax.media.jai.RenderedOp;
-import javax.media.jai.operator.TransposeDescriptor;
 import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.color.ICC_Profile;
@@ -41,19 +34,19 @@ import java.util.Arrays;
 public class Functions {
     public static boolean DEBUG = false;
 
-    public static LookupTableJAI computeGammaTable(int dataType, double gamma) {
+    public static LookupTable computeGammaTable(int dataType, double gamma) {
         if (dataType == DataBuffer.TYPE_BYTE) {
             byte[] tableDataByte = new byte[0x100];
             for (int i = 0; i < tableDataByte.length; i++) {
                 tableDataByte[i] = (byte) (0xFF * Math.pow(i / (double) 0xFF, gamma) + 0.5);
             }
-            return new LookupTableJAI(tableDataByte);
+            return LookupTableFactory.create(tableDataByte);
         } else {
             short[] tableDataUShort = new short[0x10000];
             for (int i = 0; i < tableDataUShort.length; i++) {
                 tableDataUShort[i] = (short) (0xFFFF * Math.pow(i / (double) 0xFFFF, gamma) + 0.5);
             }
-            return new LookupTableJAI(tableDataUShort, true);
+            return LookupTableFactory.create(tableDataUShort, true);
         }
     }
 
@@ -64,7 +57,7 @@ public class Functions {
         pb.add(y);
         pb.add(width);
         pb.add(height);
-        return JAI.create("Crop", pb, hints);
+        return ImageN.create("Crop", pb, hints);
     }
 
     static public RenderedOp flip(RenderedImage image, boolean horizontal, boolean vertical, RenderingHints hints) {
@@ -79,7 +72,7 @@ public class Functions {
             pb.add(TransposeDescriptor.FLIP_HORIZONTAL);
         else // if (vertical)
             pb.add(TransposeDescriptor.FLIP_VERTICAL);
-        return JAI.create("Transpose", pb, hints);
+        return ImageN.create("Transpose", pb, hints);
     }
 
     static public PlanarImage scaledRendering(Rendering rendering, Operation op, float scale, boolean cheap) {
@@ -123,16 +116,16 @@ public class Functions {
             pb.add(AffineTransform.getScaleInstance(image.getWidth() / (double) blur.getWidth(),
                                                     image.getHeight() / (double) blur.getHeight()));
             pb.add(Interpolation.getInstance(Interpolation.INTERP_BICUBIC));
-            RenderingHints sourceLayoutHints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT,
+            RenderingHints sourceLayoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT,
                                                                   new ImageLayout(0, 0,
                                                                                   JAIContext.TILE_WIDTH,
                                                                                   JAIContext.TILE_HEIGHT,
                                                                                   null, null));
-            RenderingHints extenderHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
+            RenderingHints extenderHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
                     BorderExtender.createInstance(BorderExtender.BORDER_COPY));
             sourceLayoutHints.add(extenderHints);
             // sourceLayoutHints.add(JAIContext.noCacheHint);
-            return JAI.create("Affine", pb, sourceLayoutHints);
+            return ImageN.create("Affine", pb, sourceLayoutHints);
         } else {
             return blur;
         }
@@ -140,13 +133,13 @@ public class Functions {
 
     public static RenderedOp fastGaussianBlur(RenderedImage image, double radius) {
         // TODO: Make this fast
-        RenderingHints extenderHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
+        RenderingHints extenderHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
                 BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-        KernelJAI kernel = getGaussKernel(radius);
+        KernelImageN kernel = getGaussKernel(radius);
         ParameterBlock pb = new ParameterBlock()
                 .addSource(image)
                 .add(kernel);
-        return JAI.create("LCSeparableConvolve", pb, extenderHints);
+        return ImageN.create("LCSeparableConvolve", pb, extenderHints);
     }
 
     public static ImageLayout getImageLayout(RenderedImage image) {
@@ -232,7 +225,7 @@ public class Functions {
 
     static NumberFormat fmt = DecimalFormat.getInstance();
 
-    static public KernelJAI LoGSharpenKernel(double radius, double gain) {
+    static public KernelImageN LoGSharpenKernel(double radius, double gain) {
         if (radius < 0.00001)
             radius = 0.00001;
 
@@ -251,10 +244,10 @@ public class Functions {
             if (DEBUG) System.out.println();
         }
 
-        return new KernelJAI(size, size, data);
+        return new KernelImageN(size, size, data);
     }
 
-    static public KernelJAI LoGSharpenKernel2(double radius, double gain) {
+    static public KernelImageN LoGSharpenKernel2(double radius, double gain) {
         if (radius < 0.00001)
             radius = 0.00001;
 
@@ -274,10 +267,10 @@ public class Functions {
             if (DEBUG) System.out.println();
         }
 
-        return new KernelJAI(size, size, data).getRotatedKernel();
+        return new KernelImageN(size, size, data).getRotatedKernel();
     }
 
-    static public KernelJAI getLoGKernel(double radius) {
+    static public KernelImageN getLoGKernel(double radius) {
         // boolean DEBUG = true;
 
         if (radius < 0.00001)
@@ -307,10 +300,10 @@ public class Functions {
             if (data[i] > 0)
                 data[i] *= (-negative/positive);
         }
-        return new KernelJAI(size, size, size/2, size/2, data, data);
+        return new KernelImageN(size, size, size/2, size/2, data, data);
     }
 
-    static public KernelJAI getLoGKernel(double radius, double gain) {
+    static public KernelImageN getLoGKernel(double radius, double gain) {
         // boolean DEBUG = true;
 
         if (radius < 0.00001)
@@ -348,10 +341,10 @@ public class Functions {
         for (int i = 0; i < data.length; i++)
             data[i] /= scale;
         }
-        return new KernelJAI(size, size, size/2, size/2, data, data);
+        return new KernelImageN(size, size, size/2, size/2, data, data);
     }
 
-    static public KernelJAI getGaussKernel(double sigma) {
+    static public KernelImageN getGaussKernel(double sigma) {
         if (sigma < 0.001)
             sigma = 0.001;
 
@@ -369,10 +362,10 @@ public class Functions {
         for (int i = 0; i < data.length; i++)
             data[i] /= scale;
 
-        return new KernelJAI(size, size, size/2, size/2, data, data);
+        return new KernelImageN(size, size, size/2, size/2, data, data);
     }
 
-    static public KernelJAI getSincKernel(double sigma) {
+    static public KernelImageN getSincKernel(double sigma) {
         // boolean DEBUG = true;
 
         if (sigma < 0.00001)
@@ -395,7 +388,7 @@ public class Functions {
 
         for (int i = 0; i < data.length; i++)
             data[i] /= scale;
-        return new KernelJAI(size, size, size/2, size/2, data, data);
+        return new KernelImageN(size, size, size/2, size/2, data, data);
     }
 
     static public double lanczos2(double x) {
@@ -416,7 +409,7 @@ public class Functions {
             return 0;
     }
 
-    static public KernelJAI getLanczos2Kernel(int ratio) {
+    static public KernelImageN getLanczos2Kernel(int ratio) {
         /*
          * To decimate a signal we have to sample with a frequency
          * of 1/ratio inside the support of the filter function.
@@ -433,10 +426,10 @@ public class Functions {
             sum += data[i] = (float) lanczos2(i / (double) ratio - 2.);
         for (int i = 0; i < samples; i++)
             data[i] /= sum;
-        return new KernelJAI(samples, samples, samples/2, samples/2, data, data);
+        return new KernelImageN(samples, samples, samples/2, samples/2, data, data);
     }
 
-    static public KernelJAI getHighPassKernel(double ratio) {
+    static public KernelImageN getHighPassKernel(double ratio) {
         /*
          * To decimate a signal we have to sample with a frequency
          * of 1/ratio inside the support of the filter function.
@@ -454,7 +447,7 @@ public class Functions {
         for (int i = 0; i < samples; i++)
             data[i] /= sum;
         data[samples/2] += 1;
-        return new KernelJAI(samples, samples, samples/2, samples/2, data, data);
+        return new KernelImageN(samples, samples, samples/2, samples/2, data, data);
     }
 
     /*
@@ -573,7 +566,7 @@ public class Functions {
         ComponentColorModel cm = new ComponentColorModel(source.getColorModel().getColorSpace(), false, false,
                                                          Transparency.OPAQUE, DataBuffer.TYPE_USHORT);
 
-        RenderingHints formatHints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT,
+        RenderingHints formatHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT,
                                                         new ImageLayout(0, 0, JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT,
                                                                         cm.createCompatibleSampleModel(source.getWidth(),
                                                                                                        source.getHeight()),
@@ -589,7 +582,7 @@ public class Functions {
         pb.addSource(source);
         pb.add(new double[]{C1});
         pb.add(new double[]{C0});
-        return JAI.create("Rescale", pb, formatHints);
+        return ImageN.create("Rescale", pb, formatHints);
     }
 
     public static RenderedOp fromShortToUShort(RenderedImage source, RenderingHints hints) {
@@ -598,7 +591,7 @@ public class Functions {
         ComponentColorModel cm = new ComponentColorModel(source.getColorModel().getColorSpace(), false, false,
                                                          Transparency.OPAQUE, DataBuffer.TYPE_USHORT);
 
-        RenderingHints formatHints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT,
+        RenderingHints formatHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT,
                                                         new ImageLayout(0, 0, JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT,
                                                                         cm.createCompatibleSampleModel(source.getWidth(),
                                                                                                        source.getHeight()),
@@ -614,7 +607,7 @@ public class Functions {
         pb.addSource(source);
         pb.add(new double[]{C1});
         pb.add(new double[]{C0});
-        return JAI.create("Rescale", pb, formatHints);
+        return ImageN.create("Rescale", pb, formatHints);
     }
 
     public static RenderedOp fromUShortToByte(RenderedImage source, RenderingHints hints) {
@@ -623,7 +616,7 @@ public class Functions {
         ComponentColorModel cm = new ComponentColorModel(source.getColorModel().getColorSpace(), false, false,
                                                          Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
 
-        RenderingHints formatHints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT,
+        RenderingHints formatHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT,
                                                         new ImageLayout(0, 0, JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT,
                                                                         cm.createCompatibleSampleModel(source.getWidth(),
                                                                                                        source.getHeight()),
@@ -639,7 +632,7 @@ public class Functions {
         pb.addSource(source);
         pb.add(new double[]{C1});
         pb.add(new double[]{C0});
-        return JAI.create("Rescale", pb, formatHints);
+        return ImageN.create("Rescale", pb, formatHints);
     }
 
     public static PlanarImage toColorSpace(RenderedImage source, ColorSpace cs, ICC_Profile proof,
@@ -655,7 +648,7 @@ public class Functions {
         ColorModel cm = new ComponentColorModel(cs, false, false, Transparency.OPAQUE,
                                                 source.getColorModel().getTransferType());
 
-        RenderingHints formatHints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT,
+        RenderingHints formatHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT,
                                                         new ImageLayout(0, 0, JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT,
                                                                         cm.createCompatibleSampleModel(source.getWidth(),
                                                                                                        source.getHeight()),
@@ -676,7 +669,7 @@ public class Functions {
             if (proofIntent != null)
                 pb.add(proofIntent);
         }
-        return JAI.create("LCMSColorConvert", pb, formatHints);
+        return ImageN.create("LCMSColorConvert", pb, formatHints);
     }
 
     public static PlanarImage toColorSpace(RenderedImage source, ColorSpace cs,

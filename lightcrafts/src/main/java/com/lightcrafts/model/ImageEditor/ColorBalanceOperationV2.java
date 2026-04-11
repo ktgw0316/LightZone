@@ -9,10 +9,10 @@ import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
 import com.lightcrafts.utils.splines;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.media.lookup.LookupTableFactory;
 
-import javax.media.jai.JAI;
-import javax.media.jai.LookupTableJAI;
-import javax.media.jai.PlanarImage;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.image.renderable.ParameterBlock;
@@ -173,12 +173,12 @@ public class ColorBalanceOperationV2 extends BlendedOperation implements com.lig
                 for (int i = 0; i < 0x10000; i++)
                     table[2][i] = (short) (0xffff & (int) Math.min(Math.max(i + 0xff * interpolator.interpolate(i / (double) 0xffff, blueCurve), 0), 0xffff));
 
-                LookupTableJAI lookupTable = new LookupTableJAI(table, true);
+                var lookupTable = LookupTableFactory.create(table, true);
 
                 ParameterBlock pb = new ParameterBlock();
                 pb.addSource(back);
                 pb.add(lookupTable);
-                return JAI.create("lookup", pb, JAIContext.noCacheHint);
+                return ImageN.create("lookup", pb, JAIContext.noCacheHint);
             } else {
                 return back;
             }

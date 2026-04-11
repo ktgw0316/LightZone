@@ -2,11 +2,11 @@
 
 package com.lightcrafts.jai.operator;
 
-import javax.media.jai.OperationDescriptorImpl;
-import javax.media.jai.RenderedOp;
-import javax.media.jai.ParameterBlockJAI;
-import javax.media.jai.JAI;
-import javax.media.jai.registry.RenderedRegistryMode;
+import org.eclipse.imagen.OperationDescriptorImpl;
+import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.ParameterBlockImageN;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.registry.RenderedRegistryMode;
 import java.awt.image.RenderedImage;
 import java.awt.*;
 
@@ -43,10 +43,10 @@ public class NOPDescriptor extends OperationDescriptorImpl {
 
     public static RenderedOp create(RenderedImage source,
                                     RenderingHints hints)  {
-        ParameterBlockJAI pb =
-            new ParameterBlockJAI("NOP", RenderedRegistryMode.MODE_NAME);
+        ParameterBlockImageN pb =
+            new ParameterBlockImageN("NOP", RenderedRegistryMode.MODE_NAME);
 
         pb.setSource("source0", source);
-        return JAI.create("NOP", pb, hints);
+        return ImageN.create("NOP", pb, hints);
     }
 }

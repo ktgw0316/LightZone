@@ -8,11 +8,11 @@ package com.lightcrafts.jai.opimage;
 
 import com.lightcrafts.image.color.ColorScience;
 
-import javax.media.jai.AreaOpImage;
-import javax.media.jai.BorderExtender;
-import javax.media.jai.ImageLayout;
-import javax.media.jai.RasterAccessor;
-import javax.media.jai.RasterFormatTag;
+import org.eclipse.imagen.AreaOpImage;
+import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.ImageLayout;
+import org.eclipse.imagen.RasterAccessor;
+import org.eclipse.imagen.RasterFormatTag;
 
 import java.awt.*;
 import java.awt.image.DataBuffer;

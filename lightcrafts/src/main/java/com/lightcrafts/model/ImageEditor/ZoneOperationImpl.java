@@ -8,10 +8,12 @@ import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.ZoneOperation;
 import com.lightcrafts.utils.splines;
 
-import javax.media.jai.ImageLayout;
-import javax.media.jai.JAI;
-import javax.media.jai.LookupTableJAI;
-import javax.media.jai.PlanarImage;
+import org.eclipse.imagen.ImageLayout;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.media.lookup.LookupTable;
+import org.eclipse.imagen.media.lookup.LookupTableFactory;
+
 import java.awt.*;
 import java.awt.image.renderable.ParameterBlock;
 
@@ -24,7 +26,7 @@ class ZoneOperationImpl extends BlendedOperation implements ZoneOperation {
     private static final int order = 3;
     private double[][] controlPoints = {{0, 0}, {1, 1}};
     private short[] tableData = new short[0x10000];
-    private LookupTableJAI table = null;
+    private LookupTable table = null;
     private double[][] curve = new double[0x100][2];
 
     private int scale = LuminosityScale;  // LuminosityScale (default) or RGBScale
@@ -170,25 +172,26 @@ class ZoneOperationImpl extends BlendedOperation implements ZoneOperation {
 	splines.rbspline(order, controlPoints, weights, curve);
     }
 
-    private LookupTableJAI computeTable(PlanarImage source) {
-	if (table != null)
-	    return table;
+    private LookupTable computeTable(PlanarImage source) {
+        if (table != null)
+            return table;
 
-	updateCurve();
+        updateCurve();
 
         if (controlPoints.length > 2) {
             splines.interpolate(0, 1, 1.0/(tableData.length-1), curve, tableData);
-        } else
+        } else {
             for (int i = 0; i < tableData.length; i++) {
                 double x = i / (double) (tableData.length - 1);
                 double y = controlPoints[0][1] + x * (controlPoints[1][1] - controlPoints[0][1]);
                 tableData[i] = (short) (((int) (y * (tableData.length - 1) + 0.5)) & 0xffff);
             }
+        }
 
         return table = source.getColorModel().getNumColorComponents() == 3
-                       && scale == LuminosityScale ?
-	    new LightnessLookupTable(tableData, true) :
-	    new LookupTableJAI(tableData, true);
+                && scale == LuminosityScale ?
+                new LightnessLookupTable(tableData, true) :
+                LookupTableFactory.create(tableData, true);
     }
 
     private class ZoneMapper extends BlendedTransform {
@@ -198,18 +201,18 @@ class ZoneOperationImpl extends BlendedOperation implements ZoneOperation {
 
         @Override
         public PlanarImage setFront() {
-            LookupTableJAI table = computeTable(back);
+            LookupTable table = computeTable(back);
             ParameterBlock pb = new ParameterBlock();
             pb.addSource(back);
             pb.add(table);
 
             // Add a layout hint to make sure that source and destination match
 
-            RenderingHints hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT,
+            RenderingHints hints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT,
                                                       new ImageLayout(back));
-            // hints.add(JAIContext.noCacheHint);
+            // hints.add(ImageNContext.noCacheHint);
 
-            return JAI.create("lookup", pb, hints);
+            return ImageN.create("lookup", pb, hints);
         }
     }
 

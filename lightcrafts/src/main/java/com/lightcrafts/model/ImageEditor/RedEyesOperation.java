@@ -15,9 +15,9 @@ import com.lightcrafts.ui.editor.EditorMode;
 import com.lightcrafts.utils.LCMS;
 import com.lightcrafts.utils.LCMS_ColorSpace;
 
-import javax.media.jai.JAI;
-import javax.media.jai.KernelJAI;
-import javax.media.jai.PlanarImage;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.KernelImageN;
+import org.eclipse.imagen.PlanarImage;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
@@ -87,11 +87,11 @@ public class RedEyesOperation extends BlendedOperation implements RedEyeOperatio
 
                 RenderedImage redMask = new RedMaskOpImage(labImage, tolerance, null);
 
-                KernelJAI morphKernel = new KernelJAI(3, 3, new float[] {1, 1, 1, 1, 0, 1, 1, 1, 1});
+                KernelImageN morphKernel = new KernelImageN(3, 3, new float[] {1, 1, 1, 1, 0, 1, 1, 1, 1});
                 final ParameterBlock pb = new ParameterBlock()
                         .addSource(redMask)
                         .add(morphKernel);
-                redMask = Functions.fastGaussianBlur(JAI.create("dilate", pb, null), 4 * scale);
+                redMask = Functions.fastGaussianBlur(ImageN.create("dilate", pb, null), 4 * scale);
 
                 return new RedMaskBlackener(back, redMask, null);
             } else {

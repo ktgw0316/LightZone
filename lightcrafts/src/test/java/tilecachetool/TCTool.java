@@ -1,43 +1,43 @@
 /* @(#)TCTool.java	1.4 02/10/24 21:17:44 */
 package tilecachetool;
 
-import java.util.Observer;
-import java.util.Observable;
-import java.util.Vector;
-import java.awt.Color;
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.awt.event.WindowAdapter;
-import java.awt.image.RenderedImage;
+import com.lightcrafts.jai.utils.LCTileCache;
+import org.eclipse.imagen.CachedTile;
+import org.eclipse.imagen.EnumeratedParameter;
+import org.eclipse.imagen.ImageN;
+
 import javax.swing.ButtonGroup;
-import javax.swing.JFrame;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.LineBorder;
-import javax.media.jai.JAI;
-import javax.media.jai.CachedTile;
-import javax.media.jai.EnumeratedParameter;
-
-import com.lightcrafts.jai.utils.LCTileCache;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.awt.image.RenderedImage;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Vector;
 
 /**
  * <p>Title: Tile Cache Monitoring Tool</p>
- * <p>Description: Monitors and displays JAI Tile Cache activity.</p>
+ * <p>Description: Monitors and displays ImageN Tile Cache activity.</p>
  * <p>Copyright: Copyright (c) 2002</p>
  * <p>    All Rights Reserved   </p>
  * <p>Company: Virtual Visions Software, Inc.</p>
@@ -50,7 +50,7 @@ import com.lightcrafts.jai.utils.LCTileCache;
  *        from the JVM which interacts with the garbage collector.
  *        An attempt was made to minimize these perturbations in
  *        order to provide a useful method of monitoring and
- *        understanding the JAI tile cache.
+ *        understanding the ImageN tile cache.
  */
 
 public final class TCTool extends JFrame
@@ -290,10 +290,10 @@ public final class TCTool extends JFrame
         t3.add(rad3);
         t3.add(rad4);
 
-        // important information about JAI.enableDefaultTileCache()
-        //                             JAI.disableDefaultTileCache()
+        // important information about ImageN.enableDefaultTileCache()
+        //                             ImageN.disableDefaultTileCache()
         /**
-         * Calling JAI.enableDefaultTileCache() or JAI.disableDefaultTileCache()
+         * Calling ImageN.enableDefaultTileCache() or ImageN.disableDefaultTileCache()
          * marks a change in tile cache usage.  All state before the calls is
          * maintained "as is", so if the tile cache is currently enabled, then
          * a call is made to disable it, ops/tiles that were in the cache prior
@@ -302,7 +302,7 @@ public final class TCTool extends JFrame
          * there prior to the "disable" call.  Likewise, it the cache is currently
          * disabled then enabled, tiles prior to the enable call will not be
          * cached or monitored.  The tile cache is flushed when a call is made
-         * to JAI.disableDefaultTileCache(), but any valid tiles that existed
+         * to ImageN.disableDefaultTileCache(), but any valid tiles that existed
          * will be recomputed and cached again.
          */
         rad3.setToolTipText("Resume normal cache operations");
@@ -319,7 +319,7 @@ public final class TCTool extends JFrame
         top_panel.add(center_panel, BorderLayout.CENTER);
 
         if ( lcTileCache == null ) {
-            cache = (LCTileCache) JAI.getDefaultInstance().getTileCache();
+            cache = (LCTileCache) ImageN.getDefaultInstance().getTileCache();
         } else {
             cache = lcTileCache;
         }
@@ -389,7 +389,7 @@ public final class TCTool extends JFrame
         center_panel.add(memoryChart, BorderLayout.CENTER);
         memoryChart.start();
 
-        // JAI event logging and monitoring
+        // ImageN event logging and monitoring
         JPanel p0 = new JPanel();
         p0.setBackground(LIGHT_BLUE);
         p0.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
@@ -442,9 +442,9 @@ public final class TCTool extends JFrame
                         memoryChart.stop();
                     }
                 } else if ( rb == rad3 ) {
-                    JAI.enableDefaultTileCache();
+                    ImageN.enableDefaultTileCache();
                 } else if ( rb == rad4 ) {
-                    JAI.disableDefaultTileCache();
+                    ImageN.disableDefaultTileCache();
                 }
             }
         }

@@ -13,10 +13,10 @@ import java.awt.image.renderable.ParameterBlock;
 import java.awt.print.PageFormat;
 import java.io.File;
 import java.io.IOException;
-import javax.media.jai.BorderExtender;
-import javax.media.jai.Interpolation;
-import javax.media.jai.JAI;
-import javax.media.jai.RenderedOp;
+import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.Interpolation;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.RenderedOp;
 
 // Show a scaled image inside a rectangle representing paper bounds for
 // printing.
@@ -122,18 +122,18 @@ class PreviewComponent extends JComponent {
             this
         ); */
 
-        // We use JAI to do the scaling because drawImage with a transform sometimes fails on windows
+        // We use ImageN to do the scaling because drawImage with a transform sometimes fails on windows
         if (scale > 0) {
             AffineTransform transform = AffineTransform.getScaleInstance(scale, scale);
             transform.preConcatenate(AffineTransform.getTranslateInstance(imageBounds.x, imageBounds.y));
-            RenderingHints formatHints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
+            RenderingHints formatHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
                                                             BorderExtender.createInstance(BorderExtender.BORDER_COPY));
             Interpolation interp = Interpolation.getInstance(Interpolation.INTERP_BILINEAR);
             ParameterBlock params = new ParameterBlock();
             params.addSource(image);
             params.add(transform);
             params.add(interp);
-            RenderedOp scaled = JAI.create("Affine", params, formatHints);
+            RenderedOp scaled = ImageN.create("Affine", params, formatHints);
 
             g.drawRenderedImage(scaled, new AffineTransform());
 

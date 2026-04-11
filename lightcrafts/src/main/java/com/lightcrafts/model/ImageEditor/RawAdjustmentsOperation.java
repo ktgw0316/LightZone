@@ -17,8 +17,8 @@ import com.lightcrafts.model.SliderConfig;
 import com.lightcrafts.utils.LCMatrix;
 import org.ejml.simple.SimpleMatrix;
 
-import javax.media.jai.BorderExtender;
-import javax.media.jai.PlanarImage;
+import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.PlanarImage;
 import java.awt.geom.Point2D;
 import java.awt.image.Raster;
 import java.text.DecimalFormat;

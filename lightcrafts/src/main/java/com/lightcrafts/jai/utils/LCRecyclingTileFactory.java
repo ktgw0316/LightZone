@@ -14,10 +14,9 @@ package com.lightcrafts.jai.utils;
  * $State: Exp $
  */
 
-import com.sun.media.jai.util.DataBufferUtils;
+import org.eclipse.imagen.TileFactory;
+import org.eclipse.imagen.TileRecycler;
 
-import javax.media.jai.TileFactory;
-import javax.media.jai.TileRecycler;
 import java.awt.*;
 import java.awt.image.*;
 import java.lang.ref.SoftReference;
@@ -38,28 +37,28 @@ import java.util.Observable;
  * written to a file:
  * <pre>
  * String[] sourceFiles; // source file paths
- * KernelJAI kernel; // filtering kernel
+ * KernelImageN kernel; // filtering kernel
  *
  * // Create a RenderingHints object and set hints.
  * RenderingHints rh = new RenderingHints(null);
  * RecyclingTileFactory rtf = new RecyclingTileFactory();
- * rh.put(JAI.KEY_TILE_RECYCLER, rtf);
- * rh.put(JAI.KEY_TILE_FACTORY, rtf);
- * rh.put(JAI.KEY_IMAGE_LAYOUT,
+ * rh.put(ImageN.KEY_TILE_RECYCLER, rtf);
+ * rh.put(ImageN.KEY_TILE_FACTORY, rtf);
+ * rh.put(ImageN.KEY_IMAGE_LAYOUT,
  *        new ImageLayout().setTileWidth(32).setTileHeight(32));
  *
  * int counter = 0;
  *
  * // Read each image, filter it, and save the output to a file.
  * for(int i = 0; i < sourceFiles.length; i++) {
- *     PlanarImage source = JAI.create("fileload", sourceFiles[i]);
+ *     PlanarImage source = ImageN.create("fileload", sourceFiles[i]);
  *     ParameterBlock pb =
  *         (new ParameterBlock()).addSource(source).add(kernel);
  *
  *     // The TileFactory hint will cause tiles to be created by 'rtf'.
- *     RenderedOp dest = JAI.create("convolve", pb, rh);
+ *     RenderedOp dest = ImageN.create("convolve", pb, rh);
  *     String fileName = "image_"+(++counter)+".tif";
- *     JAI.create("filestore", dest, fileName);
+ *     ImageN.create("filestore", dest, fileName);
  *
  *     // The TileRecycler hint will cause arrays to be reused by 'rtf'.
  *     dest.dispose();
@@ -70,7 +69,7 @@ import java.util.Observable;
  * first iteration.
  * </p>
  *
- * @since JAI 1.1.2
+ * @since ImageN 1.1.2
  */
 public class LCRecyclingTileFactory extends Observable
     implements TileFactory, TileRecycler {
@@ -185,10 +184,10 @@ public class LCRecyclingTileFactory extends Observable
             array = ((DataBufferInt)db).getBankData();
             break;
         case DataBuffer.TYPE_FLOAT:
-            array = DataBufferUtils.getBankDataFloat(db);
+            array = ((DataBufferFloat)db).getBankData();
             break;
         case DataBuffer.TYPE_DOUBLE:
-            array = DataBufferUtils.getBankDataDouble(db);
+            array = ((DataBufferDouble)db).getBankData();
             break;
         default:
             throw new UnsupportedOperationException("Unsupported Data Type");
@@ -343,8 +342,7 @@ public class LCRecyclingTileFactory extends Observable
                         /* for(int i = 0; i < numBanks; i++) {
                             Arrays.fill(bankData[i], 0.0F);
                         }*/
-                        db = DataBufferUtils.createDataBufferFloat(bankData,
-                                                                   (int)size);
+                        db = new DataBufferFloat(bankData, (int)size);
                     }
                     break;
                 case DataBuffer.TYPE_DOUBLE:
@@ -353,8 +351,7 @@ public class LCRecyclingTileFactory extends Observable
                         /*for(int i = 0; i < numBanks; i++) {
                             Arrays.fill(bankData[i], 0.0);
                         }*/
-                        db = DataBufferUtils.createDataBufferDouble(bankData,
-                                                                    (int)size);
+                        db = new DataBufferDouble(bankData, (int)size);
                     }
                     break;
                 default:

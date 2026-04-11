@@ -14,8 +14,8 @@
     <dependency name="ejml-simple" rev="0.44.0" org="org.ejml" conf="compile->default"/>
     <dependency name="flatlaf" rev="3.7" org="com.formdev"  conf="compile->default"/>
     <dependency name="flatlaf-intellij-themes" rev="3.7" org="com.formdev"  conf="compile->default"/>
-    <dependency name="jiconfont-font_awesome" rev="4.7.0.0" org="com.github.jiconfont" conf="compile->default"/>
-    <dependency name="jiconfont-google_material_design_icons" rev="2.2.0.2" org="com.github.jiconfont" conf="compile->default"/>
+    <dependency name="imagen-all" rev="0.9.1" org="org.eclipse.imagen" conf="compile->default"/>
+    <dependency name="jiconfont-font_awesome" rev="4.7.0.0" org="com.github.jiconfont" conf="compile->default"/>    <dependency name="jiconfont-google_material_design_icons" rev="2.2.0.2" org="com.github.jiconfont" conf="compile->default"/>
     <dependency name="jiconfont-swing" rev="1.0.1" org="com.github.jiconfont" conf="compile->default"/>
     <dependency name="json" rev="20231013" org="org.json" conf="compile->default"/>
     <dependency name="lombok" rev="1.18.42" org="org.projectlombok" conf="compile->default"/>

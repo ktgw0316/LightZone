@@ -2,20 +2,20 @@
 
 package com.lightcrafts.model.ImageEditor;
 
-import com.lightcrafts.jai.utils.Transform;
+import com.lightcrafts.image.color.ColorScience;
 import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.WhitePointOperation;
 import com.lightcrafts.utils.splines;
-import com.lightcrafts.image.color.ColorScience;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.media.lookup.LookupTableFactory;
 
-import javax.media.jai.JAI;
-import javax.media.jai.LookupTableJAI;
-import javax.media.jai.PlanarImage;
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.awt.image.renderable.ParameterBlock;
 import java.awt.image.Raster;
+import java.awt.image.renderable.ParameterBlock;
 
 import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_WHITE_BALANCE;
 
@@ -156,12 +156,12 @@ class WhitePointOperationImpl extends BlendedOperation implements WhitePointOper
                 for (int i = 0; i < 0x10000; i++)
                     table[2][i] = (short) (0xffff & (int) Math.min(Math.max(i + 0xff * interpolator.interpolate(i / (double) 0xffff, blueCurve), 0), 0xffff));
 
-                LookupTableJAI lookupTable = new LookupTableJAI(table, true);
+                var lookupTable = LookupTableFactory.create(table, true);
 
                 ParameterBlock pb = new ParameterBlock();
                 pb.addSource(back);
                 pb.add(lookupTable);
-                return JAI.create("lookup", pb, JAIContext.noCacheHint);
+                return ImageN.create("lookup", pb, JAIContext.noCacheHint);
             } else {
                 return back;
             }

@@ -9,14 +9,14 @@ import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.LayerConfig;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
+import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.ImageLayout;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.Interpolation;
+import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.media.lookup.LookupTable;
 
-import javax.media.jai.BorderExtender;
-import javax.media.jai.ImageLayout;
-import javax.media.jai.Interpolation;
-import javax.media.jai.JAI;
-import javax.media.jai.LookupTableJAI;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.RenderedOp;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.renderable.ParameterBlock;
@@ -86,7 +86,7 @@ public class ContrastMaskOperation extends BlendedOperation {
                 divideByTwo *= 2;
             }
 
-            RenderingHints hints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
+            RenderingHints hints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
                                                       BorderExtender.createInstance(BorderExtender.BORDER_COPY));
             Interpolation interp = Interpolation.getInstance(Interpolation.INTERP_BILINEAR);
 
@@ -99,14 +99,14 @@ public class ContrastMaskOperation extends BlendedOperation {
                 pb.addSource(back);
                 pb.add(AffineTransform.getScaleInstance(scaleX, scaleY));
                 pb.add(interp);
-                RenderingHints layoutHints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT,
+                RenderingHints layoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT,
                                                             new ImageLayout(0, 0,
                                                                             Math.max(JAIContext.TILE_WIDTH/divideByTwo, 8),
                                                                             Math.max(JAIContext.TILE_HEIGHT/divideByTwo, 8),
                                                                             null, null));
                 layoutHints.add(hints);
                 layoutHints.add(JAIContext.noCacheHint);
-                scaleDown = JAI.create("Affine", pb, layoutHints);
+                scaleDown = ImageN.create("Affine", pb, layoutHints);
             } else {
                 scaleDown = back;
             }
@@ -118,16 +118,16 @@ public class ContrastMaskOperation extends BlendedOperation {
                         {ColorScience.Wr, ColorScience.Wg, ColorScience.Wb, 0}
                 };
                 pb.add(transform);
-                scaleDown = JAI.create("BandCombine", pb, JAIContext.noCacheHint);  // Desaturate, single banded
+                scaleDown = ImageN.create("BandCombine", pb, JAIContext.noCacheHint);  // Desaturate, single banded
             }
 
-            scaleDown = JAI.create("Not", scaleDown, JAIContext.noCacheHint);       // Invert
-            LookupTableJAI table = Functions.computeGammaTable(scaleDown.getSampleModel().getDataType(), gamma);
+            scaleDown = ImageN.create("Not", scaleDown, JAIContext.noCacheHint);       // Invert
+            LookupTable table = Functions.computeGammaTable(scaleDown.getSampleModel().getDataType(), gamma);
             ParameterBlock pb = new ParameterBlock();
             pb.addSource(scaleDown);
             pb.add(table);
             // we cache this since convolution scans its input multiple times
-            gammaCurve = JAI.create("lookup", pb, null /*JAIContext.noCacheHint*/);
+            gammaCurve = ImageN.create("lookup", pb, null /*JAIContext.noCacheHint*/);
 
             final RenderedOp blur = Functions.fastGaussianBlur(gammaCurve, newRadius);
 
@@ -137,14 +137,14 @@ public class ContrastMaskOperation extends BlendedOperation {
                 pb.add(AffineTransform.getScaleInstance(back.getWidth() / (double) scaleDown.getWidth(),
                                                         back.getHeight() / (double) scaleDown.getHeight()));
                 pb.add(interp);
-                RenderingHints resultLayoutHints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT,
+                RenderingHints resultLayoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT,
                                                                   new ImageLayout(0, 0,
                                                                                   JAIContext.TILE_WIDTH,
                                                                                   JAIContext.TILE_HEIGHT,
                                                                                   null, null));
                 resultLayoutHints.add(hints);
                 resultLayoutHints.add(JAIContext.noCacheHint);
-                return JAI.create("Affine", pb, resultLayoutHints);
+                return ImageN.create("Affine", pb, resultLayoutHints);
             } else {
                 return blur;
             }

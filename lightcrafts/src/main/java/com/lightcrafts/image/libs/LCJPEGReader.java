@@ -21,8 +21,8 @@ import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
-import javax.media.jai.ImageLayout;
-import javax.media.jai.PlanarImage;
+import org.eclipse.imagen.ImageLayout;
+import org.eclipse.imagen.PlanarImage;
 
 import static com.lightcrafts.image.types.JPEGConstants.JPEG_APPC_MARKER;
 import static com.lightcrafts.image.types.JPEGConstants.JPEG_APPE_MARKER;

@@ -9,12 +9,12 @@ import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.utils.Functions;
 
 import javax.imageio.ImageIO;
-import javax.media.jai.BorderExtender;
-import javax.media.jai.ImageLayout;
-import javax.media.jai.Interpolation;
-import javax.media.jai.JAI;
-import javax.media.jai.PlanarImage;
-import javax.media.jai.operator.TransposeType;
+import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.ImageLayout;
+import org.eclipse.imagen.Interpolation;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.operator.TransposeType;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
@@ -87,7 +87,7 @@ class Thumbnailer {
                 ParameterBlock pb = new ParameterBlock();
                 pb.addSource(image);
                 pb.add(transpose);
-                image = JAI.create(
+                image = ImageN.create(
                     "Transpose", pb, null
                 );
             }
@@ -130,7 +130,7 @@ class Thumbnailer {
             final ParameterBlock pb = new ParameterBlock();
             pb.addSource(image);
             pb.add(transpose);
-            image = JAI.create("Transpose", pb, null);
+            image = ImageN.create("Transpose", pb, null);
         }
         return image;
     }
@@ -163,9 +163,9 @@ class Thumbnailer {
         params.addSource(source);
         params.add(AffineTransform.getScaleInstance(scaleX, scaleY));
         params.add(interpolation);
-        RenderingHints hints = new RenderingHints(JAI.KEY_BORDER_EXTENDER,
+        RenderingHints hints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
             BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-        return JAI.create("Affine", params, hints);
+        return ImageN.create("Affine", params, hints);
     }
 
     // If the image is a buffered image and it's bigger than 1024 pixels,
@@ -183,12 +183,12 @@ class Thumbnailer {
                     samples, colors
                 );
                 RenderingHints formatHints = new RenderingHints(
-                    JAI.KEY_IMAGE_LAYOUT, layout
+                    ImageN.KEY_IMAGE_LAYOUT, layout
                 );
                 ParameterBlock pb = new ParameterBlock();
                 pb.addSource(image);
                 pb.add(image.getSampleModel().getDataType());
-                image = JAI.create("Format", pb, formatHints);
+                image = ImageN.create("Format", pb, formatHints);
             }
         }
         return image;
@@ -207,7 +207,7 @@ class Thumbnailer {
             else {
                 pb.add(new int[] {0});
             }
-            image = JAI.create("bandselect", pb, null);
+            image = ImageN.create("bandselect", pb, null);
         }
         return image;
     }

@@ -19,8 +19,8 @@ import com.lightcrafts.utils.UserCanceledException;
 import com.lightcrafts.utils.thread.ProgressThread;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.eclipse.imagen.*;
 
-import javax.media.jai.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.*;
@@ -220,7 +220,7 @@ public abstract class RawImageType extends ImageType {
         pb2.addSource(rgbImage);
         pb2.add(rotation);
         pb2.add(interp);
-        RenderedOp rotated = JAI.create("Affine", pb2, null);
+        RenderedOp rotated = ImageN.create("Affine", pb2, null);
 
         final var rotatedLayout = new ImageLayout(
                 rotated.getBounds().x, rotated.getBounds().y,
@@ -228,9 +228,9 @@ public abstract class RawImageType extends ImageType {
                 rotated.getBounds().x, rotated.getBounds().y,
                 JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT,
                 sm, colorModel);
-        final var hints = new RenderingHints(JAI.KEY_IMAGE_LAYOUT, rotatedLayout);
+        final var hints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, rotatedLayout);
 
-        rotated = JAI.create("Affine", pb2, hints);
+        rotated = ImageN.create("Affine", pb2, hints);
 
         return Functions.crop(
                 rotated,
@@ -247,7 +247,7 @@ public abstract class RawImageType extends ImageType {
                 rgbImage.getHeight() - 10);
 
         final var hints = new RenderingHints(
-                JAI.KEY_BORDER_EXTENDER,
+                ImageN.KEY_BORDER_EXTENDER,
                 BorderExtender.createInstance(BorderExtender.BORDER_COPY));
 
         final var interp = Interpolation.getInstance(Interpolation.INTERP_BILINEAR);
@@ -260,13 +260,13 @@ public abstract class RawImageType extends ImageType {
                 0, 0, JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT,
                 sm, colorModel);
 
-        hints.add(new RenderingHints(JAI.KEY_IMAGE_LAYOUT, newLayout));
+        hints.add(new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, newLayout));
 
         final var pb2 = new ParameterBlock();
         pb2.addSource(rgbImage);
         pb2.add(AffineTransform.getScaleInstance(3.0 / 4.0, 3.0 / 2.0));
         pb2.add(interp);
-        return JAI.create("Affine", pb2, hints);
+        return ImageN.create("Affine", pb2, hints);
     }
 
     private void retile(PlanarImage rgbImage, final CachedImage cache) {
