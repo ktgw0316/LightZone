@@ -13,13 +13,35 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * Launch LightZone.
  */
 public class Launcher {
 
+    static {
+        initializeLoggingPath();
+    }
+
     private static final Logger logger = LoggerFactory.getLogger(Launcher.class);
+
+    private static void initializeLoggingPath() {
+        final String userHome = System.getProperty("user.home");
+        if (userHome == null || userHome.isEmpty()) {
+            return;
+        }
+
+        final Path logDir = Path.of(userHome, ".lightzone", "logs");
+        try {
+            Files.createDirectories(logDir);
+            // logback.xml should use this property, e.g. ${lightzone.logDir}/lightzone.log
+            System.setProperty("lightzone.logDir", logDir.toString());
+        } catch (Exception ignored) {
+            // Fall back to default location in logback.xml if directory setup fails.
+        }
+    }
 
     /**
      * @param args The command line arguments.
