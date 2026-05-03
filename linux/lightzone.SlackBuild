@@ -74,7 +74,7 @@ tar xvf ${SRCNAM}.tar.gz
 mv ${VCSNAM}-${VERSION} ${PRGNAM}
 
 cd ${PRGNAM}
-./gradlew build -x test
+./gradlew jpackageImage -x test
 
 LIBDIR=${PKG}/usr/lib${LIBDIRSUFFIX}
 install -dm 0755 ${LIBDIR}/${PRGNAM}
@@ -83,8 +83,7 @@ cp -pH linux/products/*.so ${LIBDIR}/${PRGNAM}
 JAVADIR=${PKG}/usr/share/java
 install -dm 0755 ${JAVADIR}/${PRGNAM}
 cp -pH lightcrafts/products/dcraw_lz ${JAVADIR}/${PRGNAM}
-cp -pH lightcrafts/products/LightZone-forkd ${JAVADIR}/${PRGNAM}
-cp -pH linux/products/*.jar ${JAVADIR}/${PRGNAM}
+cp -pH linux/build/jpackage/${PRGNAM}/lib/app/*.jar ${JAVADIR}/${PRGNAM}
 
 DATADIR=${PKG}/usr/share
 install -dm 0755 ${DATADIR}/applications

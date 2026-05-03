@@ -43,13 +43,13 @@ post-patch:
 		@${REINPLACE_CMD} -e 's|%%LOCALBASE%%|${LOCALBASE}|' ${WRKSRC}/products/lightzone
 
 do-build:
-	${WRKSRC}/../gradlew build -x test
+	${WRKSRC}/../gradlew jpackageImage -x test
 
 do-install:
 	${INSTALL_SCRIPT} ${WRKSRC}/products/${PORTNAME} ${STAGEDIR}${PREFIX}/bin/
 	${INSTALL_PROGRAM} ${WRKSRC}/products/dcraw_lz ${STAGEDIR}${PREFIX}/bin/
 	@${MKDIR} ${STAGEDIR}${JAVASHAREDIR}/${PORTNAME}
-	${INSTALL_DATA} ${WRKSRC}/products/*.jar ${STAGEDIR}${JAVASHAREDIR}/${PORTNAME}
+	${INSTALL_DATA} ${WRKSRC}/build/jpackage/${PORTNAME}/lib/app/*.jar ${STAGEDIR}${JAVASHAREDIR}/${PORTNAME}
 	@${MKDIR} ${STAGEDIR}${LIBDIR}
 	${INSTALL_LIB} ${WRKSRC}/products/*.so ${STAGEDIR}${LIBDIR}
 	${INSTALL_DATA} ${WRKSRC}/products/${PORTNAME}.desktop ${STAGEDIR}${PREFIX}/share/applications/

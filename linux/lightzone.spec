@@ -14,7 +14,7 @@ Group:		Productivity/Graphics/Convertors
 Source:		%{name}-%{version}.tar.xz
 
 %if 0%{?fedora} || 0%{?rhel_version} || 0%{?centos_version}
-%define jdk java-21-openjdk-devel
+%define jdk java-21-openjdk
 %define lcms2_devel lcms2-devel
 %define libjpeg_devel libjpeg-turbo-devel
 %define libraw LibRaw
@@ -25,7 +25,7 @@ Source:		%{name}-%{version}.tar.xz
 %endif
 
 %if 0%{?sles_version}
-%define jdk java-21-openjdk-devel
+%define jdk java-21-openjdk
 %define lcms2_devel liblcms2-devel
 %define libjpeg_devel libjpeg8-devel
 %define libraw libraw
@@ -36,7 +36,7 @@ BuildRequires: update-desktop-files
 %endif
 
 %if 0%{?suse_version}
-%define jdk java-21-openjdk-devel
+%define jdk java-21-openjdk
 %define lcms2_devel liblcms2-devel
 %define libjpeg_devel libjpeg8-devel
 %define libraw libraw
@@ -49,7 +49,7 @@ Requires:	xerces-j2-xml-apis
 %endif
 
 %if 0%{?mdkversion} || 0%{?pclinuxos}
-%define jdk java-21-openjdk-devel
+%define jdk java-21-openjdk
 %define lcms2_devel liblcms2-devel
 %define libjpeg_devel libjpeg8-devel
 %define libraw libraw
@@ -61,7 +61,7 @@ Requires:	libgomp1
 %endif
 
 %if 0%{?mageia}
-%define jdk java-latest-openjdk-devel
+%define jdk java-latest-openjdk
 %define lcms2_devel liblcms2-devel
 %define libjpeg_devel libjpeg-devel
 %define libraw libraw
@@ -72,7 +72,7 @@ BuildRequires:	libgomp-devel
 Requires:	libgomp1
 %endif
 
-BuildRequires:	javapackages-tools, %{jdk}, %{libX11_devel}, gcc, gcc-c++, make, git, %{lcms2_devel}, lensfun-devel, %{libjpeg_devel}, %{libraw}-devel, libtiff-devel, %{pkg_config}, rsync
+BuildRequires:	%{jdk}-devel, %{jdk}-jmods, %{libX11_devel}, gcc-c++, make, git, %{lcms2_devel}, lensfun-devel, %{libjpeg_devel}, %{libraw}-devel, libtiff-devel, %{pkg_config}, rsync
 Requires:	lcms2, lensfun, %{libraw}, %{xmllint}
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -84,7 +84,7 @@ LightZone is open-source professional-level digital darkroom software for Window
 %setup -q
 
 %build
-./gradlew build -x test
+./gradlew jpackageImage -x test
 
 %install
 %if 0%{?sles_version}
@@ -95,7 +95,7 @@ install -dm 0755 "%buildroot/%{_libexecdir}/%{name}"
 cp -pH linux/products/*.so "%buildroot/%{_libexecdir}/%{name}"
 
 install -dm 0755 "%buildroot/%{_javadir}/%{name}"
-cp -pH linux/products/*.jar "%buildroot/%{_javadir}/%{name}"
+cp -pH linux/build/jpackage/%{name}/lib/app/*.jar "%buildroot/%{_javadir}/%{name}"
 
 # create icons and shortcuts
 install -dm 0755 "%buildroot/%{_datadir}/applications"

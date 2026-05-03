@@ -47,7 +47,7 @@ pkg_setup() {
 }
 
 src_compile() {
-	"${S}"/gradlew build -x test
+	"${S}"/gradlew jpackageImage -x test
 }
 
 src_install() {
@@ -59,7 +59,7 @@ src_install() {
 
 	_javadir=/usr/share
 	install -dm 0755 "${D}/${_javadir}/${PN}/lib"
-	cp -pH linux/products/*.jar "${D}/${_javadir}/${PN}/lib"
+	cp -pH "linux/build/jpackage/${PN}/lib/app/*.jar" "${D}/${_javadir}/${PN}/lib"
 
 	_datadir=/usr/share
 	install -dm 0755 "${D}/${_datadir}/applications"
