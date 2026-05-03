@@ -68,7 +68,7 @@ runtime {
     options.set(listOf("--strip-debug", "--no-header-files", "--no-man-pages"))
     modules.set(
         listOf(
-            "java.base", "java.desktop", "java.logging", "java.management", "java.prefs", "java.rmi", "jdk.management"
+            "java.base", "java.desktop", "java.logging", "java.management", "java.naming", "java.prefs", "java.rmi", "jdk.management"
         )
     )
     jpackage {
