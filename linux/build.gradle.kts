@@ -91,7 +91,8 @@ runtime {
             "--linux-deb-maintainer", "arctica0316@gmail.com",
             "--linux-menu-group", "Photography",
             "--linux-package-deps",
-            "default-jre (>= 2:1.17) | openjdk-17-jre, libejml-java (>= 0.38), libflatlaf-java, libgomp1, libjiconfont-font-awesome-java, libjiconfont-google-material-design-icons-java, libjiconfont-swing-java, libjpeg62-turbo | libjpeg-turbo8, liblcms2-2, liblensfun0 | liblensfun1 (<< 0.3.95), libopenjson-java, libraw19 | libraw20 | libraw23, libtiff5 | libtiff6, libxml2-utils",
+            "default-jre (>= 2:1.17) | openjdk-21-jre, libgomp1, libjpeg62-turbo | libjpeg-turbo8, liblcms2-2, liblensfun0 | liblensfun1 (<< 0.3.95), libraw19 | libraw20 | libraw23, libtiff5 | libtiff6, libxml2-utils", // .deb
+            // "java-21-openjdk, lcms2, lensfun, LibRaw, libxml2", // .rpm
             "--linux-app-category", "graphics",
             "--linux-rpm-license-type", "BSD-3-Clause",
         )
