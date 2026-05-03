@@ -38,6 +38,20 @@ Before start the build, you have to set `JAVA_HOME` environment variable, e.g.
 export JAVA_HOME=/usr/lib/jvm/default-java
 ```
 
+### Fedora (>= 42)
+
+Install required packages:
+
+```shell
+sudo dnf install java-21-openjdk-devel java-21-openjdk-jmods git gcc-c++ lcms2-devel lensfun-devel LibRaw-devel libjpeg-turbo-devel libtiff-devel libX11-devel libxml2-devel make pkgconfig rsync
+```
+
+Set your `JAVA_HOME` variable to point to installed JDK, e.g.
+
+```shell
+export JAVA_HOME=/usr/lib/jvm/java-21-openjdk
+```
+
 ### OpenSUSE (>= 15.2)
 
 Install required packages:
@@ -87,6 +101,21 @@ sudo dpkg -i linux/build/jpackage/lightzone*.deb
 The `lightzone` command will be installed under `/opt/lightzone/bin/`.
 
 ### .rpm package (Fedora, OpenSUSE, CentOS etc.)
+
+Modify `linux/build.gradle` file to set `rpm` instead of `deb` as the target package type, then:
+
+```shell
+./gradlew jpackage
+```
+
+will create `lightzone*.rpm` package in `linux/build/jpackage/` directory,
+To install the package:
+
+```shell
+sudo rpm -i linux/build/jpackage/lightzone*.rpm
+```
+
+The `lightzone` command will be installed under `/opt/lightzone/bin/`.
 
 ### Re-packaging rpm from a source rpm
 
