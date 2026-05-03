@@ -6,7 +6,7 @@ TARGET_BASE:=		JAI
 FW_DIR:=		/System/Library/Frameworks
 
 JNI_WINDOWS_LINK:=	-lLCJNI
-JNI_LINUX_LINK:=	$(JNI_WINDOWS_LINK)
+JNI_LINUX_LINK:=	-lLCJNI -Wl,-rpath,'$$ORIGIN'
 JNI_MACOSX_LINK:=	../jniutils/libLCJNI.a
 
 ##
