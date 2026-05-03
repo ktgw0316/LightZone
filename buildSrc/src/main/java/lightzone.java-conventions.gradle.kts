@@ -28,7 +28,7 @@ dependencies {
     testCompileOnly(jetbrainsAnnotation)
     testImplementation(kotlin("test"))
     testImplementation("io.kotest:kotest-runner-junit5-jvm:5.9.1")
-    testImplementation("org.assertj:assertj-core:3.11.1")
+    testImplementation("org.assertj:assertj-core:3.27.7")
     testImplementation(platform("org.junit:junit-bom:5.14.2"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter-engine")
