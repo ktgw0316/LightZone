@@ -4,6 +4,7 @@ import java.time.format.DateTimeFormatter
 plugins {
     kotlin("jvm")
     id("lightzone.java-conventions")
+    id("lightzone.remove-unused")
     id("org.beryx.runtime")
 }
 dependencies {
@@ -23,7 +24,7 @@ tasks {
         commandLine("make", "-C", "help")
     }
     jpackage {
-        dependsOn("build", "helpFiles")
+        dependsOn("jpackageImage", "helpFiles")
         doFirst {
             copy {
                 from("products/")
@@ -38,26 +39,6 @@ tasks {
                 include("*.lproj/**")
                 include("*.icns")
                 into(layout.buildDirectory.dir("jpackage/LightZone.app/Contents/Resources"))
-            }
-
-            val jarsToDelete = listOf(
-                "annotations*.jar",
-                "antlr4-runtime*.jar",
-                "bigint*.jar",
-                "checker-qual*.jar",
-                "commons-compiler*.jar",
-                "error_prone_annotations*.jar",
-                "failureaccess*.jar",
-                "guava*.jar",
-                "j2objc-annotations*.jar",
-                "janino*.jar",
-                "jsr305*.jar",
-                "jts-core*.jar",
-                "kotlin-stdlib*.jar",
-                "listenablefuture*.jar"
-            )
-            jarsToDelete.forEach { jar ->
-                delete(fileTree(layout.buildDirectory.dir("jpackage/lightzone/lib/app")).matching { include(jar) })
             }
         }
         doLast {
