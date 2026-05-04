@@ -24,8 +24,6 @@ dependencies {
     implementation("org.eclipse.imagen:nullop:0.9.1")
     implementation("org.eclipse.imagen:rescale:0.9.1")
     implementation("org.ejml:ejml-simple:0.44.0")
-    implementation("org.slf4j:slf4j-api:2.0.17")
-    runtimeOnly("ch.qos.logback:logback-classic:1.5.25")
 }
 application {
     mainClass.set("com.lightcrafts.app.Application")

@@ -9,7 +9,6 @@ plugins {
 dependencies {
     implementation(project(":lightcrafts"))
     implementation("org.eclipse.imagen:imagen-all:0.9.1")
-    implementation("org.slf4j:slf4j-api:2.0.17")
 }
 application {
     mainClass.set("com.lightcrafts.platform.windows.WindowsLauncher")
