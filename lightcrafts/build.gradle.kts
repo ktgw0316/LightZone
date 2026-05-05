@@ -93,16 +93,20 @@ tasks {
         }
     }
     register<Task> ("revision") {
-        val gitHash = versionDetails().gitHashFull // full 40-character Git commit hash
-        project.logger.lifecycle("Git hash: ${gitHash}")
+        try {
+            val gitHash = versionDetails().gitHashFull // full 40-character Git commit hash
+            project.logger.lifecycle("Git hash: ${gitHash}")
 
-        val dirProvider = layout.buildDirectory.dir("resources/main/com/lightcrafts/utils/resources")
-        val dir = dirProvider.get().asFile
-        mkdir(dir)
-        val file = File("$dir/Revision")
-        file.delete()
-        file.writeText(gitHash)
-        File("$dir/Version").writeText(version.toString())
+            val dirProvider = layout.buildDirectory.dir("resources/main/com/lightcrafts/utils/resources")
+            val dir = dirProvider.get().asFile
+            mkdir(dir)
+            val file = File(dir, "Revision")
+            if (file.exists()) file.delete()
+            file.writeText(gitHash)
+            File(dir, "Version").writeText(version.toString())
+        } catch (e: Exception) {
+            project.logger.lifecycle("Skipping revision task: unable to determine git hash: ${e.message}")
+        }
     }
     build {
         dependsOn("coprocesses", "revision")
