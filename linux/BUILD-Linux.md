@@ -43,7 +43,7 @@ export JAVA_HOME=/usr/lib/jvm/default-java
 Install required packages:
 
 ```shell
-sudo dnf install java-21-openjdk-devel java-21-openjdk-jmods git gcc-c++ lcms2-devel lensfun-devel LibRaw-devel libjpeg-turbo-devel libtiff-devel libX11-devel libxml2-devel make pkgconfig rsync
+sudo dnf install java-21-openjdk-devel java-21-openjdk-jmods git gcc-c++ lcms2-devel lensfun-devel LibRaw-devel libjpeg-turbo-devel libtiff-devel libX11-devel libxml2-devel make pkgconfig rpm-build rsync
 ```
 
 Set your `JAVA_HOME` variable to point to installed JDK, e.g.
@@ -102,7 +102,13 @@ The `lightzone` command will be installed under `/opt/lightzone/bin/`.
 
 ### .rpm package (Fedora, OpenSUSE, CentOS etc.)
 
-Modify `linux/build.gradle` file to set `rpm` instead of `deb` as the target package type, then:
+Patch `linux/build.gradle` file by:
+
+```shell
+patch -p1 < linux/fedora.patch
+```
+
+then:
 
 ```shell
 ./gradlew jpackage
