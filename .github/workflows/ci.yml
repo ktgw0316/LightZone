@@ -11,7 +11,7 @@ jobs:
         java: ['21']
     runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Set up JDK ${{ matrix.java }}
       uses: actions/setup-java@v4
       with:
@@ -54,7 +54,7 @@ jobs:
         else
           ./gradlew jpackage
         fi
-    - name: Build on Linux
+    - name: Build on Ubuntu
       if: startsWith(matrix.os, 'ubuntu')
       run: |
         sudo add-apt-repository -y ppa:lightzone-team/lightzone
@@ -86,10 +86,45 @@ jobs:
         archive: false
         path: |
           macosx/build/jpackage/LightZone-*.dmg
-    - name: Upload Artifacts on Linux
+    - name: Upload Artifacts on Ubuntu
       if: startsWith(matrix.os, 'ubuntu')
       uses: actions/upload-artifact@v7
       with:
         archive: false
         path: |
           linux/build/jpackage/lightzone*.deb
+
+  build_on_Fedora:
+    runs-on: ubuntu-latest
+    container: fedora:43
+    steps:
+    - uses: actions/checkout@v6
+    - name: Build on Fedora
+      run: |
+        sudo dnf install -y \
+          LibRaw-devel \
+          gcc-c++ \
+          git \
+          java-21-openjdk-devel \
+          java-21-openjdk-jmods \
+          lcms2-devel \
+          lensfun-devel \
+          libX11-devel \
+          libjpeg-turbo-devel \
+          libtiff-devel \
+          libxml2 \
+          make \
+          patch \
+          pkgconfig \
+          rpm-build \
+          rsync
+        patch -p1 < linux/fedora.patch
+        export JAVA_HOME=/usr/lib/jvm/java-21-openjdk
+        ./gradlew jpackage
+    - name: Upload Artifacts on Fedora
+      uses: actions/upload-artifact@v7
+      with:
+        archive: false
+        path: |
+          linux/build/jpackage/lightzone*.rpm
+

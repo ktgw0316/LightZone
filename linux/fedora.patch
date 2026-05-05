@@ -1,0 +1,22 @@
+diff --git forkSrcPrefix/linux/build.gradle.kts forkDstPrefix/linux/build.gradle.kts
+index dca8b9c42ca9ec7fe2381b38caaca7c5af338a18..8e42e9e80a206f1618081406562c1896b57404dd 100644
+--- forkSrcPrefix/linux/build.gradle.kts
++++ forkDstPrefix/linux/build.gradle.kts
+@@ -61,15 +61,14 @@ runtime {
+         imageName = "lightzone"
+         mainJar = "${project.name}-${project.version}.jar"
+         skipInstaller = false
+-        installerType = "deb"
++        installerType = "rpm"
+         installerOptions = listOf(
+             "--vendor", "LightZone Project",
+             "--linux-package-name", "lightzone",
+             "--linux-deb-maintainer", "arctica0316@gmail.com",
+             "--linux-menu-group", "Photography",
+             "--linux-package-deps",
+-            "default-jre (>= 2:1.17) | openjdk-21-jre, libgomp1, libjpeg62-turbo | libjpeg-turbo8, liblcms2-2, liblensfun0 | liblensfun1 (<< 0.3.95), libraw19 | libraw20 | libraw23, libtiff5 | libtiff6, libxml2-utils", // .deb
+-            // "java-21-openjdk, lcms2, lensfun, LibRaw, libxml2", // .rpm
++            "java-21-openjdk, lcms2, lensfun, LibRaw, libxml2", // .rpm
+             "--linux-app-category", "graphics",
+             "--linux-rpm-license-type", "BSD-3-Clause",
+         )
