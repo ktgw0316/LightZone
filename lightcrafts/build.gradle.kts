@@ -96,7 +96,7 @@ tasks {
         val gitHash = versionDetails().gitHashFull // full 40-character Git commit hash
         project.logger.lifecycle("Git hash: ${gitHash}")
 
-        val dirProvider = layout.buildDirectory.dir("revision")
+        val dirProvider = layout.buildDirectory.dir("resources/main/com/lightcrafts/utils/resources")
         val dir = dirProvider.get().asFile
         mkdir(dir)
         val file = File("$dir/Revision")
