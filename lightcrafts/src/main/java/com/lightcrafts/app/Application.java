@@ -174,9 +174,7 @@ public class Application {
 
     public static void reOpen(ComboFrame frame) {
         if (frame == null) {
-            // No frame supplied — typically a macOS dock-icon reopen.
-            // Bring the most recently active window forward rather than
-            // spawning a duplicate empty frame.
+            // macOS dock-icon reopen: focus most-recently-active frame instead of spawning a duplicate.
             ComboFrame existing = getActiveFrame();
             if (existing != null) {
                 if (existing.getState() == Frame.ICONIFIED) {
