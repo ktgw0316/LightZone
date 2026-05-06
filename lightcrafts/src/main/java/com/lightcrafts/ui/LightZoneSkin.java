@@ -69,16 +69,9 @@ public class LightZoneSkin {
     }
 
     public static class LightZoneFontSet {
-        // cf. https://www.formdev.com/flatlaf/typography/#available
-        public static final FontUIResource TitleFont = font();
-        public static final FontUIResource SmallFont = font();
-
-        private static FontUIResource font() {
-            // Some FlatLaf theme variants don't register the typography keys;
-            // fall back to Label.font (always supplied by Swing) to avoid NPE.
-            Font f = UIManager.getFont("small.font");
-            return new FontUIResource(f != null ? f : UIManager.getFont("Label.font"));
-        }
+        // FlatLaf "small.font" key is not present in every theme variant; hardcode to avoid NPE.
+        public static final FontUIResource TitleFont = new FontUIResource(new Font(Font.SANS_SERIF, Font.PLAIN, 11));
+        public static final FontUIResource SmallFont = new FontUIResource(new Font(Font.SANS_SERIF, Font.PLAIN, 11));
     }
 
     public static Border getImageBorder() {
