@@ -3,10 +3,16 @@
 
 package com.lightcrafts.image.metadata;
 
-import org.eclipse.imagen.operator.TransposeType;
+import org.jetbrains.annotations.NotNull;
+
+import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.RenderedImage;
+import java.awt.image.WritableRaster;
 
 import static com.lightcrafts.image.types.TIFFConstants.*;
-import static org.eclipse.imagen.operator.TransposeDescriptor.*;
 
 /**
  * An <code>ImageOrientation</code> specifies the orientation of an image.
@@ -32,8 +38,8 @@ public enum ImageOrientation {
         }
 
         @Override
-        public TransposeType getCorrection() {
-            return null;
+        public RenderedImage correct(RenderedImage src) {
+            return src;
         }
 
         @Override
@@ -83,8 +89,14 @@ public enum ImageOrientation {
         }
 
         @Override
-        public TransposeType getCorrection() {
-            return ROTATE_180;                                  // clockwise
+        public RenderedImage correct(RenderedImage src) {
+            final int w = src.getWidth();
+            final int h = src.getHeight();
+
+            final var xform = AffineTransform.getTranslateInstance(w, h);
+            xform.quadrantRotate(2);
+
+            return transformedImage(src, w, h, xform);
         }
 
         @Override
@@ -134,8 +146,14 @@ public enum ImageOrientation {
         }
 
         @Override
-        public TransposeType getCorrection() {
-            return ROTATE_90;                                  // clockwise
+        public RenderedImage correct(RenderedImage src) {
+            final int w = src.getWidth();
+            final int h = src.getHeight();
+
+            final var xform = AffineTransform.getTranslateInstance(h, 0);
+            xform.quadrantRotate(1);
+
+            return transformedImage(src, h, w, xform);
         }
 
         @Override
@@ -185,8 +203,14 @@ public enum ImageOrientation {
         }
 
         @Override
-        public TransposeType getCorrection() {
-            return FLIP_DIAGONAL;
+        public RenderedImage correct(RenderedImage src) {
+            final int w = src.getWidth();
+            final int h = src.getHeight();
+
+            final var xform = AffineTransform.getQuadrantRotateInstance(1);
+            xform.scale(1, -1);
+
+            return transformedImage(src, h, w, xform);
         }
 
         @Override
@@ -236,8 +260,14 @@ public enum ImageOrientation {
         }
 
         @Override
-        public TransposeType getCorrection() {
-            return ROTATE_270;                                  // clockwise
+        public RenderedImage correct(RenderedImage src) {
+            final int w = src.getWidth();
+            final int h = src.getHeight();
+
+            final var xform = AffineTransform.getTranslateInstance(0, w);
+            xform.quadrantRotate(3);
+
+            return transformedImage(src, h, w, xform);
         }
 
         @Override
@@ -287,8 +317,15 @@ public enum ImageOrientation {
         }
 
         @Override
-        public TransposeType getCorrection() {
-            return FLIP_ANTIDIAGONAL;
+        public RenderedImage correct(RenderedImage src) {
+            final int w = src.getWidth();
+            final int h = src.getHeight();
+
+            final var xform = AffineTransform.getTranslateInstance(h, w);
+            xform.quadrantRotate(3);
+            xform.scale(1, -1);
+
+            return transformedImage(src, h, w, xform);
         }
 
         @Override
@@ -338,8 +375,14 @@ public enum ImageOrientation {
         }
 
         @Override
-        public TransposeType getCorrection() {
-            return FLIP_HORIZONTAL;
+        public RenderedImage correct(RenderedImage src) {
+            final int w = src.getWidth();
+            final int h = src.getHeight();
+
+            final var xform = AffineTransform.getTranslateInstance(w, 0);
+            xform.scale(-1, 1);
+
+            return transformedImage(src, w, h, xform);
         }
 
         @Override
@@ -389,8 +432,14 @@ public enum ImageOrientation {
         }
 
         @Override
-        public TransposeType getCorrection() {
-            return FLIP_VERTICAL;
+        public RenderedImage correct(RenderedImage src) {
+            final int w = src.getWidth();
+            final int h = src.getHeight();
+
+            final var xform = AffineTransform.getTranslateInstance(0, h);
+            xform.scale(1, -1);
+
+            return transformedImage(src, w, h, xform);
         }
 
         @Override
@@ -438,8 +487,8 @@ public enum ImageOrientation {
         }
 
         @Override
-        public TransposeType getCorrection() {
-            return null;
+        public RenderedImage correct(RenderedImage src) {
+            return src;
         }
 
         @Override
@@ -452,6 +501,17 @@ public enum ImageOrientation {
             return false;
         }
     };
+
+    private static @NotNull BufferedImage transformedImage(
+            @NotNull RenderedImage src, int dstWidth, int dstHeight, AffineTransform xform) {
+        final var cm = src.getColorModel();
+        final var raster = cm.createCompatibleWritableRaster(dstWidth, dstHeight);
+        final var dst = new BufferedImage(cm, raster, cm.isAlphaPremultiplied(), null);
+        final Graphics2D g = dst.createGraphics();
+        g.drawRenderedImage(src, xform);
+        g.dispose();
+        return dst;
+    }
 
     /**
      * Gets the orientation that is rotated 180 degrees from this orientation.
@@ -496,14 +556,7 @@ public enum ImageOrientation {
      */
     public abstract ImageOrientation getVFlip();
 
-    /**
-     * Gets the corrective action to take in order to display an image having
-     * this orientation.
-     *
-     * @return Returns said action or <code>null</code> if either no corrective
-     * action is required or the corrective action is unknown.
-     */
-    public abstract TransposeType getCorrection();
+    public abstract RenderedImage correct(RenderedImage src);
 
     /**
      * Gets the rotation angle from this <code>ImageOrientation</code> to

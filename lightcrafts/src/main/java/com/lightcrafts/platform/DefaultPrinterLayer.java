@@ -2,12 +2,14 @@
 
 package com.lightcrafts.platform;
 
+import com.lightcrafts.image.metadata.ImageOrientation;
 import com.lightcrafts.model.ImageEditor.ImageEditorEngine;
 import com.lightcrafts.model.PrintSettings;
 import com.lightcrafts.utils.thread.ProgressThread;
 import com.lightcrafts.utils.ProgressIndicator;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.JAIContext;
+import org.eclipse.imagen.media.nullop.NullDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +18,8 @@ import org.eclipse.imagen.Interpolation;
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
-import org.eclipse.imagen.operator.TransposeDescriptor;
+
+import java.awt.image.RenderedImage;
 import java.awt.print.*;
 import java.awt.image.Raster;
 import java.awt.image.BufferedImage;
@@ -207,10 +210,8 @@ public class DefaultPrinterLayer implements PrinterLayer {
             }
 
             if (fakeLandscape) {
-                ParameterBlock params = new ParameterBlock();
-                params.addSource(printImage);
-                params.add(TransposeDescriptor.ROTATE_90);
-                printImage = ImageN.create("Transpose", params, null);
+                RenderedImage corrected = ImageOrientation.ORIENTATION_90CCW.correct(printImage);
+                printImage = NullDescriptor.create(corrected, null);
             }
 
             if (printResolution != PRINTER_RESOLUTION) {
