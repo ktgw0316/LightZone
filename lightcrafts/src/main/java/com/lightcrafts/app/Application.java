@@ -174,8 +174,21 @@ public class Application {
 
     public static void reOpen(ComboFrame frame) {
         if (frame == null) {
+            // No frame supplied — typically a macOS dock-icon reopen.
+            // Bring the most recently active window forward rather than
+            // spawning a duplicate empty frame.
+            if (!Current.isEmpty()) {
+                ComboFrame existing = Current.getFirst();
+                if (existing.getState() == Frame.ICONIFIED) {
+                    existing.setState(Frame.NORMAL);
+                }
+                existing.setVisible(true);
+                existing.toFront();
+                existing.requestFocus();
+                return;
+            }
             openEmpty();
-	    return;
+            return;
         }
         Document doc = frame.getDocument();
         File file = doc.getFile();
