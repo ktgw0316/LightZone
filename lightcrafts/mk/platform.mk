@@ -209,8 +209,8 @@ ifeq ($(PLATFORM),Windows)
   else
     # MSYS2
     ifeq ($(PROCESSOR),x86_64)
-      MINGW_DIR?=	/mingw64/
-      PKG_CONFIG_PATH:=	/mingw64/lib/pkgconfig/
+      MINGW_DIR?=	/ucrt64/
+      PKG_CONFIG_PATH:=	/ucrt64/lib/pkgconfig/
     else
       MINGW_DIR?=	/mingw32/
       PKG_CONFIG_PATH:=	/mingw32/lib/pkgconfig/
