@@ -12,6 +12,10 @@ dependencies {
 }
 application {
     mainClass.set("com.lightcrafts.platform.macosx.MacOSXLauncher")
+    applicationDefaultJvmArgs = applicationDefaultJvmArgs + listOf(
+        "-Xdock:name=LightZone",
+        "-Dapple.awt.application.name=LightZone",
+    )
 }
 tasks {
     build {
@@ -86,6 +90,7 @@ runtime {
             "-Djava.library.path=\$APPDIR",
             "-Dfile.encoding=utf-8",
             "-Xdock:name=LightZone",
+            "-Dapple.awt.application.name=LightZone",
         )
     }
 }
