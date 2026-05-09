@@ -79,13 +79,11 @@ public class NoiseReductionOperation extends BlendedOperation {
             // NOTE: we cache this because the median filter is an area op that gets its input multiple times
             RenderedOp cc = ImageN.create("bandselect", pb, null);
 
-            RenderingHints mfHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
+            final var mfHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
             mfHints.add(JAIContext.noCacheHint);
-            pb = new ParameterBlock();
-            pb.addSource(cc);
-            pb.add(MedianFilterDescriptor.MEDIAN_MASK_SQUARE); // X Shape seems to give the least artifacts
-            pb.add(Math.max(2 * (int) (denoiseLevel * scale) + 1, 3));
-            denoiser = ImageN.create("MedianFilter", pb, mfHints);
+            final var maskShape = MedianFilterDescriptor.MEDIAN_MASK_SQUARE; // X Shape seems to give the least artifact
+            final var maskSize = Math.max(2 * (int) (denoiseLevel * scale) + 1, 3);
+            denoiser = MedianFilterDescriptor.create(cc, maskShape, maskSize, mfHints);
 
             RenderingHints layoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, Functions.getImageLayout(ystImage));
             pb = new ParameterBlock();

@@ -13,6 +13,7 @@ import org.eclipse.imagen.*;
 import org.eclipse.imagen.media.lookup.LookupTable;
 import org.eclipse.imagen.media.lookup.LookupTableFactory;
 import org.eclipse.imagen.media.nullop.NullDescriptor;
+import org.eclipse.imagen.media.rescale.RescaleDescriptor;
 import org.eclipse.imagen.media.util.ImageUtil;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -340,14 +341,9 @@ public class Functions {
         if (hints != null)
             formatHints.add(hints);
 
-        final double C0 = 0;
-        final double C1 = 256.0;
-
-        ParameterBlock pb = new ParameterBlock();
-        pb.addSource(source);
-        pb.add(new double[]{C1});
-        pb.add(new double[]{C0});
-        return ImageN.create("Rescale", pb, formatHints);
+        final double[] C0 = new double[] {0};
+        final double[] C1 = new double[] {256.0};
+        return RescaleDescriptor.create(source, C1, C0, formatHints);
     }
 
     public static RenderedOp fromUShortToByte(RenderedImage source, RenderingHints hints) {
@@ -365,14 +361,9 @@ public class Functions {
         if (hints != null)
             formatHints.add(hints);
 
-        final double C0 = 0;
-        final double C1 = 1.0/256.0;
-
-        ParameterBlock pb = new ParameterBlock();
-        pb.addSource(source);
-        pb.add(new double[]{C1});
-        pb.add(new double[]{C0});
-        return ImageN.create("Rescale", pb, formatHints);
+        final double[] C0 = new double[]{0};
+        final double[] C1 = new double[]{1.0/256.0};
+        return RescaleDescriptor.create(source, C1, C0, formatHints);
     }
 
     public static PlanarImage toColorSpace(RenderedImage source, ColorSpace cs, ICC_Profile proof,

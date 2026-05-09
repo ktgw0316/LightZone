@@ -8,6 +8,8 @@ import com.lightcrafts.image.metadata.ImageOrientation;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.utils.Functions;
 import org.eclipse.imagen.*;
+import org.eclipse.imagen.media.affine.AffineDescriptor;
+import org.eclipse.imagen.media.bandselect.BandSelectDescriptor;
 import org.eclipse.imagen.media.format.FormatDescriptor;
 
 import javax.imageio.ImageIO;
@@ -16,7 +18,6 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.*;
-import java.awt.image.renderable.ParameterBlock;
 import java.io.File;
 import java.io.IOException;
 
@@ -128,13 +129,11 @@ class Thumbnailer {
         float scaleX = (float) Math.floor(scale * source.getWidth()) / (float) source.getWidth();
         float scaleY = (float) Math.floor(scale * source.getHeight()) / (float) source.getHeight();
 
-        ParameterBlock params = new ParameterBlock();
-        params.addSource(source);
-        params.add(AffineTransform.getScaleInstance(scaleX, scaleY));
-        params.add(interpolation);
-        RenderingHints hints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
+        final var xform = AffineTransform.getScaleInstance(scaleX, scaleY);
+        final var hints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
             BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-        return ImageN.create("Affine", params, hints);
+        return AffineDescriptor.create(source, xform, interpolation, null, null,
+                false, false, null, hints);
     }
 
     // If the image is a buffered image and it's bigger than 1024 pixels,
@@ -166,15 +165,11 @@ class Thumbnailer {
         ColorModel colors = image.getColorModel();
         boolean hasAlpha = colors.hasAlpha();
         if (hasAlpha) {
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(image);
-            if (image.getColorModel().getNumColorComponents() == 3) {
-                pb.add(new int[] {0, 1, 2});
-            }
-            else {
-                pb.add(new int[] {0});
-            }
-            image = ImageN.create("bandselect", pb, null);
+            final var indices = switch (image.getColorModel().getNumColorComponents()) {
+                case 3 -> new int[]{0, 1, 2};
+                default -> new int[]{0};
+            };
+            image = BandSelectDescriptor.create(image, indices, null);
         }
         return image;
     }
