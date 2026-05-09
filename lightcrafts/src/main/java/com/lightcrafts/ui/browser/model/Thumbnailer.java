@@ -90,25 +90,14 @@ class Thumbnailer {
     static RenderedImage rotateNinetyTimesThenFlip(
             RenderedImage image, int multiple,
             boolean horizontal, boolean vertical) {
-        while (multiple < 0) {
-            multiple += 4;
-        }
         // Get the counter-clockwise rotated orientation,
         // then get the correction for the orientation.
-        ImageOrientation reversed;
-        switch (multiple % 4) {
-            case 1:
-                reversed = ImageOrientation.ORIENTATION_90CCW;
-                break;
-            case 2:
-                reversed = ImageOrientation.ORIENTATION_180;
-                break;
-            case 3:
-                reversed = ImageOrientation.ORIENTATION_90CW;
-                break;
-            default:
-                reversed = ImageOrientation.ORIENTATION_LANDSCAPE;
-        }
+        ImageOrientation reversed = switch (multiple % 4) {
+            case 1, -3 -> ImageOrientation.ORIENTATION_90CCW;
+            case 2, -2 -> ImageOrientation.ORIENTATION_180;
+            case 3, -1 -> ImageOrientation.ORIENTATION_90CW;
+            default -> ImageOrientation.ORIENTATION_LANDSCAPE;
+        };
         if (horizontal) {
             reversed = reversed.getHFlip();
         }
