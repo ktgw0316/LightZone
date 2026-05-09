@@ -20,6 +20,7 @@ import com.lightcrafts.utils.thread.ProgressThread;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.eclipse.imagen.*;
+import org.eclipse.imagen.media.crop.CropDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -166,11 +167,13 @@ public abstract class RawImageType extends ImageType {
             } else if (cameraMake.equals("NIKON") && rawDecoder.getModel().equals("D1X")) {
                 rgbImage = nikonD1XImage(rgbImage, colorModel);
             } else {
-                rgbImage = Functions.crop(rgbImage,
-                                          rgbImage.getMinX() + 5,
-                                          rgbImage.getMinY() + 5,
-                                          rgbImage.getWidth() - 10,
-                                          rgbImage.getHeight() - 10, JAIContext.noCacheHint);
+                rgbImage = CropDescriptor.create(rgbImage,
+                                                 rgbImage.getMinX() + 5f,
+                                                 rgbImage.getMinY() + 5f,
+                                                 rgbImage.getWidth() - 10f,
+                                                 rgbImage.getHeight() - 10f,
+                                                 null, null, null,
+                                                 JAIContext.noCacheHint);
             }
 
             final var cacheLayout = new ImageLayout(
@@ -239,11 +242,12 @@ public abstract class RawImageType extends ImageType {
 
         rotated = ImageN.create("Affine", pb2, hints);
 
-        return Functions.crop(
+        return CropDescriptor.create(
                 rotated,
-                rotated.getMinX() + (rotated.getWidth()  - width)  / 2 + 2,
-                rotated.getMinY() + (rotated.getHeight() - height) / 2 + 2,
-                width - 4, height - 4, JAIContext.noCacheHint);
+                rotated.getMinX() + (rotated.getWidth()  - width)  / 2 + 2f,
+                rotated.getMinY() + (rotated.getHeight() - height) / 2 + 2f,
+                width - 4f, height - 4f,
+                null, null, null, JAIContext.noCacheHint);
     }
 
     private PlanarImage nikonD1XImage(PlanarImage rgbImage, ComponentColorModel colorModel) {

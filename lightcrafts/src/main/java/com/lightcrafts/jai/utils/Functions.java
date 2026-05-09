@@ -54,16 +54,6 @@ public class Functions {
         }
     }
 
-    static public RenderedOp crop(RenderedImage image, float x, float y, float width, float height, RenderingHints hints) {
-        ParameterBlock pb = new ParameterBlock();
-        pb.addSource(image);
-        pb.add(x);
-        pb.add(y);
-        pb.add(width);
-        pb.add(height);
-        return ImageN.create("Crop", pb, hints);
-    }
-
     static public RenderedOp flip(RenderedImage image, boolean horizontal, boolean vertical, RenderingHints hints) {
         final ImageOrientation orient;
         if (horizontal && vertical)

@@ -9,15 +9,16 @@ import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.model.CropBounds;
 import com.lightcrafts.model.Operation;
 import lombok.Getter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.eclipse.imagen.BorderExtender;
 import org.eclipse.imagen.ImageLayout;
 import org.eclipse.imagen.Interpolation;
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.media.crop.CropDescriptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -373,10 +374,11 @@ public class Rendering implements Cloneable {
                 if (intHeight > finalBounds.height) {
                     finalBounds.width = (int) (finalBounds.height * ratio);
                 }
-                xformedSourceImage = Functions.crop(
+                xformedSourceImage = CropDescriptor.create(
                         xformedSourceImage,
-                        finalBounds.x, finalBounds.y,
-                        finalBounds.width, finalBounds.height, null);
+                        (float) finalBounds.x, (float) finalBounds.y,
+                        (float) finalBounds.width, (float) finalBounds.height,
+                        null, null, null, null);
             }
         }
         final var hFlip = cropBounds.isFlippedHorizontally();
