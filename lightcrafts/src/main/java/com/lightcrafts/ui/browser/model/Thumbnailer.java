@@ -14,7 +14,6 @@ import org.eclipse.imagen.ImageLayout;
 import org.eclipse.imagen.Interpolation;
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
-import org.eclipse.imagen.operator.TransposeType;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
@@ -78,21 +77,12 @@ class Thumbnailer {
         return image;
     }
 
-    // Rotate the given image according to the given orientation metadata.
+    /// Rotate the given image according to the given orientation metadata.
     static RenderedImage rotate(RenderedImage image, ImageMetadata meta) {
-        if (meta != null) {
-            ImageOrientation orient = meta.getOrientation();
-            TransposeType transpose = orient.getCorrection();
-            if (transpose != null) {
-                ParameterBlock pb = new ParameterBlock();
-                pb.addSource(image);
-                pb.add(transpose);
-                image = ImageN.create(
-                    "Transpose", pb, null
-                );
-            }
-        }
-        return image;
+        if (meta == null) return image;
+
+        final var orient = meta.getOrientation();
+        return orient.correct(image);
     }
 
     // Rotate the given image clockwise by 90 degrees times the given multiplier,
@@ -100,39 +90,21 @@ class Thumbnailer {
     static RenderedImage rotateNinetyTimesThenFlip(
             RenderedImage image, int multiple,
             boolean horizontal, boolean vertical) {
-        while (multiple < 0) {
-            multiple += 4;
-        }
         // Get the counter-clockwise rotated orientation,
         // then get the correction for the orientation.
-        ImageOrientation reversed;
-        switch (multiple % 4) {
-            case 1:
-                reversed = ImageOrientation.ORIENTATION_90CCW;
-                break;
-            case 2:
-                reversed = ImageOrientation.ORIENTATION_180;
-                break;
-            case 3:
-                reversed = ImageOrientation.ORIENTATION_90CW;
-                break;
-            default:
-                reversed = ImageOrientation.ORIENTATION_LANDSCAPE;
-        }
+        ImageOrientation reversed = switch (multiple % 4) {
+            case 1, -3 -> ImageOrientation.ORIENTATION_90CCW;
+            case 2, -2 -> ImageOrientation.ORIENTATION_180;
+            case 3, -1 -> ImageOrientation.ORIENTATION_90CW;
+            default -> ImageOrientation.ORIENTATION_LANDSCAPE;
+        };
         if (horizontal) {
             reversed = reversed.getHFlip();
         }
         if (vertical) {
             reversed = reversed.getVFlip();
         }
-        final TransposeType transpose = reversed.getCorrection();
-        if (transpose != null) {
-            final ParameterBlock pb = new ParameterBlock();
-            pb.addSource(image);
-            pb.add(transpose);
-            image = ImageN.create("Transpose", pb, null);
-        }
-        return image;
+        return reversed.correct(image);
     }
 
     private static float scaleFactor(RenderedImage img, int xSize) {

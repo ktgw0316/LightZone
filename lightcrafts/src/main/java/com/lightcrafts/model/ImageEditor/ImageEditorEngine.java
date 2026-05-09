@@ -26,6 +26,7 @@ import com.lightcrafts.utils.UserCanceledException;
 import com.lightcrafts.utils.thread.ProgressThread;
 import lombok.AccessLevel;
 import lombok.Getter;
+import org.eclipse.imagen.media.nullop.NullDescriptor;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -191,16 +192,11 @@ public class ImageEditorEngine implements Engine {
 
         final var orientation = metadata.getOrientation();
         if (orientation != null) {
-            final var transposeAngle = orientation.getCorrection();
-            if (transposeAngle != null) {
-                final var pb = new ParameterBlock();
-                pb.addSource(sourceImage);
-                pb.add(transposeAngle);
-                final var transposed = ImageN.create("Transpose", pb, null);
-                transposed.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
-                sourceImage = copyImageDataFrom(transposed);
-                transposed.dispose();
-            }
+            final var transposedImage = orientation.correct(sourceImage);
+            final var transposed = NullDescriptor.create(transposedImage, null);
+            transposed.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
+            sourceImage = copyImageDataFrom(transposed);
+            transposed.dispose();
         }
 
         rendering = new Rendering(sourceImage, this);

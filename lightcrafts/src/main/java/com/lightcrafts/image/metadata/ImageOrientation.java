@@ -3,10 +3,16 @@
 
 package com.lightcrafts.image.metadata;
 
-import org.eclipse.imagen.operator.TransposeType;
+import org.jetbrains.annotations.NotNull;
+
+import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.RenderedImage;
+import java.awt.image.WritableRaster;
 
 import static com.lightcrafts.image.types.TIFFConstants.*;
-import static org.eclipse.imagen.operator.TransposeDescriptor.*;
 
 /**
  * An <code>ImageOrientation</code> specifies the orientation of an image.
@@ -32,37 +38,19 @@ public enum ImageOrientation {
         }
 
         @Override
-        public TransposeType getCorrection() {
-            return null;
+        public RenderedImage correct(RenderedImage src) {
+            return src;
         }
 
         @Override
         public int getRotationTo( ImageOrientation o ) {
-            switch ( o ) {
-                case ORIENTATION_LANDSCAPE:                     // TIFF 1
-                    return 0;
-                case ORIENTATION_180:                           // TIFF 3
-                    return 180;
-                case ORIENTATION_90CCW:                         // TIFF 6
-                    return -90;
-                case ORIENTATION_90CW:                          // TIFF 8
-                    return 90;
-                default:
-                    throw new IllegalArgumentException();
-            }
-        }
-
-        @Override
-        public boolean isRotatableTo( ImageOrientation o ) {
-            switch ( o ) {
-                case ORIENTATION_180:                           // TIFF 3
-                case ORIENTATION_90CCW:                         // TIFF 6
-                case ORIENTATION_90CW:                          // TIFF 8
-                case ORIENTATION_LANDSCAPE:                     // TIFF 1
-                    return true;
-                default:
-                    return false;
-            }
+            return switch (o) {
+                case ORIENTATION_LANDSCAPE -> 0;                // TIFF 1
+                case ORIENTATION_180 -> 180;                    // TIFF 3
+                case ORIENTATION_90CCW -> -90;                  // TIFF 6
+                case ORIENTATION_90CW -> 90;                    // TIFF 8
+                default -> throw new IllegalArgumentException();
+            };
         }
     },
 
@@ -83,8 +71,14 @@ public enum ImageOrientation {
         }
 
         @Override
-        public TransposeType getCorrection() {
-            return ROTATE_180;                                  // clockwise
+        public RenderedImage correct(RenderedImage src) {
+            final int w = src.getWidth();
+            final int h = src.getHeight();
+
+            final var xform = AffineTransform.getTranslateInstance(w, h);
+            xform.quadrantRotate(2);
+
+            return transformedImage(src, w, h, xform);
         }
 
         @Override
@@ -100,19 +94,6 @@ public enum ImageOrientation {
                     return -90;
                 default:
                     throw new IllegalArgumentException();
-            }
-        }
-
-        @Override
-        public boolean isRotatableTo( ImageOrientation o ) {
-            switch ( o ) {
-                case ORIENTATION_180:                           // TIFF 3
-                case ORIENTATION_90CCW:                         // TIFF 6
-                case ORIENTATION_90CW:                          // TIFF 8
-                case ORIENTATION_LANDSCAPE:                     // TIFF 1
-                    return true;
-                default:
-                    return false;
             }
         }
     },
@@ -134,8 +115,14 @@ public enum ImageOrientation {
         }
 
         @Override
-        public TransposeType getCorrection() {
-            return ROTATE_90;                                  // clockwise
+        public RenderedImage correct(RenderedImage src) {
+            final int w = src.getWidth();
+            final int h = src.getHeight();
+
+            final var xform = AffineTransform.getTranslateInstance(h, 0);
+            xform.quadrantRotate(1);
+
+            return transformedImage(src, h, w, xform);
         }
 
         @Override
@@ -151,19 +138,6 @@ public enum ImageOrientation {
                     return 180;
                 default:
                     throw new IllegalArgumentException();
-            }
-        }
-
-        @Override
-        public boolean isRotatableTo( ImageOrientation o ) {
-            switch ( o ) {
-                case ORIENTATION_180:                           // TIFF 3
-                case ORIENTATION_90CCW:                         // TIFF 6
-                case ORIENTATION_90CW:                          // TIFF 8
-                case ORIENTATION_LANDSCAPE:                     // TIFF 1
-                    return true;
-                default:
-                    return false;
             }
         }
     },
@@ -185,8 +159,14 @@ public enum ImageOrientation {
         }
 
         @Override
-        public TransposeType getCorrection() {
-            return FLIP_DIAGONAL;
+        public RenderedImage correct(RenderedImage src) {
+            final int w = src.getWidth();
+            final int h = src.getHeight();
+
+            final var xform = AffineTransform.getQuadrantRotateInstance(1);
+            xform.scale(1, -1);
+
+            return transformedImage(src, h, w, xform);
         }
 
         @Override
@@ -202,19 +182,6 @@ public enum ImageOrientation {
                     return -90;
                 default:
                     throw new IllegalArgumentException();
-            }
-        }
-
-        @Override
-        public boolean isRotatableTo( ImageOrientation o ) {
-            switch ( o ) {
-                case ORIENTATION_90CCW_VFLIP:                   // TIFF 5
-                case ORIENTATION_90CW_VFLIP:                    // TIFF 7
-                case ORIENTATION_SEASCAPE:                      // TIFF 2
-                case ORIENTATION_VFLIP:                         // TIFF 4
-                    return true;
-                default:
-                    return false;
             }
         }
     },
@@ -236,8 +203,14 @@ public enum ImageOrientation {
         }
 
         @Override
-        public TransposeType getCorrection() {
-            return ROTATE_270;                                  // clockwise
+        public RenderedImage correct(RenderedImage src) {
+            final int w = src.getWidth();
+            final int h = src.getHeight();
+
+            final var xform = AffineTransform.getTranslateInstance(0, w);
+            xform.quadrantRotate(3);
+
+            return transformedImage(src, h, w, xform);
         }
 
         @Override
@@ -253,19 +226,6 @@ public enum ImageOrientation {
                     return 0;
                 default:
                     throw new IllegalArgumentException();
-            }
-        }
-
-        @Override
-        public boolean isRotatableTo( ImageOrientation o ) {
-            switch ( o ) {
-                case ORIENTATION_180:                           // TIFF 3
-                case ORIENTATION_90CCW:                         // TIFF 6
-                case ORIENTATION_90CW:                          // TIFF 8
-                case ORIENTATION_LANDSCAPE:                     // TIFF 1
-                    return true;
-                default:
-                    return false;
             }
         }
     },
@@ -287,8 +247,15 @@ public enum ImageOrientation {
         }
 
         @Override
-        public TransposeType getCorrection() {
-            return FLIP_ANTIDIAGONAL;
+        public RenderedImage correct(RenderedImage src) {
+            final int w = src.getWidth();
+            final int h = src.getHeight();
+
+            final var xform = AffineTransform.getTranslateInstance(h, w);
+            xform.quadrantRotate(3);
+            xform.scale(1, -1);
+
+            return transformedImage(src, h, w, xform);
         }
 
         @Override
@@ -304,19 +271,6 @@ public enum ImageOrientation {
                     return 90;
                 default:
                     throw new IllegalArgumentException();
-            }
-        }
-
-        @Override
-        public boolean isRotatableTo( ImageOrientation o ) {
-            switch ( o ) {
-                case ORIENTATION_90CCW_VFLIP:                   // TIFF 5
-                case ORIENTATION_90CW_VFLIP:                    // TIFF 7
-                case ORIENTATION_SEASCAPE:                      // TIFF 2
-                case ORIENTATION_VFLIP:                         // TIFF 4
-                    return true;
-                default:
-                    return false;
             }
         }
     },
@@ -338,8 +292,14 @@ public enum ImageOrientation {
         }
 
         @Override
-        public TransposeType getCorrection() {
-            return FLIP_HORIZONTAL;
+        public RenderedImage correct(RenderedImage src) {
+            final int w = src.getWidth();
+            final int h = src.getHeight();
+
+            final var xform = AffineTransform.getTranslateInstance(w, 0);
+            xform.scale(-1, 1);
+
+            return transformedImage(src, w, h, xform);
         }
 
         @Override
@@ -355,19 +315,6 @@ public enum ImageOrientation {
                     return 180;
                 default:
                     throw new IllegalArgumentException();
-            }
-        }
-
-        @Override
-        public boolean isRotatableTo( ImageOrientation o ) {
-            switch ( o ) {
-                case ORIENTATION_90CCW_VFLIP:                   // TIFF 5
-                case ORIENTATION_90CW_VFLIP:                    // TIFF 7
-                case ORIENTATION_SEASCAPE:                      // TIFF 2
-                case ORIENTATION_VFLIP:                         // TIFF 4
-                    return true;
-                default:
-                    return false;
             }
         }
     },
@@ -389,8 +336,14 @@ public enum ImageOrientation {
         }
 
         @Override
-        public TransposeType getCorrection() {
-            return FLIP_VERTICAL;
+        public RenderedImage correct(RenderedImage src) {
+            final int w = src.getWidth();
+            final int h = src.getHeight();
+
+            final var xform = AffineTransform.getTranslateInstance(0, h);
+            xform.scale(1, -1);
+
+            return transformedImage(src, w, h, xform);
         }
 
         @Override
@@ -406,19 +359,6 @@ public enum ImageOrientation {
                     return 0;
                 default:
                     throw new IllegalArgumentException();
-            }
-        }
-
-        @Override
-        public boolean isRotatableTo( ImageOrientation o ) {
-            switch ( o ) {
-                case ORIENTATION_90CCW_VFLIP:                   // TIFF 5
-                case ORIENTATION_90CW_VFLIP:                    // TIFF 7
-                case ORIENTATION_SEASCAPE:                      // TIFF 2
-                case ORIENTATION_VFLIP:                         // TIFF 4
-                    return true;
-                default:
-                    return false;
             }
         }
     },
@@ -438,20 +378,26 @@ public enum ImageOrientation {
         }
 
         @Override
-        public TransposeType getCorrection() {
-            return null;
+        public RenderedImage correct(RenderedImage src) {
+            return src;
         }
 
         @Override
         public int getRotationTo( ImageOrientation o ) {
             throw new IllegalArgumentException();
         }
-
-        @Override
-        public boolean isRotatableTo( ImageOrientation o ) {
-            return false;
-        }
     };
+
+    private static @NotNull BufferedImage transformedImage(
+            @NotNull RenderedImage src, int dstWidth, int dstHeight, AffineTransform xform) {
+        final var cm = src.getColorModel();
+        final var raster = cm.createCompatibleWritableRaster(dstWidth, dstHeight);
+        final var dst = new BufferedImage(cm, raster, cm.isAlphaPremultiplied(), null);
+        final Graphics2D g = dst.createGraphics();
+        g.drawRenderedImage(src, xform);
+        g.dispose();
+        return dst;
+    }
 
     /**
      * Gets the orientation that is rotated 180 degrees from this orientation.
@@ -496,14 +442,7 @@ public enum ImageOrientation {
      */
     public abstract ImageOrientation getVFlip();
 
-    /**
-     * Gets the corrective action to take in order to display an image having
-     * this orientation.
-     *
-     * @return Returns said action or <code>null</code> if either no corrective
-     * action is required or the corrective action is unknown.
-     */
-    public abstract TransposeType getCorrection();
+    public abstract RenderedImage correct(RenderedImage src);
 
     /**
      * Gets the rotation angle from this <code>ImageOrientation</code> to
@@ -530,31 +469,19 @@ public enum ImageOrientation {
      * @see #getTIFFConstant()
      */
     public static ImageOrientation getOrientationFor( int tiffConstant ) {
-        switch ( tiffConstant ) {
-            case 0: // As a special case, equate to landscape.
-            case TIFF_ORIENTATION_LANDSCAPE:
-                return ORIENTATION_LANDSCAPE;
-            case TIFF_ORIENTATION_180:
-                return ORIENTATION_180;
-            case TIFF_ORIENTATION_90CCW:
-                return ORIENTATION_90CCW;
-            case TIFF_ORIENTATION_90CCW_VFLIP:
-                return ORIENTATION_90CCW_VFLIP;
-            case TIFF_ORIENTATION_90CW:
-                return ORIENTATION_90CW;
-            case TIFF_ORIENTATION_90CW_VFLIP:
-                return ORIENTATION_90CW_VFLIP;
-            case TIFF_ORIENTATION_SEASCAPE:
-                return ORIENTATION_SEASCAPE;
-            case TIFF_ORIENTATION_VFLIP:
-                return ORIENTATION_VFLIP;
-            case TIFF_ORIENTATION_UNKNOWN:
-                return ORIENTATION_UNKNOWN;
-            default:
-                throw new IllegalArgumentException(
-                    "orientation must be [0,9]"
-                );
-        }
+        // 0 is a special case, equate to landscape.
+        return switch (tiffConstant) {
+            case TIFF_ORIENTATION_LANDSCAPE, 0 -> ORIENTATION_LANDSCAPE;
+            case TIFF_ORIENTATION_180          -> ORIENTATION_180;
+            case TIFF_ORIENTATION_90CCW        -> ORIENTATION_90CCW;
+            case TIFF_ORIENTATION_90CCW_VFLIP  -> ORIENTATION_90CCW_VFLIP;
+            case TIFF_ORIENTATION_90CW         -> ORIENTATION_90CW;
+            case TIFF_ORIENTATION_90CW_VFLIP   -> ORIENTATION_90CW_VFLIP;
+            case TIFF_ORIENTATION_SEASCAPE     -> ORIENTATION_SEASCAPE;
+            case TIFF_ORIENTATION_VFLIP        -> ORIENTATION_VFLIP;
+            case TIFF_ORIENTATION_UNKNOWN      -> ORIENTATION_UNKNOWN;
+            default -> throw new IllegalArgumentException("orientation must be [0,9]");
+        };
     }
 
     /**
@@ -576,7 +503,14 @@ public enum ImageOrientation {
      * rotated to the other.
      * @see #getRotationTo(ImageOrientation)
      */
-    public abstract boolean isRotatableTo( ImageOrientation o );
+    public boolean isRotatableTo( ImageOrientation o ) {
+        try {
+            getRotationTo(o);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
 
     ////////// private ////////////////////////////////////////////////////////
 

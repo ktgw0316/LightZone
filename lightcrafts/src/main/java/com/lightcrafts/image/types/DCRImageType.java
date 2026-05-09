@@ -4,10 +4,6 @@ package com.lightcrafts.image.types;
 
 import java.io.IOException;
 import java.awt.image.RenderedImage;
-import java.awt.image.renderable.ParameterBlock;
-
-import org.eclipse.imagen.ImageN;
-import org.eclipse.imagen.operator.TransposeType;
 
 import com.lightcrafts.image.BadImageFileException;
 import com.lightcrafts.image.ImageInfo;
@@ -50,13 +46,7 @@ public final class DCRImageType extends RawImageType {
         final RenderedImage thumb = super.getThumbnailImage( imageInfo );
         final ImageMetadata metaData = imageInfo.getMetadata();
         final ImageOrientation orientation = metaData.getOrientation();
-        final TransposeType transpose = orientation.getCorrection();
-        if ( transpose == null )
-            return thumb;
-        final ParameterBlock pb = new ParameterBlock();
-        pb.addSource( thumb );
-        pb.add( transpose );
-        return ImageN.create( "Transpose", pb, null );
+        return orientation.correct(thumb);
     }
 
     /**

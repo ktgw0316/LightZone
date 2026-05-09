@@ -3,6 +3,7 @@
 
 package com.lightcrafts.jai.utils;
 
+import com.lightcrafts.image.metadata.ImageOrientation;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.operator.LCMSColorConvertDescriptor;
 import com.lightcrafts.model.ImageEditor.ImageProcessor;
@@ -11,8 +12,8 @@ import com.lightcrafts.model.Operation;
 import org.eclipse.imagen.*;
 import org.eclipse.imagen.media.lookup.LookupTable;
 import org.eclipse.imagen.media.lookup.LookupTableFactory;
+import org.eclipse.imagen.media.nullop.NullDescriptor;
 import org.eclipse.imagen.media.util.ImageUtil;
-import org.eclipse.imagen.operator.TransposeDescriptor;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,18 +65,18 @@ public class Functions {
     }
 
     static public RenderedOp flip(RenderedImage image, boolean horizontal, boolean vertical, RenderingHints hints) {
-        if (!horizontal && !vertical)
+        final ImageOrientation orient;
+        if (horizontal && vertical)
+            orient = ImageOrientation.ORIENTATION_180;
+        else if (horizontal)
+            orient = ImageOrientation.ORIENTATION_SEASCAPE;
+        else if (vertical)
+            orient = ImageOrientation.ORIENTATION_VFLIP;
+        else
             return null;
 
-        ParameterBlock pb = new ParameterBlock();
-        pb.addSource(image);
-        if (horizontal && vertical)
-            pb.add(TransposeDescriptor.ROTATE_180);
-        else if (horizontal)
-            pb.add(TransposeDescriptor.FLIP_HORIZONTAL);
-        else // if (vertical)
-            pb.add(TransposeDescriptor.FLIP_VERTICAL);
-        return ImageN.create("Transpose", pb, hints);
+        RenderedImage corrected = orient.correct(image);
+        return NullDescriptor.create(corrected, hints);
     }
 
     static public PlanarImage scaledRendering(Rendering rendering, Operation op, float scale, boolean cheap) {
