@@ -16,6 +16,7 @@ import org.eclipse.imagen.Interpolation;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
 import org.eclipse.imagen.media.bandcombine.BandCombineDescriptor;
+import org.eclipse.imagen.media.lookup.LookupDescriptor;
 import org.eclipse.imagen.media.lookup.LookupTable;
 
 import java.awt.*;
@@ -121,16 +122,13 @@ public class ContrastMaskOperation extends BlendedOperation {
 
             scaleDown = ImageN.create("Not", scaleDown, JAIContext.noCacheHint);       // Invert
             LookupTable table = Functions.computeGammaTable(scaleDown.getSampleModel().getDataType(), gamma);
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(scaleDown);
-            pb.add(table);
             // we cache this since convolution scans its input multiple times
-            gammaCurve = ImageN.create("lookup", pb, null /*JAIContext.noCacheHint*/);
+            gammaCurve = LookupDescriptor.create(scaleDown, table, 0, null, null, false, null);
 
             final RenderedOp blur = Functions.fastGaussianBlur(gammaCurve, newRadius);
 
             if (rescale != 1) {
-                pb = new ParameterBlock();
+                var pb = new ParameterBlock();
                 pb.addSource(blur);
                 pb.add(AffineTransform.getScaleInstance(back.getWidth() / (double) scaleDown.getWidth(),
                                                         back.getHeight() / (double) scaleDown.getHeight()));

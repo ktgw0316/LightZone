@@ -11,10 +11,10 @@ import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
 import com.lightcrafts.utils.LCMatrix;
 import com.lightcrafts.utils.Spline;
-import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
 import org.eclipse.imagen.media.bandcombine.BandCombineDescriptor;
+import org.eclipse.imagen.media.lookup.LookupDescriptor;
 import org.eclipse.imagen.media.lookup.LookupTableFactory;
 import org.ejml.simple.SimpleMatrix;
 import org.slf4j.Logger;
@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.geom.Point2D;
 import java.awt.image.RenderedImage;
-import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.TreeMap;
@@ -296,12 +295,8 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
             for (int i = 0; i < 0x10000; i++)
                 table[2][i] = (short) (0xffff & (int) Math.min(Math.max(i + 0xff * interpolator.interpolate(i / (double) 0xffff, blueCurve), 0), 0xffff));
 
-            var lookupTable = LookupTableFactory.create(table, true);
-
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(image);
-            pb.add(lookupTable);
-            return ImageN.create("lookup", pb, null);
+            final var lookupTable = LookupTableFactory.create(table, true);
+            return LookupDescriptor.create(image, lookupTable, 0, null, null, false, null);
         } else
             return image;
     }

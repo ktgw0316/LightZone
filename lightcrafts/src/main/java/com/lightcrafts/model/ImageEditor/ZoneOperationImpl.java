@@ -7,10 +7,10 @@ import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.ZoneOperation;
 import com.lightcrafts.utils.Spline;
-
 import org.eclipse.imagen.ImageLayout;
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.media.lookup.LookupDescriptor;
 import org.eclipse.imagen.media.lookup.LookupTable;
 import org.eclipse.imagen.media.lookup.LookupTableFactory;
 
@@ -207,12 +207,8 @@ class ZoneOperationImpl extends BlendedOperation implements ZoneOperation {
             pb.add(table);
 
             // Add a layout hint to make sure that source and destination match
-
-            RenderingHints hints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT,
-                                                      new ImageLayout(back));
-            // hints.add(ImageNContext.noCacheHint);
-
-            return ImageN.create("lookup", pb, hints);
+            final var hints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, new ImageLayout(back));
+            return LookupDescriptor.create(back, table, 0, null, null, false, hints);
         }
     }
 

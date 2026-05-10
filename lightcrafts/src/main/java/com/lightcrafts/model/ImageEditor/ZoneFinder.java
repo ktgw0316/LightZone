@@ -16,6 +16,7 @@ import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.media.bandcombine.BandCombineDescriptor;
 import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.media.lookup.LookupDescriptor;
 import org.eclipse.imagen.media.lookup.LookupTableFactory;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -304,11 +305,8 @@ public class ZoneFinder extends Preview implements PaintListener {
             }
         }
 
-        ParameterBlock pb = new ParameterBlock();
-        pb.addSource(image);
-        pb.add(LookupTableFactory.create(lut));
-
-        return ImageN.create("lookup", pb, JAIContext.noCacheHint);
+        final var table = LookupTableFactory.create(lut);
+        return LookupDescriptor.create(image, table, 0, null, null, false, JAIContext.noCacheHint);
     }
 
     // Compute a simple hash of the image for cache comparison

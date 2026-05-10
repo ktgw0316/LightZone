@@ -15,6 +15,7 @@ import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
 import org.eclipse.imagen.media.bandcombine.BandCombineDescriptor;
 import org.eclipse.imagen.media.bandmerge.BandMergeDescriptor;
+import org.eclipse.imagen.media.lookup.LookupDescriptor;
 import org.eclipse.imagen.media.lookup.LookupTable;
 import org.eclipse.imagen.media.lookup.LookupTableFactory;
 import org.eclipse.imagen.media.bandselect.BandSelectDescriptor;
@@ -144,10 +145,7 @@ public class UnSharpMaskOperation extends BlendedOperation {
     static class GammaUSMProcessor implements ImageProcessor {
         @Override
         public RenderedOp process(RenderedImage source) {
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(source);
-            pb.add(invertTable());
-            return ImageN.create("lookup", pb, null);
+            return LookupDescriptor.create(source, invertTable(), 0, null, null, false, null);
         }
     }
 
@@ -155,13 +153,8 @@ public class UnSharpMaskOperation extends BlendedOperation {
         @Override
         public RenderedOp process(RenderedImage source) {
             double[][] yChannel = new double[][]{{ColorScience.Wr, ColorScience.Wg, ColorScience.Wb, 0}};
-
             RenderedOp y = BandCombineDescriptor.create(source, yChannel, null);
-
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(y);
-            pb.add(invertTable());
-            return ImageN.create("lookup", pb, null);
+            return LookupDescriptor.create(y, invertTable(), 0, null, null, false, null);
         }
     }
 
@@ -207,10 +200,7 @@ public class UnSharpMaskOperation extends BlendedOperation {
             RenderedOp usm = ImageN.create("LCUnsharpMask", pb, extenderHints);
             usm.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
 
-            pb = new ParameterBlock();
-            pb.addSource(usm);
-            pb.add(getTable());
-            return ImageN.create("lookup", pb, JAIContext.noCacheHint);
+            return LookupDescriptor.create(usm, getTable(), 0, null, null, false, JAIContext.noCacheHint);
         }
 
         public PlanarImage setFrontLuminance() {
@@ -233,10 +223,7 @@ public class UnSharpMaskOperation extends BlendedOperation {
             RenderedOp usm = ImageN.create("LCUnsharpMask", pb, extenderHints);
             usm.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
 
-            pb = new ParameterBlock();
-            pb.addSource(usm);
-            pb.add(getTable());
-            RenderedOp invLookup = ImageN.create("lookup", pb, JAIContext.noCacheHint);
+            RenderedOp invLookup = LookupDescriptor.create(usm, getTable(), 0, null, null, false, JAIContext.noCacheHint);
 
             final var layoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, Functions.getImageLayout(ystImage));
             layoutHints.add(JAIContext.noCacheHint);

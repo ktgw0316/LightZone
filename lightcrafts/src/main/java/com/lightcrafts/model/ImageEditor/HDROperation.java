@@ -13,6 +13,7 @@ import org.eclipse.imagen.BorderExtender;
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.media.lookup.LookupDescriptor;
 
 import java.awt.*;
 import java.awt.image.RenderedImage;
@@ -82,11 +83,8 @@ public class HDROperation extends BlendedOperation {
             final RenderedImage singleChannel = createSingleChannel(source);
             RenderedOp invert = ImageN.create("Not", singleChannel, JAIContext.noCacheHint);       // Invert
             var table = Functions.computeGammaTable(invert.getColorModel().getTransferType(), gamma);
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(invert);
-            pb.add(table);
             // we cache this since convolution scans its input multiple times
-            return ImageN.create("lookup", pb, null);
+            return LookupDescriptor.create(invert, table, 0, null, null, false, null);
         }
     }
 
