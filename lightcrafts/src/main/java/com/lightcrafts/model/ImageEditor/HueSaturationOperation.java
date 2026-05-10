@@ -2,17 +2,16 @@
 
 package com.lightcrafts.model.ImageEditor;
 
+import com.lightcrafts.image.color.ColorMatrix2;
+import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.jai.opimage.HueRotateOpImage;
+import com.lightcrafts.jai.opimage.IntVibranceOpImage;
+import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
-import com.lightcrafts.image.color.ColorMatrix2;
-import com.lightcrafts.jai.utils.Transform;
-import com.lightcrafts.jai.JAIContext;
-import com.lightcrafts.jai.opimage.IntVibranceOpImage;
-import com.lightcrafts.jai.opimage.HueRotateOpImage;
-
-import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
-import java.awt.image.renderable.ParameterBlock;
+import org.eclipse.imagen.media.bandcombine.BandCombineDescriptor;
+
 import java.text.DecimalFormat;
 
 import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_HUE_SATURATION;
@@ -143,10 +142,7 @@ public class HueSaturationOperation extends BlendedOperation {
         @Override
         public PlanarImage setFront() {
             double[][] hslTransform = computeTransform();
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(back);
-            pb.add(hslTransform);
-            PlanarImage image = ImageN.create("BandCombine", pb, JAIContext.noCacheHint);
+            PlanarImage image = BandCombineDescriptor.create(back, hslTransform, JAIContext.noCacheHint);
 
             if (vibrance != 0.0)
                 image = new IntVibranceOpImage(image, computeVibranceTransform(), null);

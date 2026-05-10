@@ -21,6 +21,7 @@ import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
 import org.eclipse.imagen.TileCache;
+import org.eclipse.imagen.media.bandcombine.BandCombineDescriptor;
 import org.eclipse.imagen.media.bandmerge.BandMergeDescriptor;
 import org.eclipse.imagen.media.bandselect.BandSelectDescriptor;
 import java.awt.*;
@@ -395,10 +396,8 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
                         LCMSColorConvertDescriptor.RELATIVE_COLORIMETRIC, null);
                 RenderedOp abImage = BandSelectDescriptor.create(labImage, new int[]{1, 2}, null);
 
-                var pb = new ParameterBlock();
-                pb.addSource(back);
-                pb.add(new double[][]{{ColorScience.Wr, ColorScience.Wg, ColorScience.Wb, 0}});
-                PlanarImage monochrome = ImageN.create("BandCombine", pb, null);
+                final var matrix = new double[][]{{ColorScience.Wr, ColorScience.Wg, ColorScience.Wb, 0}};
+                PlanarImage monochrome = BandCombineDescriptor.create(back, matrix, null);
 
                 final var layoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, Functions.getImageLayout(labImage));
                 // layoutHints.add(JAIContext.noCacheHint);
@@ -445,9 +444,6 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
         }
 
         final double[][] yChannel = new double[][]{{ColorScience.Wr, ColorScience.Wg, ColorScience.Wb, 0}};
-        ParameterBlock pb = new ParameterBlock()
-                .addSource(source)
-                .add(yChannel);
-        return ImageN.create("BandCombine", pb, null);
+        return BandCombineDescriptor.create(source, yChannel, null);
     }
 }

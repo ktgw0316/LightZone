@@ -15,6 +15,7 @@ import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.Interpolation;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.media.bandcombine.BandCombineDescriptor;
 import org.eclipse.imagen.media.lookup.LookupTable;
 
 import java.awt.*;
@@ -112,13 +113,10 @@ public class ContrastMaskOperation extends BlendedOperation {
             }
 
             if (scaleDown.getColorModel().getNumComponents() == 3) {
-                ParameterBlock pb = new ParameterBlock();
-                pb.addSource(scaleDown);
                 double[][] transform = {
                         {ColorScience.Wr, ColorScience.Wg, ColorScience.Wb, 0}
                 };
-                pb.add(transform);
-                scaleDown = ImageN.create("BandCombine", pb, JAIContext.noCacheHint);  // Desaturate, single banded
+                scaleDown = BandCombineDescriptor.create(scaleDown, transform, JAIContext.noCacheHint);  // Desaturate, single banded
             }
 
             scaleDown = ImageN.create("Not", scaleDown, JAIContext.noCacheHint);       // Invert

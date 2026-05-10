@@ -14,6 +14,7 @@ import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.utils.Segment;
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.media.bandcombine.BandCombineDescriptor;
 import org.eclipse.imagen.RenderedOp;
 import org.eclipse.imagen.media.lookup.LookupTableFactory;
 import org.jetbrains.annotations.NotNull;
@@ -246,11 +247,7 @@ public class ZoneFinder extends Preview implements PaintListener {
             double[][] transform = {
                 {pp.W[0], pp.W[1], pp.W[2], 0}
             };
-
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(image);
-            pb.add(transform);
-            image = ImageN.create("BandCombine", pb, JAIContext.noCacheHint); // Desaturate, single banded
+            image = BandCombineDescriptor.create(image, transform, JAIContext.noCacheHint); // Desaturate, single banded
         }
 
         return image;

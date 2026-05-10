@@ -13,6 +13,7 @@ import org.eclipse.imagen.BorderExtender;
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.media.bandcombine.BandCombineDescriptor;
 import org.eclipse.imagen.media.bandmerge.BandMergeDescriptor;
 import org.eclipse.imagen.media.lookup.LookupTable;
 import org.eclipse.imagen.media.lookup.LookupTableFactory;
@@ -155,12 +156,9 @@ public class UnSharpMaskOperation extends BlendedOperation {
         public RenderedOp process(RenderedImage source) {
             double[][] yChannel = new double[][]{{ColorScience.Wr, ColorScience.Wg, ColorScience.Wb, 0}};
 
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource( source );
-            pb.add( yChannel );
-            RenderedOp y = ImageN.create("BandCombine", pb, null);
+            RenderedOp y = BandCombineDescriptor.create(source, yChannel, null);
 
-            pb = new ParameterBlock();
+            ParameterBlock pb = new ParameterBlock();
             pb.addSource(y);
             pb.add(invertTable());
             return ImageN.create("lookup", pb, null);
@@ -221,16 +219,13 @@ public class UnSharpMaskOperation extends BlendedOperation {
             double[][] rgb2yst = yst.fromRGB(back.getSampleModel().getDataType());
             double[][] yst2rgb = yst.toRGB(back.getSampleModel().getDataType());
 
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource( back );
-            pb.add( rgb2yst );
-            RenderedOp ystImage = ImageN.create("BandCombine", pb, null);
+            RenderedOp ystImage = BandCombineDescriptor.create(back, rgb2yst, null);
 
             RenderedOp cc = BandSelectDescriptor.create(ystImage, new int[]{1, 2}, JAIContext.noCacheHint);
 
             RenderingHints extenderHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
                                                               BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-            pb = new ParameterBlock();
+            var pb = new ParameterBlock();
             pb.addSource(LuminanceUSMProcessorInstance.process(back));
             pb.addSource(Functions.gaussianBlur(back, rendering, op, LuminanceUSMProcessorInstance, radius * scale));
             pb.add(amount/100.0);
@@ -247,10 +242,7 @@ public class UnSharpMaskOperation extends BlendedOperation {
             layoutHints.add(JAIContext.noCacheHint);
             RenderedOp denoisedyst = BandMergeDescriptor.create(null, 0, false, layoutHints, invLookup, cc);
 
-            pb = new ParameterBlock();
-            pb.addSource( denoisedyst );
-            pb.add( yst2rgb );
-            return ImageN.create("BandCombine", pb, JAIContext.noCacheHint);
+            return BandCombineDescriptor.create(denoisedyst, yst2rgb, JAIContext.noCacheHint);
         }
 
         @Override

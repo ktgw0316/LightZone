@@ -14,6 +14,7 @@ import com.lightcrafts.utils.Spline;
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.media.bandcombine.BandCombineDescriptor;
 import org.eclipse.imagen.media.lookup.LookupTableFactory;
 import org.ejml.simple.SimpleMatrix;
 import org.slf4j.Logger;
@@ -315,7 +316,7 @@ public class WhiteBalanceV2 extends BlendedOperation implements ColorDropperOper
             for (int j = 0; j < 3; j++)
                 t[i][j] = b[i][j];
 
-        RenderedOp cargb = ImageN.create("BandCombine", image, t, null);
+        RenderedOp cargb = BandCombineDescriptor.create(image, t, null);
 
         if (tint != 0)
             return tintCast(cargb, tint, lightness);
