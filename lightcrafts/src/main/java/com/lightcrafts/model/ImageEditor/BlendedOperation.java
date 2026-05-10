@@ -21,6 +21,7 @@ import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
 import org.eclipse.imagen.TileCache;
+import org.eclipse.imagen.media.bandselect.BandSelectDescriptor;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -391,12 +392,9 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
 
                 PlanarImage labImage = Functions.toColorSpace(back, new LCMS_ColorSpace(new LCMS.LABProfile()),
                         LCMSColorConvertDescriptor.RELATIVE_COLORIMETRIC, null);
-                ParameterBlock pb = new ParameterBlock();
-                pb.addSource(labImage);
-                pb.add(new int[]{1, 2});
-                RenderedOp abImage = ImageN.create("bandselect", pb, null);
+                RenderedOp abImage = BandSelectDescriptor.create(labImage, new int[]{1, 2}, null);
 
-                pb = new ParameterBlock();
+                var pb = new ParameterBlock();
                 pb.addSource(back);
                 pb.add(new double[][]{{ColorScience.Wr, ColorScience.Wg, ColorScience.Wb, 0}});
                 PlanarImage monochrome = ImageN.create("BandCombine", pb, null);

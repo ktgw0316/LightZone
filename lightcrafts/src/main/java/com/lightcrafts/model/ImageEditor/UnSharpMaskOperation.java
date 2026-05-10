@@ -15,6 +15,7 @@ import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
 import org.eclipse.imagen.media.lookup.LookupTable;
 import org.eclipse.imagen.media.lookup.LookupTableFactory;
+import org.eclipse.imagen.media.bandselect.BandSelectDescriptor;
 
 import java.awt.*;
 import java.awt.image.RenderedImage;
@@ -224,10 +225,7 @@ public class UnSharpMaskOperation extends BlendedOperation {
             pb.add( rgb2yst );
             RenderedOp ystImage = ImageN.create("BandCombine", pb, null);
 
-            pb = new ParameterBlock();
-            pb.addSource(ystImage);
-            pb.add(new int[]{1, 2});
-            RenderedOp cc = ImageN.create("bandselect", pb, JAIContext.noCacheHint);
+            RenderedOp cc = BandSelectDescriptor.create(ystImage, new int[]{1, 2}, JAIContext.noCacheHint);
 
             RenderingHints extenderHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
                                                               BorderExtender.createInstance(BorderExtender.BORDER_COPY));
@@ -281,4 +279,3 @@ public class UnSharpMaskOperation extends BlendedOperation {
         return type;
     }
 }
-

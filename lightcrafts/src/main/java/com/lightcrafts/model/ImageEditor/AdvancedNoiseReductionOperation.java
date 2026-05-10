@@ -13,6 +13,7 @@ import org.eclipse.imagen.BorderExtender;
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.media.bandselect.BandSelectDescriptor;
 import java.awt.*;
 import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
@@ -127,15 +128,8 @@ public class AdvancedNoiseReductionOperation extends BlendedOperation {
             }
 
             if (luma_domain != 0 && luma_range != 0) {
-                pb = new ParameterBlock();
-                pb.addSource(ystImage);
-                pb.add(new int[]{0});
-                RenderedOp y = ImageN.create("bandselect", pb, null);
-
-                pb = new ParameterBlock();
-                pb.addSource(ystImage);
-                pb.add(new int[]{1, 2});
-                RenderedOp cc = ImageN.create("bandselect", pb, JAIContext.noCacheHint);
+                RenderedOp y = BandSelectDescriptor.create(ystImage, new int[]{0}, null);
+                RenderedOp cc = BandSelectDescriptor.create(ystImage, new int[]{1, 2}, JAIContext.noCacheHint);
 
                 pb = new ParameterBlock();
                 pb.addSource( y );

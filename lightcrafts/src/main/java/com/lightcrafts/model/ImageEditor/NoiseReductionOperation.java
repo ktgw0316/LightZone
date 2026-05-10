@@ -13,6 +13,7 @@ import org.eclipse.imagen.BorderExtender;
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.media.bandselect.BandSelectDescriptor;
 import org.eclipse.imagen.operator.MedianFilterDescriptor;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.*;
@@ -68,16 +69,10 @@ public class NoiseReductionOperation extends BlendedOperation {
             pb.add( rgb2yst );
             RenderedOp ystImage = ImageN.create("BandCombine", pb, JAIContext.noCacheHint);
 
-            pb = new ParameterBlock();
-            pb.addSource(ystImage);
-            pb.add(new int[]{0});
-            RenderedOp y = ImageN.create("bandselect", pb, JAIContext.noCacheHint);
+            RenderedOp y = BandSelectDescriptor.create(ystImage, new int[]{0}, JAIContext.noCacheHint);
 
-            pb = new ParameterBlock();
-            pb.addSource(ystImage);
-            pb.add(new int[]{1, 2});
             // NOTE: we cache this because the median filter is an area op that gets its input multiple times
-            RenderedOp cc = ImageN.create("bandselect", pb, null);
+            RenderedOp cc = BandSelectDescriptor.create(ystImage, new int[]{1, 2}, null);
 
             final var mfHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
             mfHints.add(JAIContext.noCacheHint);
