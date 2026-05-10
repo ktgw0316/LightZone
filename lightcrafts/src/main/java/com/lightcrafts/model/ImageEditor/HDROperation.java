@@ -13,6 +13,7 @@ import org.eclipse.imagen.BorderExtender;
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.media.algebra.AlgebraDescriptor;
 import org.eclipse.imagen.media.lookup.LookupDescriptor;
 
 import java.awt.*;
@@ -21,6 +22,7 @@ import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
 
 import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_RELIGHT;
+import static org.eclipse.imagen.media.algebra.AlgebraDescriptor.Operator.NOT;
 
 /**
  * Created by IntelliJ IDEA.
@@ -81,8 +83,8 @@ public class HDROperation extends BlendedOperation {
         @Override
         public RenderedOp process(RenderedImage source) {
             final RenderedImage singleChannel = createSingleChannel(source);
-            RenderedOp invert = ImageN.create("Not", singleChannel, JAIContext.noCacheHint);       // Invert
-            var table = Functions.computeGammaTable(invert.getColorModel().getTransferType(), gamma);
+            RenderedOp invert = AlgebraDescriptor.create(NOT, null, null, 0, JAIContext.noCacheHint, singleChannel);
+            final var table = Functions.computeGammaTable(invert.getColorModel().getTransferType(), gamma);
             // we cache this since convolution scans its input multiple times
             return LookupDescriptor.create(invert, table, 0, null, null, false, null);
         }
