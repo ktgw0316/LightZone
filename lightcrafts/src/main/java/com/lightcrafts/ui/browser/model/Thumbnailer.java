@@ -7,13 +7,10 @@ import com.lightcrafts.image.metadata.ImageMetadata;
 import com.lightcrafts.image.metadata.ImageOrientation;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.utils.Functions;
+import org.eclipse.imagen.*;
+import org.eclipse.imagen.media.format.FormatDescriptor;
 
 import javax.imageio.ImageIO;
-import org.eclipse.imagen.BorderExtender;
-import org.eclipse.imagen.ImageLayout;
-import org.eclipse.imagen.Interpolation;
-import org.eclipse.imagen.ImageN;
-import org.eclipse.imagen.PlanarImage;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
@@ -157,10 +154,8 @@ class Thumbnailer {
                 RenderingHints formatHints = new RenderingHints(
                     ImageN.KEY_IMAGE_LAYOUT, layout
                 );
-                ParameterBlock pb = new ParameterBlock();
-                pb.addSource(image);
-                pb.add(image.getSampleModel().getDataType());
-                image = ImageN.create("Format", pb, formatHints);
+                final var dataType = image.getSampleModel().getDataType();
+                image = FormatDescriptor.create(image, dataType, formatHints);
             }
         }
         return image;

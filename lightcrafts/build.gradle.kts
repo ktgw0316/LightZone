@@ -19,6 +19,7 @@ dependencies {
     implementation("org.eclipse.imagen:bandmerge:0.9.1")
     implementation("org.eclipse.imagen:bandselect:0.9.1")
     implementation("org.eclipse.imagen:crop:0.9.1")
+    implementation("org.eclipse.imagen:format:0.9.0")
     implementation("org.eclipse.imagen:imagen-core:0.9.1")
     implementation("org.eclipse.imagen:lookup:0.9.1")
     implementation("org.eclipse.imagen:nullop:0.9.1")

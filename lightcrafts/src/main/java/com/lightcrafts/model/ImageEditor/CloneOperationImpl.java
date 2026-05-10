@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2026-     Masahiro Kitagawa */
 
 package com.lightcrafts.model.ImageEditor;
 
@@ -13,6 +14,8 @@ import org.eclipse.imagen.ImageLayout;
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.media.format.FormatDescriptor;
+
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.image.renderable.ParameterBlock;
@@ -99,12 +102,9 @@ public class CloneOperationImpl extends BlendedOperation implements CloneOperati
 
             // Format retiles the image
             // TODO: this needs better understanding, can we just specify the layout for Crop?
-            pb = new ParameterBlock();
-            pb.addSource(crop)
-              .add(back.getSampleModel().getDataType());
-            RenderingHints formatHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, new ImageLayout(back));
-            formatHints.add(JAIContext.noCacheHint);
-            RenderedOp formatted = ImageN.create("Format", pb, formatHints);
+            final var dataType = back.getSampleModel().getDataType();
+            final var formatHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, new ImageLayout(back));
+            RenderedOp formatted = FormatDescriptor.create(crop, dataType, formatHints);
 
             Region r = new Region() {
                 @Override
