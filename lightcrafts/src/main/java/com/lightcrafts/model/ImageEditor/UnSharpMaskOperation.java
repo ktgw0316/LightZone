@@ -13,6 +13,7 @@ import org.eclipse.imagen.BorderExtender;
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.media.bandmerge.BandMergeDescriptor;
 import org.eclipse.imagen.media.lookup.LookupTable;
 import org.eclipse.imagen.media.lookup.LookupTableFactory;
 import org.eclipse.imagen.media.bandselect.BandSelectDescriptor;
@@ -242,12 +243,9 @@ public class UnSharpMaskOperation extends BlendedOperation {
             pb.add(getTable());
             RenderedOp invLookup = ImageN.create("lookup", pb, JAIContext.noCacheHint);
 
-            RenderingHints layoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, Functions.getImageLayout(ystImage));
-            pb = new ParameterBlock();
-            pb.addSource(invLookup);
-            pb.addSource(cc);
+            final var layoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, Functions.getImageLayout(ystImage));
             layoutHints.add(JAIContext.noCacheHint);
-            RenderedOp denoisedyst = ImageN.create("BandMerge", pb, layoutHints);
+            RenderedOp denoisedyst = BandMergeDescriptor.create(null, 0, false, layoutHints, invLookup, cc);
 
             pb = new ParameterBlock();
             pb.addSource( denoisedyst );

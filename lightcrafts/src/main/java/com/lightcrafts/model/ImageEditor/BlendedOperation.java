@@ -21,6 +21,7 @@ import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
 import org.eclipse.imagen.TileCache;
+import org.eclipse.imagen.media.bandmerge.BandMergeDescriptor;
 import org.eclipse.imagen.media.bandselect.BandSelectDescriptor;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -399,12 +400,9 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
                 pb.add(new double[][]{{ColorScience.Wr, ColorScience.Wg, ColorScience.Wb, 0}});
                 PlanarImage monochrome = ImageN.create("BandCombine", pb, null);
 
-                RenderingHints layoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, Functions.getImageLayout(labImage));
+                final var layoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, Functions.getImageLayout(labImage));
                 // layoutHints.add(JAIContext.noCacheHint);
-                pb = new ParameterBlock();
-                pb.addSource(monochrome);
-                pb.addSource(abImage);
-                PlanarImage maskImage = ImageN.create("BandMerge", pb, layoutHints);
+                PlanarImage maskImage = BandMergeDescriptor.create(null, 0, false, layoutHints, monochrome, abImage);
 
                 colorSelectionMask = Functions.fastGaussianBlur(
                         new RGBColorSelectionMaskOpImage(maskImage, getColorSelection(), null), 0.5 * scale);

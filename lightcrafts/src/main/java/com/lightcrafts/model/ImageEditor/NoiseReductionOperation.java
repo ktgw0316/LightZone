@@ -13,6 +13,7 @@ import org.eclipse.imagen.BorderExtender;
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.media.bandmerge.BandMergeDescriptor;
 import org.eclipse.imagen.media.bandselect.BandSelectDescriptor;
 import org.eclipse.imagen.operator.MedianFilterDescriptor;
 import java.awt.image.renderable.ParameterBlock;
@@ -80,12 +81,9 @@ public class NoiseReductionOperation extends BlendedOperation {
             final var maskSize = Math.max(2 * (int) (denoiseLevel * scale) + 1, 3);
             denoiser = MedianFilterDescriptor.create(cc, maskShape, maskSize, mfHints);
 
-            RenderingHints layoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, Functions.getImageLayout(ystImage));
-            pb = new ParameterBlock();
-            pb.addSource(y);
-            pb.addSource(denoiser);
+            final var layoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, Functions.getImageLayout(ystImage));
             layoutHints.add(JAIContext.noCacheHint);
-            RenderedOp denoisedyst = ImageN.create("BandMerge", pb, layoutHints);
+            RenderedOp denoisedyst = BandMergeDescriptor.create(null, 0, false, layoutHints, y, denoiser);
 
             pb = new ParameterBlock();
             pb.addSource( denoisedyst );

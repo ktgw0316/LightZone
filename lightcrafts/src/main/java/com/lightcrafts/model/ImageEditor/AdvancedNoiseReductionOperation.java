@@ -13,6 +13,7 @@ import org.eclipse.imagen.BorderExtender;
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.media.bandmerge.BandMergeDescriptor;
 import org.eclipse.imagen.media.bandselect.BandSelectDescriptor;
 import java.awt.*;
 import java.awt.image.renderable.ParameterBlock;
@@ -137,12 +138,9 @@ public class AdvancedNoiseReductionOperation extends BlendedOperation {
                 pb.add(0.005f * luma_domain);
                 y = ImageN.create("BilateralFilter", pb, mfHints);
 
-                RenderingHints layoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, Functions.getImageLayout(ystImage));
-                pb = new ParameterBlock();
-                pb.addSource(y);
-                pb.addSource(cc);
+                final var layoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, Functions.getImageLayout(ystImage));
                 layoutHints.add(JAIContext.noCacheHint);
-                ystImage = ImageN.create("BandMerge", pb, layoutHints);
+                ystImage = BandMergeDescriptor.create(null, 0, false, layoutHints, y, cc);
             }
 
             pb = new ParameterBlock();
