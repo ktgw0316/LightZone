@@ -12,13 +12,13 @@ import com.lightcrafts.model.Region;
 import com.lightcrafts.model.ZoneOperation;
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.utils.Segment;
-import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
 import org.eclipse.imagen.media.bandcombine.BandCombineDescriptor;
 import org.eclipse.imagen.media.crop.CropDescriptor;
 import org.eclipse.imagen.media.lookup.LookupDescriptor;
 import org.eclipse.imagen.media.lookup.LookupTableFactory;
+import org.eclipse.imagen.media.scale.ScaleDescriptor;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +33,6 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.*;
-import java.awt.image.renderable.ParameterBlock;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -209,12 +208,7 @@ public class ZoneFinder extends Preview implements PaintListener {
 
         if (visibleRect.width > previewSize.width || visibleRect.height > previewSize.height) {
             final float scale = Math.min(previewSize.width / (float) visibleRect.width, previewSize.height / (float) visibleRect.height);
-
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(image);
-            pb.add(scale);
-            pb.add(scale);
-            image = ImageN.create("Scale", pb, JAIContext.noCacheHint);
+            image = ScaleDescriptor.create(image, scale, scale, 0f, 0f, null, JAIContext.noCacheHint);
         }
 
         // avoid keeping references to the input image

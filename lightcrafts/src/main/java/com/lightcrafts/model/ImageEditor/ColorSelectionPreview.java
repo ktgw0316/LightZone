@@ -8,12 +8,11 @@ import com.lightcrafts.model.Operation;
 import com.lightcrafts.model.Preview;
 import com.lightcrafts.model.Region;
 import com.lightcrafts.ui.LightZoneSkin;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.media.crop.CropDescriptor;
+import org.eclipse.imagen.media.scale.ScaleDescriptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
@@ -22,7 +21,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.awt.image.RenderedImage;
-import java.awt.image.renderable.ParameterBlock;
 import java.lang.ref.SoftReference;
 
 import static com.lightcrafts.model.ImageEditor.Locale.LOCALE;
@@ -138,12 +136,7 @@ public class ColorSelectionPreview extends Preview implements PaintListener {
 
         if (visibleRect.width > previewSize.width || visibleRect.height > previewSize.height) {
             float scale = Math.min(previewSize.width / (float) visibleRect.width, previewSize.height / (float) visibleRect.height);
-
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(image);
-            pb.add(scale);
-            pb.add(scale);
-            image = ImageN.create("Scale", pb, JAIContext.noCacheHint);
+            image = ScaleDescriptor.create(image, scale, scale, 0f, 0f, null, JAIContext.noCacheHint);
         }
 
         image = Functions.toColorSpace(image, JAIContext.systemColorSpace, null);
