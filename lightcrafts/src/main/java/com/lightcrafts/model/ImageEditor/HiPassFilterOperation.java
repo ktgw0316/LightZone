@@ -2,17 +2,17 @@
 
 package com.lightcrafts.model.ImageEditor;
 
+import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.jai.utils.Functions;
+import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
-import com.lightcrafts.jai.utils.Transform;
-import com.lightcrafts.jai.utils.Functions;
-import com.lightcrafts.jai.JAIContext;
-
-import org.eclipse.imagen.KernelImageN;
-import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.KernelImageN;
 import org.eclipse.imagen.PlanarImage;
-import java.awt.image.renderable.ParameterBlock;
+import org.eclipse.imagen.media.convolve.ConvolveDescriptor;
+
 import java.awt.*;
 import java.text.DecimalFormat;
 
@@ -71,13 +71,10 @@ public class HiPassFilterOperation extends BlendedOperation {
         @Override
         public PlanarImage setFront() {
             kernel = Functions.LoGSharpenKernel(radius * scale, gain);
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(back);
-            pb.add(kernel);
-            RenderingHints hints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
+            final var hints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
                     BorderExtender.createInstance(BorderExtender.BORDER_COPY));
             hints.add(JAIContext.noCacheHint);
-            return ImageN.create("convolve", pb, hints);
+            return ConvolveDescriptor.create(back, kernel, null, null, 0, true, hints);
         }
     }
 
