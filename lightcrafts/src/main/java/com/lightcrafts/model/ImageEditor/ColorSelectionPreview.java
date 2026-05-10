@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.media.crop.CropDescriptor;
+
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -126,13 +128,10 @@ public class ColorSelectionPreview extends Preview implements PaintListener {
         visibleRect = bounds.intersection(visibleRect);
 
         if (bounds.contains(visibleRect)) {
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(image);
-            pb.add((float) visibleRect.x);
-            pb.add((float) visibleRect.y);
-            pb.add((float) visibleRect.width);
-            pb.add((float) visibleRect.height);
-            image = ImageN.create("Crop", pb, JAIContext.noCacheHint);
+            image = CropDescriptor.create(image,
+                    (float) visibleRect.x, (float) visibleRect.y,
+                    (float) visibleRect.width, (float) visibleRect.height,
+                    null, null, null, JAIContext.noCacheHint);
         }
 
         Dimension previewSize = getSize();

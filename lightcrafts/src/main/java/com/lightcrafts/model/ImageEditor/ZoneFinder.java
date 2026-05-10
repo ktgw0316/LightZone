@@ -14,8 +14,9 @@ import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.utils.Segment;
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
-import org.eclipse.imagen.media.bandcombine.BandCombineDescriptor;
 import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.media.bandcombine.BandCombineDescriptor;
+import org.eclipse.imagen.media.crop.CropDescriptor;
 import org.eclipse.imagen.media.lookup.LookupDescriptor;
 import org.eclipse.imagen.media.lookup.LookupTableFactory;
 import org.jetbrains.annotations.NotNull;
@@ -188,13 +189,10 @@ public class ZoneFinder extends Preview implements PaintListener {
         visibleRect = bounds.intersection(visibleRect);
 
         if (bounds.contains(visibleRect)) {
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(image);
-            pb.add((float) visibleRect.x);
-            pb.add((float) visibleRect.y);
-            pb.add((float) visibleRect.width);
-            pb.add((float) visibleRect.height);
-            image = ImageN.create("Crop", pb, JAIContext.noCacheHint);
+            image = CropDescriptor.create(image,
+                    (float) visibleRect.x, (float) visibleRect.y,
+                    (float) visibleRect.width, (float) visibleRect.height,
+                    null, null, null, JAIContext.noCacheHint);
         }
 
         Dimension previewSize = getSize();

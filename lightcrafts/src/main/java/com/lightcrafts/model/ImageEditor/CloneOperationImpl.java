@@ -14,6 +14,7 @@ import org.eclipse.imagen.ImageLayout;
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.media.crop.CropDescriptor;
 import org.eclipse.imagen.media.format.FormatDescriptor;
 
 import java.awt.*;
@@ -91,14 +92,10 @@ public class CloneOperationImpl extends BlendedOperation implements CloneOperati
               .add(dy < 0 ? -dy : 0)
               .add(BorderExtender.createInstance(BorderExtender.BORDER_ZERO));
             RenderedOp border = ImageN.create("Border", pb, JAIContext.noCacheHint);
-
-            pb = new ParameterBlock();
-            pb.addSource(border)
-              .add((float) back.getMinX())
-              .add((float) back.getMinY())
-              .add((float) back.getWidth())
-              .add((float) back.getHeight());
-            RenderedOp crop = ImageN.create("Crop", pb, JAIContext.noCacheHint);
+            RenderedOp crop = CropDescriptor.create(border,
+                    (float) back.getMinX(), (float) back.getMinY(),
+                    (float) back.getWidth(), (float) back.getHeight(),
+                    null, null, null, JAIContext.noCacheHint);
 
             // Format retiles the image
             // TODO: this needs better understanding, can we just specify the layout for Crop?
