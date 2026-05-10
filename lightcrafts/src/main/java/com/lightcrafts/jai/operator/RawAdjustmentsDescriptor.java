@@ -1,31 +1,21 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
 
-/*
- * $RCSfile: ErodeDescriptor.java,v $
- *
- * Copyright (c) 2005 Sun Microsystems, Inc. All rights reserved.
- *
- * Use is subject to license terms.
- *
- * $Revision: 1.1 $
- * $Date: 2005/02/11 04:57:35 $
- * $State: Exp $
- */
 package com.lightcrafts.jai.operator;
 
-import java.awt.RenderingHints;
-import java.awt.image.RenderedImage;
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.OperationDescriptorImpl;
 import org.eclipse.imagen.ParameterBlockImageN;
 import org.eclipse.imagen.RenderedOp;
 import org.eclipse.imagen.registry.RenderedRegistryMode;
 
+import java.awt.RenderingHints;
+import java.awt.image.RenderedImage;
+
 public class RawAdjustmentsDescriptor extends OperationDescriptorImpl {
 
     /**
      * The resource strings that provide the general documentation and
-     * specify the parameter list for a Erode operation.
+     * specify the parameter list for a RawAdjustments operation.
      */
     private static final String[][] resources = {
         {"GlobalName",  "RawAdjustments"},
@@ -37,17 +27,17 @@ public class RawAdjustmentsDescriptor extends OperationDescriptorImpl {
         {"arg0Desc",    "The Raw Image to Adjust"}
     };
 
-    /** The parameter names for the Erode operation. */
+    /** The parameter names for the RawAdjustments operation. */
     private static final String[] paramNames = {
         "exposure", "colorTemperature", "cameraRGB"
     };
 
-    /** The parameter class types for the Erode operation. */
+    /** The parameter class types for the RawAdjustments operation. */
     private static final Class[] paramClasses = {
         Float.class, Float.class, float[][].class
     };
 
-    /** The parameter default values for the Erode operation. */
+    /** The parameter default values for the RawAdjustments operation. */
     private static final Object[] paramDefaults = {
         NO_PARAMETER_DEFAULT, NO_PARAMETER_DEFAULT, NO_PARAMETER_DEFAULT
     };
@@ -91,6 +81,6 @@ public class RawAdjustmentsDescriptor extends OperationDescriptorImpl {
         pb.setParameter("colorTemperature", colorTemperature);
         pb.setParameter("cameraRGB", cameraRGB);
 
-        return ImageN.create("LCErode", pb, hints);
+        return ImageN.create("RawAdjustments", pb, hints);
     }
 }
