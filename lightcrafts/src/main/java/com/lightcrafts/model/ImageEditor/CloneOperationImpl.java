@@ -8,14 +8,11 @@ import com.lightcrafts.jai.LCROIShape;
 import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.*;
 import com.lightcrafts.ui.editor.EditorMode;
-
-import org.eclipse.imagen.BorderExtender;
-import org.eclipse.imagen.ImageLayout;
-import org.eclipse.imagen.ImageN;
-import org.eclipse.imagen.PlanarImage;
-import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.*;
+import org.eclipse.imagen.media.border.BorderDescriptor;
 import org.eclipse.imagen.media.crop.CropDescriptor;
 import org.eclipse.imagen.media.format.FormatDescriptor;
+import org.eclipse.imagen.media.translate.TranslateDescriptor;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
@@ -78,20 +75,10 @@ public class CloneOperationImpl extends BlendedOperation implements CloneOperati
             final int dx = (int) (target.getX() - source.getX());
             final int dy = (int) (target.getY() - source.getY());
 
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(back)
-              .add((float) dx)
-              .add((float) dy);
-            RenderedOp translated = ImageN.create("Translate", pb, JAIContext.noCacheHint);
-
-            pb = new ParameterBlock();
-            pb.addSource(translated)
-              .add(dx > 0 ?  dx : 0)
-              .add(dx < 0 ? -dx : 0)
-              .add(dy > 0 ?  dy : 0)
-              .add(dy < 0 ? -dy : 0)
-              .add(BorderExtender.createInstance(BorderExtender.BORDER_ZERO));
-            RenderedOp border = ImageN.create("Border", pb, JAIContext.noCacheHint);
+            RenderedOp translated = TranslateDescriptor.create(back, (float) dx, (float) dy, null, JAIContext.noCacheHint);
+            RenderedOp border = BorderDescriptor.create(
+                    translated, Math.max(dx, 0), Math.max(-dx, 0), Math.max(dy, 0), Math.max(-dy, 0),
+                    BorderExtender.createInstance(BorderExtender.BORDER_ZERO), JAIContext.noCacheHint);
             RenderedOp crop = CropDescriptor.create(border,
                     (float) back.getMinX(), (float) back.getMinY(),
                     (float) back.getWidth(), (float) back.getHeight(),
@@ -127,7 +114,7 @@ public class CloneOperationImpl extends BlendedOperation implements CloneOperati
 
             LCROIShape mask = new LCROIShape(r, rendering.getInputTransform());
 
-            pb = new ParameterBlock();
+            final var pb = new ParameterBlock();
             pb.addSource(formatted)
               .addSource(image)
               .add("Normal")
