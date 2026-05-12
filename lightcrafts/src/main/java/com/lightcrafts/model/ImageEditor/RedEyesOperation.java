@@ -1,4 +1,5 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2026-     Masahiro Kitagawa */
 
 package com.lightcrafts.model.ImageEditor;
 
@@ -14,15 +15,14 @@ import com.lightcrafts.model.SliderConfig;
 import com.lightcrafts.ui.editor.EditorMode;
 import com.lightcrafts.utils.LCMS;
 import com.lightcrafts.utils.LCMS_ColorSpace;
-
-import org.eclipse.imagen.ImageN;
-import org.eclipse.imagen.KernelImageN;
 import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.operator.MaxFilterDescriptor;
+
 import java.awt.image.RenderedImage;
-import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
 
 import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_RED_EYE;
+import static org.eclipse.imagen.operator.MaxFilterDescriptor.MAX_MASK_SQUARE_SEPARABLE;
 
 /**
  * Copyright (C) 2007 Light Crafts, Inc.
@@ -86,12 +86,8 @@ public class RedEyesOperation extends BlendedOperation implements RedEyeOperatio
                                                               LCMSColorConvertDescriptor.RELATIVE_COLORIMETRIC, null);
 
                 RenderedImage redMask = new RedMaskOpImage(labImage, tolerance, null);
-
-                KernelImageN morphKernel = new KernelImageN(3, 3, new float[] {1, 1, 1, 1, 0, 1, 1, 1, 1});
-                final ParameterBlock pb = new ParameterBlock()
-                        .addSource(redMask)
-                        .add(morphKernel);
-                redMask = Functions.fastGaussianBlur(ImageN.create("dilate", pb, null), 4 * scale);
+                redMask = MaxFilterDescriptor.create(redMask, MAX_MASK_SQUARE_SEPARABLE, 3, null);
+                redMask = Functions.fastGaussianBlur(redMask, 4 * scale);
 
                 return new RedMaskBlackener(back, redMask, null);
             } else {
