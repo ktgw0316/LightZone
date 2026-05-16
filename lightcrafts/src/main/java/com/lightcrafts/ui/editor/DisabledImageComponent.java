@@ -2,21 +2,22 @@
 
 package com.lightcrafts.ui.editor;
 
-import static com.lightcrafts.ui.editor.Locale.LOCALE;
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.utils.awt.geom.HiDpi;
-import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.Interpolation;
+import org.eclipse.imagen.media.affine.AffineDescriptor;
 
 import javax.swing.*;
-import java.awt.image.RenderedImage;
-import java.awt.image.BufferedImage;
-import java.awt.image.renderable.ParameterBlock;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.RoundRectangle2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.RoundRectangle2D;
+import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
+
+import static com.lightcrafts.ui.editor.Locale.LOCALE;
 
 /**
  * A JComponent that renders images, which is the most this Editor
@@ -54,17 +55,15 @@ class DisabledImageComponent extends JComponent implements Scrollable {
         g.fill(clip);
 
         if (image != null) {
-            AffineTransform xform = getTransform();
-
             RenderedImage xformedImage = image;
+            final AffineTransform xform = getTransform();
+
             if (!xform.isIdentity()) {
-                RenderingHints extenderHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
-                                                                  BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-                ParameterBlock params = new ParameterBlock();
-                params.addSource(image);
-                params.add(xform);
-                params.add(Interpolation.getInstance(Interpolation.INTERP_BILINEAR));
-                xformedImage = ImageN.create("Affine", params, extenderHints);
+                final var interp = Interpolation.getInstance(Interpolation.INTERP_BILINEAR);
+                final var extenderHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
+                        BorderExtender.createInstance(BorderExtender.BORDER_COPY));
+                xformedImage = AffineDescriptor.create(image, xform, interp, null, null, false,
+                        false, null, extenderHints);
             }
 
             g.drawRenderedImage(xformedImage, identity);

@@ -7,6 +7,7 @@ import com.lightcrafts.image.BadImageFileException;
 import com.lightcrafts.image.ColorProfileException;
 import com.lightcrafts.image.ImageInfo;
 import com.lightcrafts.image.UnknownImageTypeException;
+import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.image.export.BitsPerChannelOption;
 import com.lightcrafts.image.export.ImageExportOptions;
 import com.lightcrafts.image.export.ImageFileExportOptions;
@@ -21,24 +22,18 @@ import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.utils.LCTileCache;
 import com.lightcrafts.model.*;
 import com.lightcrafts.platform.Platform;
-import com.lightcrafts.image.color.ColorProfileInfo;
 import com.lightcrafts.utils.UserCanceledException;
 import com.lightcrafts.utils.thread.ProgressThread;
 import lombok.AccessLevel;
 import lombok.Getter;
+import org.eclipse.imagen.*;
+import org.eclipse.imagen.media.affine.AffineDescriptor;
 import org.eclipse.imagen.media.nullop.NullDescriptor;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.eclipse.imagen.BorderExtender;
-import org.eclipse.imagen.ImageLayout;
-import org.eclipse.imagen.Interpolation;
-import org.eclipse.imagen.ImageN;
-import org.eclipse.imagen.PlanarImage;
-import org.eclipse.imagen.RenderedImageAdapter;
-import org.eclipse.imagen.RenderedOp;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.color.ICC_ColorSpace;
@@ -46,15 +41,17 @@ import java.awt.color.ICC_Profile;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
-import java.awt.image.*;
-import java.awt.image.renderable.ParameterBlock;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferByte;
+import java.awt.image.DataBufferUShort;
+import java.awt.image.RenderedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.Cleaner;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 public class ImageEditorEngine implements Engine {
     private static final Logger logger = LoggerFactory.getLogger(ImageEditorEngine.class);
@@ -496,19 +493,15 @@ public class ImageEditorEngine implements Engine {
 
         final var scaleX = (float) Math.floor(scale * image.getWidth())  / image.getWidth();
         final var scaleY = (float) Math.floor(scale * image.getHeight()) / image.getHeight();
-
         final var xform = AffineTransform.getScaleInstance(scaleX, scaleY);
 
+        final var interp = Interpolation.getInstance(Interpolation.INTERP_NEAREST);
         final var formatHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
                 BorderExtender.createInstance(BorderExtender.BORDER_COPY));
 
-        final var interp = Interpolation.getInstance(Interpolation.INTERP_NEAREST);
-        final var params = new ParameterBlock();
-        params.addSource(image);
-        params.add(xform);
-        params.add(interp);
         // NOTE: we cache this for the screen
-        return ImageN.create("Affine", params, formatHints);
+        return AffineDescriptor.create(image, xform, interp, null, null, false, false, null,
+                formatHints);
     }
 
     /*
@@ -831,15 +824,11 @@ public class ImageEditorEngine implements Engine {
 
         if (scale > 1) {
             final var xform = AffineTransform.getScaleInstance(scale, scale);
+            final var interp = Interpolation.getInstance(Interpolation.INTERP_BICUBIC);
             final var formatHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
                     BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-
-            Interpolation interp = Interpolation.getInstance(Interpolation.INTERP_BICUBIC);
-            ParameterBlock params = new ParameterBlock();
-            params.addSource(exportImage);
-            params.add(xform);
-            params.add(interp);
-            exportImage = ImageN.create("Affine", params, formatHints);
+            exportImage = AffineDescriptor.create(exportImage, xform, interp, null, null, false,
+                    false, null, formatHints);
         }
 
         // Make sure that if uprezzing was requested and denied, the metadata

@@ -2,23 +2,24 @@
 
 package com.lightcrafts.ui.print;
 
+import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.Interpolation;
+import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.media.affine.AffineDescriptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.awt.geom.Rectangle2D;
 import java.awt.geom.AffineTransform;
-import java.awt.image.renderable.ParameterBlock;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
 import java.io.File;
 import java.io.IOException;
-import org.eclipse.imagen.BorderExtender;
-import org.eclipse.imagen.Interpolation;
-import org.eclipse.imagen.ImageN;
-import org.eclipse.imagen.RenderedOp;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 // Show a scaled image inside a rectangle representing paper bounds for
 // printing.
@@ -128,16 +129,13 @@ class PreviewComponent extends JComponent {
 
         // We use ImageN to do the scaling because drawImage with a transform sometimes fails on windows
         if (scale > 0) {
-            AffineTransform transform = AffineTransform.getScaleInstance(scale, scale);
+            final var transform = AffineTransform.getScaleInstance(scale, scale);
             transform.preConcatenate(AffineTransform.getTranslateInstance(imageBounds.x, imageBounds.y));
-            RenderingHints formatHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
-                                                            BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-            Interpolation interp = Interpolation.getInstance(Interpolation.INTERP_BILINEAR);
-            ParameterBlock params = new ParameterBlock();
-            params.addSource(image);
-            params.add(transform);
-            params.add(interp);
-            RenderedOp scaled = ImageN.create("Affine", params, formatHints);
+            final var formatHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
+                    BorderExtender.createInstance(BorderExtender.BORDER_COPY));
+            final var interp = Interpolation.getInstance(Interpolation.INTERP_BILINEAR);
+            RenderedOp scaled = AffineDescriptor.create(image, transform, interp, null, null, false,
+                    false, null, formatHints);
 
             g.drawRenderedImage(scaled, new AffineTransform());
 

@@ -10,6 +10,7 @@ import com.lightcrafts.model.ImageEditor.ImageProcessor;
 import com.lightcrafts.model.ImageEditor.Rendering;
 import com.lightcrafts.model.Operation;
 import org.eclipse.imagen.*;
+import org.eclipse.imagen.media.affine.AffineDescriptor;
 import org.eclipse.imagen.media.lookup.LookupTable;
 import org.eclipse.imagen.media.lookup.LookupTableFactory;
 import org.eclipse.imagen.media.nullop.NullDescriptor;
@@ -106,21 +107,21 @@ public class Functions {
         final RenderedOp blur = fastGaussianBlur(scaleDown, newRadius);
 
         if (rescale != 1) {
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(blur);
-            pb.add(AffineTransform.getScaleInstance(image.getWidth() / (double) blur.getWidth(),
-                                                    image.getHeight() / (double) blur.getHeight()));
-            pb.add(Interpolation.getInstance(Interpolation.INTERP_BICUBIC));
-            RenderingHints sourceLayoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT,
-                                                                  new ImageLayout(0, 0,
-                                                                                  JAIContext.TILE_WIDTH,
-                                                                                  JAIContext.TILE_HEIGHT,
-                                                                                  null, null));
-            RenderingHints extenderHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
+            final var xform = AffineTransform.getScaleInstance(
+                    image.getWidth() / (double) blur.getWidth(),
+                    image.getHeight() / (double) blur.getHeight());
+            final var interp = Interpolation.getInstance(Interpolation.INTERP_BICUBIC);
+
+            final var sourceLayoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT,
+                    new ImageLayout(0, 0, JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT,
+                            null, null));
+            final var extenderHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
                     BorderExtender.createInstance(BorderExtender.BORDER_COPY));
             sourceLayoutHints.add(extenderHints);
+
             // sourceLayoutHints.add(JAIContext.noCacheHint);
-            return ImageN.create("Affine", pb, sourceLayoutHints);
+            return AffineDescriptor.create(blur, xform, interp, null, null, false, false, null,
+                    sourceLayoutHints);
         } else {
             return blur;
         }

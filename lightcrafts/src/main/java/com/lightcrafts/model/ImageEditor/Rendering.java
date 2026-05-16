@@ -9,12 +9,8 @@ import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.model.CropBounds;
 import com.lightcrafts.model.Operation;
 import lombok.Getter;
-import org.eclipse.imagen.BorderExtender;
-import org.eclipse.imagen.ImageLayout;
-import org.eclipse.imagen.Interpolation;
-import org.eclipse.imagen.ImageN;
-import org.eclipse.imagen.PlanarImage;
-import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.*;
+import org.eclipse.imagen.media.affine.AffineDescriptor;
 import org.eclipse.imagen.media.crop.CropDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +20,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
-import java.awt.image.renderable.ParameterBlock;
 import java.util.LinkedList;
 
 public class Rendering implements Cloneable {
@@ -320,12 +315,10 @@ public class Rendering implements Cloneable {
                 final var extenderHints = new RenderingHints(
                         ImageN.KEY_BORDER_EXTENDER,
                         BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-                final var params = new ParameterBlock();
-                params.addSource(image);
-                params.add(transform);
-                params.add(Interpolation.getInstance(
-                        cheapScale ? Interpolation.INTERP_BILINEAR : Interpolation.INTERP_BICUBIC));
-                xformedSourceImage = ImageN.create("Affine", params, extenderHints);
+                final var interp = Interpolation.getInstance(
+                        cheapScale ? Interpolation.INTERP_BILINEAR : Interpolation.INTERP_BICUBIC);
+                xformedSourceImage = AffineDescriptor.create(image, transform, interp, null, null,
+                false, false, null, extenderHints);
             }
             else {
                 xformedSourceImage = image;

@@ -3,31 +3,26 @@
 package com.lightcrafts.platform;
 
 import com.lightcrafts.image.metadata.ImageOrientation;
+import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.model.ImageEditor.ImageEditorEngine;
 import com.lightcrafts.model.PrintSettings;
-import com.lightcrafts.utils.thread.ProgressThread;
 import com.lightcrafts.utils.ProgressIndicator;
-import com.lightcrafts.jai.utils.Functions;
-import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.utils.thread.ProgressThread;
+import org.eclipse.imagen.*;
+import org.eclipse.imagen.media.affine.AffineDescriptor;
 import org.eclipse.imagen.media.nullop.NullDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.eclipse.imagen.BorderExtender;
-import org.eclipse.imagen.Interpolation;
-import org.eclipse.imagen.ImageN;
-import org.eclipse.imagen.PlanarImage;
-import org.eclipse.imagen.RenderedOp;
-
-import java.awt.image.RenderedImage;
-import java.awt.print.*;
-import java.awt.image.Raster;
-import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
-import java.awt.image.renderable.ParameterBlock;
 import java.awt.*;
-import java.awt.geom.Point2D;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
+import java.awt.image.RenderedImage;
+import java.awt.image.WritableRaster;
+import java.awt.print.*;
 
 public class DefaultPrinterLayer implements PrinterLayer {
     private static final Logger logger = LoggerFactory.getLogger(DefaultPrinterLayer.class);
@@ -226,12 +221,9 @@ public class DefaultPrinterLayer implements PrinterLayer {
                 // Do not recycle these tiles, the canvas will cache them
                 // formatHints.add(new RenderingHints(ImageN.KEY_CACHED_TILE_RECYCLING_ENABLED, Boolean.FALSE));
 
-                Interpolation interp = Interpolation.getInstance(Interpolation.INTERP_BICUBIC_2);
-                ParameterBlock params = new ParameterBlock();
-                params.addSource(printImage);
-                params.add(xform);
-                params.add(interp);
-                printImage = ImageN.create("Affine", params, formatHints);
+                final var interp = Interpolation.getInstance(Interpolation.INTERP_BICUBIC_2);
+                printImage = AffineDescriptor.create(printImage, xform, interp, null, null, false,
+                        false, null, formatHints);
             }
 
             if (!printCancelled) {
