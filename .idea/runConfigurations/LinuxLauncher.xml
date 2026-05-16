@@ -3,7 +3,7 @@
     <option name="MAIN_CLASS_NAME" value="com.lightcrafts.platform.linux.LinuxLauncher" />
     <module name="lightzone.linux.main" />
     <option name="VM_PARAMETERS" value="--add-exports=java.desktop/sun.awt.image=ALL-UNNAMED" />
-    <option name="WORKING_DIRECTORY" value="linux/products" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/linux/products" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

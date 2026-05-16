@@ -3,7 +3,7 @@
     <option name="MAIN_CLASS_NAME" value="com.lightcrafts.platform.macosx.MacOSXLauncher" />
     <module name="lightzone.macosx.main" />
     <option name="VM_PARAMETERS" value="--add-exports=java.desktop/sun.awt.image=ALL-UNNAMED" />
-    <option name="WORKING_DIRECTORY" value="macosx/products " />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/macosx/products" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
