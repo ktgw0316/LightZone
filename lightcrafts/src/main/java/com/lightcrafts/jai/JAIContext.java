@@ -244,19 +244,13 @@ public class JAIContext {
         RIFRegistry.register(or, desc.getName(), "com.lightcrafts", crif);
         CRIFRegistry.register(or, desc.getName(), crif);
 
-        // register LCErode
-        desc = new LCErodeDescriptor();
-        or.registerDescriptor(desc);
-        rif = new LCErodeRIF();
-        RIFRegistry.register(or, desc.getName(), "com.lightcrafts", rif);
-
         // register LCBandCombine
         desc = new LCBandCombineDescriptor();
         or.registerDescriptor(desc);
         rif = new LCBandCombineCRIF();
         RIFRegistry.register(or, desc.getName(), "com.lightcrafts", rif);
 
-        // register LCBandCombine
+        // register BilateralFilter
         desc = new BilateralFilterDescriptor();
         or.registerDescriptor(desc);
         rif = new BilateralFilterRIF();
