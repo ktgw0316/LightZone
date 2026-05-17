@@ -237,13 +237,6 @@ public class JAIContext {
         RenderedImageFactory rif = new LCSeparableConvolveRIF();
         RIFRegistry.register(or, desc.getName(), "com.lightcrafts", rif);
 
-        // register NOPOp
-        desc = new NOPDescriptor();
-        or.registerDescriptor(desc);
-        crif = new NOPCRIF();
-        RIFRegistry.register(or, desc.getName(), "com.lightcrafts", crif);
-        CRIFRegistry.register(or, desc.getName(), crif);
-
         // register LCUnsharpMaskOp
         desc = new LCUnsharpMaskDescriptor();
         or.registerDescriptor(desc);
