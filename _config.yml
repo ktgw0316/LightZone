@@ -1,0 +1,10 @@
+title: LightZone
+description: >-
+  Free, open-source professional RAW photo editor for macOS, Windows, and Linux.
+  Features non-destructive editing, Zone System tools, batch processing, and
+  16-bit linear ProPhoto RGB color space.
+url: https://ktgw0316.github.io
+baseurl: /LightZone
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
