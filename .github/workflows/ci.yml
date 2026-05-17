@@ -76,6 +76,7 @@ jobs:
       if: startsWith(matrix.os, 'windows')
       uses: actions/upload-artifact@v7
       with:
+        name: lightzone-${{ matrix.os }}
         archive: false
         path: |
           windows/build/jpackage/LightZone-*.msi
@@ -83,6 +84,7 @@ jobs:
       if: startsWith(matrix.os, 'macos')
       uses: actions/upload-artifact@v7
       with:
+        name: lightzone-${{ matrix.os }}
         archive: false
         path: |
           macosx/build/jpackage/LightZone-*.dmg
@@ -90,6 +92,7 @@ jobs:
       if: startsWith(matrix.os, 'ubuntu')
       uses: actions/upload-artifact@v7
       with:
+        name: lightzone-${{ matrix.os }}
         archive: false
         path: |
           linux/build/jpackage/lightzone*.deb
@@ -124,6 +127,7 @@ jobs:
     - name: Upload Artifacts on Fedora
       uses: actions/upload-artifact@v7
       with:
+        name: lightzone-fedora
         archive: false
         path: |
           linux/build/jpackage/lightzone*.rpm
