@@ -1,7 +1,7 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
 
 /*
- * $RCSfile: LCColorConvertDescriptor.java,v $
+ * $RCSfile: LCMSColorConvertDescriptor.java,v $
  *
  * Copyright (c) 2005 Sun Microsystems, Inc. All rights reserved.
  *
@@ -64,8 +64,8 @@ import java.awt.image.renderable.RenderableImage;
  * <p><table border=1>
  * <caption>Resource List</caption>
  * <tr><th>Name</th>        <th>Value</th></tr>
- * <tr><td>GlobalName</td>  <td>LCColorConvert</td></tr>
- * <tr><td>LocalName</td>   <td>LCColorConvert</td></tr>
+ * <tr><td>GlobalName</td>  <td>LCMSColorConvert</td></tr>
+ * <tr><td>LocalName</td>   <td>LCMSColorConvert</td></tr>
  * <tr><td>Vendor</td>      <td>com.lightcrafts</td></tr>
  * <tr><td>Description</td> <td>Convert the color space of an image.<td></tr>
  * <tr><td>DocURL</td>      <td>http://java.sun.com/products/java-media/jai/forDevelopers/jai-apidocs/javax/media/jai/operator/ColorConvertDescriptor.html</td></tr>
@@ -110,10 +110,10 @@ public class LCMSColorConvertDescriptor extends OperationDescriptorImpl {
         {"GlobalName",  "LCMSColorConvert"},
         {"LocalName",   "LCMSColorConvert"},
         {"Vendor",      "com.lightcrafts"},
-        {"Description", LCJaiI18N.getString("LCColorConvertDescriptor0")},
+        {"Description", LCJaiI18N.getString("LCMSColorConvertDescriptor0")},
         {"DocURL",      "none"},
         {"Version",     LCJaiI18N.getString("DescriptorVersion2")},
-        {"arg0Desc",    LCJaiI18N.getString("LCColorConvertDescriptor1")}
+        {"arg0Desc",    LCJaiI18N.getString("LCMSColorConvertDescriptor1")}
     };
 
     /**

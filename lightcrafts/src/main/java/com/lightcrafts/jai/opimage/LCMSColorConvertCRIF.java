@@ -1,7 +1,7 @@
 /* Copyright (C) 2005-2011 Fabio Riccardi */
 
 /*
- * $RCSfile: LCColorConvertCRIF.java,v $
+ * $RCSfile: LCMSColorConvertCRIF.java,v $
  *
  * Copyright (c) 2005 Sun Microsystems, Inc. All rights reserved.
  *
@@ -14,15 +14,16 @@
 
 package com.lightcrafts.jai.opimage;
 
-import java.awt.RenderingHints;
+import com.lightcrafts.jai.operator.LCMSColorConvertDescriptor;
+import org.eclipse.imagen.CRIFImpl;
+import org.eclipse.imagen.ImageLayout;
+import org.eclipse.imagen.media.opimage.RIFUtil;
+
+import java.awt.*;
 import java.awt.color.ICC_Profile;
 import java.awt.image.ColorModel;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.ParameterBlock;
-import org.eclipse.imagen.CRIFImpl;
-import org.eclipse.imagen.ImageLayout;
-import org.eclipse.imagen.media.opimage.RIFUtil;
-import com.lightcrafts.jai.operator.LCMSColorConvertDescriptor;
 
 
 /**
