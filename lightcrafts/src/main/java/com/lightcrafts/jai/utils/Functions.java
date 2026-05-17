@@ -6,6 +6,7 @@ package com.lightcrafts.jai.utils;
 import com.lightcrafts.image.metadata.ImageOrientation;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.operator.LCMSColorConvertDescriptor;
+import com.lightcrafts.jai.operator.LCSeparableConvolveDescriptor;
 import com.lightcrafts.model.ImageEditor.ImageProcessor;
 import com.lightcrafts.model.ImageEditor.Rendering;
 import com.lightcrafts.model.Operation;
@@ -25,11 +26,9 @@ import java.awt.color.ColorSpace;
 import java.awt.color.ICC_Profile;
 import java.awt.geom.AffineTransform;
 import java.awt.image.*;
-import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * Created by IntelliJ IDEA.
@@ -129,13 +128,10 @@ public class Functions {
 
     public static RenderedOp fastGaussianBlur(RenderedImage image, double radius) {
         // TODO: Make this fast
-        RenderingHints extenderHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
+        final var extenderHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
                 BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-        KernelImageN kernel = getGaussKernel(radius);
-        ParameterBlock pb = new ParameterBlock()
-                .addSource(image)
-                .add(kernel);
-        return ImageN.create("LCSeparableConvolve", pb, extenderHints);
+        final KernelImageN kernel = getGaussKernel(radius);
+        return LCSeparableConvolveDescriptor.create(image, kernel, extenderHints);
     }
 
     public static ImageLayout getImageLayout(RenderedImage image) {
@@ -389,16 +385,11 @@ public class Functions {
         if (hints != null)
             formatHints.add(hints);
 
-        ParameterBlock pb = new ParameterBlock();
-        pb.addSource(source);
-        pb.add(cm);
-        pb.add(Objects.requireNonNullElse(intent, LCMSColorConvertDescriptor.PERCEPTUAL));
-        if (proof != null) {
-            pb.add(proof);
-            if (proofIntent != null)
-                pb.add(proofIntent);
-        }
-        return ImageN.create("LCMSColorConvert", pb, formatHints);
+        if (intent == null)
+            intent = LCMSColorConvertDescriptor.PERCEPTUAL;
+
+        return LCMSColorConvertDescriptor.create(source, cm, intent, proof, proofIntent,
+                formatHints);
     }
 
     public static PlanarImage toColorSpace(RenderedImage source, ColorSpace cs,
