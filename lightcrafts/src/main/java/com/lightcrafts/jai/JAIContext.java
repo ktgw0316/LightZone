@@ -257,12 +257,6 @@ public class JAIContext {
         rif = new LCErodeRIF();
         RIFRegistry.register(or, desc.getName(), "com.lightcrafts", rif);
 
-        // register RawAdjustments
-        desc = new RawAdjustmentsDescriptor();
-        or.registerDescriptor(desc);
-        rif = new RawAdjustmentsCRIF();
-        RIFRegistry.register(or, desc.getName(), "com.lightcrafts", rif);
-
         // register LCBandCombine
         desc = new LCBandCombineDescriptor();
         or.registerDescriptor(desc);
