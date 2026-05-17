@@ -210,17 +210,10 @@ public class JAIContext {
 
         OperationRegistry or = jaiInstance.getOperationRegistry();
 
-        // register LCColorConvert
-        OperationDescriptor desc = new LCColorConvertDescriptor();
-        or.registerDescriptor(desc);
-        ContextualRenderedImageFactory crif = new LCColorConvertCRIF();
-        RIFRegistry.register(or, desc.getName(), "com.lightcrafts", crif);
-        CRIFRegistry.register(or, desc.getName(), crif);
-
         // register LCMSColorConvert
-        desc = new LCMSColorConvertDescriptor();
+        OperationDescriptor desc = new LCMSColorConvertDescriptor();
         or.registerDescriptor(desc);
-        crif = new LCMSColorConvertCRIF();
+        ContextualRenderedImageFactory crif = new LCMSColorConvertCRIF();
         RIFRegistry.register(or, desc.getName(), "com.lightcrafts", crif);
         CRIFRegistry.register(or, desc.getName(), crif);
 
