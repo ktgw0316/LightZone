@@ -12,7 +12,31 @@ jobs:
   release-please:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v6
+
       - uses: googleapis/release-please-action@v4
+        id: release
         with:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
+
+      - name: Sync debian .dsc files to release PR
+        if: steps.release.outputs.pr != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=$(echo '${{ steps.release.outputs.pr }}' | jq -r '.number')
+          gh pr checkout "$PR_NUMBER"
+
+          NEW_VERSION=$(jq -r '."."' .release-please-manifest.json)
+
+          sed -i "s/^Version: .*/Version: ${NEW_VERSION}/" debian/lightzone-Debian_*.dsc
+          sed -i "s|^DEBTRANSFORM-TAR: lightzone-.*\.tar\.xz|DEBTRANSFORM-TAR: lightzone-${NEW_VERSION}.tar.xz|" debian/lightzone-Debian_*.dsc
+
+          if ! git diff --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add debian/lightzone-Debian_*.dsc
+            git commit -m "chore: Sync debian .dsc files to ${NEW_VERSION}"
+            git push
+          fi
