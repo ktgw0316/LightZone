@@ -2,15 +2,14 @@
 
 package com.lightcrafts.model.ImageEditor;
 
-import com.lightcrafts.model.SliderConfig;
-import com.lightcrafts.model.OperationType;
-import com.lightcrafts.jai.utils.Transform;
-import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.image.color.ColorScience;
-
-import org.eclipse.imagen.ImageN;
+import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.jai.utils.Transform;
+import com.lightcrafts.model.OperationType;
+import com.lightcrafts.model.SliderConfig;
 import org.eclipse.imagen.PlanarImage;
-import java.awt.image.renderable.ParameterBlock;
+import org.eclipse.imagen.media.bandcombine.BandCombineDescriptor;
+
 import java.text.DecimalFormat;
 
 import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_BLACK_AND_WHITE;
@@ -78,10 +77,8 @@ public class ChannelMixer extends BlendedOperation {
                 { red, green, blue, 0 }
             };
 
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(back);
-            pb.add(transform);
-            return ImageN.create("BandCombine", pb, JAIContext.noCacheHint);  // Desaturate, single banded
+            // Desaturate, single banded
+            return BandCombineDescriptor.create(back, transform, JAIContext.noCacheHint);
         }
     }
 

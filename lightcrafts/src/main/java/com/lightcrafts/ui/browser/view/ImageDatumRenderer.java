@@ -9,16 +9,15 @@ import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.ui.browser.model.ImageDatum;
 import com.lightcrafts.ui.browser.model.ImageDatumType;
 import com.lightcrafts.utils.awt.geom.HiDpi;
-
 import org.eclipse.imagen.BorderExtender;
-import org.eclipse.imagen.Interpolation;
 import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.Interpolation;
+import org.eclipse.imagen.media.affine.AffineDescriptor;
+
 import javax.swing.*;
-import javax.swing.plaf.FontUIResource;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.RenderedImage;
-import java.awt.image.renderable.ParameterBlock;
 import java.io.File;
 import java.util.prefs.Preferences;
 
@@ -128,11 +127,9 @@ class ImageDatumRenderer {
         if (!imageXform.isIdentity()) {
             RenderingHints extenderHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
                                                               BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-            ParameterBlock params = new ParameterBlock();
-            params.addSource(image);
-            params.add(imageXform);
-            params.add(Interpolation.getInstance(Interpolation.INTERP_BILINEAR));
-            xformedImage = ImageN.create("Affine", params, extenderHints);
+            final var interp = Interpolation.getInstance(Interpolation.INTERP_BILINEAR);
+            xformedImage = AffineDescriptor.create(image, imageXform, interp, null, null, false,
+                    false, null, extenderHints);
         }
         g.drawRenderedImage(xformedImage, identityTransform);
 

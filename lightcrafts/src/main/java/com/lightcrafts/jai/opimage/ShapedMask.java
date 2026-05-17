@@ -3,28 +3,25 @@
 
 package com.lightcrafts.jai.opimage;
 
-import com.lightcrafts.model.CloneContour;
-import com.lightcrafts.model.Region;
-import com.lightcrafts.model.Contour;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.LCROIShape;
 import com.lightcrafts.jai.utils.Functions;
+import com.lightcrafts.model.CloneContour;
+import com.lightcrafts.model.Contour;
+import com.lightcrafts.model.Region;
 import com.lightcrafts.utils.SoftValueHashMap;
+import org.eclipse.imagen.*;
+import org.eclipse.imagen.media.affine.AffineDescriptor;
 
-import org.eclipse.imagen.BorderExtender;
-import org.eclipse.imagen.ImageLayout;
-import org.eclipse.imagen.Interpolation;
-import org.eclipse.imagen.ImageN;
-import org.eclipse.imagen.PlanarImage;
-import org.eclipse.imagen.RasterFactory;
-import org.eclipse.imagen.TiledImage;
-
-import java.awt.image.*;
-import java.awt.image.renderable.ParameterBlock;
-import java.awt.color.ColorSpace;
 import java.awt.*;
-import java.awt.geom.*;
-import java.util.*;
+import java.awt.color.ColorSpace;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
+import java.awt.image.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * Created by IntelliJ IDEA.
@@ -333,15 +330,12 @@ public class ShapedMask extends PlanarImage {
                     AffinedImage key = new AffinedImage(maskImage, transform);
                     PlanarImage affinedImage = expandedMasks.get(key);
                     if (affinedImage == null) {
-                        RenderingHints hints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
+                        final var hints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
                                 BorderExtender.createInstance(BorderExtender.BORDER_COPY));
                         // hints.add(JAIContext.noCacheHint);
-                        Interpolation interp = Interpolation.getInstance(Interpolation.INTERP_BILINEAR);
-                        ParameterBlock params = new ParameterBlock();
-                        params.addSource(maskImage);
-                        params.add(transform);
-                        params.add(interp);
-                        maskImage = ImageN.create("Affine", params, hints);
+                        final var interp = Interpolation.getInstance(Interpolation.INTERP_BILINEAR);
+                        maskImage = AffineDescriptor.create(maskImage, transform, interp, null, null,
+                                false, false, null, hints);
                         expandedMasks.put(key, maskImage);
                     } else {
                         maskImage = affinedImage;

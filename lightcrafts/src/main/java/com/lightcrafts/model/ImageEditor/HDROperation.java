@@ -3,6 +3,7 @@
 package com.lightcrafts.model.ImageEditor;
 
 import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.jai.operator.BilateralFilterDescriptor;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.LayerConfig;
@@ -13,6 +14,8 @@ import org.eclipse.imagen.BorderExtender;
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.media.algebra.AlgebraDescriptor;
+import org.eclipse.imagen.media.lookup.LookupDescriptor;
 
 import java.awt.*;
 import java.awt.image.RenderedImage;
@@ -20,6 +23,7 @@ import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
 
 import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_RELIGHT;
+import static org.eclipse.imagen.media.algebra.AlgebraDescriptor.Operator.NOT;
 
 /**
  * Created by IntelliJ IDEA.
@@ -80,13 +84,10 @@ public class HDROperation extends BlendedOperation {
         @Override
         public RenderedOp process(RenderedImage source) {
             final RenderedImage singleChannel = createSingleChannel(source);
-            RenderedOp invert = ImageN.create("Not", singleChannel, JAIContext.noCacheHint);       // Invert
-            var table = Functions.computeGammaTable(invert.getColorModel().getTransferType(), gamma);
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(invert);
-            pb.add(table);
+            RenderedOp invert = AlgebraDescriptor.create(NOT, null, null, 0, JAIContext.noCacheHint, singleChannel);
+            final var table = Functions.computeGammaTable(invert.getColorModel().getTransferType(), gamma);
             // we cache this since convolution scans its input multiple times
-            return ImageN.create("lookup", pb, null);
+            return LookupDescriptor.create(invert, table, 0, null, null, false, null);
         }
     }
 
@@ -108,15 +109,14 @@ public class HDROperation extends BlendedOperation {
             if (detail > 0) {
                 final RenderedImage singleChannel = createSingleChannel(back);
 
-                ParameterBlock pb = new ParameterBlock();
-                pb.addSource(singleChannel);
-                pb.add(2f * scale);
-                pb.add(20f);
-                RenderingHints hints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
-                                                          BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-                RenderedOp bilateral = ImageN.create("BilateralFilter", pb, hints);
+                final float sigma_d = 2f * scale;
+                final float sigma_r = 20f;
+                final var hints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
+                        BorderExtender.createInstance(BorderExtender.BORDER_COPY));
+                RenderedOp bilateral = BilateralFilterDescriptor.create(
+                        singleChannel, sigma_d, sigma_r, hints);
 
-                pb = new ParameterBlock();
+                final var pb = new ParameterBlock();
                 pb.addSource(bilateral);
                 pb.addSource(front);
                 pb.add("Overlay");

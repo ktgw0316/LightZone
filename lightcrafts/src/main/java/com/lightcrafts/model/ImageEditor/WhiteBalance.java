@@ -2,16 +2,14 @@
 
 package com.lightcrafts.model.ImageEditor;
 
-import com.lightcrafts.model.SliderConfig;
-import com.lightcrafts.model.OperationType;
-import com.lightcrafts.jai.utils.Transform;
-import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.image.color.ColorScience;
-
-import org.eclipse.imagen.ImageN;
+import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.jai.utils.Transform;
+import com.lightcrafts.model.OperationType;
+import com.lightcrafts.model.SliderConfig;
 import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.media.rescale.RescaleDescriptor;
 
-import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
 
 /**
@@ -47,7 +45,7 @@ public class WhiteBalance extends BlendedOperation {
 
     private float original = 6500;
     private float target = 6500;
-    private float[] Wt = null;
+    private double[] Wt = null;
 
     @Override
     public void setSliderValue(String key, double value) {
@@ -66,10 +64,10 @@ public class WhiteBalance extends BlendedOperation {
         super.setSliderValue(key, value);
     }
 
-    private static float[] W(float original, float target) {
+    private static double[] W(float original, float target) {
         float[] originalW = ColorScience.W(original);
         float[] targetW = ColorScience.W(target);
-        return new float[]{originalW[0] / targetW[0], originalW[1] / targetW[1], originalW[2] / targetW[2]};
+        return new double[]{originalW[0] / targetW[0], originalW[1] / targetW[1], originalW[2] / targetW[2]};
     }
 
     private class WhiteBalanceTransform extends BlendedTransform {
@@ -80,10 +78,8 @@ public class WhiteBalance extends BlendedOperation {
         @Override
         public PlanarImage setFront() {
             Wt = W(original, target);
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(back);
-            pb.add(Wt);
-            return ImageN.create("MultiplyConst", pb, JAIContext.noCacheHint);
+            final double[] offset = {0, 0, 0};
+            return RescaleDescriptor.create(back, Wt, offset, JAIContext.noCacheHint);
         }
     }
 

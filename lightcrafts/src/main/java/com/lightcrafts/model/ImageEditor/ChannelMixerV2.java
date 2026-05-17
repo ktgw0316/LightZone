@@ -4,15 +4,13 @@ package com.lightcrafts.model.ImageEditor;
 
 import com.lightcrafts.image.color.ColorScience;
 import com.lightcrafts.jai.JAIContext;
-import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
-
-import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.media.bandcombine.BandCombineDescriptor;
+
 import java.awt.*;
-import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.Map;
@@ -118,16 +116,13 @@ public class ChannelMixerV2 extends BlendedOperation implements com.lightcrafts.
                 tred += strenght * green/4;
             }
 
-            double[][] transform = new double[][] {
-                { tred, tgreen, tblue, 0 },
-                { tred, tgreen, tblue, 0 },
-                { tred, tgreen, tblue, 0 }
+            double[][] transform = {
+                { red, green, blue, 0 },
+                { red, green, blue, 0 },
+                { red, green, blue, 0 }
             };
 
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(back);
-            pb.add(transform);
-            return ImageN.create("BandCombine", pb, null);
+            return BandCombineDescriptor.create(back, transform, null);
         }
 
         PlanarImage setFrontV3() {
@@ -152,16 +147,11 @@ public class ChannelMixerV2 extends BlendedOperation implements com.lightcrafts.
                 tred -= strenght * green/4;
             }
 
-            double[][] transform = new double[][] {
-                { tred, tgreen, tblue, 0 },
-                { tred, tgreen, tblue, 0 },
-                { tred, tgreen, tblue, 0 }
+            double[][] transform = {
+                { red, green, blue, 0 }
             };
 
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(Functions.toColorSpace(back, JAIContext.oldLinearColorSpace, null));
-            pb.add(transform);
-            return ImageN.create("BandCombine", pb, null);
+            return BandCombineDescriptor.create(back, transform, null);
         }
     }
 

@@ -21,6 +21,9 @@ import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
 import org.eclipse.imagen.TileCache;
+import org.eclipse.imagen.media.bandcombine.BandCombineDescriptor;
+import org.eclipse.imagen.media.bandmerge.BandMergeDescriptor;
+import org.eclipse.imagen.media.bandselect.BandSelectDescriptor;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -391,22 +394,14 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
 
                 PlanarImage labImage = Functions.toColorSpace(back, new LCMS_ColorSpace(new LCMS.LABProfile()),
                         LCMSColorConvertDescriptor.RELATIVE_COLORIMETRIC, null);
-                ParameterBlock pb = new ParameterBlock();
-                pb.addSource(labImage);
-                pb.add(new int[]{1, 2});
-                RenderedOp abImage = ImageN.create("bandselect", pb, null);
+                RenderedOp abImage = BandSelectDescriptor.create(labImage, new int[]{1, 2}, null);
 
-                pb = new ParameterBlock();
-                pb.addSource(back);
-                pb.add(new double[][]{{ColorScience.Wr, ColorScience.Wg, ColorScience.Wb, 0}});
-                PlanarImage monochrome = ImageN.create("BandCombine", pb, null);
+                final var matrix = new double[][]{{ColorScience.Wr, ColorScience.Wg, ColorScience.Wb, 0}};
+                PlanarImage monochrome = BandCombineDescriptor.create(back, matrix, null);
 
-                RenderingHints layoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, Functions.getImageLayout(labImage));
+                final var layoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, Functions.getImageLayout(labImage));
                 // layoutHints.add(JAIContext.noCacheHint);
-                pb = new ParameterBlock();
-                pb.addSource(monochrome);
-                pb.addSource(abImage);
-                PlanarImage maskImage = ImageN.create("BandMerge", pb, layoutHints);
+                PlanarImage maskImage = BandMergeDescriptor.create(null, 0, false, layoutHints, monochrome, abImage);
 
                 colorSelectionMask = Functions.fastGaussianBlur(
                         new RGBColorSelectionMaskOpImage(maskImage, getColorSelection(), null), 0.5 * scale);
@@ -449,9 +444,6 @@ public abstract class BlendedOperation extends GenericOperationImpl implements C
         }
 
         final double[][] yChannel = new double[][]{{ColorScience.Wr, ColorScience.Wg, ColorScience.Wb, 0}};
-        ParameterBlock pb = new ParameterBlock()
-                .addSource(source)
-                .add(yChannel);
-        return ImageN.create("BandCombine", pb, null);
+        return BandCombineDescriptor.create(source, yChannel, null);
     }
 }

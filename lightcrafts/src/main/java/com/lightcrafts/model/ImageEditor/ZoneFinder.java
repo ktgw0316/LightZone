@@ -12,10 +12,13 @@ import com.lightcrafts.model.Region;
 import com.lightcrafts.model.ZoneOperation;
 import com.lightcrafts.ui.LightZoneSkin;
 import com.lightcrafts.utils.Segment;
-import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.media.bandcombine.BandCombineDescriptor;
+import org.eclipse.imagen.media.crop.CropDescriptor;
+import org.eclipse.imagen.media.lookup.LookupDescriptor;
 import org.eclipse.imagen.media.lookup.LookupTableFactory;
+import org.eclipse.imagen.media.scale.ScaleDescriptor;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +33,6 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.*;
-import java.awt.image.renderable.ParameterBlock;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -186,13 +188,10 @@ public class ZoneFinder extends Preview implements PaintListener {
         visibleRect = bounds.intersection(visibleRect);
 
         if (bounds.contains(visibleRect)) {
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(image);
-            pb.add((float) visibleRect.x);
-            pb.add((float) visibleRect.y);
-            pb.add((float) visibleRect.width);
-            pb.add((float) visibleRect.height);
-            image = ImageN.create("Crop", pb, JAIContext.noCacheHint);
+            image = CropDescriptor.create(image,
+                    (float) visibleRect.x, (float) visibleRect.y,
+                    (float) visibleRect.width, (float) visibleRect.height,
+                    null, null, null, JAIContext.noCacheHint);
         }
 
         Dimension previewSize = getSize();
@@ -209,12 +208,7 @@ public class ZoneFinder extends Preview implements PaintListener {
 
         if (visibleRect.width > previewSize.width || visibleRect.height > previewSize.height) {
             final float scale = Math.min(previewSize.width / (float) visibleRect.width, previewSize.height / (float) visibleRect.height);
-
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(image);
-            pb.add(scale);
-            pb.add(scale);
-            image = ImageN.create("Scale", pb, JAIContext.noCacheHint);
+            image = ScaleDescriptor.create(image, scale, scale, 0f, 0f, null, JAIContext.noCacheHint);
         }
 
         // avoid keeping references to the input image
@@ -246,11 +240,7 @@ public class ZoneFinder extends Preview implements PaintListener {
             double[][] transform = {
                 {pp.W[0], pp.W[1], pp.W[2], 0}
             };
-
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(image);
-            pb.add(transform);
-            image = ImageN.create("BandCombine", pb, JAIContext.noCacheHint); // Desaturate, single banded
+            image = BandCombineDescriptor.create(image, transform, JAIContext.noCacheHint); // Desaturate, single banded
         }
 
         return image;
@@ -307,11 +297,8 @@ public class ZoneFinder extends Preview implements PaintListener {
             }
         }
 
-        ParameterBlock pb = new ParameterBlock();
-        pb.addSource(image);
-        pb.add(LookupTableFactory.create(lut));
-
-        return ImageN.create("lookup", pb, JAIContext.noCacheHint);
+        final var table = LookupTableFactory.create(lut);
+        return LookupDescriptor.create(image, table, 0, null, null, false, JAIContext.noCacheHint);
     }
 
     // Compute a simple hash of the image for cache comparison

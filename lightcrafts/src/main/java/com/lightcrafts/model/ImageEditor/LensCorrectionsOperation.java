@@ -9,11 +9,11 @@ import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
 import com.lightcrafts.utils.Lensfun;
+import org.eclipse.imagen.BorderExtender;
+import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.media.affine.AffineDescriptor;
 import org.jetbrains.annotations.NotNull;
 
-import org.eclipse.imagen.BorderExtender;
-import org.eclipse.imagen.ImageN;
-import org.eclipse.imagen.PlanarImage;
 import java.awt.geom.AffineTransform;
 import java.text.DecimalFormat;
 import java.util.List;
@@ -274,12 +274,12 @@ public class LensCorrectionsOperation extends BlendedOperation {
                 }
                 final var shiftX = back.getMinX();
                 final var shiftY = back.getMinY();
-                final var shifted = ImageN.create("affine", back,
-                        AffineTransform.getTranslateInstance(-shiftX, -shiftY));
+                final var shifted = AffineDescriptor.create(back,
+                        AffineTransform.getTranslateInstance(-shiftX, -shiftY), null, null, null);
                 final var borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
                 final var corrected = new DistortionOpImage(shifted, JAIContext.fileCacheHint, borderExtender, lf);
-                front = ImageN.create("affine", corrected,
-                        AffineTransform.getTranslateInstance(shiftX, shiftY));
+                front = AffineDescriptor.create(corrected,
+                        AffineTransform.getTranslateInstance(shiftX, shiftY), null, null, null);
             }
             front.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
             return front;

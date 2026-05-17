@@ -20,13 +20,14 @@ import com.lightcrafts.utils.thread.ProgressThread;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.eclipse.imagen.*;
+import org.eclipse.imagen.media.affine.AffineDescriptor;
+import org.eclipse.imagen.media.crop.CropDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.*;
-import java.awt.image.renderable.ParameterBlock;
 import java.io.File;
 import java.io.IOException;
 
@@ -166,11 +167,13 @@ public abstract class RawImageType extends ImageType {
             } else if (cameraMake.equals("NIKON") && rawDecoder.getModel().equals("D1X")) {
                 rgbImage = nikonD1XImage(rgbImage, colorModel);
             } else {
-                rgbImage = Functions.crop(rgbImage,
-                                          rgbImage.getMinX() + 5,
-                                          rgbImage.getMinY() + 5,
-                                          rgbImage.getWidth() - 10,
-                                          rgbImage.getHeight() - 10, JAIContext.noCacheHint);
+                rgbImage = CropDescriptor.create(rgbImage,
+                                                 rgbImage.getMinX() + 5f,
+                                                 rgbImage.getMinY() + 5f,
+                                                 rgbImage.getWidth() - 10f,
+                                                 rgbImage.getHeight() - 10f,
+                                                 null, null, null,
+                                                 JAIContext.noCacheHint);
             }
 
             final var cacheLayout = new ImageLayout(
@@ -222,12 +225,7 @@ public abstract class RawImageType extends ImageType {
                 angle, rgbImage.getWidth() / 2, rgbImage.getHeight() / 2);
         final var sm = colorModel.createCompatibleSampleModel(
                 JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT);
-
-        final var pb2 = new ParameterBlock();
-        pb2.addSource(rgbImage);
-        pb2.add(rotation);
-        pb2.add(interp);
-        RenderedOp rotated = ImageN.create("Affine", pb2, null);
+        RenderedOp rotated = AffineDescriptor.create(rgbImage, rotation, interp, null, null);
 
         final var rotatedLayout = new ImageLayout(
                 rotated.getBounds().x, rotated.getBounds().y,
@@ -236,14 +234,14 @@ public abstract class RawImageType extends ImageType {
                 JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT,
                 sm, colorModel);
         final var hints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, rotatedLayout);
-
-        rotated = ImageN.create("Affine", pb2, hints);
-
-        return Functions.crop(
+        rotated = AffineDescriptor.create(rgbImage, rotation, interp, null, null, false, false,
+                null, hints);
+        return CropDescriptor.create(
                 rotated,
-                rotated.getMinX() + (rotated.getWidth()  - width)  / 2 + 2,
-                rotated.getMinY() + (rotated.getHeight() - height) / 2 + 2,
-                width - 4, height - 4, JAIContext.noCacheHint);
+                rotated.getMinX() + (rotated.getWidth()  - width)  / 2 + 2f,
+                rotated.getMinY() + (rotated.getHeight() - height) / 2 + 2f,
+                width - 4f, height - 4f,
+                null, null, null, JAIContext.noCacheHint);
     }
 
     private PlanarImage nikonD1XImage(PlanarImage rgbImage, ComponentColorModel colorModel) {
@@ -252,28 +250,20 @@ public abstract class RawImageType extends ImageType {
                 rgbImage.getMinY() + 5,
                 rgbImage.getWidth() - 10,
                 rgbImage.getHeight() - 10);
-
-        final var hints = new RenderingHints(
-                ImageN.KEY_BORDER_EXTENDER,
-                BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-
+        final var xform = AffineTransform.getScaleInstance(3.0 / 4.0, 3.0 / 2.0);
         final var interp = Interpolation.getInstance(Interpolation.INTERP_BILINEAR);
-
         final var sm = colorModel.createCompatibleSampleModel(
                 JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT);
-
         final var newLayout = new ImageLayout(
                 0, 0, 3 * rgbImage.getWidth() / 4, 3 * rgbImage.getHeight() / 2,
                 0, 0, JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT,
                 sm, colorModel);
-
+        final var hints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
+                BorderExtender.createInstance(BorderExtender.BORDER_COPY));
         hints.add(new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, newLayout));
 
-        final var pb2 = new ParameterBlock();
-        pb2.addSource(rgbImage);
-        pb2.add(AffineTransform.getScaleInstance(3.0 / 4.0, 3.0 / 2.0));
-        pb2.add(interp);
-        return ImageN.create("Affine", pb2, hints);
+        return AffineDescriptor.create(rgbImage, xform, interp, null, null, false, false, null,
+                hints);
     }
 
     private void retile(PlanarImage rgbImage, final CachedImage cache) {

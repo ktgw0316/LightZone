@@ -28,7 +28,7 @@ public class BilateralFilterDescriptor extends OperationDescriptorImpl {
     };
 
     private static final String[] paramNames = {
-        "sigma_d", "sigma_r", "luminosity"
+        "sigma_d", "sigma_r"
     };
 
     private static final Class[] paramClasses = {
@@ -51,7 +51,7 @@ public class BilateralFilterDescriptor extends OperationDescriptorImpl {
 
 
     public static RenderedOp create(RenderedImage source,
-                                    float sigma_d, float sigma_r, boolean luminosity,
+                                    float sigma_d, float sigma_r,
                                     RenderingHints hints)  {
         ParameterBlockImageN pb =
             new ParameterBlockImageN("BilateralFilter", RenderedRegistryMode.MODE_NAME);
@@ -60,7 +60,6 @@ public class BilateralFilterDescriptor extends OperationDescriptorImpl {
 
         pb.setParameter("sigma_d", sigma_d);
         pb.setParameter("sigma_r", sigma_r);
-        pb.setParameter("luminosity", luminosity);
 
         return ImageN.create("BilateralFilter", pb, hints);
     }

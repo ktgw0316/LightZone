@@ -9,11 +9,10 @@ import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
-
-import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.media.bandselect.BandSelectDescriptor;
+
 import java.awt.image.RenderedImage;
-import java.awt.image.renderable.ParameterBlock;
 import java.lang.ref.SoftReference;
 import java.text.DecimalFormat;
 
@@ -114,10 +113,7 @@ public class HDROperationV2 extends BlendedOperation {
                                                                        JAIContext.fileCacheHint,
                                                                        (float) (depth * scale), 0.1f);
 
-                ParameterBlock pb = new ParameterBlock();
-                pb.addSource(maskImage);
-                pb.add(new int[]{0});
-                maskImage = ImageN.create("bandselect", pb, null);
+                maskImage = BandSelectDescriptor.create(maskImage, new int[]{0}, null);
 
                 if (fuzz > 0.1) {
                     maskImage = Functions.fastGaussianBlur(maskImage, 10 * (fuzz - 0.1) * scale);

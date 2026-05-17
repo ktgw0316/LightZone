@@ -2,19 +2,21 @@
 
 package com.lightcrafts.model.ImageEditor;
 
+import com.lightcrafts.image.color.ColorScience;
+import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.jai.utils.Functions;
+import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
-import com.lightcrafts.jai.utils.Transform;
-import com.lightcrafts.jai.utils.Functions;
-import com.lightcrafts.jai.JAIContext;
-import com.lightcrafts.image.color.ColorScience;
-
 import org.eclipse.imagen.BorderExtender;
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.media.bandcombine.BandCombineDescriptor;
+import org.eclipse.imagen.media.bandmerge.BandMergeDescriptor;
+import org.eclipse.imagen.media.bandselect.BandSelectDescriptor;
 import org.eclipse.imagen.operator.MedianFilterDescriptor;
-import java.awt.image.renderable.ParameterBlock;
+
 import java.awt.*;
 import java.text.DecimalFormat;
 
@@ -63,41 +65,24 @@ public class NoiseReductionOperation extends BlendedOperation {
             double[][] rgb2yst = yst.fromRGB(back.getSampleModel().getDataType());
             double[][] yst2rgb = yst.toRGB(back.getSampleModel().getDataType());
 
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource( back );
-            pb.add( rgb2yst );
-            RenderedOp ystImage = ImageN.create("BandCombine", pb, JAIContext.noCacheHint);
+            RenderedOp ystImage = BandCombineDescriptor.create(back, rgb2yst, JAIContext.noCacheHint);
 
-            pb = new ParameterBlock();
-            pb.addSource(ystImage);
-            pb.add(new int[]{0});
-            RenderedOp y = ImageN.create("bandselect", pb, JAIContext.noCacheHint);
+            RenderedOp y = BandSelectDescriptor.create(ystImage, new int[]{0}, JAIContext.noCacheHint);
 
-            pb = new ParameterBlock();
-            pb.addSource(ystImage);
-            pb.add(new int[]{1, 2});
             // NOTE: we cache this because the median filter is an area op that gets its input multiple times
-            RenderedOp cc = ImageN.create("bandselect", pb, null);
+            RenderedOp cc = BandSelectDescriptor.create(ystImage, new int[]{1, 2}, null);
 
-            RenderingHints mfHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
+            final var mfHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
             mfHints.add(JAIContext.noCacheHint);
-            pb = new ParameterBlock();
-            pb.addSource(cc);
-            pb.add(MedianFilterDescriptor.MEDIAN_MASK_SQUARE); // X Shape seems to give the least artifacts
-            pb.add(Math.max(2 * (int) (denoiseLevel * scale) + 1, 3));
-            denoiser = ImageN.create("MedianFilter", pb, mfHints);
+            final var maskShape = MedianFilterDescriptor.MEDIAN_MASK_SQUARE; // X Shape seems to give the least artifact
+            final var maskSize = Math.max(2 * (int) (denoiseLevel * scale) + 1, 3);
+            denoiser = MedianFilterDescriptor.create(cc, maskShape, maskSize, mfHints);
 
-            RenderingHints layoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, Functions.getImageLayout(ystImage));
-            pb = new ParameterBlock();
-            pb.addSource(y);
-            pb.addSource(denoiser);
+            final var layoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, Functions.getImageLayout(ystImage));
             layoutHints.add(JAIContext.noCacheHint);
-            RenderedOp denoisedyst = ImageN.create("BandMerge", pb, layoutHints);
+            RenderedOp denoisedyst = BandMergeDescriptor.create(null, 0, false, layoutHints, y, denoiser);
 
-            pb = new ParameterBlock();
-            pb.addSource( denoisedyst );
-            pb.add( yst2rgb );
-            return ImageN.create("BandCombine", pb, JAIContext.noCacheHint);
+            return BandCombineDescriptor.create(denoisedyst, yst2rgb, JAIContext.noCacheHint);
         }
     }
 

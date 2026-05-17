@@ -4,6 +4,7 @@ package com.lightcrafts.model.ImageEditor;
 
 import com.lightcrafts.image.color.ColorScience;
 import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.jai.operator.LCUnsharpMaskDescriptor;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.Operation;
@@ -13,12 +14,15 @@ import org.eclipse.imagen.BorderExtender;
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.media.bandcombine.BandCombineDescriptor;
+import org.eclipse.imagen.media.bandmerge.BandMergeDescriptor;
+import org.eclipse.imagen.media.bandselect.BandSelectDescriptor;
+import org.eclipse.imagen.media.lookup.LookupDescriptor;
 import org.eclipse.imagen.media.lookup.LookupTable;
 import org.eclipse.imagen.media.lookup.LookupTableFactory;
 
 import java.awt.*;
 import java.awt.image.RenderedImage;
-import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
 import java.util.LinkedList;
 
@@ -141,10 +145,7 @@ public class UnSharpMaskOperation extends BlendedOperation {
     static class GammaUSMProcessor implements ImageProcessor {
         @Override
         public RenderedOp process(RenderedImage source) {
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(source);
-            pb.add(invertTable());
-            return ImageN.create("lookup", pb, null);
+            return LookupDescriptor.create(source, invertTable(), 0, null, null, false, null);
         }
     }
 
@@ -152,16 +153,8 @@ public class UnSharpMaskOperation extends BlendedOperation {
         @Override
         public RenderedOp process(RenderedImage source) {
             double[][] yChannel = new double[][]{{ColorScience.Wr, ColorScience.Wg, ColorScience.Wb, 0}};
-
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource( source );
-            pb.add( yChannel );
-            RenderedOp y = ImageN.create("BandCombine", pb, null);
-
-            pb = new ParameterBlock();
-            pb.addSource(y);
-            pb.add(invertTable());
-            return ImageN.create("lookup", pb, null);
+            RenderedOp y = BandCombineDescriptor.create(source, yChannel, null);
+            return LookupDescriptor.create(y, invertTable(), 0, null, null, false, null);
         }
     }
 
@@ -179,12 +172,10 @@ public class UnSharpMaskOperation extends BlendedOperation {
         public PlanarImage setFrontPlain() {
             RenderingHints extenderHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
                                                               BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(back);
-            pb.addSource(Functions.gaussianBlur(back, rendering, op, radius * scale));
-            pb.add(amount/100.0);
-            pb.add((int) threshold);
-            return ImageN.create("LCUnsharpMask", pb, extenderHints);
+            final var source1 = Functions.gaussianBlur(back, rendering, op, radius * scale);
+            final double gain = amount / 100.0;
+
+            return LCUnsharpMaskDescriptor.create(back, source1, gain, (int) threshold, extenderHints);
         }
 
         @Override
@@ -199,18 +190,12 @@ public class UnSharpMaskOperation extends BlendedOperation {
 
             RenderingHints extenderHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
                                                               BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(GammaUSMProcessorInstance.process(back));
-            pb.addSource(blur);
-            pb.add(amount/100.0);
-            pb.add((int) threshold);
-            RenderedOp usm = ImageN.create("LCUnsharpMask", pb, extenderHints);
+            final double gain = amount / 100.0;
+            RenderedOp usm = LCUnsharpMaskDescriptor.create(
+                    GammaUSMProcessorInstance.process(back), blur, gain, (int) threshold, extenderHints);
             usm.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
 
-            pb = new ParameterBlock();
-            pb.addSource(usm);
-            pb.add(getTable());
-            return ImageN.create("lookup", pb, JAIContext.noCacheHint);
+            return LookupDescriptor.create(usm, getTable(), 0, null, null, false, JAIContext.noCacheHint);
         }
 
         public PlanarImage setFrontLuminance() {
@@ -219,42 +204,26 @@ public class UnSharpMaskOperation extends BlendedOperation {
             double[][] rgb2yst = yst.fromRGB(back.getSampleModel().getDataType());
             double[][] yst2rgb = yst.toRGB(back.getSampleModel().getDataType());
 
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource( back );
-            pb.add( rgb2yst );
-            RenderedOp ystImage = ImageN.create("BandCombine", pb, null);
+            RenderedOp ystImage = BandCombineDescriptor.create(back, rgb2yst, null);
 
-            pb = new ParameterBlock();
-            pb.addSource(ystImage);
-            pb.add(new int[]{1, 2});
-            RenderedOp cc = ImageN.create("bandselect", pb, JAIContext.noCacheHint);
+            RenderedOp cc = BandSelectDescriptor.create(ystImage, new int[]{1, 2}, JAIContext.noCacheHint);
 
             RenderingHints extenderHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
                                                               BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-            pb = new ParameterBlock();
-            pb.addSource(LuminanceUSMProcessorInstance.process(back));
-            pb.addSource(Functions.gaussianBlur(back, rendering, op, LuminanceUSMProcessorInstance, radius * scale));
-            pb.add(amount/100.0);
-            pb.add((int) threshold);
-            RenderedOp usm = ImageN.create("LCUnsharpMask", pb, extenderHints);
+            final double gain = amount / 100.0;
+            RenderedOp usm = LCUnsharpMaskDescriptor.create(
+                    LuminanceUSMProcessorInstance.process(back),
+                    Functions.gaussianBlur(back, rendering, op, LuminanceUSMProcessorInstance, radius * scale),
+                    gain, (int) threshold, extenderHints);
             usm.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
 
-            pb = new ParameterBlock();
-            pb.addSource(usm);
-            pb.add(getTable());
-            RenderedOp invLookup = ImageN.create("lookup", pb, JAIContext.noCacheHint);
+            RenderedOp invLookup = LookupDescriptor.create(usm, getTable(), 0, null, null, false, JAIContext.noCacheHint);
 
-            RenderingHints layoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, Functions.getImageLayout(ystImage));
-            pb = new ParameterBlock();
-            pb.addSource(invLookup);
-            pb.addSource(cc);
+            final var layoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, Functions.getImageLayout(ystImage));
             layoutHints.add(JAIContext.noCacheHint);
-            RenderedOp denoisedyst = ImageN.create("BandMerge", pb, layoutHints);
+            RenderedOp denoisedyst = BandMergeDescriptor.create(null, 0, false, layoutHints, invLookup, cc);
 
-            pb = new ParameterBlock();
-            pb.addSource( denoisedyst );
-            pb.add( yst2rgb );
-            return ImageN.create("BandCombine", pb, JAIContext.noCacheHint);
+            return BandCombineDescriptor.create(denoisedyst, yst2rgb, JAIContext.noCacheHint);
         }
 
         @Override
@@ -281,4 +250,3 @@ public class UnSharpMaskOperation extends BlendedOperation {
         return type;
     }
 }
-

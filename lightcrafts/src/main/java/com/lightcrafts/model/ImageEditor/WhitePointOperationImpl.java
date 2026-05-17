@@ -8,8 +8,8 @@ import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.WhitePointOperation;
 import com.lightcrafts.utils.Spline;
-import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
+import org.eclipse.imagen.media.lookup.LookupDescriptor;
 import org.eclipse.imagen.media.lookup.LookupTableFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.image.Raster;
-import java.awt.image.renderable.ParameterBlock;
 
 import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_WHITE_BALANCE;
 
@@ -150,22 +149,18 @@ class WhitePointOperationImpl extends BlendedOperation implements WhitePointOper
                 Spline.Interpolator interpolator = new Spline.Interpolator();
 
                 for (int i = 0; i < 0x10000; i++)
-                    table[0][i] = (short) (0xffff & (int) Math.min(Math.max(i + 0xff * interpolator.interpolate(i / (double) 0xffff, redCurve), 0), 0xffff));
+                    table[0][i] = (short) (0xffff & (int) Math.clamp(i + 0xff * interpolator.interpolate(i / (double) 0xffff, redCurve), 0, 0xffff));
 
                 interpolator.reset();
                 for (int i = 0; i < 0x10000; i++)
-                    table[1][i] = (short) (0xffff & (int) Math.min(Math.max(i + 0xff * interpolator.interpolate(i / (double) 0xffff, greenCurve), 0), 0xffff));
+                    table[1][i] = (short) (0xffff & (int) Math.clamp(i + 0xff * interpolator.interpolate(i / (double) 0xffff, greenCurve), 0, 0xffff));
 
                 interpolator.reset();
                 for (int i = 0; i < 0x10000; i++)
-                    table[2][i] = (short) (0xffff & (int) Math.min(Math.max(i + 0xff * interpolator.interpolate(i / (double) 0xffff, blueCurve), 0), 0xffff));
+                    table[2][i] = (short) (0xffff & (int) Math.clamp(i + 0xff * interpolator.interpolate(i / (double) 0xffff, blueCurve), 0, 0xffff));
 
-                var lookupTable = LookupTableFactory.create(table, true);
-
-                ParameterBlock pb = new ParameterBlock();
-                pb.addSource(back);
-                pb.add(lookupTable);
-                return ImageN.create("lookup", pb, JAIContext.noCacheHint);
+                final var lookupTable = LookupTableFactory.create(table, true);
+                return LookupDescriptor.create(back, lookupTable, 0, null, null, false, JAIContext.noCacheHint);
             } else {
                 return back;
             }

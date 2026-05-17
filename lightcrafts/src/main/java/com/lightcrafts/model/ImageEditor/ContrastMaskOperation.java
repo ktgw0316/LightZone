@@ -9,18 +9,18 @@ import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.LayerConfig;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
-import org.eclipse.imagen.BorderExtender;
-import org.eclipse.imagen.ImageLayout;
-import org.eclipse.imagen.ImageN;
-import org.eclipse.imagen.Interpolation;
-import org.eclipse.imagen.PlanarImage;
-import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.*;
+import org.eclipse.imagen.media.affine.AffineDescriptor;
+import org.eclipse.imagen.media.algebra.AlgebraDescriptor;
+import org.eclipse.imagen.media.bandcombine.BandCombineDescriptor;
+import org.eclipse.imagen.media.lookup.LookupDescriptor;
 import org.eclipse.imagen.media.lookup.LookupTable;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
+
+import static org.eclipse.imagen.media.algebra.AlgebraDescriptor.Operator.NOT;
 
 /**
  * Created by IntelliJ IDEA.
@@ -94,57 +94,46 @@ public class ContrastMaskOperation extends BlendedOperation {
             if (rescale != 1) {
                 float scaleX = (float) Math.floor(rescale * back.getWidth()) / (float) back.getWidth();
                 float scaleY = (float) Math.floor(rescale * back.getHeight()) / (float) back.getHeight();
+                final var xform = AffineTransform.getScaleInstance(scaleX, scaleY);
 
-                ParameterBlock pb = new ParameterBlock();
-                pb.addSource(back);
-                pb.add(AffineTransform.getScaleInstance(scaleX, scaleY));
-                pb.add(interp);
-                RenderingHints layoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT,
-                                                            new ImageLayout(0, 0,
-                                                                            Math.max(JAIContext.TILE_WIDTH/divideByTwo, 8),
-                                                                            Math.max(JAIContext.TILE_HEIGHT/divideByTwo, 8),
-                                                                            null, null));
+                final var layoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT,
+                        new ImageLayout(0, 0,
+                                Math.max(JAIContext.TILE_WIDTH/divideByTwo, 8),
+                                Math.max(JAIContext.TILE_HEIGHT/divideByTwo, 8),
+                                null, null));
                 layoutHints.add(hints);
                 layoutHints.add(JAIContext.noCacheHint);
-                scaleDown = ImageN.create("Affine", pb, layoutHints);
+
+                scaleDown = AffineDescriptor.create(back, xform, interp, null, null, false, false,
+                        null, layoutHints);
             } else {
                 scaleDown = back;
             }
 
             if (scaleDown.getColorModel().getNumComponents() == 3) {
-                ParameterBlock pb = new ParameterBlock();
-                pb.addSource(scaleDown);
                 double[][] transform = {
                         {ColorScience.Wr, ColorScience.Wg, ColorScience.Wb, 0}
                 };
-                pb.add(transform);
-                scaleDown = ImageN.create("BandCombine", pb, JAIContext.noCacheHint);  // Desaturate, single banded
+                scaleDown = BandCombineDescriptor.create(scaleDown, transform, JAIContext.noCacheHint);  // Desaturate, single banded
             }
 
-            scaleDown = ImageN.create("Not", scaleDown, JAIContext.noCacheHint);       // Invert
+            scaleDown = AlgebraDescriptor.create(NOT, null, null, 0, JAIContext.noCacheHint, scaleDown);
             LookupTable table = Functions.computeGammaTable(scaleDown.getSampleModel().getDataType(), gamma);
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(scaleDown);
-            pb.add(table);
             // we cache this since convolution scans its input multiple times
-            gammaCurve = ImageN.create("lookup", pb, null /*JAIContext.noCacheHint*/);
+            gammaCurve = LookupDescriptor.create(scaleDown, table, 0, null, null, false, null);
 
             final RenderedOp blur = Functions.fastGaussianBlur(gammaCurve, newRadius);
 
             if (rescale != 1) {
-                pb = new ParameterBlock();
-                pb.addSource(blur);
-                pb.add(AffineTransform.getScaleInstance(back.getWidth() / (double) scaleDown.getWidth(),
-                                                        back.getHeight() / (double) scaleDown.getHeight()));
-                pb.add(interp);
-                RenderingHints resultLayoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT,
-                                                                  new ImageLayout(0, 0,
-                                                                                  JAIContext.TILE_WIDTH,
-                                                                                  JAIContext.TILE_HEIGHT,
-                                                                                  null, null));
+                final var xform = AffineTransform.getScaleInstance(
+                        back.getWidth() / (double) scaleDown.getWidth(),
+                        back.getHeight() / (double) scaleDown.getHeight());
+                final var resultLayoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT,
+                        new ImageLayout(0, 0, JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT,
+                                null, null));
                 resultLayoutHints.add(hints);
                 resultLayoutHints.add(JAIContext.noCacheHint);
-                return ImageN.create("Affine", pb, resultLayoutHints);
+                return AffineDescriptor.create(blur, xform, interp, null, null, false, false, null, resultLayoutHints);
             } else {
                 return blur;
             }

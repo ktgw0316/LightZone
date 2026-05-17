@@ -11,6 +11,7 @@ import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.BorderExtender;
 import org.eclipse.imagen.Interpolation;
+import org.eclipse.imagen.media.affine.AffineDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +19,6 @@ import java.awt.print.PageFormat;
 import java.awt.print.PrinterException;
 import java.awt.print.Paper;
 import java.awt.*;
-import java.awt.image.renderable.ParameterBlock;
 import java.awt.geom.AffineTransform;
 
 /**
@@ -101,16 +101,12 @@ public class WindowsPrinterLayer implements PrinterLayer {
         if (xMagnification > 1 || yMagnification > 1) {
             logger.debug("Uprezzing by {}%", xMagnification * 100);
 
-            AffineTransform xform = AffineTransform.getScaleInstance(xMagnification, yMagnification);
-
-            RenderingHints formatHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-
-            Interpolation interp = Interpolation.getInstance(Interpolation.INTERP_BICUBIC_2);
-            ParameterBlock params = new ParameterBlock();
-            params.addSource(printImage);
-            params.add(xform);
-            params.add(interp);
-            printImage = ImageN.create("Affine", params, formatHints);
+            final var xform = AffineTransform.getScaleInstance(xMagnification, yMagnification);
+            final var interp = Interpolation.getInstance(Interpolation.INTERP_BICUBIC_2);
+            final var formatHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
+                    BorderExtender.createInstance(BorderExtender.BORDER_COPY));
+            printImage = AffineDescriptor.create(printImage, xform, interp, null, null, false,
+                    false, null, formatHints);
         }
 
         Point location = new Point((int) (settings.getX() * resolution.getWidth() / 72.0),

@@ -6,13 +6,13 @@ package com.lightcrafts.model.ImageEditor;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.utils.Functions;
 import org.eclipse.imagen.BorderExtender;
-import org.eclipse.imagen.Interpolation;
 import org.eclipse.imagen.ImageN;
+import org.eclipse.imagen.Interpolation;
 import org.eclipse.imagen.RenderedOp;
+import org.eclipse.imagen.operator.FilteredSubsampleDescriptor;
 
 import java.awt.*;
 import java.awt.image.RenderedImage;
-import java.awt.image.renderable.ParameterBlock;
 import java.util.ArrayList;
 
 class ImagePyramid {
@@ -68,15 +68,10 @@ class ImagePyramid {
         final var qsFilterArray = new float[kdata.length - ko];
         System.arraycopy(kdata, ko, qsFilterArray, 0, qsFilterArray.length);
 
-        final var params = new ParameterBlock();
-        params.addSource(src);
-        params.add(ratio);
-        params.add(ratio);
-        params.add(qsFilterArray);
-        params.add(Interpolation.getInstance(Interpolation.INTERP_NEAREST));
-        return ImageN.create("FilteredSubsample", params,
-                new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
-                        BorderExtender.createInstance(BorderExtender.BORDER_COPY)));
+        final var interp = Interpolation.getInstance(Interpolation.INTERP_NEAREST);
+        final var hints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
+                BorderExtender.createInstance(BorderExtender.BORDER_COPY));
+        return FilteredSubsampleDescriptor.create(src, ratio, ratio, qsFilterArray, interp, hints);
     }
 
 }

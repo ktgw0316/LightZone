@@ -210,17 +210,10 @@ public class JAIContext {
 
         OperationRegistry or = jaiInstance.getOperationRegistry();
 
-        // register LCColorConvert
-        OperationDescriptor desc = new LCColorConvertDescriptor();
-        or.registerDescriptor(desc);
-        ContextualRenderedImageFactory crif = new LCColorConvertCRIF();
-        RIFRegistry.register(or, desc.getName(), "com.lightcrafts", crif);
-        CRIFRegistry.register(or, desc.getName(), crif);
-
         // register LCMSColorConvert
-        desc = new LCMSColorConvertDescriptor();
+        OperationDescriptor desc = new LCMSColorConvertDescriptor();
         or.registerDescriptor(desc);
-        crif = new LCMSColorConvertCRIF();
+        ContextualRenderedImageFactory crif = new LCMSColorConvertCRIF();
         RIFRegistry.register(or, desc.getName(), "com.lightcrafts", crif);
         CRIFRegistry.register(or, desc.getName(), crif);
 
@@ -237,13 +230,6 @@ public class JAIContext {
         RenderedImageFactory rif = new LCSeparableConvolveRIF();
         RIFRegistry.register(or, desc.getName(), "com.lightcrafts", rif);
 
-        // register NOPOp
-        desc = new NOPDescriptor();
-        or.registerDescriptor(desc);
-        crif = new NOPCRIF();
-        RIFRegistry.register(or, desc.getName(), "com.lightcrafts", crif);
-        CRIFRegistry.register(or, desc.getName(), crif);
-
         // register LCUnsharpMaskOp
         desc = new LCUnsharpMaskDescriptor();
         or.registerDescriptor(desc);
@@ -251,25 +237,7 @@ public class JAIContext {
         RIFRegistry.register(or, desc.getName(), "com.lightcrafts", crif);
         CRIFRegistry.register(or, desc.getName(), crif);
 
-        // register LCErode
-        desc = new LCErodeDescriptor();
-        or.registerDescriptor(desc);
-        rif = new LCErodeRIF();
-        RIFRegistry.register(or, desc.getName(), "com.lightcrafts", rif);
-
-        // register RawAdjustments
-        desc = new RawAdjustmentsDescriptor();
-        or.registerDescriptor(desc);
-        rif = new RawAdjustmentsCRIF();
-        RIFRegistry.register(or, desc.getName(), "com.lightcrafts", rif);
-
-        // register LCBandCombine
-        desc = new LCBandCombineDescriptor();
-        or.registerDescriptor(desc);
-        rif = new LCBandCombineCRIF();
-        RIFRegistry.register(or, desc.getName(), "com.lightcrafts", rif);
-
-        // register LCBandCombine
+        // register BilateralFilter
         desc = new BilateralFilterDescriptor();
         or.registerDescriptor(desc);
         rif = new BilateralFilterRIF();

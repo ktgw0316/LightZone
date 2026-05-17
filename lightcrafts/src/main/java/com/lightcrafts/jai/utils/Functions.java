@@ -6,13 +6,16 @@ package com.lightcrafts.jai.utils;
 import com.lightcrafts.image.metadata.ImageOrientation;
 import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.operator.LCMSColorConvertDescriptor;
+import com.lightcrafts.jai.operator.LCSeparableConvolveDescriptor;
 import com.lightcrafts.model.ImageEditor.ImageProcessor;
 import com.lightcrafts.model.ImageEditor.Rendering;
 import com.lightcrafts.model.Operation;
 import org.eclipse.imagen.*;
+import org.eclipse.imagen.media.affine.AffineDescriptor;
 import org.eclipse.imagen.media.lookup.LookupTable;
 import org.eclipse.imagen.media.lookup.LookupTableFactory;
 import org.eclipse.imagen.media.nullop.NullDescriptor;
+import org.eclipse.imagen.media.rescale.RescaleDescriptor;
 import org.eclipse.imagen.media.util.ImageUtil;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -23,11 +26,9 @@ import java.awt.color.ColorSpace;
 import java.awt.color.ICC_Profile;
 import java.awt.geom.AffineTransform;
 import java.awt.image.*;
-import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * Created by IntelliJ IDEA.
@@ -52,16 +53,6 @@ public class Functions {
             }
             return LookupTableFactory.create(tableDataUShort, true);
         }
-    }
-
-    static public RenderedOp crop(RenderedImage image, float x, float y, float width, float height, RenderingHints hints) {
-        ParameterBlock pb = new ParameterBlock();
-        pb.addSource(image);
-        pb.add(x);
-        pb.add(y);
-        pb.add(width);
-        pb.add(height);
-        return ImageN.create("Crop", pb, hints);
     }
 
     static public RenderedOp flip(RenderedImage image, boolean horizontal, boolean vertical, RenderingHints hints) {
@@ -115,21 +106,21 @@ public class Functions {
         final RenderedOp blur = fastGaussianBlur(scaleDown, newRadius);
 
         if (rescale != 1) {
-            ParameterBlock pb = new ParameterBlock();
-            pb.addSource(blur);
-            pb.add(AffineTransform.getScaleInstance(image.getWidth() / (double) blur.getWidth(),
-                                                    image.getHeight() / (double) blur.getHeight()));
-            pb.add(Interpolation.getInstance(Interpolation.INTERP_BICUBIC));
-            RenderingHints sourceLayoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT,
-                                                                  new ImageLayout(0, 0,
-                                                                                  JAIContext.TILE_WIDTH,
-                                                                                  JAIContext.TILE_HEIGHT,
-                                                                                  null, null));
-            RenderingHints extenderHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
+            final var xform = AffineTransform.getScaleInstance(
+                    image.getWidth() / (double) blur.getWidth(),
+                    image.getHeight() / (double) blur.getHeight());
+            final var interp = Interpolation.getInstance(Interpolation.INTERP_BICUBIC);
+
+            final var sourceLayoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT,
+                    new ImageLayout(0, 0, JAIContext.TILE_WIDTH, JAIContext.TILE_HEIGHT,
+                            null, null));
+            final var extenderHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
                     BorderExtender.createInstance(BorderExtender.BORDER_COPY));
             sourceLayoutHints.add(extenderHints);
+
             // sourceLayoutHints.add(JAIContext.noCacheHint);
-            return ImageN.create("Affine", pb, sourceLayoutHints);
+            return AffineDescriptor.create(blur, xform, interp, null, null, false, false, null,
+                    sourceLayoutHints);
         } else {
             return blur;
         }
@@ -137,13 +128,10 @@ public class Functions {
 
     public static RenderedOp fastGaussianBlur(RenderedImage image, double radius) {
         // TODO: Make this fast
-        RenderingHints extenderHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
+        final var extenderHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
                 BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-        KernelImageN kernel = getGaussKernel(radius);
-        ParameterBlock pb = new ParameterBlock()
-                .addSource(image)
-                .add(kernel);
-        return ImageN.create("LCSeparableConvolve", pb, extenderHints);
+        final KernelImageN kernel = getGaussKernel(radius);
+        return LCSeparableConvolveDescriptor.create(image, kernel, extenderHints);
     }
 
     public static ImageLayout getImageLayout(RenderedImage image) {
@@ -350,14 +338,9 @@ public class Functions {
         if (hints != null)
             formatHints.add(hints);
 
-        final double C0 = 0;
-        final double C1 = 256.0;
-
-        ParameterBlock pb = new ParameterBlock();
-        pb.addSource(source);
-        pb.add(new double[]{C1});
-        pb.add(new double[]{C0});
-        return ImageN.create("Rescale", pb, formatHints);
+        final double[] C0 = new double[] {0};
+        final double[] C1 = new double[] {256.0};
+        return RescaleDescriptor.create(source, C1, C0, formatHints);
     }
 
     public static RenderedOp fromUShortToByte(RenderedImage source, RenderingHints hints) {
@@ -375,14 +358,9 @@ public class Functions {
         if (hints != null)
             formatHints.add(hints);
 
-        final double C0 = 0;
-        final double C1 = 1.0/256.0;
-
-        ParameterBlock pb = new ParameterBlock();
-        pb.addSource(source);
-        pb.add(new double[]{C1});
-        pb.add(new double[]{C0});
-        return ImageN.create("Rescale", pb, formatHints);
+        final double[] C0 = new double[]{0};
+        final double[] C1 = new double[]{1.0/256.0};
+        return RescaleDescriptor.create(source, C1, C0, formatHints);
     }
 
     public static PlanarImage toColorSpace(RenderedImage source, ColorSpace cs, ICC_Profile proof,
@@ -407,16 +385,11 @@ public class Functions {
         if (hints != null)
             formatHints.add(hints);
 
-        ParameterBlock pb = new ParameterBlock();
-        pb.addSource(source);
-        pb.add(cm);
-        pb.add(Objects.requireNonNullElse(intent, LCMSColorConvertDescriptor.PERCEPTUAL));
-        if (proof != null) {
-            pb.add(proof);
-            if (proofIntent != null)
-                pb.add(proofIntent);
-        }
-        return ImageN.create("LCMSColorConvert", pb, formatHints);
+        if (intent == null)
+            intent = LCMSColorConvertDescriptor.PERCEPTUAL;
+
+        return LCMSColorConvertDescriptor.create(source, cm, intent, proof, proofIntent,
+                formatHints);
     }
 
     public static PlanarImage toColorSpace(RenderedImage source, ColorSpace cs,
