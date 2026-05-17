@@ -75,4 +75,8 @@ public class Convolutions {
                                                    int s1LineStride, int dLineStride,
                                                    int dheight, int dwidth, int kw, int kh,
                                                    float[] hValues, float[] vValues);
+
+    static {
+        System.loadLibrary("JAI");
+    }
 }
