@@ -4,11 +4,11 @@ package com.lightcrafts.model.ImageEditor;
 
 import com.lightcrafts.image.color.ColorScience;
 import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.jai.operator.BilateralFilterDescriptor;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.SliderConfig;
-
 import org.eclipse.imagen.BorderExtender;
 import org.eclipse.imagen.ImageN;
 import org.eclipse.imagen.PlanarImage;
@@ -16,8 +16,8 @@ import org.eclipse.imagen.RenderedOp;
 import org.eclipse.imagen.media.bandcombine.BandCombineDescriptor;
 import org.eclipse.imagen.media.bandmerge.BandMergeDescriptor;
 import org.eclipse.imagen.media.bandselect.BandSelectDescriptor;
+
 import java.awt.*;
-import java.awt.image.renderable.ParameterBlock;
 import java.text.DecimalFormat;
 
 import static com.lightcrafts.ui.help.HelpConstants.HELP_TOOL_NOISE_REDUCTION;
@@ -117,12 +117,9 @@ public class AdvancedNoiseReductionOperation extends BlendedOperation {
             RenderingHints mfHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER, BorderExtender.createInstance(BorderExtender.BORDER_COPY));
 
             if (chroma_domain != 0 && chroma_range != 0) {
-                var pb = new ParameterBlock();
-                pb.addSource(ystImage);
-                pb.add(chroma_domain * scale);
-                pb.add(0.02f + 0.001f * chroma_domain);
-                // pb.add(0.1f);
-                ystImage = ImageN.create("BilateralFilter", pb, mfHints);
+                final float sigma_d = chroma_domain * scale;
+                final float sigma_r = 0.02f + 0.001f * chroma_domain;
+                ystImage = BilateralFilterDescriptor.create(ystImage, sigma_d, sigma_r, mfHints);
                 ystImage.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
             }
 
@@ -130,11 +127,9 @@ public class AdvancedNoiseReductionOperation extends BlendedOperation {
                 RenderedOp y = BandSelectDescriptor.create(ystImage, new int[]{0}, null);
                 RenderedOp cc = BandSelectDescriptor.create(ystImage, new int[]{1, 2}, JAIContext.noCacheHint);
 
-                var pb = new ParameterBlock();
-                pb.addSource( y );
-                pb.add((2 + luma_domain / 10f)* scale);
-                pb.add(0.005f * luma_domain);
-                y = ImageN.create("BilateralFilter", pb, mfHints);
+                final float sigma_d = (2 + luma_domain / 10f)* scale;
+                final float sigma_r = 0.005f * luma_domain;
+                y = BilateralFilterDescriptor.create(y, sigma_d, sigma_r, mfHints);
 
                 final var layoutHints = new RenderingHints(ImageN.KEY_IMAGE_LAYOUT, Functions.getImageLayout(ystImage));
                 layoutHints.add(JAIContext.noCacheHint);

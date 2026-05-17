@@ -3,6 +3,7 @@
 package com.lightcrafts.model.ImageEditor;
 
 import com.lightcrafts.jai.JAIContext;
+import com.lightcrafts.jai.operator.BilateralFilterDescriptor;
 import com.lightcrafts.jai.utils.Functions;
 import com.lightcrafts.jai.utils.Transform;
 import com.lightcrafts.model.LayerConfig;
@@ -108,15 +109,14 @@ public class HDROperation extends BlendedOperation {
             if (detail > 0) {
                 final RenderedImage singleChannel = createSingleChannel(back);
 
-                ParameterBlock pb = new ParameterBlock();
-                pb.addSource(singleChannel);
-                pb.add(2f * scale);
-                pb.add(20f);
-                RenderingHints hints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
-                                                          BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-                RenderedOp bilateral = ImageN.create("BilateralFilter", pb, hints);
+                final float sigma_d = 2f * scale;
+                final float sigma_r = 20f;
+                final var hints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
+                        BorderExtender.createInstance(BorderExtender.BORDER_COPY));
+                RenderedOp bilateral = BilateralFilterDescriptor.create(
+                        singleChannel, sigma_d, sigma_r, hints);
 
-                pb = new ParameterBlock();
+                final var pb = new ParameterBlock();
                 pb.addSource(bilateral);
                 pb.addSource(front);
                 pb.add("Overlay");
