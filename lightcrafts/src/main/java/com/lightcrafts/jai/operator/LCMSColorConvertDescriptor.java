@@ -185,8 +185,12 @@ public class LCMSColorConvertDescriptor extends OperationDescriptorImpl {
 
         pb.setParameter("colorModel", colorModel);
         pb.setParameter("renderingIntent", renderingIntent);
-        pb.setParameter("proof", proof);
-        pb.setParameter("proofIntent", proofIntent);
+        if (proof != null) {
+            pb.setParameter("proof", proof);
+            if (proofIntent != null) {
+                pb.setParameter("proofIntent", proofIntent);
+            }
+        }
 
         return ImageN.create("LCMSColorConvert", pb, hints);
     }
