@@ -154,7 +154,7 @@ public final class CheckForUpdate {
     }
 
     public static boolean isEnabled() {
-        return false;
+        return true;
     }
 
     ////////// private ////////////////////////////////////////////////////////
@@ -285,17 +285,17 @@ public final class CheckForUpdate {
         }
     }
 
+    /// Returns true if and only if the latest version is newer than the current version.
     static boolean compareVersions(@NotNull String currentVersion, @NotNull String latestVersion) {
         final var currentVersionParts = currentVersion.split("[.~]");
         final var latestVersionParts = latestVersion.split("[.~]");
         final int length = Math.min(currentVersionParts.length, latestVersionParts.length);
         for (int i = 0; i < length; i++) {
-            final String currentVersionPart = currentVersionParts[i];
-            final String latestVersionPart = latestVersionParts[i];
-            final int result = currentVersionPart.compareTo(latestVersionPart);
-            if (result < 0) {
+            final int currentVersionNumber = Integer.parseInt(currentVersionParts[i].replace("beta", ""));
+            final int latestVersionNumber = Integer.parseInt(latestVersionParts[i].replace("beta", ""));
+            if (currentVersionNumber < latestVersionNumber) {
                 return true;
-            } else if (result > 0) {
+            } else if (currentVersionNumber > latestVersionNumber) {
                 return false;
             }
         }
