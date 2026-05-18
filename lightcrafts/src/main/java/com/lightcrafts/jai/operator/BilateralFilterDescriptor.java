@@ -32,11 +32,11 @@ public class BilateralFilterDescriptor extends OperationDescriptorImpl {
     };
 
     private static final Class[] paramClasses = {
-        Float.class, Float.class, Boolean.class
+        Float.class, Float.class
     };
 
     private static final Object[] paramDefaults = {
-        2f, 4f, Boolean.FALSE
+        2f, 4f
     };
 
     public BilateralFilterDescriptor() {
