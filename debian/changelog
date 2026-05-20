@@ -1,3 +1,10 @@
+lightzone (5.0.1-0obs1) unstable; urgency=medium
+
+  * Drop ~beta pre-release versioning; use plain semver going forward.
+  * Add automated GitHub Release publishing on tag push.
+
+ -- Chris Bendel <chrissbendel@gmail.com>  Sun, 17 May 2026 12:00:00 +0000
+
 lightzone (5.0.0~beta3-0obs1) unstable; urgency=medium
 
   * Upstream sync

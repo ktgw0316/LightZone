@@ -76,6 +76,7 @@ jobs:
       if: startsWith(matrix.os, 'windows')
       uses: actions/upload-artifact@v7
       with:
+        name: lightzone-${{ matrix.os }}
         archive: false
         path: |
           windows/build/jpackage/LightZone-*.msi
@@ -83,6 +84,7 @@ jobs:
       if: startsWith(matrix.os, 'macos')
       uses: actions/upload-artifact@v7
       with:
+        name: lightzone-${{ matrix.os }}
         archive: false
         path: |
           macosx/build/jpackage/LightZone-*.dmg
@@ -90,6 +92,7 @@ jobs:
       if: startsWith(matrix.os, 'ubuntu')
       uses: actions/upload-artifact@v7
       with:
+        name: lightzone-${{ matrix.os }}
         archive: false
         path: |
           linux/build/jpackage/lightzone*.deb
@@ -124,7 +127,35 @@ jobs:
     - name: Upload Artifacts on Fedora
       uses: actions/upload-artifact@v7
       with:
+        name: lightzone-fedora
         archive: false
         path: |
           linux/build/jpackage/lightzone*.rpm
+
+  release:
+    needs: [build, build_on_Fedora]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v7
+      with:
+        path: artifacts
+        merge-multiple: true
+    - name: Publish GitHub Release
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        PRERELEASE_FLAG=""
+        if [[ "${GITHUB_REF_NAME}" == *-* ]]; then
+          PRERELEASE_FLAG="--prerelease"
+        fi
+        gh release create "${GITHUB_REF_NAME}" \
+          --repo "${GITHUB_REPOSITORY}" \
+          --title "${GITHUB_REF_NAME}" \
+          --generate-notes \
+          ${PRERELEASE_FLAG} \
+          artifacts/*
 
