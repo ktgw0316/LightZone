@@ -154,7 +154,7 @@ public final class CheckForUpdate {
     }
 
     public static boolean isEnabled() {
-        return false;
+        return true;
     }
 
     ////////// private ////////////////////////////////////////////////////////
@@ -269,12 +269,11 @@ public final class CheckForUpdate {
     @NotNull
     private static String checkLatestRelease() {
         // Check github release page
-        final var client = HttpClient.newHttpClient();
         final var request = HttpRequest.newBuilder()
                 .uri(CHECK_URI)
                 .header("Content-Type", "application/json")
                 .build();
-        try {
+        try (final var client = HttpClient.newHttpClient()) {
             final HttpResponse<String> response =
                     client.send(request, HttpResponse.BodyHandlers.ofString());
             final var jsonObject = new JSONObject(response.body());
@@ -285,17 +284,17 @@ public final class CheckForUpdate {
         }
     }
 
+    /// Returns true if and only if the latest version is newer than the current version.
     static boolean compareVersions(@NotNull String currentVersion, @NotNull String latestVersion) {
         final var currentVersionParts = currentVersion.split("[.~]");
         final var latestVersionParts = latestVersion.split("[.~]");
         final int length = Math.min(currentVersionParts.length, latestVersionParts.length);
         for (int i = 0; i < length; i++) {
-            final String currentVersionPart = currentVersionParts[i];
-            final String latestVersionPart = latestVersionParts[i];
-            final int result = currentVersionPart.compareTo(latestVersionPart);
-            if (result < 0) {
+            final int currentVersionNumber = Integer.parseInt(currentVersionParts[i].replace("beta", ""));
+            final int latestVersionNumber = Integer.parseInt(latestVersionParts[i].replace("beta", ""));
+            if (currentVersionNumber < latestVersionNumber) {
                 return true;
-            } else if (result > 0) {
+            } else if (currentVersionNumber > latestVersionNumber) {
                 return false;
             }
         }
@@ -494,7 +493,8 @@ public final class CheckForUpdate {
     /**
      * The URI to go to to get the update.
      */
-    private static String m_updateURI;
+    private static final String m_updateURI =
+            "https://github.com/ktgw0316/LightZone/releases/latest";
 
     /**
      * The user-presentable version of the update.
@@ -515,14 +515,13 @@ public final class CheckForUpdate {
     private static final String CHECK_HOST = "api.github.com";
 
     /**
-     * The URI to fetch the <code>versions.xml</code> document from.
+     * The URI to fetch the JSON document from.
      * @see #CHECK_URI_STRING
      */
     private static URI CHECK_URI;
 
     /**
-     * The string of the URI to fetch the <code>versions.xml</code> document
-     * from.
+     * The string of the URI to fetch the JSON document from.
      * @see #CHECK_URI
      */
     private static final String CHECK_URI_STRING =
