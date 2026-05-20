@@ -269,12 +269,11 @@ public final class CheckForUpdate {
     @NotNull
     private static String checkLatestRelease() {
         // Check github release page
-        final var client = HttpClient.newHttpClient();
         final var request = HttpRequest.newBuilder()
                 .uri(CHECK_URI)
                 .header("Content-Type", "application/json")
                 .build();
-        try {
+        try (final var client = HttpClient.newHttpClient()) {
             final HttpResponse<String> response =
                     client.send(request, HttpResponse.BodyHandlers.ofString());
             final var jsonObject = new JSONObject(response.body());
@@ -494,7 +493,8 @@ public final class CheckForUpdate {
     /**
      * The URI to go to to get the update.
      */
-    private static String m_updateURI;
+    private static final String m_updateURI =
+            "https://github.com/ktgw0316/LightZone/releases/latest";
 
     /**
      * The user-presentable version of the update.
@@ -515,14 +515,13 @@ public final class CheckForUpdate {
     private static final String CHECK_HOST = "api.github.com";
 
     /**
-     * The URI to fetch the <code>versions.xml</code> document from.
+     * The URI to fetch the JSON document from.
      * @see #CHECK_URI_STRING
      */
     private static URI CHECK_URI;
 
     /**
-     * The string of the URI to fetch the <code>versions.xml</code> document
-     * from.
+     * The string of the URI to fetch the JSON document from.
      * @see #CHECK_URI
      */
     private static final String CHECK_URI_STRING =
