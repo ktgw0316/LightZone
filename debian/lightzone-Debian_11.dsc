@@ -2,7 +2,7 @@ Format: 3.0 (quilt)
 Source: lightzone
 Binary: lightzone
 Architecture: i386 amd64 armhf arm64
-Version: 5.0.1
+Version: 5.0.0
 Maintainer: Masahiro Kitagawa <arctica0316@gmail.com>
 Homepage: https://github.com/ktgw0316/LightZone
 Standards-Version: 4.4.1
@@ -36,4 +36,4 @@ Build-Depends:
 Package-List:
  lightzone deb graphics optional
 DEBTRANSFORM-RELEASE: 1
-DEBTRANSFORM-TAR: lightzone-5.0.1.tar.xz
+DEBTRANSFORM-TAR: lightzone-5.0.0.tar.xz
