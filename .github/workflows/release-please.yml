@@ -67,7 +67,8 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add debian/changelog debian/lightzone-Debian_*.dsc
-            git add freebsd-ports/graphics/lightzone/Makefile linux/lightzone.SlackBuild linux/lightzone.spec linux/products/lightzone linux/lightzone.changes
+            git add freebsd-ports/graphics/lightzone/Makefile linux/lightzone.SlackBuild linux/lightzone.spec linux/lightzone.changes
+            git add -f linux/products/lightzone
             git add macosx/src/main/resources/Info.plist
             git commit -m "chore: Sync version numbers to ${NEW_VERSION}"
             git push
