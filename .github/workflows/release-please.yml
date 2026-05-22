@@ -2,8 +2,7 @@ name: release-please
 
 on:
   push:
-    tags:
-      - '*.*.*'
+    branches: [release]
 
 permissions:
   contents: write
