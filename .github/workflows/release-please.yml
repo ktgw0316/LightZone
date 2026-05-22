@@ -39,9 +39,9 @@ jobs:
           MAINTAINER_NAME="${GITHUB_ACTOR}"
           MAINTAINER_EMAIL="${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com"
 
-          DEBFULLNAME="${MAINTAINER_NAME}"
-          DEBEMAIL="${MAINTAINER_EMAIL}"
-          dch --changelog debian/changelog --newversion "${DEB_VERSION}" --distribution unstable "Upstream sync"
+          export DEBFULLNAME="${MAINTAINER_NAME}"
+          export DEBEMAIL="${MAINTAINER_EMAIL}"
+          dch -b --changelog debian/changelog --newversion "${DEB_VERSION}" --distribution unstable "Upstream sync"
 
           if ! grep -q -- "- Upstream sync to ${CHANGELOG_VERSION}$" linux/lightzone.changes; then
             {
