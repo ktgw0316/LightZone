@@ -21,7 +21,7 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
-      - name: Sync debian .dsc files to release PR
+      - name: Sync version numbers to release PR
         if: steps.release.outputs.pr != ''
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -29,15 +29,47 @@ jobs:
           PR_NUMBER=$(echo '${{ steps.release.outputs.pr }}' | jq -r '.number')
           gh pr checkout "$PR_NUMBER"
 
-          NEW_VERSION=$(jq -r '."."' .release-please-manifest.json)
+          sudo apt-get update
+          sudo apt-get install -y devscripts
 
-          sed -i "s/^Version: .*/Version: ${NEW_VERSION}/" debian/lightzone-Debian_*.dsc
-          sed -i "s|^DEBTRANSFORM-TAR: lightzone-.*\.tar\.xz|DEBTRANSFORM-TAR: lightzone-${NEW_VERSION}.tar.xz|" debian/lightzone-Debian_*.dsc
+          NEW_VERSION=$(jq -r '."."' .release-please-manifest.json)
+          DEB_VERSION="${NEW_VERSION}-1"
+          CHANGELOG_VERSION=${NEW_VERSION//-/ }
+          CHANGELOG_DATE=$(LC_ALL=C date +"%a %b %d %Y")
+
+          MAINTAINER_NAME="${GITHUB_ACTOR}"
+          MAINTAINER_EMAIL="${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com"
+
+          DEBFULLNAME="${MAINTAINER_NAME}"
+          DEBEMAIL="${MAINTAINER_EMAIL}"
+          dch --changelog debian/changelog --newversion "${DEB_VERSION}" --distribution unstable "Upstream sync"
+
+          if ! grep -q -- "- Upstream sync to ${CHANGELOG_VERSION}$" linux/lightzone.changes; then
+            {
+              echo "${CHANGELOG_DATE} - ${MAINTAINER_NAME} <${MAINTAINER_EMAIL}>"
+              echo
+              echo "- Upstream sync to ${CHANGELOG_VERSION}"
+              echo
+              echo "-------------------------------------------------------------------"
+              cat linux/lightzone.changes
+            } > linux/lightzone.changes.new
+            mv linux/lightzone.changes.new linux/lightzone.changes
+          fi
+
+          sed -i -E "s/^(Version:[[:space:]]*).*/\1${NEW_VERSION}/" debian/lightzone-Debian_*.dsc
+          sed -i -E "s|^(DEBTRANSFORM-TAR:[[:space:]]*lightzone-).*(\.tar\.xz)$|\1${NEW_VERSION}\2|" debian/lightzone-Debian_*.dsc
+          sed -i -E "s/^(DISTVERSION=[[:space:]]*).*/\1${NEW_VERSION}/" freebsd-ports/graphics/lightzone/Makefile
+          sed -i -E 's/^(VERSION=\$\{VERSION:-).*(\})$/\1'"${NEW_VERSION}"'\2/' linux/lightzone.SlackBuild
+          sed -i -E "s/^(Version:[[:space:]]*).*/\1${NEW_VERSION}/" linux/lightzone.spec
+          sed -i -E "s/^(echo Starting LightZone version ).*( \.\.\.)$/\1${NEW_VERSION}\2/" linux/products/lightzone
+          sed -i -E '/<key>CFBundleVersion<\/key>/{n;s/^([[:space:]]*<string>).*(<\/string>)$/\1'"${NEW_VERSION}"'\2/;}' macosx/src/main/resources/Info.plist
 
           if ! git diff --quiet; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add debian/lightzone-Debian_*.dsc
-            git commit -m "chore: Sync debian .dsc files to ${NEW_VERSION}"
+            git add debian/changelog debian/lightzone-Debian_*.dsc
+            git add freebsd-ports/graphics/lightzone/Makefile linux/lightzone.SlackBuild linux/lightzone.spec linux/products/lightzone linux/lightzone.changes
+            git add macosx/src/main/resources/Info.plist
+            git commit -m "chore: Sync version numbers to ${NEW_VERSION}"
             git push
           fi
