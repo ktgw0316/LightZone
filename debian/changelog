@@ -1,3 +1,9 @@
+lightzone (5.0.0-1) unstable; urgency=medium
+
+  * Upstream sync
+
+ -- ktgw0316 <3116763+ktgw0316@users.noreply.github.com>  Fri, 22 May 2026 15:29:28 +0000
+
 lightzone (5.0.1-0obs1) unstable; urgency=medium
 
   * Drop ~beta pre-release versioning; use plain semver going forward.
