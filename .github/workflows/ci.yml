@@ -77,7 +77,6 @@ jobs:
       uses: actions/upload-artifact@v7
       with:
         name: lightzone-${{ matrix.os }}
-        archive: false
         path: |
           windows/build/jpackage/LightZone-*.msi
     - name: Upload Artifacts on macOS
@@ -85,7 +84,6 @@ jobs:
       uses: actions/upload-artifact@v7
       with:
         name: lightzone-${{ matrix.os }}
-        archive: false
         path: |
           macosx/build/jpackage/LightZone-*.dmg
     - name: Upload Artifacts on Ubuntu
@@ -93,7 +91,6 @@ jobs:
       uses: actions/upload-artifact@v7
       with:
         name: lightzone-${{ matrix.os }}
-        archive: false
         path: |
           linux/build/jpackage/lightzone*.deb
 
@@ -128,7 +125,6 @@ jobs:
       uses: actions/upload-artifact@v7
       with:
         name: lightzone-fedora
-        archive: false
         path: |
           linux/build/jpackage/lightzone*.rpm
 
@@ -140,7 +136,7 @@ jobs:
       contents: write
     steps:
     - name: Download all artifacts
-      uses: actions/download-artifact@v7
+      uses: actions/download-artifact@v8
       with:
         path: artifacts
         merge-multiple: true
