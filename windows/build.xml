@@ -60,7 +60,7 @@
     <mkdir dir="build"/>
     <mkdir dir="javah"/>
     <javac destdir="build" debug="true"
-           release="17" nativeheaderdir="javah">
+           release="21" nativeheaderdir="javah">
       <src path="src/main/java"/>
       <compilerarg value="-proc:full" />
       <classpath>
