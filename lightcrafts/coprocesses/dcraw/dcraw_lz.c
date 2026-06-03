@@ -1331,8 +1331,8 @@ void CLASS nikon_3700()
   bits = (dp[8] & 3) << 4 | (dp[20] & 3);
   for (i=0; i < sizeof table / sizeof *table; i++)
     if (bits == table[i].bits) {
-      strcpy (make,  table[i].make );
-      strcpy (model, table[i].model);
+      strncpy (make,  table[i].make,  sizeof make  - 1); make[sizeof make   - 1] = '\0';
+      strncpy (model, table[i].model, sizeof model - 1); model[sizeof model - 1] = '\0';
     }
 }
 
