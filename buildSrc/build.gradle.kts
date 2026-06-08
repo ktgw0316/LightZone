@@ -1,5 +1,5 @@
 plugins {
-    `kotlin-dsl`
+    id("org.gradle.kotlin.kotlin-dsl") version "6.7.4"
 }
 repositories {
     gradlePluginPortal()

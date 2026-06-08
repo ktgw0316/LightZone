@@ -1,10 +1,19 @@
+buildscript {
+  repositories {
+    gradlePluginPortal()
+  }
+  dependencies {
+    classpath("org.beryx.runtime:org.beryx.runtime.gradle.plugin:2.0.1")
+    classpath("org.gradle.kotlin.kotlin-dsl:org.gradle.kotlin.kotlin-dsl.gradle.plugin:6.7.4")
+    classpath("org.jetbrains.kotlin.jvm:org.jetbrains.kotlin.jvm.gradle.plugin:2.4.10-RC")
+  }
+}
+apply(plugin = "org.jetbrains.kotlin.jvm")
+
 plugins {
-    kotlin("jvm")
     id("com.palantir.git-version")
     id("lightzone.java-conventions")
-}
-kotlin {
-    jvmToolchain(21)
+    id("io.github.jwharm.flatpak-gradle-generator") version "1.8.0"
 }
 dependencies {
     implementation("com.formdev:flatlaf:3.7.1")
@@ -116,5 +125,9 @@ tasks {
     }
     clean {
         dependsOn("cleanCoprocesses", "cleanJni")
+    }
+    flatpakGradleGenerator {
+       outputFile = file("../flatpak-sources.json")
+       downloadDirectory.set("./offline-repository")
     }
 }
