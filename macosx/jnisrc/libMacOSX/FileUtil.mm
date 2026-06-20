@@ -39,6 +39,10 @@ JNIEXPORT jstring JNICALL MacOSXFileUtil_METHOD(resolveAlias)
 {
     auto_obj<NSAutoreleasePool> pool;
     NSString *const nsPath = LC_jstringToNSString( env, jPath );
+    if (!nsPath) {
+        // Some emoji characters cause LC_jstringToNSString to fail.
+        return NULL;
+    }
     jstring result = NULL;
 
     @autoreleasepool {
