@@ -4,8 +4,9 @@ buildscript {
   }
   dependencies {
     classpath("org.beryx.runtime:org.beryx.runtime.gradle.plugin:2.0.1")
-    classpath("org.gradle.kotlin.kotlin-dsl:org.gradle.kotlin.kotlin-dsl.gradle.plugin:6.7.4")
-    classpath("org.jetbrains.kotlin.jvm:org.jetbrains.kotlin.jvm.gradle.plugin:2.4.10-RC")
+    classpath("org.gradle.kotlin.kotlin-dsl:org.gradle.kotlin.kotlin-dsl.gradle.plugin:6.6.4")
+    classpath("org.jetbrains.kotlin.jvm:org.jetbrains.kotlin.jvm.gradle.plugin:2.3.21")
+    classpath("org.jetbrains.kotlin:kotlin-reflect:2.3.21")
   }
 }
 apply(plugin = "org.jetbrains.kotlin.jvm")
