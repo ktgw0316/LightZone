@@ -27,7 +27,6 @@ DEPEND="virtual/jdk
 	media-libs/libjpeg-turbo
 	media-libs/libraw
 	media-libs/tiff
-	net-misc/rsync
 	x11-libs/libX11"
 
 RDEPEND="virtual/jre

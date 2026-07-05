@@ -18,7 +18,6 @@ Building the LightZone source requires (at least) following packages:
 - __make__
 - __openjdk-17-jdk__ or later
 - __pkg-config__
-- __rsync__
 
 ### Debian (>= 11) and Ubuntu (>= 20.04)
 
@@ -27,7 +26,7 @@ _See also [Packaging on Debian or Ubuntu](#.deb-package-(debian-or-ubuntu)) belo
 Install required packages:
 
 ```shell
-sudo apt-get install debhelper devscripts build-essential git-core default-jdk default-jre-headless libglib2.0-dev libjiconfont-google-material-design-icons-java liblcms2-dev liblensfun-dev libjpeg-dev libraw-dev libtiff-dev libx11-dev libxml2-utils pkg-config rsync
+sudo apt-get install debhelper devscripts build-essential git-core default-jdk default-jre-headless libglib2.0-dev libjiconfont-google-material-design-icons-java liblcms2-dev liblensfun-dev libjpeg-dev libraw-dev libtiff-dev libx11-dev libxml2-utils pkg-config
 ```
 
 _Note:_ gcc, g++, libc6-dev and make shall be installed with the build-essential.
@@ -43,7 +42,7 @@ export JAVA_HOME=/usr/lib/jvm/default-java
 Install required packages:
 
 ```shell
-sudo dnf install java-21-openjdk-devel java-21-openjdk-jmods git gcc-c++ lcms2-devel lensfun-devel LibRaw-devel libjpeg-turbo-devel libtiff-devel libX11-devel libxml2-devel make pkgconfig rpm-build rsync
+sudo dnf install java-21-openjdk-devel java-21-openjdk-jmods git gcc-c++ lcms2-devel lensfun-devel LibRaw-devel libjpeg-turbo-devel libtiff-devel libX11-devel libxml2-devel make pkgconfig rpm-build
 ```
 
 Set your `JAVA_HOME` variable to point to installed JDK, e.g.
@@ -58,7 +57,7 @@ Install required packages:
 
 ```shell
 sudo zypper install gcc gcc-c++ make
-git liblcms2-devel lensfun-devel libjpeg8-devel libraw-devel libtiff-devel libxml2-utils rsync libX11-devel java-21-openjdk-devel pkg-config
+git liblcms2-devel lensfun-devel libjpeg8-devel libraw-devel libtiff-devel libxml2-utils libX11-devel java-21-openjdk-devel pkg-config
 ```
 
 Set your `JAVA_HOME` variable to point to installed JDK, e.g.

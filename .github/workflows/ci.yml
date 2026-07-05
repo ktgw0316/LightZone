@@ -116,8 +116,7 @@ jobs:
           make \
           patch \
           pkgconfig \
-          rpm-build \
-          rsync
+          rpm-build
         patch -p1 < linux/fedora.patch
         export JAVA_HOME=/usr/lib/jvm/java-21-openjdk
         ./gradlew jpackage

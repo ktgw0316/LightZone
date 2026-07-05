@@ -31,8 +31,7 @@ Build-Depends:
  libraw-dev,
  libtiff-dev,
  libx11-dev,
- pkg-config,
- rsync
+ pkg-config
 Package-List:
  lightzone deb graphics optional
 DEBTRANSFORM-RELEASE: 1

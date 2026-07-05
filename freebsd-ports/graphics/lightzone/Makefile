@@ -12,8 +12,7 @@ COMMENT=	Open-source professional-level digital darkroom software
 
 LICENSE=	BSD3CLAUSE
 
-BUILD_DEPENDS=	git:${PORTSDIR}/devel/git \
-		rsync:${PORTSDIR}/net/rsync
+BUILD_DEPENDS=	git:${PORTSDIR}/devel/git
 LIB_DEPENDS=	liblcms2.so:${PORTSDIR}/graphics/lcms2 \
 		liblensfun.so:${PORTSDIR}/graphics/lensfun \
 		libraw.so:${PORTSDIR}/graphics/libraw \

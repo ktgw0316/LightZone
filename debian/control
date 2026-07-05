@@ -30,8 +30,7 @@ Build-Depends:
  libtiff-dev,
  libx11-dev,
  pkg-config,
- quilt,
- rsync
+ quilt
 
 Package: lightzone
 Architecture: i386 amd64 armhf arm64
