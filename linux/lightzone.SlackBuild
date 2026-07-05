@@ -77,22 +77,18 @@ cd ${PRGNAM}
 ./gradlew jpackageImage -x test
 
 LIBDIR=${PKG}/usr/lib${LIBDIRSUFFIX}
-install -dm 0755 ${LIBDIR}/${PRGNAM}
-cp -pH linux/products/*.so ${LIBDIR}/${PRGNAM}
+install -Dt ${LIBDIR}/${PRGNAM} lightcrafts/build/resources/main/native/*.so
 
 JAVADIR=${PKG}/usr/share/java
-install -dm 0755 ${JAVADIR}/${PRGNAM}
-cp -pH lightcrafts/products/dcraw_lz ${JAVADIR}/${PRGNAM}
-cp -pH linux/build/jpackage/${PRGNAM}/lib/app/*.jar ${JAVADIR}/${PRGNAM}
+install -Dt ${JAVADIR}/${PRGNAM} lightcrafts/build/resources/main/native/dcraw_lz
+install -t  ${JAVADIR}/${PRGNAM} linux/build/jpackage/${PRGNAM}/lib/app/*.jar -m644
 
 DATADIR=${PKG}/usr/share
-install -dm 0755 ${DATADIR}/applications
-install -m 644 linux/products/${PRGNAM}.desktop ${DATADIR}/applications/
-cp -pHR linux/icons ${DATADIR}/
+install -Dt ${DATADIR}/applications linux/products/${PRGNAM}.desktop -m644
+cp -a linux/icons ${DATADIR}/
 
 BINDIR=${PKG}/usr/bin
-install -dm 0755 ${BINDIR}
-install -m 755 linux/products/${PRGNAM} ${BINDIR}
+install -Dt ${BINDIR} linux/products/${PRGNAM}
 
 mkdir -p ${PKG}/usr/doc/${PRGNAM}-${VERSION}
 cat ${CWD}/${PRGNAM}.SlackBuild > ${PKG}/usr/doc/${PRGNAM}-${VERSION}/${PRGNAM}.SlackBuild

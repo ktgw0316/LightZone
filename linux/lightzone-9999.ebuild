@@ -54,22 +54,16 @@ src_install() {
 	cd "${S}"
 
 	_libdir=/usr/$(get_libdir)
-	install -dm 0755 "${D}/${_libdir}/${PN}"
-	cp -pH linux/products/*.so "${D}/${_libdir}/${PN}"
+    install -Dt "${D}/${_libdir}/${PN}" lightcrafts/build/resources/main/native/*.so
 
 	_javadir=/usr/share
-	install -dm 0755 "${D}/${_javadir}/${PN}/lib"
-	cp -pH "linux/build/jpackage/${PN}/lib/app/*.jar" "${D}/${_javadir}/${PN}/lib"
+	install -Dt "${D}/${_javadir}/${PN}/lib" "linux/build/jpackage/${PN}/lib/app/*.jar" -m644
 
 	_datadir=/usr/share
-	install -dm 0755 "${D}/${_datadir}/applications"
-	install -m 644 linux/products/lightzone.desktop "${D}/${_datadir}/applications/"
-	install -dm 0755 "${D}/${_datadir}/metainfo"
-	install -m 644 linux/products/io.github.ktgw0316.LightZone.metainfo.xml "${D}/${_datadir}/metainfo/"
-	cp -pHR linux/icons "${D}/${_datadir}/"
+	install -Dt "${D}/${_datadir}/applications" "linux/products/${PN}.desktop" -m644
+	cp -a linux/icons "${D}/${_datadir}/"
 
 	_bindir=/usr/bin
-	install -dm 0755 "${D}/${_bindir}"
-	install -m 755 lightcrafts/products/dcraw_lz "${D}/${_bindir}"
-	install -m 755 "linux/products/${PN}" "${D}/${_bindir}"
+	install -Dt "${D}/${_bindir}" lightcrafts/build/resources/main/native/dcraw_lz
+	install -t  "${D}/${_bindir}" "linux/products/${PN}"
 }

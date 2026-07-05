@@ -91,22 +91,15 @@ LightZone is open-source professional-level digital darkroom software for Window
 export NO_BRP_CHECK_BYTECODE_VERSION=true
 %endif
 
-install -dm 0755 "%buildroot/%{_libexecdir}/%{name}"
-cp -pH linux/products/*.so "%buildroot/%{_libexecdir}/%{name}"
-
-install -dm 0755 "%buildroot/%{_javadir}/%{name}"
-cp -pH linux/build/jpackage/%{name}/lib/app/*.jar "%buildroot/%{_javadir}/%{name}"
+install -Dt "%buildroot/%{_libexecdir}/%{name}" lightcrafts/build/resources/main/native/*.so
+install -Dt "%buildroot/%{_javadir}/%{name}" linux/build/jpackage/%{name}/lib/app/*.jar -m644
 
 # create icons and shortcuts
-install -dm 0755 "%buildroot/%{_datadir}/applications"
-install -m 644 linux/products/lightzone.desktop "%buildroot/%{_datadir}/applications/"
-install -dm 0755 "%buildroot/%{_datadir}/metainfo"
-install -m 644 linux/products/io.github.ktgw0316.LightZone.metainfo.xml "%buildroot/%{_datadir}/metainfo/"
-cp -pHR linux/icons "%buildroot/%{_datadir}/"
+install -Dt "%buildroot/%{_datadir}/applications/" linux/products/lightzone.desktop -m644
+cp -a linux/icons "%buildroot/%{_datadir}/"
 
-install -dm 755 %{buildroot}/%{_bindir}
-install -m 755 lightcrafts/products/dcraw_lz %{buildroot}/%{_bindir}
-install -m 755 linux/products/%{name} %{buildroot}/%{_bindir}
+install -Dt %{buildroot}/%{_bindir} lightcrafts/build/resources/main/native/dcraw_lz
+install -t  %{buildroot}/%{_bindir} linux/products/%{name}
 
 %if 0%{?sles_version}
 %suse_update_desktop_file -n %{name}
@@ -121,7 +114,6 @@ install -m 755 linux/products/%{name} %{buildroot}/%{_bindir}
 %{_javadir}/%{name}/*
 %{_bindir}/%{name}
 %{_datadir}/applications/%{name}.desktop
-%{_datadir}/metainfo/*"
 %define icondir %{_datadir}/icons/hicolor
 %dir %{icondir}
 %dir %{icondir}/256x256
