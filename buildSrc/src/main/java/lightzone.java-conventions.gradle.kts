@@ -11,10 +11,9 @@ group = "com.lightcrafts"
 version = rootProject.file("lightcrafts/version.txt").readText().trim().substringBefore('~')
 
 repositories {
-    maven {
-        url = uri("https://repo.osgeo.org/repository/release/")
-    }
     mavenCentral()
+    maven { url = uri("https://repo.osgeo.org/repository/release/") }
+    maven { url = uri("../offline-repository") }
 }
 
 val jetbrainsAnnotation = "org.jetbrains:annotations:26.0.2-1"
