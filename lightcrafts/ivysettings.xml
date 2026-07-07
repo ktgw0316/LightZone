@@ -1,9 +1,0 @@
-<ivysettings>
-  <settings defaultResolver="myChain"/>
-  <resolvers>
-    <chain name="myChain">
-      <ibiblio name="osgeo" root="http://repo.osgeo.org/repository/release/" m2compatible="true"/>
-      <ibiblio name="ibiblio" m2compatible="true"/>
-    </chain>
-  </resolvers>
-</ivysettings>
