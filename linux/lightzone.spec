@@ -96,6 +96,7 @@ install -Dt "%buildroot/%{_javadir}/%{name}" linux/build/jpackage/%{name}/lib/ap
 
 # create icons and shortcuts
 install -Dt "%buildroot/%{_datadir}/applications/" linux/products/lightzone.desktop -m644
+install -Dt "%buildroot/%{_datadir}/metainfo/" linux/products/io.github.ktgw0316.LightZone.metainfo.xml -m644
 cp -a linux/icons "%buildroot/%{_datadir}/"
 
 install -Dt %{buildroot}/%{_bindir} lightcrafts/build/resources/main/native/dcraw_lz

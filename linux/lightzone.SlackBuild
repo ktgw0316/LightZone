@@ -85,6 +85,7 @@ install -t  ${JAVADIR}/${PRGNAM} linux/build/jpackage/${PRGNAM}/lib/app/*.jar -m
 
 DATADIR=${PKG}/usr/share
 install -Dt ${DATADIR}/applications linux/products/${PRGNAM}.desktop -m644
+install -Dt ${DATADIR}/metainfo linux/products/io.github.ktgw0316.LightZone.metainfo.xml -m644
 cp -a linux/icons ${DATADIR}/
 
 BINDIR=${PKG}/usr/bin
