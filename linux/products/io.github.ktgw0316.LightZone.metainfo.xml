@@ -43,3 +43,6 @@
   <url type="bugtracker">https://github.com/ktgw0316/LightZone/issues</url>
   <content_rating type="oars-1.1"/>
 </component>
+    <release version="5.0.1" date="2026-07-18">
+      <url>https://github.com/ktgw0316/LightZone/releases/tag/5.0.1</url>
+    </release>
