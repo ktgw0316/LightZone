@@ -1,10 +1,20 @@
-plugins {
-    kotlin("jvm")
-    id("com.palantir.git-version")
-    id("lightzone.java-conventions")
+buildscript {
+  repositories {
+    gradlePluginPortal()
+  }
+  dependencies {
+    classpath("org.beryx.runtime:org.beryx.runtime.gradle.plugin:2.0.1")
+    classpath("org.gradle.kotlin.kotlin-dsl:org.gradle.kotlin.kotlin-dsl.gradle.plugin:6.6.4")
+    classpath("org.jetbrains.kotlin.jvm:org.jetbrains.kotlin.jvm.gradle.plugin:2.3.21")
+    classpath("org.jetbrains.kotlin:kotlin-reflect:2.3.21")
+  }
 }
-kotlin {
-    jvmToolchain(21)
+apply(plugin = "org.jetbrains.kotlin.jvm")
+
+plugins {
+    id("lightzone.java-conventions")
+    id("io.github.jwharm.flatpak-gradle-generator") version "1.8.0"
+    id("com.palantir.git-version") version "5.0.0"
 }
 dependencies {
     implementation("com.formdev:flatlaf:3.7.1")
@@ -43,7 +53,6 @@ val MAKE = with(os) {
         else -> "make"
     }
 }
-val versionDetails: groovy.lang.Closure<com.palantir.gradle.gitversion.VersionDetails> by extra
 val nativeLibPath = layout.buildDirectory.dir("resources/main/native").get().asFile.absolutePath
 tasks {
     // Disable run task since this is a library project, not a standalone application
@@ -93,7 +102,13 @@ tasks {
     }
     register<Task> ("revision") {
         try {
-            val gitHash = versionDetails().gitHashFull // full 40-character Git commit hash
+            val process = ProcessBuilder("git", "rev-parse", "HEAD")
+                .redirectErrorStream(true)
+                .start()
+            val gitHash = process.inputStream.bufferedReader().use { it.readText() }.trim()
+            if (process.waitFor() != 0) {
+                throw IllegalStateException("git rev-parse HEAD failed")
+            }
             project.logger.lifecycle("Git hash: ${gitHash}")
 
             val dirProvider = layout.buildDirectory.dir("resources/main/com/lightcrafts/utils/resources")
@@ -116,5 +131,9 @@ tasks {
     }
     clean {
         dependsOn("cleanCoprocesses", "cleanJni")
+    }
+    flatpakGradleGenerator {
+       outputFile = file("../flatpak-sources.json")
+       downloadDirectory.set("./offline-repository")
     }
 }

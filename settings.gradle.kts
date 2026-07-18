@@ -1,7 +1,14 @@
 import org.gradle.internal.os.OperatingSystem
 
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        maven { url = uri("./offline-repository") }
+    }
+}
+
 plugins {
-    kotlin("jvm") version "2.2.20" apply false
+    kotlin("jvm") version "2.3.21" apply false
     id("org.beryx.runtime") version "2.0.1" apply false
 }
 
