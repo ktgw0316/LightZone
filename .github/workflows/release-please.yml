@@ -56,11 +56,21 @@ jobs:
           sed -i -E "s/^(echo Starting LightZone version ).*( \.\.\.)$/\1${NEW_VERSION}\2/" linux/products/lightzone
           sed -i -E '/<key>CFBundleVersion<\/key>/{n;s/^([[:space:]]*<string>).*(<\/string>)$/\1'"${NEW_VERSION}"'\2/;}' macosx/src/main/resources/Info.plist
 
+          RELEASE_DATE=$(date +"%Y-%m-%d")
+
+          if ! grep -q -- "<release version=\"${NEW_VERSION}\"" linux/products/io.github.ktgw0316.LightZone.metainfo.xml; then
+            {
+              echo "    <release version=\"${NEW_VERSION}\" date=\"${RELEASE_DATE}\">"
+              echo "      <url>https://github.com/ktgw0316/LightZone/releases/tag/${NEW_VERSION}</url>"
+              echo "    </release>"
+            } >> linux/products/io.github.ktgw0316.LightZone.metainfo.xml
+          fi
+
           if ! git diff --quiet; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add freebsd-ports/graphics/lightzone/Makefile linux/lightzone.SlackBuild linux/lightzone.spec linux/lightzone.changes
-            git add -f linux/products/lightzone
+            git add -f linux/products/lightzone linux/products/io.github.ktgw0316.LightZone.metainfo.xml
             git add macosx/src/main/resources/Info.plist
             git commit -m "chore: Sync version numbers to ${NEW_VERSION}"
             git push
