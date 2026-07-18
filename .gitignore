@@ -45,11 +45,6 @@
 !.idea/misc.xml
 !.idea/runConfigurations
 Java.runtime
-debian/*.debhelper
-debian/*.substvars
-debian/DEBIAN
-debian/files
-debian/lightzone
 lightcrafts/coprocesses/*/Debug
 lightcrafts/coprocesses/*/Release
 lightcrafts/coprocesses/*/x64

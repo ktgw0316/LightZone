@@ -32,16 +32,11 @@ jobs:
           sudo apt-get install -y devscripts
 
           NEW_VERSION=$(jq -r '."."' .release-please-manifest.json)
-          DEB_VERSION="${NEW_VERSION}-1"
           CHANGELOG_VERSION=${NEW_VERSION//-/ }
           CHANGELOG_DATE=$(LC_ALL=C date +"%a %b %d %Y")
 
           MAINTAINER_NAME="${GITHUB_ACTOR}"
           MAINTAINER_EMAIL="${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com"
-
-          export DEBFULLNAME="${MAINTAINER_NAME}"
-          export DEBEMAIL="${MAINTAINER_EMAIL}"
-          dch -b --changelog debian/changelog --newversion "${DEB_VERSION}" --distribution unstable "Upstream sync"
 
           if ! grep -q -- "- Upstream sync to ${CHANGELOG_VERSION}$" linux/lightzone.changes; then
             {
@@ -55,8 +50,6 @@ jobs:
             mv linux/lightzone.changes.new linux/lightzone.changes
           fi
 
-          sed -i -E "s/^(Version:[[:space:]]*).*/\1${NEW_VERSION}/" debian/lightzone-Debian_*.dsc
-          sed -i -E "s|^(DEBTRANSFORM-TAR:[[:space:]]*lightzone-).*(\.tar\.xz)$|\1${NEW_VERSION}\2|" debian/lightzone-Debian_*.dsc
           sed -i -E "s/^(DISTVERSION=[[:space:]]*).*/\1${NEW_VERSION}/" freebsd-ports/graphics/lightzone/Makefile
           sed -i -E 's/^(VERSION=\$\{VERSION:-).*(\})$/\1'"${NEW_VERSION}"'\2/' linux/lightzone.SlackBuild
           sed -i -E "s/^(Version:[[:space:]]*).*/\1${NEW_VERSION}/" linux/lightzone.spec
@@ -66,7 +59,6 @@ jobs:
           if ! git diff --quiet; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add debian/changelog debian/lightzone-Debian_*.dsc
             git add freebsd-ports/graphics/lightzone/Makefile linux/lightzone.SlackBuild linux/lightzone.spec linux/lightzone.changes
             git add -f linux/products/lightzone
             git add macosx/src/main/resources/Info.plist
