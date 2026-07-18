@@ -1,5 +1,13 @@
 # Changelog
 
+## [5.0.1](https://github.com/ktgw0316/LightZone/compare/v5.0.0...v5.0.1) (2026-07-18)
+
+
+### Bug Fixes
+
+* add buffer-length check in dcraw_lz.c ([20f47d9](https://github.com/ktgw0316/LightZone/commit/20f47d974f67a22a5945fbf76955014a4a745225))
+* **mac:** Some emojis in file path cause crush ([1f43130](https://github.com/ktgw0316/LightZone/commit/1f43130fc770d5feefe7733e84d1da1cac68cd4d))
+
 ## [5.0.0](https://github.com/ktgw0316/LightZone/compare/5.0.0...v5.0.0) (2026-05-22)
 
 
