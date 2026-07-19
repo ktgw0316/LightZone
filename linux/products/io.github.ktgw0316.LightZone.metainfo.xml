@@ -31,8 +31,11 @@
   </screenshots>
   <launchable type="desktop-id">io.github.ktgw0316.LightZone.desktop</launchable>
   <releases>
+    <release version="5.0.1" date="2026-07-18">
+      <url>https://github.com/ktgw0316/LightZone/releases/tag/v5.0.1</url>
+    </release>
     <release version="5.0.0" date="2026-05-23">
-      <url>https://github.com/ktgw0316/LightZone/releases/tag/5.0.0</url>
+      <url>https://github.com/ktgw0316/LightZone/releases/tag/v5.0.0</url>
     </release>
     <release version="4.2.5" date="2023-01-05" type="stable">
       <url>https://github.com/ktgw0316/LightZone/releases/tag/4.2.5</url>
@@ -43,6 +46,3 @@
   <url type="bugtracker">https://github.com/ktgw0316/LightZone/issues</url>
   <content_rating type="oars-1.1"/>
 </component>
-    <release version="5.0.1" date="2026-07-18">
-      <url>https://github.com/ktgw0316/LightZone/releases/tag/5.0.1</url>
-    </release>
