@@ -123,10 +123,10 @@ public final class Version {
     private static final String versionName; // Contents of "version.txt"
 
     static {
-        final String rev = readResource("Revision");
+        final String rev = readResource("Revision.txt");
         revisionNumber = (rev != null && 7 < rev.length()) ? rev.substring(0,7) : "";
 
-        final String ver = readResource("Version");
+        final String ver = readResource("Version.txt");
         versionName = ver != null ? ver.trim() : "";
     }
 }

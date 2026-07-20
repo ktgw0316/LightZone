@@ -114,10 +114,10 @@ tasks {
             val dirProvider = layout.buildDirectory.dir("resources/main/com/lightcrafts/utils/resources")
             val dir = dirProvider.get().asFile
             mkdir(dir)
-            val file = File(dir, "Revision")
+            val file = File(dir, "Revision.txt")
             if (file.exists()) file.delete()
             file.writeText(gitHash)
-            File(dir, "Version").writeText(version.toString())
+            File(dir, "Version.txt").writeText(version.toString())
         } catch (e: Exception) {
             project.logger.lifecycle("Skipping revision task: unable to determine git hash: ${e.message}")
         }
