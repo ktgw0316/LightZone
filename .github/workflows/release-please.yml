@@ -58,12 +58,17 @@ jobs:
 
           RELEASE_DATE=$(date +"%Y-%m-%d")
 
-          if ! grep -q -- "<release version=\"${NEW_VERSION}\"" linux/products/io.github.ktgw0316.LightZone.metainfo.xml; then
+          METAINFO_FILE=linux/products/io.github.ktgw0316.LightZone.metainfo.xml
+          if ! grep -q -- "<release version=\"${NEW_VERSION}\"" "${METAINFO_FILE}"; then
+            tmp_file=$(mktemp)
             {
+              sed "/<releases>/q" "${METAINFO_FILE}"
               echo "    <release version=\"${NEW_VERSION}\" date=\"${RELEASE_DATE}\">"
-              echo "      <url>https://github.com/ktgw0316/LightZone/releases/tag/${NEW_VERSION}</url>"
+              echo "      <url>https://github.com/ktgw0316/LightZone/releases/tag/v${NEW_VERSION}</url>"
               echo "    </release>"
-            } >> linux/products/io.github.ktgw0316.LightZone.metainfo.xml
+              sed "0,/<releases>/d" "${METAINFO_FILE}"
+            } > "${tmp_file}"
+            mv "${tmp_file}" "${METAINFO_FILE}"
           fi
 
           if ! git diff --quiet; then
