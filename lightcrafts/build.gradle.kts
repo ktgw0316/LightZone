@@ -101,6 +101,8 @@ tasks {
         }
     }
     register<Task> ("revision") {
+        outputs.upToDateWhen { false }
+
         try {
             val process = ProcessBuilder("git", "rev-parse", "HEAD")
                 .redirectErrorStream(true)
