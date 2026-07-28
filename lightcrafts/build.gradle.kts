@@ -14,7 +14,7 @@ apply(plugin = "org.jetbrains.kotlin.jvm")
 plugins {
     id("lightzone.java-conventions")
     id("io.github.jwharm.flatpak-gradle-generator") version "1.8.0"
-    id("com.palantir.git-version") version "5.0.0"
+    id("com.gorylenko.gradle-git-properties") version "4.0.1"
 }
 dependencies {
     implementation("com.formdev:flatlaf:3.7.1")
@@ -100,30 +100,8 @@ tasks {
             nativeFiles?.forEach { it.deleteRecursively() }
         }
     }
-    register<Task> ("revision") {
-        try {
-            val process = ProcessBuilder("git", "rev-parse", "HEAD")
-                .redirectErrorStream(true)
-                .start()
-            val gitHash = process.inputStream.bufferedReader().use { it.readText() }.trim()
-            if (process.waitFor() != 0) {
-                throw IllegalStateException("git rev-parse HEAD failed")
-            }
-            project.logger.lifecycle("Git hash: ${gitHash}")
-
-            val dirProvider = layout.buildDirectory.dir("resources/main/com/lightcrafts/utils/resources")
-            val dir = dirProvider.get().asFile
-            mkdir(dir)
-            val file = File(dir, "Revision")
-            if (file.exists()) file.delete()
-            file.writeText(gitHash)
-            File(dir, "Version").writeText(version.toString())
-        } catch (e: Exception) {
-            project.logger.lifecycle("Skipping revision task: unable to determine git hash: ${e.message}")
-        }
-    }
     build {
-        dependsOn("coprocesses", "revision")
+        dependsOn("coprocesses")
     }
     test {
         dependsOn("jni")

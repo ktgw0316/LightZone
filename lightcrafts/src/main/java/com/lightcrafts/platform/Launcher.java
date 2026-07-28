@@ -82,12 +82,7 @@ public class Launcher {
     }
 
     protected void showAppVersion() {
-        final String rev = Version.getRevisionNumber();
-        final String msg = "This is " + Version.getApplicationName() + ' '
-                + Version.getVersionName();
-        logger.info(
-                rev.isEmpty() ? msg : msg + ' ' + '(' + rev + ')'
-        );
+        logger.info("This is " + Version.getApplicationName() + ' ' + Version.getVersionText());
     }
 
     protected String showJavaVersion() {

@@ -50,12 +50,7 @@ public final class SplashImage extends BufferedImage {
      * Get the test that is to be overprinted onto the splash screen.
      */
     public static String[] getDefaultSplashText( String licenseText ) {
-        final String name = Version.getVersionName();
-        final String revision = Version.getRevisionNumber();
-        final String versionText = name.isEmpty() ? "Version unknown"
-                : revision.isEmpty()
-                ? "Version " + name
-                : "Version " + name + " (" + revision + ')';
+        final String versionText = Version.getVersionText();
         return (licenseText != null)
                 ? new String[]{versionText, licenseText}
                 : new String[]{versionText};
