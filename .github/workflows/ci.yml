@@ -96,29 +96,12 @@ jobs:
 
   build_on_Fedora:
     runs-on: ubuntu-latest
-    container: fedora:43
+    container: ghcr.io/ktgw0316/lightzone-builder:fedora43
     steps:
     - uses: actions/checkout@v6
     - name: Build on Fedora
       run: |
-        sudo dnf install -y \
-          LibRaw-devel \
-          gcc-c++ \
-          git \
-          java-21-openjdk-devel \
-          java-21-openjdk-jmods \
-          lcms2-devel \
-          lensfun-devel \
-          libX11-devel \
-          libjpeg-turbo-devel \
-          libtiff-devel \
-          libxml2 \
-          make \
-          patch \
-          pkgconfig \
-          rpm-build
         patch -p1 < linux/fedora.patch
-        export JAVA_HOME=/usr/lib/jvm/java-21-openjdk
         ./gradlew jpackage
     - name: Upload Artifacts on Fedora
       uses: actions/upload-artifact@v7
