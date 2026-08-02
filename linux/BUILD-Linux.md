@@ -6,11 +6,11 @@ Building the LightZone source requires (at least) following packages:
 
 - __fakeroot__ for linux package creation
 - __g++__
-- __gcc__ version 4.4 or later
+- __gcc__ >= version 4.4
 - __git__
 - __libglib2.0-dev__
 - __liblcms2-dev__
-- __liblensfun-dev__ version 0.3.2
+- __liblensfun-dev__ < version 0.3.95
 - __libjpeg-dev__ or __libjpeg-turbo-dev__
 - __libraw-dev__
 - __libtiff__
