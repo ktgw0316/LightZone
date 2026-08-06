@@ -31,6 +31,9 @@
   </screenshots>
   <launchable type="desktop-id">io.github.ktgw0316.LightZone.desktop</launchable>
   <releases>
+    <release version="5.0.2" date="2026-08-06">
+      <url>https://github.com/ktgw0316/LightZone/releases/tag/v5.0.2</url>
+    </release>
     <release version="5.0.1" date="2026-07-18">
       <url>https://github.com/ktgw0316/LightZone/releases/tag/v5.0.1</url>
     </release>
