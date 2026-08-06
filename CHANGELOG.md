@@ -1,5 +1,13 @@
 # Changelog
 
+## [5.0.2](https://github.com/ktgw0316/LightZone/compare/v5.0.1...v5.0.2) (2026-08-06)
+
+
+### Bug Fixes
+
+* "version unknown" on splash screen ([75e4148](https://github.com/ktgw0316/LightZone/commit/75e41482674e2199f8419e0131b1719938661b2b))
+* **ci:** Incorrect update of metainfo.xml ([c974b43](https://github.com/ktgw0316/LightZone/commit/c974b4303f2333fef2022976c97f868d3e51da00))
+
 ## [5.0.1](https://github.com/ktgw0316/LightZone/compare/v5.0.0...v5.0.1) (2026-07-18)
 
 
