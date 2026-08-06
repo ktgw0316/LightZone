@@ -20,6 +20,23 @@ LightZone has advanced features including:
 
 Install instruction for Windows, macOS and Linux are available on GitHub [Release](https://github.com/ktgw0316/LightZone/releases/latest) page.
 
+## Supported Platforms
+
+### Windows
+
+Windows 11 (x64) is supported.
+
+### Linux
+
+Packages built for Ubuntu-latest and Fedora 43 are provided. However, providing packages for each distribution (including AppImage and Flatpak) is outside the scope of the LightZone project.
+
+### macOS
+
+The three most recent major releases of macOS are supported.
+
+Expanding the range of supported OS versions would significantly increase the burden of testing and maintenance, making it difficult to deliver new features and reliable updates.
+
+If you are using an older OS that is no longer supported by the current version, you can try building it from source yourself.
 
 ## Resources
 
