@@ -1,20 +1,25 @@
+# Keep tracked build scripts and project files
 !**/GNUMakefile
 !**/lightzone*
-**/.gradle
-**/.pc
-**/.vscode
-**/bin
-**/build
+
+# Generated directories
+**/.gradle/
+**/.pc/
+**/.vscode/
+**/bin/
+**/build/
 **/gradle.xml
-**/java_jni
-**/javah
-**/out
-**/products
-**/release
+**/java_jni/
+**/javah/
+**/out/
+**/products/
+**/release/
+
+# Binary and temporary files
 *.0
 *.a
-*.cache
 *.bak
+*.cache
 *.d
 *.db
 *.dll
@@ -41,18 +46,24 @@
 *.zip
 *~
 -
+
+# IDE and OS leftovers
 .idea/*
 !.idea/misc.xml
 !.idea/runConfigurations
+.DS_Store
 Java.runtime
-lightcrafts/coprocesses/*/Debug
-lightcrafts/coprocesses/*/Release
-lightcrafts/coprocesses/*/x64
-lightcrafts/extbuild
+
+# Native build leftovers
+lightcrafts/coprocesses/*/Debug/
+lightcrafts/coprocesses/*/Release/
+lightcrafts/coprocesses/*/x64/
+lightcrafts/extbuild/
 lightcrafts/jnisrc/**/*config\.h
 lightcrafts/jnisrc/**/arch-*
 lightcrafts/jnisrc/**/configure
-out
+
+# Windows packaging artifacts
 windows/helpers/JavaAppLauncher/LightZone.ico
 windows/helpers/JavaAppLauncher/jar_md5_include
 windows/md5sums
