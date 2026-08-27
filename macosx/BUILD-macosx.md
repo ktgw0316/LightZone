@@ -1,233 +1,124 @@
-# Development guide
+# Building LightZone on Apple Silicon macOS
 
-Written and tested on MacOS Sequoia 15.7 with Java 21 64-bit.
+This document describes how to build LightZone directly from source on an Apple Silicon Mac (`arm64`). The build uses Gradle and the Gradle Wrapper included in the repository; Apache Ant is not required.
 
-LightZone can be built with Gradle, and edited with any java IDE; these instructions use Eclipse for convenience,
-since it's a common IDE with Gradle support.
+## Requirements
 
-These instructions sometimes say to right-click on something; use Control+Click instead if necessary.
-
-## General Info and Status
-
-The application's startup java class is com.lightcrafts.app.Application.
-There's also an OSX-specific startup class, which will read its info
-from LightZone/macosx/resources/Info.plist and launch the MainClass defined there.
-
-## Install required software
-
-Building the LightZone source requires the following software:
-
-- __Java__ version 21 or later
-- __clang__
-- __git__
-- __homebrew__ from <http://brew.sh/>
-
-You need to install following packages using homebrew:
-
-- __jpeg-turbo__
-- __lensfun__
-- __libomp__
-- __libraw__
-- __libtiff__
-- __little-cms2__
-- __pkg-config__
-
-If you need to install clang and git, the easiest route is to download XCode's command-line tools; the link depends on your OS X version.
-
-- Run `xcode-select --install` on OS X 10.9 or later
-- <http://stackoverflow.com/questions/9353444/how-to-use-install-gcc-on-mac-os-x-10-8-xcode-4-4>
-- <http://stackoverflow.com/questions/4360110/installing-gcc-to-mac-os-x-leopard-without-installing-xcode>
-- <http://stackoverflow.com/questions/10904774/install-git-separately-from-xcode>
-
-## Pre-work
-
-Open the Java Preferences app. (You can use Spotlight to search for it)
-
-On the General tab, note the topmost Java version and type (64- or 32-bit).
-Because the project builds its libraries and JARs using varied commands,
-make sure you use this version consistently throughout the project settings.
-
-## Build instructions for LightZone with Gradle (if you're not using Eclipse)
-
-If you're using Eclipse, skip this section.
-
-- Make sure command-line tools, clang-omp, git, and gradle are installed.
-- Make sure your default java version is set in the Java Preferences app.
-- Set the `JAVA_HOME` environment variable to:
-  - Arm: `/opt/homebrew/opt/openjdk/libexec/openjdk.jdk/Contents/Home/`
-  - Intel: `/usr/local/opt/openjdk/libexec/openjdk.jdk/Contents/Home/`
-- cd to the root of the source folder (where `gradlew` is located).
-- To build LightZone, run these commands; each run's output should end with "BUILD SUCCESSFUL" when you run it.
-If you have errors, see the "Troubleshooting" section of this document.
+Install the Xcode Command Line Tools, Homebrew, and the required dependencies:
 
 ```sh
-  ./gradlew clean
-  ./gradlew build -x test
-  ./gradlew jar
+xcode-select --install
+brew install openjdk@21 jpeg-turbo lensfun libomp libraw libtiff little-cms2 pkg-config
 ```
 
-- You should now be able to run LightZone with:
+LightZone is built and tested with Java 21. Confirm that Homebrew is using the Apple Silicon prefix:
 
 ```sh
-  ./gradlew run
+brew --prefix
+uname -m
 ```
 
-- If everything is OK, you should be able to create an installer package with:
+The expected architecture is `arm64`, and the usual Homebrew prefix is `/opt/homebrew`.
+
+## Configure Java
+
+Set `JAVA_HOME` to the Homebrew Java 21 installation:
 
 ```sh
-  ./gradlew jpackage
+export JAVA_HOME="/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home"
+export PATH="$JAVA_HOME/bin:$PATH"
 ```
 
-## Setup instructions for LightZone as an Eclipse project
+To make this configuration permanent for Zsh:
 
-(This is written for Eclipse 3.6, and should be applicable to other versions with minor changes.)
+```sh
+cat >> ~/.zshrc <<'EOF'
+export JAVA_HOME="/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home"
+export PATH="$JAVA_HOME/bin:$PATH"
+EOF
 
-If you're already using Eclipse for other development, you may want to make a new eclipse workspace for LightZone only.
+source ~/.zshrc
+```
 
-## Eclipse initial setup
+Verify the Java installation:
 
-- Eclipse prefs -> Java -> Installed JREs -> whatever you selected in Java Preferences (21 for me)
+```sh
+java -version
+javac -version
+./gradlew --version
+```
 
-If you can't find it in the list, click Add -> Mac OS X JVM and browse to
-/System/Library/Frameworks/JavaVM.framework/Versions/21/Home
+All commands should report Java 21. If `java_home` cannot find Java, use the explicit `JAVA_HOME` value above rather than `/usr/libexec/java_home`.
 
-- Eclipse prefs -> java -> compiler -> compliance level: 21
+## Build
 
-- Choose File -> New -> Project... -> Gradle -> Gradle Project.
-- Browse to the root directory of the project (where settings.gradle.kts is located)
-- Click "Finish"
+Run the build from the repository root, where `gradlew` and `settings.gradle.kts` are located:
 
-In the Project Explorer view, do the following:
+```sh
+cd /path/to/LightZone
+chmod +x gradlew
 
-- Right-click the project
-  - Choose Properties
-  - Resource: Text file encoding: Other: UTF-8 (not the default MacRoman)
-  - Hit OK
+./gradlew clean
+./gradlew build -x test
+./gradlew jar
+```
 
-## Build Setup and Preparation
+A successful build ends with:
 
-We will create several build configs.  The first one will be from scratch, then to save time for the rest
-we'll copy it and change the copy's build targets.
+```text
+BUILD SUCCESSFUL
+```
 
-If you get error messages while running these builds, see the "Troubleshooting" section at the end of this document.
+The native JNI libraries are compiled as part of the Gradle build. Some compiler and linker warnings may be emitted; they do not necessarily indicate a failed build. The final `BUILD SUCCESSFUL` status is the relevant result.
 
-## First build config: clean
+## Run the application
 
-- Click the down-arrow next to the External Tools icon, or choose Run -> External Tools -> External Tools Configurations
-- Select Gradle Build, click the New icon
+To run the application directly from Gradle:
 
-Set up this config for the build:
+```sh
+./gradlew run
+```
 
-- Main tab:
-  - Name: clean
-  - Buildfile: Browse workspace: root -> build.gradle.kts (or settings.gradle.kts)
-  - Base directory: Browse file system: root (at top level of the source tree)
-- Build tab: un-check "Build before launch"
-- Tasks tab: check clean
-- JRE tab: Separate JRE  ; in the dropdown, be sure to select the same one you're using throughout the project
-- Environment tab:
-  - New: `JAVA_HOME = /Library/Java/Home`
-  - Choose "Append Environment", not Replace
-- Click Apply, click Run
+## Create a macOS package
 
- The console output should end with:
+To create a macOS application package and DMG installer:
 
-  BUILD SUCCESSFUL
+```sh
+./gradlew jpackage
+```
 
-## Main build config: build
-
-- Open the External Tools Configurations window.
-- Right-click our first one ("clean") and Duplicate
-- Name: build
-- Tasks tab: un-check clean; check build
-- Click Apply, click Run
-
- Run will take a while. Some parts of LightZone are in c or c++, and gcc or gcc+ will compile them to JNI libraries.
-
- Eventually the console output should end with:
-
-  BUILD SUCCESSFUL
-
-## Final build config: jar
-
-This config will package LightZone as a JAR for execution.
-
-- Open the External Tools Configurations window.
-- Right-click our first one ("clean") and Duplicate
-- Name: jar
-- Build tab: [X] Build before launch; select "The project containing the selected resource"
-- Tasks tab: un-check clean; check jar
-- Click Apply, click Run
-
- Run will quickly verify the build steps, then create a jar file.
- The console output should end with:
-
-  BUILD SUCCESSFUL
-
-Now, LightZone is built and can be set up to run inside Eclipse.
-
-## Setup to add LightZone to the run menu
-
-If any part of this fails, check the error message and the console tab, and see the Troubleshooting section.
-
-- Project Explorer: in src, in package com.lightcrafts.app, find Application.java
-- right-click, Run As: Java Application
-
-  (startup will fail with several errors, but this at least creates an eclipse run configuration)
-
-  Click OK at each error message. Eventually you will see "LightZone has encountered an internal error." Choose "Exit without saving files"
-
-- edit the run configuration
-
-  - Arguments tab: Working directory: Other: file system: under source tree: lightcrafts/products
-  - Apply, Run
-  - "LightZone failed to start last time... Would you like to try resetting your LightZone settings?"
-    - choose Reset
-  - "Are you sure?"
-    - choose Reset
-
-## Setup is Complete
-
-At this point, you can now run and develop LightZone.
-
-## Testing your Build
-
-- Run LightZone, from the Eclipse run menu or from the command line with Gradle.
-- Navigate to a folder with some JPEGs, TIFFs or RAWs. Try all 3 if you have them; they are parsed with different libraries.
-- Make sure you can see the thumbnails at the bottom of the window.
-- Right-click an image thumbnail and choose Apply Style (any style) to test Batch Processing.
-- Double-click an image thumbnail and try some Tools and Styles on it.
+The generated files are placed below the Gradle `build/jpackage` directory.
 
 ## Troubleshooting
 
-If you get a popup error, or something doesn't work as expected, note the error and also check the console in Eclipse.
-If you get a build error, you can get more details by adding `--debug` to the build arguments (External Tool: main tab) in Eclipse.
+### Java/Kotlin JVM-target mismatch
 
-Some specific errors:
+If Gradle reports a mismatch between Java and Kotlin JVM targets, make sure the build is using Java 21:
 
-### class file has wrong version
+```sh
+java -version
+./gradlew --version
+```
 
-If this appears, then some of the project was built with a different Java version.
+Both commands should report Java 21.
 
-- Find which one is the default JVM version for your machine, and set that (see "Eclipse initial setup" above).
-- Then, run the "clean" external tool and rebuild the project.
+### Native compilation failures
 
-### "java.lang.UnsatisfiedLinkError" ending with "mach-o, but wrong architecture" or "Couldn't link with native library: DCRaw: libDCRaw.jnilib: mach-o, but wrong architecture"
+If the build fails during native compilation, verify that the dependencies are installed for the same Homebrew architecture:
 
-Probably some code was compiled as 64-bit, but you're running the app in a 32-bit JVM.
+```sh
+brew list jpeg-turbo lensfun libomp libraw libtiff little-cms2 pkg-config
+brew --prefix
+```
 
-- Use the "`file`" command on the library:
+The prefix should be `/opt/homebrew` on Apple Silicon.
 
-  libDCRaw.jnilib: Mach-O dynamically linked shared library x86_64
+### Detailed diagnostics
 
-- x86_64 means 64-bit (i386 means 32-bit); if this is the case, Add `-d64` as a VM argument in the Eclipse Run Configuration and re-run.
+For more detailed Gradle diagnostics, run:
 
-### "java.lang.UnsatisfiedLinkError" or "Link not satisfied": LCJPEG
+```sh
+./gradlew build -x test --stacktrace --warning-mode all
+```
 
-- go to the lightzone/products folder and run: `otool -L libLCJPEG.jnilib`
-- make sure each other library file listed there actually exists there
-- use the "file" command to verify each one's architecture and bitness (32 or 64) matches the project settings and system default JDK
-
-## Questions/Comments?
-
-This quick guide, and the OSX 64-bit build updates, were originally done by Jeremy D Monin <jdmonin@nand.net> and updated by Masahiro Kitagawa <arctica0316@gmail.com>.
+The complete macOS development notes are available in [`macosx/BUILD-macosx.md`](macosx/BUILD-macosx.md).
