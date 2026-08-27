@@ -120,5 +120,3 @@ For more detailed Gradle diagnostics, run:
 ```sh
 ./gradlew build -x test --stacktrace --warning-mode all
 ```
-
-The complete macOS development notes are available in [`macosx/BUILD-macosx.md`](macosx/BUILD-macosx.md).
