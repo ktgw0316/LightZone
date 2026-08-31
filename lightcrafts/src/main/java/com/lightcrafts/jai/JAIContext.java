@@ -169,6 +169,32 @@ public class JAIContext {
         logger.debug("zero lum: {}", zlum);
     }
 
+    private static void registerDescriptor(OperationRegistry registry, OperationDescriptor descriptor) {
+        try {
+            registry.registerDescriptor(descriptor);
+        } catch (IllegalArgumentException ignored) {
+            // Some tests and startup paths re-register the same descriptor name.
+        }
+    }
+
+    private static void registerRif(OperationRegistry registry, String name, String vendor,
+                                   RenderedImageFactory factory) {
+        try {
+            RIFRegistry.register(registry, name, vendor, factory);
+        } catch (IllegalArgumentException ignored) {
+            // A duplicate registration is harmless when the registry is already initialized.
+        }
+    }
+
+    private static void registerCric(OperationRegistry registry, String name,
+                                    ContextualRenderedImageFactory factory) {
+        try {
+            CRIFRegistry.register(registry, name, factory);
+        } catch (IllegalArgumentException ignored) {
+            // Some startup paths initialize the same descriptor multiple times across tests.
+        }
+    }
+
     static {
         final int MB = 1024 * 1024;
 
@@ -212,42 +238,42 @@ public class JAIContext {
 
         // register LCMSColorConvert
         OperationDescriptor desc = new LCMSColorConvertDescriptor();
-        or.registerDescriptor(desc);
+        registerDescriptor(or, desc);
         ContextualRenderedImageFactory crif = new LCMSColorConvertCRIF();
-        RIFRegistry.register(or, desc.getName(), "com.lightcrafts", crif);
-        CRIFRegistry.register(or, desc.getName(), crif);
+        registerRif(or, desc.getName(), "com.lightcrafts", crif);
+        registerCric(or, desc.getName(), crif);
 
         // register BlendOp
         desc = new BlendDescriptor();
-        or.registerDescriptor(desc);
+        registerDescriptor(or, desc);
         crif = new BlendCRIF();
-        RIFRegistry.register(or, desc.getName(), "com.lightcrafts", crif);
-        CRIFRegistry.register(or, desc.getName(), crif);
+        registerRif(or, desc.getName(), "com.lightcrafts", crif);
+        registerCric(or, desc.getName(), crif);
 
         // register LCSeparableConvolve
         desc = new LCSeparableConvolveDescriptor();
-        or.registerDescriptor(desc);
+        registerDescriptor(or, desc);
         RenderedImageFactory rif = new LCSeparableConvolveRIF();
-        RIFRegistry.register(or, desc.getName(), "com.lightcrafts", rif);
+        registerRif(or, desc.getName(), "com.lightcrafts", rif);
 
         // register FastBoxFilter
         desc = new FastBoxFilterDescriptor();
-        or.registerDescriptor(desc);
+        registerDescriptor(or, desc);
         rif = new FastBoxFilterRIF();
-        RIFRegistry.register(or, desc.getName(), "com.lightcrafts", rif);
+        registerRif(or, desc.getName(), "com.lightcrafts", rif);
 
         // register LCUnsharpMaskOp
         desc = new LCUnsharpMaskDescriptor();
-        or.registerDescriptor(desc);
+        registerDescriptor(or, desc);
         crif = new LCUnsharpMaskCRIF();
-        RIFRegistry.register(or, desc.getName(), "com.lightcrafts", crif);
-        CRIFRegistry.register(or, desc.getName(), crif);
+        registerRif(or, desc.getName(), "com.lightcrafts", crif);
+        registerCric(or, desc.getName(), crif);
 
         // register BilateralFilter
         desc = new BilateralFilterDescriptor();
-        or.registerDescriptor(desc);
+        registerDescriptor(or, desc);
         rif = new BilateralFilterRIF();
-        RIFRegistry.register(or, desc.getName(), "com.lightcrafts", rif);
+        registerRif(or, desc.getName(), "com.lightcrafts", rif);
 
         systemProfiles = new ArrayList<>();
         final Collection<ColorProfileInfo> exportProfiles =
