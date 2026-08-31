@@ -1,19 +1,22 @@
 package com.lightcrafts.jai.utils;
 
+import com.lightcrafts.jai.JAIContext;
 import com.lightcrafts.jai.operator.LCSeparableConvolveDescriptor;
 import com.lightcrafts.jai.opimage.LCSeparableConvolveRIF;
 import org.eclipse.imagen.*;
-import org.eclipse.imagen.media.convolve.ConvolveDescriptor;
 import org.eclipse.imagen.media.util.SunTileCache;
 import org.eclipse.imagen.registry.RIFRegistry;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
+import java.awt.image.*;
 import java.awt.image.renderable.ParameterBlock;
 import java.awt.image.renderable.RenderedImageFactory;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -58,15 +61,35 @@ class FastGaussianBlurBenchmarkTest {
                 MEASURE
         );
 
-        benchmark("fastGaussianBlur / LCSeparableConvolve", WARMUP, MEASURE, () ->
+        benchmark("Functions.fastGaussianBlur", WARMUP, MEASURE, () ->
+                Functions.fastGaussianBlur(source, RADIUS)
+        );
+
+        benchmark("LCSeparableConvolve", WARMUP, MEASURE, () ->
                 createLCSeparableConvolve(source, kernel, hints)
         );
 
-        benchmark("ImageN SeparableConvolve", WARMUP, MEASURE, () -> {
-//            assert kernel.isSeparable();
-            return ConvolveDescriptor.create(source, kernel,
-                    null, null, 0, false, hints);
-        });
+//        benchmark("ImageN SeparableConvolve", WARMUP, MEASURE, () -> {
+////            assert kernel.isSeparable();
+//            return ConvolveDescriptor.create(source, kernel,
+//                    null, null, 0, false, hints);
+//        });
+
+        final var outputDirectory = Path.of("build/gaussian-blur-output");
+        try {
+            Files.createDirectories(outputDirectory);
+
+            final var sourceFile = outputDirectory.resolve("source.png").toFile();
+            ImageIO.write(source, "PNG", sourceFile);
+
+            final var fastGaussianBlurFile = outputDirectory.resolve("fastGaussianBlur.png").toFile();
+            ImageIO.write(Functions.fastGaussianBlur(source, RADIUS), "PNG", fastGaussianBlurFile);
+
+            final var lcSeparableConvolveFile = outputDirectory.resolve("lcSeparableConvolve.png").toFile();
+            ImageIO.write(createLCSeparableConvolve(source, kernel, hints), "PNG", lcSeparableConvolveFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static void registerLCSeparableConvolve() {
@@ -175,16 +198,31 @@ class FastGaussianBlurBenchmarkTest {
         return nanos / (double) TimeUnit.MILLISECONDS.toNanos(1);
     }
 
-    private static BufferedImage createTestImage(int width, int height) {
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
-
+    private static RenderedImage createTestImage(int width, int height) {
+        final WritableRaster raster = Raster.createWritableRaster(
+                new BandedSampleModel(DataBuffer.TYPE_USHORT, width, height, 3),
+                new DataBufferUShort(width * height, 3),
+                new Point(0, 0)
+        );
+        final var colorModel = new ComponentColorModel(
+                JAIContext.sRGBColorSpace,
+                new int[]{16, 16, 16},
+                false,
+                false,
+                Transparency.OPAQUE,
+                DataBuffer.TYPE_USHORT
+        );
+        final var image = PlanarImage.wrapRenderedImage(
+                new BufferedImage(colorModel, raster, false, null)
+        );
         for (int y = 0; y < height; y++) {
-            int gy = y & 0xff;
+            final int g = y & 0xff;
             for (int x = 0; x < width; x++) {
-                int r = x & 0xff;
-                int g = gy;
-                int b = (x * 31 + y * 17) & 0xff;
-                image.setRGB(x, y, (r << 16) | (g << 8) | b);
+                final int r = x & 0xff;
+                final int b = (x * 31 + y * 17) & 0xff;
+                raster.setSample(x, y, 0, r << 8);
+                raster.setSample(x, y, 1, g << 8);
+                raster.setSample(x, y, 2, b << 8);
             }
         }
 

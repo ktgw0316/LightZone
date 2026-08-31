@@ -132,6 +132,10 @@ public class Functions {
         radius = Math.max(radius, 0.001);
         final int size = 2 * (int) Math.ceil(radius) + 1;
         final int key = size / 2;
+
+        image = FastBoxFilterDescriptor.create(image, size, size, key, key, extenderHints);
+        FastBoxFilterDescriptor.create(image, size, size, key, key, extenderHints);
+        FastBoxFilterDescriptor.create(image, size, size, key, key, extenderHints);
         return FastBoxFilterDescriptor.create(image, size, size, key, key, extenderHints);
     }
 
