@@ -74,9 +74,9 @@ public class FastBoxFilterOpImage extends AreaOpImage {
 //            case DataBuffer.TYPE_SHORT:
 //                shortLoop(srcAccessor, dstAccessor);
 //                break;
-//            case DataBuffer.TYPE_USHORT:
-//                ushortLoop(srcAccessor, dstAccessor);
-//                break;
+            case DataBuffer.TYPE_USHORT:
+                ushortLoop(srcAccessor, dstAccessor);
+                break;
 //            case DataBuffer.TYPE_FLOAT:
 //                floatLoop(srcAccessor, dstAccessor);
 //                break;
@@ -111,63 +111,140 @@ public class FastBoxFilterOpImage extends AreaOpImage {
         int srcPixelStride = src.getPixelStride();
         int srcScanlineStride = src.getScanlineStride();
 
+        // Temporary cumulative buffer sized to the max of width/height + kernel
+        int maxLen = Math.max(dwidth, dheight) + Math.max(kw, kh);
+        long[] cum = new long[maxLen + 1];
+
         for (int k = 0; k < dnumBands; k++) {
             final int[] dstData = dstDataArrays[k];
             final int[] srcData = srcDataArrays[k];
 
+            // intermediate buffer to hold horizontal-pass results; match src layout to include padding
+            int[] tmp = new int[srcData.length];
+
+            // horizontal pass using cumulative sums (chunked implicitly by reuse)
+            int srcScanlineOffset = srcBandOffsets[k];
+            int tmpScanlineOffset = srcBandOffsets[k];
+            int rowsToProcess = dheight + kh - 1;
+            for (int j = 0; j < rowsToProcess; j++) {
+                // build cumulative sum for this source scanline: we need dwidth + kw - 1 samples
+                int samples = dwidth + kw - 1;
+                cum[0] = 0L;
+                int sp = srcScanlineOffset;
+                for (int t = 0; t < samples; t++, sp += srcPixelStride) {
+                    cum[t + 1] = cum[t] + (long) srcData[sp];
+                }
+
+                int tmpPixelOffset = tmpScanlineOffset;
+                for (int out = 0; out < dwidth; out++) {
+                    long sumRaw = cum[out + kw] - cum[out];
+                    tmp[tmpPixelOffset] = (int) (sumRaw * hValue);
+                    tmpPixelOffset += srcPixelStride;
+                }
+
+                srcScanlineOffset += srcScanlineStride;
+                tmpScanlineOffset += srcScanlineStride;
+            }
+
+            // vertical pass using cumulative sums down each column reading from tmp and writing to dst
+            int tmpPixelOffset = srcBandOffsets[k];
+            int dstPixelOffset = dstBandOffsets[k];
+            for (int i = 0; i < dwidth; i++) {
+                // build cumulative sum for this source column: need dheight + kh - 1 samples
+                int samples = dheight + kh - 1;
+                cum[0] = 0L;
+                int tp = tmpPixelOffset;
+                for (int t = 0; t < samples; t++, tp += srcScanlineStride) {
+                    cum[t + 1] = cum[t] + (long) tmp[tp];
+                }
+
+                int outOffset = dstPixelOffset;
+                for (int out = 0; out < dheight; out++) {
+                    long sumRaw = cum[out + kh] - cum[out];
+                    dstData[outOffset] = (int) (sumRaw * vValue);
+                    outOffset += dstScanlineStride;
+                }
+
+                tmpPixelOffset += srcPixelStride;
+                dstPixelOffset += dstPixelStride;
+            }
+        }
+    }
+
+    protected void ushortLoop(RasterAccessor src,
+                              RasterAccessor dst) {
+        int dwidth = dst.getWidth();
+        int dheight = dst.getHeight();
+        int dnumBands = dst.getNumBands();
+
+        short[][] dstDataArrays = dst.getShortDataArrays();
+        int[] dstBandOffsets = dst.getBandOffsets();
+        int dstPixelStride = dst.getPixelStride();
+        int dstScanlineStride = dst.getScanlineStride();
+
+        short[][] srcDataArrays = src.getShortDataArrays();
+        int[] srcBandOffsets = src.getBandOffsets();
+        int srcPixelStride = src.getPixelStride();
+        int srcScanlineStride = src.getScanlineStride();
+
+        int maxLen = Math.max(dwidth, dheight) + Math.max(kw, kh);
+        long[] cum = new long[maxLen + 1];
+
+        for (int k = 0; k < dnumBands; k++) {
+            final short[] dstData = dstDataArrays[k];
+            final short[] srcData = srcDataArrays[k];
+
+            // intermediate buffer to hold horizontal-pass results; match src layout to include padding
+            int[] tmp = new int[srcData.length];
+
             // horizontal pass
             int srcScanlineOffset = srcBandOffsets[k];
-            int dstScanlineOffset = dstBandOffsets[k];
-            for (int j = 0; j < dheight; j++) {
-                int srcPixelOffset = srcScanlineOffset;
-                int dstPixelOffset = dstScanlineOffset;
-                float sum = 0.0f;
-
-                for (int i = 0; i < kw; i++) {
-                    sum += srcData[srcPixelOffset] * hValue;
-                    srcPixelOffset += srcPixelStride;
+            int tmpScanlineOffset = srcBandOffsets[k];
+            int rowsToProcess = dheight + kh - 1;
+            for (int j = 0; j < rowsToProcess; j++) {
+                int samples = dwidth + kw - 1;
+                cum[0] = 0L;
+                int sp = srcScanlineOffset;
+                for (int t = 0; t < samples; t++, sp += srcPixelStride) {
+                    cum[t + 1] = cum[t] + ((long) srcData[sp] & 0xFFFFL);
                 }
-                dstData[dstPixelOffset] = (int) sum;
-                dstPixelOffset += dstPixelStride;
 
-                for (int i = kw; i < dwidth; i++) {
-                    final int head = srcData[srcPixelOffset - srcPixelStride * kw];
-                    final int tail = srcData[srcPixelOffset];
-                    sum += ((float) tail - head) * hValue;
-                    dstData[dstPixelOffset] = (int) sum;
-
-                    srcPixelOffset += srcPixelStride;
-                    dstPixelOffset += dstPixelStride;
+                int tmpPixelOffset = tmpScanlineOffset;
+                for (int out = 0; out < dwidth; out++) {
+                    long sumRaw = cum[out + kw] - cum[out];
+                    long val = (long) (sumRaw * hValue);
+                    if (val < 0L) val = 0L;
+                    if (val > 0xFFFFL) val = 0xFFFFL;
+                    tmp[tmpPixelOffset] = (int) (val & 0xFFFF);
+                    tmpPixelOffset += srcPixelStride;
                 }
+
                 srcScanlineOffset += srcScanlineStride;
-                dstScanlineOffset += dstScanlineStride;
+                tmpScanlineOffset += srcScanlineStride;
             }
 
             // vertical pass
-            int srcPixelOffset = srcBandOffsets[k];
+            int tmpPixelOffset = srcBandOffsets[k];
             int dstPixelOffset = dstBandOffsets[k];
             for (int i = 0; i < dwidth; i++) {
-                srcScanlineOffset = srcPixelOffset;
-                dstScanlineOffset = dstPixelOffset;
-                float sum = 0.0f;
-
-                for (int j = 0; j < kh; j++) {
-                    sum += srcData[srcScanlineOffset] * vValue;
-                    srcScanlineOffset += srcScanlineStride;
+                int samples = dheight + kh - 1;
+                cum[0] = 0L;
+                int tp = tmpPixelOffset;
+                for (int t = 0; t < samples; t++, tp += srcScanlineStride) {
+                    cum[t + 1] = cum[t] + ((long) tmp[tp] & 0xFFFFFFFFL);
                 }
-                dstData[dstScanlineOffset] = (int) sum;
-                dstScanlineOffset += dstScanlineStride;
 
-                for (int j = kh; j < dheight; j++) {
-                    final int head = srcData[srcScanlineOffset - srcScanlineStride * kh];
-                    final int tail = srcData[srcScanlineOffset];
-                    sum += ((float) tail - head) * vValue;
-                    dstData[dstScanlineOffset] = (int) sum;
-
-                    srcScanlineOffset += srcScanlineStride;
-                    dstScanlineOffset += dstScanlineStride;
+                int outOffset = dstPixelOffset;
+                for (int out = 0; out < dheight; out++) {
+                    long sumRaw = cum[out + kh] - cum[out];
+                    long val = (long) (sumRaw * vValue);
+                    if (val < 0L) val = 0L;
+                    if (val > 0xFFFFL) val = 0xFFFFL;
+                    dstData[outOffset] = (short) (val & 0xFFFF);
+                    outOffset += dstScanlineStride;
                 }
-                srcPixelOffset += srcPixelStride;
+
+                tmpPixelOffset += srcPixelStride;
                 dstPixelOffset += dstPixelStride;
             }
         }
