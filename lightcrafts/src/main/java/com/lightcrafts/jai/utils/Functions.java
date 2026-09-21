@@ -126,17 +126,61 @@ public class Functions {
         }
     }
 
+    /**
+     * Box sizes to minimize the error of the approximation of a 1-sigma Gaussian
+     * by 4 box filters
+     */
+    private static int[] boxSizes(double sigma) {
+        if (sigma == 1) {
+            return new int[]{1, 1, 1, 1};
+        }
+        if (sigma == 2) {
+            return new int[]{1, 3, 3, 3};
+        }
+        final int last = (int) (2 * sigma - 1);
+        if (sigma <= 8) {
+            return new int[]{3, 3, 3, last};
+        }
+        if (sigma <= 11) {
+            return new int[]{3, 3, 5, last};
+        }
+        if (sigma <= 15) {
+            return new int[]{3, 5, 5, last};
+        }
+        if (sigma <= 21) {
+            return new int[]{5, 5, 5, last};
+        }
+        if (sigma <= 25) {
+            return new int[]{7, 7, 9, last};
+        }
+        if (sigma <= 29) {
+            return new int[]{7, 9, 9, last};
+        }
+        return new int[]{9, 9, 9, last};
+    }
+
+    /**
+     * Fast Gaussian blur implementation using box filters.
+     *
+     * Note: Original implementation by LightCrafts limits gaussian window radius to ceil(sigma),
+     * which is not enough for a proper Gaussian blur.
+     * This implementation uses multi-box filters to approximate the original implementation.
+     *
+     * @param image The input image.
+     * @param radius The blur radius (standard deviation).
+     * @return The blurred image.
+     */
     public static RenderedOp fastGaussianBlur(RenderedImage image, double radius) {
         final var extenderHints = new RenderingHints(ImageN.KEY_BORDER_EXTENDER,
                 BorderExtender.createInstance(BorderExtender.BORDER_COPY));
-        radius = Math.max(radius, 0.001);
-        final int size = 2 * (int) Math.ceil(radius) + 1;
-        final int key = size / 2;
 
-        image = FastBoxFilterDescriptor.create(image, size, size, key, key, extenderHints);
-        FastBoxFilterDescriptor.create(image, size, size, key, key, extenderHints);
-        FastBoxFilterDescriptor.create(image, size, size, key, key, extenderHints);
-        return FastBoxFilterDescriptor.create(image, size, size, key, key, extenderHints);
+        final int[] sizes = boxSizes(radius);
+        for (final int size: sizes) {
+            if (size > 1) {
+                image = FastBoxFilterDescriptor.create(image, size, size, extenderHints);
+            }
+        }
+        return (RenderedOp) image;
     }
 
     public static ImageLayout getImageLayout(RenderedImage image) {
@@ -157,10 +201,6 @@ public class Functions {
         synchronized (ColorSpace.class) {
             return target.fromCIEXYZ(JAIContext.linearColorSpace.toCIEXYZ(color));
         }
-    }
-
-    public static double gauss(double x, double s) {
-        return Math.exp(-x * x / (2 * s * s));
     }
 
     public static double LoG(double x, double y, double s) {
@@ -210,27 +250,6 @@ public class Functions {
         }
 
         return new KernelImageN(size, size, data);
-    }
-
-    static public KernelImageN getGaussKernel(double sigma) {
-        if (sigma < 0.001)
-            sigma = 0.001;
-
-        int size = 2 * (int) Math.ceil(sigma) + 1;
-
-        float[] data = new float[size];
-        int j = 0;
-        float scale = 0;
-
-        for (int x = -size/2; x <= size/2; x++) {
-            data[j++] = (float) gauss(x, sigma);
-            scale += data[j - 1];
-        }
-
-        for (int i = 0; i < data.length; i++)
-            data[i] /= scale;
-
-        return new KernelImageN(size, size, size/2, size/2, data, data);
     }
 
     static public double lanczos2(double x) {
