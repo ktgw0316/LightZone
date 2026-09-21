@@ -100,6 +100,7 @@ public class FastBoxFilterDescriptor extends OperationDescriptorImpl {
      * @return The <code>RenderedOp</code> destination.
      * @throws IllegalArgumentException if <code>source0</code> is <code>null</code>.
      */
+    @Deprecated
     public static RenderedOp create(RenderedImage source0,
                                     Integer width,
                                     Integer height,
@@ -116,5 +117,33 @@ public class FastBoxFilterDescriptor extends OperationDescriptorImpl {
         pb.setParameter("yKey", yKey);
 
         return ImageN.create("FastBoxFilter", pb, hints);
+    }
+
+    /**
+     * Performs special case convolution where each source pixel contributes equally to the intensity of the destination pixel.
+     *
+     * <p>Creates a <code>ParameterBlockJAI</code> from all
+     * supplied arguments except <code>hints</code> and invokes
+     * {@link ImageN#create(String, ParameterBlockImageN, RenderingHints)}.
+     *
+     * @see ImageN
+     * @see ParameterBlockImageN
+     * @see RenderedOp
+     *
+     * @param source0 <code>RenderedImage</code> source 0.
+     * @param width The width of the box.
+     * May be <code>null</code>.
+     * @param height The height of the box.
+     * May be <code>null</code>.
+     * @param hints The <code>RenderingHints</code> to use.
+     * May be <code>null</code>.
+     * @return The <code>RenderedOp</code> destination.
+     * @throws IllegalArgumentException if <code>source0</code> is <code>null</code>.
+     */
+    public static RenderedOp create(RenderedImage source0,
+                                    Integer width,
+                                    Integer height,
+                                    RenderingHints hints)  {
+        return create(source0, width, height, width / 2, height / 2, hints);
     }
 }

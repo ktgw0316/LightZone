@@ -28,13 +28,13 @@ class FastBoxFilterOpImageUShortTest {
     private final int width = 128;
     private final int height = 96;
 
-    private RenderedOp applyBoxFilter(BufferedImage src, int kw, int kh, int kx, int ky) {
+    private RenderedOp applyBoxFilter(RenderedImage src, int kw, int kh) {
         // Ensure JAI context is initialized so the FastBoxFilter operation is registered
         try {
             Class.forName("com.lightcrafts.jai.JAIContext");
         } catch (ClassNotFoundException ignored) {
         }
-        return FastBoxFilterDescriptor.create(src, kw, kh, kx, ky, null);
+        return FastBoxFilterDescriptor.create(src, kw, kh, null);
     }
 
     @Test
@@ -48,7 +48,7 @@ class FastBoxFilterOpImageUShortTest {
             }
         }
 
-        RenderedOp out = applyBoxFilter(src, 5, 5, 2, 2);
+        RenderedOp out = applyBoxFilter(src, 5, 5);
         // force evaluation
         WritableRaster result = out.copyData(null);
 
@@ -79,7 +79,7 @@ class FastBoxFilterOpImageUShortTest {
                 rmin.setSample(x, y, 0, 0);
             }
         }
-        RenderedOp outMin = applyBoxFilter(srcMin, 3, 3, 1, 1);
+        RenderedOp outMin = applyBoxFilter(srcMin, 3, 3);
         WritableRaster resMin = outMin.copyData(null);
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
@@ -95,7 +95,7 @@ class FastBoxFilterOpImageUShortTest {
                 rmax.setSample(x, y, 0, 65535);
             }
         }
-        RenderedOp outMax = applyBoxFilter(srcMax, 7, 7, 3, 3);
+        RenderedOp outMax = applyBoxFilter(srcMax, 7, 7);
         WritableRaster resMax = outMax.copyData(null);
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
