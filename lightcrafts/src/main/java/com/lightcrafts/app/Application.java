@@ -19,7 +19,6 @@ import com.lightcrafts.model.OperationType;
 import com.lightcrafts.model.PrintSettings;
 import com.lightcrafts.model.Scale;
 import com.lightcrafts.platform.*;
-import com.lightcrafts.prefs.PreferencesDialog;
 import com.lightcrafts.splash.AboutDialog;
 import com.lightcrafts.splash.SplashWindow;
 import com.lightcrafts.splash.StartupProgress;
@@ -35,6 +34,7 @@ import com.lightcrafts.ui.export.SaveOptions;
 import com.lightcrafts.ui.help.HelpConstants;
 import com.lightcrafts.ui.print.PrintLayoutDialog;
 import com.lightcrafts.ui.print.PrintLayoutModel;
+import com.lightcrafts.shell.prefs.PreferencesController;
 import com.lightcrafts.ui.templates.TemplateList;
 import com.lightcrafts.utils.UserCanceledException;
 import com.lightcrafts.utils.file.FileUtil;
@@ -1340,7 +1340,11 @@ public class Application {
     }
 
     public static void showPreferences() {
-        PreferencesDialog.showDialog(getActiveFrame());
+        showPreferences(getActiveFrame());
+    }
+
+    public static void showPreferences(Component parent) {
+        PreferencesController.showDialog(parent);
     }
 
     static ComboFrame getFrameForFile(File file) {

@@ -2,43 +2,26 @@
 
 package com.lightcrafts.ui.metadata2;
 
-import java.util.prefs.Preferences;
+import com.lightcrafts.shell.prefs.CopyrightPreferenceStorage;
 
 /**
  * A global place for setting the default copyright text.
  */
 public class CopyrightDefaults {
 
-    private final static Preferences Prefs = Preferences.userRoot().node(
-        "/com/lightcrafts/metadata2"
-    );
-    private final static String CopyrightKey = "Copyright";
-
-    private final static String CreatorKey = "Creator";
-
     public static void setDefaultCopyright(String text) {
-        if (text != null) {
-            Prefs.put(CopyrightKey, text);
-        }
-        else {
-            Prefs.remove(CopyrightKey);
-        }
+        CopyrightPreferenceStorage.setDefaultCopyright(text);
     }
 
     public static String getDefaultCopyright() {
-        return Prefs.get(CopyrightKey, null);
+        return CopyrightPreferenceStorage.getDefaultCopyright();
     }
 
     public static void setDefaultCreator(String text) {
-        if (text != null) {
-            Prefs.put(CreatorKey, text);
-        }
-        else {
-            Prefs.remove(CreatorKey);
-        }
+        CopyrightPreferenceStorage.setDefaultCreator(text);
     }
 
     public static String getDefaultCreator() {
-        return Prefs.get(CreatorKey, null);
+        return CopyrightPreferenceStorage.getDefaultCreator();
     }
 }

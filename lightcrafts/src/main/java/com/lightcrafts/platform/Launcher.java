@@ -5,7 +5,7 @@ package com.lightcrafts.platform;
 import com.lightcrafts.app.Application;
 import com.lightcrafts.app.CheckForUpdate;
 import com.lightcrafts.app.ExceptionDialog;
-import com.lightcrafts.prefs.LocaleModel;
+import com.lightcrafts.shell.prefs.LocaleModel;
 import com.lightcrafts.splash.SplashImage;
 import com.lightcrafts.splash.SplashWindow;
 import com.lightcrafts.utils.Version;
