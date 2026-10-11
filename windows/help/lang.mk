@@ -21,17 +21,9 @@ TARGET_HELP_DIR:=	/tmp/$(HELP)
 include			$(COMMON_DIR)/mk/platform0.mk
 UNAME:=			$(shell uname -ms | grep -e 64 -e WOW)
 ifeq ($(strip $(UNAME)),)
-  ifeq ($(CYGWIN),1)
-    HTML_HELP_DIR:=	/cygdrive/c/Program\ Files
-  else
-    HTML_HELP_DIR:=	/c/Program\ Files
-  endif
+  HTML_HELP_DIR:=	/c/Program\ Files
 else
-  ifeq ($(CYGWIN),1)
-    HTML_HELP_DIR:=	/cygdrive/c/Program\ Files\ \(x86\)
-  else
-    HTML_HELP_DIR:=	/c/Program\ Files\ \(x86\)
-  endif
+  HTML_HELP_DIR:=	/c/Program\ Files\ \(x86\)
 endif
 HTML_HELP_COMPILER:=	$(HTML_HELP_DIR)/HTML\ Help\ Workshop/hhc
 

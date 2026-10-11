@@ -41,13 +41,6 @@ AUTO_DEP_CC:=		$(CC)
 
 MAKEDEPEND:=		$(AUTO_DEP_CC) $(AUTO_DEP_FLAGS)
 
-# Must not use := here!
-ifeq ($(CYGWIN),1)
-  define MAKE_DEP
-    $(MAKEDEPEND) $1 | sed "s!^\([^ :]*\):!\1 $2 : !" | sed 's/\(\w\):/\/cygdrive\/\L\1/g' > $2; [ -s $2 ]  || $(RM) $2
-  endef
-endif
-
 .%.d : %.c
 	$(call MAKE_DEP,$<,$@)
 

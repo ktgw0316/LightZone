@@ -19,19 +19,13 @@ CC:=		$(MINGW)-gcc
 CXX:=		$(MINGW)-g++
 PKGCFG:=	$(MINGW)-pkg-config
 
-ifeq ($(CYGWIN),1)
-  MINGW_DIR?=		/usr/$(MINGW)/sys-root/mingw/
+ifeq ($(PROCESSOR),x86_64)
+  MINGW_DIR?=	/ucrt64/
+  PKG_CONFIG_PATH:=	/ucrt64/lib/pkgconfig/
 else
-  # MSYS2
-  ifeq ($(PROCESSOR),x86_64)
-    MINGW_DIR?=	/ucrt64/
-    PKG_CONFIG_PATH:=	/ucrt64/lib/pkgconfig/
-  else
-    MINGW_DIR?=	/mingw32/
-    PKG_CONFIG_PATH:=	/mingw32/lib/pkgconfig/
-  endif
+  MINGW_DIR?=	/mingw32/
+  PKG_CONFIG_PATH:=	/mingw32/lib/pkgconfig/
 endif
-
 DLL_DIR:=		$(MINGW_DIR)bin/
 
 PLATFORM_CFLAGS:=	$(SSE_FLAGS) $(PLATFORM_CFLAGS)
