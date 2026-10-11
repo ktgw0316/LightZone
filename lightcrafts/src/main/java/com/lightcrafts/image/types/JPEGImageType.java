@@ -713,6 +713,7 @@ public class JPEGImageType extends ImageType implements TrueImageTypeProvider {
             }
         }
         catch ( LCImageLibException e ) {
+            logger.error( "JPEG export failed", e );
             final IOException ioe = new IOException( "JPEG export failed" );
             ioe.initCause( e );
             throw ioe;
