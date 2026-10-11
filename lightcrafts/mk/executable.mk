@@ -66,16 +66,10 @@ ifeq ($(PLATFORM),MacOSX)
   LINK+=		$(EXEC_MACOSX_LINK)
 
   CFLAGS+=		$(EXEC_MACOSX_CFLAGS)
-  ifeq ($(PROCESSOR),arm64)
-    CFLAGS+=		$(EXEC_ARM_CFLAGS)
-    DEFINES+=		$(EXEC_ARM_DEFINES)
-    LDFLAGS+=		$(EXEC_ARM_LDFLAGS)
-  endif
-  ifeq ($(PROCESSOR),x86_64)
-    CFLAGS+=		$(EXEC_X86_CFLAGS)
-    DEFINES+=		$(EXEC_X86_DEFINES)
-    LDFLAGS+=		$(EXEC_X86_LDFLAGS)
-  endif
+
+  CFLAGS+=		$(EXEC_ARM_CFLAGS)
+  DEFINES+=		$(EXEC_ARM_DEFINES)
+  LDFLAGS+=		$(EXEC_ARM_LDFLAGS)
 endif
 
 ifeq ($(PLATFORM),Windows)
@@ -114,12 +108,6 @@ BUILT_LIBS:=	$(wildcard */lib/*.a)
 TARGET:=	$(TARGET_DIR)/$(TARGET_BASE)$(EXEC_EXT)
 
 ##
-# These are always defined so a "make disclean" will remove them.
-##
-TARGET_ARM:=	$(TARGET_BASE)-arm$(EXEC_EXT)
-TARGET_X86:=	$(TARGET_BASE)-x86$(EXEC_EXT)
-
-##
 # Build rules
 ##
 
@@ -142,6 +130,6 @@ clean:
 	$(RM) *.o .*.d
 
 distclean mostlyclean: clean
-	$(RM) $(TARGET) $(TARGET_ARM) $(TARGET_X86) $(POST_TARGET)
+	$(RM) $(TARGET) $(POST_TARGET)
 
 # vim:set noet sw=8 ts=8:

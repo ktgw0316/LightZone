@@ -88,18 +88,12 @@ ifeq ($(PLATFORM),MacOSX)
     endif
   endif
   CFLAGS+=		$(JNI_MACOSX_CFLAGS)
-  ifeq ($(PROCESSOR),arm64)
-    CFLAGS+=		$(JNI_ARM_CFLAGS)
-    DEFINES+=		$(JNI_ARM_DEFINES)
-    LDFLAGS+=		$(JNI_ARM_LDFLAGS)
-    LINK+=		$(JNI_ARM_LINK)
-  endif
-  ifeq ($(PROCESSOR),x86_64)
-    CFLAGS+=		$(JNI_X86_CFLAGS)
-    DEFINES+=		$(JNI_X86_DEFINES)
-    LDFLAGS+=		$(JNI_X86_LDFLAGS)
-    LINK+=		$(JNI_X86_LINK)
-  endif
+
+  CFLAGS+=		$(JNI_ARM_CFLAGS)
+  DEFINES+=		$(JNI_ARM_DEFINES)
+  LDFLAGS+=		$(JNI_ARM_LDFLAGS)
+  LINK+=		$(JNI_ARM_LINK)
+
   JNI_EXTRA_CLEAN+=	$(JNI_MACOSX_CLEAN)
   JNI_EXTRA_DISTCLEAN+=	$(JNI_MACOSX_DISTCLEAN)
 endif
@@ -146,12 +140,6 @@ TARGET:=	$(JNILIB_PREFIX)$(TARGET_BASE)$(JNILIB_EXT)
 else
 TARGET:=	$(TARGET_DIR)/$(JNILIB_PREFIX)$(TARGET_BASE)$(JNILIB_EXT)
 endif
-
-##
-# These are always defined so a "make disclean" will remove them.
-##
-TARGET_ARM:=	$(JNILIB_PREFIX)$(TARGET_BASE)-arm64$(JNILIB_EXT)
-TARGET_X86:=	$(JNILIB_PREFIX)$(TARGET_BASE)-x86$(JNILIB_EXT)
 
 ##
 # Build rules
@@ -217,6 +205,6 @@ clean:
 	$(RM) *.o .*.d javah java_jni *-ranlib.a *.dSYM *.res $(TARGET).dSYM $(JNI_EXTRA_CLEAN)
 
 distclean mostlyclean: clean
-	$(RM) $(TARGET) $(TARGET_ARM) $(TARGET_X86) $(POST_TARGET) $(JNI_EXTRA_DISTCLEAN)
+	$(RM) $(TARGET) $(POST_TARGET) $(JNI_EXTRA_DISTCLEAN)
 
 # vim:set noet sw=8 ts=8:

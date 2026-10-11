@@ -7,11 +7,7 @@ ifndef EXECUTABLE
 endif
 ALTIVEC_CFLAGS:=	-DLC_USE_ALTIVEC
 
-ifeq ($(PROCESSOR),arm64)
-  BREW_DIR?=  /opt/homebrew
-else
-  BREW_DIR?=  /usr/local
-endif
+BREW_DIR?=  /opt/homebrew
 PKGCFG:=	$(BREW_DIR)/bin/pkg-config
 LIBOMP_PATH?= $(shell $(BREW_DIR)/bin/brew --prefix libomp)
 PLATFORM_INCLUDES+=	-I$(LIBOMP_PATH)/include
@@ -29,27 +25,13 @@ PLATFORM_LDFLAGS+=	$(MACOSX_SYSLIBROOT)
 ##
 # These are to be only the bare minimum architecture-specific CFLAGS.
 ##
-MACOSX_CFLAGS_ARM:=	-target arm64-apple-macos11
-MACOSX_CFLAGS_X86:=	-target x86_64-apple-macos10.12
+PLATFORM_CFLAGS+=	-target arm64-apple-macos11
 
-FAST_CFLAGS_ARM:=	-O3 \
+FAST_CFLAGS:=	-O3 \
 			-fno-trapping-math \
 			-fomit-frame-pointer \
 			-mcpu=apple-m1
-FAST_CFLAGS_X86:=	-O3 \
-			-fno-trapping-math \
-			-fomit-frame-pointer \
-			-msse2 -mfpmath=sse
-MACOSX_CFLAGS_ARM+=	$(FAST_CFLAGS_ARM)
-MACOSX_CFLAGS_X86+=	$(FAST_CFLAGS_X86)
-
-ifeq ($(PROCESSOR),arm64)
-  PLATFORM_CFLAGS+=	$(MACOSX_CFLAGS_ARM)
-  PLATFORM_CFLAGS_ARM:= $(PLATFORM_CFLAGS)
-else
-  PLATFORM_CFLAGS+=	$(MACOSX_CFLAGS_X86)
-  PLATFORM_CFLAGS_X86:= $(PLATFORM_CFLAGS)
-endif
+PLATFORM_CFLAGS+=	$(FAST_CFLAGS)
 
 LIPO:=		lipo
 
