@@ -18,13 +18,13 @@ Download and install (or unpack) following:
   1. Install common packages:
 
     ```shell
-    pacman -S diffutils git make tar pacboy
+    pacman -S diffutils git make tar pactoys
     ```
 
-  1. Install target-specific packages:
+  1. Install ucrt-x86_64 packages:
 
     ```shell
-    pacboy -S lcms2 libraw lensfun ntldd-git pkgconf toolchain
+    pacboy -S lcms2:u libraw:u lensfun:u ntldd-git:u pkgconf:u toolchain:u
     ```
 
     For toolchain, select (at least) `binutils`, `gcc`, and `gcc-libs`.
@@ -41,7 +41,7 @@ Download and install (or unpack) following:
 
 Few points for MSYS2 beginners
 
-- It is POSIX evnironment for Windows (emulates a lot of stuff that is in Linux)
+- It is POSIX environment for Windows (emulates a lot of stuff that is in Linux)
 - It is case-sensitive
 - Computer drives under it are available under `/` (root) directory, e.g. `/c/`
 - Home directory is abbreviated with `~`
