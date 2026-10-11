@@ -119,12 +119,6 @@ ifeq ($(PLATFORM),Windows)
   DEFINES+=		$(JNI_WINDOWS_DEFINES)
   INCLUDES+=		$(JNI_WINDOWS_INCLUDES)
   LDFLAGS+=		-shared -Wl,--add-stdcall-alias $(JNI_WINDOWS_LDFLAGS)
-  ifdef JNI_WINDOWS_IMPLIB
-    TARGET_IMPLIB:=	$(TARGET_DIR)/$(TARGET_BASE)-implib.a
-    ifeq ($(USE_ICC),1)
-      LDFLAGS+=		-Wl,--out-implib=$(TARGET_IMPLIB)
-    endif
-  endif
   LINK+=		$(JNI_WINDOWS_LINK)
   JNI_EXTRA_CLEAN+=	$(JNI_WINDOWS_CLEAN)
   JNI_EXTRA_DISTCLEAN+=	$(JNI_WINDOWS_DISTCLEAN)
@@ -274,6 +268,6 @@ clean:
 	$(RM) *.o .*.d javah java_jni *-ranlib.a *.dSYM *.res $(TARGET).dSYM $(JNI_EXTRA_CLEAN)
 
 distclean mostlyclean: clean
-	$(RM) $(TARGET) $(TARGET_IMPLIB) $(TARGET_ARM) $(TARGET_X86) $(POST_TARGET) $(JNI_EXTRA_DISTCLEAN)
+	$(RM) $(TARGET) $(TARGET_ARM) $(TARGET_X86) $(POST_TARGET) $(JNI_EXTRA_DISTCLEAN)
 
 # vim:set noet sw=8 ts=8:

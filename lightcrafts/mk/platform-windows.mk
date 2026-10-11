@@ -36,21 +36,9 @@ DLL_DIR:=		$(MINGW_DIR)bin/
 
 PLATFORM_CFLAGS:=	$(SSE_FLAGS) $(PLATFORM_CFLAGS)
 
-ifdef HIGH_PERFORMANCE
-  ifdef USE_ICC_HERE
-    ICC:=		$(TOOLS_BIN)/lc-icc-w32
-    CC:=		$(ICC)
-    CXX:=		$(ICC)
-    PLATFORM_CFLAGS:=	-g -O3 /QxW /Qipo \
-    			-D__MMX__ -D__SSE__ -D__SSE2__ -D_USE_MATH_DEFINES
-  else
-    PLATFORM_CFLAGS+=	-O3 \
-			-fno-trapping-math \
-			-fomit-frame-pointer
-  endif
-else
-  PLATFORM_CFLAGS+=	-Os
-endif
+FAST_CFLAGS:=	-O3 -fno-trapping-math -fomit-frame-pointer
+PLATFORM_CFLAGS+=	$(FAST_CFLAGS)
+
 CLASSPATH_SEP:=	;
 JAVA_INCLUDES:=	-I"$(JAVA_HOME)/include" -I"$(JAVA_HOME)/include/win32"
 JAVA_LDFLAGS:=	-L"$(JAVA_HOME)/lib"

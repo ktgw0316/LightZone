@@ -4,7 +4,6 @@ TARGET_BASE:=		LCJNI
 #DEBUG:=		true
 
 JNI_MACOSX_SHAREDLIB:=	1
-JNI_WINDOWS_IMPLIB:=	1
 
 ROOT:=			../../..
 include			../jni.mk

@@ -32,26 +32,21 @@ endif
 PLATFORM_LDFLAGS+=	$(MACOSX_SYSLIBROOT)
 
 ##
-# These are to be only the bare minimum architecture-specific CFLAGS.  High-
-# performance CFLAGS go in the FAST_CFLAGS_* variables below.
+# These are to be only the bare minimum architecture-specific CFLAGS.
 ##
 MACOSX_CFLAGS_ARM:=	-target arm64-apple-macos11
 MACOSX_CFLAGS_X86:=	-target x86_64-apple-macos10.12
 
-ifdef HIGH_PERFORMANCE
-  ##
-  # High-performance architecture-specific CFLAGS only.
-  ##
-  FAST_CFLAGS_ARM:=	-O3 # TODO
-  FAST_CFLAGS_X86:=	-O3 \
+FAST_CFLAGS_ARM:=	-O3 \
+			-fno-trapping-math \
+			-fomit-frame-pointer \
+			-mcpu=apple-m1
+FAST_CFLAGS_X86:=	-O3 \
 			-fno-trapping-math \
 			-fomit-frame-pointer \
 			-msse2 -mfpmath=sse
-  MACOSX_CFLAGS_ARM+=	$(FAST_CFLAGS_ARM)
-  MACOSX_CFLAGS_X86+=	$(FAST_CFLAGS_X86)
-else
-  PLATFORM_CFLAGS+=	-Os
-endif
+MACOSX_CFLAGS_ARM+=	$(FAST_CFLAGS_ARM)
+MACOSX_CFLAGS_X86+=	$(FAST_CFLAGS_X86)
 
 ifeq ($(UNIVERSAL),1)
   PLATFORM_CFLAGS_ARM:= $(PLATFORM_CFLAGS) $(MACOSX_CFLAGS_ARM)

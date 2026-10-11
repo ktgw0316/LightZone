@@ -35,11 +35,6 @@ TOOLS_BIN:=		$(abspath $(ROOT)/lightcrafts/tools/bin)
 # Default to a normal (Unix) classpath separator.
 CLASSPATH_SEP:=		:
 
-# Unset USE_ICC_HERE if the overall USE_ICC flags != 1.
-ifneq ($(USE_ICC),1)
-  USE_ICC_HERE:=
-endif
-
 # The initial set of CFLAGS and LDFLAGS.  (Must not use := here!)
 PLATFORM_CFLAGS=	$(CFLAGS) -g
 PLATFORM_LDFLAGS=	$(LDFLAGS)

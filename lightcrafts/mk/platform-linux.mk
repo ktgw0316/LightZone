@@ -16,13 +16,8 @@ else ifeq ($(PROCESSOR),ppc64)
 endif
 PLATFORM_CFLAGS:=	$(CPU_FLAGS) $(PLATFORM_CFLAGS)
 
-ifdef HIGH_PERFORMANCE
-  PLATFORM_CFLAGS+=	-O3 \
-			-fno-trapping-math \
-			-fomit-frame-pointer
-else
-  PLATFORM_CFLAGS+=	-Os
-endif
+FAST_CFLAGS:=	-O3 -fno-trapping-math -fomit-frame-pointer
+PLATFORM_CFLAGS+=	$(FAST_CFLAGS)
 
 JAVA_LDFLAGS:=	-L$(JAVA_HOME)/lib
 JNILIB_PREFIX:=	lib

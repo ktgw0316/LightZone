@@ -1,6 +1,3 @@
-HIGH_PERFORMANCE:=	1
-USE_ICC_HERE:=		1
-
 TARGET_BASE:=		fbf
 
 FW_DIR:=		/System/Library/Frameworks

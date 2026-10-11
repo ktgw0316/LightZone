@@ -1,5 +1,3 @@
-HIGH_PERFORMANCE:=	1
-
 TARGET_BASE:=		LCJPEG
 
 # Uncomment to compile in debug mode.
