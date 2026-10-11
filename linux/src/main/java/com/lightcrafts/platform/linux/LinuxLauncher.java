@@ -13,8 +13,8 @@ public final class LinuxLauncher extends Launcher {
 
     @Override
     protected void checkCpu() {
-        if (! TestSSE2.hasSSE2()) {
-            TestSSE2.showDialog();
+        if (! TestSSE42.hasSSE42()) {
+            TestSSE42.showDialog();
             System.exit(0);
         }
     }

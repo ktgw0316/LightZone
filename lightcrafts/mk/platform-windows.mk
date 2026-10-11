@@ -28,7 +28,7 @@ else
 endif
 DLL_DIR:=		$(MINGW_DIR)bin/
 
-PLATFORM_CFLAGS:=	$(SSE_FLAGS) $(PLATFORM_CFLAGS)
+PLATFORM_CFLAGS:=	-march=x86-64-v2 $(PLATFORM_CFLAGS)
 
 FAST_CFLAGS:=	-O3 -fno-trapping-math -fomit-frame-pointer
 PLATFORM_CFLAGS+=	$(FAST_CFLAGS)

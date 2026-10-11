@@ -20,9 +20,9 @@ import java.awt.event.MouseEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class TestSSE2 {
+class TestSSE42 {
 
-    private static final Logger logger = LoggerFactory.getLogger(TestSSE2.class);
+    private static final Logger logger = LoggerFactory.getLogger(TestSSE42.class);
 
     private static String simdRegex;
     private static String modelRegex;
@@ -38,26 +38,26 @@ class TestSSE2 {
                 modelRegex = "^Model name: ";
                 cmd = new String[] {"lscpu"};
             } else {
-                simdRegex = "^flags\t\t:.*sse2";
+                simdRegex = "^flags\t\t:.*sse4_2";
                 modelRegex = "^model name\t: ";
                 cmd = new String[] {"cat", "/proc/cpuinfo"};
             }
         } else if (osname.contains("SunOS")) {
             cmd = new String[] {"sh", "-c", "isainfo -nv ; psrinfo -pv"};
-            simdRegex = "^\t.*sse2";
+            simdRegex = "^\t.*sse4_2";
             modelRegex = "^\t";
         } else if (osname.contains("FreeBSD")) {
             cmd = new String[] {"sysctl", "hw"};
-            simdRegex = "^hw.instruction_sse: 1";
+            simdRegex = "^hw.instruction_sse42: 1";
             modelRegex = "^hw.model: ";
         } else {
             cmd = new String[] {"dmesg"};
-            simdRegex = "^  Features=.*SSE2";
+            simdRegex = "^  Features=.*SSE4.2";
             modelRegex = "^CPU: ";
         }
     }
 
-    static boolean hasSSE2() {
+    static boolean hasSSE42() {
         return getCpuInfoLine(simdRegex) != null;
     }
 
@@ -87,47 +87,25 @@ class TestSSE2 {
     }
 
     static void showDialog() {
-        String messageA = LOCALE.get("CantRunSSE2Title");
-        String messageB = LOCALE.get("CantRunSSE2");
+        String messageA = LOCALE.get("CantRunSSE42Title");
+        String messageB = LOCALE.get("CantRunSSE42");
         String messageC = LOCALE.get("FoundProcCpuinfo", getCpuModel());
-        String messageD = LOCALE.get("LearnMoreSSE2");
-        String messageE = LOCALE.get("LearnMoreSSE2URL");
 
         JLabel title = new JLabel(messageA);
         title.setFont(title.getFont().deriveFont(22f));
         title.setAlignmentX(.5f);
 
-        StringBuilder buffer = new StringBuilder();
-        buffer.append(messageB);
-        buffer.append("\n\n");
-        buffer.append(messageC);
-        buffer.append("\n\n");
-        buffer.append(messageD);
-
-        final String url = messageE;
-        JLabel link = new JLabel(url);
-        link.setForeground(Color.blue);
-        link.setAlignmentX(.5f);
-        link.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        link.addMouseListener(
-            new MouseAdapter() {
-                public void mouseClicked(MouseEvent event) {
-                    WebBrowser.browse(url);
-                }
-            }
-        );
-        JTextArea text = TextAreaFactory.createTextArea(buffer.toString(), 40);
+        String message = messageB + "\n\n" + messageC;
+        JTextArea text = TextAreaFactory.createTextArea(message, 40);
         text.setBackground((new JPanel()).getBackground());
 
         Box box = Box.createVerticalBox();
         box.add(title);
         box.add(Box.createVerticalStrut(8));
         box.add(text);
-        box.add(Box.createVerticalStrut(8));
-        box.add(link);
 
         JOptionPane.showMessageDialog(
-            null, box, messageA, JOptionPane.ERROR_MESSAGE
+                null, box, messageA, JOptionPane.ERROR_MESSAGE
         );
     }
 }

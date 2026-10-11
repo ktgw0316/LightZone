@@ -51,38 +51,12 @@ RM:=			rm -fr
 
 ifeq ($(PLATFORM),MacOSX)
   include $(ROOT)/lightcrafts/mk/platform-macos.mk
+else ifeq ($(PLATFORM),Windows)
+  include $(ROOT)/lightcrafts/mk/platform-windows.mk
+else ifeq ($(PLATFORM),$(filter $(PLATFORM),Linux FreeBSD SunOS))
+  include $(ROOT)/lightcrafts/mk/platform-linux.mk
 else
-  ##
-  # JNI on non-Mac platforms doesn't do proper stack alignment when SSE
-  # instructions are being used.  Therefore, we turn it off unless it's needed
-  # for high performance code.
-  #
-  # To turn it on on a per-file basis, name the source file such that it has
-  # "_sse" just before the extension, e.g., "foo_sse.c".
-  #
-  # See Sun bug ID: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=5102720
-  ##
-  ifeq ($(PROCESSOR),x86_64)
-    P4_CPU_FLAGS:=	-mtune=generic -m64
-  else
-    P4_CPU_FLAGS:=	-march=pentium4 -m32
-  endif
-
-  SSE_FLAGS_OFF:=	$(P4_CPU_FLAGS) -mno-sse
-  SSE_FLAGS_ON:=	$(P4_CPU_FLAGS) -msse2 -mfpmath=sse
-  # SSE_FLAGS:=		$(SSE_FLAGS_OFF)
-  SSE_FLAGS:=		$(SSE_FLAGS_ON)
-
-  %_sse.o:
-    SSE_FLAGS:= $(SSE_FLAGS_ON)
-
-  ifeq ($(PLATFORM),Windows)
-    include $(ROOT)/lightcrafts/mk/platform-windows.mk
-  else ifeq ($(PLATFORM),$(filter $(PLATFORM),Linux FreeBSD SunOS))
-    include $(ROOT)/lightcrafts/mk/platform-linux.mk
-  else
-    $(error Unsupported platform: $(PLATFORM))
-  endif
+  $(error Unsupported platform: $(PLATFORM))
 endif
 
 MAKE+=			--no-print-directory #-j $(NUM_PROCESSORS)
