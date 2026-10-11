@@ -49,8 +49,8 @@ public final class WindowMenu extends UpdatableDisposableMenu {
                     ComboFrame frame = getComboFrame();
                     int state = frame.getExtendedState();
                     // If already maximized, then unmaximize:
-                    if ((state & Frame.MAXIMIZED_BOTH) != 0) {
-                        frame.setExtendedState(state - Frame.MAXIMIZED_BOTH);
+                    if ((state & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH) {
+                        frame.setExtendedState(Frame.NORMAL);
                     }
                     else {
                         frame.setExtendedState(Frame.MAXIMIZED_BOTH);
