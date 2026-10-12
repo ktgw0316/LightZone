@@ -10,10 +10,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * The WindowMenu maintains a list of open AppFrames.  It is therefore a
@@ -35,54 +34,42 @@ public final class WindowMenu extends UpdatableDisposableMenu {
         Menus.add(this);
 
         JMenuItem minItem = MenuFactory.createMenuItem("Minimize");
-        minItem.addActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    ComboFrame frame = getComboFrame();
-                    final int oldState = frame.getExtendedState();
-                    frame.setExtendedState(Frame.ICONIFIED);
-                    logFrameStateChange(frame, oldState);
-                }
-            }
-        );
+        minItem.addActionListener(e -> {
+            ComboFrame frame3 = getComboFrame();
+            final int oldState = frame3.getExtendedState();
+            frame3.setExtendedState(Frame.ICONIFIED);
+            logFrameStateChange(frame3, oldState);
+        });
         minItem.setEnabled(frame != null);
         put("minItem", minItem);
 
         JMenuItem maxItem = MenuFactory.createMenuItem("Maximize");
-        maxItem.addActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    ComboFrame frame = getComboFrame();
-                    final int oldState = frame.getExtendedState();
-                    // If already maximized, then unmaximize:
-                    if ((oldState & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH) {
-                        frame.setExtendedState(Frame.NORMAL);
-                    }
-                    else {
-                        frame.setExtendedState(Frame.MAXIMIZED_BOTH);
-                    }
-                    logFrameStateChange(frame, oldState);
-                }
+        maxItem.addActionListener(e -> {
+            ComboFrame frame2 = getComboFrame();
+            final int oldState = frame2.getExtendedState();
+            // If already maximized, then unmaximize:
+            if ((oldState & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH) {
+                frame2.setExtendedState(Frame.NORMAL);
             }
-        );
+            else {
+                frame2.setExtendedState(Frame.MAXIMIZED_BOTH);
+            }
+            logFrameStateChange(frame2, oldState);
+        });
         maxItem.setEnabled(frame != null);
         put("maxItem", maxItem);
 
         JMenuItem allItem = MenuFactory.createMenuItem("AllToFront");
-        allItem.addActionListener(
-            new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    for (WindowMenu windowMenu : Menus) {
-                        Frame window = windowMenu.getComboFrame();
-                        if (window != null) {
-                            final var oldState = window.getExtendedState();
-                            window.toFront();
-                            logFrameStateChange(window, oldState);
-                        }
-                    }
-                }
-            }
-        );
+        allItem.addActionListener(e -> {
+            Menus.stream()
+                    .map(UpdatableDisposableMenu::getComboFrame)
+                    .filter(Objects::nonNull)
+                    .forEach(window -> {
+                        final var oldState = window.getExtendedState();
+                        window.toFront();
+                        logFrameStateChange(window, oldState);
+                    });
+        });
         put("allItem", allItem);
 
         if ((System.getProperty("lightcrafts.debug") != null) ||
@@ -91,14 +78,10 @@ public final class WindowMenu extends UpdatableDisposableMenu {
             addSeparator();
 
             JMenuItem journalItem = new JMenuItem("Event Journal");
-            journalItem.addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        ComboFrame frame = getComboFrame();
-                        JournalDialog.showJournalDialog(frame);
-                    }
-                }
-            );
+            journalItem.addActionListener(e -> {
+                ComboFrame frame1 = getComboFrame();
+                JournalDialog.showJournalDialog(frame1);
+            });
             put("journalItem", journalItem);
         }
         update();
@@ -133,16 +116,12 @@ public final class WindowMenu extends UpdatableDisposableMenu {
             JMenuItem menuItem = new JMenuItem(title);
             final String frameKey = "frame" + index++;
             put(frameKey, frame);
-            menuItem.addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        Frame frame = (Frame) get(frameKey);
-                        final var oldState = frame.getExtendedState();
-                        frame.toFront();
-                        logFrameStateChange(frame, oldState);
-                    }
-                }
-            );
+            menuItem.addActionListener(e -> {
+                Frame frame1 = (Frame) get(frameKey);
+                final var oldState = frame1.getExtendedState();
+                frame1.toFront();
+                logFrameStateChange(frame1, oldState);
+            });
             add(menuItem);
         }
         if (current.isEmpty()) {
