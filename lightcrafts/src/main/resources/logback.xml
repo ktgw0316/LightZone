@@ -24,10 +24,11 @@
     </appender>
 
     <!-- Logger configuration -->
-    <logger name="com.lightcrafts" level="INFO"/>
+    <property name="LZ_LOG_LEVEL" value="${LZ_LOG_LEVEL:-INFO}"/>
+    <logger name="com.lightcrafts" level="${LZ_LOG_LEVEL}"/>
 
     <!-- Root logger -->
-    <root level="INFO">
+    <root level="${LZ_LOG_LEVEL}">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE"/>
     </root>
