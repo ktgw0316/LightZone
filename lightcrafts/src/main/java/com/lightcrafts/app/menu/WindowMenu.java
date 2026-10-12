@@ -5,6 +5,8 @@ package com.lightcrafts.app.menu;
 import com.lightcrafts.app.Application;
 import com.lightcrafts.app.ComboFrame;
 import com.lightcrafts.ui.toolkit.journal.JournalDialog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,6 +24,8 @@ import java.util.List;
  */
 public final class WindowMenu extends UpdatableDisposableMenu {
 
+    private static final Logger logger = LoggerFactory.getLogger(WindowMenu.class);
+
     // Keep a copy of all menus generated, so they can be updated:
     private static LinkedList<WindowMenu> Menus = new LinkedList<WindowMenu>();
 
@@ -35,7 +39,9 @@ public final class WindowMenu extends UpdatableDisposableMenu {
             new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     ComboFrame frame = getComboFrame();
+                    final int oldState = frame.getExtendedState();
                     frame.setExtendedState(Frame.ICONIFIED);
+                    logFrameStateChange(frame, oldState);
                 }
             }
         );
@@ -47,14 +53,15 @@ public final class WindowMenu extends UpdatableDisposableMenu {
             new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     ComboFrame frame = getComboFrame();
-                    int state = frame.getExtendedState();
+                    final int oldState = frame.getExtendedState();
                     // If already maximized, then unmaximize:
-                    if ((state & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH) {
+                    if ((oldState & Frame.MAXIMIZED_BOTH) == Frame.MAXIMIZED_BOTH) {
                         frame.setExtendedState(Frame.NORMAL);
                     }
                     else {
                         frame.setExtendedState(Frame.MAXIMIZED_BOTH);
                     }
+                    logFrameStateChange(frame, oldState);
                 }
             }
         );
@@ -66,9 +73,11 @@ public final class WindowMenu extends UpdatableDisposableMenu {
             new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     for (WindowMenu windowMenu : Menus) {
-                        Window window = windowMenu.getComboFrame();
+                        Frame window = windowMenu.getComboFrame();
                         if (window != null) {
+                            final var oldState = window.getExtendedState();
                             window.toFront();
+                            logFrameStateChange(window, oldState);
                         }
                     }
                 }
@@ -128,7 +137,9 @@ public final class WindowMenu extends UpdatableDisposableMenu {
                 new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         Frame frame = (Frame) get(frameKey);
+                        final var oldState = frame.getExtendedState();
                         frame.toFront();
+                        logFrameStateChange(frame, oldState);
                     }
                 }
             );
@@ -154,5 +165,12 @@ public final class WindowMenu extends UpdatableDisposableMenu {
     public static void destroyMenu(WindowMenu menu) {
         menu.dispose();
         Menus.remove(menu);
+    }
+
+    private static void logFrameStateChange(Frame frame, int oldState) {
+        final int newState = frame.getExtendedState();
+        if (oldState == newState) return;
+        logger.info( "Window state changed from {} ({}x{}) to {}",
+                oldState, frame.getWidth(), frame.getHeight(), newState );
     }
 }
