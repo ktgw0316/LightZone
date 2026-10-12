@@ -14,7 +14,9 @@ cd $1
 
 # Copy required dylibs
 FILES=$(find . -maxdepth 1 -name "*.jnilib" -o -name "dcraw_lz")
-sh ${SCRIPT_DIR}/copydylibs.sh ${FILES}
+for FILE in ${FILES}; do
+  sh ${SCRIPT_DIR}/copydylibs.sh ${FILE}
+done
 
 # Change the local library paths in each file
 EXCLUDE_PATTERN="(/usr/lib|/System|@loader_path|@rpath)"
