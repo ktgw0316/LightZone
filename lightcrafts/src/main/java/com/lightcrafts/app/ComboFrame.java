@@ -310,6 +310,7 @@ public class ComboFrame
         String disabledText = getDisabledEditorText();
         editor.setDisabledText(disabledText);
 
+        setMinimumSize(new Dimension(800, 400));
         updateTitle();
     }
 
