@@ -56,12 +56,7 @@ LINK:=
 COMMON_DIR:=		$(ROOT)/lightcrafts
 include			$(COMMON_DIR)/mk/platform.mk
 
-ifeq ($(UNIVERSAL),1)
-  CFLAGS_ARM:=		$(PLATFORM_CFLAGS_ARM) $(JNI_EXTRA_CFLAGS)
-  CFLAGS_X86:=		$(PLATFORM_CFLAGS_X86) $(JNI_EXTRA_CFLAGS)
-else
-  CFLAGS:=		$(PLATFORM_CFLAGS) $(JNI_EXTRA_CFLAGS)
-endif
+CFLAGS:=		$(PLATFORM_CFLAGS) $(JNI_EXTRA_CFLAGS)
 
 DEFINES:=		-DJNILIB $(JNI_EXTRA_DEFINES)
 INCLUDES:=		$(PLATFORM_INCLUDES) $(JAVA_INCLUDES) \
@@ -92,24 +87,13 @@ ifeq ($(PLATFORM),MacOSX)
       JNILIB_EXT:=	.a
     endif
   endif
-  ifeq ($(UNIVERSAL),1)
-    CFLAGS_ARM+=	$(JNI_MACOSX_CFLAGS) $(JNI_ARM_CFLAGS)
-    CFLAGS_X86+=	$(JNI_MACOSX_CFLAGS) $(JNI_X86_CFLAGS)
-  else
-    CFLAGS+=		$(JNI_MACOSX_CFLAGS)
-    ifeq ($(PROCESSOR),arm64)
-      CFLAGS+=		$(JNI_ARM_CFLAGS)
-      DEFINES+=		$(JNI_ARM_DEFINES)
-      LDFLAGS+=		$(JNI_ARM_LDFLAGS)
-      LINK+=		$(JNI_ARM_LINK)
-    endif
-    ifeq ($(PROCESSOR),x86_64)
-      CFLAGS+=		$(JNI_X86_CFLAGS)
-      DEFINES+=		$(JNI_X86_DEFINES)
-      LDFLAGS+=		$(JNI_X86_LDFLAGS)
-      LINK+=		$(JNI_X86_LINK)
-    endif
-  endif
+  CFLAGS+=		$(JNI_MACOSX_CFLAGS)
+
+  CFLAGS+=		$(JNI_ARM_CFLAGS)
+  DEFINES+=		$(JNI_ARM_DEFINES)
+  LDFLAGS+=		$(JNI_ARM_LDFLAGS)
+  LINK+=		$(JNI_ARM_LINK)
+
   JNI_EXTRA_CLEAN+=	$(JNI_MACOSX_CLEAN)
   JNI_EXTRA_DISTCLEAN+=	$(JNI_MACOSX_DISTCLEAN)
 endif
@@ -119,12 +103,6 @@ ifeq ($(PLATFORM),Windows)
   DEFINES+=		$(JNI_WINDOWS_DEFINES)
   INCLUDES+=		$(JNI_WINDOWS_INCLUDES)
   LDFLAGS+=		-shared -Wl,--add-stdcall-alias $(JNI_WINDOWS_LDFLAGS)
-  ifdef JNI_WINDOWS_IMPLIB
-    TARGET_IMPLIB:=	$(TARGET_DIR)/$(TARGET_BASE)-implib.a
-    ifeq ($(USE_ICC),1)
-      LDFLAGS+=		-Wl,--out-implib=$(TARGET_IMPLIB)
-    endif
-  endif
   LINK+=		$(JNI_WINDOWS_LINK)
   JNI_EXTRA_CLEAN+=	$(JNI_WINDOWS_CLEAN)
   JNI_EXTRA_DISTCLEAN+=	$(JNI_WINDOWS_DISTCLEAN)
@@ -146,14 +124,7 @@ ifdef DEBUG
 DEFINES+=	-DDEBUG
 endif
 
-ifeq ($(UNIVERSAL),1)
-  CFLAGS_ARM+=		$(DEFINES) $(JNI_ARM_DEFINES)
-  CFLAGS_X86+=		$(DEFINES) $(JNI_X86_DEFINES)
-  INCLUDES_ARM:=	$(INCLUDES) $(JNI_ARM_INCLUDES)
-  INCLUDES_X86:=	$(INCLUDES) $(JNI_X86_INCLUDES)
-else
-  CFLAGS+=		$(DEFINES)
-endif
+CFLAGS+=		$(DEFINES)
 
 include			$(COMMON_DIR)/mk/sources.mk
 
@@ -169,13 +140,6 @@ TARGET:=	$(JNILIB_PREFIX)$(TARGET_BASE)$(JNILIB_EXT)
 else
 TARGET:=	$(TARGET_DIR)/$(JNILIB_PREFIX)$(TARGET_BASE)$(JNILIB_EXT)
 endif
-
-##
-# These are always defined even when UNIVERSAL is not set so a "make disclean"
-# will remove them.
-##
-TARGET_ARM:=	$(JNILIB_PREFIX)$(TARGET_BASE)-arm64$(JNILIB_EXT)
-TARGET_X86:=	$(JNILIB_PREFIX)$(TARGET_BASE)-x86$(JNILIB_EXT)
 
 ##
 # Build rules
@@ -211,37 +175,6 @@ ifdef JNI_MACOSX_SHAREDLIB
 endif
 endif
 
-ifeq ($(UNIVERSAL),1)
-
-$(TARGET): $(TARGET_ARM) $(TARGET_X86)
-	-$(MKDIR) $(TARGET_DIR)
-	$(LIPO) -create $(TARGET_ARM) $(TARGET_X86) -output $@
-ifeq ($(PLATFORM),MacOSX)
-	cp -p $@ $(TARGET_DIR)
-endif
-
-ifndef JNI_MANUAL_TARGET
-ifdef USE_AR_RANLIB
-$(TARGET_ARM): $(OBJECTS_ARM) $(BUILT_LIBS)
-	ar -rc $@ *-arm64.o
-	-ranlib $@
-else
-$(TARGET_ARM): $(OBJECTS_ARM) $(LOCAL_RANLIBS) $(BUILT_LIBS)
-	$(CC_LINK) $(CFLAGS_ARM) $(LDFLAGS) -o $@ *-arm64.o $(LINK)
-endif
-
-ifdef USE_AR_RANLIB
-$(TARGET_X86): $(OBJECTS_X86) $(BUILT_LIBS)
-	ar -rc $@ *-x86.o
-	-ranlib $@
-else
-$(TARGET_X86): $(OBJECTS_X86) $(LOCAL_RANLIBS) $(BUILT_LIBS)
-	$(CC_LINK) $(CFLAGS_X86) $(LDFLAGS) -o $@ *-x86.o $(LINK)
-endif
-endif	# JNI_MANUAL_TARGET
-
-else	# UNIVERSAL
-
 ifndef JNI_MANUAL_TARGET
 ifdef USE_AR_RANLIB
 $(TARGET): $(OBJECTS) $(RC_OBJECTS) $(BUILT_LIBS)
@@ -258,8 +191,6 @@ endif
 endif
 endif	# JNI_MANUAL_TARGET
 
-endif	# UNIVERSAL
-
 %-ranlib.a : %.a
 	cp $< $@
 	-ranlib $@
@@ -274,6 +205,6 @@ clean:
 	$(RM) *.o .*.d javah java_jni *-ranlib.a *.dSYM *.res $(TARGET).dSYM $(JNI_EXTRA_CLEAN)
 
 distclean mostlyclean: clean
-	$(RM) $(TARGET) $(TARGET_IMPLIB) $(TARGET_ARM) $(TARGET_X86) $(POST_TARGET) $(JNI_EXTRA_DISTCLEAN)
+	$(RM) $(TARGET) $(POST_TARGET) $(JNI_EXTRA_DISTCLEAN)
 
 # vim:set noet sw=8 ts=8:

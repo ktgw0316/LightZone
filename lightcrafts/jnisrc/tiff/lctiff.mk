@@ -1,8 +1,3 @@
-HIGH_PERFORMANCE:=	1
-ifeq ($(PLATFORM),MacOSX)
-  USE_ICC_HERE:=	1
-endif
-
 TARGET_BASE:=		LCTIFF
 
 # Uncomment to compile in debug mode.

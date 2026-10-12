@@ -7,7 +7,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-latest, macos-14, ubuntu-latest]
+        os: [windows-latest, macos-latest, macos-15, ubuntu-latest]
         java: ['21']
     runs-on: ${{ matrix.os }}
     steps:
@@ -48,7 +48,7 @@ jobs:
       run: |
         export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
         brew install lensfun libomp libraw
-        if [ "${{ matrix.os }}" == "macos-14" ]; then
+        if [ "${{ matrix.os }}" == "macos-15" ]; then
           export LIBOMP_PATH=/opt/homebrew/opt/libomp
           TARGET_ARCH=arm64 ./gradlew jpackage
         else

@@ -51,12 +51,7 @@ LINK:=
 COMMON_DIR:=		$(ROOT)/lightcrafts
 include			$(COMMON_DIR)/mk/platform.mk
 
-ifeq ($(UNIVERSAL),1)
-  CFLAGS_ARM:=		$(PLATFORM_CFLAGS_ARM) $(EXEC_EXTRA_CFLAGS)
-  CFLAGS_X86:=		$(PLATFORM_CFLAGS_X86) $(EXEC_EXTRA_CFLAGS)
-else
-  CFLAGS:=		$(PLATFORM_CFLAGS) $(EXEC_EXTRA_CFLAGS)
-endif
+CFLAGS:=		$(PLATFORM_CFLAGS) $(EXEC_EXTRA_CFLAGS)
 
 DEFINES:=		$(EXEC_EXTRA_DEFINES)
 INCLUDES:=		$(PLATFORM_INCLUDES) $(EXEC_EXTRA_INCLUDES)
@@ -69,22 +64,12 @@ ifeq ($(PLATFORM),MacOSX)
   INCLUDES:=		$(MACOSX_ISYSROOT) $(INCLUDES) $(EXEC_MACOSX_INCLUDES)
   LDFLAGS+=		$(EXEC_MACOSX_LDFLAGS)
   LINK+=		$(EXEC_MACOSX_LINK)
-  ifeq ($(UNIVERSAL),1)
-    CFLAGS_ARM+=	$(EXEC_MACOSX_CFLAGS) $(EXEC_ARM_CFLAGS)
-    CFLAGS_X86+=	$(EXEC_MACOSX_CFLAGS) $(EXEC_X86_CFLAGS)
-  else
-    CFLAGS+=		$(EXEC_MACOSX_CFLAGS)
-    ifeq ($(PROCESSOR),arm64)
-      CFLAGS+=		$(EXEC_ARM_CFLAGS)
-      DEFINES+=		$(EXEC_ARM_DEFINES)
-      LDFLAGS+=		$(EXEC_ARM_LDFLAGS)
-    endif
-    ifeq ($(PROCESSOR),x86_64)
-      CFLAGS+=		$(EXEC_X86_CFLAGS)
-      DEFINES+=		$(EXEC_X86_DEFINES)
-      LDFLAGS+=		$(EXEC_X86_LDFLAGS)
-    endif
-  endif
+
+  CFLAGS+=		$(EXEC_MACOSX_CFLAGS)
+
+  CFLAGS+=		$(EXEC_ARM_CFLAGS)
+  DEFINES+=		$(EXEC_ARM_DEFINES)
+  LDFLAGS+=		$(EXEC_ARM_LDFLAGS)
 endif
 
 ifeq ($(PLATFORM),Windows)
@@ -111,14 +96,7 @@ ifdef DEBUG
 DEFINES+=	-DDEBUG
 endif
 
-ifeq ($(UNIVERSAL),1)
-  CFLAGS_ARM+=		$(DEFINES) $(EXEC_ARM_DEFINES)
-  CFLAGS_X86+=		$(DEFINES) $(EXEC_X86_DEFINES)
-  INCLUDES_ARM:=	$(INCLUDES) $(EXEC_ARM_INCLUDES)
-  INCLUDES_X86:=	$(INCLUDES) $(EXEC_X86_INCLUDES)
-else
-  CFLAGS+=		$(DEFINES)
-endif
+CFLAGS+=		$(DEFINES)
 
 include			$(COMMON_DIR)/mk/sources.mk
 
@@ -130,13 +108,6 @@ BUILT_LIBS:=	$(wildcard */lib/*.a)
 TARGET:=	$(TARGET_DIR)/$(TARGET_BASE)$(EXEC_EXT)
 
 ##
-# These are always defined even when UNIVERSAL is not set so a "make disclean"
-# will remove them.
-##
-TARGET_ARM:=	$(TARGET_BASE)-arm$(EXEC_EXT)
-TARGET_X86:=	$(TARGET_BASE)-x86$(EXEC_EXT)
-
-##
 # Build rules
 ##
 
@@ -145,27 +116,9 @@ TARGET_X86:=	$(TARGET_BASE)-x86$(EXEC_EXT)
 all: $(TARGET) $(POST_TARGET)
 include		$(COMMON_DIR)/mk/auto_dep.mk
 
-ifeq ($(UNIVERSAL),1)
-
-$(TARGET): $(TARGET_ARM) $(TARGET_X86)
-	-$(MKDIR) $(TARGET_DIR)
-	$(LIPO) -create $(TARGET_ARM) $(TARGET_X86) -output $@
-
-ifndef JNI_MANUAL_TARGET
-$(TARGET_ARM): $(OBJECTS_ARM) $(LOCAL_RANLIBS) $(BUILT_LIBS)
-	$(CC_LINK) $(CFLAGS_ARM) $(LDFLAGS) -o $@ *-arm.o $(LINK)
-
-$(TARGET_X86): $(OBJECTS_X86) $(LOCAL_RANLIBS) $(BUILT_LIBS)
-	$(CC_LINK) $(CFLAGS_X86) $(LDFLAGS) -o $@ *-x86.o $(LINK)
-endif
-
-else	# UNIVERSAL
-
 $(TARGET): $(OBJECTS) $(LOCAL_RANLIBS) $(BUILT_LIBS)
 	-$(MKDIR) $(TARGET_DIR)
 	$(CC_LINK) $(CFLAGS) $(LDFLAGS) -o $@ *.o $(LINK)
-
-endif	# UNIVERSAL
 
 ##
 # Utility rules
@@ -177,6 +130,6 @@ clean:
 	$(RM) *.o .*.d
 
 distclean mostlyclean: clean
-	$(RM) $(TARGET) $(TARGET_ARM) $(TARGET_X86) $(POST_TARGET)
+	$(RM) $(TARGET) $(POST_TARGET)
 
 # vim:set noet sw=8 ts=8:

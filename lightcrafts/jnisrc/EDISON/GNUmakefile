@@ -1,6 +1,3 @@
-HIGH_PERFORMANCE:=	1
-USE_ICC_HERE:=		1
-
 TARGET_BASE:=		Segment
 
 # Uncomment to compile in debug mode.
@@ -23,22 +20,12 @@ SEGM_SOURCE:=		segm/ms.cpp segm/msImageProcessor.cpp segm/RAList.cpp segm/rlist.
 SEGM_INCLUDES:=		segm/tdef.h segm/RAList.h segm/ms.h segm/msImageProcessor.h segm/rlist.h
 SEGM_LDFLAGS:=		$(PLATFORM_LDFLAGS)
 
-ifeq ($(UNIVERSAL),1)
-$(TARGET_ARM) $(TARGET_X86): $(SEGM_SOURCE) $(SEGM_INCLUDES)
-	-$(MKDIR) $(TARGET_DIR)
-	$(CC_LINK) $(CFLAGS) $(INCLUDES) $(SEGM_LDFLAGS) -o $@ $(SEGM_SOURCE)
-ifeq ($(PLATFORM),MacOSX)
-	  cp -p $@ $(TARGET_DIR)
-endif
-	$(RM) $@.dSYM
-else
 $(TARGET): $(SEGM_SOURCE) $(SEGM_INCLUDES)
 	-$(MKDIR) $(TARGET_DIR)
 	$(CC_LINK) $(CFLAGS) $(INCLUDES) $(SEGM_LDFLAGS) -o $@ $(SEGM_SOURCE)
 ifeq ($(PLATFORM),MacOSX)
-	  cp -p $@ $(TARGET_DIR)
+	cp -p $@ $(TARGET_DIR)
 endif
 	$(RM) $@.dSYM
-endif
 
 # vim:set noet sw=8 ts=8:
