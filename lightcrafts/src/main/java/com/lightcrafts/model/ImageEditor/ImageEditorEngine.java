@@ -840,11 +840,6 @@ public class ImageEditorEngine implements Engine {
             fileOptions.resizeHeight.setValue(exportImage.getHeight());
         }
 
-        if (exportImage instanceof RenderedOp) {
-            final var rop = (RenderedOp) exportImage;
-            rop.setProperty(JAIContext.PERSISTENT_CACHE_TAG, Boolean.TRUE);
-        }
-
         // LZN editor state data
         final var lzn = exportOptions.getAuxData();
         final var imageInfo = (m_exportInfo != null) ? m_exportInfo : m_imageInfo;
