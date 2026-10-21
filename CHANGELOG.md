@@ -1,5 +1,20 @@
 # Changelog
 
+## [5.1.0](https://github.com/ktgw0316/LightZone/compare/v5.0.2...v5.1.0) (2026-10-21)
+
+
+### Features
+
+* Set minimum size 800x400 for ComboFrame ([0324dd8](https://github.com/ktgw0316/LightZone/commit/0324dd8f3008717678c2e028ec0bdecaaa1b29a9))
+* Switch log level with LZ_LOG_LEVEL environment variable ([ec7b432](https://github.com/ktgw0316/LightZone/commit/ec7b4326772267ff86235de0a1b181820e7dbb27))
+
+
+### Bug Fixes
+
+* Avoid persistent tile caching for one-shot exports ([da7b46b](https://github.com/ktgw0316/LightZone/commit/da7b46b9ee7521b5c33a5d635b1eb8052583a37f))
+* Frame state shouldn't be negative ([3c1740f](https://github.com/ktgw0316/LightZone/commit/3c1740f67d5398c42beb7545ddf54e56f4e5f483))
+* **mac:** Copy dependency dylibs that under [@rpath](https://github.com/rpath) ([506bf0f](https://github.com/ktgw0316/LightZone/commit/506bf0f3c1766c2e3aaafc530ca0b1089c1c5ecd))
+
 ## [5.0.2](https://github.com/ktgw0316/LightZone/compare/v5.0.1...v5.0.2) (2026-08-06)
 
 
