@@ -54,7 +54,7 @@ jobs:
           sed -i -E 's/^(VERSION=\$\{VERSION:-).*(\})$/\1'"${NEW_VERSION}"'\2/' linux/lightzone.SlackBuild
           sed -i -E "s/^(Version:[[:space:]]*).*/\1${NEW_VERSION}/" linux/lightzone.spec
           sed -i -E "s/^(echo Starting LightZone version ).*( \.\.\.)$/\1${NEW_VERSION}\2/" linux/products/lightzone
-          sed -i -E '/<key>CFBundleVersion<\/key>/{n;s/^([[:space:]]*<string>).*(<\/string>)$/\1'"${NEW_VERSION}"'\2/;}' macosx/src/main/resources/Info.plist
+          sed -i -E "/<key>CFBundleVersion<\\/key>/{n;s/^([[:space:]]*<string>).*(<\\/string>)$/\\1${NEW_VERSION}\\2/;}" macosx/src/main/resources/Info.plist
 
           RELEASE_DATE=$(date +"%Y-%m-%d")
 
