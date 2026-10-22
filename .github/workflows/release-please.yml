@@ -3,6 +3,10 @@ name: release-please
 on:
   push:
     branches: [release]
+  workflow_dispatch:
+  pull_request:
+    branches: [master]
+    types: [closed]
 
 permissions:
   contents: write
@@ -10,6 +14,14 @@ permissions:
 
 jobs:
   release-please:
+    if: >
+      github.event_name == 'push' ||
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event_name == 'pull_request' &&
+        github.event.pull_request.merged == true &&
+        github.event.pull_request.user.login == 'github-actions[bot]'
+      )
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -17,8 +29,10 @@ jobs:
       - uses: googleapis/release-please-action@v4
         id: release
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
+          target-branch: master
 
       - name: Sync version numbers to release PR
         if: steps.release.outputs.pr != ''
