@@ -5,12 +5,7 @@ TARGET_BASE:=		LCJPEG
 
 JNI_EXTRA_CFLAGS:=	-fexceptions -std=c++0x
 JNI_EXTRA_PKGCFG:=	libjpeg
-JNI_WINDOWS_LINK:=	-lLCJNI
-JNI_LINUX_LINK:=	-lLCJNI -Wl,-rpath,'$$ORIGIN'
-JNI_MACOSX_LINK:=	../jniutils/libLCJNI.a
-
-JAVAH_CLASSES:=		com.lightcrafts.image.libs.LCJPEGReader \
-			com.lightcrafts.image.libs.LCJPEGWriter
+JNI_LINUX_LINK:=	-Wl,-rpath,'$$ORIGIN'
 
 ROOT:=		../../..
 include			../jni.mk
