@@ -1,6 +1,6 @@
 name: CI
 
-on: [push, pull_request]
+on: [push, pull_request, workflow_dispatch]
 
 jobs:
   build:
@@ -54,6 +54,18 @@ jobs:
         else
           ./gradlew jpackage
         fi
+    - name: Give macOS package a unique asset name
+      if: startsWith(matrix.os, 'macos')
+      env:
+        OS_LABEL: ${{ matrix.os }}
+      run: |
+        shopt -s nullglob
+        packages=(macosx/build/jpackage/LightZone-*.dmg)
+        if (( ${#packages[@]} != 1 )); then
+          printf 'Expected one macOS package, found %s\n' "${#packages[@]}" >&2
+          exit 1
+        fi
+        mv "${packages[0]}" "macosx/build/jpackage/LightZone-${OS_LABEL}-${RUNNER_ARCH}.dmg"
     - name: Build on Ubuntu
       if: startsWith(matrix.os, 'ubuntu')
       run: |
@@ -130,10 +142,14 @@ jobs:
         if [[ "${GITHUB_REF_NAME}" == *-* ]]; then
           PRERELEASE_FLAG="--prerelease"
         fi
-        gh release create "${GITHUB_REF_NAME}" \
+        if ! gh release view "${GITHUB_REF_NAME}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+          gh release create "${GITHUB_REF_NAME}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --title "${GITHUB_REF_NAME}" \
+            --generate-notes \
+            ${PRERELEASE_FLAG}
+        fi
+        gh release upload "${GITHUB_REF_NAME}" \
           --repo "${GITHUB_REPOSITORY}" \
-          --title "${GITHUB_REF_NAME}" \
-          --generate-notes \
-          ${PRERELEASE_FLAG} \
+          --clobber \
           artifacts/*
-

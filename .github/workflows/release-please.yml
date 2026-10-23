@@ -9,6 +9,7 @@ on:
     types: [closed]
 
 permissions:
+  actions: write
   contents: write
   pull-requests: write
 
@@ -33,6 +34,13 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
           target-branch: master
+
+      - name: Dispatch release build
+        if: steps.release.outputs.release_created == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ steps.release.outputs.tag_name }}
+        run: gh workflow run ci.yml --ref "$RELEASE_TAG"
 
       - name: Sync version numbers to release PR
         if: steps.release.outputs.pr != ''
