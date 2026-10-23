@@ -16,7 +16,7 @@ Building the LightZone source requires (at least) following packages:
 - __libtiff__
 - __libxml2-utils__ for xmllint
 - __make__
-- __openjdk-17-jdk__ or later
+- JDK 25 or later
 - __pkg-config__
 
 ### Debian (>= 11) and Ubuntu (>= 20.04)
@@ -42,13 +42,13 @@ export JAVA_HOME=/usr/lib/jvm/default-java
 Install required packages:
 
 ```shell
-sudo dnf install java-21-openjdk-devel java-21-openjdk-jmods git gcc-c++ lcms2-devel lensfun-devel LibRaw-devel libjpeg-turbo-devel libtiff-devel libX11-devel libxml2-devel make pkgconfig rpm-build
+sudo dnf install java-25-openjdk-devel java-25-openjdk-jmods git gcc-c++ lcms2-devel lensfun-devel LibRaw-devel libjpeg-turbo-devel libtiff-devel libX11-devel libxml2-devel make pkgconfig rpm-build
 ```
 
 Set your `JAVA_HOME` variable to point to installed JDK, e.g.
 
 ```shell
-export JAVA_HOME=/usr/lib/jvm/java-21-openjdk
+export JAVA_HOME=/usr/lib/jvm/java-25-openjdk
 ```
 
 ### OpenSUSE (>= 15.2)
@@ -57,7 +57,7 @@ Install required packages:
 
 ```shell
 sudo zypper install gcc gcc-c++ make
-git liblcms2-devel lensfun-devel libjpeg8-devel libraw-devel libtiff-devel libxml2-utils libX11-devel java-21-openjdk-devel pkg-config
+git liblcms2-devel lensfun-devel libjpeg8-devel libraw-devel libtiff-devel libxml2-utils libX11-devel java-25-openjdk-devel pkg-config
 ```
 
 Set your `JAVA_HOME` variable to point to installed JDK, e.g.
@@ -194,7 +194,7 @@ There is a SlackBuild script to build a Slackware package.
 You can use it like following:
 
 ```shell
-sbopkg -i zulu-openjdk21
+sbopkg -i zulu-openjdk25
 su -c linux/lightzone.SlackBuild
 su -c "installpkg /tmp/lightzone-4.2.4-1_SBo.tgz"
 ```
