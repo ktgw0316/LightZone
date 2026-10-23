@@ -8,7 +8,7 @@ pluginManagement {
 }
 
 plugins {
-    kotlin("jvm") version "2.3.21" apply false
+    kotlin("jvm") version "2.4.10" apply false
     id("org.beryx.runtime") version "2.0.1" apply false
 }
 
