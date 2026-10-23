@@ -3,8 +3,7 @@
 #ifndef LC_dest_mgr_H
 #define LC_dest_mgr_H
 
-// standard
-#include <jni.h>
+#include <vector>
 
 extern "C" {
 #   include <jpeglib.h>
@@ -15,22 +14,15 @@ extern "C" {
  * data to the Java side.
  */
 struct LC_dest_mgr : jpeg_destination_mgr {
-    jclass      m_jImageDataReceiverClass;
-    jobject     m_jImageDataReceiver;
-    jmethodID   m_putImageData_methodID;
-    jobject     m_jByteBuffer;
-    JOCTET*     m_buffer;
-    jint        m_bufSize;
+    using WriteCallback = int (*)(unsigned char*, int);
 
-    LC_dest_mgr( JNIEnv*, jobject jImageDataReceiver, jint bufSize );
-    ~LC_dest_mgr();
+    WriteCallback m_write;
+    std::vector<JOCTET> m_buffer;
 
-    void reset() {
-        next_output_byte = m_buffer;
-        free_in_buffer = m_bufSize;
-    }
+    LC_dest_mgr(WriteCallback, int bufSize);
 
-    jint write( JNIEnv*, j_compress_ptr, jint );
+    void reset();
+    void write(int byteCount);
 };
 
 #endif  /* LC_dest_mgr_H */

@@ -1,47 +1,41 @@
-/* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2026 LightZone Project */
 
-#ifndef LC_JPEGWriter_H
-#define LC_JPEGWriter_H
+#ifndef LC_JPEGWRITER_H
+#define LC_JPEGWRITER_H
 
-// standard
-#include <cstdio>                       /* for FILE */
-#include <jni.h>
+#ifdef _WIN32
+#define LCJPEG_WRITER_EXPORT __declspec(dllexport)
+#else
+#define LCJPEG_WRITER_EXPORT
+#endif
+
+typedef int (*LCJPEGWriterWriteCallback)(unsigned char*, int);
 
 extern "C" {
-#   include <jpeglib.h>
+LCJPEG_WRITER_EXPORT void* lcjpeg_writer_create(
+    LCJPEGWriterWriteCallback write,
+    int bufferSize,
+    int width,
+    int height,
+    int components,
+    int colorSpace,
+    int quality);
+LCJPEG_WRITER_EXPORT int lcjpeg_writer_destroy(void* handle);
+LCJPEG_WRITER_EXPORT int lcjpeg_writer_write_segment(
+    void* handle,
+    int marker,
+    const unsigned char* buffer,
+    int length);
+LCJPEG_WRITER_EXPORT int lcjpeg_writer_write_scanlines(
+    void* handle,
+    const unsigned char* buffer,
+    int bufferSize,
+    int offset,
+    int numLines,
+    int lineStride);
+LCJPEG_WRITER_EXPORT int lcjpeg_writer_last_error(unsigned char* buffer, int capacity);
 }
 
-// local
-#include "LC_dest_mgr.h"
+#undef LCJPEG_WRITER_EXPORT
 
-/**
- * An LC_JPEGWriter contains data that needs to be maintained between native
- * function invocations for writing JPEG images.  Its destructor also ensures
- * proper clean-up.
- */
-struct LC_JPEGWriter {
-    //
-    // We write image data either to a FILE *or* to an LC_dest_mgr.
-    //
-    FILE*                   m_file;
-    LC_dest_mgr*            m_dest;
-
-    jpeg_compress_struct    cinfo;
-    jpeg_error_mgr          m_errMgr;
-
-    LC_JPEGWriter();
-    ~LC_JPEGWriter();
-
-    void start_compress( int, int, int, int, int );
-
-private:
-    /**
-     * This flag is used to know if the destructor should call
-     * jpeg_finish_compress() based on whether jpeg_start_compress() has been
-     * successfully called.
-     */
-    bool m_startedCompress;
-};
-
-#endif  /* LC_JPEGWriter_H */
-/* vim:set et sw=4 ts=4: */
+#endif

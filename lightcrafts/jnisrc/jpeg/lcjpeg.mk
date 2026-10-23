@@ -9,9 +9,6 @@ JNI_WINDOWS_LINK:=	-lLCJNI
 JNI_LINUX_LINK:=	-lLCJNI -Wl,-rpath,'$$ORIGIN'
 JNI_MACOSX_LINK:=	../jniutils/libLCJNI.a
 
-JAVAH_CLASSES:=		com.lightcrafts.image.libs.LCJPEGReader \
-			com.lightcrafts.image.libs.LCJPEGWriter
-
 ROOT:=		../../..
 include			../jni.mk
 

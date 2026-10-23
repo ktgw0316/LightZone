@@ -21,8 +21,20 @@ import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;
 import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.foreign.Arena;
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.Linker;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.SymbolLookup;
+import java.lang.foreign.ValueLayout;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+import java.nio.ByteBuffer;
 import org.eclipse.imagen.ImageLayout;
 import org.eclipse.imagen.PlanarImage;
 
@@ -45,15 +57,70 @@ import static com.lightcrafts.jai.JAIContext.sRGBColorSpace;
 public final class LCJPEGReader implements AutoCloseable, LCImageReader {
 
     private static final Logger logger = LoggerFactory.getLogger(LCJPEGReader.class);
+    private static final Linker linker;
+    private static final FunctionDescriptor readCallbackDescriptor =
+            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT);
+    private static final MethodHandle createReader;
+    private static final MethodHandle destroyReader;
+    private static final MethodHandle getReaderWidth;
+    private static final MethodHandle getReaderHeight;
+    private static final MethodHandle getReaderComponents;
+    private static final MethodHandle getReaderColorSpace;
+    private static final MethodHandle readReaderScanLines;
+    private static final MethodHandle getReaderError;
+
+    static {
+        System.loadLibrary("LCJPEG");
+        linker = Linker.nativeLinker();
+        var symbols = SymbolLookup.loaderLookup();
+        try {
+            createReader =
+                    linker.downcallHandle(
+                            symbols.find("lcjpeg_reader_create").orElseThrow(),
+                            FunctionDescriptor.of(
+                                    ValueLayout.ADDRESS,
+                                    ValueLayout.ADDRESS,
+                                    ValueLayout.JAVA_INT,
+                                    ValueLayout.JAVA_INT,
+                                    ValueLayout.JAVA_INT));
+            destroyReader =
+                    linker.downcallHandle(
+                            symbols.find("lcjpeg_reader_destroy").orElseThrow(),
+                            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            getReaderWidth = readerIntFunction(symbols, "lcjpeg_reader_width");
+            getReaderHeight = readerIntFunction(symbols, "lcjpeg_reader_height");
+            getReaderComponents = readerIntFunction(symbols, "lcjpeg_reader_components");
+            getReaderColorSpace = readerIntFunction(symbols, "lcjpeg_reader_color_space");
+            readReaderScanLines =
+                    linker.downcallHandle(
+                            symbols.find("lcjpeg_reader_read_scanlines").orElseThrow(),
+                            FunctionDescriptor.of(
+                                    ValueLayout.JAVA_INT,
+                                    ValueLayout.ADDRESS,
+                                    ValueLayout.ADDRESS,
+                                    ValueLayout.JAVA_INT));
+            getReaderError =
+                    linker.downcallHandle(
+                            symbols.find("lcjpeg_reader_last_error").orElseThrow(),
+                            FunctionDescriptor.of(
+                                    ValueLayout.JAVA_INT,
+                                    ValueLayout.ADDRESS,
+                                    ValueLayout.JAVA_INT));
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            throw new ExceptionInInitializerError(e);
+        }
+    }
+
+    private static MethodHandle readerIntFunction(SymbolLookup symbols, String name) {
+        return linker.downcallHandle(
+                symbols.find(name).orElseThrow(),
+                FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+    }
 
     /**
      * The default buffer size for use with {@link #LCJPEGReader(LCImageDataProvider).
      */
     private static final int DEFAULT_BUF_SIZE = 32 * 1024;
-
-    static {
-        System.loadLibrary("LCJPEG");
-    }
 
     /**
      * The number of colors per pixel. This is set from native code.
@@ -88,10 +155,12 @@ public final class LCJPEGReader implements AutoCloseable, LCImageReader {
     private PlanarImage m_image;
     /**
      * This is where the native code stores a pointer to the <code>JPEG</code> native data
-     * structure. Do not touch this from Java except to compare it to zero.
+     * structure. Do not access it outside the FFM calls below.
      */
-    @SuppressWarnings({"UNUSED_SYMBOL"})
-    private long m_nativePtr;
+    private MemorySegment m_nativePtr = MemorySegment.NULL;
+    private Arena m_nativeArena;
+    private ProviderCallback m_providerCallback;
+    private InputStreamImageDataProvider m_ownedProvider;
     /**
      * The image width. This is set from native code.
      */
@@ -184,7 +253,43 @@ public final class LCJPEGReader implements AutoCloseable, LCImageReader {
     /**
      * Dispose of an <code>LCJPEGReader</code>.
      */
-    public native void dispose() throws LCImageLibException;
+    public synchronized void dispose() throws LCImageLibException {
+        final MemorySegment nativePtr = m_nativePtr;
+        m_nativePtr = MemorySegment.NULL;
+        try {
+            if (!nativePtr.equals(MemorySegment.NULL)) {
+                final int status = (int) destroyReader.invokeExact(nativePtr);
+                if (status < 0) {
+                    checkProviderFailure();
+                    throw new LCImageLibException(lastNativeError());
+                }
+            }
+            if (m_providerCallback != null) {
+                checkProviderFailure();
+            }
+        } catch (LCImageLibException e) {
+            throw e;
+        } catch (RuntimeException | Error e) {
+            throw e;
+        } catch (IOException e) {
+            throw LCJPEGReader.<RuntimeException>throwUnchecked(e);
+        } catch (Throwable e) {
+            throw new LCImageLibException(e);
+        } finally {
+            try {
+                if (m_nativeArena != null) {
+                    m_nativeArena.close();
+                    m_nativeArena = null;
+                    m_providerCallback = null;
+                }
+            } finally {
+                if (m_ownedProvider != null) {
+                    m_ownedProvider.close();
+                    m_ownedProvider = null;
+                }
+            }
+        }
+    }
 
     /**
      * Gets the number of color components per pixel.
@@ -287,8 +392,53 @@ public final class LCJPEGReader implements AutoCloseable, LCImageReader {
      * @param numLines The number of scanlines to read.
      * @return Returns the number of scanlines read.
      */
-    public synchronized native int readScanLines(byte[] buf, long offset, int numLines)
-            throws LCImageLibException;
+    public synchronized int readScanLines(byte[] buf, long offset, int numLines)
+            throws LCImageLibException {
+        if (m_nativePtr.equals(MemorySegment.NULL)) {
+            throw new LCImageLibException("JPEG reader is closed");
+        }
+        if (offset < 0 || numLines < 0) {
+            throw new IndexOutOfBoundsException("Negative scanline offset or count");
+        }
+        final long rowSize;
+        final long bytesToRead;
+        try {
+            rowSize = Math.multiplyExact((long) m_width, m_colorsPerPixel);
+            bytesToRead = Math.multiplyExact(rowSize, numLines);
+        } catch (ArithmeticException e) {
+            throw new IndexOutOfBoundsException("Scanline buffer size overflows");
+        }
+        if (bytesToRead > buf.length || offset > buf.length - bytesToRead) {
+            throw new IndexOutOfBoundsException("Scanline buffer is too small");
+        }
+        if (numLines == 0) {
+            return 0;
+        }
+
+        try (Arena scratch = Arena.ofConfined()) {
+            final MemorySegment nativeBuffer = scratch.allocate(bytesToRead);
+            final int linesRead =
+                    (int) readReaderScanLines.invokeExact(m_nativePtr, nativeBuffer, numLines);
+            checkProviderFailure();
+            if (linesRead < 0) {
+                throw new LCImageLibException(lastNativeError());
+            }
+            if (linesRead > 0) {
+                final long bytesRead = rowSize * linesRead;
+                MemorySegment.ofArray(buf).asSlice(offset, bytesRead)
+                        .copyFrom(nativeBuffer.asSlice(0, bytesRead));
+            }
+            return linesRead;
+        } catch (LCImageLibException e) {
+            throw e;
+        } catch (IOException e) {
+            throw LCJPEGReader.<RuntimeException>throwUnchecked(e);
+        } catch (RuntimeException | Error e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new LCImageLibException(e);
+        }
+    }
 
     @Override
     public void close() throws LCImageLibException {
@@ -305,9 +455,52 @@ public final class LCJPEGReader implements AutoCloseable, LCImageReader {
      * @param maxHeight The maximum height of the image to get, rescaling if necessary. A value of 0
      * means don't scale.
      */
-    private native void beginRead(
+    private void beginRead(
             LCImageDataProvider provider, int bufSize, int maxWidth, int maxHeight)
-            throws LCImageLibException;
+            throws LCImageLibException {
+        if (bufSize < 2) {
+            throw new IllegalArgumentException("JPEG input buffer must be at least 2 bytes");
+        }
+        final Arena arena = Arena.ofShared();
+        final ProviderCallback callback = new ProviderCallback(provider);
+        m_nativeArena = arena;
+        m_providerCallback = callback;
+        try {
+            final MemorySegment callbackStub =
+                    linker.upcallStub(
+                            MethodHandles.lookup()
+                                    .findVirtual(
+                                            ProviderCallback.class,
+                                            "read",
+                                            MethodType.methodType(
+                                                    int.class, MemorySegment.class, int.class))
+                                    .bindTo(callback),
+                            readCallbackDescriptor,
+                            arena);
+            m_nativePtr =
+                    (MemorySegment)
+                            createReader.invokeExact(callbackStub, bufSize, maxWidth, maxHeight);
+            if (m_nativePtr.equals(MemorySegment.NULL)) {
+                checkProviderFailure();
+                throw new LCImageLibException(lastNativeError());
+            }
+            checkProviderFailure();
+            m_width = (int) getReaderWidth.invokeExact(m_nativePtr);
+            m_height = (int) getReaderHeight.invokeExact(m_nativePtr);
+            m_colorsPerPixel = (int) getReaderComponents.invokeExact(m_nativePtr);
+            m_colorSpace = (int) getReaderColorSpace.invokeExact(m_nativePtr);
+        } catch (LCImageLibException | RuntimeException | Error e) {
+            releaseNativeResources(e);
+            throw e;
+        } catch (Throwable e) {
+            final LCImageLibException exception = new LCImageLibException(e);
+            releaseNativeResources(exception);
+            if (e instanceof IOException) {
+                throw LCJPEGReader.<RuntimeException>throwUnchecked(e);
+            }
+            throw exception;
+        }
+    }
 
     /**
      * Open a JPEG file for reading.
@@ -320,12 +513,124 @@ public final class LCJPEGReader implements AutoCloseable, LCImageReader {
      */
     private void openForReading(String fileName, int maxWidth, int maxHeight)
             throws FileNotFoundException, LCImageLibException, UnsupportedEncodingException {
-        byte[] fileNameUtf8 = (fileName + '\000').getBytes("UTF-8");
-        openForReading(fileNameUtf8, maxWidth, maxHeight);
+        m_ownedProvider = new InputStreamImageDataProvider(new FileInputStream(fileName));
+        try {
+            beginRead(m_ownedProvider, DEFAULT_BUF_SIZE, maxWidth, maxHeight);
+        } catch (LCImageLibException | RuntimeException | Error e) {
+            m_ownedProvider.close();
+            m_ownedProvider = null;
+            throw e;
+        } catch (Throwable e) {
+            m_ownedProvider.close();
+            m_ownedProvider = null;
+            throw LCJPEGReader.<RuntimeException>throwUnchecked(e);
+        }
     }
 
-    private native void openForReading(byte[] fileNameUtf8, int maxWidth, int maxHeight)
-            throws FileNotFoundException, LCImageLibException;
+    private void releaseNativeResources(Throwable cause) {
+        if (!m_nativeHandleIsNull()) {
+            try {
+                final int status = (int) destroyReader.invokeExact(m_nativePtr);
+                if (status < 0) {
+                    cause.addSuppressed(new LCImageLibException(lastNativeError()));
+                }
+            } catch (Throwable e) {
+                cause.addSuppressed(e);
+            }
+            m_nativePtr = MemorySegment.NULL;
+        }
+        if (m_nativeArena != null) {
+            try {
+                m_nativeArena.close();
+            } catch (Throwable e) {
+                cause.addSuppressed(e);
+            }
+            m_nativeArena = null;
+            m_providerCallback = null;
+        }
+    }
+
+    private boolean m_nativeHandleIsNull() {
+        return m_nativePtr.equals(MemorySegment.NULL);
+    }
+
+    private void checkProviderFailure() throws LCImageLibException {
+        final Throwable failure = m_providerCallback.failure;
+        if (failure == null) {
+            return;
+        }
+        if (failure instanceof LCImageLibException e) {
+            throw e;
+        }
+        if (failure instanceof IOException e) {
+            throw LCJPEGReader.<RuntimeException>throwUnchecked(e);
+        }
+        if (failure instanceof Error e) {
+            throw e;
+        }
+        if (failure instanceof RuntimeException e) {
+            throw e;
+        }
+        throw new LCImageLibException(failure);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T extends Throwable> RuntimeException throwUnchecked(Throwable failure)
+            throws T {
+        throw (T) failure;
+    }
+
+    private static String lastNativeError() throws LCImageLibException {
+        try (Arena scratch = Arena.ofConfined()) {
+            final MemorySegment error = scratch.allocate(1024);
+            final int length = (int) getReaderError.invokeExact(error, 1024);
+            if (length < 0) {
+                return "Native JPEG decoder failed without an error message";
+            }
+            final String message = error.getString(0);
+            return message.isBlank()
+                    ? "Native JPEG decoder failed without an error message"
+                    : message;
+        } catch (Throwable e) {
+            if (e instanceof RuntimeException exception) {
+                throw exception;
+            }
+            if (e instanceof Error error) {
+                throw error;
+            }
+            throw new LCImageLibException("Unable to read JPEG error message: " + e);
+        }
+    }
+
+    private static final class ProviderCallback {
+        private final LCImageDataProvider provider;
+        private volatile Throwable failure;
+        private ByteBuffer buffer;
+
+        private ProviderCallback(LCImageDataProvider provider) {
+            this.provider = provider;
+        }
+
+        private int read(MemorySegment destination, int capacity) {
+            try {
+                if (buffer == null) {
+                    buffer = destination.reinterpret(capacity).asByteBuffer();
+                } else if (buffer.capacity() != capacity) {
+                    throw new LCImageLibException("JPEG input buffer capacity changed");
+                }
+                buffer.clear();
+                final int bytesRead = provider.getImageData(buffer);
+                if (bytesRead > capacity) {
+                    throw new LCImageLibException(
+                            "Image data provider returned more bytes than the supplied buffer");
+                }
+                return bytesRead;
+            } catch (Throwable e) {
+                failure = e;
+                return -1;
+            }
+        }
+    }
 
     /**
      * Reads the JPEG image.

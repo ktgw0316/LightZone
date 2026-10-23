@@ -25,12 +25,22 @@ import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.ref.Cleaner;
+import java.lang.foreign.Arena;
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.Linker;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.SymbolLookup;
+import java.lang.foreign.ValueLayout;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.nio.ByteBuffer;
 import org.eclipse.imagen.PlanarImage;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import static com.lightcrafts.image.libs.LCJPEGConstants.CS_CMYK;
@@ -55,8 +65,67 @@ import static com.lightcrafts.image.types.JPEGConstants.JPEG_MAX_SEGMENT_SIZE;
  */
 public final class LCJPEGWriter implements AutoCloseable {
 
+    private static final Logger logger = LoggerFactory.getLogger(LCJPEGWriter.class);
+    private static final Linker linker;
+    private static final FunctionDescriptor writeCallbackDescriptor =
+            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS, ValueLayout.JAVA_INT);
+    private static final MethodHandle createWriter;
+    private static final MethodHandle destroyWriter;
+    private static final MethodHandle writeWriterSegment;
+    private static final MethodHandle writeWriterScanLines;
+    private static final MethodHandle getWriterError;
+
     static {
         System.loadLibrary("LCJPEG");
+        linker = Linker.nativeLinker();
+        var symbols = SymbolLookup.loaderLookup();
+        try {
+            createWriter =
+                    linker.downcallHandle(
+                            symbols.find("lcjpeg_writer_create").orElseThrow(),
+                            FunctionDescriptor.of(
+                                    ValueLayout.ADDRESS,
+                                    ValueLayout.ADDRESS,
+                                    ValueLayout.JAVA_INT,
+                                    ValueLayout.JAVA_INT,
+                                    ValueLayout.JAVA_INT,
+                                    ValueLayout.JAVA_INT,
+                                    ValueLayout.JAVA_INT,
+                                    ValueLayout.JAVA_INT));
+            destroyWriter =
+                    linker.downcallHandle(
+                            symbols.find("lcjpeg_writer_destroy").orElseThrow(),
+                            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            writeWriterSegment =
+                    linker.downcallHandle(
+                            symbols.find("lcjpeg_writer_write_segment").orElseThrow(),
+                            FunctionDescriptor.of(
+                                    ValueLayout.JAVA_INT,
+                                    ValueLayout.ADDRESS,
+                                    ValueLayout.JAVA_INT,
+                                    ValueLayout.ADDRESS,
+                                    ValueLayout.JAVA_INT));
+            writeWriterScanLines =
+                    linker.downcallHandle(
+                            symbols.find("lcjpeg_writer_write_scanlines").orElseThrow(),
+                            FunctionDescriptor.of(
+                                    ValueLayout.JAVA_INT,
+                                    ValueLayout.ADDRESS,
+                                    ValueLayout.ADDRESS,
+                                    ValueLayout.JAVA_INT,
+                                    ValueLayout.JAVA_INT,
+                                    ValueLayout.JAVA_INT,
+                                    ValueLayout.JAVA_INT));
+            getWriterError =
+                    linker.downcallHandle(
+                            symbols.find("lcjpeg_writer_last_error").orElseThrow(),
+                            FunctionDescriptor.of(
+                                    ValueLayout.JAVA_INT,
+                                    ValueLayout.ADDRESS,
+                                    ValueLayout.JAVA_INT));
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            throw new ExceptionInInitializerError(e);
+        }
     }
 
     /**
@@ -67,6 +136,7 @@ public final class LCJPEGWriter implements AutoCloseable {
      * The width of the image as exported.
      */
     private final int m_exportWidth;
+    private final int m_colorsPerPixel;
     /**
      * The resolution (in pixels per unit) of the image as exported.
      */
@@ -75,14 +145,8 @@ public final class LCJPEGWriter implements AutoCloseable {
      * The resolution unit of the image as exported.
      */
     private final int m_resolutionUnit;
-    /**
-     * This is where the native code stores a pointer to the <code>JPEG</code> native data
-     * structure.  Do not touch this from Java except to compare it to zero.
-     */
-    @SuppressWarnings({"UNUSED_SYMBOL"})
-    private long m_nativePtr;
-
     private static final Cleaner cleaner = Cleaner.create();
+    private final NativeState nativeState;
     private final Cleaner.Cleanable cleanable;
 
     /**
@@ -105,9 +169,11 @@ public final class LCJPEGWriter implements AutoCloseable {
             int colorsPerPixel, int colorSpace, int quality,
             int resolution, int resolutionUnit)
             throws IOException, LCImageLibException {
-        cleanable = cleaner.register(this, cleanup());
+        nativeState = new NativeState();
+        cleanable = cleaner.register(this, nativeState);
         m_exportWidth = width;
         m_exportHeight = height;
+        m_colorsPerPixel = colorsPerPixel;
         m_resolution = resolution;
         m_resolutionUnit = resolutionUnit;
         openForWriting(
@@ -133,9 +199,11 @@ public final class LCJPEGWriter implements AutoCloseable {
             int height, int colorsPerPixel, int colorSpace,
             int quality)
             throws LCImageLibException {
-        cleanable = cleaner.register(this, cleanup());
+        nativeState = new NativeState();
+        cleanable = cleaner.register(this, nativeState);
         m_exportWidth = width;
         m_exportHeight = height;
+        m_colorsPerPixel = colorsPerPixel;
         m_resolution = ResolutionOption.DEFAULT_VALUE;
         m_resolutionUnit = ResolutionUnitOption.DEFAULT_VALUE;
         beginWrite(
@@ -163,16 +231,17 @@ public final class LCJPEGWriter implements AutoCloseable {
     /**
      * Dispose of an <code>LCJPEGWriter</code>.
      */
-    public native void dispose();
+    public synchronized void dispose() {
+        final LCImageLibException failure = nativeState.dispose();
+        cleanable.clean();
+        if (failure != null) {
+            throwUnchecked(failure);
+        }
+    }
 
     @Override
     public void close() {
         cleanable.clean();
-    }
-
-    @Contract(pure = true)
-    private @NotNull Runnable cleanup() {
-        return this::dispose;
     }
 
     /**
@@ -300,10 +369,56 @@ public final class LCJPEGWriter implements AutoCloseable {
      * @param numLines The number of scanlines to compress.
      * @return Returns the number of scanlines written.
      */
-    public native synchronized int writeScanLines(byte[] buf, int offset,
-            int numLines,
-            int lineStride)
-            throws LCImageLibException;
+    public synchronized int writeScanLines(byte[] buf, int offset, int numLines, int lineStride)
+            throws LCImageLibException {
+        checkOpen();
+        if (offset < 0 || numLines < 0 || lineStride < 0) {
+            throw new IndexOutOfBoundsException("Negative scanline offset, count, or stride");
+        }
+        final long rowSize = (long) m_exportWidth * m_colorsPerPixel;
+        final long requiredBytes;
+        try {
+            requiredBytes =
+                    numLines == 0
+                            ? offset
+                            : Math.addExact(
+                                    Math.addExact(
+                                            (long) offset,
+                                            Math.multiplyExact((long) numLines - 1, lineStride)),
+                                    rowSize);
+        } catch (ArithmeticException e) {
+            throw new IndexOutOfBoundsException("Scanline buffer size overflows");
+        }
+        if (requiredBytes > buf.length) {
+            throw new IndexOutOfBoundsException("Scanline buffer is too small");
+        }
+        try {
+            try (Arena scratch = Arena.ofConfined()) {
+                final MemorySegment nativeBuffer = scratch.allocate(Math.max(buf.length, 1));
+                if (buf.length > 0) {
+                    nativeBuffer.copyFrom(MemorySegment.ofArray(buf));
+                }
+                final int linesWritten =
+                        (int)
+                                writeWriterScanLines.invokeExact(
+                                        nativeState.handle,
+                                        nativeBuffer,
+                                        buf.length,
+                                        offset,
+                                        numLines,
+                                        lineStride);
+                checkCallbackFailure();
+                if (linesWritten < 0) {
+                    throw new LCImageLibException(lastNativeError(getWriterError));
+                }
+                return linesWritten;
+            }
+        } catch (LCImageLibException e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new LCImageLibException(e);
+        }
+    }
 
     /**
      * Write an APP segment to the JPEG file.
@@ -311,8 +426,29 @@ public final class LCJPEGWriter implements AutoCloseable {
      * @param marker The APP segment marker.
      * @param buf The buffer comprising the raw binary contents for the segment.
      */
-    public native void writeSegment(int marker, byte[] buf)
-            throws LCImageLibException;
+    public synchronized void writeSegment(int marker, byte[] buf) throws LCImageLibException {
+        checkOpen();
+        try {
+            try (Arena scratch = Arena.ofConfined()) {
+                final MemorySegment nativeBuffer = scratch.allocate(Math.max(buf.length, 1));
+                if (buf.length > 0) {
+                    nativeBuffer.copyFrom(MemorySegment.ofArray(buf));
+                }
+                final int status =
+                        (int)
+                                writeWriterSegment.invokeExact(
+                                        nativeState.handle, marker, nativeBuffer, buf.length);
+                checkCallbackFailure();
+                if (status < 0) {
+                    throw new LCImageLibException(lastNativeError(getWriterError));
+                }
+            }
+        } catch (LCImageLibException e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new LCImageLibException(e);
+        }
+    }
 
     /**
      * Begin using the {@link LCImageDataProvider} to get JPEG image data.
@@ -328,10 +464,56 @@ public final class LCJPEGWriter implements AutoCloseable {
      * LCJPEGConstants#CS_YCCK}.
      * @param quality Image quality: 0-100.
      */
-    private native void beginWrite(LCImageDataReceiver receiver, int bufSize,
-            int width, int height, int colorsPerPixel,
-            int colorSpace, int quality)
-            throws LCImageLibException;
+    private void beginWrite(
+            LCImageDataReceiver receiver,
+            int bufSize,
+            int width,
+            int height,
+            int colorsPerPixel,
+            int colorSpace,
+            int quality)
+            throws LCImageLibException {
+        if (receiver == null || bufSize < 1) {
+            throw new IllegalArgumentException("Receiver must be non-null and buffer size positive");
+        }
+        final WriterCallback callback = new WriterCallback(receiver);
+        nativeState.callback = callback;
+        nativeState.arena = Arena.ofShared();
+        try {
+            final MemorySegment callbackStub =
+                    linker.upcallStub(
+                            MethodHandles.lookup()
+                                    .findVirtual(
+                                            WriterCallback.class,
+                                            "write",
+                                            MethodType.methodType(
+                                                    int.class, MemorySegment.class, int.class))
+                                    .bindTo(callback),
+                            writeCallbackDescriptor,
+                            nativeState.arena);
+            nativeState.handle =
+                    (MemorySegment)
+                            createWriter.invokeExact(
+                                    callbackStub,
+                                    bufSize,
+                                    width,
+                                    height,
+                                    colorsPerPixel,
+                                    colorSpace,
+                                    quality);
+            if (nativeState.handle.equals(MemorySegment.NULL)) {
+                checkCallbackFailure();
+                throw new LCImageLibException(lastNativeError(getWriterError));
+            }
+            checkCallbackFailure();
+        } catch (LCImageLibException | RuntimeException | Error e) {
+            nativeState.dispose();
+            throw e;
+        } catch (Throwable e) {
+            nativeState.dispose();
+            throw new LCImageLibException(e);
+        }
+    }
 
     /**
      * Opens a JPEG file for writing.
@@ -350,16 +532,145 @@ public final class LCJPEGWriter implements AutoCloseable {
             int colorsPerPixel, int colorSpace,
             int quality)
             throws IOException, LCImageLibException {
-        byte[] fileNameUtf8 = (fileName + '\000').getBytes("UTF-8");
-        openForWriting(
-                fileNameUtf8, width, height, colorsPerPixel, colorSpace, quality
-        );
+        final var receiver =
+                new OutputStreamImageDataReceiver(new FileOutputStream(fileName));
+        nativeState.ownedReceiver = receiver;
+        try {
+            beginWrite(receiver, 32 * 1024, width, height, colorsPerPixel, colorSpace, quality);
+        } catch (LCImageLibException | RuntimeException | Error e) {
+            nativeState.dispose();
+            throw e;
+        }
     }
 
-    private native void openForWriting(byte[] fileNameUtf8, int width, int height,
-            int colorsPerPixel, int colorSpace,
-            int quality)
-            throws IOException, LCImageLibException;
+    private void checkOpen() throws LCImageLibException {
+        if (nativeState.handle.equals(MemorySegment.NULL)) {
+            throw new LCImageLibException("JPEG writer is closed");
+        }
+    }
+
+    private void checkCallbackFailure() throws LCImageLibException {
+        final Throwable failure = nativeState.callback == null ? null : nativeState.callback.failure;
+        if (failure == null) {
+            return;
+        }
+        if (failure instanceof LCImageLibException e) {
+            throw e;
+        }
+        if (failure instanceof RuntimeException e) {
+            throw e;
+        }
+        if (failure instanceof Error e) {
+            throw e;
+        }
+        throw new LCImageLibException(failure);
+    }
+
+    private static String lastNativeError(MethodHandle errorFunction)
+            throws LCImageLibException {
+        try (Arena scratch = Arena.ofConfined()) {
+            final MemorySegment error = scratch.allocate(1024);
+            final int length = (int) errorFunction.invokeExact(error, 1024);
+            if (length < 0) {
+                return "Native JPEG encoder failed without an error message";
+            }
+            final String message = error.getString(0);
+            return message.isBlank()
+                    ? "Native JPEG encoder failed without an error message"
+                    : message;
+        } catch (Throwable e) {
+            if (e instanceof RuntimeException exception) {
+                throw exception;
+            }
+            if (e instanceof Error error) {
+                throw error;
+            }
+            throw new LCImageLibException("Unable to read JPEG encoder error message: " + e);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T extends Throwable> void throwUnchecked(Throwable failure) throws T {
+        throw (T) failure;
+    }
+
+    private static final class WriterCallback {
+        private final LCImageDataReceiver receiver;
+        private volatile Throwable failure;
+
+        private WriterCallback(LCImageDataReceiver receiver) {
+            this.receiver = receiver;
+        }
+
+        private int write(MemorySegment source, int size) {
+            try {
+                final ByteBuffer buffer = source.reinterpret(size).asByteBuffer();
+                final int bytesWritten = receiver.putImageData(buffer);
+                if (bytesWritten != size) {
+                    throw new LCImageLibException(
+                            "Image data receiver wrote " + bytesWritten + " of " + size + " bytes");
+                }
+                return bytesWritten;
+            } catch (Throwable e) {
+                failure = e;
+                return -1;
+            }
+        }
+    }
+
+    private static final class NativeState implements Runnable {
+        private MemorySegment handle = MemorySegment.NULL;
+        private Arena arena;
+        private WriterCallback callback;
+        private OutputStreamImageDataReceiver ownedReceiver;
+
+        private synchronized LCImageLibException dispose() {
+            if (handle.equals(MemorySegment.NULL)) {
+                closeResources();
+                return null;
+            }
+            final MemorySegment writer = handle;
+            handle = MemorySegment.NULL;
+            LCImageLibException failure = null;
+            try {
+                final int status = (int) destroyWriter.invokeExact(writer);
+                if (status < 0) {
+                    failure = new LCImageLibException(lastNativeError(getWriterError));
+                }
+            } catch (Throwable e) {
+                failure = new LCImageLibException(e);
+            }
+            if (callback != null && callback.failure != null) {
+                if (failure == null) {
+                    failure = new LCImageLibException(callback.failure);
+                } else {
+                    failure.addSuppressed(callback.failure);
+                }
+            }
+            closeResources();
+            return failure;
+        }
+
+        private void closeResources() {
+            if (arena != null) {
+                arena.close();
+                arena = null;
+            }
+            callback = null;
+            if (ownedReceiver != null) {
+                ownedReceiver.close();
+                ownedReceiver = null;
+            }
+        }
+
+        @Override
+        public void run() {
+            final LCImageLibException failure = dispose();
+            if (failure != null) {
+                logger.warn("Failed to finish JPEG output during cleanup", failure);
+            }
+        }
+    }
 
     /**
      * Writes an Adobe (APPE) segment.  The bytes of an Adobe segment are:
