@@ -80,6 +80,7 @@ runtime {
     launcher {
         jvmArgs = listOf(
             "--add-exports=java.desktop/sun.awt.image=ALL-UNNAMED",
+            "--enable-native-access=ALL-UNNAMED",
             "-Djava.library.path=\$APPDIR",
             "-Dfile.encoding=utf-8",
         )

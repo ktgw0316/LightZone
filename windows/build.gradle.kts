@@ -88,6 +88,9 @@ runtime {
         imageOptions = listOf("--icon", "src/main/resources/icons/LightZone.ico")
     }
     launcher {
-        jvmArgs = listOf("--add-exports=java.desktop/sun.awt.image=ALL-UNNAMED")
+        jvmArgs = listOf(
+            "--add-exports=java.desktop/sun.awt.image=ALL-UNNAMED",
+            "--enable-native-access=ALL-UNNAMED",
+        )
     }
 }
