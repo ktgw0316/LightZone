@@ -37,6 +37,7 @@
 *.orig
 *.rej
 *.res
+*.salive
 *.so
 *.srctrl*
 *.status
