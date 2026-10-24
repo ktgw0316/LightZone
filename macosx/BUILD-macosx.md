@@ -8,10 +8,10 @@ Install the Xcode Command Line Tools, Homebrew, and the required dependencies:
 
 ```sh
 xcode-select --install
-brew install openjdk@21 jpeg-turbo lensfun libomp libraw libtiff little-cms2 pkg-config
+brew install openjdk jpeg-turbo lensfun libomp libraw libtiff little-cms2 pkg-config
 ```
 
-LightZone is built and tested with Java 21. Confirm that Homebrew is using the Apple Silicon prefix:
+LightZone is built and tested with Java 25 or later. Confirm that Homebrew is using the Apple Silicon prefix:
 
 ```sh
 brew --prefix
@@ -22,10 +22,10 @@ The expected architecture is `arm64`, and the usual Homebrew prefix is `/opt/hom
 
 ## Configure Java
 
-Set `JAVA_HOME` to the Homebrew Java 21 installation:
+Set `JAVA_HOME` to the Homebrew Java 25 installation:
 
 ```sh
-export JAVA_HOME="/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home"
+export JAVA_HOME="$(brew --prefix openjdk)/libexec/openjdk.jdk/Contents/Home"
 export PATH="$JAVA_HOME/bin:$PATH"
 ```
 
@@ -33,7 +33,7 @@ To make this configuration permanent for Zsh:
 
 ```sh
 cat >> ~/.zshrc <<'EOF'
-export JAVA_HOME="/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home"
+export JAVA_HOME="$(brew --prefix openjdk)/libexec/openjdk.jdk/Contents/Home"
 export PATH="$JAVA_HOME/bin:$PATH"
 EOF
 
@@ -48,7 +48,7 @@ javac -version
 ./gradlew --version
 ```
 
-All commands should report Java 21. If `java_home` cannot find Java, use the explicit `JAVA_HOME` value above rather than `/usr/libexec/java_home`.
+All commands should report Java 25 or later. If `java_home` cannot find Java, use the explicit `JAVA_HOME` value above rather than `/usr/libexec/java_home`.
 
 ## Build
 
@@ -93,14 +93,14 @@ The generated files are placed below the Gradle `build/jpackage` directory.
 
 ### Java/Kotlin JVM-target mismatch
 
-If Gradle reports a mismatch between Java and Kotlin JVM targets, make sure the build is using Java 21:
+If Gradle reports a mismatch between Java and Kotlin JVM targets, make sure the build is using Java 25 or later:
 
 ```sh
 java -version
 ./gradlew --version
 ```
 
-Both commands should report Java 21.
+Both commands should report Java 25 or later.
 
 ### Native compilation failures
 

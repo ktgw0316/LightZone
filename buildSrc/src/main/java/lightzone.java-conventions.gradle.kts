@@ -7,6 +7,12 @@ plugins {
     java
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
 group = "com.lightcrafts"
 version = rootProject.file("lightcrafts/version.txt").readText().trim().substringBefore('~')
 
@@ -55,8 +61,8 @@ tasks {
     withType<JavaCompile> {
         options.encoding = "UTF-8"
         options.compilerArgs = listOf("-h", file("javah").absolutePath, "-proc:full")
-        sourceCompatibility = "21"
-        targetCompatibility = "21"
+        sourceCompatibility = "25"
+        targetCompatibility = "25"
     }
     test {
         useJUnitPlatform()

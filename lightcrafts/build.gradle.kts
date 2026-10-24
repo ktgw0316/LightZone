@@ -5,8 +5,8 @@ buildscript {
   dependencies {
     classpath("org.beryx.runtime:org.beryx.runtime.gradle.plugin:2.0.1")
     classpath("org.gradle.kotlin.kotlin-dsl:org.gradle.kotlin.kotlin-dsl.gradle.plugin:6.6.4")
-    classpath("org.jetbrains.kotlin.jvm:org.jetbrains.kotlin.jvm.gradle.plugin:2.3.21")
-    classpath("org.jetbrains.kotlin:kotlin-reflect:2.3.21")
+    classpath("org.jetbrains.kotlin.jvm:org.jetbrains.kotlin.jvm.gradle.plugin:2.4.10")
+    classpath("org.jetbrains.kotlin:kotlin-reflect:2.4.10")
   }
 }
 apply(plugin = "org.jetbrains.kotlin.jvm")
@@ -16,6 +16,11 @@ plugins {
     id("io.github.jwharm.flatpak-gradle-generator") version "1.8.0"
     id("com.gorylenko.gradle-git-properties") version "4.0.1"
 }
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_25)
+}
+
 dependencies {
     implementation("com.formdev:flatlaf:3.7.1")
     implementation("com.formdev:flatlaf-intellij-themes:3.7.1")
