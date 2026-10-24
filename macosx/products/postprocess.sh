@@ -13,7 +13,8 @@ SCRIPT_DIR=$(cd $(dirname $0) && pwd)
 cd $1
 
 # Copy required dylibs
-FILES=$(find . -maxdepth 1 -name "*.jnilib" -o -name "dcraw_lz")
+JNILIBS=$(find . -maxdepth 1 -name "*.jnilib")
+FILES="${JNILIBS} $(find . -maxdepth 1 -name "dcraw_lz")"
 for FILE in ${FILES}; do
   sh ${SCRIPT_DIR}/copydylibs.sh ${FILE}
 done
@@ -21,7 +22,7 @@ done
 # Change the local library paths in each file
 EXCLUDE_PATTERN="(/usr/lib|/System|@loader_path|@rpath)"
 DYLIBS=$(find . -maxdepth 1 -name "*.dylib")
-for LIB in ${FILES} ${DYLIBS}; do
+for LIB in ${JNILIBS} ${DYLIBS}; do
   otool -LX ${LIB} | grep -v "$(otool -DX ${LIB})" | egrep -v "${EXCLUDE_PATTERN}" | grep -o "/.*\.dylib" | while read; do
     sh -x -c "install_name_tool -change ${REPLY} @rpath/$(basename ${REPLY}) ${LIB}"
   done
