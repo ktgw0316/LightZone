@@ -11,8 +11,6 @@ JNI_EXTRA_PKGCFG:=	lcms2
 ##
 JNI_WINDOWS_DEFINES:=	-D__CONSOLE__
 
-JAVAH_CLASSES:=		com.lightcrafts.utils.LCMSNative
-
 ROOT:=			../../..
 include			../jni.mk
 
