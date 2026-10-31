@@ -33,6 +33,7 @@ import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.foreign.MemorySegment;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Map;
@@ -156,7 +157,6 @@ public final class LCTIFFWriter extends LCTIFFCommon {
     public LCTIFFWriter(String fileName, String appendFileName, int width,
             int height, int resolution, int resolutionUnit)
             throws LCImageLibException, UnsupportedEncodingException {
-        cleaner.register(this, cleanup(this));
         m_fileName = fileName;
         m_appendFileName = appendFileName;
         m_exportWidth = width;
@@ -165,9 +165,9 @@ public final class LCTIFFWriter extends LCTIFFCommon {
         m_resolutionUnit = resolutionUnit;
         openForWriting(fileName);
         //
-        // If openForWriting() fails, it will store 0 in the native pointer.
+        // If openForWriting() fails, the native handle remains null.
         //
-        if (m_nativePtr == 0) {
+        if (nativeHandle().equals(MemorySegment.NULL)) {
             throw new LCImageLibException("Could not open " + fileName);
         }
     }
@@ -327,8 +327,9 @@ public final class LCTIFFWriter extends LCTIFFCommon {
      * @see #setIntField(int, int)
      * @see #setStringField(int, String)
      */
-    public native boolean setByteField(int tagID, byte[] value)
-            throws LCImageLibException;
+    public boolean setByteField(int tagID, byte[] value) throws LCImageLibException {
+        return TIFFNative.writerSetBytes(nativeHandle(), tagID, value);
+    }
 
     /**
      * Sets the value of the given TIFF integer metadata field.
@@ -344,8 +345,9 @@ public final class LCTIFFWriter extends LCTIFFCommon {
      * @see #setIntField(int, int)
      * @see #setStringField(int, String)
      */
-    private native boolean setFloatField(int tagID, float value)
-            throws LCImageLibException;
+    private boolean setFloatField(int tagID, float value) throws LCImageLibException {
+        return TIFFNative.writerSetFloat(nativeHandle(), tagID, value);
+    }
 
     /**
      * Sets the ICC profile of the TIFF image.  This <i>must</i> be called only once and prior to
@@ -373,8 +375,9 @@ public final class LCTIFFWriter extends LCTIFFCommon {
      * @see #setFloatField(int, float)
      * @see #setStringField(int, String)
      */
-    public native boolean setIntField(int tagID, int value)
-            throws LCImageLibException;
+    public boolean setIntField(int tagID, int value) throws LCImageLibException {
+        return TIFFNative.writerSetInt(nativeHandle(), tagID, value);
+    }
 
     /**
      * Sets the value of the given TIFF string metadata field.
@@ -391,12 +394,12 @@ public final class LCTIFFWriter extends LCTIFFCommon {
      */
     private boolean setStringField(int tagID, String value)
             throws LCImageLibException, UnsupportedEncodingException {
-        byte[] valueUtf8 = (value + '\000').getBytes("UTF-8");
-        return setStringField(tagID, valueUtf8);
+        return setStringField(tagID, (value + '\000').getBytes("UTF-8"));
     }
 
-    private native boolean setStringField(int tagID, byte[] valueUtf8)
-            throws LCImageLibException;
+    private boolean setStringField(int tagID, byte[] valueUtf8) throws LCImageLibException {
+        return TIFFNative.writerSetString(nativeHandle(), tagID, valueUtf8);
+    }
 
     /**
      * Append the TIFF image in the given file creating a multi-page TIFF file.
@@ -406,11 +409,8 @@ public final class LCTIFFWriter extends LCTIFFCommon {
      */
     private boolean append(String fileName)
             throws UnsupportedEncodingException {
-        byte[] fileNameUtf8 = (fileName + '\000').getBytes("UTF-8");
-        return append(fileNameUtf8);
+        return TIFFNative.writerAppend(nativeHandle(), fileName);
     }
-
-    private native boolean append(byte[] fileNameUtf8);
 
     /**
      * Computes which tile a given point is in.
@@ -421,7 +421,9 @@ public final class LCTIFFWriter extends LCTIFFCommon {
      * @param sample TODO
      * @return Returns the tile index.
      */
-    private native int computeTile(int x, int y, int z, int sample);
+    private int computeTile(int x, int y, int z, int sample) {
+        return TIFFNative.writerComputeTile(nativeHandle(), x, y, z, sample);
+    }
 
     /**
      * Fix the EXIF metadata in a TIFF file.
@@ -509,12 +511,8 @@ public final class LCTIFFWriter extends LCTIFFCommon {
      */
     private void openForWriting(String fileName)
             throws LCImageLibException, UnsupportedEncodingException {
-        byte[] fileNameUtf8 = (fileName + '\000').getBytes("UTF-8");
-        openForWriting(fileNameUtf8);
+        setNativeHandle(open(fileName, "w"));
     }
-
-    private native void openForWriting(byte[] fileNameUtf8)
-            throws LCImageLibException;
 
     /**
      * Writes a TIFF image as strips.
@@ -676,9 +674,10 @@ public final class LCTIFFWriter extends LCTIFFCommon {
      * @param stripSize The size of the strip.
      * @return Returns the number of bytes written or -1 if there was an error.
      */
-    private native int writeStripByte(int stripIndex, byte[] buf, long offset,
-            int stripSize)
-            throws LCImageLibException;
+    private int writeStripByte(int stripIndex, byte[] buf, long offset, int stripSize)
+            throws LCImageLibException {
+        return TIFFNative.writerWriteStrip(nativeHandle(), stripIndex, buf, offset, stripSize);
+    }
 
     /**
      * Encodes and writes a strip to the TIFF image.
@@ -689,9 +688,10 @@ public final class LCTIFFWriter extends LCTIFFCommon {
      * @param stripSize The size of the strip.
      * @return Returns the number of bytes written or -1 if there was an error.
      */
-    private native int writeStripShort(int stripIndex, short[] buf, long offset,
-            int stripSize)
-            throws LCImageLibException;
+    private int writeStripShort(int stripIndex, short[] buf, long offset, int stripSize)
+            throws LCImageLibException {
+        return TIFFNative.writerWriteStrip(nativeHandle(), stripIndex, buf, offset, stripSize);
+    }
 
     /**
      * Encodes and writes a tile to the TIFF image.
@@ -702,9 +702,10 @@ public final class LCTIFFWriter extends LCTIFFCommon {
      * @param tileSize The size of the tile.
      * @return Returns the number of bytes written or -1 if there was an error.
      */
-    private native int writeTileByte(int tileIndex, byte[] buf, long offset,
-            int tileSize)
-            throws LCImageLibException;
+    private int writeTileByte(int tileIndex, byte[] buf, long offset, int tileSize)
+            throws LCImageLibException {
+        return TIFFNative.writerWriteTile(nativeHandle(), tileIndex, buf, offset, tileSize);
+    }
 
     /**
      * Encodes and writes a tile to the TIFF image.
@@ -715,9 +716,10 @@ public final class LCTIFFWriter extends LCTIFFCommon {
      * @param tileSize The size of the tile.
      * @return Returns the number of bytes written or -1 if there was an error.
      */
-    private native int writeTileShort(int tileIndex, short[] buf, long offset,
-            int tileSize)
-            throws LCImageLibException;
+    private int writeTileShort(int tileIndex, short[] buf, long offset, int tileSize)
+            throws LCImageLibException {
+        return TIFFNative.writerWriteTile(nativeHandle(), tileIndex, buf, offset, tileSize);
+    }
 
     /**
      * The name of the TIFF file to append, if any.
