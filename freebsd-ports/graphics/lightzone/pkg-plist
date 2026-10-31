@@ -3,7 +3,6 @@ bin/dcraw_lz
 %%LIBDIR%%/libDCRaw.so
 %%LIBDIR%%/libFASTJAI.so
 %%LIBDIR%%/libJAI.so
-%%LIBDIR%%/libLCCache.so
 %%LIBDIR%%/libLCJNI.so
 %%LIBDIR%%/libLCJPEG.so
 %%LIBDIR%%/libLCLCMS.so

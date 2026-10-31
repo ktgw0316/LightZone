@@ -92,11 +92,22 @@ public final class LRUCacheObjectMap implements CacheObjectMap {
         final ByteBuffer buf;
         synchronized ( this ) {
             buf = m_lruMap.remove( key );
+            if ( buf != null )
+                m_curSize -= buf.limit();
         }
         if ( buf != null ) {
-            final CacheObjectBroker broker = m_cache.getCacheObjectBroker();
-            buf.position( 0 );
-            return broker.decodeFromByteBuffer( buf, aux );
+            try {
+                final CacheObjectBroker broker = m_cache.getCacheObjectBroker();
+                buf.position( 0 );
+                return broker.decodeFromByteBuffer( buf, aux );
+            } finally {
+                synchronized ( this ) {
+                    if ( m_bufAlloc != null ) {
+                        final boolean freed = m_bufAlloc.freeByteBuffer( buf );
+                        assert freed;
+                    }
+                }
+            }
         }
         return m_cache.readFromStore( key, aux );
     }

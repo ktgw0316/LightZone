@@ -2,22 +2,18 @@
 
 package com.lightcrafts.utils.cache;
 
-import java.lang.ref.Cleaner;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
 import com.lightcrafts.utils.bytebuffer.ByteBufferAllocator;
-import com.lightcrafts.utils.bytebuffer.FileByteBuffer;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * A <code>NativeByteBufferAllocator</code> is-a {@link ByteBufferAllocator}
- * that uses native memory for allocated {@link ByteBuffer}s.
+ * that uses direct off-heap memory for allocated {@link ByteBuffer}s.
  *
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */
@@ -34,10 +30,8 @@ public final class NativeByteBufferAllocator implements ByteBufferAllocator {
         m_chunkList = new LinkedList<>();
         m_chunkSize = chunkSize;
         m_freeBlockManagerList = new LinkedList<>();
-        m_allocdBlocks = new HashMap<>();
-        m_allocdFBMs = new HashMap<>();
-
-        cleaner.register(this, cleanup(this));
+        m_allocdBlocks = new IdentityHashMap<>();
+        m_allocdFBMs = new IdentityHashMap<>();
     }
 
     /**
@@ -75,9 +69,6 @@ public final class NativeByteBufferAllocator implements ByteBufferAllocator {
      */
     public synchronized void clear() {
         dispose();
-        m_allocdBlocks.clear();
-        m_allocdFBMs.clear();
-        m_freeBlockManagerList.clear();
     }
 
     /**
@@ -86,15 +77,17 @@ public final class NativeByteBufferAllocator implements ByteBufferAllocator {
     public synchronized void dispose() {
         m_chunkList.forEach(NativeChunk::dispose);
         m_chunkList.clear();
+        m_allocdBlocks.clear();
+        m_allocdFBMs.clear();
+        m_freeBlockManagerList.clear();
     }
 
     /**
      * {@inheritDoc}
      */
     public synchronized boolean freeByteBuffer( ByteBuffer buf ) {
-        final long bufKey = getKeyFor( buf );
-        final CacheBlock block = m_allocdBlocks.remove( bufKey );
-        final FreeBlockManager fbm = m_allocdFBMs.remove( bufKey );
+        final CacheBlock block = m_allocdBlocks.remove( buf );
+        final FreeBlockManager fbm = m_allocdFBMs.remove( buf );
         if ( block != null && fbm != null ) {
             fbm.freeBlock( block );
             return true;
@@ -136,66 +129,34 @@ public final class NativeByteBufferAllocator implements ByteBufferAllocator {
                                       FreeBlockManager fbm ) {
         final CacheBlock block = fbm.findBlockOfSize( size );
         if ( block != null ) {
-            final long addr = chunk.getAddr() + block.getPosition();
-            final ByteBuffer buf = getNativeByteBuffer( addr, size );
+            final ByteBuffer buf = chunk.getByteBuffer(
+                Math.toIntExact( block.getPosition() ), size
+            );
             buf.order( ByteOrder.nativeOrder() );
-            final long bufKey = getKeyFor( buf );
-            m_allocdBlocks.put( bufKey, block );
-            m_allocdFBMs.put( bufKey, fbm );
+            m_allocdBlocks.put( buf, block );
+            m_allocdFBMs.put( buf, fbm );
             return buf;
         }
         return null;
     }
 
     /**
-     * Compute the hash key of a {@link ByteBuffer}.  We can't use
-     * {@link ByteBuffer#hashCode()} because it computes a hash code bases on
-     * certain aspects of the {@link ByteBuffer} in its current state, i.e.,
-     * it changes over time.  We need a constant value.
-     *
-     * @param buf The {@link ByteBuffer} to compute the hash key of.
-     * @return Returns said hash key.
-     */
-    private static long getKeyFor( ByteBuffer buf ) {
-        return getNativeAddressOf(buf);
-    }
-
-    /**
-     * Gets the native address of the given {@link ByteBuffer}.
-     *
-     * @param buf The {@link ByteBuffer} to get the native address of.
-     * @return Returns the native address cast to a <code>long</code>.
-     */
-    private static native long getNativeAddressOf( ByteBuffer buf );
-
-    /**
-     * Gets a {@link ByteBuffer} that uses native memory.
-     *
-     * @param addr The native address at which to allocate the
-     * {@link ByteBuffer}.
-     * @param size The size of the {@link ByteBuffer} to create (in bytes).
-     * @return Returns said {@link ByteBuffer}.
-     */
-    private static native ByteBuffer getNativeByteBuffer( long addr, int size );
-
-    /**
-     * A map of the allocated blocks where the key is that of a
-     * {@link ByteBuffer} and the value is the {@link CacheBlock} it uses.
+     * A map of the allocated blocks keyed by the exact {@link ByteBuffer}
+     * instance returned to the caller.
      * <p>
      * For every entry, there is a corresponding entry in
      * {@link #m_allocdFBMs} having the same key.
      */
-    private final Map<Long,CacheBlock> m_allocdBlocks;
+    private final Map<ByteBuffer,CacheBlock> m_allocdBlocks;
 
     /**
-     * A map of the allocated {@link FreeBlockManager}s where the key is that
-     * of a {@link ByteBuffer} and the value is the {@link FreeBlockManager}
-     * for it.
+     * A map of the allocated {@link FreeBlockManager}s keyed by the exact
+     * {@link ByteBuffer} instance.
      * <p>
      * For every entry, there is a corresponding entry in
      * {@link #m_allocdBlocks} having the same key.
      */
-    private final Map<Long,FreeBlockManager> m_allocdFBMs;
+    private final Map<ByteBuffer,FreeBlockManager> m_allocdFBMs;
 
     /**
      * A list of all the allocated chunks.  For every entry, there is a
@@ -214,15 +175,5 @@ public final class NativeByteBufferAllocator implements ByteBufferAllocator {
      */
     private final LinkedList<FreeBlockManager> m_freeBlockManagerList;
 
-    private static final Cleaner cleaner = Cleaner.create();
-
-    @Contract(pure = true)
-    private static @NotNull Runnable cleanup(@NotNull NativeByteBufferAllocator allocator) {
-        return allocator::dispose;
-    }
-
-    static {
-        System.loadLibrary( "LCCache" );
-    }
 }
 /* vim:set et sw=4 ts=4: */
