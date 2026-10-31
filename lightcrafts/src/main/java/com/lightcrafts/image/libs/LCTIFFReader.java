@@ -29,7 +29,7 @@ import java.awt.image.Raster;
 import java.awt.image.SampleModel;
 import java.awt.image.WritableRaster;
 import java.io.UnsupportedEncodingException;
-import java.lang.ref.Cleaner;
+import java.lang.foreign.MemorySegment;
 import org.eclipse.imagen.ImageLayout;
 import org.eclipse.imagen.PlanarImage;
 import org.eclipse.imagen.TileCache;
@@ -75,8 +75,6 @@ public final class LCTIFFReader extends LCTIFFCommon implements LCImageReader {
 
     private static final Logger logger = LoggerFactory.getLogger(LCTIFFReader.class);
 
-    private final Cleaner.Cleanable cleanable;
-
     /**
      * Construct an <code>LCTIFFReader</code> and open a TIFF file.
      *
@@ -95,13 +93,12 @@ public final class LCTIFFReader extends LCTIFFCommon implements LCImageReader {
      */
     public LCTIFFReader(String fileName, boolean read2nd)
             throws LCImageLibException, UnsupportedEncodingException {
-        cleanable = cleaner.register(this, cleanup(this));
         m_read2nd = read2nd;
         openForReading(fileName);
         //
-        // If openForReading() fails, it will store 0 in the native pointer.
+        // If openForReading() fails, the native handle remains null.
         //
-        if (m_nativePtr == 0) {
+        if (nativeHandle().equals(MemorySegment.NULL)) {
             throw new LCImageLibException("Could not open " + fileName);
         }
     }
@@ -167,7 +164,9 @@ public final class LCTIFFReader extends LCTIFFCommon implements LCImageReader {
      * field or is otherwise unsupported.
      * @see #getStringField(int)
      */
-    public native int getIntField(int tagID);
+    public int getIntField(int tagID) {
+        return TIFFNative.readerGetInt(nativeHandle(), tagID);
+    }
 
     /**
      * Gets one of the values of the given TIFF two-value integer metadata field.
@@ -181,7 +180,9 @@ public final class LCTIFFReader extends LCTIFFCommon implements LCImageReader {
      * field or is otherwise unsupported.
      * @see #getStringField(int)
      */
-    public native int getIntField2(int tagID, boolean getSecond);
+    public int getIntField2(int tagID, boolean getSecond) {
+        return TIFFNative.readerGetInt2(nativeHandle(), tagID, getSecond);
+    }
 
     /**
      * Gets the number of strips in the TIFF image.  The image must be stored in strips and not
@@ -190,7 +191,9 @@ public final class LCTIFFReader extends LCTIFFCommon implements LCImageReader {
      * @return Returns said number of strips.
      * @see #isTiled()
      */
-    public native int getNumberOfStrips();
+    public int getNumberOfStrips() {
+        return TIFFNative.readerNumberOfStrips(nativeHandle());
+    }
 
     /**
      * Gets the number of tiles in the TIFF image.  The image must be stored in tiles and not
@@ -199,7 +202,9 @@ public final class LCTIFFReader extends LCTIFFCommon implements LCImageReader {
      * @return Returns said number of tiles.
      * @see #isTiled()
      */
-    public native int getNumberOfTiles();
+    public int getNumberOfTiles() {
+        return TIFFNative.readerNumberOfTiles(nativeHandle());
+    }
 
     /**
      * Gets the value of the given TIFF string metadata field.
@@ -212,7 +217,9 @@ public final class LCTIFFReader extends LCTIFFCommon implements LCImageReader {
      * @see #getIntField(int)
      * @see #getIntField2(int, boolean)
      */
-    public native String getStringField(int tagID);
+    public String getStringField(int tagID) {
+        return TIFFNative.readerGetString(nativeHandle(), tagID);
+    }
 
     /**
      * Returns the size of the strips in bytes.  The image must be stored in strips and not in
@@ -221,7 +228,9 @@ public final class LCTIFFReader extends LCTIFFCommon implements LCImageReader {
      * @return Returns said size.
      * @see #isTiled()
      */
-    public native int getStripSize();
+    public int getStripSize() {
+        return TIFFNative.readerStripSize(nativeHandle());
+    }
 
     /**
      * Returns the size of the tiles in bytes.  The image must be stored in tiles and not in
@@ -230,21 +239,27 @@ public final class LCTIFFReader extends LCTIFFCommon implements LCImageReader {
      * @return Returns said size.
      * @see #isTiled()
      */
-    public native int getTileSize();
+    public int getTileSize() {
+        return TIFFNative.readerTileSize(nativeHandle());
+    }
 
     /**
      * Returns whether the TIFF image is stored in tiles.
      *
      * @return Returns <code>true</code> only if the image is stored in tiles.
      */
-    public native boolean isTiled();
+    public boolean isTiled() {
+        return TIFFNative.readerIsTiled(nativeHandle());
+    }
 
     /**
      * Gets the raw ICC profile data (minus the header) from the TIFF image.
      *
      * @return Returns said data as a <code>byte</code> array.
      */
-    private native byte[] getICCProfileData();
+    private byte[] getICCProfileData() {
+        return TIFFNative.readerIccProfile(nativeHandle());
+    }
 
     /**
      * Checks whether the current TIFF file is a 2-page (layered) TIFF file created by LightZone.
@@ -268,7 +283,9 @@ public final class LCTIFFReader extends LCTIFFCommon implements LCImageReader {
      *
      * @return Returns <code>true</code> if the next directory was read successfully.
      */
-    private native boolean nextDirectory() throws LCImageLibException;
+    private boolean nextDirectory() throws LCImageLibException {
+        return TIFFNative.readerNextDirectory(nativeHandle());
+    }
 
     /**
      * Opens a TIFF file.
@@ -277,12 +294,8 @@ public final class LCTIFFReader extends LCTIFFCommon implements LCImageReader {
      */
     private void openForReading(String fileName)
             throws LCImageLibException, UnsupportedEncodingException {
-        byte[] fileNameUtf8 = (fileName + '\000').getBytes("UTF-8");
-        openForReading(fileNameUtf8);
+        setNativeHandle(open(fileName, "r"));
     }
-
-    private native void openForReading(byte[] fileNameUtf8)
-            throws LCImageLibException;
 
     private class TIFF_Format {
 
@@ -617,9 +630,10 @@ public final class LCTIFFReader extends LCTIFFCommon implements LCImageReader {
      * @see #isTiled()
      * @see #getStripSize()
      */
-    private native synchronized int readStripByte(int stripIndex, byte[] buf, long offset,
-            int stripSize)
-            throws LCImageLibException;
+    private synchronized int readStripByte(int stripIndex, byte[] buf, long offset, int stripSize)
+            throws LCImageLibException {
+        return TIFFNative.readerReadStrip(nativeHandle(), stripIndex, buf, offset, stripSize);
+    }
 
     /**
      * Reads and decodes and encoded strip from the TIFF image.  The image must be stored in strips
@@ -633,9 +647,10 @@ public final class LCTIFFReader extends LCTIFFCommon implements LCImageReader {
      * @see #isTiled()
      * @see #getStripSize()
      */
-    private native synchronized int readStripShort(int stripIndex, short[] buf, long offset,
-            int stripSize)
-            throws LCImageLibException;
+    private synchronized int readStripShort(int stripIndex, short[] buf, long offset, int stripSize)
+            throws LCImageLibException {
+        return TIFFNative.readerReadStrip(nativeHandle(), stripIndex, buf, offset, stripSize);
+    }
 
     /**
      * Reads and decodes and encoded tile from the TIFF image.  The image must be stored in tiles
@@ -649,8 +664,10 @@ public final class LCTIFFReader extends LCTIFFCommon implements LCImageReader {
      * @see #isTiled()
      * @see #getTileSize()
      */
-    private native synchronized int readTileByte(int tileIndex, byte[] buf, long offset,
-            int tileSize) throws LCImageLibException;
+    private synchronized int readTileByte(int tileIndex, byte[] buf, long offset, int tileSize)
+            throws LCImageLibException {
+        return TIFFNative.readerReadTile(nativeHandle(), tileIndex, buf, offset, tileSize);
+    }
 
     /**
      * Reads and decodes and encoded tile from the TIFF image.  The image must be stored in tiles
@@ -664,8 +681,10 @@ public final class LCTIFFReader extends LCTIFFCommon implements LCImageReader {
      * @see #isTiled()
      * @see #getTileSize()
      */
-    private native synchronized int readTileShort(int tileIndex, short[] buf, long offset,
-            int tileSize) throws LCImageLibException;
+    private synchronized int readTileShort(int tileIndex, short[] buf, long offset, int tileSize)
+            throws LCImageLibException {
+        return TIFFNative.readerReadTile(nativeHandle(), tileIndex, buf, offset, tileSize);
+    }
 
     /**
      * The actual end-result image.
