@@ -5,13 +5,8 @@ TARGET_BASE:=		LCTIFF
 
 JNI_EXTRA_PKGCFG:=	libtiff-4
 JNI_EXTRA_CFLAGS:=	-DTIFF_DISABLE_DEPRECATED -Wall
-JNI_WINDOWS_LINK:=	-Wl,-Bdynamic -lLCJNI -Wl,-Bstatic -lstdc++
-JNI_LINUX_LINK:=	-lLCJNI -lstdc++ -Wl,-rpath,'$$ORIGIN'
-JNI_MACOSX_LINK:=	../jniutils/libLCJNI.a
-
-JAVAH_CLASSES:=		com.lightcrafts.image.libs.LCTIFFCommon \
-			com.lightcrafts.image.libs.LCTIFFReader \
-			com.lightcrafts.image.libs.LCTIFFWriter
+JNI_WINDOWS_LINK:=	-lstdc++
+JNI_LINUX_LINK:=	-lstdc++ -Wl,-rpath,'$$ORIGIN'
 
 ROOT:=		../../..
 include			../jni.mk
