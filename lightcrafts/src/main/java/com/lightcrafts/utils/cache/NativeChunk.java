@@ -2,13 +2,10 @@
 
 package com.lightcrafts.utils.cache;
 
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-
-import java.lang.ref.Cleaner;
+import java.nio.ByteBuffer;
 
 /**
- * A <code>NativeChunk</code> is a chunk of allocated native memory.
+ * A <code>NativeChunk</code> is a chunk of off-heap memory.
  *
  * @author Paul J. Lucas [paul@lightcrafts.com]
  */
@@ -19,36 +16,36 @@ public final class NativeChunk {
     /**
      * Construct a <code>NativeChunk</code>.
      *
-     * @param size The size of the chunk to create.  Note that this is subject
-     * to operating-system-dependent constraints such as minimum or maximum
-     * sizes.
+     * @param size The size of the chunk to create, subject to the JVM's
+     * direct-memory limit.
      */
     public NativeChunk( int size ) {
-        m_addr = alloc( size );
-        if ( m_addr == 0 )
-            throw new OutOfMemoryError( "failed to alloc native chunk" );
+        m_buffer = ByteBuffer.allocateDirect( size );
         m_size = size;
-
-        cleaner.register(this, cleanup(this));
     }
 
     /**
-     * Disposes of the native memory used for this chunk.
+     * Drops this chunk's reference to its memory. Existing views remain valid
+     * until they are no longer reachable and the JVM reclaims the direct buffer.
      */
     public synchronized void dispose() {
-        if ( m_addr != 0 ) {
-            free( m_addr, m_size );
-            m_addr = 0;
-        }
+        m_buffer = null;
     }
 
     /**
-     * Gets the base address of the native chunk.
+     * Gets a view of a region in this chunk.
      *
-     * @return Returns said address cast to a <code>long</code>.
+     * @param position The start offset in bytes.
+     * @param size The size of the region in bytes.
+     * @return A direct buffer view over the requested region.
      */
-    public long getAddr() {
-        return m_addr;
+    public synchronized ByteBuffer getByteBuffer( int position, int size ) {
+        if ( m_buffer == null )
+            throw new IllegalStateException( "chunk is disposed" );
+        final ByteBuffer view = m_buffer.duplicate();
+        view.position( position );
+        view.limit( Math.addExact( position, size ) );
+        return view.slice();
     }
 
     /**
@@ -62,42 +59,12 @@ public final class NativeChunk {
 
     ////////// private ////////////////////////////////////////////////////////
 
-    /**
-     * Allocate a new chunk.
-     *
-     * @param size The size of the chunk to allocate (in bytes).
-     * @return Returns the native address of the chunk cast to a
-     * <code>long</code>.
-     */
-    private static native long alloc( int size );
-
-    /**
-     * Free a chunk.
-     *
-     * @param addr The native address of the chunk to free.
-     * @param size The size of the chunk to deallocate (in bytes).
-     */
-    private static native void free( long addr, int size );
-
-    /**
-     * The native address of the chunk.
-     */
-    private long m_addr;
+    private ByteBuffer m_buffer;
 
     /**
      * The size of the chunk (in bytes).
      */
     private final int m_size;
 
-    private static final Cleaner cleaner = Cleaner.create();
-
-    @Contract(pure = true)
-    private static @NotNull Runnable cleanup(@NotNull NativeChunk chunk) {
-        return chunk::dispose;
-    }
-
-    static {
-        System.loadLibrary( "LCCache" );
-    }
 }
 /* vim:set et sw=4 ts=4: */
