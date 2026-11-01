@@ -1,6 +1,5 @@
 #include <iostream>
 #include <lensfun.h>
-#include <jni.h>
 
 class LC_lensfun
 {
@@ -43,10 +42,6 @@ public:
           int dstRectWidth, int dstRectHeight ) const;
 
 private:
-    JNIEnv* env;
-    static jclass cls;
-
     lfDatabase* ldb = nullptr;
     lfLens* default_lens = nullptr;
 };
-
