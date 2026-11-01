@@ -4,6 +4,7 @@
 
 #include <cmath>
 #include <cstring>
+#include <vector>
 #include <omp.h>
 
 #include "interpolation.h"
@@ -194,11 +195,11 @@ void LC_lensfun::applyModifier
 {
 #pragma omp parallel
     {
-        auto pos = new float[dstRectWidth * 2 * 3];
+        auto pos = std::vector<float>(dstRectWidth * 2 * 3);
 
 #pragma omp for schedule (guided)
         for (int y = dstRectY; y < dstRectY + dstRectHeight; ++y) {
-            mod->ApplySubpixelGeometryDistortion(dstRectX, y, dstRectWidth, 1, pos);
+            mod->ApplySubpixelGeometryDistortion(dstRectX, y, dstRectWidth, 1, pos.data());
 
             for (int x = dstRectX, i = 0; x < dstRectX + dstRectWidth; ++x, i += 6) {
                 const auto srcRX = pos[i];
@@ -231,8 +232,6 @@ void LC_lensfun::applyModifier
                 }
             }
         }
-
-        delete[] pos;
     } // omp parallel
 }
 
@@ -241,19 +240,19 @@ void LC_lensfun::backwardMapRect
   int dstRectX, int dstRectY,
   int dstRectWidth, int dstRectHeight ) const
 {
-    auto top    = new float[dstRectWidth  * 2 * 3];
-    auto bottom = new float[dstRectWidth  * 2 * 3];
-    auto left   = new float[dstRectHeight * 2 * 3];
-    auto right  = new float[dstRectHeight * 2 * 3];
+    auto top    = std::vector<float>(dstRectWidth  * 2 * 3);
+    auto bottom = std::vector<float>(dstRectWidth  * 2 * 3);
+    auto left   = std::vector<float>(dstRectHeight * 2 * 3);
+    auto right  = std::vector<float>(dstRectHeight * 2 * 3);
 
     mod->ApplySubpixelGeometryDistortion(dstRectX, dstRectY,
-            dstRectWidth, 1, top);
+            dstRectWidth, 1, top.data());
     mod->ApplySubpixelGeometryDistortion(dstRectX, dstRectY + dstRectHeight,
-            dstRectWidth, 1, bottom);
+            dstRectWidth, 1, bottom.data());
     mod->ApplySubpixelGeometryDistortion(dstRectX,
-            dstRectY, 1, dstRectHeight, left);
+            dstRectY, 1, dstRectHeight, left.data());
     mod->ApplySubpixelGeometryDistortion(dstRectX + dstRectWidth,
-            dstRectY, 1, dstRectHeight, right);
+            dstRectY, 1, dstRectHeight, right.data());
 
     // initial values
     auto srcRectY    = top[1];
@@ -305,11 +304,6 @@ void LC_lensfun::backwardMapRect
             }
         }
     }
-
-    delete[] top;
-    delete[] bottom;
-    delete[] left;
-    delete[] right;
 
     // margin is required for interpolation
     const int topMost    = static_cast<int>(srcRectX) - 1;
