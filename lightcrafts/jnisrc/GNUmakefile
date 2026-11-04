@@ -10,7 +10,6 @@ SUBDIRS:=	jniutils \
 		lensfun \
 		libraw \
 		jpeg \
-		lcms \
 		tiff
 
 include	../mk/recurse.mk

@@ -14,51 +14,64 @@ import java.util.Objects;
 public class LCMSNative {
 
     private static final Linker linker;
-    private static final MethodHandle openProfileFromMem;
+    private static final MethodHandle buildGamma;
     private static final MethodHandle createRGBProfile;
     private static final MethodHandle createLab2Profile;
+    private static final MethodHandle freeToneCurve;
+    private static final MethodHandle openProfileFromMem;
     private static final MethodHandle closeProfile;
     private static final MethodHandle createTransform;
     private static final MethodHandle createProofingTransform;
+    private static final MethodHandle getTransformInputFormat;
+    private static final MethodHandle getTransformOutputFormat;
     private static final MethodHandle deleteTransform;
-    private static final MethodHandle doTransformBytes;
-    private static final MethodHandle doTransformShorts;
-    private static final MethodHandle doTransformDoubles;
+    private static final MethodHandle doTransform;
 
     static {
-        System.loadLibrary("LCLCMS");
+        System.loadLibrary("lcms2");
         linker = Linker.nativeLinker();
         final SymbolLookup symbols = SymbolLookup.loaderLookup();
         try {
-            openProfileFromMem =
+            buildGamma =
                     downcall(
                             symbols,
-                            "lcms_open_profile_from_mem",
+                            "cmsBuildGamma",
                             FunctionDescriptor.of(
-                                    ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
+                                    ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_DOUBLE));
             createRGBProfile =
                     downcall(
                             symbols,
-                            "lcms_create_rgb_profile",
+                            "cmsCreateRGBProfile",
                             FunctionDescriptor.of(
                                     ValueLayout.ADDRESS,
                                     ValueLayout.ADDRESS,
                                     ValueLayout.ADDRESS,
-                                    ValueLayout.JAVA_DOUBLE));
+                                    ValueLayout.ADDRESS));
             createLab2Profile =
                     downcall(
                             symbols,
-                            "lcms_create_lab2_profile",
-                            FunctionDescriptor.of(ValueLayout.ADDRESS));
+                            "cmsCreateLab2Profile",
+                            FunctionDescriptor.of(ValueLayout.ADDRESS, ValueLayout.ADDRESS));
+            freeToneCurve =
+                    downcall(
+                            symbols,
+                            "cmsFreeToneCurve",
+                            FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
+            openProfileFromMem =
+                    downcall(
+                            symbols,
+                            "cmsOpenProfileFromMem",
+                            FunctionDescriptor.of(
+                                    ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.JAVA_INT));
             closeProfile =
                     downcall(
                             symbols,
-                            "lcms_close_profile",
+                            "cmsCloseProfile",
                             FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
             createTransform =
                     downcall(
                             symbols,
-                            "lcms_create_transform",
+                            "cmsCreateTransform",
                             FunctionDescriptor.of(
                                     ValueLayout.ADDRESS,
                                     ValueLayout.ADDRESS,
@@ -70,7 +83,7 @@ public class LCMSNative {
             createProofingTransform =
                     downcall(
                             symbols,
-                            "lcms_create_proofing_transform",
+                            "cmsCreateProofingTransform",
                             FunctionDescriptor.of(
                                     ValueLayout.ADDRESS,
                                     ValueLayout.ADDRESS,
@@ -81,46 +94,29 @@ public class LCMSNative {
                                     ValueLayout.JAVA_INT,
                                     ValueLayout.JAVA_INT,
                                     ValueLayout.JAVA_INT));
+            getTransformInputFormat =
+                    downcall(
+                            symbols,
+                            "cmsGetTransformInputFormat",
+                            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
+            getTransformOutputFormat =
+                    downcall(
+                            symbols,
+                            "cmsGetTransformOutputFormat",
+                            FunctionDescriptor.of(ValueLayout.JAVA_INT, ValueLayout.ADDRESS));
             deleteTransform =
                     downcall(
                             symbols,
-                            "lcms_delete_transform",
+                            "cmsDeleteTransform",
                             FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
-            doTransformBytes =
+            doTransform =
                     downcall(
                             symbols,
-                            "lcms_do_transform_bytes",
-                            FunctionDescriptor.of(
-                                    ValueLayout.JAVA_INT,
+                            "cmsDoTransform",
+                            FunctionDescriptor.ofVoid(
                                     ValueLayout.ADDRESS,
                                     ValueLayout.ADDRESS,
-                                    ValueLayout.JAVA_INT,
                                     ValueLayout.ADDRESS,
-                                    ValueLayout.JAVA_INT,
-                                    ValueLayout.JAVA_INT));
-            doTransformShorts =
-                    downcall(
-                            symbols,
-                            "lcms_do_transform_shorts",
-                            FunctionDescriptor.of(
-                                    ValueLayout.JAVA_INT,
-                                    ValueLayout.ADDRESS,
-                                    ValueLayout.ADDRESS,
-                                    ValueLayout.JAVA_INT,
-                                    ValueLayout.ADDRESS,
-                                    ValueLayout.JAVA_INT,
-                                    ValueLayout.JAVA_INT));
-            doTransformDoubles =
-                    downcall(
-                            symbols,
-                            "lcms_do_transform_doubles",
-                            FunctionDescriptor.of(
-                                    ValueLayout.JAVA_INT,
-                                    ValueLayout.ADDRESS,
-                                    ValueLayout.ADDRESS,
-                                    ValueLayout.JAVA_INT,
-                                    ValueLayout.ADDRESS,
-                                    ValueLayout.JAVA_INT,
                                     ValueLayout.JAVA_INT));
         } catch (IllegalArgumentException | IllegalStateException e) {
             throw new ExceptionInInitializerError(e);
@@ -154,7 +150,7 @@ public class LCMSNative {
     }
 
     protected static synchronized long cmsCreateLab2Profile() {
-        return invokeAddress(createLab2Profile);
+        return invokeAddress(createLab2Profile, MemorySegment.NULL);
     }
 
     protected static synchronized long cmsOpenProfileFromMem(byte[] data, int size) {
@@ -176,10 +172,27 @@ public class LCMSNative {
             throw new IndexOutOfBoundsException("Insufficient RGB profile components");
         }
         try (Arena arena = Arena.ofConfined()) {
-            final MemorySegment nativeWhitePoint = copyDoubles(arena, whitePoint);
-            final MemorySegment nativePrimaries = copyDoubles(arena, primaries);
-            return invokeAddress(
-                    createRGBProfile, nativeWhitePoint, nativePrimaries, gamma);
+            final MemorySegment nativeWhitePoint = copyDoubles(arena, whitePoint, 3);
+            final MemorySegment nativePrimaries = copyDoubles(arena, primaries, 9);
+            final MemorySegment gammaContext = gamma == 1
+                    ? arena.allocate(Integer.BYTES, Integer.BYTES)
+                    : MemorySegment.NULL;
+            final MemorySegment toneCurve = invokeSegment(buildGamma, gammaContext, gamma);
+            if (toneCurve.address() == 0) {
+                return 0;
+            }
+            try {
+                final MemorySegment curves = arena.allocate(3L * ValueLayout.ADDRESS.byteSize());
+                for (long offset = 0;
+                        offset < 3L * ValueLayout.ADDRESS.byteSize();
+                        offset += ValueLayout.ADDRESS.byteSize()) {
+                    curves.set(ValueLayout.ADDRESS, offset, toneCurve);
+                }
+                return invokeAddress(
+                        createRGBProfile, nativeWhitePoint, nativePrimaries, curves);
+            } finally {
+                invokeVoid(freeToneCurve, toneCurve);
+            }
         }
     }
 
@@ -205,7 +218,9 @@ public class LCMSNative {
     }
 
     static synchronized void cmsDeleteTransform(long transform) {
-        invokeVoid(deleteTransform, address(transform));
+        if (transform != 0) {
+            invokeVoid(deleteTransform, address(transform));
+        }
     }
 
     static void cmsDoTransform(
@@ -213,19 +228,14 @@ public class LCMSNative {
         Objects.requireNonNull(inputBuffer, "inputBuffer");
         Objects.requireNonNull(outputBuffer, "outputBuffer");
         checkSize(size);
+        if (transform == 0) {
+            return;
+        }
+        checkTransformBuffers(transform, inputBuffer.length, outputBuffer.length, 1, size);
         try (Arena arena = Arena.ofConfined()) {
             final MemorySegment nativeInput = copyBytes(arena, inputBuffer);
             final MemorySegment nativeOutput = copyBytes(arena, outputBuffer);
-            final int status =
-                    invokeInt(
-                            doTransformBytes,
-                            address(transform),
-                            nativeInput,
-                            inputBuffer.length,
-                            nativeOutput,
-                            outputBuffer.length,
-                            size);
-            checkTransformStatus(status);
+            invokeVoid(doTransform, address(transform), nativeInput, nativeOutput, size);
             copyBytesBack(nativeOutput, outputBuffer);
         }
     }
@@ -235,25 +245,14 @@ public class LCMSNative {
         Objects.requireNonNull(inputBuffer, "inputBuffer");
         Objects.requireNonNull(outputBuffer, "outputBuffer");
         checkSize(size);
+        if (transform == 0) {
+            return;
+        }
+        checkTransformBuffers(transform, inputBuffer.length, outputBuffer.length, 2, size);
         try (Arena arena = Arena.ofConfined()) {
             final MemorySegment nativeInput = copyShorts(arena, inputBuffer);
-            final MemorySegment nativeOutput =
-                    arena.allocate(
-                            Math.max((long) outputBuffer.length * Short.BYTES, 1),
-                            Short.BYTES);
-            if (outputBuffer.length > 0) {
-                nativeOutput.copyFrom(MemorySegment.ofArray(outputBuffer));
-            }
-            final int status =
-                    invokeInt(
-                            doTransformShorts,
-                            address(transform),
-                            nativeInput,
-                            inputBuffer.length,
-                            nativeOutput,
-                            outputBuffer.length,
-                            size);
-            checkTransformStatus(status);
+            final MemorySegment nativeOutput = copyShorts(arena, outputBuffer);
+            invokeVoid(doTransform, address(transform), nativeInput, nativeOutput, size);
             copyShortsBack(nativeOutput, outputBuffer);
         }
     }
@@ -263,31 +262,57 @@ public class LCMSNative {
         Objects.requireNonNull(inputBuffer, "inputBuffer");
         Objects.requireNonNull(outputBuffer, "outputBuffer");
         checkSize(size);
+        if (transform == 0) {
+            return;
+        }
+        checkTransformBuffers(transform, inputBuffer.length, outputBuffer.length, 0, size);
         try (Arena arena = Arena.ofConfined()) {
-            final MemorySegment nativeInput = copyDoubles(arena, inputBuffer);
-            final MemorySegment nativeOutput =
-                    arena.allocate(
-                            Math.max((long) outputBuffer.length * Double.BYTES, 1),
-                            Double.BYTES);
-            if (outputBuffer.length > 0) {
-                nativeOutput.copyFrom(MemorySegment.ofArray(outputBuffer));
-            }
-            final int status =
-                    invokeInt(
-                            doTransformDoubles,
-                            address(transform),
-                            nativeInput,
-                            inputBuffer.length,
-                            nativeOutput,
-                            outputBuffer.length,
-                            size);
-            checkTransformStatus(status);
+            final MemorySegment nativeInput = copyDoubles(arena, inputBuffer, inputBuffer.length);
+            final MemorySegment nativeOutput = copyDoubles(arena, outputBuffer, outputBuffer.length);
+            invokeVoid(doTransform, address(transform), nativeInput, nativeOutput, size);
             copyDoublesBack(nativeOutput, outputBuffer);
         }
     }
 
-    private static MemorySegment address(long address) {
-        return MemorySegment.ofAddress(address);
+    private static void checkTransformBuffers(
+            long transform, int inputElements, int outputElements, int expectedBytes, int pixels) {
+        final MemorySegment nativeTransform = address(transform);
+        final int inputFormat = invokeInt(getTransformInputFormat, nativeTransform);
+        final int outputFormat = invokeInt(getTransformOutputFormat, nativeTransform);
+        if (bytesPerSample(inputFormat) != expectedBytes
+                || bytesPerSample(outputFormat) != expectedBytes
+                || (expectedBytes == 0
+                        && (!isFloat(inputFormat) || !isFloat(outputFormat)))) {
+            throw new IndexOutOfBoundsException("Transform buffer type does not match the transform");
+        }
+
+        final long inputRequired =
+                (long) pixels * (channels(inputFormat) + extraSamples(inputFormat));
+        final long outputRequired =
+                (long) pixels * (channels(outputFormat) + extraSamples(outputFormat));
+        if (inputElements < inputRequired || outputElements < outputRequired) {
+            throw new IndexOutOfBoundsException("Transform buffers are too small");
+        }
+    }
+
+    private static int bytesPerSample(int format) {
+        return format & 7;
+    }
+
+    private static int channels(int format) {
+        return (format >>> 3) & 15;
+    }
+
+    private static int extraSamples(int format) {
+        return (format >>> 7) & 7;
+    }
+
+    private static boolean isFloat(int format) {
+        return ((format >>> 22) & 1) != 0;
+    }
+
+    private static MemorySegment address(long value) {
+        return MemorySegment.ofAddress(value);
     }
 
     private static MemorySegment copyBytes(Arena arena, byte[] source) {
@@ -299,21 +324,25 @@ public class LCMSNative {
     }
 
     private static MemorySegment copyShorts(Arena arena, short[] source) {
+        return copyShorts(arena, source, source.length);
+    }
+
+    private static MemorySegment copyShorts(Arena arena, short[] source, int length) {
         final MemorySegment destination =
-                arena.allocate(
-                        Math.max((long) source.length * Short.BYTES, 1), Short.BYTES);
-        if (source.length > 0) {
-            destination.copyFrom(MemorySegment.ofArray(source));
+                arena.allocate(Math.max((long) length * Short.BYTES, 1), Short.BYTES);
+        if (length > 0) {
+            destination.copyFrom(
+                    MemorySegment.ofArray(source).asSlice(0, (long) length * Short.BYTES));
         }
         return destination;
     }
 
-    private static MemorySegment copyDoubles(Arena arena, double[] source) {
+    private static MemorySegment copyDoubles(Arena arena, double[] source, int length) {
         final MemorySegment destination =
-                arena.allocate(
-                        Math.max((long) source.length * Double.BYTES, 1), Double.BYTES);
-        if (source.length > 0) {
-            destination.copyFrom(MemorySegment.ofArray(source));
+                arena.allocate(Math.max((long) length * Double.BYTES, 1), Double.BYTES);
+        if (length > 0) {
+            destination.copyFrom(
+                    MemorySegment.ofArray(source).asSlice(0, (long) length * Double.BYTES));
         }
         return destination;
     }
@@ -344,19 +373,16 @@ public class LCMSNative {
         }
     }
 
-    private static void checkTransformStatus(int status) {
-        if (status < 0) {
-            throw new IndexOutOfBoundsException("Transform buffers are too small");
+    private static MemorySegment invokeSegment(MethodHandle handle, Object... arguments) {
+        try {
+            return (MemorySegment) handle.invokeWithArguments(arguments);
+        } catch (Throwable e) {
+            throw rethrow(e);
         }
     }
 
     private static long invokeAddress(MethodHandle handle, Object... arguments) {
-        try {
-            final MemorySegment result = (MemorySegment) handle.invokeWithArguments(arguments);
-            return result.address();
-        } catch (Throwable e) {
-            throw rethrow(e);
-        }
+        return invokeSegment(handle, arguments).address();
     }
 
     private static int invokeInt(MethodHandle handle, Object... arguments) {

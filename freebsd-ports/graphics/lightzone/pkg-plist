@@ -5,7 +5,6 @@ bin/dcraw_lz
 %%LIBDIR%%/libJAI.so
 %%LIBDIR%%/libLCJNI.so
 %%LIBDIR%%/libLCJPEG.so
-%%LIBDIR%%/libLCLCMS.so
 %%LIBDIR%%/libLCLENSFUN.so
 %%LIBDIR%%/libLCTIFF.so
 %%LIBDIR%%/libSegment.so

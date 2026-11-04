@@ -7,6 +7,7 @@ import java.awt.color.ICC_Profile;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LCMSNativeTest {
@@ -24,6 +25,18 @@ class LCMSNativeTest {
                         2.2);
         assertNotEquals(0, profile);
 
+        final long linearProfile =
+                LCMSNative.cmsCreateRGBProfile(
+                        new double[] {0.3127, 0.3290, 1.0},
+                        new double[] {
+                            0.64, 0.33, 1.0,
+                            0.30, 0.60, 1.0,
+                            0.15, 0.06, 1.0
+                        },
+                        1.0);
+        assertNotEquals(0, linearProfile);
+        assertTrue(LCMSNative.cmsCloseProfile(linearProfile));
+
         final long labProfile = LCMSNative.cmsCreateLab2Profile();
         assertNotEquals(0, labProfile);
 
@@ -39,6 +52,12 @@ class LCMSNativeTest {
                         profile, LCMS.TYPE_RGB_8,
                         LCMS.INTENT_PERCEPTUAL, 0);
         assertNotEquals(0, transform);
+        assertThrows(
+                IndexOutOfBoundsException.class,
+                () -> LCMSNative.cmsDoTransform(transform, new byte[2], new byte[3], 1));
+        assertThrows(
+                IndexOutOfBoundsException.class,
+                () -> LCMSNative.cmsDoTransform(transform, new byte[3], new byte[2], 1));
 
         final byte[] inputBytes = {(byte) 32, (byte) 128, (byte) 224};
         final byte[] outputBytes = new byte[inputBytes.length];
