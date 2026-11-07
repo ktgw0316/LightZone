@@ -58,7 +58,7 @@ val MAKE = with(os) {
         else -> "make"
     }
 }
-val nativeLibPath = layout.buildDirectory.dir("resources/main/native").get().asFile.absolutePath
+val nativeLibPath = rootProject.layout.buildDirectory.dir("resources/main/native").get().asFile.absolutePath
 tasks {
     // Disable run task since this is a library project, not a standalone application
     named("run") {
@@ -83,19 +83,6 @@ tasks {
             }
         }
     }
-    jni {
-        doLast {
-            copy {
-                from("products/")
-                include("share/**")
-                include("*.dll")
-                include("*.dylib")
-                include("*.jnilib")
-                include("*.so")
-                into(nativeLibPath)
-            }
-        }
-    }
     cleanJni {
         doLast {
             val nativeFiles = File(nativeLibPath).listFiles { _, name ->
@@ -109,7 +96,7 @@ tasks {
         dependsOn("coprocesses")
     }
     test {
-        dependsOn("jni")
+        dependsOn(rootProject.tasks.named("prepareHostNativeLibraries"))
         jvmArgs("-Djava.library.path=$nativeLibPath")
     }
     clean {

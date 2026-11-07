@@ -20,6 +20,17 @@ tasks {
     clean {
         dependsOn(":lightcrafts:clean")
     }
+    register ("prepareNativeLibraries") {
+        dependsOn(":lightcrafts:jni")
+        dependsOn("products")
+        doLast {
+            copy {
+                from("products/")
+                include("*.so")
+                into(rootProject.layout.buildDirectory.dir("resources/main/native"))
+            }
+        }
+    }
     jpackage {
         dependsOn("jpackageImage")
         doFirst {
