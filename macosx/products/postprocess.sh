@@ -8,9 +8,9 @@ if [ $# -ne 1 ]; then
   exit 1
 fi
 
-SCRIPT_DIR=$(cd $(dirname $0) && pwd)
+SCRIPT_DIR=$(cd "$(dirname $0)" && pwd)
 
-cd $1
+cd $1 || exit 1
 
 # Copy required dylibs
 JNILIBS=$(find . -maxdepth 1 -name "*.jnilib")
@@ -35,12 +35,18 @@ done
 sh -x -c "install_name_tool -add_rpath @loader_path dcraw_lz"
 
 for LIB in ${DYLIBS}; do
-    install_name_tool -id @rpath/$(basename ${LIB}) ${LIB}
+    install_name_tool -id "@rpath/$(basename ${LIB})" ${LIB}
 done
 
 # Sign the dylibs/executables
 for FILE in ${FILES} ${DYLIBS}; do
   codesign --force --deep --sign - ${FILE}
+done
+
+# Symlink the libraries so that System.loadLibrary() can find them
+DYLIBS_WITH_VERSION="liblcms2.*.dylib"
+for LIB in ${DYLIBS_WITH_VERSION}; do
+  ln -sf ${LIB} "${LIB%%.*}.dylib"
 done
 
 # vim:set noet sw=8 ts=8:
