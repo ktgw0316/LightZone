@@ -7,9 +7,15 @@ val osName = when {
     else -> "linux"
 }
 
-// Delegate 'run' task to the OS-specific subproject
-tasks.register("run") {
-    dependsOn(":$osName:run")
-    group = "application"
-    description = "Runs the application (delegates to :$osName:run)"
+// Delegate tasks to the OS-specific subproject
+tasks {
+    register("run") {
+        dependsOn(":$osName:run")
+        group = "application"
+        description = "Runs the application (delegates to :$osName:run)"
+    }
+    register("prepareHostNativeLibraries") {
+        dependsOn(":$osName:prepareNativeLibraries")
+    }
 }
+

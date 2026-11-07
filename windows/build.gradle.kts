@@ -24,6 +24,23 @@ tasks {
     register<Exec> ("helpFiles") {
         commandLine("make", "-C", "help")
     }
+    register ("prepareNativeLibraries") {
+        dependsOn(":lightcrafts:jni")
+        dependsOn("jni")
+        dependsOn("products")
+        doLast {
+            copy {
+                from("products/")
+                include("*.dll")
+                into(rootProject.layout.buildDirectory.dir("resources/main/native"))
+            }
+            copy {
+                from(".")
+                include("share/**")
+                into(rootProject.layout.buildDirectory.dir("resources/main/native"))
+            }
+        }
+    }
     jpackage {
         dependsOn("jpackageImage", "helpFiles")
         doFirst {
