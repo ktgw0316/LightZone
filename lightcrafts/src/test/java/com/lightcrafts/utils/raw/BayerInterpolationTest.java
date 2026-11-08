@@ -7,7 +7,7 @@ import java.util.Arrays;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class DCRawInterpolationTest {
+class BayerInterpolationTest {
 
     @Test
     void interpolatesGreenAndRedBlueChannelsWithPaddedRows() {
@@ -25,11 +25,11 @@ class DCRawInterpolationTest {
         final short[] destination = new short[destinationStride * height * 3];
         Arrays.fill(destination, (short) 173);
 
-        DCRaw.interpolateGreen(
+        Bayer.interpolateGreen(
                 source, destination, width, height,
                 sourceStride, destinationStride,
                 3, 0, 1, 2, 0, 0, 0);
-        DCRaw.interpolateRedBlue(
+        Bayer.interpolateRedBlue(
                 destination, width, height, destinationStride,
                 0, 1, 2, 1, 0, 0, 1);
 

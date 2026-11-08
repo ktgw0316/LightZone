@@ -3,13 +3,13 @@
 package com.lightcrafts.jai.opimage;
 
 import com.lightcrafts.jai.utils.Functions;
-import com.lightcrafts.utils.raw.DCRaw;
-
+import com.lightcrafts.utils.raw.Bayer;
 import org.eclipse.imagen.AreaOpImage;
 import org.eclipse.imagen.BorderExtender;
 import org.eclipse.imagen.ImageLayout;
 import org.eclipse.imagen.RasterAccessor;
 import org.eclipse.imagen.RasterFormatTag;
+
 import java.awt.*;
 import java.awt.image.*;
 import java.util.Arrays;
@@ -52,7 +52,7 @@ public class RGBDemosaicOpImage extends AreaOpImage {
         }
     }
 
-    private ThreadLocal<Raster> tltmp = new ThreadLocal<Raster>();
+    private final ThreadLocal<Raster> tltmp = new ThreadLocal<>();
 
     protected void computeRect(Raster[] sources,
                                WritableRaster dest,
@@ -128,7 +128,7 @@ public class RGBDemosaicOpImage extends AreaOpImage {
         int dWidth = dst.getWidth();
         int dHeight = dst.getHeight();
 
-        DCRaw.interpolateGreen(srcData, destData, dWidth, dHeight, srcScanlineStride, dstScanlineStride, srcOffset, rOffset, gOffset, bOffset, gx, gy, ry );
-        DCRaw.interpolateRedBlue(destData, dWidth, dHeight, dstScanlineStride, rOffset, gOffset, bOffset, rx, ry, bx, by );
+        Bayer.interpolateGreen(srcData, destData, dWidth, dHeight, srcScanlineStride, dstScanlineStride, srcOffset, rOffset, gOffset, bOffset, gx, gy, ry );
+        Bayer.interpolateRedBlue(destData, dWidth, dHeight, dstScanlineStride, rOffset, gOffset, bOffset, rx, ry, bx, by );
     }
 }
