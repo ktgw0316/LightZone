@@ -27,7 +27,6 @@ public class ImageListProgress {
     public static ImageList createImageList(
         final Frame frame, final File directory
     ) {
-        System.loadLibrary("DCRaw");
         System.loadLibrary("LCJPEG");
         System.loadLibrary("LCTIFF");
 

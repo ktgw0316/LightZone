@@ -116,8 +116,6 @@ public class BrowserTest {
     }
 
     public static void main(String[] args) {
-        System.loadLibrary("DCRaw");
-
         BrowserTest browser = new BrowserTest();
 
         JFrame frame = new JFrame("Folders");

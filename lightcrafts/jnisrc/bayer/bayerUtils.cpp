@@ -302,7 +302,7 @@ static bool validRgbBuffer(const uint16_t *data, int length, int width,
   return required <= static_cast<uint64_t>(length);
 }
 
-extern "C" int dcraw_interpolate_green(
+extern "C" int bayer_interpolate_green(
     const uint16_t *srcData, int srcLength, uint16_t *dstData, int dstLength,
     int width, int height, int srcLineStride, int dstLineStride, int srcOffset,
     int rOffset, int gOffset, int bOffset, int gx, int gy, int ry) {
@@ -327,7 +327,7 @@ extern "C" int dcraw_interpolate_green(
   return 0;
 }
 
-extern "C" int dcraw_interpolate_red_blue(
+extern "C" int bayer_interpolate_red_blue(
     uint16_t *data, int length, int width, int height, int lineStride,
     int rOffset, int gOffset, int bOffset, int rx0, int ry0, int bx0, int by0) {
   if (!validRgbBuffer(data, length, width, height, lineStride, rOffset,

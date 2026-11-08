@@ -109,7 +109,6 @@ public class EditorLayout extends JPanel {
                 System.err.println("not a file: " + args[0]);
                 System.exit(0);
             }
-            System.loadLibrary("DCRaw");
             System.loadLibrary("Segment");
             // Other JNI libraries seem to get pulled in automatically.
 

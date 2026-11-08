@@ -1,6 +1,6 @@
 bin/lightzone
 bin/dcraw_lz
-%%LIBDIR%%/libDCRaw.so
+%%LIBDIR%%/libBayer.so
 %%LIBDIR%%/libFASTJAI.so
 %%LIBDIR%%/libJAI.so
 %%LIBDIR%%/libLCJNI.so
