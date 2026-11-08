@@ -251,7 +251,7 @@ BlendMode *BlendMode::blendMode[] = {
                       ushort(hilightsThreshold * maxVal / 2)), // 21
 };
 
-#include "../pixutils/HSB.h"
+#include "include/hsb.h"
 #include <cassert>
 #include <cstdio>
 #include <functional>
