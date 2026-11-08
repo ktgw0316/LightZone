@@ -8,8 +8,6 @@
 
 // standard
 #include <cstdlib>
-#include <cstring>
-#include <cerrno>
 #include <iostream>
 #include <jni.h>
 
@@ -22,23 +20,6 @@
 // local
 #define LC_JNIUtils_IMPLEMENTATION
 #include "LC_JNIUtils.h"
-
-#if defined(__x86_64__) || defined(__i386__)
-
-/* Registers for 32-bit x86. */
-#define CPU_REG_b "ebx"
-#define CPU_REG_S "esi"
-
-#define CPUID(index,eax,ebx,ecx,edx)                            \
-        asm volatile (                                          \
-            "mov %%" CPU_REG_b ", %%" CPU_REG_S "\n\t"          \
-            "cpuid\n\t"                                         \
-            "xchg %%" CPU_REG_b ", %%" CPU_REG_S                \
-            : "=a" (eax), "=S" (ebx), "=c" (ecx), "=d" (edx)    \
-            : "0" (index)                                       \
-        )
-
-#endif  /* __x86_64__ || __i386__ */
 
 using namespace std;
 using namespace LightCrafts;
@@ -100,23 +81,6 @@ jclass LC_findClassOrDie( JNIEnv *env, char const *className,
 }
 
 /**
- * Given a class, method name, and method signature, gets the jmethodID.
- */
-jmethodID LC_getStaticMethodID( JNIEnv *env, jclass jClass,
-                                char const *methodName,
-                                char const *methodSignature ) {
-    jmethodID const jMethodID = env->GetStaticMethodID(
-        jClass, methodName, methodSignature
-    );
-    if ( LC_exceptionOccurred( env ) || !jMethodID ) {
-        cerr << "GetStaticMethodID(" << methodName << ',' << methodSignature
-             << ") failed" << endl;
-        ::exit( 1 );
-    }
-    return jMethodID;
-}
-
-/**
  * Open a file.  This function correctly handles path names containing Unicode
  * (UTF-8) on all platforms.
  */
@@ -174,36 +138,6 @@ void* LC_getNativePtr( JNIEnv *env, jobject jObject ) {
     return reinterpret_cast<void*>( env->GetLongField( jObject, fieldID ) );
 }
 
-#if defined(__x86_64__) || defined(__i386__)
-/**
- * Returns non-zero only if the CPU has SSE2 support.
- */
-int LC_hasSSE2() {
-    int max_std_level, std_caps;
-    int eax, ebx, ecx, edx;
-
-    CPUID( 0, max_std_level, ebx, ecx, edx );
-    if ( max_std_level >= 1 ) {
-        CPUID( 1, eax, ebx, ecx, std_caps );
-        if ( std_caps & (1 << 26) /* SSE2 */ )
-            return 1;
-    }
-    return 0;
-}
-#endif  /* __x86_64__ || __i386__ */
-
-/**
- * Sets a float field of a Java class to a given value.
- */
-void LC_setFloatField( JNIEnv *env, jobject jObject, char const *fieldName,
-                       float value ) {
-    auto_jclass const jClass( env, jObject );
-    jfieldID const fieldID = env->GetFieldID( jClass, fieldName, "F" );
-    if ( !fieldID )
-        return;                         // NoSuchFieldError was thrown by Java
-    env->SetFloatField( jObject, fieldID, value );
-}
-
 /**
  * Sets an int field of a Java class to a given value.
  */
@@ -225,17 +159,6 @@ void LC_setNativePtr( JNIEnv *env, jobject jObject, void *ptr ) {
     if ( !fieldID )
         return;                         // NoSuchFieldError was thrown by Java
     env->SetLongField( jObject, fieldID, reinterpret_cast<jlong>( ptr ) );
-}
-
-/**
- * Sets a static int field of a Java class to a given value.
- */
-void LC_setStaticIntField( JNIEnv *env, jclass jClass, char const *fieldName,
-                           int value ) {
-    jfieldID const fieldID = env->GetStaticFieldID( jClass, fieldName, "I" );
-    if ( !fieldID )
-        return;                         // NoSuchFieldError was thrown by Java
-    env->SetStaticIntField( jClass, fieldID, value );
 }
 
 /**
@@ -293,28 +216,6 @@ void LC_throwIOException( JNIEnv *env, char const *msg ) {
     }
     char const IOExceptionClass[] = "java/io/IOException";
     env->ThrowNew( LC_findClassOrDie( env, IOExceptionClass ), msg );
-}
-
-/**
- * Throw an IOException back on the Java side based on errno.
- */
-void LC_throwIOExceptionForErrno( JNIEnv *env ) {
-#ifdef __APPLE__
-    char errorBuf[ 80 ];
-    ::strerror_r( errno, errorBuf, sizeof errorBuf );
-#else
-    char const *const errorBuf = ::strerror( errno );
-#endif
-    LC_throwIOException( env, errorBuf );
-}
-
-/**
- * Throw an IOException back on the Java side for the given error code.
- */
-void LC_throwIOExceptionForErrorCode( JNIEnv *env, int errorCode ) {
-    char errorBuf[ 20 ];
-    snprintf( errorBuf, sizeof errorBuf, "Error code %d", errorCode );
-    LC_throwIOException( env, errorBuf );
 }
 
 /**
