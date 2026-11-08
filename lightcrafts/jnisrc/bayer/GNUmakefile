@@ -1,4 +1,4 @@
-TARGET_BASE:=		DCRaw
+TARGET_BASE:=		Bayer
 
 # Uncomment to compile in debug mode.
 #DEBUG:=			true
@@ -21,7 +21,7 @@ JNI_MACOSX_LINK:=	-lstdc++ -single_module -lomp
 ##
 JNI_PPC_DEFINES=	$(ALTIVEC_CFLAGS)
 
-CXX_SOURCES:=		dcrawUtils.cpp
+CXX_SOURCES:=		bayerUtils.cpp
 
 ROOT:=			../../..
 include			../jni.mk

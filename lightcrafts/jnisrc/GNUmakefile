@@ -2,7 +2,7 @@
 # We need to specify this manually so that jniutils is built first.
 ##
 SUBDIRS:=	jniutils \
-		dcraw \
+		bayer \
 		EDISON \
 		jai \
 		fast_jai \

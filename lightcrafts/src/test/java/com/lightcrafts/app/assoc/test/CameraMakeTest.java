@@ -61,7 +61,6 @@ public class CameraMakeTest {
             System.err.println("\"" + args[0] + "\" is not a directory");
             return;
         }
-        System.loadLibrary("DCRaw");
         printCameraMake(file);
     }
 }

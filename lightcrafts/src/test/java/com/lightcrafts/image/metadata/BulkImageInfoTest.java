@@ -114,9 +114,5 @@ public final class BulkImageInfoTest {
      */
     private static final Logger m_logger =
         Logger.getLogger( "com.lightcrafts.image.metadata" );
-
-    static {
-        System.loadLibrary( "DCRaw" );
-    }
 }
 /* vim:set et sw=4 ts=4: */

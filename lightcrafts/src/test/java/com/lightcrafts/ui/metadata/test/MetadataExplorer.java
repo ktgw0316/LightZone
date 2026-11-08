@@ -22,8 +22,6 @@ public class MetadataExplorer {
             String dir = System.getProperty("user.dir");
             root = new File(dir);
         }
-        // The ImageInfo thumbnails mechanism needs dcraw for raw files:
-        System.loadLibrary("DCRaw");
         if ( Platform.isMac() ) {
             System.loadLibrary("MacOSX");
         }

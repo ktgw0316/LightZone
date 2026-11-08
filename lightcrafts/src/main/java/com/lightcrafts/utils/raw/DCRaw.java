@@ -59,13 +59,13 @@ public final class DCRaw extends RawDecoder {
     private static final MethodHandle interpolateRedBlueNative;
 
     static {
-        System.loadLibrary("DCRaw");
+        System.loadLibrary("Bayer");
         final Linker linker = Linker.nativeLinker();
         final SymbolLookup symbols = SymbolLookup.loaderLookup();
         try {
             interpolateGreenNative =
                     linker.downcallHandle(
-                            symbols.find("dcraw_interpolate_green").orElseThrow(),
+                            symbols.find("bayer_interpolate_green").orElseThrow(),
                             FunctionDescriptor.of(
                                     ValueLayout.JAVA_INT,
                                     ValueLayout.ADDRESS,
@@ -85,7 +85,7 @@ public final class DCRaw extends RawDecoder {
                                     ValueLayout.JAVA_INT));
             interpolateRedBlueNative =
                     linker.downcallHandle(
-                            symbols.find("dcraw_interpolate_red_blue").orElseThrow(),
+                            symbols.find("bayer_interpolate_red_blue").orElseThrow(),
                             FunctionDescriptor.of(
                                     ValueLayout.JAVA_INT,
                                     ValueLayout.ADDRESS,
