@@ -7,40 +7,35 @@
  *
  */
 
-#include <jni.h>
-#include <cstdarg>
-#include <cstdlib>
+#include <cstdint>
+#include <climits>
 
 #include "segm/msImageProcessor.h"
 
-void bgLogVar(const char *, va_list) { }
-
-extern "C" JNIEXPORT jbyteArray JNICALL Java_com_lightcrafts_utils_Segment_segmentImage
-  (JNIEnv *env, jclass clazz, jbyteArray image, jint channels, jint height, jint width)
-{
-    byte *data = (byte *) env->GetPrimitiveArrayCritical(image, 0);
-
+extern "C" int segment_image(
+        const unsigned char* image, int channels, int height, int width,
+        unsigned char* result, int resultCapacity) {
+    if (!image || !result || (channels != 1 && channels != 3)
+            || height <= 0 || width <= 0) {
+        return -1;
+    }
+    if (height > INT_MAX / width || height * width > INT_MAX / channels) {
+        return -1;
+    }
+    const auto imageSize = channels * height * width;
+    if (resultCapacity < imageSize) {
+        return -1;
+    }
     msImageProcessor processor;
 
     if (channels == 1)
-      processor.DefineImage(data, GRAYSCALE, height, width);
+      processor.DefineImage(const_cast<byte*>(image), GRAYSCALE, height, width);
     else
-      processor.DefineImage(data, COLOR, height, width);
-
-    env->ReleasePrimitiveArrayCritical(image, data, 0);
+      processor.DefineImage(const_cast<byte*>(image), COLOR, height, width);
 
     processor.SetSpeedThreshold(0.5);
     processor.Segment(4, 4.0, 20);
 
-    int imageSize = height * width * channels;
-
-    jbyteArray result = env->NewByteArray(imageSize);
-
-    byte *out_data = (byte *) env->GetPrimitiveArrayCritical(result, 0);
-
-    processor.GetResults(out_data);
-
-    env->ReleasePrimitiveArrayCritical(result, out_data, 0);
-
-    return result;
+    processor.GetResults(reinterpret_cast<byte*>(result));
+    return static_cast<int>(imageSize);
 }

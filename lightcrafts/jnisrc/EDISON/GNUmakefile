@@ -11,8 +11,6 @@ JNI_MANUAL_TARGET:=	1
 
 JNI_EXTRA_CFLAGS:=	-std=c++14
 
-JAVAH_CLASSES:=		com.lightcrafts.utils.Segment
-
 ROOT:=			../../..
 include			../jni.mk
 
