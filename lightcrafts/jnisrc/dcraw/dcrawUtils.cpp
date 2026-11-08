@@ -276,44 +276,69 @@ void interpolateGreen(uint16_t *data, int width, int height, int lineStride,
   }
 }
 
-// JNI
+static bool validSourceBuffer(const uint16_t *data, int length, int width,
+                              int height, int lineStride) {
+  if (data == nullptr || length < 0 || width <= 0 || height <= 0 ||
+      lineStride < width) {
+    return false;
+  }
+  const uint64_t required =
+      static_cast<uint64_t>(height - 1) * lineStride + width;
+  return required <= static_cast<uint64_t>(length);
+}
 
-#include <jni.h>
-#ifndef AUTO_DEP
-#include "javah/com_lightcrafts_utils_raw_DCRaw.h"
-#endif
-#include "LC_JNIUtils.h"
+static bool validRgbBuffer(const uint16_t *data, int length, int width,
+                           int height, int lineStride, int rOffset,
+                           int gOffset, int bOffset) {
+  if (data == nullptr || length < 0 || width <= 0 || height <= 0 ||
+      lineStride < width || rOffset < 0 || rOffset > 2 || gOffset < 0 ||
+      gOffset > 2 || bOffset < 0 || bOffset > 2) {
+    return false;
+  }
+  const uint64_t lastPixel =
+      static_cast<uint64_t>(height - 1) * lineStride + width - 1;
+  const uint64_t required =
+      lastPixel * pixelStride + std::max({rOffset, gOffset, bOffset}) + 1;
+  return required <= static_cast<uint64_t>(length);
+}
 
-#define DCRaw_METHOD(method)                                                   \
-  name4(Java_, com_lightcrafts_utils_raw_DCRaw, _, method)
-
-JNIEXPORT void JNICALL DCRaw_METHOD(interpolateGreen)(
-    JNIEnv *env, jclass cls, jshortArray jsrcData, jshortArray jdstData,
-    jint width, jint height, jint srcLineStride, jint dstLineStride,
-    jint srcOffset, jint rOffset, jint gOffset, jint bOffset, jint gx, jint gy,
-    jint ry) {
-  auto srcData =
-      static_cast<uint16_t *>(env->GetPrimitiveArrayCritical(jsrcData, 0));
-  auto dstData =
-      static_cast<uint16_t *>(env->GetPrimitiveArrayCritical(jdstData, 0));
+extern "C" int dcraw_interpolate_green(
+    const uint16_t *srcData, int srcLength, uint16_t *dstData, int dstLength,
+    int width, int height, int srcLineStride, int dstLineStride, int srcOffset,
+    int rOffset, int gOffset, int bOffset, int gx, int gy, int ry) {
+  if (!validSourceBuffer(srcData, srcLength, width, height, srcLineStride) ||
+      !validRgbBuffer(dstData, dstLength, width, height, dstLineStride, rOffset,
+                      gOffset, bOffset) ||
+      gx < 0 || gx > 1 || gy < 0 || gy > 1 || ry < 0 || ry > 1) {
+    return -1;
+  }
+  (void)srcOffset;
 #pragma omp parallel shared(srcData, dstData)
   {
     copyRawToRgb(srcData, dstData, width, height, srcLineStride, dstLineStride,
                  srcOffset, rOffset, gOffset, bOffset, gx, gy, ry);
-    interpolateGreenChannel(dstData, width, height, dstLineStride, gx, gy, ry,
-                            rOffset, gOffset, bOffset);
-    refineGreenChannel(dstData, width, height, dstLineStride, gx, gy, ry,
-                       rOffset, gOffset, bOffset);
+    if (width >= 4 && height >= 5) {
+      interpolateGreenChannel(dstData, width, height, dstLineStride, gx, gy,
+                              ry, rOffset, gOffset, bOffset);
+      refineGreenChannel(dstData, width, height, dstLineStride, gx, gy, ry,
+                         rOffset, gOffset, bOffset);
+    }
   }
-  env->ReleasePrimitiveArrayCritical(jsrcData, srcData, 0);
-  env->ReleasePrimitiveArrayCritical(jdstData, dstData, 0);
+  return 0;
 }
 
-JNIEXPORT void JNICALL DCRaw_METHOD(interpolateRedBlue)(
-    JNIEnv *env, jclass cls, jshortArray jdata, jint width, jint height,
-    jint lineStride, jint rOffset, jint gOffset, jint bOffset, jint rx0,
-    jint ry0, jint bx0, jint by0) {
-  auto data = static_cast<uint16_t *>(env->GetPrimitiveArrayCritical(jdata, 0));
+extern "C" int dcraw_interpolate_red_blue(
+    uint16_t *data, int length, int width, int height, int lineStride,
+    int rOffset, int gOffset, int bOffset, int rx0, int ry0, int bx0, int by0) {
+  if (!validRgbBuffer(data, length, width, height, lineStride, rOffset,
+                      gOffset, bOffset) ||
+      rx0 < 0 || rx0 > 1 || ry0 < 0 || ry0 > 1 || bx0 < 0 || bx0 > 1 ||
+      by0 < 0 || by0 > 1) {
+    return -1;
+  }
+  if (width < 3 || height < 3) {
+    return 0;
+  }
 #pragma omp parallel shared(data)
   {
     interpolateRedOrBlue(data, width, height, lineStride, rx0, ry0, gOffset,
@@ -321,5 +346,5 @@ JNIEXPORT void JNICALL DCRaw_METHOD(interpolateRedBlue)(
     interpolateRedOrBlue(data, width, height, lineStride, bx0, by0, gOffset,
                          bOffset);
   }
-  env->ReleasePrimitiveArrayCritical(jdata, data, 0);
+  return 0;
 }
