@@ -21,13 +21,7 @@ JNI_MACOSX_LINK:=	-lstdc++ -single_module -lomp
 ##
 JNI_PPC_DEFINES=	$(ALTIVEC_CFLAGS)
 
-##
-# Manually specify our own C sources because dcraw.c is #include'd into
-# DCRawjnilib.c; therefore dcraw.c must not be built into dcraw.o.
-##
-C_SOURCES:=		dcrawUtils.c
-
-JAVAH_CLASSES:=		com.lightcrafts.utils.raw.DCRaw
+CXX_SOURCES:=		dcrawUtils.cpp
 
 ROOT:=			../../..
 include			../jni.mk

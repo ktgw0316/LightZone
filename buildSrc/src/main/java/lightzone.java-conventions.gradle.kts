@@ -45,6 +45,7 @@ application {
     applicationName = "LightZone"
     applicationDefaultJvmArgs += listOf(
         "--add-exports=java.desktop/sun.awt.image=ALL-UNNAMED",
+        "--enable-native-access=ALL-UNNAMED",
         "-Xmx512m",
     )
 }
@@ -66,6 +67,7 @@ tasks {
     }
     test {
         useJUnitPlatform()
+        jvmArgs("--enable-native-access=ALL-UNNAMED")
         testLogging {
             events("passed", "skipped", "failed")
         }

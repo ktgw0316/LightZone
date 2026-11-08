@@ -89,24 +89,6 @@ JNIEXPORT JNIEnv* JNICALL LC_getJNIEnv( int *mustDetach );
 JNIEXPORT void* JNICALL LC_getNativePtr( JNIEnv*, jobject );
 
 /**
- * Given a class, method name, and method signature, gets the jmethodID.
- */
-JNIEXPORT jmethodID JNICALL LC_getStaticMethodID( JNIEnv*, jclass,
-                                                  char const *methodName,
-                                                  char const *methodSignature );
-
-/**
- * Returns non-zero only if the CPU has SSE2 support.
- */
-JNIEXPORT int JNICALL LC_hasSSE2();
-
-/**
- * Sets a float field of a Java class to a given value.
- */
-JNIEXPORT void JNICALL LC_setFloatField( JNIEnv*, jobject,
-                                         char const *fieldName, float value );
-
-/**
  * Sets an int field of a Java class to a given value.
  */
 JNIEXPORT void JNICALL LC_setIntField( JNIEnv*, jobject, char const *fieldName,
@@ -116,12 +98,6 @@ JNIEXPORT void JNICALL LC_setIntField( JNIEnv*, jobject, char const *fieldName,
  * Sets the pointer inside the Java object.
  */
 JNIEXPORT void JNICALL LC_setNativePtr( JNIEnv*, jobject, void* );
-
-/**
- * Sets a static int field of a Java class to a given value.
- */
-JNIEXPORT void JNICALL LC_setStaticIntField( JNIEnv*, jclass,
-                                             char const *fieldName, int value );
 
 /**
  * Throws a FileNotFoundException back on the Java side.
@@ -145,17 +121,6 @@ JNIEXPORT void JNICALL LC_throwIllegalStateException( JNIEnv*,
  * Throws an IOException back on the Java side with the given message.
  */
 JNIEXPORT void JNICALL LC_throwIOException( JNIEnv*, char const *msg );
-
-/**
- * Throws an IOException back on the Java side based on errno.
- */
-JNIEXPORT void JNICALL LC_throwIOExceptionForErrno( JNIEnv* );
-
-/**
- * Throws an IOException back on the Java side for the given error code.
- */
-JNIEXPORT void JNICALL LC_throwIOExceptionForErrorCode( JNIEnv*,
-                                                        int errorCode );
 
 /**
  * Throws an OutOfMemoryError back on the Java side.

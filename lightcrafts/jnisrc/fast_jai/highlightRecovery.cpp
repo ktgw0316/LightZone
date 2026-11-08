@@ -7,7 +7,7 @@
  *
  */
 
-#include "../pixutils/HSB.h"
+#include "include/hsb.h"
 #include "mathlz.h"
 #include <algorithm>
 #include <jni.h>

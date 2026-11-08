@@ -87,7 +87,6 @@ tasks {
         doLast {
             copy {
                 from("products/")
-                include("share/**")
                 include("*.dll")
                 include("*.dylib")
                 include("*.jnilib")
@@ -110,6 +109,13 @@ tasks {
     }
     test {
         dependsOn("jni")
+        doFirst {
+            copy {
+                from("../windows/share")
+                include("lensfun/**")
+                into(layout.buildDirectory.dir("classes/java"))
+            }
+        }
         jvmArgs("-Djava.library.path=$nativeLibPath")
     }
     clean {

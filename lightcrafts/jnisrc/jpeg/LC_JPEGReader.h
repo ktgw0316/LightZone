@@ -1,48 +1,31 @@
-/* Copyright (C) 2005-2011 Fabio Riccardi */
+/* Copyright (C) 2026 LightZone Project */
 
-#ifndef LC_JPEGReader_H
-#define LC_JPEGReader_H
+#ifndef LC_JPEGREADER_H
+#define LC_JPEGREADER_H
 
-// standard
-#include <cstdio>                       /* for FILE */
-#include <jni.h>
+#ifdef _WIN32
+#define LCJPEG_EXPORT __declspec(dllexport)
+#else
+#define LCJPEG_EXPORT
+#endif
+
+typedef int (*LCJPEGReaderReadCallback)(unsigned char*, int);
 
 extern "C" {
-#   include <jpeglib.h>
+LCJPEG_EXPORT void* lcjpeg_reader_create(
+    LCJPEGReaderReadCallback read,
+    int bufferSize,
+    int maxWidth,
+    int maxHeight);
+LCJPEG_EXPORT int lcjpeg_reader_destroy(void* handle);
+LCJPEG_EXPORT int lcjpeg_reader_width(void* handle);
+LCJPEG_EXPORT int lcjpeg_reader_height(void* handle);
+LCJPEG_EXPORT int lcjpeg_reader_components(void* handle);
+LCJPEG_EXPORT int lcjpeg_reader_color_space(void* handle);
+LCJPEG_EXPORT int lcjpeg_reader_read_scanlines(void* handle, unsigned char* buffer, int numLines);
+LCJPEG_EXPORT int lcjpeg_reader_last_error(unsigned char* buffer, int capacity);
 }
 
-// local
-#include "LC_source_mgr.h"
+#undef LCJPEG_EXPORT
 
-/**
- * An LC_JPEGReader contains data that needs to be maintained between native
- * function invocations for reading JPEG images.  Its destructor also ensures
- * proper clean-up.
- */
-struct LC_JPEGReader {
-    //
-    // We read image data either from a FILE *or* from an LC_source_mgr.
-    //
-    FILE*                   m_file;
-    LC_source_mgr*          m_src;
-
-    jpeg_decompress_struct  cinfo;
-    jpeg_error_mgr          m_errMgr;
-
-    LC_JPEGReader();
-    ~LC_JPEGReader();
-
-    void setFields( JNIEnv*, jobject jLCJPEGReader );
-    void start_decompress( int maxWidth, int maxHeight );
-
-private:
-    /**
-     * This flag is used to know if the destructor should call
-     * jpeg_finish_decompress() based on whether jpeg_start_decompress() has
-     * been successfully called.
-     */
-    bool m_startedDecompress;
-};
-
-#endif  /* LC_JPEGReader_H */
-/* vim:set et sw=4 ts=4: */
+#endif
