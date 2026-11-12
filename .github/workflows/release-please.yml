@@ -2,11 +2,7 @@ name: release-please
 
 on:
   push:
-    branches: [release]
-  workflow_dispatch:
-  pull_request:
     branches: [master]
-    types: [closed]
 
 permissions:
   actions: write
