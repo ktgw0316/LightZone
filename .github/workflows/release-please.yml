@@ -7,6 +7,7 @@ on:
 permissions:
   actions: write
   contents: write
+  issues: write
   pull-requests: write
 
 jobs:
@@ -26,7 +27,7 @@ jobs:
       - uses: googleapis/release-please-action@v4
         id: release
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
           target-branch: master
