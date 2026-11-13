@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.0.4](https://github.com/ktgw0316/LightZone/compare/v5.0.3...v5.0.4) (2026-11-13)
+
+
+### Performance Improvements
+
+* Update minimum CPU requirement to SSE4.2 ([0867683](https://github.com/ktgw0316/LightZone/commit/08676833c1a341d20dc2c9035b31f4e459a2ebc9))
+
 ## [5.0.3](https://github.com/ktgw0316/LightZone/compare/v5.0.2...v5.0.3) (2026-10-22)
 
 
