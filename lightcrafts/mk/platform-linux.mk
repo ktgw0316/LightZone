@@ -5,6 +5,7 @@ PLATFORM_CFLAGS+=	-fPIC
 
 ifeq ($(PROCESSOR),x86_64)
   CPU_FLAGS=	-march=x86-64-v2
+  PLATFORM_LDFLAGS+=	-Wl,-z,x86-64-v2
 else ifeq ($(PROCESSOR),arm64)
   CPU_FLAGS=	-march=armv8-a
 else ifeq ($(PROCESSOR),$(filter $(PROCESSOR),armhf armv7l))

@@ -14,7 +14,7 @@ jobs:
             distribution: liberica
           - os: macos-15
             distribution: liberica
-          - os: ubuntu-latest
+          - os: ubuntu-24.04
             distribution: liberica
     runs-on: ${{ matrix.os }}
     steps:
