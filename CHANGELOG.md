@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.1.1](https://github.com/ktgw0316/LightZone/compare/v5.1.0...v5.1.1) (2026-11-23)
+
+
+### Bug Fixes
+
+* **linux:** Specify correct ISA level for binaries ([633a6f8](https://github.com/ktgw0316/LightZone/commit/633a6f843e47062230f78b3a577363f114c12f1e))
+
 ## [5.1.0](https://github.com/ktgw0316/LightZone/compare/v5.0.3...v5.1.0) (2026-11-13)
 
 
