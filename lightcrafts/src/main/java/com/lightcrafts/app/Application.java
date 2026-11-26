@@ -35,6 +35,7 @@ import com.lightcrafts.ui.help.HelpConstants;
 import com.lightcrafts.ui.print.PrintLayoutDialog;
 import com.lightcrafts.ui.print.PrintLayoutModel;
 import com.lightcrafts.shell.prefs.PreferencesController;
+import com.lightcrafts.ui.prefs.PreferencesUi;
 import com.lightcrafts.ui.templates.TemplateList;
 import com.lightcrafts.utils.UserCanceledException;
 import com.lightcrafts.utils.file.FileUtil;
@@ -57,8 +58,6 @@ import java.awt.image.RenderedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterAbortException;
 import java.awt.print.PrinterException;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.util.*;
 import java.util.List;
@@ -1344,7 +1343,7 @@ public class Application {
     }
 
     public static void showPreferences(Component parent) {
-        PreferencesController.showDialog(parent);
+        PreferencesController.showDialog(new PreferencesUi(parent));
     }
 
     static ComboFrame getFrameForFile(File file) {

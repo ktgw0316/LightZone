@@ -17,6 +17,7 @@ import static com.lightcrafts.ui.prefs.Locale.LOCALE;
 public class PreferencesDialog extends JPanel {
     private Component parent;
     private PreferencesEffectHandler effectHandler;
+    private PreferencesUi ui;
     private SavePrefsPanel save;
     private CopyrightPrefsPanel copyright;
     private PreferencesPanel general;
@@ -29,11 +30,13 @@ public class PreferencesDialog extends JPanel {
         Component parent,
         PreferencesModel initialModel,
         ImageExportOptions defaultExportOptions,
-        PreferencesEffectHandler effectHandler
+        PreferencesEffectHandler effectHandler,
+        PreferencesUi ui
     ) {
         this.parent = parent;
         model = initialModel;
         this.effectHandler = effectHandler;
+        this.ui = ui;
         save = new SavePrefsPanel(
             model.saveFormat(), defaultExportOptions, this::dispatch
         );
@@ -47,10 +50,11 @@ public class PreferencesDialog extends JPanel {
         Component parent,
         PreferencesModel model,
         ImageExportOptions defaultExportOptions,
-        PreferencesEffectHandler effectHandler
+        PreferencesEffectHandler effectHandler,
+        PreferencesUi ui
     ) {
         new PreferencesDialog(
-            parent, model, defaultExportOptions, effectHandler
+            parent, model, defaultExportOptions, effectHandler, ui
         ).displayDialog();
     }
 
@@ -89,9 +93,9 @@ public class PreferencesDialog extends JPanel {
         for (PreferencesEffect effect : transition.effects()) {
             effectHandler.handle(
                 effect,
-                parent,
                 save.getSelectedExportOptions(),
-                this::dispatch
+                this::dispatch,
+                ui
             );
         }
     }
